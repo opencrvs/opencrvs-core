@@ -305,7 +305,7 @@ export interface IFormFieldBase {
   hideHeader?: boolean
   mode?: THEME_MODE
   hidden?: boolean
-  previewTag?: string
+  previewGroup?: string
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -713,7 +713,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
-  previewTags?: IFormTag[]
+  previewGroups?: IFormTag[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]

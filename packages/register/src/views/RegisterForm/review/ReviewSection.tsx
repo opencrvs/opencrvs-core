@@ -93,6 +93,7 @@ import { IValidationResult } from '@register/utils/validate'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
+  text-transform: lowercase;
 `
 const Row = styled.div`
   display: flex;
@@ -519,22 +520,22 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 field => isVisibleField(field, section) && !isViewOnly(field)
               )
               .map(field => {
-                if (field.previewTag) {
-                  if (!visitedTags.includes(field.previewTag)) {
-                    visitedTags.push(field.previewTag)
+                if (field.previewGroup) {
+                  if (!visitedTags.includes(field.previewGroup)) {
+                    visitedTags.push(field.previewGroup)
 
-                    const baseTag = field.previewTag
+                    const baseTag = field.previewGroup
                     const taggedFields = group.fields.filter(
                       field =>
                         isVisibleField(field, section) &&
                         !isViewOnly(field) &&
-                        field.previewTag === baseTag
+                        field.previewGroup === baseTag
                     )
 
                     const tagDef =
-                      (group.previewTags &&
-                        (group.previewTags.filter(
-                          previewTag => previewTag.id === baseTag
+                      (group.previewGroups &&
+                        (group.previewGroups.filter(
+                          previewGroup => previewGroup.id === baseTag
                         ) as IFormTag[])) ||
                       []
 

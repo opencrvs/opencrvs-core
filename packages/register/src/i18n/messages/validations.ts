@@ -17,7 +17,6 @@ interface IValidationMessages {
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
   required: MessageDescriptor
-  requiredWithLowerCaseMessage: MessageDescriptor
   requiredSymbol: MessageDescriptor
   validBirthRegistrationNumber: MessageDescriptor
   validDeathRegistrationNumber: MessageDescriptor
@@ -127,12 +126,6 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Required',
     description: 'The error message that appears on required fields',
     id: 'validations.required'
-  },
-  requiredWithLowerCaseMessage: {
-    defaultMessage: 'required for registration',
-    description:
-      'The error message that appears on required fields with all lower case characters',
-    id: 'validations.requiredWithLowerCaseMessage'
   },
   requiredSymbol: {
     defaultMessage: '',

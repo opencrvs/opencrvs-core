@@ -417,7 +417,7 @@
                 {
                   "name": "placeOfBirth",
                   "type": "SELECT_WITH_OPTIONS",
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
@@ -517,7 +517,7 @@
                 {
                   "name": "country",
                   "type": "SELECT_WITH_OPTIONS",
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "label": {
                     "defaultMessage": "Country",
                     "description": "Title for the country select",
@@ -559,7 +559,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -601,7 +601,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -647,7 +647,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -697,7 +697,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -755,7 +755,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -804,7 +804,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -853,7 +853,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -902,7 +902,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -951,7 +951,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1000,7 +1000,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "placeOfBirth",
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1042,7 +1042,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "placeOfBirth",
                   "label": {
@@ -1707,7 +1707,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -1738,7 +1738,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -1776,7 +1776,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -1818,7 +1818,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -1864,7 +1864,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1918,7 +1918,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1963,7 +1963,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2008,7 +2008,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2053,7 +2053,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2106,7 +2106,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2151,7 +2151,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2262,7 +2262,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -2294,7 +2294,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "placeholder": {
@@ -2336,7 +2336,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -2382,7 +2382,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -2432,7 +2432,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2490,7 +2490,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2539,7 +2539,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2588,7 +2588,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2637,7 +2637,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2694,7 +2694,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -2743,7 +2743,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -2793,7 +2793,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "permanentAddress",
                   "label": {
@@ -3633,7 +3633,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -3670,7 +3670,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -3712,7 +3712,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -3758,7 +3758,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -3808,7 +3808,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -3866,7 +3866,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -3915,7 +3915,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -3964,7 +3964,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4013,7 +4013,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -4070,7 +4070,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4119,7 +4119,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -4253,7 +4253,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -4294,7 +4294,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -4336,7 +4336,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -4382,7 +4382,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -4432,7 +4432,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4490,7 +4490,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4539,7 +4539,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4588,7 +4588,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4637,7 +4637,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -4694,7 +4694,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -4743,7 +4743,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -4793,7 +4793,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "permanentAddress",
                   "label": {
@@ -6030,7 +6030,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -6056,7 +6056,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6094,7 +6094,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6136,7 +6136,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6182,7 +6182,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6236,7 +6236,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6281,7 +6281,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6326,7 +6326,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6371,7 +6371,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -6424,7 +6424,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6469,7 +6469,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -6573,7 +6573,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -6610,7 +6610,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6652,7 +6652,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6698,7 +6698,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -6748,7 +6748,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6806,7 +6806,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6855,7 +6855,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6904,7 +6904,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -6953,7 +6953,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -7010,7 +7010,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7059,7 +7059,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -7109,7 +7109,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "permanentAddress",
                   "label": {
@@ -7392,7 +7392,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -7423,7 +7423,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7461,7 +7461,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7503,7 +7503,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7549,7 +7549,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7603,7 +7603,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7648,7 +7648,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7693,7 +7693,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7738,7 +7738,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7783,7 +7783,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7828,7 +7828,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "privateHome",
+                  "previewGroup": "privateHome",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7866,7 +7866,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "privateHome",
                   "label": {
@@ -7899,7 +7899,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -7930,7 +7930,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7968,7 +7968,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -8010,7 +8010,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -8056,7 +8056,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8110,7 +8110,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8155,7 +8155,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8200,7 +8200,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8245,7 +8245,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8290,7 +8290,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8335,7 +8335,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "otherInstitution",
+                  "previewGroup": "otherInstitution",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8373,7 +8373,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "otherInstitution",
                   "label": {
@@ -9273,7 +9273,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -9317,7 +9317,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -9368,7 +9368,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -9423,7 +9423,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -9477,7 +9477,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -9544,7 +9544,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -9606,7 +9606,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -9664,7 +9664,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -9726,7 +9726,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -9796,7 +9796,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -9854,7 +9854,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "currentAddress",
+                  "previewGroup": "currentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -9986,7 +9986,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "BGD",
                   "validate": [],
@@ -10036,7 +10036,7 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -10091,7 +10091,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -10150,7 +10150,7 @@
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -10213,7 +10213,7 @@
                     "description": "Title for the address line 3 option 1",
                     "id": "form.field.label.addressLine3"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -10284,7 +10284,7 @@
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -10342,7 +10342,7 @@
                     "description": "Title for the address line 2",
                     "id": "form.field.label.addressLine2"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -10404,7 +10404,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -10462,7 +10462,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -10528,7 +10528,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -10590,7 +10590,7 @@
                     "description": "Title for the postcode field",
                     "id": "form.field.label.postCode"
                   },
-                  "previewTag": "permanentAddress",
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [
@@ -10653,7 +10653,7 @@
                   }
                 }
               ],
-              "previewTags": [
+              "previewGroups": [
                 {
                   "id": "permanentAddress",
                   "label": {

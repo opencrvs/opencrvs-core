@@ -1,8 +1,4 @@
-import {
-  required,
-  IValidationResult,
-  requiredWithLowerCaseMessage
-} from '@register/utils/validate'
+import { required, IValidationResult } from '@register/utils/validate'
 import {
   IFormField,
   IFormSectionData,
@@ -37,11 +33,7 @@ export function getValidationErrorsForField(
   validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
   if (field.required) {
-    if (field.previewTag) {
-      validators.push(requiredWithLowerCaseMessage)
-    } else {
-      validators.push(required)
-    }
+    validators.push(required)
   } else if (!value) {
     validators = []
   }
