@@ -7,7 +7,7 @@ import {
 import {
   getTemplates,
   ITemplates
-} from '@resources/bgd/features/templates/service'
+} from '@resources/zmb/features/templates/service'
 
 interface IDefinitionsResponse {
   forms: IForms
