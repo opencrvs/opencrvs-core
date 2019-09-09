@@ -30,9 +30,9 @@ Then:
 4. **Starting the dev environment (necessary for Ubuntu):**Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo)
    **Starting the dev environment (necessary for OSX):**
    Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find your local IP address and start the dev environment like this: `LOCAL_IP=192.168.0.5 yarn dev`
-5. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
+5. `cd packages/resources && yarn db:backup:restore <<insert country code>>` to restore a pre-populated database with user, location and facility data for your country.
 
-That's it! You should be running OpenCRVS with test users and test locations set to Bangladesh by default. Apps can be found running at the following URLs:
+That's it! You should be running OpenCRVS with test users and test locations. Apps can be found running at the following URLs:
 
 - Styleguide: http://localhost:6060/
 - Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
@@ -62,7 +62,7 @@ Start the development environment as described above, then:
 6. Manually add the IDs into user-mgnt/resources/populate.ts
 7. `cd packages/user-mgnt && yarn populate && cd ../..`
 8. Login to the OpenHIM console and upload the base config file.
-9. `yarn db:backup:create`
+9. `cd packages/resources && yarn db:backup:create <<insert country code>>`
 10. Commit and push the new db dump archive files that have been created.
 
 ### tmuxed development setup
@@ -94,7 +94,7 @@ For the command above there is:
 
 To deploy to staging we use the same docker-compose files that are used in the docker setup above with a few minor tweaks to configure the stack for staging. The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files. **Note:** This deployment is currently automated so that every time we push to master the build will be deployed during the CI process.
 
-The deploy is easily executed by just running: `yarn deploy:staging` - you will need ssh access to the server for this to work.
+The deploy is easily executed by just running: `yarn deploy:staging <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>` - you will need ssh access to the server for this to work.
 
 The applications will be available here:
 
@@ -115,9 +115,7 @@ To scale a service change the deploy->replicas setting in the corresponding comp
 
 Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environemt as well.
 
-```
-yarn deploy:qa VERSION
-```
+`yarn deploy:qa <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
 
 The applications will be available here:
 
