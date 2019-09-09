@@ -226,7 +226,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
               className="item"
               onClick={this.handleClick}
             >
-              {intl.formatMessage(formMessages.changeAssignedOffice)}
+              {intl.formatMessage(formMessages.changeButtonLabel, {
+                fieldName
+              })}
             </LinkButton>
           </InputSection>
         )}
@@ -241,7 +243,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         <ResponsiveModal
           id="office-search-modal"
           title={intl.formatMessage(formMessages.searchFieldModalTitle, {
-            fieldName: fieldName
+            fieldName
           })}
           width={918}
           contentHeight={280}
