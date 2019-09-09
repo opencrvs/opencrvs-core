@@ -24,11 +24,11 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-docker run --rm -v $DIR/src/$1/backups:/src/$1/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/src/$1/backups/hearth-dev.gz"
+docker run --rm -v $DIR/src/$COUNTRY/backups:/src/$COUNTRY/backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/src/$COUNTRY/backups/hearth-dev.gz"
 
-docker run --rm -v $DIR/src/$1/backups:/src/$1/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/src/$1/backups/openhim-dev.gz"
+docker run --rm -v $DIR/src/$COUNTRY/backups:/src/$COUNTRY/backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/src/$COUNTRY/backups/openhim-dev.gz"
 
-docker run --rm -v $DIR/src/$1/backups:/src/$1/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/src/$1/backups/user-mgnt.gz"
+docker run --rm -v $DIR/src/$COUNTRY/backups:/src/$COUNTRY/backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/src/$COUNTRY/backups/user-mgnt.gz"
