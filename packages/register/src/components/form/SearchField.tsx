@@ -164,6 +164,16 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         id: 'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5',
         name: 'Moktarpur Union Parishad',
         detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
+      },
+      {
+        id: '033518d8-7c18-482f-8633-8344ce81405d',
+        name: 'Nagari Union Parishad',
+        detailedLocation: 'Nagari, Kaliganj, Gazipur, Dhaka'
+      },
+      {
+        id: '79ad255c-7b36-4d8b-813f-971deee192eb',
+        name: 'Bhurungamari Union Parishad',
+        detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
       }
     ]
     const selectedValue = this.state.selectedValue || locations[0].name
