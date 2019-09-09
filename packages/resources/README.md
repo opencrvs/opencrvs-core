@@ -36,7 +36,7 @@ This feature, imports and converts the administrative divisions for a country in
 
 ## Facilities
 
-This feature, imports and converts civil registration offices and health facilities into [FHIR Location](https://www.hl7.org/fhir/location.html) objects.
+This feature, imports and converts civil registration offices and health facilities into [FHIR Location](https://www.hl7.org/fhir/location.html) objects. Each facility must have a unique id.
 
 [This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc)
 
@@ -44,7 +44,7 @@ This feature, imports and converts civil registration offices and health facilit
 
 ## Employees
 
-This feature, imports and converts an employee list into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The list is a test list based on the users and permissions in the [user-mgnt package.](https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts)
+This feature, imports and converts a test user and employee list from a csv file into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The facility id for the users working location must match a facility unique id
 
 [This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc)
 
