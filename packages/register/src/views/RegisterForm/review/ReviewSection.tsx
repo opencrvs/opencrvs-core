@@ -46,7 +46,8 @@ import { getLanguage } from '@register/i18n/selectors'
 import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
-  IntlShape
+  IntlShape,
+  MessageDescriptor
 } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -68,6 +69,8 @@ import {
   Event,
   Section,
   BirthSection,
+  IFormTag,
+  IFormSectionGroup,
   SEARCH_FIELD
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
@@ -94,6 +97,7 @@ import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
+  text-transform: lowercase;
 `
 const Row = styled.div`
   display: flex;
@@ -180,7 +184,7 @@ type State = {
   displayEditDialog: boolean
   editClickedSectionId: Section | null
   editClickedSectionGroupId: string
-  editClickFieldName: string
+  editClickFieldName?: string
   activeSection: Section | null
 }
 type FullProps = IProps & IntlShapeProps
@@ -463,7 +467,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   editLinkClickHandler = (
     sectionId: Section | null,
     sectionGroupId: string,
-    fieldName: string
+    fieldName?: string
   ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
@@ -489,74 +493,193 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  isVisibleField(field: IFormField, section: IFormSection) {
+    const { draft, offlineResources } = this.props
+    const conditionalActions = getConditionalActionsForField(
+      field,
+      draft.data[section.id] || {},
+      offlineResources,
+      draft.data
+    )
+    return !conditionalActions.includes('hide')
+  }
+
+  isViewOnly(field: IFormField) {
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
+      type => type === field.type
+    )
+  }
+
+  getFieldValueWithErrorMessage(
+    section: IFormSection,
+    field: IFormField,
+    errorsOnField: any
+  ) {
+    return (
+      <RequiredField id={`required_label_${section.id}_${field.name}`}>
+        {field.previewGroup && this.props.intl.formatMessage(field.label) + ' '}
+        {this.props.intl.formatMessage(
+          errorsOnField.message,
+          errorsOnField.props
+        )}
+      </RequiredField>
+    )
+  }
+
+  getRenderableField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    fieldLabel: MessageDescriptor,
+    fieldName: string,
+    value: IFormFieldValue | JSX.Element | undefined
+  ) {
+    const { intl } = this.props
+
+    return {
+      label: intl.formatMessage(fieldLabel),
+      value,
+      action: {
+        id: `btn_change_${section.id}_${fieldName}`,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          this.editLinkClickHandler(section.id, group.id, fieldName)
+        }
+      }
+    }
+  }
+
+  getPreviewGroupsField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    visitedTags: string[],
+    errorsOnFields: any
+  ) {
+    const { intl, draft, offlineResources, language } = this.props
+
+    if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
+      visitedTags.push(field.previewGroup)
+
+      const baseTag = field.previewGroup
+      const taggedFields = group.fields.filter(
+        field =>
+          this.isVisibleField(field, section) &&
+          !this.isViewOnly(field) &&
+          field.previewGroup === baseTag
+      )
+
+      const tagDef =
+        (group.previewGroups &&
+          (group.previewGroups.filter(
+            previewGroup => previewGroup.id === baseTag
+          ) as IFormTag[])) ||
+        []
+
+      const values = taggedFields
+        .map(field => {
+          const errorsOnField = errorsOnFields[section.id][field.name]
+
+          return errorsOnField.length > 0
+            ? this.getFieldValueWithErrorMessage(
+                section,
+                field,
+                errorsOnField[0]
+              )
+            : renderValue(
+                draft,
+                section,
+                field,
+                intl,
+                offlineResources,
+                language
+              )
+        })
+        .filter(value => value)
+
+      let completeValue = values[0]
+      values.shift()
+      values.forEach(
+        value =>
+          (completeValue = (
+            <>
+              {completeValue}
+              <br />
+              {value}
+            </>
+          ))
+      )
+
+      return this.getRenderableField(
+        section,
+        group,
+        (tagDef[0] && tagDef[0].label) || field.label,
+        (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
+        completeValue
+      )
+    }
+  }
+
+  getSinglePreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    errorsOnFields: any
+  ) {
+    const { intl, draft, offlineResources, language } = this.props
+    const errorsOnField = errorsOnFields[section.id][field.name]
+
+    const value =
+      errorsOnField.length > 0
+        ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+        : renderValue(draft, section, field, intl, offlineResources, language)
+
+    return this.getRenderableField(
+      section,
+      group,
+      field.label,
+      field.name,
+      value
+    )
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: any
   ) => {
-    const { intl, draft, offlineResources, language } = this.props
-    const isVisibleField = (field: IFormField, section: IFormSection) => {
-      const conditionalActions = getConditionalActionsForField(
-        field,
-        draft.data[section.id] || {},
-        offlineResources,
-        draft.data
-      )
-      return !conditionalActions.includes('hide')
-    }
+    const { intl, draft } = this.props
 
-    const isViewOnly = (field: IFormField) => {
-      return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
-        type => type === field.type
-      )
-    }
     return formSections.map(section => {
       let items: any[] = []
+      let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
         section,
         draft.data[section.id] || {}
       ).forEach(group => {
-        items = items.concat(
-          group.fields
-            .filter(
-              field => isVisibleField(field, section) && !isViewOnly(field)
-            )
-            .map(field => {
-              const errorsOnField =
-                // @ts-ignore
-                errorsOnFields[section.id][field.name]
-
-              return {
-                label: intl.formatMessage(field.label),
-                value:
-                  errorsOnField.length > 0 ? (
-                    <RequiredField
-                      id={`required_label_${section.id}_${field.name}`}
-                    >
-                      {intl.formatMessage(
-                        errorsOnField[0].message,
-                        errorsOnField[0].props
-                      )}
-                    </RequiredField>
-                  ) : (
-                    renderValue(
-                      draft,
+        items = items
+          .concat(
+            group.fields
+              .filter(
+                field =>
+                  this.isVisibleField(field, section) && !this.isViewOnly(field)
+              )
+              .map(field => {
+                return field.previewGroup
+                  ? this.getPreviewGroupsField(
                       section,
+                      group,
                       field,
-                      intl,
-                      offlineResources,
-                      language
+                      visitedTags,
+                      errorsOnFields
                     )
-                  ),
-                action: {
-                  id: `btn_change_${section.id}_${field.name}`,
-                  label: intl.formatMessage(buttonMessages.change),
-                  handler: () => {
-                    this.editLinkClickHandler(section.id, group.id, field.name)
-                  }
-                }
-              }
-            })
-        )
+                  : this.getSinglePreviewField(
+                      section,
+                      group,
+                      field,
+                      errorsOnFields
+                    )
+              })
+          )
+          .filter(item => item)
       })
       return {
         id: section.id,
