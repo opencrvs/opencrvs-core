@@ -25,6 +25,15 @@ describe("PDF template's logged-in user field related transformer tests", () => 
       expect(transformedValue).toEqual('')
     })
   })
+  describe('LoggedInUserName transformer tests', () => {
+    it('Returns the name properly', () => {
+      const transformedValue = userTransformers.LoggedInUserName(
+        userDetails,
+        intl
+      )
+      expect(transformedValue).toEqual('Shakib Al Hasan')
+    })
+  })
   describe('LoggedInUserOfficeName transformer tests', () => {
     it('Returns the office name properly', () => {
       const transformedValue = userTransformers.LoggedInUserOfficeName(
@@ -62,6 +71,22 @@ describe("PDF template's logged-in user field related transformer tests", () => 
         intl
       )
       expect(transformedValue).toEqual('')
+    })
+  })
+  describe('LoggedInUserRole transformer tests', () => {
+    it('Returns the role properly', () => {
+      const intl = createIntl({
+        locale: 'en',
+        messages: {
+          FIELD_AGENT: 'Field Agent'
+        }
+      })
+
+      const transformedValue = userTransformers.LoggedInUserRole(
+        userDetails,
+        intl
+      )
+      expect(transformedValue).toEqual('Field Agent')
     })
   })
   describe('LoggedInUserSignature transformer tests', () => {
