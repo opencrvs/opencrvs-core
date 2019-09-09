@@ -48,7 +48,7 @@ interface IFormMessages {
   causeOfDeathNotice: MessageDescriptor
   causeOfDeathTitle: MessageDescriptor
   certification: MessageDescriptor
-  changeAssignedOffice: MessageDescriptor
+  changeButtonLabel: MessageDescriptor
   childDateOfBirth: MessageDescriptor
   childFamilyName: MessageDescriptor
   childFamilyNameEng: MessageDescriptor
@@ -531,11 +531,6 @@ const messagesToDefine: IFormMessages = {
       'Certification regarding NGO worker authorized by registrar in favour of date of birth, or',
     description: 'Certification regarding NGO worker',
     id: 'form.section.documents.list.certification'
-  },
-  changeAssignedOffice: {
-    defaultMessage: 'Change assigned office',
-    description: 'Edit button text',
-    id: 'form.field.SearchField.changeAssignedOffice'
   },
   childDateOfBirth: {
     defaultMessage: 'Date of birth',
@@ -1545,9 +1540,14 @@ const messagesToDefine: IFormMessages = {
     description: 'Relationship place holder',
     id: 'form.field.label.relationshipPlaceHolder'
   },
+  changeButtonLabel: {
+    id: 'form.field.SearchField.changeButtonLabel',
+    defaultMessage: `{fieldName, select, registrationOffice {Change assigned office} birthLocation {Change health institute}}`,
+    description: 'Edit button text'
+  },
   searchFieldModalTitle: {
     id: 'form.field.SearchField.modalTitle',
-    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office} birthLocation {Health institutions}}`,
     description: 'Modal title'
   },
   searchFieldPlaceHolderText: {
