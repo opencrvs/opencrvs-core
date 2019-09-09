@@ -209,6 +209,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 2,
               registered: 7,
@@ -1426,6 +1427,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 2,
               registered: 7,

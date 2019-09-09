@@ -105,50 +105,6 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register or validate scope')
         )
       }
-    },
-    async countEventRegistrationsByStatus(
-      _,
-      { status = null, locationIds = null },
-      authHeader
-    ) {
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const registrations = await getCompositions(
-          status,
-          locationIds,
-          authHeader,
-          0,
-          0
-        )
-        return { count: registrations.totalItems }
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a register or validate scope')
-        )
-      }
-    },
-    async countEventRegistrations(_, { locationIds = null }, authHeader) {
-      const declaredBundle = await getCompositions(
-        'DECLARED',
-        locationIds,
-        authHeader,
-        0,
-        0
-      )
-      const rejectedBundle = await getCompositions(
-        'REJECTED',
-        locationIds,
-        authHeader,
-        0,
-        0
-      )
-
-      return {
-        declared: declaredBundle.totalItems,
-        rejected: rejectedBundle.totalItems
-      }
     }
   },
 

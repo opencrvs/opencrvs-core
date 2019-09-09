@@ -27,8 +27,8 @@ import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
 import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  LIST_EVENT_REGISTRATIONS_BY_STATUS
+  LIST_EVENT_REGISTRATIONS_BY_STATUS,
+  COUNT_REGISTRATION_QUERY
 } from '@register/views/RegistrationHome/queries'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
@@ -293,10 +293,9 @@ export class InProgressTabComponent extends React.Component<
 
     return (
       <Query
-        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
+        query={COUNT_REGISTRATION_QUERY}
         variables={{
-          locationIds: [registrarLocationId],
-          status: EVENT_STATUS.IN_PROGRESS
+          locationIds: [registrarLocationId]
         }}
       >
         {({
@@ -360,9 +359,7 @@ export class InProgressTabComponent extends React.Component<
                   }
                 >
                   {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
+                  {(data && data.countEvents && data.countEvents.inProgress) ||
                     0}
                   )
                 </BlueButton>
@@ -378,9 +375,7 @@ export class InProgressTabComponent extends React.Component<
                   }
                 >
                   {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
+                  {(data && data.countEvents && data.countEvents.inProgress) ||
                     0}
                   )
                 </WhiteButton>

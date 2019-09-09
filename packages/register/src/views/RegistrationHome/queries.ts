@@ -3,21 +3,11 @@ import gql from 'graphql-tag'
 export const COUNT_REGISTRATION_QUERY = gql`
   query data($locationIds: [String]) {
     countEvents(locationIds: $locationIds) {
+      inProgress
       declared
       validated
       registered
       rejected
-    }
-  }
-`
-
-export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
-  query data($locationIds: [String], $status: String) {
-    countEventRegistrationsByStatus(
-      locationIds: $locationIds
-      status: $status
-    ) {
-      count
     }
   }
 `

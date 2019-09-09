@@ -202,6 +202,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 0,
               registered: 7,
@@ -758,6 +759,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 0,
               registered: 2,
@@ -902,6 +904,7 @@ describe('Tablet tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 0,
               registered: 2,

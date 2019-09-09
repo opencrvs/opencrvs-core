@@ -61,6 +61,13 @@ export const resolvers: GQLResolver = {
           applicationLocationId: locationIds.join(',')
         }) ||
         {}
+
+      const inProgressCriteria: ISearchCriteria = {
+        ...searchCriteria,
+        status: ['IN_PROGRESS']
+      }
+      const inProgressResult = await postSearch(authHeader, inProgressCriteria)
+
       const declaredCriteria: ISearchCriteria = {
         ...searchCriteria,
         status: ['DECLARED']
@@ -85,6 +92,11 @@ export const resolvers: GQLResolver = {
       }
       const rejectedResult = await postSearch(authHeader, rejectedCriteria)
       return {
+        inProgress:
+          (inProgressResult &&
+            inProgressResult.hits &&
+            inProgressResult.hits.total) ||
+          0,
         declared:
           (declaredResult &&
             declaredResult.hits &&

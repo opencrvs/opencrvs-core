@@ -41,6 +41,7 @@ type DeathEventSearchSet implements EventSearchSet {
 }
 
 type EventCount {
+  inProgress: Int
   declared: Int
   validated: Int
   registered: Int

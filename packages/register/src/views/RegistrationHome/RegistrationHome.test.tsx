@@ -4,10 +4,7 @@ import { queries } from '@register/profile/queries'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import { createTestComponent, mockUserResponse } from '@register/tests/util'
-import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrationHome/queries'
+import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
 import {
   EVENT_STATUS,
   RegistrationHome
@@ -83,6 +80,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 0,
               registered: 7,
@@ -92,17 +90,21 @@ describe('RegistrationHome In Progress tab related tests', () => {
         }
       },
       {
+        // do we need both of these?
         request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
           data: {
-            countEventRegistrationsByStatus: {
-              count: 3
+            countEvents: {
+              inProgress: 3,
+              declared: 10,
+              validated: 0,
+              registered: 7,
+              rejected: 5
             }
           }
         }
@@ -152,6 +154,7 @@ describe('RegistrationHome In Progress tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 5,
               declared: 10,
               validated: 0,
               registered: 7,
@@ -161,17 +164,21 @@ describe('RegistrationHome In Progress tab related tests', () => {
         }
       },
       {
+        // do we need both fo these?
         request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
           data: {
-            countEventRegistrationsByStatus: {
-              count: 5
+            countEvents: {
+              inProgress: 5,
+              declared: 10,
+              validated: 0,
+              registered: 7,
+              rejected: 5
             }
           }
         }

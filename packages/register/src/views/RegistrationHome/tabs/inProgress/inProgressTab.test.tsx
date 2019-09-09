@@ -21,9 +21,9 @@ import {
   resizeWindow
 } from '@register/tests/util'
 import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
   FETCH_REGISTRATION_BY_COMPOSITION,
-  LIST_EVENT_REGISTRATIONS_BY_STATUS
+  LIST_EVENT_REGISTRATIONS_BY_STATUS,
+  COUNT_REGISTRATION_QUERY
 } from '@register/views/RegistrationHome/queries'
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import { merge } from 'lodash'
@@ -71,16 +71,19 @@ describe('In Progress tab', () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
           data: {
-            countEventRegistrationsByStatus: {
-              count: 5
+            countEvents: {
+              inProgress: 5,
+              declared: 10,
+              validated: 0,
+              registered: 7,
+              rejected: 5
             }
           }
         }
@@ -147,16 +150,19 @@ describe('In Progress tab', () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
+          query: COUNT_REGISTRATION_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
           }
         },
         result: {
           data: {
-            countEventRegistrationsByStatus: {
-              count: 5
+            countEvents: {
+              inProgress: 5,
+              declared: 10,
+              validated: 0,
+              registered: 7,
+              rejected: 5
             }
           }
         }

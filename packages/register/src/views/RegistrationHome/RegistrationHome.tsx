@@ -35,10 +35,7 @@ import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrationHome/NotificationToast'
-import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrationHome/queries'
+import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
@@ -177,68 +174,6 @@ export class RegistrationHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  renderInProgressTabWithCount = (
-    tabId: string,
-    drafts: IApplication[],
-    registrarLocationId: string
-  ) => {
-    const { intl } = this.props
-
-    return (
-      <Query
-        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
-        variables={{
-          locationIds: [registrarLocationId],
-          status: EVENT_STATUS.IN_PROGRESS
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-
-          return (
-            <IconTab
-              id={`tab_${TAB_ID.inProgress}`}
-              key={TAB_ID.inProgress}
-              active={tabId === TAB_ID.inProgress}
-              align={ICON_ALIGNMENT.LEFT}
-              icon={() => <StatusProgress />}
-              onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
-            >
-              {intl.formatMessage(messages.inProgress)} (
-              {(drafts &&
-                drafts.filter(
-                  draft =>
-                    draft.submissionStatus ===
-                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                ).length +
-                  ((data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
-                    0)) ||
-                0}
-              )
-            </IconTab>
-          )
-        }}
-      </Query>
-    )
-  }
-
   onPageChange = (newPageNumber: number) => {
     if (this.props.tabId === TAB_ID.readyForReview) {
       this.setState({ reviewCurrentPage: newPageNumber })
@@ -252,12 +187,13 @@ export class RegistrationHomeView extends React.Component<
     return <RowHistoryView eventId={itemId} />
   }
 
-  count(count: number, status: string[]) {
+  subtractApplicationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.outboxApplications.filter(
       app => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
   }
+
   render() {
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
     const registrarLocationId = userDetails && getUserLocation(userDetails).id
@@ -272,6 +208,7 @@ export class RegistrationHomeView extends React.Component<
           variables={{
             locationIds: [registrarLocationId]
           }}
+          pollInterval={window.config.UI_POLLING_INTERVAL}
         >
           {({
             loading,
@@ -301,19 +238,37 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
-            const declaredCount = this.count(data.countEvents.declared, [
-              SUBMISSION_STATUS.READY_TO_REGISTER,
-              SUBMISSION_STATUS.REGISTERING
-            ])
+            // ignore counts waiting to process or being processed right now
+            // TODO: do this for other states
+            const declaredAndNotProcessingCount = this.subtractApplicationsWithStatus(
+              data.countEvents.declared,
+              [
+                SUBMISSION_STATUS.READY_TO_REGISTER,
+                SUBMISSION_STATUS.REGISTERING
+              ]
+            )
 
             return (
               <>
                 <TopBar>
-                  {this.renderInProgressTabWithCount(
-                    tabId,
-                    drafts,
-                    registrarLocationId as string
-                  )}
+                  <IconTab
+                    id={`tab_${TAB_ID.inProgress}`}
+                    key={TAB_ID.inProgress}
+                    active={tabId === TAB_ID.inProgress}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusProgress />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
+                    }
+                  >
+                    {intl.formatMessage(messages.inProgress)} (
+                    {drafts.filter(
+                      draft =>
+                        draft.submissionStatus ===
+                        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                    ).length + data.countEvents.inProgress}
+                    )
+                  </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.readyForReview}`}
                     key={TAB_ID.readyForReview}
@@ -326,8 +281,9 @@ export class RegistrationHomeView extends React.Component<
                   >
                     {intl.formatMessage(messages.readyForReview)} (
                     {this.userHasRegisterScope()
-                      ? declaredCount + data.countEvents.validated
-                      : declaredCount}
+                      ? declaredAndNotProcessingCount +
+                        data.countEvents.validated
+                      : declaredAndNotProcessingCount}
                     )
                   </IconTab>
                   <IconTab

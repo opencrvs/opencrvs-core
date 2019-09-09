@@ -393,11 +393,6 @@ type Query {
     count: Int
     skip: Int
   ): EventRegResultSet
-  countEventRegistrationsByStatus(
-    locationIds: [String]
-    status: String
-  ): EventRegCount
-  countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }
 

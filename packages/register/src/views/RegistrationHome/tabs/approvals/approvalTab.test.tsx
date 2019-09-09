@@ -211,6 +211,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         result: {
           data: {
             countEvents: {
+              inProgress: 3,
               declared: 10,
               validated: 2,
               registered: 7,
