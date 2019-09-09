@@ -520,7 +520,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
-  getPreviewField(
+  getRenderableField(
     section: IFormSection,
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
@@ -603,16 +603,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ))
       )
 
-      return (
-        (tagDef[0] &&
-          this.getPreviewField(
-            section,
-            group,
-            tagDef[0].label,
-            tagDef[0].fieldToRedirect || '',
-            completeValue
-          )) ||
-        null
+      return this.getRenderableField(
+        section,
+        group,
+        (tagDef[0] && tagDef[0].label) || field.label,
+        (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
+        completeValue
       )
     }
   }
@@ -631,7 +627,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
         : renderValue(draft, section, field, intl, offlineResources, language)
 
-    return this.getPreviewField(section, group, field.label, field.name, value)
+    return this.getRenderableField(
+      section,
+      group,
+      field.label,
+      field.name,
+      value
+    )
   }
 
   transformSectionData = (
