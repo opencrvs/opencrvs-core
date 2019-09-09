@@ -354,9 +354,9 @@ function GeneratedInputField({
         fieldLabel={fieldDefinition.label}
         isFieldRequired={fieldDefinition.required as boolean}
         fieldValue={fieldDefinition.initialValue as IDynamicValues}
-        onModalComplete={(label: string, value: string) =>
+        onModalComplete={(label: string, value: string) => {
           onSetFieldValue(fieldDefinition.name, { label, value })
-        }
+        }}
       />
     )
   }
