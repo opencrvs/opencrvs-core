@@ -1,10 +1,11 @@
 import { getUserDetails, getUserLocation } from '@performance/utils/userUtils'
 import { user, userDetails } from '@performance/tests/util'
 import { cloneDeep } from 'lodash'
+import { GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 
 describe('getUserDetails', () => {
   it('returns the correctly formatted user details', () => {
-    expect(getUserDetails(user)).toEqual(userDetails)
+    expect(getUserDetails((user as unknown) as GQLUser)).toEqual(userDetails)
   })
 })
 

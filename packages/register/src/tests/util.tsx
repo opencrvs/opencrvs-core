@@ -135,18 +135,26 @@ export const selectOption = (
   wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
   selector: string,
   option: string
-): string => {
-  const input = wrapper
-    .find(`${selector} input`)
-    .instance() as React.InputHTMLAttributes<HTMLInputElement>
-  input.value = option.charAt(0)
-  wrapper.find(`${selector} input`).simulate('change', {
-    target: { value: option.charAt(0) }
-  })
-  wrapper
-    .find(`${selector} .react-select__menu div[children="${option}"]`)
+): ReactWrapper => {
+  const input = wrapper.find(selector).hostNodes()
+
+  input
+    .find('input')
+    .simulate('focus')
+    .update()
+  input
+    .find('.react-select__control')
+    .simulate('mousedown')
+    .update()
+  input
+    .update()
+    .find('.react-select__option')
+    .findWhere((el: ReactWrapper) => el.text() === option)
+    .hostNodes()
     .simulate('click')
-  return `${selector} .react-select__single-value`
+    .update()
+
+  return input.find('.react-select__control')
 }
 
 const currentUserId = '123'
@@ -1896,8 +1904,20 @@ export const userDetails = {
       ]
     }
   ],
-  signature: {
-    data: `data:image/png;base64,${validImageB64String}`
+  localRegistrar: {
+    role: 'LOCAL_REGISTRAR',
+    signature: {
+      data: `data:image/png;base64,${validImageB64String}`,
+      type: 'image/png'
+    },
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Mohammad',
+        familyName: 'Ashraful',
+        __typename: 'HumanName'
+      }
+    ]
   }
 }
 
@@ -1989,7 +2009,23 @@ export const mockUserResponse = {
       },
       __typename: 'User',
       signature: {
-        data: `data:image/png;base64,${validImageB64String}`
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            firstNames: 'Mohammad',
+            familyName: 'Ashraful',
+            __typename: 'HumanName'
+          }
+        ]
       }
     }
   }
@@ -2057,8 +2093,22 @@ export const mockRegistrarUserResponse = {
       },
       role: 'LOCAL_REGISTRAR',
       signature: {
-        data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo',
+        data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
       },
       __typename: 'User'
     }

@@ -32,7 +32,11 @@ export interface IUserDetails {
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
   language: string
-  signature?: GQLSignature
+  localRegistrar: {
+    name: Array<GQLHumanName | null>
+    role?: string
+    signature?: GQLSignature
+  }
 }
 
 export function getUserDetails(user: GQLUser): IUserDetails {
@@ -46,10 +50,11 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     status,
     userMgntUserID,
     practitionerId,
-    signature
+    localRegistrar
   } = user
   const userDetails: IUserDetails = {
-    language: getDefaultLanguage()
+    language: getDefaultLanguage(),
+    localRegistrar
   }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID
@@ -104,10 +109,6 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     if (potentialCatchmentAreas !== undefined) {
       userDetails.catchmentArea = potentialCatchmentAreas
     }
-  }
-
-  if (signature) {
-    userDetails.signature = signature
   }
 
   return userDetails

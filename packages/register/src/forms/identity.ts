@@ -11,6 +11,7 @@ export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
 export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
+export const SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 
 export const birthIdentityOptions = [
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },

@@ -68,7 +68,8 @@ describe('when user logs in', () => {
 
   const currentUserDetails: IUserDetails = {
     language: 'en',
-    userMgntUserID: 'shakib75'
+    userMgntUserID: 'shakib75',
+    localRegistrar: { name: [] }
   }
 
   const indexedDB = {
@@ -254,7 +255,7 @@ describe('when user is in the register form for birth event', () => {
         '#countryPermanent',
         'United States of America'
       )
-      expect(component.find(select).text()).toEqual('United States of America')
+      expect(select.text()).toEqual('United States of America')
     })
     it('takes field agent to declaration submitted page when save button is clicked', () => {
       localStorage.getItem = jest.fn(

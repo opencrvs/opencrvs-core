@@ -2,7 +2,7 @@ import * as React from 'react'
 import { SearchBlue } from '../icons'
 import styled from 'styled-components'
 
-const Wrapper = styled.form`
+const Wrapper = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.colors.background};
   display: flex;
@@ -45,6 +45,14 @@ export class SearchInputWithIcon extends React.Component<IProps, IState> {
       this.state.searchParam && this.props.searchHandler(this.state.searchParam)
     )
   }
+  searchOnEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      return (
+        this.state.searchParam &&
+        this.props.searchHandler(this.state.searchParam)
+      )
+    }
+  }
 
   onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ searchParam: event.target.value })
@@ -52,13 +60,14 @@ export class SearchInputWithIcon extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <Wrapper action="javascript:void(0);" onSubmit={this.search}>
+      <Wrapper>
         <SearchBlue id="searchInputIcon" onClick={this.search} />
         <SearchTextInput
           id="searchInputText"
           type="text"
           placeholder={this.props.placeHolderText}
           onChange={this.onChangeHandler}
+          onKeyPress={this.searchOnEnterPress}
           value={this.state.searchParam}
         />
       </Wrapper>

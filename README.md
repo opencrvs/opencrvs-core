@@ -36,7 +36,6 @@ That's it! You should be running OpenCRVS with test users and test locations. Ap
 
 - Styleguide: http://localhost:6060/
 - Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
-  - More test users can be found from `packages/user-mgnt/resources/populate.ts`
 - Register: http://localhost:3000/
 - Performance management: http://localhost:3001/
 
@@ -56,14 +55,9 @@ Start the development environment as described above, then:
 
 1. Start the dev environment - as explained above.
 2. Populate reference data for your country requirements from the resources package. `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
-3. Curl the practioners from hearth using the mobile phone numbers in resources/src/<<insert alpha3 country code>>/features/employees/generated/test-employees.csv to get the associated PractitionerRole id. e.g: `curl http://localhost:3447/fhir/Practitioner\?telecom\=phone\|01711111111`
-4. Curl the PractitionerRole resource to get the location IDs. e.g.: `curl http://localhost:3447/fhir/PractitionerRole/<<insert id>>`
-5. Curl the Locations by ID to check them and find the ones that should be inserted into user-mgnt/resources/populate.ts. Check the comments in user-mgnt/resources/populate.ts
-6. Manually add the IDs into user-mgnt/resources/populate.ts
-7. `cd packages/user-mgnt && yarn populate && cd ../..`
-8. Login to the OpenHIM console and upload the base config file.
-9. `cd packages/resources && yarn db:backup:create <<insert country code>>`
-10. Commit and push the new db dump archive files that have been created.
+3. Login to the OpenHIM console and upload the base config file.
+4. `cd packages/resources && yarn db:backup:create <<insert country code>>`
+5. Commit and push the new db dump archive files that have been created.
 
 ### tmuxed development setup
 

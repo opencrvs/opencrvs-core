@@ -29,9 +29,17 @@ export const FETCH_USER = gql`
         name
         status
       }
-      signature {
-        data
-        type
+      localRegistrar {
+        name {
+          use
+          firstNames
+          familyName
+        }
+        role
+        signature {
+          data
+          type
+        }
       }
     }
   }

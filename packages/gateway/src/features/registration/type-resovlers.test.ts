@@ -208,6 +208,12 @@ describe('Registration type resolvers', () => {
     expect(maritalStatus).toBe('Married')
   })
 
+  it('returns occupation', () => {
+    // @ts-ignore
+    const maritalStatus = typeResolvers.Person.occupation(mockPatient)
+    expect(maritalStatus).toBe('Some Occupation')
+  })
+
   it('returns multipleBirth', () => {
     // @ts-ignore
     const multipleBirth = typeResolvers.Person.multipleBirth(mockPatient)

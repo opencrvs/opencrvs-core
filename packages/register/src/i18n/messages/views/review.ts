@@ -31,6 +31,7 @@ interface IReviewMessages {
   validateCompleteApplicationActionDescription: MessageDescriptor
   validateApplicationActionModalTitle: MessageDescriptor
   validateApplicationActionModalDescription: MessageDescriptor
+  govtName: MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
@@ -193,23 +194,12 @@ const messagesToDefine: IReviewMessages = {
       'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     description: 'Zero documents text',
     id: 'review.documents.zeroDocumentsText'
-  }
-}
-
-export const messages: IReviewMessages = defineMessages(messagesToDefine)
-
-interface IDynamicReviewMessages {
-  [key: string]: MessageDescriptor
-}
-
-const dynamicMessagesToDefine = {
-  bgdGovtName: {
-    id: 'review.header.title.govtName.bgd',
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
   }
 }
 
-export const dynamicMessages: IDynamicReviewMessages = defineMessages(
-  dynamicMessagesToDefine
-)
+export const messages: IReviewMessages = defineMessages(messagesToDefine)
