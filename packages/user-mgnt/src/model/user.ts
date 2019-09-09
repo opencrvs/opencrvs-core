@@ -19,6 +19,11 @@ interface ISignature {
   type: string
   data: string
 }
+interface ILocalRegistrar {
+  name: IUserName[]
+  role?: string
+  signature: ISignature
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -34,6 +39,7 @@ export interface IUser {
   catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
+  localRegistrar: ILocalRegistrar
   status: string
   deviceId?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]

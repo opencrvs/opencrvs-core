@@ -787,17 +787,17 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LoggedInUserSignature",
+          "operation": "LocalRegistrarUserSignature",
           "baseData": "userdetails"
         },
         {
           "field": "registrarName",
-          "operation": "LoggedInUserName",
+          "operation": "LocalRegistrarUserName",
           "baseData": "userdetails"
         },
         {
           "field": "role",
-          "operation": "LoggedInUserRole",
+          "operation": "LocalRegistrarUserRole",
           "baseData": "userdetails"
         }
       ],
@@ -1270,17 +1270,17 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LoggedInUserSignature",
+          "operation": "LocalRegistrarUserSignature",
           "baseData": "userdetails"
         },
         {
           "field": "registrarName",
-          "operation": "LoggedInUserName",
+          "operation": "LocalRegistrarUserName",
           "baseData": "userdetails"
         },
         {
           "field": "role",
-          "operation": "LoggedInUserRole",
+          "operation": "LocalRegistrarUserRole",
           "baseData": "userdetails"
         }
       ],

@@ -18,8 +18,7 @@ const token = jwt.sign(
   }
 )
 
-// @ts-ignore
-const mockUser: IUser & { password: string } = {
+const mockUser = ({
   name: [
     {
       use: 'en',
@@ -42,8 +41,22 @@ const mockUser: IUser & { password: string } = {
     type: 'image/png',
     data:
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+  },
+  localRegistrar: {
+    name: [
+      {
+        use: 'en',
+        given: ['John', 'William'],
+        family: 'Doe'
+      }
+    ],
+    signature: {
+      type: 'image/png',
+      data:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+    }
   }
-}
+} as unknown) as IUser & { password: string }
 
 describe('createUser handler', () => {
   let server: any
