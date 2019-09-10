@@ -205,6 +205,7 @@ services:
       - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
       - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
+      - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGES=bn,en
       - COUNTRY_ALPHA3=BGD
