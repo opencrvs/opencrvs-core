@@ -198,6 +198,7 @@ services:
       - clickatell-api-id
       - infobip-gateway-endpoint
       - infobip-api-key
+      - infobip-sender-id
       - jwt-public-key.{{ts}}
     environment:
       - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
@@ -205,6 +206,7 @@ services:
       - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
       - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
+      - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGES=bn,en
       - COUNTRY_ALPHA3=BGD
@@ -344,6 +346,8 @@ secrets:
   infobip-gateway-endpoint:
     external: true
   infobip-api-key:
+    external: true
+  infobip-sender-id:
     external: true
 
 configs:
