@@ -40,7 +40,7 @@ context('User Integration Test', () => {
     cy.get('#username').type('n.ahmed')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
-    cy.get('#user-setup-start-button').click()
+    cy.get('#user-setup-start-button', { timeout: 30000 }).click()
     cy.get('#NewPassword').type('Test0000')
     cy.get('#ConfirmPassword').type('Test0000')
     cy.get('#Continue').click()
