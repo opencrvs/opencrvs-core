@@ -1,247 +1,248 @@
-division,district,upazila,union,A2IReference,facilityNameBengali,facilityNameEnglish,facilityTypeBengali,facilityTypeEnglish,email,phone,type
-Dhaka,Gazipur,Gazipur Sadar,,division=3&district=20&upazila=163,শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল,Shaheed Taj Uddin Ahmad Medical College,মেডিকেল কলেজ,HEALTH_FACILITY,ggazipurmc@ac.dghs.gov.bd,01711220636
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Kaliganj Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,kaliganj_singra@usc.dghs.gov.bd,01833280000
-Dhaka,Gazipur,Kaliganj,Urban Ward No-05,division=3&district=20&upazila=165,কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স,Kaliganj Upazila Health Complex,উপজেলা স্বাস্থ্য কমপ্লেক্স,HEALTH_FACILITY,kaliganj@uhfpo.dghs.gov.bd,01769957469
-Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ধলাশাধুখান সিসি - কালিগঞ্জ,Dholashadhukhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005330@cc.dghs.gov.bd,01913509954
-Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,খোলাপাড়া সিসি - কালিগঞ্জ,Kholapara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005331@cc.dghs.gov.bd,01822615831
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,বেরুয়া সিসি - কালিগঞ্জ,Berua Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005332@cc.dghs.gov.bd,01784398882
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ব্রাহ্মণগাঁও সিসি - কালিগঞ্জ,Brammangaon Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005333@cc.dghs.gov.bd,01710205124
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ফুলদি সিসি - কালিগঞ্জ,Fuldi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005334@cc.dghs.gov.bd,01724380333
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,মাজুখান সিসি - কালিগঞ্জ,Majhukhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005335@cc.dghs.gov.bd,01710829696
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,মোহানি সিসি - কালিগঞ্জ,Mohani Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005336@cc.dghs.gov.bd,01818748812
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ভাটিরা সিসি - কালিগঞ্জ,Vatira Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005337@cc.dghs.gov.bd,01820534056
-Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,ছাইলাদি সিসি - কালিগঞ্জ,Chhailadi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005338@cc.dghs.gov.bd,01720901210
-Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,জামালপুর সিসি - কালিগঞ্জ,Jamalpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005339@cc.dghs.gov.bd,01710434146
-Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,কাপাইস সিসি - কালিগঞ্জ,Kapais Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005340@cc.dghs.gov.bd,01715109218
-Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ছাতিয়ানি সিসি - কালিগঞ্জ,Chhatiyani Cc ,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005341@cc.dghs.gov.bd,01916739950
-Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ডুবরিয়া সিসি - কালিগঞ্জ,Dubriya Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005342@cc.dghs.gov.bd,01912355502
-Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,জাঙ্গালিয়া সিসি - কালিগঞ্জ,Jangaliya Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005343@cc.dghs.gov.bd,01723651943
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,ছাইতেরপারা সিসি - কালিগঞ্জ,Chaiterpara CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005344@cc.dghs.gov.bd,01746795168
-Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ছান্দাইয়া সিসি - কালিগঞ্জ,Chandaiya CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005345@cc.dghs.gov.bd,01713582076
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,দেওপারা সিসি - কালিগঞ্জ,Deopara Cc ,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005346@cc.dghs.gov.bd,01945127140
-Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ডুব্বাতি সিসি - কালিগঞ্জ,Dubbati CC ,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005347@cc.dghs.gov.bd,01735071148
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কুমারটেক সিসি - কালিগঞ্জ,Kumartek Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005348@cc.dghs.gov.bd,01721524414
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,উত্তারগাঁও সিসি - কালিগঞ্জ,Uttargaon Cc ,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005349@cc.dghs.gov.bd,01723010799
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বাঘুন সিসি - কালিগঞ্জ,Baghun Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005350@cc.dghs.gov.bd,01757109313
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বারাগাঁও সিসি - কালিগঞ্জ,Baragaon Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005351@cc.dghs.gov.bd,01726452402
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,ধানপুর সিসি - কালিগঞ্জ,Dhanpur Cc ,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005352@cc.dghs.gov.bd,01719691215
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,রাথুরা সিসি - কালিগঞ্জ,Rathura Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005353@cc.dghs.gov.bd,01718433397
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,শিংলাব সিসি - কালিগঞ্জ,Shinglab Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005354@cc.dghs.gov.bd,01716550722
-Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,বোয়ালি সিসি - কালিগঞ্জ,Boali Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005355@cc.dghs.gov.bd,01918108510
-Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,সাউথ সম সিসি - কালিগঞ্জ,South Som Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005356@cc.dghs.gov.bd,01756862098
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাহাদুরশাদী ইউনিয়ন সেন্টার,Bahadurshadi Union Centre ,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015046@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বক্তারপুর ইউনিয়ন সেন্টার,Baktarpur Union Centre ,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015047@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জামালপুর ইউনিয়ন সেন্টার,Jamalpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015048@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জাঙ্গালিয়া ইউনিয়ন সেন্টার,Jangalia Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015049@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,মোক্তারপুর ইউনিয়ন সেন্টার,Moktarpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015050@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,নাগরি ইউনিয়ন সেন্টার,Nagri Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015051@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,তুমুলিয়া ইউনিয়ন সেন্টার,Tumulia Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015052@union.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,রয়েন সিসি - কালিগঞ্জ,Royen CC- Kaligonj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018828@cc.dghs.gov.bd,01723133608
-Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,পারাবারথা সিসি - কালিগঞ্জ,Parabartha CC- Kaligonj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018829@cc.dghs.gov.bd,01760820154
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - কালিগঞ্জ,Bangladesh Red Crescent Society-Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01735064458
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - ২ কালিগঞ্জ,Bangladesh Red Crescent Society-2 Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01725548512
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি -৩ কালিগঞ্জ,Bangladesh Red Crescent Society-3 Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734467901
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,ব্রাক (বিএইচপি) - কালিগঞ্জ,BRAC (BHP) -Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01710614466
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,মেরি স্টোপস - কালিগঞ্জ,Marie Stops-Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,সেন্ট মেরিস কাথলিক মাদার অ্যান্ড চাইল্ড হেলথ সেন্টার - কালিগঞ্জ,Saint marys Catholic Mother and Child Health center-Kaliganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01715374832
-Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,এসটি আন্থনি মাদার অ্যান্ড চাইল্ড হেলথ কেয়ার - কালিগঞ্জ,St. Anthony Mother and Child Health Care-Kaliganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01715374832
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালিগঞ্জ সেন্টার হসপিটাল - কালিগঞ্জ,Kaliganj Central Hospital-kalioganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01720025298
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জামিল আই জেনারেল হসপিটাল - কালিগঞ্জ,Jamil Eye General Hospital-kalioganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711974635
-Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,নরুন সিসি - কালিগঞ্জ,Norun CC - Kaliganj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10022028@cc.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,উপজেলা ফ্যামিলি ওয়েলফেয়ার অফিস - কালিগঞ্জ গাজীপুর.,Upazila family welfare office,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Urban Ward No-09,division=3&district=20&upazila=165,উপজেলা ফ্যামিলি ওয়েলফেয়ার সদর ক্লিনিক কালিগঞ্জ গাজীপুর.,Upazila family welfare sadar clinic,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (ইউএইচ অ্যান্ড এফডবলিওসি) বাহাদুরশাদী কালিগঞ্জ গাজীপুর.,UH & FWC Bahadursad,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জামালপুর কালিগঞ্জ গাজীপুর.,UH & FWC Jamalpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) বক্তারপুর কালিগঞ্জ গাজীপুর.,UH & FWC Bakterpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) মক্তারপুর কালিগঞ্জ গাজীপুর.,UH & FWC makterpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জাঙ্গালিয়া কালিগঞ্জ গাজীপুর.,UH & FWC Jangalia,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020
-Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) তুমুলিয়া কালিগঞ্জ গাজীপুর.,UH & FWC Tumolia,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,,01970107020
-Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,খইকরা সিসি - কালিগঞ্জ,Khoikora CC - Kaliganj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10024556@cc.dghs.gov.bd,
-Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালিগঞ্জ (জিপি) মুন,Kaliganj (GP) Mun.,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,
-Dhaka,Narsingdi,Narsingdi,Urban Ward No-04,division=3&district=29&upazila=229,আল্গি (মাধাব্দি) ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Algi(madhabdi) Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,algi_madhabdi@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,আমদিয়া উপ-স্বাস্থ্য কেন্দ্র,Amdia Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,amdia@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ভাগিরাথপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bhagirathpur Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,bhagirathpur@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,ভাটপারা ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bhatpara Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,bhatpara@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,করিমপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Karimpur Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,karimpur@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী সদর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Narsingdi Sadar Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,narsingdisadar@usc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী (সদর) উপজেলা স্বাস্থ্য অফিস,Narsingdi (sadar) Upazila Health Office,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,narsingdisadar@uhfpo.dghs.gov.bd,01712221651
-Dhaka,Narsingdi,Narsingdi,Urban Ward No-01 (narsingdi),division=3&district=29&upazila=229,নরসিংদী সিভিল সার্জন অফিস,Narsingdi Civil Surgeon Office,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,norshingdi@cs.dghs.gov.bd,01797000888
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী জেলা হসপিটাল,Narsingdi District Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,narsingdi@hospi.dghs.gov.bd,01797000888
-Dhaka,Narsingdi,Narsingdi,Urban Ward No-01 (narsingdi),division=3&district=29&upazila=229,নরসিংদী ১০০ বেড জেলা হসপিটাল,Narsingdi 100 Bed Zilla Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,n100b@hospi.dghs.gov.bd,01730324787
-Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,চরমাধবপুর (বাখারনগর) সিসি - নরসিংদী সদর,Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006853@cc.dghs.gov.bd,01749464912
-Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,খোদাদিলা সিসি – নরসিংদী সদর,Khodadila Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006854@cc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,বেলাব (ভাইয়ুম) সিসি - নরসিংদী সদর,Belab (bhaiyum) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006855@cc.dghs.gov.bd,01731603510
-Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,গলাদি সিসি - নরসিংদী সদর,Goaldi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006856@cc.dghs.gov.bd,01920561874
-Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,পাকুরিয়া সিসি - নরসিংদী সদর,Pakuriya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006857@cc.dghs.gov.bd,01756042732
-Dhaka,Narsingdi,Narsingdi,Char Dighaldi,division=3&district=29&upazila=229,কালিকাপুর সিসি - নরসিংদী সদর,Kalikapur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006858@cc.dghs.gov.bd,01814971429
-Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,চিনিসপুর সিসি - নরসিংদী সদর,Chinishpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006859@cc.dghs.gov.bd,01814760020
-Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,ঘোরাদিয়া সিসি - নরসিংদী সদর,Ghoradiya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006860@cc.dghs.gov.bd,0174952751
-Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,বাদারপুর সিসি - নরসিংদী সদর,Badarpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006861@cc.dghs.gov.bd,01917278312
-Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,হাজিপুর সিসি - নরসিংদী সদর,Hajipur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006862@cc.dghs.gov.bd,01926150848
-Dhaka,Narsingdi,Narsingdi,Kanthalia,division=3&district=29&upazila=229,দাউকাদি সিসি - নরসিংদী সদর,Daukadi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006863@cc.dghs.gov.bd,01914361436
-Dhaka,Narsingdi,Narsingdi,Kanthalia,division=3&district=29&upazila=229,খামারদি সিসি - নরসিংদী সদর,Khamardi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006864@cc.dghs.gov.bd,01726913068
-Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,পঞ্চবতি সিসি - নরসিংদী সদর,Panchabati Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006865@cc.dghs.gov.bd,01726075450
-Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,রাসুলপুর সিসি - নরসিংদী সদর,Rasulpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006866@cc.dghs.gov.bd,01974920321
-Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,শ্রীনগর মধ্যপাড়া সিসি - নরসিংদী সদর,Sreenagar Madhyapara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006867@cc.dghs.gov.bd,01913153223
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,বালুচর সিসি - নরসিংদী সদর,Baluchar Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006868@cc.dghs.gov.bd,01675788144
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,চান্দেরপাড়া সিসি - নরসিংদী সদর,Chanderpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006869@cc.dghs.gov.bd,01712508717
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,দরিগাজিরগাঁও সিসি - নরসিংদী সদর,Dorigazirgaon Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006870@cc.dghs.gov.bd,01917677441
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,কোটালিচর সিসি - নরসিংদী সদর,Kotalichor(bilpar) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006871@cc.dghs.gov.bd,01932469056
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,মহিষাসুরাগ্রাম সিসি - নরসিংদী সদর,Mahishashuragram Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006872@cc.dghs.gov.bd,01930731121
-Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,মেহেরপুরা সিসি - নরসিংদী সদর,Meherpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006873@cc.dghs.gov.bd,01913271278
-Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,সর্পনিগৈর সিসি - নরসিংদী সদর,Sbarpanigair Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006874@cc.dghs.gov.bd,01196179612
-Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,ছাগরিয়াপারা - নরসিংদী সদর,Chhagriyapara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006875@cc.dghs.gov.bd,01945717848
-Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,দিলারপুর - নরসিংদী সদর,Dilarpur (alipur School Cc) - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006876@cc.dghs.gov.bd,01981807643
-Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,দিলারপুর ঈদগাহ - নরসিংদী সদর,Dilarpur Eidgah Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006877@cc.dghs.gov.bd,01884606135
-Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,জামালিয়াকান্দি - নরসিংদী সদর,Jamaliyakandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006878@cc.dghs.gov.bd,01906477092
-Dhaka,Narsingdi,Narsingdi,Paikar Char,division=3&district=29&upazila=229,নর্থ চর বাশানিয়া - নরসিংদী সদর,North Char Bashania Cc. Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006879@cc.dghs.gov.bd,01717357621
-Dhaka,Narsingdi,Narsingdi,Panchdona,division=3&district=29&upazila=229,ভাতপারা সিসি - নরসিংদী সদর,Bhatpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006880@cc.dghs.gov.bd,01914536450
-Dhaka,Narsingdi,Narsingdi,Panchdona,division=3&district=29&upazila=229,কাকশিয়া - নরসিংদী সদর,Kakshiya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006881@cc.dghs.gov.bd,01861349096
-Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,শেখেরচর সিসি - নরসিংদী সদর,Shekherchar Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006882@cc.dghs.gov.bd,01717358766
-Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,শিলামান্দি সিসি - নরসিংদী সদর,Shilmandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006883@cc.dghs.gov.bd,01940563431
-Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,আলোকবালি ইউনিয়ন সেন্টার,Alokbali Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015520@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,চরদিঘলদি ইউনিয়ন সেন্টার,Chardighaldi Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015521@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,চিনিসপুর ইউনিয়ন সেন্টার,Chinishpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015522@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নজরপুর ইউনিয়ন সেন্টার,Nazarpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015523@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নুরালপুর ইউনিয়ন সেন্টার,Nuralpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015524@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Paikar Char,division=3&district=29&upazila=229,পাইকারচর ইউনিয়ন সেন্টার,Paikar Char Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015525@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,শিলামান্দি ইউনিয়ন সেন্টার,Silmandi Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015526@union.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,কাযিরকান্দি সিসি - নরসিংদী সদর,Kazir Kandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018891@cc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ব্র্যাক (বিএইচপি) - নরসিংদী সদর,BRAC (BHP) ,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01721495481
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - নরসিংদী সদর,Bangladesh Red Crescent Society,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718064921
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মেরি স্টোপস সিসি - নরসিংদী সদর,Marie Stops,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711620086
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,বাংলাদেশ এসোসিয়েশন ফর অফ প্রেভেনশন সেপটিক এবোরশন,Bangladesh Association for Prevention of Septic Abortion,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711710063
-Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,ব্র্যাক (বিএইচপি)- নরসিংদী সদর,BRAC (BHP),এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711979394
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ওয়েলকাম হসপিটাল - নরসিংদী সদর,Welcome Hospital Pvt.,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01717201621
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মডার্ন ক্লিনিক - নরসিংদী সদর,Narsingdi Modern Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711811535
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর,Prime General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01716626769
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী জেনারেল হসপিটাল - নরসিংদী সদর,Narsingdhi General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711320536
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মুক্তি জেনারেল হসপিটাল - নরসিংদী সদর,Mukti General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712581171
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ন্যাশনাল জেনারেল চাইল্ড হসপিটাল - নরসিংদী সদর,National General Child Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714688017
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ইবিএ প্রাইভেট হসপিটাল - নরসিংদী সদর,EBA Private Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711816903
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,হলি লাইফ জেনারেল হসপিটাল - নরসিংদী সদর,Holy Life General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01812247800
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,সুফিয়া পিভিটি. হসপিটাল - নরসিংদী সদর,Sufia Pvt. Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711681816
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মাধোভি জেনারেল হসপিটাল - নরসিংদী সদর,Madhavi General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01722163479
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,পলি ক্লিনিক এন্ড আই কেয়ার সেন্টার - নরসিংদী সদর,Poli Clinic and Eye Care Center,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711445138
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,আলফালাহা পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর,Alfalaha Pipals Prikate Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712272942
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,এপোলো হসপিটাল - নরসিংদী সদর,Apollo Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711574245
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর,People's Pvt. Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01191312445
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মিতা নার্সিং হোম - নরসিংদী সদর,Mita Nursing Home,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711634265
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,হলি ক্রিসেন্ট হসপিটাল - নরসিংদী সদর,Holly Cricent Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01716270730
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ফেইথ জেনারেল হসপিটাল - নরসিংদী সদর,Faith General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712104546
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর,Prime General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711586350
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার সেন্টার (এমসিডব্লিওসি) নরসিংদী সদর,Mother & Child Welfare Centre (MCWC) Narsingdi Sadar,মা ও শিশু কল্যান কেন্দ্র,HEALTH_FACILITY,,
-Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ঢাকা প্রগ্রেসসিভ লায়ন্স আই হসপিটাল - নরসিংদী সদর,Dhaka Progressive Lions Eye Hospital,বিশেষায়িত হাসপাতাল,HEALTH_FACILITY,dplehnbd101@gmail.com,01742248555
-Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,বাঘহাটা টেক পাড়া সিসি - নরসিংদী সদর,Baghhata take para CC - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10023625@cc.dghs.gov.bd,
-Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,ডঃ নুরুজামান খোকন সিসি - নরসিংদী সদর,Dr. Nuruzzaman Khokon CC - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10024892@cc.dghs.gov.bd,01731904481
-Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-02,division=6&district=55&upazila=417,কুড়িগ্রাম (সদর) উপজেলা হেল্‌থ অফিস,Kurigram (Sadar) Upazila Health office,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,kurigramsadar@uhfpo.dghs.gov.bd,01710868407
-Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,পাঁচগাছি (এউএইচএন্ডএফডবলিওসি),Pangachi Uh&fwc,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,pangachi@uhfwc.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-05,division=6&district=55&upazila=417,কুড়িগ্রাম সিভিল সার্জন অফিস,Kurigram Civil Surgeon Office,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,kurigram@cs.dghs.gov.bd,01711109078
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম জেলা হসপিটাল,Kurigram District Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,kurigram@hospi.dghs.gov.bd,01713200322
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম চেস্ট ডিসিস ক্লিনিক,Kurigram Chest Disease Clinic,বক্ষব্যাধি ক্লিনিক,HEALTH_FACILITY,kurigram@tc.dghs.gov.bd,01718658967
-Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,চিলাপাড়া সিসি- কুড়িগ্রাম সদর,Chilapara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011516@cc.dghs.gov.bd,01925861050
-Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,পলাশবাড়ী সিসি- কুড়িগ্রাম সদর,Palashbari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011517@cc.dghs.gov.bd,01718519393
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,বাসুরভিটা সিসি- কুড়িগ্রাম সদর,Basurvita Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011518@cc.dghs.gov.bd,01737130809
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,মাধবরাম সিসি- কুড়িগ্রাম সদর,Madhabram Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011519@cc.dghs.gov.bd, 1712933300
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,উত্তর কুমারপুর সিসি- কুড়িগ্রাম সদর,Uttor Kumarpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011520@cc.dghs.gov.bd,01764455159
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,পারামালি সিসি- কুড়িগ্রাম সদর,Paramali Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011521@cc.dghs.gov.bd,01723797946
-Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,কাছিছার সিসি- কুড়িগ্রাম সদর,Kachichar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011522@cc.dghs.gov.bd,01714655451
-Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,লাকশির খামার সিসি- কুড়িগ্রাম সদর,Lakshir Khamar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011523@cc.dghs.gov.bd,01723340477
-Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,রাসুলপুর সিসি- কুড়িগ্রাম সদর,Rasulpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011524@cc.dghs.gov.bd,01714655451
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,লাকশিখান্ত সিসি- কুড়িগ্রাম সদর,Lakshikanto Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011525@cc.dghs.gov.bd,01723588725
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হলোখানা সিসি- কুড়িগ্রাম সদর,Halokhana Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011526@cc.dghs.gov.bd,01746445629
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,ভেরভেরী সিসি- কুড়িগ্রাম সদর,Ververi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011527@cc.dghs.gov.bd,01716310428
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,ঘনেশ্যামপুর সিসি- কুড়িগ্রাম সদর,Ghaneshyampur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011528@cc.dghs.gov.bd,017214654
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,আধগ্রাম সিসি- কুড়িগ্রাম সদর,Adhgram Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011529@cc.dghs.gov.bd,01712725205
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,জোতগোবরধন সিসি- কুড়িগ্রাম সদর,Jotgobardhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011530@cc.dghs.gov.bd,01722373526
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খালিসা কালোয়া সিসি- কুড়িগ্রাম সদর,Khalisa Kalowa Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011531@cc.dghs.gov.bd,02147483647
-Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,উত্তর সিতাইঝার সিসি- কুড়িগ্রাম সদর,Uttor Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011532@cc.dghs.gov.bd,01721764827
-Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,দক্ষিন সিতাইঝার সিসি- কুড়িগ্রাম সদর,Dakhin Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011533@cc.dghs.gov.bd,01714558275
-Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,গোবিন্দাপুর সিসি- কুড়িগ্রাম সদর,Gobindapur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011534@cc.dghs.gov.bd,01717624150
-Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,শুলকুর বাজার সিসি- কুড়িগ্রাম সদর,Shulkur Bazar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011535@cc.dghs.gov.bd,01923004451
-Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,সিতাইঝার সিসি- কুড়িগ্রাম সদর,Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011536@cc.dghs.gov.bd,01728655858
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হলোখানা সিসি- কুড়িগ্রাম সদর,Holokhana Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016726@union.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,জাত্তারাপুর সিসি- কুড়িগ্রাম সদর,Jattarapur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016727@union.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খাতালবাড়ী সিসি- কুড়িগ্রাম সদর,Khatalbari Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016728@union.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,মঘুলবাসা সিসি- কুড়িগ্রাম সদর,Mogulbasha Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016729@union.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,ভগদাঙ্গা সিসি- কুড়িগ্রাম সদর,Vogdanga Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016730@union.dghs.gov.bd,
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,চর বরাইবাড়ী সিসি- কুড়িগ্রাম সদর,Char Boraibari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018007@cc.dghs.gov.bd,01764884557
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খালিশা যালফারা সিসি- কুড়িগ্রাম সদর,Khalisha Zalfara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018139@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,ভেলাকোপা সিসি- কুড়িগ্রাম সদর,Velakopa CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018140@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,কাছিচর তেলিপারা)সিসি- কুড়িগ্রাম সদর,Kachichar(telipara) Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018142@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,মরাতরি সিসি- কুড়িগ্রাম সদর,Moratari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018150@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হিমেরকুটি সিসি- কুড়িগ্রাম সদর,Himerkuti Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018152@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,পিপুলবাড়ী সিসি- কুড়িগ্রাম সদর,Pipul Bari CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018153@cc.dghs.gov.bd,01713728843
-Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,মধ্য কুমরপুর সিসি- কুড়িগ্রাম সদর,Madhya Kumorpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018154@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,কদমতলা সিসি- কুড়িগ্রাম সদর,Kadomtola Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018155@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,চর কিষ্ণপুর সিসি- কুড়িগ্রাম সদর,Char Kisnopur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018227@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,পুর্ব কল্যাণ সিসি- কুড়িগ্রাম সদর,Purbo Kollan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018375@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,পার্বতীপুর সিসি- কুড়িগ্রাম সদর,Parbotipur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10019040@cc.dghs.gov.bd,01718971370
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর,Terre Des Hommes Foundation,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734022316
-Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,আরডিআরএস বাংলাদেশ -কুড়িগ্রাম সদর,RDRS Bangladesh,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712315867
-Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,ব্র্যাক (বিএইচপি) - কুড়িগ্রাম সদর,BRAC (BHP) ,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01721417574
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,পারিবাইক স্বাস্থ্য ক্লিনিক - কুড়িগ্রাম সদর,Paribaik Shastho Clinic,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718319215
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,আরডিআরএস বাংলাদেশ - কুড়িগ্রাম সদর – ২,RDRS Bangladesh,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01725344597
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,ছিন্ন মুকুল - কুড়িগ্রাম সদর,Chinno Mukul,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718312951
-Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর -২,Terre Des Hommes Foundation,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734022316
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,সেবা ক্লিনিক - কুড়িগ্রাম সদর,Sheba Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714052116
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,খান ক্লিনিক - কুড়িগ্রাম সদর,Khan Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714230285
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,ধারলা ক্লিনিক - কুড়িগ্রাম সদর,Dharla clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718697932
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম ক্লিনিক - কুড়িগ্রাম সদর,Kurigram clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712687317
-Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার (এমসিডবলিওসি),Mother & Child Welfare Centre (MCWC) Kurigram Sadar,মা ও শিশু কল্যান কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-03,division=6&district=55&upazila=417,জেলা ফ্যামিলি প্লানিং অফিস কুড়িগ্রাম,District Family Planing Office Kurigram,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,dfpokuri@gmail.com,
-Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচএন্ডএফডবলিওসি) হলোখানা কুড়িগ্রাম সদর কুড়িগ্রাম,UH&FWC Holokhana,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,,01728052261
-Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-01,division=6&district=55&upazila=417,উপজেলা ফ্যামিলি প্লানিং অফিস সদর কুড়িগ্রাম,Upazila Family Planning Office Sadar Kurigram,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,01714004225
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,আন্ধারিঝড় ইউনিয়ন সেন্টার,Andharirjhar Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,বাগভান্দের(ঝুকিয়া)সিসি,Bagbhander(jhukia) Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,বড় খাতামারি সিসি-ভুরুঙ্গামারি,Bara Khatamari CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,বারুইতারি সিসি-ভুরুঙ্গামারি,Baruitary CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,বেলাদহ সিসি - ভুরুঙ্গামারি,Beladaha CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ভুরুঙ্গামারি উপজেলা স্বাস্থ্য কমপ্লেক্স,Bhurungamari Upazila Health Complex,উপজেলা স্বাস্থ্য কমপ্লেক্স,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,বির ধুরার কুটি সিসি - ভুরুঙ্গামারি,Bir Dhaurar Kuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,বঙ্গ সোনাহাট ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bongo Sonahat Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,বড়বাড়ীয়া সমাজ উন্নয়ন সংস্থা – ভুরুঙ্গামারি,Borobaria Samaj Unnayan Songstha Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ব্রাক (বিএইচপি) - ভুরুঙ্গামারি,BRAC (BHP) Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,চর বলদিয়া সিসি - ভুরুঙ্গামারি,Char Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Char Bhurungamari,division=6&district=55&upazila=413,চর ভুরুঙ্গামারি ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Char Bhurungamari Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,ছীট পাইকেরছরা সিসি-ভুরুঙ্গামারি,Chhit Paikerchhara CC - Bhurangamari,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,ছোট খাতামারি সিসি-ভুরুঙ্গামারি,Chotokhatamari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,দেওয়ানের খামার সিসি-ভুরুঙ্গামারি,Dawaner Khamer CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,ধাউড়াড়খুটি সিসি-ভুরুঙ্গামারি,Dhaurarkuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,গছিডাঙ্গা সিসি-ভুরুঙ্গামারি,Gochhidanga -Bhurangamari,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,হেলোডাঙ্গা সিসি-ভুরুঙ্গামারি,Helodanga CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,হুছেরবালা সিসি-ভুরুঙ্গামারি,Hucherbala CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,জয়মনিরহাট ইউনিয়ন স্বাস্থ্য কেন্দ্র,Joymonirhat Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,কাঠগিরি সিসি-ভুরুঙ্গামারি,Kathgiri CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,খামার আন্ধারিঝড় সিসি-ভুরুঙ্গামারি,Khamar Andharijhar CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,মাহিগং চান্দুনিয়া সিসি-ভুরুঙ্গামারি,Mahigong Chandunia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,মানিক কাজি সিসি-ভুরুঙ্গামারি,Manik Kazi CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,মৈদাম সিসি-ভুরুঙ্গামারি,Moidam CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,,division=6&district=55&upazila=413,মংলেরকুটি সিসি-ভুরুঙ্গামারি,Monglerkuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,মাদার ক্লিনিক অ্যান্ড নার্সিং হোম - ভুরুঙ্গামারি,Mother Clinic and Nursing Home Bhurungamari,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,নলেয়া সিসি-ভুরুঙ্গামারি,Noleya CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,নর্থ বালদিয়া সিসি-ভুরুঙ্গামারি,North Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,নর্থ ধালডাঙ্গা সিসি-ভুরুঙ্গামারি,North Dhaldanga CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকেরছারা সিসি-ভুরুঙ্গামারি,Paikerchhara CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকেরছরা ইউনিয়ন স্বাস্থ্য কেন্দ্র,Paikerchhora Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,,division=6&district=55&upazila=413,পরিবাইক স্বাস্থ্য ক্লিনিক,Paribaik Shastho Clinic Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,পাথরডুবি ইউনিয়ন স্বাস্থ্য কেন্দ্র,Patherdubi Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,আরডিআরএস বাংলাদেশ - ভুরুঙ্গামারি,RDRS Bangladesh Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,শাহি বাজার (বলদিয়া) ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Shahi Bazar(boldia) Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,শিলকুরি ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Shilkuri Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,শিংঝড় সিসি-ভুরুঙ্গামারি,Shingjhar CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,সংবন্ধা খলিসাকুরি সিসি-ভুরুঙ্গামারি,Sonbondha Kholishakuri CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,সাউথ বলদিয়া সিসি-ভুরুঙ্গামারি,South Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,সাউথ বাশজানি সিসি-ভুরুঙ্গামারি,South Bashjani CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,সাউথ পাথরডুবি সিসি-ভুরুঙ্গামারি,South Pathardubi CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,সাউথ তেলাই সিসি-ভুরুঙ্গামারি,South Telai CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,তিলাই ইউনিয়ন স্বাস্থ্য কেন্দ্র,Tilai Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকের ছরা (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Paiker Chhara (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,আন্ধারিঝড় (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Andharijhar (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,জয়মনিরহাট (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Joymanirhat (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,পাথরডুবি (ইউএইচ অ্যান্ড এফডবলিওসি) -ভুরুঙ্গামারি - কুড়িগ্রাম,Pathardubi (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,তিলাই (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Tilai (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,উপজেলা  ফ্যামিলি প্লানিং - ভুরুঙ্গামারি - কুড়িগ্রাম,Bhurungamari Upazila Family Planning,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,ভারাতেরছারা (ময়নাতলা) সিসি-ভুরুঙ্গামারি,Varaterchhara(Moynatala) CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ভোটহাট সিসি-ভুরুঙ্গামারি,Votehat CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
-Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,ওয়েস্ট ছাট গোপালপুর সিসি,West Chat Gopalpur CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,
+facilityId,division,district,upazila,union,A2IReference,facilityNameBengali,facilityNameEnglish,facilityTypeBengali,facilityTypeEnglish,email,phone,type
+FACILITY000001,Dhaka,Gazipur,Gazipur Sadar,,division=3&district=20&upazila=163,শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল,Shaheed Taj Uddin Ahmad Medical College,মেডিকেল কলেজ,HEALTH_FACILITY,ggazipurmc@ac.dghs.gov.bd,01711220636,
+FACILITY000002,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Kaliganj Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,kaliganj_singra@usc.dghs.gov.bd,01833280000,
+FACILITY000003,Dhaka,Gazipur,Kaliganj,Urban Ward No-05,division=3&district=20&upazila=165,কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স,Kaliganj Upazila Health Complex,উপজেলা স্বাস্থ্য কমপ্লেক্স,HEALTH_FACILITY,kaliganj@uhfpo.dghs.gov.bd,01769957469,
+FACILITY000004,Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ধলাশাধুখান সিসি - কালিগঞ্জ,Dholashadhukhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005330@cc.dghs.gov.bd,01913509954,
+FACILITY000005,Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,খোলাপাড়া সিসি - কালিগঞ্জ,Kholapara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005331@cc.dghs.gov.bd,01822615831,
+FACILITY000006,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,বেরুয়া সিসি - কালিগঞ্জ,Berua Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005332@cc.dghs.gov.bd,01784398882,
+FACILITY000007,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ব্রাহ্মণগাঁও সিসি - কালিগঞ্জ,Brammangaon Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005333@cc.dghs.gov.bd,01710205124,
+FACILITY000008,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ফুলদি সিসি - কালিগঞ্জ,Fuldi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005334@cc.dghs.gov.bd,01724380333,
+FACILITY000009,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,মাজুখান সিসি - কালিগঞ্জ,Majhukhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005335@cc.dghs.gov.bd,01710829696,
+FACILITY000010,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,মোহানি সিসি - কালিগঞ্জ,Mohani Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005336@cc.dghs.gov.bd,01818748812,
+FACILITY000011,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ভাটিরা সিসি - কালিগঞ্জ,Vatira Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005337@cc.dghs.gov.bd,01820534056,
+FACILITY000012,Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,ছাইলাদি সিসি - কালিগঞ্জ,Chhailadi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005338@cc.dghs.gov.bd,01720901210,
+FACILITY000013,Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,জামালপুর সিসি - কালিগঞ্জ,Jamalpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005339@cc.dghs.gov.bd,01710434146,
+FACILITY000014,Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,কাপাইস সিসি - কালিগঞ্জ,Kapais Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005340@cc.dghs.gov.bd,01715109218,
+FACILITY000015,Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ছাতিয়ানি সিসি - কালিগঞ্জ,Chhatiyani Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005341@cc.dghs.gov.bd,01916739950,
+FACILITY000016,Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ডুবরিয়া সিসি - কালিগঞ্জ,Dubriya Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005342@cc.dghs.gov.bd,01912355502,
+FACILITY000017,Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,জাঙ্গালিয়া সিসি - কালিগঞ্জ,Jangaliya Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005343@cc.dghs.gov.bd,01723651943,
+FACILITY000018,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,ছাইতেরপারা সিসি - কালিগঞ্জ,Chaiterpara CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005344@cc.dghs.gov.bd,01746795168,
+FACILITY000019,Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ছান্দাইয়া সিসি - কালিগঞ্জ,Chandaiya CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005345@cc.dghs.gov.bd,01713582076,
+FACILITY000020,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,দেওপারা সিসি - কালিগঞ্জ,Deopara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005346@cc.dghs.gov.bd,01945127140,
+FACILITY000021,Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ডুব্বাতি সিসি - কালিগঞ্জ,Dubbati CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005347@cc.dghs.gov.bd,01735071148,
+FACILITY000022,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কুমারটেক সিসি - কালিগঞ্জ,Kumartek Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005348@cc.dghs.gov.bd,01721524414,
+FACILITY000023,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,উত্তারগাঁও সিসি - কালিগঞ্জ,Uttargaon Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005349@cc.dghs.gov.bd,01723010799,
+FACILITY000024,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বাঘুন সিসি - কালিগঞ্জ,Baghun Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005350@cc.dghs.gov.bd,01757109313,
+FACILITY000025,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বারাগাঁও সিসি - কালিগঞ্জ,Baragaon Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005351@cc.dghs.gov.bd,01726452402,
+FACILITY000026,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,ধানপুর সিসি - কালিগঞ্জ,Dhanpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005352@cc.dghs.gov.bd,01719691215,
+FACILITY000027,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,রাথুরা সিসি - কালিগঞ্জ,Rathura Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005353@cc.dghs.gov.bd,01718433397,
+FACILITY000028,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,শিংলাব সিসি - কালিগঞ্জ,Shinglab Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005354@cc.dghs.gov.bd,01716550722,
+FACILITY000029,Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,বোয়ালি সিসি - কালিগঞ্জ,Boali Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005355@cc.dghs.gov.bd,01918108510,
+FACILITY000030,Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,সাউথ সম সিসি - কালিগঞ্জ,South Som Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10005356@cc.dghs.gov.bd,01756862098,
+FACILITY000031,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাহাদুরশাদী ইউনিয়ন সেন্টার,Bahadurshadi Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015046@union.dghs.gov.bd,,
+FACILITY000032,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বক্তারপুর ইউনিয়ন সেন্টার,Baktarpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015047@union.dghs.gov.bd,,
+FACILITY000033,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জামালপুর ইউনিয়ন সেন্টার,Jamalpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015048@union.dghs.gov.bd,,
+FACILITY000034,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জাঙ্গালিয়া ইউনিয়ন সেন্টার,Jangalia Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015049@union.dghs.gov.bd,,
+FACILITY000035,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,মোক্তারপুর ইউনিয়ন সেন্টার,Moktarpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015050@union.dghs.gov.bd,,
+FACILITY000036,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,নাগরি ইউনিয়ন সেন্টার,Nagri Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015051@union.dghs.gov.bd,,
+FACILITY000037,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,তুমুলিয়া ইউনিয়ন সেন্টার,Tumulia Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015052@union.dghs.gov.bd,,
+FACILITY000038,Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,রয়েন সিসি - কালিগঞ্জ,Royen CC- Kaligonj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018828@cc.dghs.gov.bd,01723133608,
+FACILITY000039,Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,পারাবারথা সিসি - কালিগঞ্জ,Parabartha CC- Kaligonj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018829@cc.dghs.gov.bd,01760820154,
+FACILITY000040,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - কালিগঞ্জ,Bangladesh Red Crescent Society-Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01735064458,
+FACILITY000041,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - ২ কালিগঞ্জ,Bangladesh Red Crescent Society-2 Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01725548512,
+FACILITY000042,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি -৩ কালিগঞ্জ,Bangladesh Red Crescent Society-3 Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734467901,
+FACILITY000043,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,ব্রাক (বিএইচপি) - কালিগঞ্জ,BRAC (BHP) -Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01710614466,
+FACILITY000044,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,মেরি স্টোপস - কালিগঞ্জ,Marie Stops-Kaliganj,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000045,Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,সেন্ট মেরিস কাথলিক মাদার অ্যান্ড চাইল্ড হেলথ সেন্টার - কালিগঞ্জ,Saint marys Catholic Mother and Child Health center-Kaliganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01715374832,
+FACILITY000046,Dhaka,Gazipur,Kaliganj,Nagari,division=3&district=20&upazila=165,এসটি আন্থনি মাদার অ্যান্ড চাইল্ড হেলথ কেয়ার - কালিগঞ্জ,St. Anthony Mother and Child Health Care-Kaliganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01715374832,
+FACILITY000047,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালিগঞ্জ সেন্টার হসপিটাল - কালিগঞ্জ,Kaliganj Central Hospital-kalioganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01720025298,
+FACILITY000048,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,জামিল আই জেনারেল হসপিটাল - কালিগঞ্জ,Jamil Eye General Hospital-kalioganj,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711974635,
+FACILITY000049,Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,নরুন সিসি - কালিগঞ্জ,Norun CC - Kaliganj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10022028@cc.dghs.gov.bd,,
+FACILITY000050,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,উপজেলা ফ্যামিলি ওয়েলফেয়ার অফিস - কালিগঞ্জ গাজীপুর.,Upazila family welfare office,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000051,Dhaka,Gazipur,Kaliganj,Urban Ward No-09,division=3&district=20&upazila=165,উপজেলা ফ্যামিলি ওয়েলফেয়ার সদর ক্লিনিক কালিগঞ্জ গাজীপুর.,Upazila family welfare sadar clinic,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000052,Dhaka,Gazipur,Kaliganj,Bahadursadi,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (ইউএইচ অ্যান্ড এফডবলিওসি) বাহাদুরশাদী কালিগঞ্জ গাজীপুর.,UH & FWC Bahadursad,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000053,Dhaka,Gazipur,Kaliganj,Jamalpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জামালপুর কালিগঞ্জ গাজীপুর.,UH & FWC Jamalpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000054,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) বক্তারপুর কালিগঞ্জ গাজীপুর.,UH & FWC Bakterpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000055,Dhaka,Gazipur,Kaliganj,Moktarpur,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) মক্তারপুর কালিগঞ্জ গাজীপুর.,UH & FWC makterpur,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000056,Dhaka,Gazipur,Kaliganj,Jangalia,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) জাঙ্গালিয়া কালিগঞ্জ গাজীপুর.,UH & FWC Jangalia,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,sanjida.ealy@gmail.com,01970107020,
+FACILITY000057,Dhaka,Gazipur,Kaliganj,Tumulia,division=3&district=20&upazila=165,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচ অ্যান্ড এফডবলিওসি) তুমুলিয়া কালিগঞ্জ গাজীপুর.,UH & FWC Tumolia,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,,01970107020,
+FACILITY000058,Dhaka,Gazipur,Kaliganj,Baktarpur,division=3&district=20&upazila=165,খইকরা সিসি - কালিগঞ্জ,Khoikora CC - Kaliganj,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10024556@cc.dghs.gov.bd,,
+FACILITY000059,Dhaka,Gazipur,Kaliganj,,division=3&district=20&upazila=165,কালিগঞ্জ (জিপি) মুন,Kaliganj (GP) Mun.,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,,
+FACILITY000060,Dhaka,Narsingdi,Narsingdi,Urban Ward No-04,division=3&district=29&upazila=229,আল্গি (মাধাব্দি) ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Algi(madhabdi) Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,algi_madhabdi@usc.dghs.gov.bd,,
+FACILITY000061,Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,আমদিয়া উপ-স্বাস্থ্য কেন্দ্র,Amdia Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,amdia@usc.dghs.gov.bd,,
+FACILITY000062,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ভাগিরাথপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bhagirathpur Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,bhagirathpur@usc.dghs.gov.bd,,
+FACILITY000063,Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,ভাটপারা ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bhatpara Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,bhatpara@usc.dghs.gov.bd,,
+FACILITY000064,Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,করিমপুর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Karimpur Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,karimpur@usc.dghs.gov.bd,,
+FACILITY000065,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী সদর ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Narsingdi Sadar Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,narsingdisadar@usc.dghs.gov.bd,,
+FACILITY000066,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী (সদর) উপজেলা স্বাস্থ্য অফিস,Narsingdi (sadar) Upazila Health Office,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,narsingdisadar@uhfpo.dghs.gov.bd,01712221651,
+FACILITY000067,Dhaka,Narsingdi,Narsingdi,Urban Ward No-01 (narsingdi),division=3&district=29&upazila=229,নরসিংদী সিভিল সার্জন অফিস,Narsingdi Civil Surgeon Office,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,norshingdi@cs.dghs.gov.bd,01797000888,
+FACILITY000068,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী জেলা হসপিটাল,Narsingdi District Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,narsingdi@hospi.dghs.gov.bd,01797000888,
+FACILITY000069,Dhaka,Narsingdi,Narsingdi,Urban Ward No-01 (narsingdi),division=3&district=29&upazila=229,নরসিংদী ১০০ বেড জেলা হসপিটাল,Narsingdi 100 Bed Zilla Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,n100b@hospi.dghs.gov.bd,01730324787,
+FACILITY000070,Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,চরমাধবপুর (বাখারনগর) সিসি - নরসিংদী সদর,Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006853@cc.dghs.gov.bd,01749464912,
+FACILITY000071,Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,খোদাদিলা সিসি – নরসিংদী সদর,Khodadila Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006854@cc.dghs.gov.bd,,
+FACILITY000072,Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,বেলাব (ভাইয়ুম) সিসি - নরসিংদী সদর,Belab (bhaiyum) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006855@cc.dghs.gov.bd,01731603510,
+FACILITY000073,Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,গলাদি সিসি - নরসিংদী সদর,Goaldi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006856@cc.dghs.gov.bd,01920561874,
+FACILITY000074,Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,পাকুরিয়া সিসি - নরসিংদী সদর,Pakuriya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006857@cc.dghs.gov.bd,01756042732,
+FACILITY000075,Dhaka,Narsingdi,Narsingdi,Char Dighaldi,division=3&district=29&upazila=229,কালিকাপুর সিসি - নরসিংদী সদর,Kalikapur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006858@cc.dghs.gov.bd,01814971429,
+FACILITY000076,Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,চিনিসপুর সিসি - নরসিংদী সদর,Chinishpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006859@cc.dghs.gov.bd,01814760020,
+FACILITY000077,Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,ঘোরাদিয়া সিসি - নরসিংদী সদর,Ghoradiya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006860@cc.dghs.gov.bd,0174952751,
+FACILITY000078,Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,বাদারপুর সিসি - নরসিংদী সদর,Badarpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006861@cc.dghs.gov.bd,01917278312,
+FACILITY000079,Dhaka,Narsingdi,Narsingdi,Hajipur,division=3&district=29&upazila=229,হাজিপুর সিসি - নরসিংদী সদর,Hajipur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006862@cc.dghs.gov.bd,01926150848,
+FACILITY000080,Dhaka,Narsingdi,Narsingdi,Kanthalia,division=3&district=29&upazila=229,দাউকাদি সিসি - নরসিংদী সদর,Daukadi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006863@cc.dghs.gov.bd,01914361436,
+FACILITY000081,Dhaka,Narsingdi,Narsingdi,Kanthalia,division=3&district=29&upazila=229,খামারদি সিসি - নরসিংদী সদর,Khamardi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006864@cc.dghs.gov.bd,01726913068,
+FACILITY000082,Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,পঞ্চবতি সিসি - নরসিংদী সদর,Panchabati Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006865@cc.dghs.gov.bd,01726075450,
+FACILITY000083,Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,রাসুলপুর সিসি - নরসিংদী সদর,Rasulpur Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006866@cc.dghs.gov.bd,01974920321,
+FACILITY000084,Dhaka,Narsingdi,Narsingdi,Karimpur,division=3&district=29&upazila=229,শ্রীনগর মধ্যপাড়া সিসি - নরসিংদী সদর,Sreenagar Madhyapara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006867@cc.dghs.gov.bd,01913153223,
+FACILITY000085,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,বালুচর সিসি - নরসিংদী সদর,Baluchar Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006868@cc.dghs.gov.bd,01675788144,
+FACILITY000086,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,চান্দেরপাড়া সিসি - নরসিংদী সদর,Chanderpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006869@cc.dghs.gov.bd,01712508717,
+FACILITY000087,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,দরিগাজিরগাঁও সিসি - নরসিংদী সদর,Dorigazirgaon Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006870@cc.dghs.gov.bd,01917677441,
+FACILITY000088,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,কোটালিচর সিসি - নরসিংদী সদর,Kotalichor(bilpar) Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006871@cc.dghs.gov.bd,01932469056,
+FACILITY000089,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,মহিষাসুরাগ্রাম সিসি - নরসিংদী সদর,Mahishashuragram Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006872@cc.dghs.gov.bd,01930731121,
+FACILITY000090,Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,মেহেরপুরা সিসি - নরসিংদী সদর,Meherpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006873@cc.dghs.gov.bd,01913271278,
+FACILITY000091,Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,সর্পনিগৈর সিসি - নরসিংদী সদর,Sbarpanigair Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006874@cc.dghs.gov.bd,01196179612,
+FACILITY000092,Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,ছাগরিয়াপারা - নরসিংদী সদর,Chhagriyapara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006875@cc.dghs.gov.bd,01945717848,
+FACILITY000093,Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,দিলারপুর - নরসিংদী সদর,Dilarpur (alipur School Cc) - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006876@cc.dghs.gov.bd,01981807643,
+FACILITY000094,Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,দিলারপুর ঈদগাহ - নরসিংদী সদর,Dilarpur Eidgah Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006877@cc.dghs.gov.bd,01884606135,
+FACILITY000095,Dhaka,Narsingdi,Narsingdi,Nazarpur,division=3&district=29&upazila=229,জামালিয়াকান্দি - নরসিংদী সদর,Jamaliyakandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006878@cc.dghs.gov.bd,01906477092,
+FACILITY000096,Dhaka,Narsingdi,Narsingdi,Paikar Char,division=3&district=29&upazila=229,নর্থ চর বাশানিয়া - নরসিংদী সদর,North Char Bashania Cc. Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006879@cc.dghs.gov.bd,01717357621,
+FACILITY000097,Dhaka,Narsingdi,Narsingdi,Panchdona,division=3&district=29&upazila=229,ভাতপারা সিসি - নরসিংদী সদর,Bhatpara Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006880@cc.dghs.gov.bd,01914536450,
+FACILITY000098,Dhaka,Narsingdi,Narsingdi,Panchdona,division=3&district=29&upazila=229,কাকশিয়া - নরসিংদী সদর,Kakshiya Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006881@cc.dghs.gov.bd,01861349096,
+FACILITY000099,Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,শেখেরচর সিসি - নরসিংদী সদর,Shekherchar Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006882@cc.dghs.gov.bd,01717358766,
+FACILITY000100,Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,শিলামান্দি সিসি - নরসিংদী সদর,Shilmandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10006883@cc.dghs.gov.bd,01940563431,
+FACILITY000101,Dhaka,Narsingdi,Narsingdi,Amdia,division=3&district=29&upazila=229,আলোকবালি ইউনিয়ন সেন্টার,Alokbali Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015520@union.dghs.gov.bd,,
+FACILITY000102,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,চরদিঘলদি ইউনিয়ন সেন্টার,Chardighaldi Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015521@union.dghs.gov.bd,,
+FACILITY000103,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,চিনিসপুর ইউনিয়ন সেন্টার,Chinishpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015522@union.dghs.gov.bd,,
+FACILITY000104,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নজরপুর ইউনিয়ন সেন্টার,Nazarpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015523@union.dghs.gov.bd,,
+FACILITY000105,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নুরালপুর ইউনিয়ন সেন্টার,Nuralpur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015524@union.dghs.gov.bd,,
+FACILITY000106,Dhaka,Narsingdi,Narsingdi,Paikar Char,division=3&district=29&upazila=229,পাইকারচর ইউনিয়ন সেন্টার,Paikar Char Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015525@union.dghs.gov.bd,,
+FACILITY000107,Dhaka,Narsingdi,Narsingdi,Meher Para,division=3&district=29&upazila=229,শিলামান্দি ইউনিয়ন সেন্টার,Silmandi Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10015526@union.dghs.gov.bd,,
+FACILITY000108,Dhaka,Narsingdi,Narsingdi,Alokbali,division=3&district=29&upazila=229,কাযিরকান্দি সিসি - নরসিংদী সদর,Kazir Kandi Cc - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018891@cc.dghs.gov.bd,,
+FACILITY000109,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ব্র্যাক (বিএইচপি) - নরসিংদী সদর,BRAC (BHP),এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01721495481,
+FACILITY000110,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,বাংলাদেশ রেড ক্রিসেন্ট সোসাইটি - নরসিংদী সদর,Bangladesh Red Crescent Society,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718064921,
+FACILITY000111,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মেরি স্টোপস সিসি - নরসিংদী সদর,Marie Stops,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711620086,
+FACILITY000112,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,বাংলাদেশ এসোসিয়েশন ফর অফ প্রেভেনশন সেপটিক এবোরশন,Bangladesh Association for Prevention of Septic Abortion,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711710063,
+FACILITY000113,Dhaka,Narsingdi,Narsingdi,Chinishpur,division=3&district=29&upazila=229,ব্র্যাক (বিএইচপি)- নরসিংদী সদর,BRAC (BHP),এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711979394,
+FACILITY000114,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ওয়েলকাম হসপিটাল - নরসিংদী সদর,Welcome Hospital Pvt.,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01717201621,
+FACILITY000115,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মডার্ন ক্লিনিক - নরসিংদী সদর,Narsingdi Modern Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711811535,
+FACILITY000116,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর,Prime General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01716626769,
+FACILITY000117,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,নরসিংদী জেনারেল হসপিটাল - নরসিংদী সদর,Narsingdhi General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711320536,
+FACILITY000118,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মুক্তি জেনারেল হসপিটাল - নরসিংদী সদর,Mukti General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712581171,
+FACILITY000119,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ন্যাশনাল জেনারেল চাইল্ড হসপিটাল - নরসিংদী সদর,National General Child Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714688017,
+FACILITY000120,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ইবিএ প্রাইভেট হসপিটাল - নরসিংদী সদর,EBA Private Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711816903,
+FACILITY000121,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,হলি লাইফ জেনারেল হসপিটাল - নরসিংদী সদর,Holy Life General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01812247800,
+FACILITY000122,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,সুফিয়া পিভিটি. হসপিটাল - নরসিংদী সদর,Sufia Pvt. Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711681816,
+FACILITY000123,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মাধোভি জেনারেল হসপিটাল - নরসিংদী সদর,Madhavi General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01722163479,
+FACILITY000124,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,পলি ক্লিনিক এন্ড আই কেয়ার সেন্টার - নরসিংদী সদর,Poli Clinic and Eye Care Center,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711445138,
+FACILITY000125,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,আলফালাহা পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর,Alfalaha Pipals Prikate Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712272942,
+FACILITY000126,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,এপোলো হসপিটাল - নরসিংদী সদর,Apollo Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711574245,
+FACILITY000127,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,পিপলস প্রাইভেট হসপিটাল - নরসিংদী সদর,People's Pvt. Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01191312445,
+FACILITY000128,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মিতা নার্সিং হোম - নরসিংদী সদর,Mita Nursing Home,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711634265,
+FACILITY000129,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,হলি ক্রিসেন্ট হসপিটাল - নরসিংদী সদর,Holly Cricent Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01716270730,
+FACILITY000130,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ফেইথ জেনারেল হসপিটাল - নরসিংদী সদর,Faith General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712104546,
+FACILITY000131,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,প্রাইম জেনারেল হসপিটাল - নরসিংদী সদর,Prime General Hospital,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01711586350,
+FACILITY000132,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার সেন্টার (এমসিডব্লিওসি) নরসিংদী সদর,Mother & Child Welfare Centre (MCWC) Narsingdi Sadar,মা ও শিশু কল্যান কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000133,Dhaka,Narsingdi,Narsingdi,,division=3&district=29&upazila=229,ঢাকা প্রগ্রেসসিভ লায়ন্স আই হসপিটাল - নরসিংদী সদর,Dhaka Progressive Lions Eye Hospital,বিশেষায়িত হাসপাতাল,HEALTH_FACILITY,dplehnbd101@gmail.com,01742248555,
+FACILITY000134,Dhaka,Narsingdi,Narsingdi,Silmandi,division=3&district=29&upazila=229,বাঘহাটা টেক পাড়া সিসি - নরসিংদী সদর,Baghhata take para CC - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10023625@cc.dghs.gov.bd,,
+FACILITY000135,Dhaka,Narsingdi,Narsingdi,Mahishasura,division=3&district=29&upazila=229,ডঃ নুরুজামান খোকন সিসি - নরসিংদী সদর,Dr. Nuruzzaman Khokon CC - Narsingdi Sadar,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10024892@cc.dghs.gov.bd,01731904481,
+FACILITY000136,Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-02,division=6&district=55&upazila=417,কুড়িগ্রাম (সদর) উপজেলা হেল্‌থ অফিস,Kurigram (Sadar) Upazila Health office,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,kurigramsadar@uhfpo.dghs.gov.bd,01710868407,
+FACILITY000137,Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,পাঁচগাছি (এউএইচএন্ডএফডবলিওসি),Pangachi Uh&fwc,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,pangachi@uhfwc.dghs.gov.bd,,
+FACILITY000138,Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-05,division=6&district=55&upazila=417,কুড়িগ্রাম সিভিল সার্জন অফিস,Kurigram Civil Surgeon Office,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,kurigram@cs.dghs.gov.bd,01711109078,
+FACILITY000139,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম জেলা হসপিটাল,Kurigram District Hospital,জেলা হাসপাতাল,HEALTH_FACILITY,kurigram@hospi.dghs.gov.bd,01713200322,
+FACILITY000140,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম চেস্ট ডিসিস ক্লিনিক,Kurigram Chest Disease Clinic,বক্ষব্যাধি ক্লিনিক,HEALTH_FACILITY,kurigram@tc.dghs.gov.bd,01718658967,
+FACILITY000141,Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,চিলাপাড়া সিসি- কুড়িগ্রাম সদর,Chilapara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011516@cc.dghs.gov.bd,01925861050,
+FACILITY000142,Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,পলাশবাড়ী সিসি- কুড়িগ্রাম সদর,Palashbari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011517@cc.dghs.gov.bd,01718519393,
+FACILITY000143,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,বাসুরভিটা সিসি- কুড়িগ্রাম সদর,Basurvita Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011518@cc.dghs.gov.bd,01737130809,
+FACILITY000144,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,মাধবরাম সিসি- কুড়িগ্রাম সদর,Madhabram Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011519@cc.dghs.gov.bd,1712933300,
+FACILITY000145,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,উত্তর কুমারপুর সিসি- কুড়িগ্রাম সদর,Uttor Kumarpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011520@cc.dghs.gov.bd,01764455159,
+FACILITY000146,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,পারামালি সিসি- কুড়িগ্রাম সদর,Paramali Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011521@cc.dghs.gov.bd,01723797946,
+FACILITY000147,Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,কাছিছার সিসি- কুড়িগ্রাম সদর,Kachichar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011522@cc.dghs.gov.bd,01714655451,
+FACILITY000148,Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,লাকশির খামার সিসি- কুড়িগ্রাম সদর,Lakshir Khamar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011523@cc.dghs.gov.bd,01723340477,
+FACILITY000149,Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,রাসুলপুর সিসি- কুড়িগ্রাম সদর,Rasulpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011524@cc.dghs.gov.bd,01714655451,
+FACILITY000150,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,লাকশিখান্ত সিসি- কুড়িগ্রাম সদর,Lakshikanto Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011525@cc.dghs.gov.bd,01723588725,
+FACILITY000151,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হলোখানা সিসি- কুড়িগ্রাম সদর,Halokhana Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011526@cc.dghs.gov.bd,01746445629,
+FACILITY000152,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,ভেরভেরী সিসি- কুড়িগ্রাম সদর,Ververi Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011527@cc.dghs.gov.bd,01716310428,
+FACILITY000153,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,ঘনেশ্যামপুর সিসি- কুড়িগ্রাম সদর,Ghaneshyampur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011528@cc.dghs.gov.bd,017214654,
+FACILITY000154,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,আধগ্রাম সিসি- কুড়িগ্রাম সদর,Adhgram Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011529@cc.dghs.gov.bd,01712725205,
+FACILITY000155,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,জোতগোবরধন সিসি- কুড়িগ্রাম সদর,Jotgobardhan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011530@cc.dghs.gov.bd,01722373526,
+FACILITY000156,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খালিসা কালোয়া সিসি- কুড়িগ্রাম সদর,Khalisa Kalowa Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011531@cc.dghs.gov.bd,02147483647,
+FACILITY000157,Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,উত্তর সিতাইঝার সিসি- কুড়িগ্রাম সদর,Uttor Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011532@cc.dghs.gov.bd,01721764827,
+FACILITY000158,Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,দক্ষিন সিতাইঝার সিসি- কুড়িগ্রাম সদর,Dakhin Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011533@cc.dghs.gov.bd,01714558275,
+FACILITY000159,Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,গোবিন্দাপুর সিসি- কুড়িগ্রাম সদর,Gobindapur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011534@cc.dghs.gov.bd,01717624150,
+FACILITY000160,Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,শুলকুর বাজার সিসি- কুড়িগ্রাম সদর,Shulkur Bazar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011535@cc.dghs.gov.bd,01923004451,
+FACILITY000161,Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,সিতাইঝার সিসি- কুড়িগ্রাম সদর,Sitaijhar Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10011536@cc.dghs.gov.bd,01728655858,
+FACILITY000162,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হলোখানা সিসি- কুড়িগ্রাম সদর,Holokhana Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016726@union.dghs.gov.bd,,
+FACILITY000163,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,জাত্তারাপুর সিসি- কুড়িগ্রাম সদর,Jattarapur Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016727@union.dghs.gov.bd,,
+FACILITY000164,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খাতালবাড়ী সিসি- কুড়িগ্রাম সদর,Khatalbari Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016728@union.dghs.gov.bd,,
+FACILITY000165,Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,মঘুলবাসা সিসি- কুড়িগ্রাম সদর,Mogulbasha Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016729@union.dghs.gov.bd,,
+FACILITY000166,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,ভগদাঙ্গা সিসি- কুড়িগ্রাম সদর,Vogdanga Union Centre,ইউনিয়্ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,u10016730@union.dghs.gov.bd,,
+FACILITY000167,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,চর বরাইবাড়ী সিসি- কুড়িগ্রাম সদর,Char Boraibari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018007@cc.dghs.gov.bd,01764884557,
+FACILITY000168,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,খালিশা যালফারা সিসি- কুড়িগ্রাম সদর,Khalisha Zalfara Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018139@cc.dghs.gov.bd,01718971370,
+FACILITY000169,Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,ভেলাকোপা সিসি- কুড়িগ্রাম সদর,Velakopa CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018140@cc.dghs.gov.bd,01718971370,
+FACILITY000170,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,কাছিচর তেলিপারা)সিসি- কুড়িগ্রাম সদর,Kachichar(telipara) Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018142@cc.dghs.gov.bd,01718971370,
+FACILITY000171,Rangpur,Kurigram,Kurigram Sadar,Ghogadaha,division=6&district=55&upazila=417,মরাতরি সিসি- কুড়িগ্রাম সদর,Moratari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018150@cc.dghs.gov.bd,01718971370,
+FACILITY000172,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,হিমেরকুটি সিসি- কুড়িগ্রাম সদর,Himerkuti Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018152@cc.dghs.gov.bd,01718971370,
+FACILITY000173,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,পিপুলবাড়ী সিসি- কুড়িগ্রাম সদর,Pipul Bari CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018153@cc.dghs.gov.bd,01713728843,
+FACILITY000174,Rangpur,Kurigram,Kurigram Sadar,Bhogdanga,division=6&district=55&upazila=417,মধ্য কুমরপুর সিসি- কুড়িগ্রাম সদর,Madhya Kumorpur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018154@cc.dghs.gov.bd,01718971370,
+FACILITY000175,Rangpur,Kurigram,Kurigram Sadar,Punchgachhi,division=6&district=55&upazila=417,কদমতলা সিসি- কুড়িগ্রাম সদর,Kadomtola Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018155@cc.dghs.gov.bd,01718971370,
+FACILITY000176,Rangpur,Kurigram,Kurigram Sadar,Mogalbachha,division=6&district=55&upazila=417,চর কিষ্ণপুর সিসি- কুড়িগ্রাম সদর,Char Kisnopur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018227@cc.dghs.gov.bd,01718971370,
+FACILITY000177,Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,পুর্ব কল্যাণ সিসি- কুড়িগ্রাম সদর,Purbo Kollan Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10018375@cc.dghs.gov.bd,01718971370,
+FACILITY000178,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,পার্বতীপুর সিসি- কুড়িগ্রাম সদর,Parbotipur Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,cc10019040@cc.dghs.gov.bd,01718971370,
+FACILITY000179,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর,Terre Des Hommes Foundation,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734022316,
+FACILITY000180,Rangpur,Kurigram,Kurigram Sadar,Kanthalbari,division=6&district=55&upazila=417,আরডিআরএস বাংলাদেশ -কুড়িগ্রাম সদর,RDRS Bangladesh,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712315867,
+FACILITY000181,Rangpur,Kurigram,Kurigram Sadar,Belgachha,division=6&district=55&upazila=417,ব্র্যাক (বিএইচপি) - কুড়িগ্রাম সদর,BRAC (BHP),এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01721417574,
+FACILITY000182,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,পারিবাইক স্বাস্থ্য ক্লিনিক - কুড়িগ্রাম সদর,Paribaik Shastho Clinic,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718319215,
+FACILITY000183,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,আরডিআরএস বাংলাদেশ - কুড়িগ্রাম সদর – ২,RDRS Bangladesh,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01725344597,
+FACILITY000184,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,ছিন্ন মুকুল - কুড়িগ্রাম সদর,Chinno Mukul,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718312951,
+FACILITY000185,Rangpur,Kurigram,Kurigram Sadar,Jatrapur,division=6&district=55&upazila=417,তেরে দেস হোমস ফাউন্ডেশন - কুড়িগ্রাম সদর -২,Terre Des Hommes Foundation,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01734022316,
+FACILITY000186,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,সেবা ক্লিনিক - কুড়িগ্রাম সদর,Sheba Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714052116,
+FACILITY000187,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,খান ক্লিনিক - কুড়িগ্রাম সদর,Khan Clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01714230285,
+FACILITY000188,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,ধারলা ক্লিনিক - কুড়িগ্রাম সদর,Dharla clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01718697932,
+FACILITY000189,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,কুড়িগ্রাম ক্লিনিক - কুড়িগ্রাম সদর,Kurigram clinic,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,01712687317,
+FACILITY000190,Rangpur,Kurigram,Kurigram Sadar,,division=6&district=55&upazila=417,মাদার অ্যান্ড চাইল্ড ওয়েলফেয়ার (এমসিডবলিওসি),Mother & Child Welfare Centre (MCWC) Kurigram Sadar,মা ও শিশু কল্যান কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000191,Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-03,division=6&district=55&upazila=417,জেলা ফ্যামিলি প্লানিং অফিস কুড়িগ্রাম,District Family Planing Office Kurigram,জেলা পর্যায়ের অফিস,HEALTH_FACILITY,dfpokuri@gmail.com,,
+FACILITY000192,Rangpur,Kurigram,Kurigram Sadar,Holokhana,division=6&district=55&upazila=417,ইউনিয়ন হেলথ অ্যান্ড ফ্যামিলি ওয়েলফেয়ার সেন্টার (এউএইচএন্ডএফডবলিওসি) হলোখানা কুড়িগ্রাম সদর কুড়িগ্রাম,UH&FWC Holokhana,ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র,HEALTH_FACILITY,,01728052261,
+FACILITY000193,Rangpur,Kurigram,Kurigram Sadar,Urban Ward No-01,division=6&district=55&upazila=417,উপজেলা ফ্যামিলি প্লানিং অফিস সদর কুড়িগ্রাম,Upazila Family Planning Office Sadar Kurigram,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,01714004225,
+FACILITY000194,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,আন্ধারিঝড় ইউনিয়ন সেন্টার,Andharirjhar Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000195,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,বাগভান্দের(ঝুকিয়া)সিসি,Bagbhander(jhukia) Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000196,Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,বড় খাতামারি সিসি-ভুরুঙ্গামারি,Bara Khatamari CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000197,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,বারুইতারি সিসি-ভুরুঙ্গামারি,Baruitary CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000198,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,বেলাদহ সিসি - ভুরুঙ্গামারি,Beladaha CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000199,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ভুরুঙ্গামারি উপজেলা স্বাস্থ্য কমপ্লেক্স,Bhurungamari Upazila Health Complex,উপজেলা স্বাস্থ্য কমপ্লেক্স,HEALTH_FACILITY,,,
+FACILITY000200,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,বির ধুরার কুটি সিসি - ভুরুঙ্গামারি,Bir Dhaurar Kuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000201,Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,বঙ্গ সোনাহাট ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Bongo Sonahat Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000202,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,বড়বাড়ীয়া সমাজ উন্নয়ন সংস্থা – ভুরুঙ্গামারি,Borobaria Samaj Unnayan Songstha Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000203,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ব্রাক (বিএইচপি) - ভুরুঙ্গামারি,BRAC (BHP) Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000204,Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,চর বলদিয়া সিসি - ভুরুঙ্গামারি,Char Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000205,Rangpur,Kurigram,Bhurungamari,Char Bhurungamari,division=6&district=55&upazila=413,চর ভুরুঙ্গামারি ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Char Bhurungamari Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000206,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,ছীট পাইকেরছরা সিসি-ভুরুঙ্গামারি,Chhit Paikerchhara CC - Bhurangamari,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000207,Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,ছোট খাতামারি সিসি-ভুরুঙ্গামারি,Chotokhatamari Cc,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000208,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,দেওয়ানের খামার সিসি-ভুরুঙ্গামারি,Dawaner Khamer CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000209,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,ধাউড়াড়খুটি সিসি-ভুরুঙ্গামারি,Dhaurarkuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000210,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,গছিডাঙ্গা সিসি-ভুরুঙ্গামারি,Gochhidanga -Bhurangamari,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000211,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,হেলোডাঙ্গা সিসি-ভুরুঙ্গামারি,Helodanga CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000212,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,হুছেরবালা সিসি-ভুরুঙ্গামারি,Hucherbala CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000213,Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,জয়মনিরহাট ইউনিয়ন স্বাস্থ্য কেন্দ্র,Joymonirhat Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000214,Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,কাঠগিরি সিসি-ভুরুঙ্গামারি,Kathgiri CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000215,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,খামার আন্ধারিঝড় সিসি-ভুরুঙ্গামারি,Khamar Andharijhar CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000216,Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,মাহিগং চান্দুনিয়া সিসি-ভুরুঙ্গামারি,Mahigong Chandunia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000217,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,মানিক কাজি সিসি-ভুরুঙ্গামারি,Manik Kazi CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000218,Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,মৈদাম সিসি-ভুরুঙ্গামারি,Moidam CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000219,Rangpur,Kurigram,Bhurungamari,,division=6&district=55&upazila=413,মংলেরকুটি সিসি-ভুরুঙ্গামারি,Monglerkuti CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000220,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,মাদার ক্লিনিক অ্যান্ড নার্সিং হোম - ভুরুঙ্গামারি,Mother Clinic and Nursing Home Bhurungamari,বেসরকারী হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000221,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,নলেয়া সিসি-ভুরুঙ্গামারি,Noleya CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000222,Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,নর্থ বালদিয়া সিসি-ভুরুঙ্গামারি,North Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000223,Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,নর্থ ধালডাঙ্গা সিসি-ভুরুঙ্গামারি,North Dhaldanga CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000224,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকেরছারা সিসি-ভুরুঙ্গামারি,Paikerchhara CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000225,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকেরছরা ইউনিয়ন স্বাস্থ্য কেন্দ্র,Paikerchhora Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000226,Rangpur,Kurigram,Bhurungamari,,division=6&district=55&upazila=413,পরিবাইক স্বাস্থ্য ক্লিনিক,Paribaik Shastho Clinic Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000227,Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,পাথরডুবি ইউনিয়ন স্বাস্থ্য কেন্দ্র,Patherdubi Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000228,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,আরডিআরএস বাংলাদেশ - ভুরুঙ্গামারি,RDRS Bangladesh Bhurungamari,এনজিও হাসপাতাল / ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000229,Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,শাহি বাজার (বলদিয়া) ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Shahi Bazar(boldia) Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000230,Rangpur,Kurigram,Bhurungamari,Shilkhuri,division=6&district=55&upazila=413,শিলকুরি ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,Shilkuri Union Sub Center,ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000231,Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,শিংঝড় সিসি-ভুরুঙ্গামারি,Shingjhar CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000232,Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,সংবন্ধা খলিসাকুরি সিসি-ভুরুঙ্গামারি,Sonbondha Kholishakuri CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000233,Rangpur,Kurigram,Bhurungamari,Boldia,division=6&district=55&upazila=413,সাউথ বলদিয়া সিসি-ভুরুঙ্গামারি,South Baldia CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000234,Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,সাউথ বাশজানি সিসি-ভুরুঙ্গামারি,South Bashjani CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000235,Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,সাউথ পাথরডুবি সিসি-ভুরুঙ্গামারি,South Pathardubi CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000236,Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,সাউথ তেলাই সিসি-ভুরুঙ্গামারি,South Telai CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000237,Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,তিলাই ইউনিয়ন স্বাস্থ্য কেন্দ্র,Tilai Union Centre,ইউনিয়ন স্বাস্থ্য কেন্দ্র,HEALTH_FACILITY,,,
+FACILITY000238,Rangpur,Kurigram,Bhurungamari,Paiker Chhara,division=6&district=55&upazila=413,পাইকের ছরা (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Paiker Chhara (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,,
+FACILITY000239,Rangpur,Kurigram,Bhurungamari,Andhari Jhar,division=6&district=55&upazila=413,আন্ধারিঝড় (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Andharijhar (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,,
+FACILITY000240,Rangpur,Kurigram,Bhurungamari,Joymanirhat,division=6&district=55&upazila=413,জয়মনিরহাট (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Joymanirhat (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,,
+FACILITY000241,Rangpur,Kurigram,Bhurungamari,Pathardubi,division=6&district=55&upazila=413,পাথরডুবি (ইউএইচ অ্যান্ড এফডবলিওসি) -ভুরুঙ্গামারি - কুড়িগ্রাম,Pathardubi (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,,
+FACILITY000242,Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,তিলাই (ইউএইচ অ্যান্ড এফডবলিওসি) - ভুরুঙ্গামারি - কুড়িগ্রাম,Tilai (UH&FWC),ইউনিয়ন স্বাস্থ্য ও পরিবার কল্যাণ কেন্দ্র (এউএইচএন্ডএফডবলিওসি),HEALTH_FACILITY,,,
+FACILITY000243,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,উপজেলা  ফ্যামিলি প্লানিং - ভুরুঙ্গামারি - কুড়িগ্রাম,Bhurungamari Upazila Family Planning,উপজেলা পর্যায়ের অফিস,HEALTH_FACILITY,,,
+FACILITY000244,Rangpur,Kurigram,Bhurungamari,Bangasonahat,division=6&district=55&upazila=413,ভারাতেরছারা (ময়নাতলা) সিসি-ভুরুঙ্গামারি,Varaterchhara(Moynatala) CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000245,Rangpur,Kurigram,Bhurungamari,Bhurungamari,division=6&district=55&upazila=413,ভোটহাট সিসি-ভুরুঙ্গামারি,Votehat CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000246,Rangpur,Kurigram,Bhurungamari,Tilai,division=6&district=55&upazila=413,ওয়েস্ট ছাট গোপালপুর সিসি,West Chat Gopalpur CC,কমিউনিটি ক্লিনিক,HEALTH_FACILITY,,,
+FACILITY000247,,,,,,,,,,,,

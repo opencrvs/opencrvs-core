@@ -123,7 +123,8 @@ jest.mock('@register/utils/referenceApi', (): {
     loadDefinitions: () =>
       Promise.resolve({
         languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates
       }),
     loadAssets: () => Promise.resolve(mockOfflineData.assets)
   }
