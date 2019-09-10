@@ -16,22 +16,22 @@ if [ -z "$1" ] || { [ $1 != 'bgd' ] && [ $1 != 'zmb' ] ;} ; then
 fi
 
 if [ -z "$2" ] || { [ $2 != '--clear-data=no' ] && [ $2 != '--clear-data=yes' ] ;} ; then
-    echo 'Error: Argument --clear-data is required in postition 1.'
+    echo 'Error: Argument --clear-data is required in postition 2.'
     print_usage_and_exit
 fi
 
 if [ -z "$3" ] || { [ $3 != '--restore-metadata=no' ] && [ $3 != '--restore-metadata=yes' ] ;} ; then
-    echo 'Error: Argument --restore-metadata is required in postition 2.'
+    echo 'Error: Argument --restore-metadata is required in postition 3.'
     print_usage_and_exit
 fi
 
 if [ -z "$4" ] ; then
-    echo 'Error: Argument HOST is required in postition 3.'
+    echo 'Error: Argument HOST is required in postition 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument VERSION is required in postition 4.'
+    echo 'Error: Argument VERSION is required in postition 5.'
     print_usage_and_exit
 fi
 
@@ -47,8 +47,6 @@ echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
 # Copy selected country config to public & infrastructure folder
-cp packages/resources/src/$COUNTRY/config/register-config.js packages/register/public/config.js
-cp packages/resources/src/$COUNTRY/config/login-config.js packages/login/public/config.js
 cp packages/resources/src/$COUNTRY/config/register-config.js /tmp/compose/infrastructure/register-config.js
 cp packages/resources/src/$COUNTRY/config/login-config.js /tmp/compose/infrastructure/login-config.js
 

@@ -25,7 +25,7 @@ jobs:
         - yarn compose:all &
         - wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 tcp:8086 tcp:3447 tcp:5001
         - cd packages/resources && yarn db:backup:restore bgd
-        - cd packages/resources && yarn save:testData && cd ../..
+        - yarn save:testData && cd ../..
         - cd packages/e2e && yarn start --record false
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
