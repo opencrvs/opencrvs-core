@@ -11,7 +11,7 @@ import {
 } from '@register/tests/util'
 import { createIntl } from 'react-intl'
 import { Event } from '@register/forms'
-import { omit } from 'lodash'
+import { omit, cloneDeep } from 'lodash'
 
 const intl = createIntl({
   locale: 'en'
@@ -60,6 +60,22 @@ describe('PDFUtils related tests', () => {
         mockOfflineData
       )
     ).toThrowError('No user details found')
+  })
+  it('Print money reciept function will throws exception if receipt template is not present', () => {
+    const faultyOfflineData = cloneDeep(mockOfflineData)
+    faultyOfflineData.templates.receipt = null
+    expect(() =>
+      printMoneyReceipt(
+        intl,
+        {
+          id: 'asdhdqe2472487jsdfsdf',
+          data: mockDeathApplicationData,
+          event: Event.DEATH
+        },
+        userDetails,
+        faultyOfflineData
+      )
+    ).toThrowError('Money reciept template is misssing in offline data')
   })
   it('Throws exception if invalid key is provided', () => {
     const deathApplication = omit(mockDeathApplicationData, 'deathEvent')
