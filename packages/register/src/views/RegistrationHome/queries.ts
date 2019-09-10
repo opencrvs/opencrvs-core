@@ -1,5 +1,214 @@
 import gql from 'graphql-tag'
 
+// TODO - can we convert listEventRegistrations to SEARCH_EVENTS query
+export const REGISTRATION_HOME_QUERY = gql`
+  query registrationHome(
+    $locationIds: [String]
+    $count: Int
+    $inProgressSkip: Int
+    $reviewStatuses: [String]
+    $reviewSkip: Int
+    $rejectSkip: Int
+    $approvalSkip: Int
+    $printSkip: Int
+  ) {
+    counts: countEvents(locationIds: $locationIds) {
+      inProgress
+      declared
+      validated
+      registered
+      rejected
+    }
+    inProgressTab: listEventRegistrations(
+      locationIds: $locationIds
+      status: "IN_PROGRESS"
+      count: $count
+      skip: $inProgressSkip
+    ) {
+      totalItems
+      results {
+        id
+        registration {
+          type
+          trackingId
+        }
+        ... on BirthRegistration {
+          child {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          createdAt
+        }
+        ... on DeathRegistration {
+          deceased {
+            name {
+              use
+              firstNames
+              familyName
+            }
+          }
+          createdAt
+        }
+      }
+    }
+    reviewTab: searchEvents(
+      locationIds: $locationIds
+      status: $reviewStatuses
+      count: $count
+      skip: $reviewSkip
+    ) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          status
+          contactNumber
+          trackingId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
+      }
+    }
+    rejectTab: searchEvents(
+      locationIds: $locationIds
+      status: ["REJECTED"]
+      count: $count
+      skip: $rejectSkip
+    ) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          status
+          contactNumber
+          trackingId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
+      }
+    }
+    approvalTab: searchEvents(
+      locationIds: $locationIds
+      status: ["VALIDATED"]
+      count: $count
+      skip: $approvalSkip
+    ) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          status
+          contactNumber
+          trackingId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
+      }
+    }
+    printTab: searchEvents(
+      locationIds: $locationIds
+      status: ["REGISTERED"]
+      count: $count
+      skip: $printSkip
+    ) {
+      totalItems
+      results {
+        id
+        type
+        registration {
+          status
+          contactNumber
+          trackingId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
+      }
+    }
+  }
+`
+
 export const COUNT_REGISTRATION_QUERY = gql`
   query data($locationIds: [String]) {
     countEvents(locationIds: $locationIds) {

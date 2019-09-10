@@ -5,7 +5,7 @@ import {
   IAction
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   goToPage,
   goToReviewDuplicate,
@@ -20,11 +20,9 @@ import { Scope } from '@register/utils/authUtils'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
   EVENT_STATUS,
@@ -46,12 +44,17 @@ interface IBaseReviewTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  parentQueryLoading?: boolean
   outboxApplications: IApplication[]
+  queryData: {
+    loading: boolean
+    error: Error | undefined
+    data: GQLEventSearchResultSet
+  }
+  page: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IReviewTabState {
-  reviewCurrentPage: number
   width: number
 }
 
@@ -65,8 +68,7 @@ class ReviewTabComponent extends React.Component<
   constructor(props: IReviewTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      reviewCurrentPage: 1
+      width: window.innerWidth
     }
   }
 
@@ -92,8 +94,8 @@ class ReviewTabComponent extends React.Component<
     return this.props.scope && this.props.scope.includes('register')
   }
 
-  transformDeclaredContent = (data: GQLQuery) => {
-    if (!data.searchEvents || !data.searchEvents.results) {
+  transformDeclaredContent = (data: GQLEventSearchResultSet) => {
+    if (!data || !data.results) {
       return []
     }
     const transformedData = transformData(
@@ -210,86 +212,53 @@ class ReviewTabComponent extends React.Component<
     }
   }
 
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ reviewCurrentPage: newPageNumber })
-  }
-
   renderExpandedComponent = (itemId: string) => {
     return <RowHistoryView eventId={itemId} />
   }
 
   render() {
-    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
+    const { theme, intl, queryData, page, onPageChange } = this.props
+    const { loading, error, data } = queryData
 
-    const queryStatuses = this.userHasRegisterScope()
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
-      : [EVENT_STATUS.DECLARED]
+    if (loading) {
+      return (
+        <StyledSpinner
+          id="search-result-spinner"
+          baseColor={theme.colors.background}
+        />
+      )
+    }
+    if (error) {
+      Sentry.captureException(error)
+      return (
+        <ErrorText id="search-result-error-text-review">
+          {intl.formatMessage(errorMessages.queryError)}
+        </ErrorText>
+      )
+    }
+
     return (
-      <Query
-        query={SEARCH_EVENTS}
-        variables={{
-          status: queryStatuses,
-          locationIds: [registrarLocationId],
-          count: this.pageSize,
-          skip: (this.state.reviewCurrentPage - 1) * this.pageSize
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (loading) {
-            return (
-              (!parentQueryLoading && (
-                <StyledSpinner
-                  id="search-result-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )) ||
-              null
-            )
-          }
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-review">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-
-          return (
-            <HomeContent>
-              <ReactTooltip id="validateTooltip">
-                <ToolTipContainer>
-                  {this.props.intl.formatMessage(
-                    messages.validatedApplicationTooltipForRegistrar
-                  )}
-                </ToolTipContainer>
-              </ReactTooltip>
-              <GridTable
-                content={this.transformDeclaredContent(data)}
-                columns={this.getColumns()}
-                renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={this.state.reviewCurrentPage}
-                expandable={this.getExpandable()}
-                clickable={!this.getExpandable()}
-              />
-            </HomeContent>
-          )
-        }}
-      </Query>
+      <HomeContent>
+        <ReactTooltip id="validateTooltip">
+          <ToolTipContainer>
+            {this.props.intl.formatMessage(
+              messages.validatedApplicationTooltipForRegistrar
+            )}
+          </ToolTipContainer>
+        </ReactTooltip>
+        <GridTable
+          content={this.transformDeclaredContent(data)}
+          columns={this.getColumns()}
+          renderExpandedComponent={this.renderExpandedComponent}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          expandable={this.getExpandable()}
+          clickable={!this.getExpandable()}
+        />
+      </HomeContent>
     )
   }
 }

@@ -3,8 +3,8 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLQuery,
-  GQLRegStatus
+  GQLRegStatus,
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@register/utils/data-formatting'
@@ -12,17 +12,17 @@ import { formatLongDate } from '@register/utils/date-formatting'
 import { IApplication } from '@register/applications'
 
 export const transformData = (
-  data: GQLQuery,
+  data: GQLEventSearchResultSet,
   intl: IntlShape,
   outboxApplications: IApplication[] = [],
   checkStatus: string[] = []
 ) => {
   const { locale } = intl
-  if (!data.searchEvents || !data.searchEvents.results) {
+  if (!data || !data.results) {
     return []
   }
 
-  return data.searchEvents.results
+  return data.results
     .filter((req): req is GQLEventSearchSet => req !== null)
     .filter((reg: GQLEventSearchSet) => {
       if (outboxApplications.length === 0) {

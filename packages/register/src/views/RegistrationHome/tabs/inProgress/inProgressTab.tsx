@@ -10,7 +10,7 @@ import {
   GQLDeathRegistration,
   GQLEventRegistration,
   GQLHumanName,
-  GQLQuery
+  GQLEventRegResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IApplication } from '@register/applications'
 import {
@@ -26,10 +26,7 @@ import {
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
-import {
-  LIST_EVENT_REGISTRATIONS_BY_STATUS,
-  COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrationHome/queries'
+import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
@@ -38,7 +35,6 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
-import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import {
   buttonMessages,
   errorMessages,
@@ -97,12 +93,17 @@ interface IBaseRegistrarHomeProps {
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
-  parentQueryLoading?: boolean
+  queryData: {
+    loading: boolean
+    error: Error | undefined
+    data: GQLEventRegResultSet
+  }
+  page: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IRegistrarHomeState {
   width: number
-  progressCurrentPage: number
 }
 
 type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps
@@ -126,87 +127,82 @@ export class InProgressTabComponent extends React.Component<
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      progressCurrentPage: 1
+      width: window.innerWidth
     }
   }
 
-  transformRemoteDraftsContent = (data: GQLQuery) => {
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+  transformRemoteDraftsContent = (data: GQLEventRegResultSet) => {
+    if (!data || !data.results) {
       return []
     }
 
     const { intl } = this.props
     const { locale } = intl
 
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration | null) => {
-        let birthReg
-        let deathReg
-        let name
+    return data.results.map((reg: GQLEventRegistration | null) => {
+      let birthReg
+      let deathReg
+      let name
 
-        const regId = (reg as GQLEventRegistration).id
-        const event =
-          reg && reg.registration && (reg.registration.type as string)
-        const lastModificationDate = reg && reg.createdAt
-        const trackingId =
-          reg && reg.registration && reg.registration.trackingId
-        const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
+      const regId = (reg as GQLEventRegistration).id
+      const event = reg && reg.registration && (reg.registration.type as string)
+      const lastModificationDate = reg && reg.createdAt
+      const trackingId = reg && reg.registration && reg.registration.trackingId
+      const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
-        if (event && event.toLowerCase() === 'birth') {
-          birthReg = reg as GQLBirthRegistration
-          const childName =
-            (birthReg.child && (birthReg.child.name as GQLHumanName[])) || []
-          name =
-            (createNamesMap(childName)[locale] as string) ||
-            (createNamesMap(childName)[LANG_EN] as string) ||
-            ''
-        } else if (event && event.toLowerCase() === 'death') {
-          deathReg = reg as GQLDeathRegistration
-          const deceasedName =
-            (deathReg.deceased && (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-          name =
-            (createNamesMap(deceasedName)[locale] as string) ||
-            (createNamesMap(deceasedName)['default'] as string) ||
-            ''
+      if (event && event.toLowerCase() === 'birth') {
+        birthReg = reg as GQLBirthRegistration
+        const childName =
+          (birthReg.child && (birthReg.child.name as GQLHumanName[])) || []
+        name =
+          (createNamesMap(childName)[locale] as string) ||
+          (createNamesMap(childName)[LANG_EN] as string) ||
+          ''
+      } else if (event && event.toLowerCase() === 'death') {
+        deathReg = reg as GQLDeathRegistration
+        const deceasedName =
+          (deathReg.deceased && (deathReg.deceased.name as GQLHumanName[])) ||
+          []
+        name =
+          (createNamesMap(deceasedName)[locale] as string) ||
+          (createNamesMap(deceasedName)['default'] as string) ||
+          ''
+      }
+      const actions = [
+        {
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () =>
+            this.props.goToPage(
+              pageRoute,
+              regId,
+              'review',
+              (event && event.toLowerCase()) || ''
+            )
         }
-        const actions = [
+      ]
+      moment.locale(locale)
+      return {
+        id: regId,
+        event:
+          (event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[event.toLowerCase()]
+            )) ||
+          '',
+        name,
+        trackingId,
+        dateOfModification:
+          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          '',
+        actions,
+        rowClickHandler: [
           {
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () =>
-              this.props.goToPage(
-                pageRoute,
-                regId,
-                'review',
-                (event && event.toLowerCase()) || ''
-              )
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(regId)
           }
         ]
-        moment.locale(locale)
-        return {
-          id: regId,
-          event:
-            (event &&
-              intl.formatMessage(
-                dynamicConstantsMessages[event.toLowerCase()]
-              )) ||
-            '',
-          name,
-          trackingId,
-          dateOfModification:
-            (lastModificationDate && moment(lastModificationDate).fromNow()) ||
-            '',
-          actions,
-          rowClickHandler: [
-            {
-              label: 'rowClickHandler',
-              handler: () => this.props.goToApplicationDetails(regId)
-            }
-          ]
-        }
       }
-    )
+    })
   }
 
   transformDraftContent = () => {
@@ -298,15 +294,7 @@ export class InProgressTabComponent extends React.Component<
           locationIds: [registrarLocationId]
         }}
       >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
+        {({ error, data }: { loading: any; error?: any; data: any }) => {
           if (error) {
             Sentry.captureException(error)
             return (
@@ -385,10 +373,6 @@ export class InProgressTabComponent extends React.Component<
         }}
       </Query>
     )
-  }
-
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ progressCurrentPage: newPageNumber })
   }
 
   renderDraftDataExpandedComponent = (itemId: string) => {
@@ -523,7 +507,9 @@ export class InProgressTabComponent extends React.Component<
       registrarLocationId,
       selectorId,
       drafts,
-      parentQueryLoading
+      queryData,
+      page,
+      onPageChange
     } = this.props
 
     return (
@@ -539,78 +525,49 @@ export class InProgressTabComponent extends React.Component<
             columns={this.getDraftColumns()}
             renderExpandedComponent={this.renderDraftDataExpandedComponent}
             noResultText={intl.formatMessage(constantsMessages.noResults)}
-            onPageChange={(currentPage: number) => {
-              this.onPageChange(currentPage)
-            }}
+            onPageChange={onPageChange}
             pageSize={this.pageSize}
             totalItems={drafts && drafts.length}
-            currentPage={this.state.progressCurrentPage}
+            currentPage={page}
             expandable={this.getExpandable()}
             clickable={!this.getExpandable()}
           />
         )}
-        {selectorId === SELECTOR_ID.fieldAgentDrafts && (
-          <Query
-            query={LIST_EVENT_REGISTRATIONS_BY_STATUS}
-            variables={{
-              status: EVENT_STATUS.IN_PROGRESS,
-              locationIds: [registrarLocationId],
-              count: this.pageSize,
-              skip: (this.state.progressCurrentPage - 1) * this.pageSize
-            }}
-          >
-            {({
-              loading,
-              error,
-              data
-            }: {
-              loading: any
-              error?: any
-              data: any
-            }) => {
-              if (loading) {
-                return (
-                  (!parentQueryLoading && (
-                    <StyledSpinner
-                      id="remote-drafts-spinner"
-                      baseColor={theme.colors.background}
-                    />
-                  )) ||
-                  null
-                )
-              }
-              if (error) {
-                Sentry.captureException(error)
-                return (
-                  <ErrorText id="remote-drafts-error-text">
-                    {intl.formatMessage(errorMessages.queryError)}
-                  </ErrorText>
-                )
-              }
+        {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+          (() => {
+            if (queryData.loading) {
               return (
-                <GridTable
-                  content={this.transformRemoteDraftsContent(data)}
-                  columns={this.getRemoteDraftColumns()}
-                  renderExpandedComponent={
-                    this.renderInProgressDataExpandedComponent
-                  }
-                  noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  onPageChange={(currentPage: number) => {
-                    this.onPageChange(currentPage)
-                  }}
-                  pageSize={this.pageSize}
-                  totalItems={
-                    data.listEventRegistrations &&
-                    data.listEventRegistrations.totalItems
-                  }
-                  currentPage={this.state.progressCurrentPage}
-                  expandable={this.getExpandable()}
-                  clickable={!this.getExpandable()}
+                <StyledSpinner
+                  id="remote-drafts-spinner"
+                  baseColor={theme.colors.background}
                 />
               )
-            }}
-          </Query>
-        )}
+            }
+            if (queryData.error) {
+              Sentry.captureException(queryData.error)
+              return (
+                <ErrorText id="remote-drafts-error-text">
+                  {intl.formatMessage(errorMessages.queryError)}
+                </ErrorText>
+              )
+            }
+            return (
+              <GridTable
+                content={this.transformRemoteDraftsContent(queryData.data)}
+                columns={this.getRemoteDraftColumns()}
+                renderExpandedComponent={
+                  this.renderInProgressDataExpandedComponent
+                }
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+                onPageChange={onPageChange}
+                pageSize={this.pageSize}
+                totalItems={(queryData.data && queryData.data.totalItems) || 0}
+                currentPage={page}
+                expandable={this.getExpandable()}
+                clickable={!this.getExpandable()}
+              />
+            )
+          })}
       </HomeContent>
     )
   }

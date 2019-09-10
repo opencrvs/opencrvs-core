@@ -35,7 +35,7 @@ import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrationHome/NotificationToast'
-import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@register/views/RegistrationHome/queries'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
@@ -51,6 +51,11 @@ import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { errorMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@register/i18n/messages/views/certificate'
+import {
+  GQLEventSearchResultSet,
+  GQLEventRegResultSet,
+  GQLEventCount
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -124,8 +129,11 @@ interface IBaseRegistrationHomeProps {
 }
 
 interface IRegistrationHomeState {
+  progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
+  approvalCurrentPage: number
+  printCurrentPage: number
   showCertificateToast: boolean
 }
 
@@ -157,8 +165,11 @@ export class RegistrationHomeView extends React.Component<
   constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
+      progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
+      approvalCurrentPage: 1,
+      printCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.applications.filter(
           item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
@@ -174,15 +185,6 @@ export class RegistrationHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  onPageChange = (newPageNumber: number) => {
-    if (this.props.tabId === TAB_ID.readyForReview) {
-      this.setState({ reviewCurrentPage: newPageNumber })
-    }
-    if (this.props.tabId === TAB_ID.sentForUpdates) {
-      this.setState({ updatesCurrentPage: newPageNumber })
-    }
-  }
-
   renderExpandedComponent = (itemId: string) => {
     return <RowHistoryView eventId={itemId} />
   }
@@ -194,19 +196,57 @@ export class RegistrationHomeView extends React.Component<
     return count - outboxCount
   }
 
+  onPageChange = (newPageNumber: number) => {
+    switch (this.props.tabId) {
+      case TAB_ID.inProgress:
+        this.setState({ progressCurrentPage: newPageNumber })
+        break
+      case TAB_ID.readyForReview:
+        this.setState({ reviewCurrentPage: newPageNumber })
+        break
+      case TAB_ID.sentForUpdates:
+        this.setState({ updatesCurrentPage: newPageNumber })
+        break
+      case TAB_ID.sentForApproval:
+        this.setState({ approvalCurrentPage: newPageNumber })
+        break
+      case TAB_ID.readyForPrint:
+        this.setState({ printCurrentPage: newPageNumber })
+        break
+      default:
+        throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
+    }
+  }
+
   render() {
     const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
+    const {
+      progressCurrentPage,
+      reviewCurrentPage,
+      updatesCurrentPage,
+      approvalCurrentPage,
+      printCurrentPage
+    } = this.state
     const registrarLocationId = userDetails && getUserLocation(userDetails).id
 
-    let parentQueryLoading = false
+    const reviewStatuses = this.userHasRegisterScope()
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
 
     return (
       <>
         <Header />
         <Query
-          query={COUNT_REGISTRATION_QUERY}
+          query={REGISTRATION_HOME_QUERY}
           variables={{
-            locationIds: [registrarLocationId]
+            locationIds: [registrarLocationId],
+            count: 10,
+            reviewStatuses: reviewStatuses,
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }}
           pollInterval={window.config.UI_POLLING_INTERVAL}
         >
@@ -215,12 +255,18 @@ export class RegistrationHomeView extends React.Component<
             error,
             data
           }: {
-            loading: any
-            error?: any
-            data: any
+            loading: boolean
+            error?: Error
+            data: {
+              counts: GQLEventCount
+              inProgressTab: GQLEventRegResultSet
+              reviewTab: GQLEventSearchResultSet
+              rejectTab: GQLEventSearchResultSet
+              approvalTab: GQLEventSearchResultSet
+              printTab: GQLEventSearchResultSet
+            }
           }) => {
             if (loading) {
-              parentQueryLoading = true
               return (
                 <StyledSpinner
                   id="search-result-spinner"
@@ -228,7 +274,6 @@ export class RegistrationHomeView extends React.Component<
                 />
               )
             }
-            parentQueryLoading = false
             if (error) {
               Sentry.captureException(error)
               return (
@@ -241,7 +286,7 @@ export class RegistrationHomeView extends React.Component<
             // ignore counts waiting to process or being processed right now
             // TODO: do this for other states
             const declaredAndNotProcessingCount = this.subtractApplicationsWithStatus(
-              data.countEvents.declared,
+              data.counts.declared || 0,
               [
                 SUBMISSION_STATUS.READY_TO_REGISTER,
                 SUBMISSION_STATUS.REGISTERING
@@ -266,7 +311,7 @@ export class RegistrationHomeView extends React.Component<
                       draft =>
                         draft.submissionStatus ===
                         SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                    ).length + data.countEvents.inProgress}
+                    ).length + (data.counts.inProgress || 0)}
                     )
                   </IconTab>
                   <IconTab
@@ -282,7 +327,7 @@ export class RegistrationHomeView extends React.Component<
                     {intl.formatMessage(messages.readyForReview)} (
                     {this.userHasRegisterScope()
                       ? declaredAndNotProcessingCount +
-                        data.countEvents.validated
+                        (data.counts.validated || 0)
                       : declaredAndNotProcessingCount}
                     )
                   </IconTab>
@@ -297,7 +342,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.sentForUpdates)} (
-                    {data.countEvents.rejected})
+                    {data.counts.rejected})
                   </IconTab>
                   {this.userHasValidateScope() && (
                     <IconTab
@@ -311,7 +356,7 @@ export class RegistrationHomeView extends React.Component<
                       }
                     >
                       {intl.formatMessage(messages.sentForApprovals)} (
-                      {data.countEvents.validated})
+                      {data.counts.validated})
                     </IconTab>
                   )}
                   <IconTab
@@ -325,45 +370,76 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyToPrint)} (
-                    {data.countEvents.registered})
+                    {data.counts.registered})
                   </IconTab>
                 </TopBar>
+                {tabId === TAB_ID.inProgress && (
+                  <InProgressTab
+                    drafts={drafts}
+                    selectorId={selectorId}
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      loading,
+                      error,
+                      data: data.inProgressTab
+                    }}
+                    page={progressCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.readyForReview && (
+                  <ReviewTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      loading,
+                      error,
+                      data: data.reviewTab
+                    }}
+                    page={reviewCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.sentForUpdates && (
+                  <RejectTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      loading,
+                      error,
+                      data: data.rejectTab
+                    }}
+                    page={updatesCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.sentForApproval && (
+                  <ApprovalTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      loading,
+                      error,
+                      data: data.approvalTab
+                    }}
+                    page={approvalCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.readyForPrint && (
+                  <PrintTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      loading,
+                      error,
+                      data: data.printTab
+                    }}
+                    page={printCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
               </>
             )
           }}
         </Query>
-        {tabId === TAB_ID.inProgress && (
-          <InProgressTab
-            drafts={drafts}
-            selectorId={selectorId}
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.readyForReview && (
-          <ReviewTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.sentForUpdates && (
-          <RejectTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.sentForApproval && (
-          <ApprovalTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.readyForPrint && (
-          <PrintTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
+
         <FABContainer>
           <FloatingActionButton
             id="new_event_declaration"

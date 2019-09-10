@@ -3,7 +3,7 @@ import {
   GridTable
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   goToPrintCertificate,
   goToApplicationDetails
@@ -13,14 +13,11 @@ import { ITheme } from '@register/styledComponents'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
 import {
   ErrorText,
-  EVENT_STATUS,
   StyledSpinner
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
@@ -38,12 +35,17 @@ interface IBasePrintTabProps {
   goToPrintCertificate: typeof goToPrintCertificate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  parentQueryLoading?: boolean
   outboxApplications: IApplication[]
+  queryData: {
+    loading: boolean
+    error: Error | undefined
+    data: GQLEventSearchResultSet
+  }
+  page: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IPrintTabState {
-  printCurrentPage: number
   width: number
 }
 
@@ -57,8 +59,7 @@ class PrintTabComponent extends React.Component<
   constructor(props: IPrintTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      printCurrentPage: 1
+      width: window.innerWidth
     }
   }
 
@@ -127,8 +128,8 @@ class PrintTabComponent extends React.Component<
     }
   }
 
-  transformRegisterdContent = (data: GQLQuery) => {
-    if (!data.searchEvents || !data.searchEvents.results) {
+  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
+    if (!data || !data.results) {
       return []
     }
 
@@ -173,75 +174,45 @@ class PrintTabComponent extends React.Component<
     })
   }
 
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ printCurrentPage: newPageNumber })
-  }
-
   renderExpandedComponent = (itemId: string) => {
     return <RowHistoryView eventId={itemId} />
   }
 
   render() {
-    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
+    const { theme, intl, queryData, page, onPageChange } = this.props
+    const { loading, error, data } = queryData
 
+    if (loading) {
+      return (
+        <StyledSpinner
+          id="search-result-spinner-print"
+          baseColor={theme.colors.background}
+        />
+      )
+    }
+    if (error) {
+      Sentry.captureException(error)
+      return (
+        <ErrorText id="search-result-error-text-print">
+          {intl.formatMessage(errorMessages.queryError)}
+        </ErrorText>
+      )
+    }
     return (
-      <Query
-        query={SEARCH_EVENTS}
-        variables={{
-          status: [EVENT_STATUS.REGISTERED],
-          locationIds: [registrarLocationId],
-          count: this.pageSize,
-          skip: (this.state.printCurrentPage - 1) * this.pageSize
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (loading) {
-            return (
-              (!parentQueryLoading && (
-                <StyledSpinner
-                  id="search-result-spinner-print"
-                  baseColor={theme.colors.background}
-                />
-              )) ||
-              null
-            )
-          }
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-print">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-          return (
-            <HomeContent>
-              <GridTable
-                content={this.transformRegisterdContent(data)}
-                columns={this.getColumns()}
-                renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={this.state.printCurrentPage}
-                expandable={this.getExpandable()}
-                clickable={!this.getExpandable()}
-              />
-            </HomeContent>
-          )
-        }}
-      </Query>
+      <HomeContent>
+        <GridTable
+          content={this.transformRegisteredContent(data)}
+          columns={this.getColumns()}
+          renderExpandedComponent={this.renderExpandedComponent}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          expandable={this.getExpandable()}
+          clickable={!this.getExpandable()}
+        />
+      </HomeContent>
     )
   }
 }
