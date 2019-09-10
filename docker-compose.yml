@@ -124,6 +124,7 @@ services:
     environment:
       - LANGUAGES=bn,en
       - AUTH_URL=http://auth:4040
+      - HOST=0.0.0.0
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
