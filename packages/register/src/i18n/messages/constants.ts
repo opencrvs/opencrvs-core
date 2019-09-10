@@ -402,6 +402,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     defaultMessage: 'certified',
     description: 'A label for certified'
   },
+  validated: {
+    id: 'constants.validated',
+    defaultMessage: 'validated',
+    description: 'A label for validated'
+  },
   male: {
     id: 'constants.male',
     defaultMessage: 'Male',
