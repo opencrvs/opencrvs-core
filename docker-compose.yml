@@ -57,6 +57,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
+      - RESOURCE_SERVICE_URL=http://resources:3040/bgd/
       - COUNTRY=bgd
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true

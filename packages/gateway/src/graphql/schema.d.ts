@@ -338,19 +338,18 @@ export interface GQLUser {
   status?: string
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-  signature?: GQLSignature
   localRegistrar: GQLLocalRegistrar
-}
-
-export interface GQLSignature {
-  data?: string
-  type?: string
 }
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
   role: string
   signature?: GQLSignature
+}
+
+export interface GQLSignature {
+  data?: string
+  type?: string
 }
 
 export interface GQLComment {
@@ -880,8 +879,8 @@ export interface GQLResolver {
   Registration?: GQLRegistrationTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   User?: GQLUserTypeResolver
-  Signature?: GQLSignatureTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
+  Signature?: GQLSignatureTypeResolver
   Comment?: GQLCommentTypeResolver
   Certificate?: GQLCertificateTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -2011,7 +2010,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   status?: UserToStatusResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
-  signature?: UserToSignatureResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
 }
 
@@ -2063,24 +2061,7 @@ export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface UserToSignatureResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLSignatureTypeResolver<TParent = any> {
-  data?: SignatureToDataResolver<TParent>
-  type?: SignatureToTypeResolver<TParent>
-}
-
-export interface SignatureToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2102,6 +2083,19 @@ export interface LocalRegistrarToSignatureResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSignatureTypeResolver<TParent = any> {
+  data?: SignatureToDataResolver<TParent>
+  type?: SignatureToTypeResolver<TParent>
+}
+
+export interface SignatureToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

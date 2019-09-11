@@ -4,6 +4,8 @@ export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
+export const RESOURCE_SERVICE_URL =
+  process.env.RESOURCE_SERVICE_URL || 'http://localhost:3040/bgd/'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
