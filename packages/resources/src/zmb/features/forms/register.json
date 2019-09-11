@@ -4716,7 +4716,7 @@
                     "id": "form.field.label.deceased.nationality"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "options": {
                     "resource": "countries"
@@ -5008,7 +5008,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "options": {
                     "resource": "countries"
@@ -5620,7 +5620,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -6368,25 +6368,9 @@
                     {
                       "value": "PERMANENT",
                       "label": {
-                        "defaultMessage": "Permanent address of the deceased",
-                        "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsPermanent"
-                      }
-                    },
-                    {
-                      "value": "CURRENT",
-                      "label": {
-                        "defaultMessage": "Current address of the deceased",
-                        "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsCurrent"
-                      }
-                    },
-                    {
-                      "value": "PRIVATE_HOME",
-                      "label": {
-                        "defaultMessage": "Private Home",
+                        "defaultMessage": "Residential address of deceased",
                         "description": "Select item for Private Home",
-                        "id": "form.field.label.privateHome"
+                        "id": "form.field.label.resedentialAddress"
                       }
                     },
                     {
@@ -6432,23 +6416,19 @@
               "fields": [
                 {
                   "name": "deathLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
                     "defaultMessage": "What hospital did the death occur at?",
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.deathAtFacility"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "deathPlaceAddress"
                   },
                   "mapping": {
                     "mutation": {
@@ -6486,7 +6466,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -7008,7 +6988,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -8020,7 +8000,7 @@
                     "id": "form.field.label.applicants.nationality"
                   },
                   "required": false,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -8461,7 +8441,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -9231,7 +9211,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
