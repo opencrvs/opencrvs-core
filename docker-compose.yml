@@ -41,7 +41,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
-      - COUNTRY=bgd
       - AUTH_URL=http://auth:4040
 
   # User facing services
@@ -57,7 +56,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
-      - COUNTRY=${COUNTRY?Missing "COUNTRY" from environment variables}
+      - COUNTRY=${COUNTRY:-bgd}
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
 
@@ -123,7 +122,7 @@ services:
     restart: unless-stopped
     environment:
       - AUTH_URL=http://auth:4040
-      - COUNTRY=${COUNTRY?Missing "COUNTRY" from environment variables}
+      - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
 
   resources:
