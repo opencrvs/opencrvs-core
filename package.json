@@ -30,7 +30,7 @@
     "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
-    "deploy:staging": "bash deploy.sh $1 $2 $3 $4 $5",
+    "deploy:staging": "bash deploy.sh",
     "deploy:qa": "bash deploy.sh $1 --clear-data=yes --restore-metadata=yes opencrvs.qa1.jembi.org",
     "deploy:bn-prod": "SSH_USER=mishealth SSH_HOST=172.16.17.54 LOG_LOCATION=/home/mishealth bash deploy.sh bgd --clear-data=no --restore-metadata=yes opencrvsbd.org",
     "cy:open": "yarn db:clear:all && yarn db:backup:restore && cd packages/e2e && yarn open",
