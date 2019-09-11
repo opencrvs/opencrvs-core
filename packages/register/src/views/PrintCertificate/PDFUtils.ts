@@ -1,8 +1,5 @@
 import { IntlShape } from 'react-intl'
 import { createPDF, printPDF } from '@register/pdfRenderer'
-import { template as receiptTemplate } from '@register/pdfRenderer/templates/receipt'
-import { template as birthCertificateTemplate } from '@register/pdfRenderer/templates/birthCertificate'
-import { template as deathCertificateTemplate } from '@register/pdfRenderer/templates/deathCertificate'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@opencrvs/register/src/utils/userUtils'
 import { Event } from '@register/forms'
@@ -17,7 +14,16 @@ export function printMoneyReceipt(
   if (!userDetails) {
     throw new Error('No user details found')
   }
-  printPDF(receiptTemplate, application, userDetails, offlineResource, intl)
+  if (!offlineResource.templates || !offlineResource.templates.receipt) {
+    throw new Error('Money reciept template is misssing in offline data')
+  }
+  printPDF(
+    offlineResource.templates.receipt,
+    application,
+    userDetails,
+    offlineResource,
+    intl
+  )
 }
 
 export async function previewCertificate(
@@ -32,8 +38,8 @@ export async function previewCertificate(
   }
   await createPDF(
     application.event === Event.BIRTH
-      ? birthCertificateTemplate
-      : deathCertificateTemplate,
+      ? offlineResource.templates.certificates.birth
+      : offlineResource.templates.certificates.death,
     application,
     userDetails,
     offlineResource,
@@ -54,8 +60,8 @@ export function printCertificate(
   }
   printPDF(
     application.event === Event.BIRTH
-      ? birthCertificateTemplate
-      : deathCertificateTemplate,
+      ? offlineResource.templates.certificates.birth
+      : offlineResource.templates.certificates.death,
     application,
     userDetails,
     offlineResource,

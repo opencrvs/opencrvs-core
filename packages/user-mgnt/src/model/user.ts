@@ -1,5 +1,6 @@
 import { model, Schema, Document } from 'mongoose'
-import { statuses } from '@user-mgnt/utils/userUtils'
+// tslint:disable-next-line
+import { statuses } from '../utils/userUtils'
 
 export interface IUserName {
   use: string
@@ -19,6 +20,11 @@ interface ISignature {
   type: string
   data: string
 }
+interface ILocalRegistrar {
+  name: IUserName[]
+  role?: string
+  signature: ISignature
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -34,6 +40,7 @@ export interface IUser {
   catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
+  localRegistrar: ILocalRegistrar
   status: string
   deviceId?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
