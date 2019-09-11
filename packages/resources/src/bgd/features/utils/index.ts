@@ -1,6 +1,12 @@
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
 
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const JURISDICTION_TYPE_DISTRICT = 'district'
+export const JURISDICTION_TYPE_UPAZILA = 'upazila'
+export const JURISDICTION_TYPE_UNION = 'union'
+export const GENERATE_TYPE_RN = 'registrationNumber'
+
 type ISupportedType =
   | fhir.Practitioner
   | fhir.PractitionerRole
@@ -125,4 +131,51 @@ export const titleCase = (str: string) => {
       stringArray[i].charAt(0).toUpperCase() + stringArray[i].slice(1)
   }
   return stringArray.join(' ')
+}
+
+export async function getPractitionerLocations(
+  practitionerId: string
+): Promise<[fhir.Location]> {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
+  )
+  const roleEntry = roleResponse.entry[0].resource
+  if (!roleEntry || !roleEntry.location) {
+    throw new Error('PractitionerRole has no locations associated')
+  }
+  const locList = []
+  for (const location of roleEntry.location) {
+    const splitRef = location.reference.split('/')
+    const locationResponse: fhir.Location = await getFromFhir(
+      `/Location/${splitRef[1]}`
+    )
+    if (!locationResponse) {
+      throw new Error(`Location not found for ${location}`)
+    }
+    locList.push(locationResponse)
+  }
+  return locList as [fhir.Location]
+}
+
+export function getJurisDictionalLocations() {
+  return [
+    {
+      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UNION,
+      bbsCode: ''
+    }
+  ]
+}
+
+export function convertStringToASCII(str: string): string {
+  return [...str]
+    .map(char => char.charCodeAt(0).toString())
+    .reduce((acc, v) => acc.concat(v))
 }
