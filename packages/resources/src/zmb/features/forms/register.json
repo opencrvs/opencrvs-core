@@ -2429,277 +2429,71 @@
               "id": "deceased-view-group",
               "fields": [
                 {
-                  "name": "iDType",
-                  "type": "SELECT_WITH_OPTIONS",
+                  "name": "nationalID",
+                  "type": "NUMBER",
                   "label": {
-                    "defaultMessage": "Type of ID",
-                    "description": "Label for form field: Existing ID",
-                    "id": "form.field.label.deceasedIdType"
+                    "defaultMessage": "National ID",
+                    "description": "Option for form field: Type of ID",
+                    "id": "form.field.label.iDTypeNationalID"
                   },
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
+                  "validate": [
                     {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
+                      "operation": "numeric"
                     },
                     {
-                      "value": "NATIONAL_ID",
-                      "label": {
-                        "defaultMessage": "National ID",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
-                      }
-                    },
-                    {
-                      "value": "DRIVING_LICENSE",
-                      "label": {
-                        "defaultMessage": "Drivers License",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeDrivingLicense"
-                      }
-                    },
-                    {
-                      "value": "BIRTH_REGISTRATION_NUMBER",
-                      "label": {
-                        "defaultMessage": "Birth Registration Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
-                      }
-                    },
-                    {
-                      "value": "REFUGEE_NUMBER",
-                      "label": {
-                        "defaultMessage": "Refugee Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeRefugeeNumber"
-                      }
-                    },
-                    {
-                      "value": "ALIEN_NUMBER",
-                      "label": {
-                        "defaultMessage": "Alien Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeAlienNumber"
-                      }
-                    },
-                    {
-                      "value": "NO_ID",
-                      "label": {
-                        "defaultMessage": "No ID available",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNoID"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
+                      "operation": "validLength",
+                      "parameters": [
+                        9
+                      ]
                     }
                   ],
+                  "conditionals": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
+                      "operation": "fieldToIdentityTransformer",
                       "parameters": [
-                        "type"
+                        "id",
+                        "NATIONAL_ID"
                       ]
                     },
                     "query": {
-                      "operation": "identifierToFieldTransformer",
+                      "operation": "identityToFieldTransformer",
                       "parameters": [
-                        "type"
+                        "id",
+                        "NATIONAL_ID"
                       ]
                     }
                   }
                 },
                 {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
+                  "name": "socialSecurityNo",
+                  "type": "NUMBER",
                   "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
+                    "defaultMessage": "Social security no./NAPSA",
+                    "description": "text for social security number form field",
+                    "id": "form.field.label.socialSecurityNumber"
                   },
                   "required": true,
                   "initialValue": "",
                   "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
+                  "conditionals": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
+                      "operation": "fieldToIdentityTransformer",
                       "parameters": [
-                        "otherType"
+                        "id",
+                        "SOCIAL_SECURITY_NO"
                       ]
                     },
                     "query": {
-                      "operation": "identifierToFieldTransformer",
+                      "operation": "identityToFieldTransformer",
                       "parameters": [
-                        "otherType"
+                        "id",
+                        "SOCIAL_SECURITY_NO"
                       ]
                     }
-                  }
-                },
-                {
-                  "name": "iD",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "iDType",
-                      "labelMapper": {
-                        "operation": "identityNameMapper"
-                      }
-                    },
-                    "type": {
-                      "kind": "dynamic",
-                      "dependency": "iDType",
-                      "typeMapper": {
-                        "operation": "identityTypeMapper"
-                      }
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "validIDNumber",
-                          "parameters": []
-                        },
-                        "dependencies": [
-                          "iDType"
-                        ]
-                      }
-                    ]
-                  },
-                  "label": {
-                    "defaultMessage": "ID Number",
-                    "description": "Label for form field: ID Number",
-                    "id": "form.field.label.iD"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || values.iDType === \"NO_ID\""
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
-                      "parameters": [
-                        "id"
-                      ]
-                    },
-                    "query": {
-                      "operation": "identifierToFieldTransformer",
-                      "parameters": [
-                        "id"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "fetchButton",
-                  "type": "FETCH_BUTTON",
-                  "label": {
-                    "defaultMessage": "Retrieve Deceased's Details",
-                    "description": "Label for loader button",
-                    "id": "form.field.label.fetchDeceasedDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "queryMap": {
-                    "BIRTH_REGISTRATION_NUMBER": {
-                      "query": {
-                        "operation": "FETCH_REGISTRATION"
-                      },
-                      "inputs": [
-                        {
-                          "name": "identifier",
-                          "valueField": "iD"
-                        }
-                      ],
-                      "responseTransformer": {
-                        "operation": "transformRegistrationData"
-                      },
-                      "modalInfoText": {
-                        "defaultMessage": "Birth Registration Number",
-                        "description": "Label for loader button",
-                        "id": "form.field.label.fetchRegistrationModalInfo"
-                      },
-                      "errorText": {
-                        "defaultMessage": "No registration found for provided BRN",
-                        "description": "Label for fetch modal error title",
-                        "id": "form.field.label.fetchRegistrationModalErrorText"
-                      }
-                    },
-                    "NATIONAL_ID": {
-                      "query": {
-                        "operation": "FETCH_PERSON"
-                      },
-                      "inputs": [
-                        {
-                          "name": "identifier",
-                          "valueField": "iD"
-                        }
-                      ],
-                      "responseTransformer": {
-                        "operation": "transformPersonData"
-                      },
-                      "modalInfoText": {
-                        "defaultMessage": "National ID",
-                        "description": "Label for loader button",
-                        "id": "form.field.label.fetchPersonByNIDModalInfo"
-                      },
-                      "errorText": {
-                        "defaultMessage": "No person found for provided NID",
-                        "description": "Label for fetch modal error title",
-                        "id": "form.field.label.fetchPersonByNIDModalErrorText"
-                      }
-                    }
-                  },
-                  "querySelectorInput": {
-                    "name": "identifierType",
-                    "valueField": "iDType"
-                  },
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
-                    }
-                  ],
-                  "modalTitle": {
-                    "defaultMessage": "Checking",
-                    "description": "Label for fetch modal title",
-                    "id": "form.field.label.fetchIdentifierModalTitle"
-                  },
-                  "successTitle": {
-                    "defaultMessage": "ID valid",
-                    "description": "Label for fetch modal success title",
-                    "id": "form.field.label.fetchIdentifierModalSuccessTitle"
-                  },
-                  "errorTitle": {
-                    "defaultMessage": "Invalid Id",
-                    "description": "Label for fetch modal error title",
-                    "id": "form.field.label.fetchIdentifierModalErrorTitle"
                   }
                 },
                 {
@@ -2710,9 +2504,14 @@
                     "description": "Label for form field: Nationality",
                     "id": "form.field.label.deceased.nationality"
                   },
-                  "required": true,
-                  "initialValue": "BGD",
+                  "required": false,
+                  "initialValue": "ZMB",
                   "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
                   "options": {
                     "resource": "countries"
                   },
@@ -2729,71 +2528,11 @@
                   "name": "firstNames",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "Given name(s)",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.deceasedGivenNames"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "bn"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "bn"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "familyName",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
-                    "description": "Label for form field: Family name",
-                    "id": "form.field.label.deceasedFamilyName"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "bn"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "bn"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "firstNamesEng",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: Given names in english",
                     "id": "form.field.label.deceasedGivenNamesEng"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [
                     {
@@ -2818,11 +2557,11 @@
                   }
                 },
                 {
-                  "name": "familyNameEng",
+                  "name": "familyName",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
+                    "defaultMessage": "Surname",
+                    "description": "Label for form field: Surname in english",
                     "id": "form.field.label.deceasedFamilyNameEng"
                   },
                   "required": true,
@@ -2848,6 +2587,22 @@
                       ]
                     }
                   }
+                },
+                {
+                  "name": "birthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of Birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.deceasedDateOfBirth"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "isValidBirthDate"
+                    }
+                  ]
                 },
                 {
                   "name": "gender",
@@ -2901,20 +2656,16 @@
                   ]
                 },
                 {
-                  "name": "birthDate",
-                  "type": "DATE",
+                  "name": "seperator",
+                  "type": "SUBSECTION",
                   "label": {
-                    "defaultMessage": "Date of Birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.deceasedDateOfBirth"
+                    "defaultMessage": " ",
+                    "description": "empty string",
+                    "id": "form.field.label.empty"
                   },
-                  "required": true,
                   "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "isValidBirthDate"
-                    }
-                  ]
+                  "validate": [],
+                  "conditionals": []
                 },
                 {
                   "name": "maritalStatus",
@@ -2984,10 +2735,23 @@
                   ]
                 },
                 {
+                  "name": "occupation",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Occupation",
+                    "description": "text for occupation form field",
+                    "id": "form.field.label.occupation"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": []
+                },
+                {
                   "name": "permanentAddress",
                   "type": "SUBSECTION",
                   "label": {
-                    "defaultMessage": "What was their permanent address?",
+                    "defaultMessage": "What was their residential address?",
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
@@ -3002,9 +2766,14 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "required": true,
-                  "initialValue": "BGD",
+                  "required": false,
+                  "initialValue": "ZMB",
                   "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
                   "options": {
                     "resource": "countries"
                   },
@@ -3031,11 +2800,11 @@
                   "name": "statePermanent",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
                   "label": {
-                    "defaultMessage": "Division",
+                    "defaultMessage": "Province",
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "required": true,
+                  "required": false,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -3068,1140 +2837,6 @@
                         "PERMANENT",
                         0,
                         "state"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "districtPermanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "District",
-                    "description": "Title for the district select",
-                    "id": "form.field.label.district"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "statePermanent"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine4Permanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "districtPermanent"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3Permanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4Permanent"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3CityOptionPermanent",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Ward",
-                    "description": "Title for the address line 3 option 2",
-                    "id": "form.field.label.addressLine3CityOption"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2Permanent",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1CityOptionPermanent",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCodeCityOptionPermanent",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "postalCode"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "postalCode"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1Permanent",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCodePermanent",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "postalCode"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "postalCode"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "currentAddressSameAsPermanent",
-                  "type": "RADIO_GROUP",
-                  "label": {
-                    "defaultMessage": "Is deceased’s current address the same as their permanent address?",
-                    "description": "Title for the radio button to select that the deceased current address is the same as their permanent address",
-                    "id": "form.field.label.deceasedCurrentAddressSameAsPermanent"
-                  },
-                  "required": true,
-                  "initialValue": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": true,
-                      "label": {
-                        "defaultMessage": "Yes",
-                        "description": "confirmation label for yes / no radio button",
-                        "id": "form.field.label.confirm"
-                      }
-                    },
-                    {
-                      "value": false,
-                      "label": {
-                        "defaultMessage": "No",
-                        "description": "deny label for yes / no radio button",
-                        "id": "form.field.label.deny"
-                      }
-                    }
-                  ],
-                  "conditionals": [],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "copyAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        "deceased",
-                        "CURRENT",
-                        "deceased"
-                      ]
-                    },
-                    "query": {
-                      "operation": "sameAddressFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        "deceased",
-                        "CURRENT",
-                        "deceased"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "country",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Country",
-                    "description": "Title for the country select",
-                    "id": "form.field.label.country"
-                  },
-                  "required": true,
-                  "initialValue": "BGD",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": {
-                    "resource": "countries"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "state",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Division",
-                    "description": "Title for the state select",
-                    "id": "form.field.label.state"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "country"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "district",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "District",
-                    "description": "Title for the district select",
-                    "id": "form.field.label.district"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "state"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine4",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "district"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        6
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        6
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        4
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        4
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Ward",
-                    "description": "Title for the address line 3 option 2",
-                    "id": "form.field.label.addressLine3CityOption"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        5
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        5
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        3
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        3
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        2
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        2
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCodeCityOption",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "postalCode"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "postalCode"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        1
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        1
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCode",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "postalCode"
-                      ]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "postalCode"
                       ]
                     }
                   }
