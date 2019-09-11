@@ -122,9 +122,8 @@ services:
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
-      - LANGUAGES=${LANGUAGES?Missing "LANGUAGES" from environment variables}
       - AUTH_URL=http://auth:4040
-      - COUNTRY_ALPHA3=${COUNTRY_ALPHA3?Missing "COUNTRY_ALPHA3" from environment variables}
+      - COUNTRY=${COUNTRY?Missing "COUNTRY" from environment variables}
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}

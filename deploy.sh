@@ -46,9 +46,11 @@ echo
 echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
+mkdir -p /tmp/compose/infrastructure/backups
+
 # Copy selected country config to public & infrastructure folder
-cp packages/resources/src/$COUNTRY/config/register-config.js /tmp/compose/infrastructure/register-config.js
-cp packages/resources/src/$COUNTRY/config/login-config.js /tmp/compose/infrastructure/login-config.js
+cp packages/resources/src/$COUNTRY/config/register-config.prod.js /tmp/compose/infrastructure/register-config.js
+cp packages/resources/src/$COUNTRY/config/login-config.prod.js /tmp/compose/infrastructure/login-config.js
 
 # Copy selected country backups to infrastructure backups folder
 cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/backups/hearth-dev.gz
@@ -58,6 +60,9 @@ cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastruct
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
 
+# Override configuration files with country specific files
+rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
+
 # Prepare docker-compose.deploy.yml file - rotate secrets etc
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 
@@ -65,7 +70,7 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/comp
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
-ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml --with-registry-auth opencrvs'
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml --with-registry-auth opencrvs'
 
 if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
     echo

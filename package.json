@@ -11,8 +11,8 @@
   "scripts": {
     "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
-    "start:zmb": "cp packages/resources/src/zmb/config/register-config.js packages/register/public/config.js && cp packages/resources/src/zmb/config/login-config.js packages/login/public/config.js && COUNTRY=zmb COUNTRY_ALPHA3=ZMB BRN_GENERATOR_CODE=zm yarn start",
-    "start:bgd": "cp packages/resources/src/bgd/config/register-config.js packages/register/public/config.js && cp packages/resources/src/bgd/config/login-config.js packages/login/public/config.js && COUNTRY=bgd COUNTRY_ALPHA3=BGD BRN_GENERATOR_CODE=bd yarn start",
+    "start:zmb": "cp packages/resources/src/zmb/config/register-config.js packages/register/public/config.js && cp packages/resources/src/zmb/config/login-config.js packages/login/public/config.js && COUNTRY=zmb BRN_GENERATOR_CODE=zm yarn start",
+    "start:bgd": "cp packages/resources/src/bgd/config/register-config.js packages/register/public/config.js && cp packages/resources/src/bgd/config/login-config.js packages/login/public/config.js && COUNTRY=bgd BRN_GENERATOR_CODE=bd yarn start",
     "start:prod": "yarn build && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
     "dev:bgd": "yarn dev:secrets:gen && concurrently \"yarn run start:bgd\" \"yarn run compose:deps\"",
     "dev:zmb": "yarn dev:secrets:gen && concurrently \"yarn run start:zmb\" \"yarn run compose:deps\"",

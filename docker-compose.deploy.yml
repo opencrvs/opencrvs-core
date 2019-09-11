@@ -207,7 +207,6 @@ services:
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGES=bn,en
-      - COUNTRY_ALPHA3=BGD
     deploy:
       replicas: 2
     networks:
