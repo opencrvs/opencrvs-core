@@ -125,6 +125,7 @@ services:
     environment:
       - LANGUAGES=bn,en
       - AUTH_URL=http://auth:4040
+      - HOST=0.0.0.0
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
@@ -133,6 +134,8 @@ services:
       dockerfile: ./packages/resources/Dockerfile
     restart: unless-stopped
     environment:
+      - MONGO_URL=mongodb://mongo1/user-mgnt
+      - TEST_USER_PASSWORD=test
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040

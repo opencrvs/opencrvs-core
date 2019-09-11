@@ -8,6 +8,7 @@ import {
   CLICKATELL_PASSWORD,
   CLICKATELL_USER,
   INFOBIP_API_KEY,
+  INFOBIP_SENDER_ID,
   INFOBIP_GATEWAY_ENDPOINT
 } from '@notification/constants'
 import { logger } from '@notification/logger'
@@ -56,6 +57,7 @@ async function sendSMSClickatell(
 
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
+    from: INFOBIP_SENDER_ID,
     to: convertToMSISDN(to),
     text
   })
