@@ -57,7 +57,7 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
-      - COUNTRY=bgd
+      - COUNTRY=${COUNTRY?Missing "COUNTRY" from environment variables}
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
 
@@ -122,8 +122,9 @@ services:
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
-      - LANGUAGES=bn,en
+      - LANGUAGES=${LANGUAGES?Missing "LANGUAGES" from environment variables}
       - AUTH_URL=http://auth:4040
+      - COUNTRY_ALPHA3=${COUNTRY_ALPHA3?Missing "COUNTRY_ALPHA3" from environment variables}
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}
