@@ -381,7 +381,8 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.inProgressTab
+                      data: data.inProgressTab,
+                      count: data.counts.inProgress || 0
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}

@@ -26,12 +26,14 @@ import {
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
-import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
 import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
@@ -85,6 +87,14 @@ const TabGroup = styled.div`
     padding-top: 5px;
   }
 `
+
+interface IQueryData {
+  loading: boolean
+  error: Error | undefined
+  data: GQLEventRegResultSet
+  count: number
+}
+
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
@@ -93,11 +103,7 @@ interface IBaseRegistrarHomeProps {
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
-  queryData: {
-    loading: boolean
-    error: Error | undefined
-    data: GQLEventRegResultSet
-  }
+  queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
 }
@@ -283,95 +289,70 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressSelectorsWithCounts = (
     selectorId: string,
     drafts: IApplication[],
-    registrarLocationId: string
+    count: number
   ) => {
     const { intl } = this.props
 
     return (
-      <Query
-        query={COUNT_REGISTRATION_QUERY}
-        variables={{
-          locationIds: [registrarLocationId]
-        }}
-      >
-        {({ error, data }: { loading: any; error?: any; data: any }) => {
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-          return (
-            <TabGroup>
-              {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-                <BlueButton
-                  id={`selector_${SELECTOR_ID.ownDrafts}`}
-                  key={SELECTOR_ID.ownDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.ownDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                  {drafts && drafts.length})
-                </BlueButton>
-              )) || (
-                <WhiteButton
-                  id={`selector_${SELECTOR_ID.ownDrafts}`}
-                  key={SELECTOR_ID.ownDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.ownDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                  {drafts && drafts.length})
-                </WhiteButton>
-              )}
+      <TabGroup>
+        {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+          <BlueButton
+            id={`selector_${SELECTOR_ID.ownDrafts}`}
+            key={SELECTOR_ID.ownDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.ownDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressOwnDrafts)} (
+            {drafts && drafts.length})
+          </BlueButton>
+        )) || (
+          <WhiteButton
+            id={`selector_${SELECTOR_ID.ownDrafts}`}
+            key={SELECTOR_ID.ownDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.ownDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressOwnDrafts)} (
+            {drafts && drafts.length})
+          </WhiteButton>
+        )}
 
-              {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
-                <BlueButton
-                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                  key={SELECTOR_ID.fieldAgentDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.fieldAgentDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data && data.countEvents && data.countEvents.inProgress) ||
-                    0}
-                  )
-                </BlueButton>
-              )) || (
-                <WhiteButton
-                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                  key={SELECTOR_ID.fieldAgentDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.fieldAgentDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data && data.countEvents && data.countEvents.inProgress) ||
-                    0}
-                  )
-                </WhiteButton>
-              )}
-            </TabGroup>
-          )
-        }}
-      </Query>
+        {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
+          <BlueButton
+            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+            key={SELECTOR_ID.fieldAgentDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.fieldAgentDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressFieldAgents)} ({count})
+          </BlueButton>
+        )) || (
+          <WhiteButton
+            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+            key={SELECTOR_ID.fieldAgentDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.fieldAgentDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressFieldAgents)} ({count})
+          </WhiteButton>
+        )}
+      </TabGroup>
     )
   }
 
@@ -382,6 +363,46 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressDataExpandedComponent = (itemId: string) => {
     return <RemoteInProgressDataDetails eventId={itemId} />
   }
+
+  renderFieldAgentTable = (
+    queryData: IQueryData,
+    theme: ITheme,
+    intl: IntlShape,
+    page: number,
+    onPageChange: (newPageNumber: number) => void
+  ) => {
+    if (queryData.loading) {
+      return (
+        <StyledSpinner
+          id="remote-drafts-spinner"
+          baseColor={theme.colors.background}
+        />
+      )
+    }
+    if (queryData.error) {
+      Sentry.captureException(queryData.error)
+      return (
+        <ErrorText id="remote-drafts-error-text">
+          {intl.formatMessage(errorMessages.queryError)}
+        </ErrorText>
+      )
+    }
+    return (
+      <GridTable
+        content={this.transformRemoteDraftsContent(queryData.data)}
+        columns={this.getRemoteDraftColumns()}
+        renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+        noResultText={intl.formatMessage(constantsMessages.noResults)}
+        onPageChange={onPageChange}
+        pageSize={this.pageSize}
+        totalItems={(queryData.data && queryData.data.totalItems) || 0}
+        currentPage={page}
+        expandable={this.getExpandable()}
+        clickable={!this.getExpandable()}
+      />
+    )
+  }
+
   componentDidMount() {
     window.addEventListener('resize', this.recordWindowWidth)
   }
@@ -504,7 +525,6 @@ export class InProgressTabComponent extends React.Component<
     const {
       theme,
       intl,
-      registrarLocationId,
       selectorId,
       drafts,
       queryData,
@@ -517,7 +537,7 @@ export class InProgressTabComponent extends React.Component<
         {this.renderInProgressSelectorsWithCounts(
           selectorId,
           drafts,
-          registrarLocationId as string
+          queryData.count
         )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
@@ -534,40 +554,13 @@ export class InProgressTabComponent extends React.Component<
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
-          (() => {
-            if (queryData.loading) {
-              return (
-                <StyledSpinner
-                  id="remote-drafts-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )
-            }
-            if (queryData.error) {
-              Sentry.captureException(queryData.error)
-              return (
-                <ErrorText id="remote-drafts-error-text">
-                  {intl.formatMessage(errorMessages.queryError)}
-                </ErrorText>
-              )
-            }
-            return (
-              <GridTable
-                content={this.transformRemoteDraftsContent(queryData.data)}
-                columns={this.getRemoteDraftColumns()}
-                renderExpandedComponent={
-                  this.renderInProgressDataExpandedComponent
-                }
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                onPageChange={onPageChange}
-                pageSize={this.pageSize}
-                totalItems={(queryData.data && queryData.data.totalItems) || 0}
-                currentPage={page}
-                expandable={this.getExpandable()}
-                clickable={!this.getExpandable()}
-              />
-            )
-          })}
+          this.renderFieldAgentTable(
+            queryData,
+            theme,
+            intl,
+            page,
+            onPageChange
+          )}
       </HomeContent>
     )
   }
