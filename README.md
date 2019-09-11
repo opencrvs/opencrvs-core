@@ -45,7 +45,7 @@ You can open all of them by running `yarn open`
 
 1. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
 2. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
-3. Click Channels and for each channel -
+3. Click Channels and check all have loaded successfully. for each channel you may need to -
    1. click edit, and then go to routes tab and change the value of host from service name to your local IP address.
 4. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
 
@@ -55,9 +55,8 @@ Start the development environment as described above, then:
 
 1. Start the dev environment - as explained above.
 2. Populate reference data for your country requirements from the resources package. `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
-3. Login to the OpenHIM console and upload the base config file.
-4. `cd packages/resources && yarn db:backup:create <<insert country code>>`
-5. Commit and push the new db dump archive files that have been created.
+3. `cd packages/resources && yarn db:backup:create <<insert country code>>`
+4. Commit and push the new db dump archive files that have been created in your country folder in resources package.
 
 ### tmuxed development setup
 
