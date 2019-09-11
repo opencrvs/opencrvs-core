@@ -4,6 +4,8 @@ import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { IQueryData } from '@register/views/RegistrationHome/RegistrationHome'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -33,6 +35,19 @@ export enum SUBMISSION_STATUS {
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
+
+export const processingStates = [
+  SUBMISSION_STATUS.READY_TO_SUBMIT,
+  SUBMISSION_STATUS.SUBMITTING,
+  SUBMISSION_STATUS.READY_TO_APPROVE,
+  SUBMISSION_STATUS.APPROVING,
+  SUBMISSION_STATUS.READY_TO_REGISTER,
+  SUBMISSION_STATUS.REGISTERING,
+  SUBMISSION_STATUS.READY_TO_REJECT,
+  SUBMISSION_STATUS.REJECTING,
+  SUBMISSION_STATUS.READY_TO_CERTIFY,
+  SUBMISSION_STATUS.CERTIFYING
+]
 
 export interface IPayload {
   [key: string]: IFormFieldValue
@@ -438,5 +453,67 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       }
     default:
       return state
+  }
+}
+
+export function filterProcessingApplications(
+  data: GQLEventSearchResultSet,
+  processingApplicationIds: string[]
+): GQLEventSearchResultSet {
+  if (!data.results) {
+    return data
+  }
+
+  const filteredResults = data.results.filter(result => {
+    if (result === null) {
+      return false
+    }
+
+    return !processingApplicationIds.includes(result.id)
+  })
+  const filteredTotal =
+    (data.totalItems || 0) - (data.results.length - filteredResults.length)
+
+  return {
+    results: filteredResults,
+    totalItems: filteredTotal
+  }
+}
+
+export function filterProcessingApplicationsFromQuery(
+  queryData: IQueryData,
+  storedApplications: IApplication[]
+): IQueryData {
+  const processingApplicationIds = storedApplications
+    .filter(
+      application =>
+        application.submissionStatus &&
+        processingStates.includes(
+          application.submissionStatus as SUBMISSION_STATUS
+        )
+    )
+    .map(application => application.id)
+
+  return {
+    inProgressTab: filterProcessingApplications(
+      queryData.inProgressTab,
+      processingApplicationIds
+    ),
+    reviewTab: filterProcessingApplications(
+      queryData.reviewTab,
+      processingApplicationIds
+    ),
+    rejectTab: filterProcessingApplications(
+      queryData.rejectTab,
+      processingApplicationIds
+    ),
+    approvalTab: filterProcessingApplications(
+      queryData.approvalTab,
+      processingApplicationIds
+    ),
+    printTab: filterProcessingApplications(
+      queryData.printTab,
+      processingApplicationIds
+    )
   }
 }

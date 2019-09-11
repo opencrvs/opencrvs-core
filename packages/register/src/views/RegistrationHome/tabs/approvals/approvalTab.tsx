@@ -24,7 +24,7 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { errorMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
+import { IApplication } from '@register/applications'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -140,12 +140,7 @@ class ApprovalTabComponent extends React.Component<
     if (!data || !data.results) {
       return []
     }
-    const transformedData = transformData(
-      data,
-      this.props.intl,
-      this.props.outboxApplications,
-      [SUBMISSION_STATUS.READY_TO_APPROVE, SUBMISSION_STATUS.APPROVING]
-    )
+    const transformedData = transformData(data, this.props.intl)
 
     return transformedData.map(reg => {
       const icon: JSX.Element = (

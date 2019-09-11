@@ -19,7 +19,11 @@ import {
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  filterProcessingApplicationsFromQuery
+} from '@register/applications'
 import { Header } from '@register/components/interface/Header/Header'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
 import {
@@ -51,16 +55,20 @@ import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { errorMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@register/i18n/messages/views/certificate'
-import {
-  GQLEventSearchResultSet,
-  GQLEventRegResultSet,
-  GQLEventCount
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface IProps extends IButtonProps {
   active?: boolean
   disabled?: boolean
   id: string
+}
+
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
 }
 
 export const IconTab = styled(Button).attrs<IProps>({})`
@@ -125,7 +133,7 @@ interface IBaseRegistrationHomeProps {
   drafts: IApplication[]
   applications: IApplication[]
   goToEvents: typeof goToEventsAction
-  outboxApplications: IApplication[]
+  storedApplications: IApplication[]
 }
 
 interface IRegistrationHomeState {
@@ -190,7 +198,7 @@ export class RegistrationHomeView extends React.Component<
   }
 
   subtractApplicationsWithStatus(count: number, status: string[]) {
-    const outboxCount = this.props.outboxApplications.filter(
+    const outboxCount = this.props.storedApplications.filter(
       app => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
@@ -219,7 +227,15 @@ export class RegistrationHomeView extends React.Component<
   }
 
   render() {
-    const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
+    const {
+      theme,
+      intl,
+      userDetails,
+      tabId,
+      selectorId,
+      drafts,
+      storedApplications
+    } = this.props
     const {
       progressCurrentPage,
       reviewCurrentPage,
@@ -257,14 +273,7 @@ export class RegistrationHomeView extends React.Component<
           }: {
             loading: boolean
             error?: Error
-            data: {
-              counts: GQLEventCount
-              inProgressTab: GQLEventRegResultSet
-              reviewTab: GQLEventSearchResultSet
-              rejectTab: GQLEventSearchResultSet
-              approvalTab: GQLEventSearchResultSet
-              printTab: GQLEventSearchResultSet
-            }
+            data: IQueryData
           }) => {
             if (loading) {
               return (
@@ -283,14 +292,9 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
-            // ignore counts waiting to process or being processed right now
-            // TODO: do this for other states
-            const declaredAndNotProcessingCount = this.subtractApplicationsWithStatus(
-              data.counts.declared || 0,
-              [
-                SUBMISSION_STATUS.READY_TO_REGISTER,
-                SUBMISSION_STATUS.REGISTERING
-              ]
+            const filteredData = filterProcessingApplicationsFromQuery(
+              data,
+              storedApplications
             )
 
             return (
@@ -311,7 +315,7 @@ export class RegistrationHomeView extends React.Component<
                       draft =>
                         draft.submissionStatus ===
                         SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                    ).length + (data.counts.inProgress || 0)}
+                    ).length + (filteredData.inProgressTab.totalItems || 0)}
                     )
                   </IconTab>
                   <IconTab
@@ -325,11 +329,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {this.userHasRegisterScope()
-                      ? declaredAndNotProcessingCount +
-                        (data.counts.validated || 0)
-                      : declaredAndNotProcessingCount}
-                    )
+                    {filteredData.reviewTab.totalItems})
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -342,7 +342,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.sentForUpdates)} (
-                    {data.counts.rejected})
+                    {filteredData.rejectTab.totalItems})
                   </IconTab>
                   {this.userHasValidateScope() && (
                     <IconTab
@@ -356,7 +356,7 @@ export class RegistrationHomeView extends React.Component<
                       }
                     >
                       {intl.formatMessage(messages.sentForApprovals)} (
-                      {data.counts.validated})
+                      {filteredData.approvalTab.totalItems})
                     </IconTab>
                   )}
                   <IconTab
@@ -370,7 +370,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyToPrint)} (
-                    {data.counts.registered})
+                    {filteredData.printTab.totalItems})
                   </IconTab>
                 </TopBar>
                 {tabId === TAB_ID.inProgress && (
@@ -381,8 +381,8 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.inProgressTab,
-                      count: data.counts.inProgress || 0
+                      data: filteredData.inProgressTab,
+                      count: filteredData.inProgressTab.totalItems || 0
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}
@@ -394,7 +394,7 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.reviewTab
+                      data: filteredData.reviewTab
                     }}
                     page={reviewCurrentPage}
                     onPageChange={this.onPageChange}
@@ -406,7 +406,7 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.rejectTab
+                      data: filteredData.rejectTab
                     }}
                     page={updatesCurrentPage}
                     onPageChange={this.onPageChange}
@@ -418,7 +418,7 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.approvalTab
+                      data: filteredData.approvalTab
                     }}
                     page={approvalCurrentPage}
                     onPageChange={this.onPageChange}
@@ -430,7 +430,7 @@ export class RegistrationHomeView extends React.Component<
                     queryData={{
                       loading,
                       error,
-                      data: data.printTab
+                      data: filteredData.printTab
                     }}
                     page={printCurrentPage}
                     onPageChange={this.onPageChange}
@@ -478,7 +478,7 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
-    outboxApplications: state.applicationsState.applications,
+    storedApplications: state.applicationsState.applications,
     drafts:
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(

@@ -12,45 +12,41 @@ export const REGISTRATION_HOME_QUERY = gql`
     $approvalSkip: Int
     $printSkip: Int
   ) {
-    counts: countEvents(locationIds: $locationIds) {
-      inProgress
-      declared
-      validated
-      registered
-      rejected
-    }
-    inProgressTab: listEventRegistrations(
+    inProgressTab: searchEvents(
       locationIds: $locationIds
-      status: "IN_PROGRESS"
+      status: ["IN_PROGRESS"]
       count: $count
       skip: $inProgressSkip
     ) {
       totalItems
       results {
         id
+        type
         registration {
-          type
+          status
+          contactNumber
           trackingId
-        }
-        ... on BirthRegistration {
-          child {
-            name {
-              use
-              firstNames
-              familyName
-            }
-          }
+          registrationNumber
+          registeredLocationId
+          duplicates
           createdAt
+          modifiedAt
         }
-        ... on DeathRegistration {
-          deceased {
-            name {
-              use
-              firstNames
-              familyName
-            }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
           }
-          createdAt
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
         }
       }
     }

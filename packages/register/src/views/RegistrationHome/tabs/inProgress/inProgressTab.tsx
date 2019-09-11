@@ -6,11 +6,10 @@ import {
 } from '@opencrvs/components/lib/interface/GridTable'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
-  GQLBirthRegistration,
-  GQLDeathRegistration,
-  GQLEventRegistration,
   GQLHumanName,
-  GQLEventRegResultSet
+  GQLEventSearchResultSet,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IApplication } from '@register/applications'
 import {
@@ -91,7 +90,7 @@ const TabGroup = styled.div`
 interface IQueryData {
   loading: boolean
   error: Error | undefined
-  data: GQLEventRegResultSet
+  data: GQLEventSearchResultSet
   count: number
 }
 
@@ -137,7 +136,7 @@ export class InProgressTabComponent extends React.Component<
     }
   }
 
-  transformRemoteDraftsContent = (data: GQLEventRegResultSet) => {
+  transformRemoteDraftsContent = (data: GQLEventSearchResultSet) => {
     if (!data || !data.results) {
       return []
     }
@@ -145,35 +144,31 @@ export class InProgressTabComponent extends React.Component<
     const { intl } = this.props
     const { locale } = intl
 
-    return data.results.map((reg: GQLEventRegistration | null) => {
-      let birthReg
-      let deathReg
-      let name
+    return data.results.map(reg => {
+      if (!reg) {
+        throw new Error('Registration is null')
+      }
 
-      const regId = (reg as GQLEventRegistration).id
-      const event = reg && reg.registration && (reg.registration.type as string)
-      const lastModificationDate = reg && reg.createdAt
+      const regId = reg.id
+      const event = reg.type
+      const lastModificationDate =
+        (reg && reg.registration && reg.registration.modifiedAt) || ''
       const trackingId = reg && reg.registration && reg.registration.trackingId
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
-      if (event && event.toLowerCase() === 'birth') {
-        birthReg = reg as GQLBirthRegistration
-        const childName =
-          (birthReg.child && (birthReg.child.name as GQLHumanName[])) || []
-        name =
-          (createNamesMap(childName)[locale] as string) ||
-          (createNamesMap(childName)[LANG_EN] as string) ||
-          ''
-      } else if (event && event.toLowerCase() === 'death') {
-        deathReg = reg as GQLDeathRegistration
-        const deceasedName =
-          (deathReg.deceased && (deathReg.deceased.name as GQLHumanName[])) ||
-          []
-        name =
-          (createNamesMap(deceasedName)[locale] as string) ||
-          (createNamesMap(deceasedName)['default'] as string) ||
-          ''
+      let name
+      if (reg.registration && reg.type === 'Birth') {
+        const birthReg = reg as GQLBirthEventSearchSet
+        const names = birthReg && (birthReg.childName as GQLHumanName[])
+        const namesMap = createNamesMap(names)
+        name = namesMap[locale] || namesMap[LANG_EN]
+      } else {
+        const deathReg = reg as GQLDeathEventSearchSet
+        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+        const namesMap = createNamesMap(names)
+        name = namesMap[locale] || namesMap[LANG_EN]
       }
+
       const actions = [
         {
           label: intl.formatMessage(buttonMessages.update),

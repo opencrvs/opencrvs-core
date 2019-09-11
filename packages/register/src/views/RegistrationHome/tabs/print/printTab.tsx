@@ -133,11 +133,7 @@ class PrintTabComponent extends React.Component<
       return []
     }
 
-    const transformedData = transformData(
-      data,
-      this.props.intl,
-      this.props.outboxApplications
-    )
+    const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const actions = [
         {

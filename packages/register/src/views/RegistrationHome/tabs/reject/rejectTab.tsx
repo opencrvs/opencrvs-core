@@ -33,7 +33,7 @@ import {
   constantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
+import { IApplication } from '@register/applications'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -145,12 +145,7 @@ class RejectTabComponent extends React.Component<
     if (!data || !data.results) {
       return []
     }
-    const transformedData = transformData(
-      data,
-      this.props.intl,
-      this.props.outboxApplications,
-      [SUBMISSION_STATUS.READY_TO_REJECT, SUBMISSION_STATUS.REJECTING]
-    )
+    const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       if (this.userHasRegisterScope()) {
