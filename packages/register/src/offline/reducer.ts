@@ -9,6 +9,7 @@ import { tempData } from '@register/offline/temp/tempLocations'
 import { ISerializedForm } from '@register/forms'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@register/utils/userUtils'
+import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -32,6 +33,13 @@ export interface IOfflineData {
     registerForm: {
       birth: ISerializedForm
       death: ISerializedForm
+    }
+  }
+  templates: {
+    receipt?: IPDFTemplate
+    certificates: {
+      birth: IPDFTemplate
+      death: IPDFTemplate
     }
   }
   assets: {
@@ -149,7 +157,8 @@ function reducer(
         offlineData: {
           ...state.offlineData,
           languages: action.payload.languages,
-          forms: action.payload.forms
+          forms: action.payload.forms,
+          templates: action.payload.templates
         }
       }
     }

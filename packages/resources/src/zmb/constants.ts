@@ -13,3 +13,8 @@ export const FACILITIES_SOURCE = path.join(
   process.cwd(),
   'src/zmb/features/facilities/'
 )
+
+export const EMPLOYEES_SOURCE = path.join(
+  process.cwd(),
+  'src/zmb/features/employees/generated/'
+)

@@ -318,11 +318,12 @@ describe('User type resolvers', () => {
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
-    const response = await userTypeResolvers.User.signature(mockResponse)
+    const response = await userTypeResolvers.User.localRegistrar(mockResponse)
 
     expect(response).toEqual({
-      type: 'image/png',
-      data: signatureData
+      role: 'LOCAL_REGISTRAR',
+      name: undefined,
+      signature: { type: 'image/png', data: signatureData }
     })
   })
 
@@ -356,20 +357,14 @@ describe('User type resolvers', () => {
     const userResponse = mockResponse
     userResponse.scope.push('register')
 
-    const response = await userTypeResolvers.User.signature(userResponse)
+    const response = await userTypeResolvers.User.localRegistrar(userResponse)
 
     expect(response).toEqual({
-      type: 'image/png',
-      data: signatureData
+      role: 'REGISTRATION_AGENT',
+      signature: {
+        type: 'image/png',
+        data: signatureData
+      }
     })
-  })
-
-  it('return null as user signature for field agent', async () => {
-    const userResponse = mockResponse
-    userResponse.scope = ['declare']
-
-    const response = await userTypeResolvers.User.signature(userResponse)
-
-    expect(response).toEqual(null)
   })
 })
