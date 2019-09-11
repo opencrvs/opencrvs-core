@@ -3,6 +3,7 @@ import { getToken } from '@register/utils/authUtils'
 import { ILanguage } from '@register/i18n/reducer'
 import { ISerializedForm } from '@register/forms'
 import * as ImageDownloader from 'image-to-base64'
+import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -13,6 +14,13 @@ export interface IFacilitiesDataResponse {
 export interface IDefinitionsResponse {
   languages: ILanguage[]
   forms: { registerForm: { birth: ISerializedForm; death: ISerializedForm } }
+  templates: {
+    receipt?: IPDFTemplate
+    certificates: {
+      birth: IPDFTemplate
+      death: IPDFTemplate
+    }
+  }
 }
 export interface IAssetResponse {
   logo: string

@@ -45,6 +45,17 @@ export async function createServer() {
   const routes = getRoutes()
   server.route(routes)
 
+  /*
+   * For debugging sent applications on pre-prod environments.
+   * Custom implementation a sGood doesn't support logging request payloads
+   * https://github.com/hapijs/good/search?q=request&type=Issues
+   */
+  if (process.env.NODE_ENV !== 'production') {
+    server.events.on('response', request => {
+      server.log('info', JSON.stringify(request.payload))
+    })
+  }
+
   async function start() {
     await server.start()
     server.log('info', `server started on port ${PORT}`)

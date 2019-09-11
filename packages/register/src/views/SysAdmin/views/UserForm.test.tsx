@@ -89,7 +89,7 @@ describe('Create new user page tests', () => {
         .find('#registrationOffice-id')
         .hostNodes()
         .props().value
-    ).toEqual('Amdia Union Parishad')
+    ).toEqual('Nagari Union Parishad')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
