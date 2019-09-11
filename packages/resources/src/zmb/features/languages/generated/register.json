@@ -684,7 +684,7 @@
         "form.field.label.verbalAutopsy": "Verbal autopsy",
         "form.field.label.weightAtBirth": "Weight at birth",
         "form.field.label.whatDocToUpload": "Which document type are you uploading?",
-        "form.field.SearchField.changeButtonLabel": "{fieldName, select, registrationOffice {Change assigned office} birthLocation {Change health institute}}",
+        "form.field.SearchField.changeButtonLabel": "{fieldName, select, registrationOffice {Change assigned office} other {Change health institute}}",
         "form.field.SearchField.modalTitle": "{fieldName, select, registrationOffice {Assigned registration office} other {Health institutions}}",
         "form.field.SearchField.officeLocationId": "Id: {locationId}",
         "form.field.SearchField.placeHolderText": "Search",
