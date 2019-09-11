@@ -124,6 +124,7 @@ services:
     environment:
       - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY?Missing "COUNTRY" from environment variables}
+      - HOST=0.0.0.0
 
   resources:
     image: jembi/ocrvs-resources:${VERSION:-latest}

@@ -30,6 +30,10 @@ export const INFOBIP_API_KEY = process.env.INFOBIP_API_KEY_PATH
   ? readFileSync(process.env.INFOBIP_API_KEY_PATH).toString()
   : ''
 
+export const INFOBIP_SENDER_ID = process.env.INFOBIP_SENDER_ID
+  ? readFileSync(process.env.INFOBIP_SENDER_ID).toString()
+  : ''
+
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
