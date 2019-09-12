@@ -46,8 +46,6 @@ interface IBaseReviewTabProps {
   goToApplicationDetails: typeof goToApplicationDetails
   outboxApplications: IApplication[]
   queryData: {
-    loading: boolean
-    error: Error | undefined
     data: GQLEventSearchResultSet
   }
   page: number
@@ -212,25 +210,8 @@ class ReviewTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, queryData, page, onPageChange } = this.props
-    const { loading, error, data } = queryData
-
-    if (loading) {
-      return (
-        <StyledSpinner
-          id="search-result-spinner"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (error) {
-      Sentry.captureException(error)
-      return (
-        <ErrorText id="search-result-error-text-review">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
+    const { intl, queryData, page, onPageChange } = this.props
+    const { data } = queryData
 
     return (
       <HomeContent>

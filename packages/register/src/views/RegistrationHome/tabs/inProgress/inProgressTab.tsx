@@ -25,7 +25,6 @@ import {
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import {
@@ -38,21 +37,11 @@ import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
 import {
   buttonMessages,
-  errorMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-align: center;
-  margin-top: 100px;
-`
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
   height: 32px;
@@ -88,8 +77,6 @@ const TabGroup = styled.div`
 `
 
 interface IQueryData {
-  loading: boolean
-  error: Error | undefined
   data: GQLEventSearchResultSet
   count: number
 }
@@ -360,37 +347,20 @@ export class InProgressTabComponent extends React.Component<
   }
 
   renderFieldAgentTable = (
-    queryData: IQueryData,
-    theme: ITheme,
+    data: GQLEventSearchResultSet,
     intl: IntlShape,
     page: number,
     onPageChange: (newPageNumber: number) => void
   ) => {
-    if (queryData.loading) {
-      return (
-        <StyledSpinner
-          id="remote-drafts-spinner"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (queryData.error) {
-      Sentry.captureException(queryData.error)
-      return (
-        <ErrorText id="remote-drafts-error-text">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
     return (
       <GridTable
-        content={this.transformRemoteDraftsContent(queryData.data)}
+        content={this.transformRemoteDraftsContent(data)}
         columns={this.getRemoteDraftColumns()}
         renderExpandedComponent={this.renderInProgressDataExpandedComponent}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
         onPageChange={onPageChange}
         pageSize={this.pageSize}
-        totalItems={(queryData.data && queryData.data.totalItems) || 0}
+        totalItems={(data && data.totalItems) || 0}
         currentPage={page}
         expandable={this.getExpandable()}
         clickable={!this.getExpandable()}
@@ -518,7 +488,6 @@ export class InProgressTabComponent extends React.Component<
 
   render() {
     const {
-      theme,
       intl,
       selectorId,
       drafts,
@@ -526,14 +495,11 @@ export class InProgressTabComponent extends React.Component<
       page,
       onPageChange
     } = this.props
+    const { data, count } = queryData
 
     return (
       <HomeContent>
-        {this.renderInProgressSelectorsWithCounts(
-          selectorId,
-          drafts,
-          queryData.count
-        )}
+        {this.renderInProgressSelectorsWithCounts(selectorId, drafts, count)}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
             content={this.transformDraftContent()}
@@ -549,13 +515,7 @@ export class InProgressTabComponent extends React.Component<
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
-          this.renderFieldAgentTable(
-            queryData,
-            theme,
-            intl,
-            page,
-            onPageChange
-          )}
+          this.renderFieldAgentTable(data, intl, page, onPageChange)}
       </HomeContent>
     )
   }

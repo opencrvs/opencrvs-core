@@ -10,22 +10,13 @@ import {
 } from '@register/navigation'
 import { transformData } from '@register/search/transformer'
 import { ITheme } from '@register/styledComponents'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import {
-  ErrorText,
-  StyledSpinner
-} from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
-import {
-  buttonMessages,
-  errorMessages,
-  constantsMessages
-} from '@register/i18n/messages'
+import { buttonMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { IStoreState } from '@register/store'
 import { IApplication } from '@register/applications'
@@ -37,8 +28,6 @@ interface IBasePrintTabProps {
   goToApplicationDetails: typeof goToApplicationDetails
   outboxApplications: IApplication[]
   queryData: {
-    loading: boolean
-    error: Error | undefined
     data: GQLEventSearchResultSet
   }
   page: number
@@ -175,25 +164,9 @@ class PrintTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, queryData, page, onPageChange } = this.props
-    const { loading, error, data } = queryData
+    const { intl, queryData, page, onPageChange } = this.props
+    const { data } = queryData
 
-    if (loading) {
-      return (
-        <StyledSpinner
-          id="search-result-spinner-print"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (error) {
-      Sentry.captureException(error)
-      return (
-        <ErrorText id="search-result-error-text-print">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
     return (
       <HomeContent>
         <GridTable

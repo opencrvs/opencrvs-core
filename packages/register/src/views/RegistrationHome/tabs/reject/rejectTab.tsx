@@ -44,8 +44,6 @@ interface IBaseRejectTabProps {
   goToApplicationDetails: typeof goToApplicationDetails
   outboxApplications: IApplication[]
   queryData: {
-    loading: boolean
-    error: Error | undefined
     data: GQLEventSearchResultSet
   }
   page: number
@@ -192,25 +190,9 @@ class RejectTabComponent extends React.Component<
   }
 
   render() {
-    const { theme, intl, queryData, page, onPageChange } = this.props
-    const { loading, error, data } = queryData
+    const { intl, queryData, page, onPageChange } = this.props
+    const { data } = queryData
 
-    if (loading) {
-      return (
-        <StyledSpinner
-          id="search-result-spinner"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (error) {
-      Sentry.captureException(error)
-      return (
-        <ErrorText id="search-result-error-text-reject">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
     return (
       <HomeContent>
         <GridTable

@@ -379,8 +379,6 @@ export class RegistrationHomeView extends React.Component<
                     selectorId={selectorId}
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      loading,
-                      error,
                       data: filteredData.inProgressTab,
                       count: filteredData.inProgressTab.totalItems || 0
                     }}
@@ -392,8 +390,6 @@ export class RegistrationHomeView extends React.Component<
                   <ReviewTab
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      loading,
-                      error,
                       data: filteredData.reviewTab
                     }}
                     page={reviewCurrentPage}
@@ -404,8 +400,6 @@ export class RegistrationHomeView extends React.Component<
                   <RejectTab
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      loading,
-                      error,
                       data: filteredData.rejectTab
                     }}
                     page={updatesCurrentPage}
@@ -416,8 +410,6 @@ export class RegistrationHomeView extends React.Component<
                   <ApprovalTab
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      loading,
-                      error,
                       data: filteredData.approvalTab
                     }}
                     page={approvalCurrentPage}
@@ -428,8 +420,6 @@ export class RegistrationHomeView extends React.Component<
                   <PrintTab
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      loading,
-                      error,
                       data: filteredData.printTab
                     }}
                     page={printCurrentPage}
