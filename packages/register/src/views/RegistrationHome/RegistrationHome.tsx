@@ -379,8 +379,7 @@ export class RegistrationHomeView extends React.Component<
                     selectorId={selectorId}
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      data: filteredData.inProgressTab,
-                      count: filteredData.inProgressTab.totalItems || 0
+                      data: filteredData.inProgressTab
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}

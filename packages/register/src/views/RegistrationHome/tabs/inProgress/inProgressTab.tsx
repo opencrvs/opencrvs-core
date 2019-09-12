@@ -1,5 +1,4 @@
 import { Button } from '@opencrvs/components/lib/buttons'
-import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
   GridTable
@@ -78,7 +77,6 @@ const TabGroup = styled.div`
 
 interface IQueryData {
   data: GQLEventSearchResultSet
-  count: number
 }
 
 interface IBaseRegistrarHomeProps {
@@ -495,11 +493,15 @@ export class InProgressTabComponent extends React.Component<
       page,
       onPageChange
     } = this.props
-    const { data, count } = queryData
+    const { data } = queryData
 
     return (
       <HomeContent>
-        {this.renderInProgressSelectorsWithCounts(selectorId, drafts, count)}
+        {this.renderInProgressSelectorsWithCounts(
+          selectorId,
+          drafts,
+          data.totalItems || 0
+        )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
             content={this.transformDraftContent()}
