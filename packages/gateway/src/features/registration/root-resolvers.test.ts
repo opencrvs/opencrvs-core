@@ -120,57 +120,6 @@ describe('Registration root resolvers', () => {
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
     })
   })
-  describe('listEventRegistrations()', () => {
-    it('returns an array of composition results', async () => {
-      fetch.mockResponse(
-        JSON.stringify({ entry: [{ resource: { focus: {} } }], total: 1 })
-      )
-      const result = await resolvers.Query.listEventRegistrations(
-        {},
-        { status: 'DECLARED' },
-        authHeaderRegCert
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
-    })
-
-    it('returns an array of composition results when location ids provided', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
-          total: 2
-        })
-      )
-
-      const result = await resolvers.Query.listEventRegistrations(
-        {},
-        {
-          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
-          status: 'DECLARED'
-        },
-        authHeaderRegCert
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(2)
-    })
-
-    it('throws error if user does not have register or validate scope', async () => {
-      await expect(
-        resolvers.Query.listEventRegistrations(
-          {},
-          {
-            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
-            status: 'DECLARED'
-          },
-          authHeaderNotRegCert
-        )
-      ).rejects.toThrowError('User does not have a register or validate scope')
-    })
-  })
   describe('createDeathRegistration()', () => {
     const details = {
       deceased: {

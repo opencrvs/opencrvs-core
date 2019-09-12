@@ -594,11 +594,6 @@ input PersonInput {
   educationalAttainment: EducationType
 }
 
-type EventCount {
-  declared: Int
-  rejected: Int
-}
-
 type Query {
   listNotifications(
     locationIds: [String]
@@ -620,24 +615,7 @@ type Query {
     skip: Int
   ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
   fetchRegistration(id: ID!): EventRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -658,7 +636,6 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): BirthRegistrationMetrics
-  countEvents(locationIds: [String]): EventCount
   searchEvents(
     locationIds: [String]
     trackingId: String

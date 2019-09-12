@@ -1,6 +1,5 @@
 import gql from 'graphql-tag'
 
-// TODO - can we convert listEventRegistrations to SEARCH_EVENTS query
 export const REGISTRATION_HOME_QUERY = gql`
   query registrationHome(
     $locationIds: [String]
@@ -199,58 +198,6 @@ export const REGISTRATION_HOME_QUERY = gql`
             familyName
             use
           }
-        }
-      }
-    }
-  }
-`
-
-export const COUNT_REGISTRATION_QUERY = gql`
-  query data($locationIds: [String]) {
-    countEvents(locationIds: $locationIds) {
-      inProgress
-      declared
-      validated
-      registered
-      rejected
-    }
-  }
-`
-
-export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
-  query data($locationIds: [String], $status: String, $count: Int, $skip: Int) {
-    listEventRegistrations(
-      locationIds: $locationIds
-      status: $status
-      count: $count
-      skip: $skip
-    ) {
-      totalItems
-      results {
-        id
-        registration {
-          type
-          trackingId
-        }
-        ... on BirthRegistration {
-          child {
-            name {
-              use
-              firstNames
-              familyName
-            }
-          }
-          createdAt
-        }
-        ... on DeathRegistration {
-          deceased {
-            name {
-              use
-              firstNames
-              familyName
-            }
-          }
-          createdAt
         }
       }
     }
