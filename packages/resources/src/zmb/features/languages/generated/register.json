@@ -963,7 +963,7 @@
         "userSetupReview.instruction": "Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.",
         "validate.application.action.modal.description": "This application will be sent to the registrar from them to register",
         "validate.application.action.modal.title": "Send for approval?",
-        "validate.complete.application.action.description": "By approving you confirm that the applicatiohn is ready to register",
+        "validate.complete.application.action.description": "By approving you confirm that the application is ready to register",
         "validate.complete.application.action.title": "Ready to approve?",
         "validations.bengaliOnlyNameFormat": "Must contain only Bengali characters",
         "validations.blockAlphaNumericDot": "Can contain only block character, number and dot (e.g. C91.5)",
