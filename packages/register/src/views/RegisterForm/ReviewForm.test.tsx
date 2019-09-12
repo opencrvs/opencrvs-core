@@ -53,6 +53,7 @@ describe('ReviewForm tests', () => {
       offlineDataReady({
         languages: mockOfflineData.languages,
         forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
         assets: mockOfflineData.assets

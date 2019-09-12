@@ -305,6 +305,7 @@ export interface IFormFieldBase {
   hideHeader?: boolean
   mode?: THEME_MODE
   hidden?: boolean
+  previewGroup?: string
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -463,6 +464,12 @@ export type IFormField =
   | ILoaderButton
   | ISearchFormField
   | ISimpleDocumentUploaderFormField
+
+export interface IFormTag {
+  id: string
+  label: MessageDescriptor
+  fieldToRedirect?: string
+}
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
   IFormFieldWithDynamicDefinitions
@@ -706,6 +713,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
+  previewGroups?: IFormTag[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]

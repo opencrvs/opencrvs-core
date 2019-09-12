@@ -9,7 +9,7 @@ export default async function prepareSourceJSON() {
   // tslint:disable-next-line:no-console
   console.log(
     `${chalk.blueBright(
-      '/////////////////////////// CONVERTING EMPLOYEES CSV TO JSON ///////////////////////////'
+      '/////////////////////////// CONVERTING STATISTICS CSV TO JSON ///////////////////////////'
     )}`
   )
   fs.createReadStream(`${ADMIN_STRUCTURE_SOURCE}statistics/divisions.csv`)

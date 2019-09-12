@@ -764,18 +764,9 @@ describe('Tablet tests', () => {
       graphqlMock
     )
 
-    getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
     testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
+    const element = await waitForElement(testComponent.component, '#row_0')
+    element.hostNodes().simulate('click')
 
     await new Promise(resolve => {
       setTimeout(resolve, 100)

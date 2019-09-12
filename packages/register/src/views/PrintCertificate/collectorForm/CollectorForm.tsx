@@ -302,6 +302,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       application
     )
     const applicationToBeCertified = application
+
     if (
       !applicationToBeCertified ||
       !applicationToBeCertified.data.registration.regStatus
@@ -339,7 +340,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                   event
                 )
 
-                this.props.storeApplication(newApplicationToBeCertified)
+                if (applicationToBeCertified) {
+                  this.props.modifyApplication(newApplicationToBeCertified)
+                } else {
+                  this.props.storeApplication(newApplicationToBeCertified)
+                }
               }
             }}
           </QueryContext.Consumer>

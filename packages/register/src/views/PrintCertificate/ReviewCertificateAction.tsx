@@ -142,12 +142,6 @@ class ReviewCertificateActionComponent extends React.Component<
 
   readyToCertify = () => {
     const { draft } = this.props
-    printCertificate(
-      this.props.intl,
-      draft,
-      this.props.userDetails,
-      this.props.resources
-    )
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
 
@@ -165,6 +159,12 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.modifyApplication(draft)
     this.toggleModal()
     this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    printCertificate(
+      this.props.intl,
+      draft,
+      this.props.userDetails,
+      this.props.resources
+    )
   }
 
   getTitle = () => {
