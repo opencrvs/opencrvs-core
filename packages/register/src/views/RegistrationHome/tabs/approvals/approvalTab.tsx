@@ -10,19 +10,14 @@ import { getScope } from '@register/profile/profileSelectors'
 import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import styled, { ITheme } from '@register/styledComponents'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import {
-  ErrorText,
-  StyledSpinner
-} from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
-import { errorMessages, constantsMessages } from '@register/i18n/messages'
+import { constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { IApplication } from '@register/applications'
 

@@ -11,11 +11,10 @@ import {
   RegistrationHome,
   EVENT_STATUS
 } from '@register/views/RegistrationHome/RegistrationHome'
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { GridTable } from '@opencrvs/components/lib/interface'
 import {
-  COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATION_BY_COMPOSITION,
-  SEARCH_EVENTS
+  REGISTRATION_HOME_QUERY
 } from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
@@ -136,87 +135,29 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     store.dispatch(checkAuth({ '?token': validateScopeToken }))
   })
 
-  it('sets loading state while waiting for data', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-
-    // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-  })
-  it('renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        error: new Error('boom')
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#search-result-error-text-approvals')
-        .children()
-        .text()
-    ).toBe('An error occurred while searching')
-  })
-
   it('check sent for approval tab count', async () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            countEvents: {
-              inProgress: 3,
-              declared: 10,
-              validated: 2,
-              registered: 7,
-              rejected: 5
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 2, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -227,7 +168,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       <RegistrationHome
         match={{
           params: {
-            tabId: 'review'
+            tabId: 'approvals'
           },
           isExact: true,
           path: '',
@@ -239,38 +180,38 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       graphqlMock
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_approvals')
-        .hostNodes()
-        .text()
-    ).toContain('Sent for approval (2)')
+    const element = await waitForElement(
+      testComponent.component,
+      '#tab_approvals'
+    )
+    expect(element.hostNodes().text()).toContain('Sent for approval (2)')
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
+
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: {
               totalItems: 2,
               results: [
                 {
@@ -334,11 +275,13 @@ describe('RegistrationHome sent for approval tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
+
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
@@ -381,16 +324,26 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
-          data: {}
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 2, results: [] },
+            printTab: { totalItems: 0, results: [] }
+          }
         }
       }
     ]
@@ -428,20 +381,25 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 14,
-              results: userData
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 14, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -479,17 +437,24 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: {
               totalItems: 2,
               results: [
                 {
@@ -553,7 +518,8 @@ describe('RegistrationHome sent for approval tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       },
@@ -693,17 +659,24 @@ describe('Tablet tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: {
               totalItems: 2,
               results: [
                 {
@@ -767,7 +740,8 @@ describe('Tablet tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
