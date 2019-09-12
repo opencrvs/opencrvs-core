@@ -4757,7 +4757,7 @@
                   "type": "SUBSECTION",
                   "label": {
                     "defaultMessage": "What was their residential address?",
-                    "description": "Title for the permanent address fields",
+                    "description": "Title for the residential address fields",
                     "id": "form.field.label.permanentAddress"
                   },
                   "initialValue": "",
@@ -4771,7 +4771,8 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
-                  "required": false,
+                  "previewGroup": "permanentAddress",
+                  "required": true,
                   "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
@@ -4809,7 +4810,8 @@
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
-                  "required": false,
+                  "previewGroup": "permanentAddress",
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -4854,7 +4856,8 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
-                  "required": false,
+                  "previewGroup": "permanentAddress",
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -4922,6 +4925,8 @@
                     }
                   ],
                   "initialValue": "URBAN",
+                  "previewGroup": "permanentAddress",
+                  "hideInReview": true,
                   "required": false,
                   "validate": [],
                   "conditionals": [
@@ -4957,46 +4962,16 @@
                 },
                 {
                   "name": "addressChiefPermanent",
-                  "type": "SELECT_WITH_OPTIONS",
+                  "type": "TEXT",
                   "label": {
                     "id": "form.field.label.addressChief",
                     "defaultMessage": "Chief",
                     "description": "The lable for form field chief"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "label": {
-                        "id": "form.field.select.chiefs.option1",
-                        "defaultMessage": "Chief Mushili",
-                        "description": "Label for select chief option 1"
-                      },
-                      "value": "Chief Mushili"
-                    },
-                    {
-                      "label": {
-                        "id": "form.field.select.chiefs.option2",
-                        "defaultMessage": "Chief Lesa",
-                        "description": "Label for select chief option 2"
-                      },
-                      "value": "Chief Lesa"
-                    },
-                    {
-                      "label": {
-                        "id": "form.field.select.chiefs.option3",
-                        "defaultMessage": "Chief Selenje",
-                        "description": "Label for select chief option 3"
-                      },
-                      "value": "Chief Selenje"
-                    }
-                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -5020,38 +4995,30 @@
                       "operation": "fieldToAddressTransformer",
                       "parameters": [
                         "PERMANENT",
-                        3
+                        6
                       ]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
                       "parameters": [
                         "PERMANENT",
-                        3
+                        6
                       ]
                     }
                   }
                 },
                 {
                   "name": "addressLine4CityOptionPermanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "TEXT",
                   "label": {
                     "defaultMessage": "Town",
                     "description": "Title for the address line 4",
                     "id": "form.field.label.addressLine4CityOption"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "districtPermanent"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -5075,33 +5042,30 @@
                       "operation": "fieldToAddressTransformer",
                       "parameters": [
                         "PERMANENT",
-                        6
+                        4
                       ]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
                       "parameters": [
                         "PERMANENT",
-                        6
+                        4
                       ]
                     }
                   }
                 },
                 {
                   "name": "addressLine3CityOptionPermanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "TEXT",
                   "label": {
                     "defaultMessage": "Residential Area",
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4CityOptionPermanent"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -5125,26 +5089,27 @@
                       "operation": "fieldToAddressTransformer",
                       "parameters": [
                         "PERMANENT",
-                        5
+                        3
                       ]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
                       "parameters": [
                         "PERMANENT",
-                        5
+                        3
                       ]
                     }
                   }
                 },
                 {
-                  "name": "addressLine1CityOptionPermanent",
+                  "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Street / Plot Number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1CityOption"
+                    "id": "form.field.label.addressLine2CityOption"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -5184,13 +5149,14 @@
                   }
                 },
                 {
-                  "name": "postCodeCityOptionPermanent",
+                  "name": "numberOptionPermanent",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "Number",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
+                    "description": "Title for the number field",
+                    "id": "form.field.label.number"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -5217,16 +5183,14 @@
                       "operation": "fieldToAddressTransformer",
                       "parameters": [
                         "PERMANENT",
-                        0,
-                        "postalCode"
+                        1
                       ]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
                       "parameters": [
                         "PERMANENT",
-                        0,
-                        "postalCode"
+                        1
                       ]
                     }
                   }
@@ -5239,6 +5203,7 @@
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -5265,17 +5230,28 @@
                       "operation": "fieldToAddressTransformer",
                       "parameters": [
                         "PERMANENT",
-                        1
+                        5
                       ]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
                       "parameters": [
                         "PERMANENT",
-                        1
+                        5
                       ]
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
                 }
               ]
             }
