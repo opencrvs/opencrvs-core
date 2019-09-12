@@ -106,7 +106,7 @@ export const titleCase = (str: string) => {
 
 export async function getPractitionerLocations(
   practitionerId: string
-): Promise<[fhir.Location]> {
+): Promise<fhir.Location[]> {
   const roleResponse = await getFromFhir(
     `/PractitionerRole?practitioner=${practitionerId}`
   )
@@ -125,7 +125,7 @@ export async function getPractitionerLocations(
     }
     locList.push(locationResponse)
   }
-  return locList as [fhir.Location]
+  return locList as fhir.Location[]
 }
 
 export function getJurisDictionalLocations() {
