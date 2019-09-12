@@ -54,6 +54,7 @@ services:
       - NODE_ENV=DEVELOPMENT
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - RESOURCE_SERVICE_URL=http://resources:3040/${COUNTRY:-bgd}/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=${COUNTRY:-bgd}
