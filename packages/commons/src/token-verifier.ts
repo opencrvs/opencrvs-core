@@ -26,13 +26,11 @@ export const validateFunc = async (
   authUrl: string
 ) => {
   let valid
-  console.log('hi')
   if (checkInvalidToken === 'true') {
     valid = await verifyToken(
       request.headers.authorization.replace('Bearer ', ''),
       authUrl
     )
-    console.log(valid)
   }
 
   if (valid === true || checkInvalidToken !== 'true') {
