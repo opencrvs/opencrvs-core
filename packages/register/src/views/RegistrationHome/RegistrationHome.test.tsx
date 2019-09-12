@@ -4,13 +4,15 @@ import { queries } from '@register/profile/queries'
 import { storage } from '@register/storage'
 import { createStore } from '@register/store'
 import { createTestComponent, mockUserResponse } from '@register/tests/util'
-import { COUNT_REGISTRATION_QUERY } from '@register/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@register/views/RegistrationHome/queries'
 import {
-  EVENT_STATUS,
-  RegistrationHome
+  RegistrationHome,
+  EVENT_STATUS
 } from '@register/views/RegistrationHome/RegistrationHome'
 import { merge } from 'lodash'
 import * as React from 'react'
+import { storeApplication, createApplication } from '@register/applications'
+import { Event } from '@register/forms'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -72,40 +74,25 @@ describe('RegistrationHome In Progress tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            countEvents: {
-              inProgress: 3,
-              declared: 10,
-              validated: 0,
-              registered: 7,
-              rejected: 5
-            }
-          }
-        }
-      },
-      {
-        // do we need both of these?
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        result: {
-          data: {
-            countEvents: {
-              inProgress: 3,
-              declared: 10,
-              validated: 0,
-              registered: 7,
-              rejected: 5
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 7, results: [] }
           }
         }
       }
@@ -146,45 +133,32 @@ describe('RegistrationHome In Progress tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            countEvents: {
-              inProgress: 5,
-              declared: 10,
-              validated: 0,
-              registered: 7,
-              rejected: 5
-            }
-          }
-        }
-      },
-      {
-        // do we need both fo these?
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        result: {
-          data: {
-            countEvents: {
-              inProgress: 5,
-              declared: 10,
-              validated: 0,
-              registered: 7,
-              rejected: 5
-            }
+            inProgressTab: { totalItems: 5, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
-    // store.dispatch(storeApplication(createApplication(Event.BIRTH)))
+
+    store.dispatch(storeApplication(createApplication(Event.BIRTH)))
+
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
@@ -204,6 +178,6 @@ describe('RegistrationHome In Progress tab related tests', () => {
         .find('#tab_progress')
         .hostNodes()
         .text()
-    ).toContain('In progress (5)')
+    ).toContain('In progress (6)')
   })
 })
