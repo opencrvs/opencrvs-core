@@ -28,7 +28,8 @@ import {
   IFormSectionGroup,
   DOCUMENT_UPLOADER_WITH_OPTION,
   SEARCH_FIELD,
-  ISearchFormField
+  ISearchFormField,
+  IRadioGroupFormField
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -88,6 +89,17 @@ export const internationaliseFieldObject = (
         // @ts-ignore
         (field as IRadioGroupFormField).notice
       )
+    }
+
+    if (base.nestedFields) {
+      Object.keys(base.nestedFields).forEach((option: string) => {
+        // @ts-ignore
+        base.nestedFields[option] = base.nestedFields[option].map(opt => {
+          return typeof opt.label === 'string'
+            ? opt
+            : internationaliseFieldObject(intl, opt)
+        })
+      })
     }
   }
 

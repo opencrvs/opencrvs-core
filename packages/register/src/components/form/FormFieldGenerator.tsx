@@ -210,10 +210,11 @@ function GeneratedInputField({
         <RadioGroup
           {...inputProps}
           size={fieldDefinition.size}
-          onChange={(val: string) => {
+          onChange={(val: string, nestedFieldName: string | null = null) => {
             resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(fieldDefinition.name, val)
+            onSetFieldValue(nestedFieldName || fieldDefinition.name, val)
           }}
+          nestedFields={fieldDefinition.nestedFields}
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}

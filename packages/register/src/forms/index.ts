@@ -322,11 +322,16 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
+export type INestedInputFields = {
+  [key: string]: Array<ITextFormField | ITelFormField>
+}
+
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
   notice?: MessageDescriptor
+  nestedFields?: INestedInputFields
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -757,11 +762,16 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   options: SelectComponentOption[]
 }
 
+export type Ii18nNestedInputFields = {
+  [key: string]: Array<Ii18nTextFormField | Ii18nTelFormField>
+}
+
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
   size?: RadioSize
   notice?: string
+  nestedFields?: Ii18nNestedInputFields
 }
 
 type Name = {
