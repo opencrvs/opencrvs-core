@@ -191,21 +191,23 @@ export async function getRegistrationNumber(
   practitionerId: string,
   authHeader: { Authorization: string }
 ): Promise<{ registrationNumber: string }> {
-  return await fetch(`${RESOURCE_SERVICE_URL}generate/registrationNumber`, {
-    method: 'POST',
-    body: JSON.stringify({
-      trackingId,
-      practitionerId
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader
-    }
-  })
-    .then(response => {
-      return response.json()
-    })
-    .catch(err => {
-      logger.error(`Unable to get registration number for error : ${err}`)
-    })
+  try {
+    const response = await fetch(
+      `${RESOURCE_SERVICE_URL}generate/registrationNumber`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          trackingId,
+          practitionerId
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      }
+    )
+    return response.json()
+  } catch (err) {
+    throw new Error(`Unable to get registration number for error : ${err}`)
+  }
 }
