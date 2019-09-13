@@ -32,11 +32,9 @@ const nameObjectProcessor = (
 }
 
 const addressObjectProcessor = (
-  objValues: Array<{ [key: string]: string | string[] }>,
-  srcValues: Array<{ [key: string]: string | string[] }>
+  objValues: Array<{ [key: string]: string | string[] }> = [],
+  srcValues: Array<{ [key: string]: string | string[] }> = []
 ) => {
-  objValues = objValues || []
-  srcValues = srcValues || []
   srcValues.forEach(srcValue => {
     let index = findIndex(objValues, { type: srcValue.type })
     if (index < 0) {
