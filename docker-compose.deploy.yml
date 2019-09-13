@@ -209,7 +209,6 @@ services:
       - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - LANGUAGES=bn,en
-      - COUNTRY_ALPHA3=BGD
     deploy:
       replicas: 2
     networks:
