@@ -286,7 +286,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
           generateHistoryEntry(
             DraftStatus.DRAFT_MODIFIED,
             userDetails.name as GQLHumanName[],
-            new Date(draft.modifiedOn).toString(),
+            new Date(draft.modifiedOn).toISOString(),
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
                   userMessages[userDetails.role as string]
@@ -305,7 +305,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
           generateHistoryEntry(
             DraftStatus.DRAFT_STARTED,
             userDetails.name as GQLHumanName[],
-            (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+            (draft.savedOn && new Date(draft.savedOn).toISOString()) || '',
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
                   userMessages[userDetails.role as string]
