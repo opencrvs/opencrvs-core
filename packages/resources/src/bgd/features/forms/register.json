@@ -479,12 +479,12 @@
                 {
                   "name": "birthLocation",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-
                   "label": {
                     "defaultMessage": "Hospital / Clinic",
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.birthLocation"
                   },
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1696,6 +1696,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -2245,6 +2246,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3612,6 +3614,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4232,6 +4235,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
