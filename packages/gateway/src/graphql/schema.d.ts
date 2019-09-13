@@ -446,7 +446,8 @@ export enum GQLBirthRegPresence {
   INFORMANT = 'INFORMANT',
   MOTHER = 'MOTHER',
   FATHER = 'FATHER',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN'
 }
 
 export interface GQLBirthRegResultSet {
