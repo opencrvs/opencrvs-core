@@ -23,18 +23,23 @@ export type TransformerPayload =
   | IDateFeildValuePayload
   | IFormattedFeildValuePayload
   | INumberFeildConversionPayload
+  | IOfflineAddressPayload
 
 export interface IFieldTransformer {
   field: string
   operation: string
-  baseData?: string // deafult is application data
   parameters?: TransformerPayload
 }
 
-export type TransformableData = IApplication | IUserDetails | IOfflineData
+export type TemplateTransformerData = {
+  application: IApplication
+  userDetails: IUserDetails
+  resource: IOfflineData
+}
+
 export interface IFunctionTransformer {
   [transformerFunction: string]: (
-    data: TransformableData,
+    data: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => string | null
@@ -76,6 +81,14 @@ export interface IFormattedFeildValuePayload {
 export interface INumberFeildConversionPayload {
   valueKey: string // ex: child.dob
   conversionMap: { [key: string]: string } // { 0: '০', 1: '১'}
+}
+
+export interface IOfflineAddressPayload {
+  conditionalKeys: {
+    addressType: string
+    addressKey: string
+    formattedKeys: string
+  }[]
 }
 
 // Based on the need, add more here

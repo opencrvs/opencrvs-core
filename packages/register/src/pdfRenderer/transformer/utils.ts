@@ -1,8 +1,6 @@
 import {
-  IFieldTransformer,
   ExecutorKey,
-  IEventWiseKey,
-  TransformableData
+  IEventWiseKey
 } from '@register/pdfRenderer/transformer/types'
 import {
   Event,
@@ -12,12 +10,6 @@ import {
 } from '@opencrvs/register/src/forms'
 import { IApplication } from '@register/applications'
 import { MessageDescriptor } from 'react-intl'
-import { IUserDetails } from '@register/utils/userUtils'
-import { IOfflineData } from '@register/offline/reducer'
-import {
-  TRANSFORMER_BASE_RESOURCE_DATA,
-  TRANSFORMER_BASE_USER_DETAILS
-} from '@register/pdfRenderer/transformer/constants'
 
 const eventMessageDescriptor = {
   [Event.BIRTH]: {
@@ -53,26 +45,6 @@ export function getValueFromApplicationDataByKey(
     throw new Error(`Given value key structure is not valid: ${valueKey}`)
   }
   return valueObject
-}
-
-export function getTransformerDataByBase(
-  transformerDef: IFieldTransformer,
-  application: IApplication,
-  userdetails: IUserDetails,
-  offlineResource: IOfflineData
-): TransformableData {
-  if (!transformerDef.baseData) {
-    return application
-  } else if (
-    transformerDef.baseData.toLowerCase() === TRANSFORMER_BASE_USER_DETAILS
-  ) {
-    return userdetails
-  } else if (
-    transformerDef.baseData.toLowerCase() === TRANSFORMER_BASE_RESOURCE_DATA
-  ) {
-    return offlineResource
-  }
-  return application
 }
 
 export function getEventMessageDescription(event: Event): MessageDescriptor {
