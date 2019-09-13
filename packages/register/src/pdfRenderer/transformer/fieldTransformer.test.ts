@@ -6,7 +6,6 @@ import {
 import { fieldTransformers } from '@register/pdfRenderer/transformer/fieldTransformer'
 import { createIntl } from 'react-intl'
 import { Event } from '@register/forms'
-import { IApplication } from '@register/applications'
 import { TemplateTransformerData } from './types'
 
 describe('PDF template field transformer tests', () => {

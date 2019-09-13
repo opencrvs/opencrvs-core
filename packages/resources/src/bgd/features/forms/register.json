@@ -423,7 +423,7 @@
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -485,7 +485,7 @@
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.birthLocation"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {

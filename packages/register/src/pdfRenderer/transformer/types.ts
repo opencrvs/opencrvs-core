@@ -85,6 +85,10 @@ export interface INumberFeildConversionPayload {
 
 export interface IOfflineAddressPayload {
   conditionalKeys: {
+    condition: {
+      key: string
+      matchValues: string[]
+    }
     addressType: string
     addressKey: string
     formattedKeys: string
