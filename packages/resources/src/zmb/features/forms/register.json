@@ -9042,71 +9042,16 @@
                   "label": {
                     "defaultMessage": "For a death registration the following documents are required:",
                     "description": "Documents Paragraph text",
-                    "id": "form.section.documents.birth.requirements"
+                    "id": "form.field.label.deceasedDocumentParagraph"
                   },
                   "initialValue": "",
                   "validate": []
                 },
                 {
-                  "name": "uploadDocForDeceased",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Deceased's ID",
-                    "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.deceasedIDProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "DECEASED_ID_PROOF",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "National ID (front)",
-                      "label": {
-                        "defaultMessage": "National ID (front)",
-                        "description": "Label for select option radio option NID front",
-                        "id": "form.field.label.docTypeNIDFront"
-                      }
-                    },
-                    {
-                      "value": "National ID (back)",
-                      "label": {
-                        "defaultMessage": "National ID (back)",
-                        "description": "Label for select option radio option NID back",
-                        "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "deathAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
                   "name": "uploadDocForApplicant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of Applicant's ID",
+                    "defaultMessage": "Applicant id",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.applicantIDProof"
                   },
@@ -9116,35 +9061,19 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "National ID (front)",
+                      "value": "Front of National ID",
                       "label": {
-                        "defaultMessage": "National ID (front)",
+                        "defaultMessage": "Front of national ID",
                         "description": "Label for select option radio option NID front",
                         "id": "form.field.label.docTypeNIDFront"
                       }
                     },
                     {
-                      "value": "National ID (back)",
+                      "value": "Back of National ID",
                       "label": {
-                        "defaultMessage": "National ID (back)",
+                        "defaultMessage": "Back of national ID",
                         "description": "Label for select option radio option NID back",
                         "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
                       }
                     }
                   ],
@@ -9161,7 +9090,7 @@
                   "name": "uploadDocForDeceasedDeath",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of Death of Deceased",
+                    "defaultMessage": "Proof of death of deceased",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.deceasedDeathProof"
                   },
@@ -9171,113 +9100,28 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Certified Post Mortem Report",
+                      "value": "Police Brought In Dead Certificate",
                       "label": {
-                        "defaultMessage": "Certified Post Mortem Report",
-                        "description": "Label for select option Post Mortem Report",
-                        "id": "form.field.label.docTypePostMortemReport"
+                        "defaultMessage": "Police brought in dead certificate",
+                        "description": "Label for select option Police brought in dead certificate",
+                        "id": "form.field.label.docTypePoliceBroughtInDeathCertificate"
                       }
                     },
                     {
-                      "value": "Hospital Discharge Certificate",
+                      "value": "Coroners Report",
                       "label": {
-                        "defaultMessage": "Hospital Discharge Certificate",
-                        "description": "Label for select option Hospital Discharge Certificate",
-                        "id": "form.field.label.docTypeHospitalDischargeCertificate"
+                        "defaultMessage": "Coroner's report",
+                        "description": "Label for select option Coroner's report",
+                        "id": "form.field.label.docTypeCoronersReport"
                       }
                     },
                     {
-                      "value": "Attested Letter of Death",
+                      "value": "Other",
                       "label": {
-                        "defaultMessage": "Attested Letter of Death",
-                        "description": "Label for select option Attested Letter of Death",
-                        "id": "form.field.label.docTypeLetterOfDeath"
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "form.field.label.docTypeOther"
                       }
-                    },
-                    {
-                      "value": "Attested Certificate of Death",
-                      "label": {
-                        "defaultMessage": "Attested Certificate of Death",
-                        "description": "Label for select option Attested Certificate of Death",
-                        "id": "form.field.label.docTypeDeathCertificate"
-                      }
-                    },
-                    {
-                      "value": "Certified Copy of Burial Receipt",
-                      "label": {
-                        "defaultMessage": "Certified Copy of Burial Receipt",
-                        "description": "Label for select option Certified Copy of Burial Receipt",
-                        "id": "form.field.label.docTypeCopyOfBurialReceipt"
-                      }
-                    },
-                    {
-                      "value": "Certified Copy of Funeral Receipt",
-                      "label": {
-                        "defaultMessage": "Certified Copy of Funeral Receipt",
-                        "description": "Label for select option Certified Copy of Funeral Receipt",
-                        "id": "form.field.label.docTypeFuneralReceipt"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "deathAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForDeceasedPermanentAddress",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Permanent Address of Deceased",
-                    "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.deceasedPermanentAddressProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "DECEASED_PARMANENT_ADDRESS_PROOF",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "National ID (front)",
-                      "label": {
-                        "defaultMessage": "National ID (front)",
-                        "description": "Label for select option radio option NID front",
-                        "id": "form.field.label.docTypeNIDFront"
-                      }
-                    },
-                    {
-                      "value": "National ID (back)",
-                      "label": {
-                        "defaultMessage": "National ID (back)",
-                        "description": "Label for select option radio option NID back",
-                        "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => [\"National ID (front)\", \"National ID (Back)\"].indexOf(a.optionValues[1]) > -1))"
                     }
                   ],
                   "mapping": {
