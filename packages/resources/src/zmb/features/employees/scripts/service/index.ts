@@ -117,10 +117,6 @@ export async function composeAndSavePractitioners(
         partOf = parentLocation.partOf
       }
     }
-    if (parentLocation.id) {
-      locations.push({ reference: `Location/${parentLocation.id}` })
-      catchmentAreaIds.push(parentLocation.id)
-    }
 
     // Create and save Practitioner
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(
@@ -147,6 +143,10 @@ export async function composeAndSavePractitioners(
       practitioner.role,
       practitionerReference,
       locations
+    )
+
+    logger.info(
+      `PractitionerRole saved to fhir: ${JSON.stringify(newPractitionerRole)}`
     )
 
     const savedPractitionerRoleResponse = await sendToFhir(

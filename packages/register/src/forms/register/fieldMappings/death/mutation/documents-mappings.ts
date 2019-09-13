@@ -41,7 +41,9 @@ export const deathDocumentTypeFhirMapping = {
   'Attested Certificate of Death': 'ATTESTED_DEATH_CERTIFICATE',
   'Certified Copy of Burial Receipt': 'BURIAL_RECEIPT',
   'Certified Copy of Funeral Receipt': 'FUNERAL_RECEIPT',
-  Passport: 'PASSPORT'
+  Passport: 'PASSPORT',
+  'Police Brought In Dead Certificate': 'BROUGHT_IN_DEAD_CERTIFICATE',
+  'Coroners Report': 'CORONERS_REPORT'
 }
 
 export function deathFieldToAttachmentTransformer(

@@ -30,9 +30,9 @@ Then:
 4. **Starting the dev environment (necessary for Ubuntu):**Run `yarn dev` to up the dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR you may run the dependencies and the serviecs in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo)
    **Starting the dev environment (necessary for OSX):**
    Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find your local IP address and start the dev environment like this: `LOCAL_IP=192.168.0.5 yarn dev`
-5. Run `yarn db:backup:restore` to restore a pre-populated database with user, location and facility data.
+5. `cd packages/resources && yarn db:backup:restore <<insert country code>>` to restore a pre-populated database with user, location and facility data for your country.
 
-That's it! You should be running OpenCRVS with test users and test locations set to Bangladesh by default. Apps can be found running at the following URLs:
+That's it! You should be running OpenCRVS with test users and test locations. Apps can be found running at the following URLs:
 
 - Styleguide: http://localhost:6060/
 - Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
@@ -45,7 +45,7 @@ You can open all of them by running `yarn open`
 
 1. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
 2. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
-3. Click Channels and for each channel -
+3. Click Channels and check all have loaded successfully. for each channel you may need to -
    1. click edit, and then go to routes tab and change the value of host from service name to your local IP address.
 4. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
 
@@ -55,9 +55,8 @@ Start the development environment as described above, then:
 
 1. Start the dev environment - as explained above.
 2. Populate reference data for your country requirements from the resources package. `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
-3. Login to the OpenHIM console and upload the base config file.
-4. `yarn db:backup:create`
-5. Commit and push the new db dump archive files that have been created.
+3. `cd packages/resources && yarn db:backup:create <<insert country code>>`
+4. Commit and push the new db dump archive files that have been created in your country folder in resources package.
 
 ### tmuxed development setup
 
@@ -88,7 +87,7 @@ For the command above there is:
 
 To deploy to staging we use the same docker-compose files that are used in the docker setup above with a few minor tweaks to configure the stack for staging. The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each service with a number of replicas defined in the docker compose files. **Note:** This deployment is currently automated so that every time we push to master the build will be deployed during the CI process.
 
-The deploy is easily executed by just running: `yarn deploy:staging` - you will need ssh access to the server for this to work.
+The deploy is easily executed by just running: `yarn deploy:staging <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>` - you will need ssh access to the server for this to work.
 
 The applications will be available here:
 
@@ -109,9 +108,7 @@ To scale a service change the deploy->replicas setting in the corresponding comp
 
 Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environemt as well.
 
-```
-yarn deploy:qa VERSION
-```
+`yarn deploy:qa <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
 
 The applications will be available here:
 
