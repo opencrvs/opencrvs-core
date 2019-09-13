@@ -24,7 +24,7 @@ const composeFhirLocation = (
     identifier: [
       {
         system: `${ORG_URL}/specs/id/internal-id`,
-        value: String(location.statisticalID)
+        value: `${location.code}_${String(location.statisticalID)}`
       }
     ],
     name: location.name, // English name
