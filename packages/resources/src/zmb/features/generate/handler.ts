@@ -23,7 +23,8 @@ export async function generatorHandler(
 }
 
 export const requestSchema = Joi.object({
-  trackingId: Joi.string()
+  trackingId: Joi.string(),
+  practitionerId: Joi.string()
 })
 
 export const responseSchema = Joi.object({
