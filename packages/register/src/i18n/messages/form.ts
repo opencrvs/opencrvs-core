@@ -1548,12 +1548,12 @@ const messagesToDefine: IFormMessages = {
   },
   changeButtonLabel: {
     id: 'form.field.SearchField.changeButtonLabel',
-    defaultMessage: `{fieldName, select, registrationOffice {Change assigned office} birthLocation {Change health institute}}`,
+    defaultMessage: `{fieldName, select, registrationOffice {Change assigned office} other {Change health institute}}`,
     description: 'Edit button text'
   },
   searchFieldModalTitle: {
     id: 'form.field.SearchField.modalTitle',
-    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office} birthLocation {Health institutions}}`,
+    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office} other {Health institutions}}`,
     description: 'Modal title'
   },
   searchFieldPlaceHolderText: {

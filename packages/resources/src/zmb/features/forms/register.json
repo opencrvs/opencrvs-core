@@ -4239,7 +4239,7 @@
                     "id": "form.field.label.deceased.nationality"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "options": {
                     "resource": "countries"
@@ -4511,7 +4511,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "options": {
                     "resource": "countries"
@@ -5043,7 +5043,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -5715,25 +5715,9 @@
                     {
                       "value": "PERMANENT",
                       "label": {
-                        "defaultMessage": "Permanent address of the deceased",
-                        "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsPermanent"
-                      }
-                    },
-                    {
-                      "value": "CURRENT",
-                      "label": {
-                        "defaultMessage": "Current address of the deceased",
-                        "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsCurrent"
-                      }
-                    },
-                    {
-                      "value": "PRIVATE_HOME",
-                      "label": {
-                        "defaultMessage": "Private Home",
+                        "defaultMessage": "Residential address of the deceased",
                         "description": "Select item for Private Home",
-                        "id": "form.field.label.privateHome"
+                        "id": "form.field.label.resedentialAddress"
                       }
                     },
                     {
@@ -5747,9 +5731,9 @@
                     {
                       "value": "OTHER",
                       "label": {
-                        "defaultMessage": "Other Institution",
-                        "description": "Select item for Other Institution",
-                        "id": "form.field.label.otherInstitution"
+                        "defaultMessage": "Other address",
+                        "description": "Select item for Other address",
+                        "id": "form.field.label.otherAddress"
                       }
                     }
                   ],
@@ -5777,23 +5761,19 @@
               "fields": [
                 {
                   "name": "deathLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
                     "defaultMessage": "What hospital did the death occur at?",
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.deathAtFacility"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "deathPlaceAddress"
                   },
                   "mapping": {
                     "mutation": {
@@ -5803,492 +5783,6 @@
                     "query": {
                       "operation": "eventLocationIDQueryTransformer",
                       "parameters": []
-                    }
-                  }
-                }
-              ]
-            },
-            {
-              "id": "deathEvent-deathAtPrivateHome",
-              "title": {
-                "defaultMessage": "What is the address of the private home?",
-                "description": "Label for form field: Private Home Address",
-                "id": "form.field.label.deathAtPrivateHome"
-              },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "values.deathPlaceAddress !== \"PRIVATE_HOME\""
-                }
-              ],
-              "fields": [
-                {
-                  "name": "country",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Country",
-                    "description": "Title for the country select",
-                    "id": "form.field.label.country"
-                  },
-                  "required": true,
-                  "initialValue": "BGD",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": {
-                    "resource": "countries"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "state",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Division",
-                    "description": "Title for the state select",
-                    "id": "form.field.label.state"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "country"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "district",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "District",
-                    "description": "Title for the district select",
-                    "id": "form.field.label.district"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "state"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine4",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "district"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [6]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [6]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [4]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [4]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Ward",
-                    "description": "Title for the address line 3 option 2",
-                    "id": "form.field.label.addressLine3CityOption"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [5]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [5]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [3]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [3]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [2]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [2]
-                    }
-                  }
-                },
-                {
-                  "name": "postCodeCityOption",
-                  "type": "NUMBER",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [0, "postalCode"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "postalCode"]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [1]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [1]
-                    }
-                  }
-                },
-                {
-                  "name": "postCode",
-                  "type": "NUMBER",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [0, "postalCode"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "postalCode"]
                     }
                   }
                 }
@@ -6307,17 +5801,29 @@
                   "expression": "values.deathPlaceAddress !== \"OTHER\""
                 }
               ],
+              "previewGroups": [
+                {
+                  "id": "deathPlaceAddress",
+                  "label": {
+                    "defaultMessage": "What is the other address did the death occur at?",
+                    "description": "Label for form field: Other Location Address",
+                    "id": "form.field.label.deathAtOtherLocation"
+                  },
+                  "fieldToRedirect": "country"
+                }
+              ],
               "fields": [
                 {
                   "name": "country",
                   "type": "SELECT_WITH_OPTIONS",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
                     "defaultMessage": "Country",
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -6341,8 +5847,9 @@
                 {
                   "name": "state",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Division",
+                    "defaultMessage": "Province",
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
@@ -6378,6 +5885,7 @@
                 {
                   "name": "district",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
                     "defaultMessage": "District",
                     "description": "Title for the district select",
@@ -6417,25 +5925,36 @@
                   }
                 },
                 {
-                  "name": "addressLine4",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "name": "ruralOrUrban",
+                  "type": "RADIO_GROUP",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
+                    "defaultMessage": " ",
+                    "description": "Empty label for form field",
+                    "id": "form.field.label.emptyLabel"
                   },
-                  "required": true,
-                  "initialValue": "",
+                  "options": [
+                    {
+                      "label": {
+                        "defaultMessage": "Urban address",
+                        "id": "form.field.label.urban",
+                        "description": "Label for form field checkbox option Urban"
+                      },
+                      "value": "URBAN"
+                    },
+                    {
+                      "label": {
+                        "defaultMessage": "Rural address",
+                        "id": "form.field.label.rural",
+                        "description": "Label for form field checkbox option Rural"
+                      },
+                      "value": "RURAL"
+                    }
+                  ],
+                  "initialValue": "URBAN",
+                  "required": false,
+                  "hideInReview": true,
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "district"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -6453,34 +5972,26 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [6]
+                      "parameters": [7]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [6]
+                      "parameters": [7]
                     }
                   }
                 },
                 {
-                  "name": "addressLine3",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "name": "addressChief",
+                  "type": "TEXT",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
                   },
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -6496,11 +6007,48 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4"
+                      "expression": "values.ruralOrUrban !== \"RURAL\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathEventLocationMutationTransformer",
+                      "parameters": [6]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [6]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine4CityOption",
+                  "type": "TEXT",
+                  "previewGroup": "deathPlaceAddress",
+                  "label": {
+                    "defaultMessage": "Town",
+                    "description": "Title for the address line 4",
+                    "id": "form.field.label.addressLine4CityOption"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.country"
                     },
                     {
                       "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "!values.state"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.district"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -6517,8 +6065,9 @@
                 {
                   "name": "addressLine3CityOption",
                   "type": "TEXT",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Ward",
+                    "defaultMessage": "Residential Area",
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
@@ -6540,55 +6089,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [5]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [5]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -6603,12 +6104,13 @@
                   }
                 },
                 {
-                  "name": "addressLine1CityOption",
+                  "name": "addressLine2CityOption",
                   "type": "TEXT",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Street and house number",
+                    "defaultMessage": "Street / Plot Number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
+                    "id": "form.field.label.addressLine2CityOption"
                   },
                   "required": false,
                   "initialValue": "",
@@ -6628,11 +6130,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -6647,12 +6145,13 @@
                   }
                 },
                 {
-                  "name": "postCodeCityOption",
+                  "name": "numberOption",
                   "type": "NUMBER",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
+                    "defaultMessage": "Number",
+                    "description": "Title for the number field",
+                    "id": "form.field.label.number"
                   },
                   "required": false,
                   "initialValue": "",
@@ -6672,29 +6171,26 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
+                      "expression": "values.ruralOrUrban !== \"URBAN\""
                     }
                   ],
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [0, "postalCode"]
+                      "parameters": [1]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "postalCode"]
+                      "parameters": [1]
                     }
                   }
                 },
                 {
                   "name": "addressLine1",
                   "type": "TEXT",
+                  "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Street and house number",
+                    "defaultMessage": "Village",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
@@ -6716,65 +6212,17 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
+                      "expression": "values.ruralOrUrban !== \"RURAL\""
                     }
                   ],
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [1]
+                      "parameters": [5]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [1]
-                    }
-                  }
-                },
-                {
-                  "name": "postCode",
-                  "type": "NUMBER",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [0, "postalCode"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "postalCode"]
+                      "parameters": [5]
                     }
                   }
                 }
@@ -7269,7 +6717,7 @@
                     "id": "form.field.label.applicants.nationality"
                   },
                   "required": false,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -7670,7 +7118,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -8372,7 +7820,7 @@
                     "id": "form.field.label.country"
                   },
                   "required": true,
-                  "initialValue": "BGD",
+                  "initialValue": "ZMB",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -9061,71 +8509,16 @@
                   "label": {
                     "defaultMessage": "For a death registration the following documents are required:",
                     "description": "Documents Paragraph text",
-                    "id": "form.section.documents.birth.requirements"
+                    "id": "form.field.label.deceasedDocumentParagraph"
                   },
                   "initialValue": "",
                   "validate": []
                 },
                 {
-                  "name": "uploadDocForDeceased",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Deceased's ID",
-                    "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.deceasedIDProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "DECEASED_ID_PROOF",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "National ID (front)",
-                      "label": {
-                        "defaultMessage": "National ID (front)",
-                        "description": "Label for select option radio option NID front",
-                        "id": "form.field.label.docTypeNIDFront"
-                      }
-                    },
-                    {
-                      "value": "National ID (back)",
-                      "label": {
-                        "defaultMessage": "National ID (back)",
-                        "description": "Label for select option radio option NID back",
-                        "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "deathAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
                   "name": "uploadDocForApplicant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of Applicant's ID",
+                    "defaultMessage": "Applicant id",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.applicantIDProof"
                   },
@@ -9135,35 +8528,19 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "National ID (front)",
+                      "value": "Front of National ID",
                       "label": {
-                        "defaultMessage": "National ID (front)",
+                        "defaultMessage": "Front of national ID",
                         "description": "Label for select option radio option NID front",
                         "id": "form.field.label.docTypeNIDFront"
                       }
                     },
                     {
-                      "value": "National ID (back)",
+                      "value": "Back of National ID",
                       "label": {
-                        "defaultMessage": "National ID (back)",
+                        "defaultMessage": "Back of national ID",
                         "description": "Label for select option radio option NID back",
                         "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
                       }
                     }
                   ],
@@ -9180,7 +8557,7 @@
                   "name": "uploadDocForDeceasedDeath",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of Death of Deceased",
+                    "defaultMessage": "Proof of death of deceased",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.deceasedDeathProof"
                   },
@@ -9190,113 +8567,28 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Certified Post Mortem Report",
+                      "value": "Police Brought In Dead Certificate",
                       "label": {
-                        "defaultMessage": "Certified Post Mortem Report",
-                        "description": "Label for select option Post Mortem Report",
-                        "id": "form.field.label.docTypePostMortemReport"
+                        "defaultMessage": "Police brought in dead certificate",
+                        "description": "Label for select option Police brought in dead certificate",
+                        "id": "form.field.label.docTypePoliceBroughtInDeathCertificate"
                       }
                     },
                     {
-                      "value": "Hospital Discharge Certificate",
+                      "value": "Coroners Report",
                       "label": {
-                        "defaultMessage": "Hospital Discharge Certificate",
-                        "description": "Label for select option Hospital Discharge Certificate",
-                        "id": "form.field.label.docTypeHospitalDischargeCertificate"
+                        "defaultMessage": "Coroner's report",
+                        "description": "Label for select option Coroner's report",
+                        "id": "form.field.label.docTypeCoronersReport"
                       }
                     },
                     {
-                      "value": "Attested Letter of Death",
+                      "value": "Other",
                       "label": {
-                        "defaultMessage": "Attested Letter of Death",
-                        "description": "Label for select option Attested Letter of Death",
-                        "id": "form.field.label.docTypeLetterOfDeath"
+                        "defaultMessage": "Other",
+                        "description": "Label for radio option Other",
+                        "id": "form.field.label.docTypeOther"
                       }
-                    },
-                    {
-                      "value": "Attested Certificate of Death",
-                      "label": {
-                        "defaultMessage": "Attested Certificate of Death",
-                        "description": "Label for select option Attested Certificate of Death",
-                        "id": "form.field.label.docTypeDeathCertificate"
-                      }
-                    },
-                    {
-                      "value": "Certified Copy of Burial Receipt",
-                      "label": {
-                        "defaultMessage": "Certified Copy of Burial Receipt",
-                        "description": "Label for select option Certified Copy of Burial Receipt",
-                        "id": "form.field.label.docTypeCopyOfBurialReceipt"
-                      }
-                    },
-                    {
-                      "value": "Certified Copy of Funeral Receipt",
-                      "label": {
-                        "defaultMessage": "Certified Copy of Funeral Receipt",
-                        "description": "Label for select option Certified Copy of Funeral Receipt",
-                        "id": "form.field.label.docTypeFuneralReceipt"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "deathFieldToAttachmentTransformer"
-                    },
-                    "query": {
-                      "operation": "deathAttachmentToFieldTransformer"
-                    }
-                  }
-                },
-                {
-                  "name": "uploadDocForDeceasedPermanentAddress",
-                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
-                  "label": {
-                    "defaultMessage": "Proof of Permanent Address of Deceased",
-                    "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.deceasedPermanentAddressProof"
-                  },
-                  "initialValue": "",
-                  "extraValue": "DECEASED_PARMANENT_ADDRESS_PROOF",
-                  "hideAsterisk": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": "National ID (front)",
-                      "label": {
-                        "defaultMessage": "National ID (front)",
-                        "description": "Label for select option radio option NID front",
-                        "id": "form.field.label.docTypeNIDFront"
-                      }
-                    },
-                    {
-                      "value": "National ID (back)",
-                      "label": {
-                        "defaultMessage": "National ID (back)",
-                        "description": "Label for select option radio option NID back",
-                        "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Birth Registration",
-                      "label": {
-                        "defaultMessage": "Birth Registration",
-                        "description": "Label for select option Birth Registration",
-                        "id": "form.field.label.docTypeBR"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => [\"National ID (front)\", \"National ID (Back)\"].indexOf(a.optionValues[1]) > -1))"
                     }
                   ],
                   "mapping": {
