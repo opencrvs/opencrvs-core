@@ -1,5 +1,6 @@
 import { model, Schema, Document } from 'mongoose'
-import { statuses } from '@user-mgnt/utils/userUtils'
+// tslint:disable-next-line
+import { statuses } from '../utils/userUtils'
 
 export interface IUserName {
   use: string

@@ -7,6 +7,7 @@ import {
 } from '@resources/bgd/features/utils'
 
 interface IDGHSFacility {
+  facilityId: string
   division: string
   district: string
   upazila: string
@@ -26,7 +27,12 @@ const composeFhirLocation = (
 ): fhir.Location => {
   return {
     resourceType: 'Location',
-    identifier: [],
+    identifier: [
+      {
+        system: `${ORG_URL}/specs/id/internal-id`,
+        value: String(location.facilityId)
+      }
+    ],
     name: location.facilityNameEnglish, // English name
     alias: [location.facilityNameBengali], // Bangla name in element 0
     status: 'active',

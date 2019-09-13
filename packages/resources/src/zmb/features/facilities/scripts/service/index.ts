@@ -21,7 +21,12 @@ const composeFhirLocation = (
 ): fhir.Location => {
   return {
     resourceType: 'Location',
-    identifier: [],
+    identifier: [
+      {
+        system: `${ORG_URL}/specs/id/internal-id`,
+        value: `${location.code}_${String(location.statisticalID)}`
+      }
+    ],
     name: location.name, // English name
     alias: [location.name], // Secondary language name in element 0
     status: 'active',

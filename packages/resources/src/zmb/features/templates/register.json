@@ -1,0 +1,460 @@
+{
+  "certificates": {
+    "birth": {
+      "definition": {
+        "pageSize": {
+          "width": 595.28,
+          "height": 791.89
+        },
+        "info": {
+          "title": "Birth Registration Certificate"
+        },
+        "defaultStyle": {
+          "font": "notosans"
+        },
+        "content": [
+          {
+            "table": {
+              "widths": ["100%"],
+              "body": [
+                [
+                  {
+                    "margin": [30, 25, 30, 25],
+                    "alignment": "center",
+                    "stack": [
+                      {
+                        "image": "{countryLogo}",
+                        "fit": [78, 78]
+                      },
+                      "\n",
+                      {
+                        "text": "Birth Registration No",
+                        "style": "lightHeader"
+                      },
+                      {
+                        "text": "{registrationNumber}",
+                        "style": "boldHeader"
+                      },
+                      "\n",
+                      {
+                        "text": "Date of issuance of certificate: {certificateDate}"
+                      },
+                      "\n",
+                      {
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 445,
+                            "y2": 0,
+                            "lineWidth": 1,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      "\n\n",
+                      {
+                        "text": "This is to certify that"
+                      },
+                      {
+                        "text": "{applicantName}",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "text": "Was born on"
+                      },
+                      {
+                        "text": "{eventDate}",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "text": "Place of birth"
+                      },
+                      {
+                        "text": "District, Province",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 445,
+                            "y2": 0,
+                            "lineWidth": 1,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      "\n\n",
+                      {
+                        "text": "This event was registered at {registrationLocation}"
+                      },
+                      "\n\n\n\n",
+                      {
+                        "image": "{registrarSignature}",
+                        "fit": [78, 50]
+                      },
+                      {
+                        "margin": [0, 10, 0, 10],
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 150,
+                            "y2": 0,
+                            "lineWidth": 0.5,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "{registrarName}"
+                      },
+                      {
+                        "text": "({role})"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "styles": {
+          "lightHeader": {
+            "fontSize": 18
+          },
+          "boldHeader": {
+            "fontSize": 18,
+            "bold": true
+          },
+          "boldText": {
+            "bold": true
+          },
+          "subHeader": {
+            "fontSize": 13,
+            "bold": true
+          }
+        }
+      },
+      "fonts": {
+        "en": {
+          "notosans": {
+            "normal": "NotoSans-Light.ttf",
+            "bold": "NotoSans-Regular.ttf"
+          }
+        }
+      },
+      "vfs": {},
+      "transformers": [
+        {
+          "field": "countryLogo",
+          "operation": "OfflineCompanyLogo",
+          "baseData": "resource"
+        },
+        {
+          "field": "registrationNumber",
+          "operation": "FieldValue",
+          "parameters": {
+            "valueKey": "registration.registrationNumber"
+          }
+        },
+        {
+          "field": "certificateDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "format": "DD MMMM YYYY",
+            "language": "en",
+            "momentLocale": {
+              "en": "locale/en-ie"
+            }
+          }
+        },
+        {
+          "field": "applicantName",
+          "operation": "ApplicantName",
+          "parameters": {
+            "key": {
+              "birth": "child"
+            },
+            "format": {
+              "en": ["firstNamesEng", "familyNameEng"]
+            },
+            "language": "en"
+          }
+        },
+        {
+          "field": "eventDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "key": {
+              "birth": "child.childBirthDate"
+            },
+            "format": "DD MMMM YYYY",
+            "language": "en",
+            "momentLocale": {
+              "en": "locale/en-ie"
+            }
+          }
+        },
+        {
+          "field": "registrationLocation",
+          "operation": "FormattedFieldValue",
+          "parameters": {
+            "formattedKeys": "{registration.regStatus.officeName}, {registration.regStatus.officeAddressLevel3}, {registration.regStatus.officeAddressLevel4}"
+          }
+        },
+        {
+          "field": "registrarSignature",
+          "operation": "LocalRegistrarUserSignature",
+          "baseData": "userdetails"
+        },
+        {
+          "field": "registrarName",
+          "operation": "LocalRegistrarUserName",
+          "baseData": "userdetails"
+        },
+        {
+          "field": "role",
+          "operation": "LocalRegistrarUserRole",
+          "baseData": "userdetails"
+        }
+      ]
+    },
+    "death": {
+      "definition": {
+        "pageSize": {
+          "width": 595.28,
+          "height": 791.89
+        },
+        "info": {
+          "title": "Death Registration Certificate"
+        },
+        "defaultStyle": {
+          "font": "notosans"
+        },
+        "content": [
+          {
+            "table": {
+              "widths": ["100%"],
+              "body": [
+                [
+                  {
+                    "margin": [30, 25, 30, 25],
+                    "alignment": "center",
+                    "stack": [
+                      {
+                        "image": "{countryLogo}",
+                        "fit": [78, 78]
+                      },
+                      "\n",
+                      {
+                        "text": "Death Registration No",
+                        "style": "lightHeader"
+                      },
+                      {
+                        "text": "{registrationNumber}",
+                        "style": "boldHeader"
+                      },
+                      "\n",
+                      {
+                        "text": "Date of issuance of certificate: {certificateDate}"
+                      },
+                      "\n",
+                      {
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 445,
+                            "y2": 0,
+                            "lineWidth": 1,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      "\n\n",
+                      {
+                        "text": "This is to certify that"
+                      },
+                      {
+                        "text": "{applicantName}",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "text": "Died on"
+                      },
+                      {
+                        "text": "{eventDate}",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "text": "Place of death"
+                      },
+                      {
+                        "text": "District, Province",
+                        "style": "boldText"
+                      },
+                      "\n\n",
+                      {
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 445,
+                            "y2": 0,
+                            "lineWidth": 1,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      "\n\n\n",
+                      {
+                        "text": "This event was registered at {registrationLocation}"
+                      },
+                      "\n\n\n\n",
+                      {
+                        "image": "{registrarSignature}",
+                        "fit": [78, 50]
+                      },
+                      {
+                        "margin": [0, 10, 0, 10],
+                        "canvas": [
+                          {
+                            "type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 150,
+                            "y2": 0,
+                            "lineWidth": 0.5,
+                            "color": "#DADEDF"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "{registrarName}"
+                      },
+                      {
+                        "text": "({role})"
+                      }
+                    ]
+                  }
+                ]
+              ]
+            }
+          }
+        ],
+        "styles": {
+          "lightHeader": {
+            "fontSize": 18
+          },
+          "boldHeader": {
+            "fontSize": 18,
+            "bold": true
+          },
+          "boldText": {
+            "bold": true
+          },
+          "subHeader": {
+            "fontSize": 13,
+            "bold": true
+          }
+        }
+      },
+      "fonts": {
+        "en": {
+          "notosans": {
+            "normal": "NotoSans-Light.ttf",
+            "bold": "NotoSans-Regular.ttf"
+          }
+        }
+      },
+      "vfs": {},
+      "transformers": [
+        {
+          "field": "countryLogo",
+          "operation": "OfflineCompanyLogo",
+          "baseData": "resource"
+        },
+        {
+          "field": "registrationNumber",
+          "operation": "FieldValue",
+          "parameters": {
+            "valueKey": "registration.registrationNumber"
+          }
+        },
+        {
+          "field": "certificateDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "format": "DD MMMM YYYY",
+            "language": "en",
+            "momentLocale": {
+              "en": "locale/en-ie"
+            }
+          }
+        },
+        {
+          "field": "applicantName",
+          "operation": "ApplicantName",
+          "parameters": {
+            "key": {
+              "death": "deceased"
+            },
+            "format": {
+              "en": ["firstNamesEng", "familyNameEng"]
+            },
+            "language": "en"
+          }
+        },
+        {
+          "field": "eventDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "key": {
+              "death": "deathEvent.deathDate"
+            },
+            "format": "DD MMMM YYYY",
+            "language": "en",
+            "momentLocale": {
+              "en": "locale/en-ie"
+            }
+          }
+        },
+        {
+          "field": "registrationLocation",
+          "operation": "FormattedFieldValue",
+          "parameters": {
+            "formattedKeys": "{registration.regStatus.officeName}, {registration.regStatus.officeAddressLevel3}, {registration.regStatus.officeAddressLevel4}"
+          }
+        },
+        {
+          "field": "registrarSignature",
+          "operation": "LocalRegistrarUserSignature",
+          "baseData": "userdetails"
+        },
+        {
+          "field": "registrarName",
+          "operation": "LocalRegistrarUserName",
+          "baseData": "userdetails"
+        },
+        {
+          "field": "role",
+          "operation": "LocalRegistrarUserRole",
+          "baseData": "userdetails"
+        }
+      ]
+    }
+  }
+}

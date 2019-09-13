@@ -2620,6 +2620,11 @@ export const mockOfflineData = {
       '../resources/src/bgd/features/languages/generated/register.json'
     ).toString()
   ).data,
+  templates: JSON.parse(
+    readFileSync(
+      '../resources/src/bgd/features/templates/register.json'
+    ).toString()
+  ),
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   }
@@ -2631,6 +2636,7 @@ export async function createTestStore() {
     offlineDataReady({
       languages: mockOfflineData.languages,
       forms: mockOfflineData.forms,
+      templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
       assets: mockOfflineData.assets
@@ -2655,6 +2661,7 @@ export async function createTestComponent(
     offlineDataReady({
       languages: mockOfflineData.languages,
       forms: mockOfflineData.forms,
+      templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
       assets: mockOfflineData.assets
