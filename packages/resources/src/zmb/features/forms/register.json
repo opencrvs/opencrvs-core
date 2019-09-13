@@ -1473,43 +1473,6 @@
                   }
                 },
                 {
-                  "name": "addressTribePlaceOfHeritage",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Tribe",
-                    "description": "Title for the address tribe place of heritage",
-                    "id": "form.field.label.addressTribePlaceOfHeritage"
-                  },
-                  "previewGroup": "placeOfHeritage",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPlaceOfHeritage"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePlaceOfHeritage"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPlaceOfHeritage"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToAddressTransformer",
-                      "parameters": ["PLACE_OF_HERITAGE", 2]
-                    },
-                    "query": {
-                      "operation": "addressToFieldTransformer",
-                      "parameters": ["PLACE_OF_HERITAGE", 2]
-                    }
-                  }
-                },
-                {
                   "name": "addressLine1PlaceOfHeritage",
                   "type": "TEXT",
                   "label": {
