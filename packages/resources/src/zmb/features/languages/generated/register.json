@@ -445,7 +445,6 @@
         "form.field.label.addressLine2": "Area / Ward / Mouja / Village",
         "form.field.label.addressLine3": "Union / Municipality / Cantonement",
         "form.field.label.addressLine3CityOption": "Residential Area",
-        "form.field.label.addressTribePlaceOfHeritage": "Tribe",
         "form.field.label.addressLine4CityOption": "Town",
         "form.field.label.addressSameAsMother": "Is his current address the same as the mother's?",
         "form.field.label.applicantIDProof": "Applicant id",

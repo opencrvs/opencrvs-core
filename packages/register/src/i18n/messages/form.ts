@@ -8,7 +8,6 @@ interface IFormMessages {
   addressLine3CityOption: MessageDescriptor
   addressLine4: MessageDescriptor
   addressSameAsMother: MessageDescriptor
-  addressTribePlaceOfHeritage: MessageDescriptor
   answer: MessageDescriptor
   applicantIDProof: MessageDescriptor
   applicantName: MessageDescriptor
@@ -329,11 +328,6 @@ const messagesToDefine: IFormMessages = {
     description:
       "Title for the radio button to select that the father's current address is the same as the mother's address",
     id: 'form.field.label.addressSameAsMother'
-  },
-  addressTribePlaceOfHeritage: {
-    defaultMessage: 'Tribe',
-    description: 'Title for the address tribe place of heritage',
-    id: 'form.field.label.addressTribePlaceOfHeritage'
   },
   answer: {
     defaultMessage: 'Answer',
