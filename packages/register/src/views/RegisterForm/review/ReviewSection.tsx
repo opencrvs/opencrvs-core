@@ -73,7 +73,8 @@ import {
   IFormSectionGroup,
   SEARCH_FIELD,
   IRadioOption,
-  RADIO_GROUP
+  RADIO_GROUP,
+  SUBSECTION
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages } from '@register/i18n/messages/views/review'
@@ -290,7 +291,7 @@ const renderValue = (
   if (field.type === SEARCH_FIELD) {
     return (value as IDynamicValues).label
   }
-  if (field.hideInReview) {
+  if (field.hideValueInPreview) {
     return ''
   }
 
@@ -514,7 +515,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
       type => type === field.type
     )
   }
