@@ -11787,6 +11787,43 @@
                   }
                 },
                 {
+                  "name": "uploadDocForApplicantAthorityToApply",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of applicant's authority to apply",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.applicantAthorityToApplyProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "APPLICANT_ATHORITY_TO_APPLY_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Signed Affidavit",
+                      "label": {
+                        "defaultMessage": "Signed affidavit",
+                        "description": "Label for select option Signed Affidavit",
+                        "id": "form.field.label.docTypeSignedAffidavit"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "draftData.informant.applicantsRelationToDeceased !== \"OTHER\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
                   "name": "uploadDocForDeceasedDeath",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {

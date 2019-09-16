@@ -76,6 +76,7 @@ enum AttachmentType {
   TAX_RECEIPT
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
+  SIGNED_AFFIDAVIT
 }
 
 enum AttachmentSubject {
@@ -90,6 +91,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
   APPLICANT_ID_PROOF
+  APPLICANT_ATHORITY_TO_APPLY_PROOF
 }
 
 enum RegistrationType {
