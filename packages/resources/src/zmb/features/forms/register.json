@@ -403,6 +403,7 @@
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -464,6 +465,7 @@
                     "description": "Label for form field: Health Institution",
                     "id": "form.field.label.healdInstitution"
                   },
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1406,6 +1408,7 @@
                     "description": "Title for mother place of birth",
                     "id": "form.field.label.motherPlaceOfHeritage"
                   },
+                  "previewGroup": "placeOfHeritage",
                   "initialValue": "",
                   "validate": []
                 },
@@ -1638,6 +1641,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.motherPermanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -2179,6 +2183,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3307,6 +3312,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.fatherPermanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4621,6 +4627,7 @@
                     "description": "Title for the residential address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
