@@ -356,11 +356,7 @@ class ReviewActionComponent extends React.Component<
                 disabled={!completeApplication}
                 align={ICON_ALIGNMENT.LEFT}
               >
-                {intl.formatMessage(
-                  draftApplication
-                    ? buttonMessages.sendForReview
-                    : buttonMessages.sendForApproval
-                )}
+                {intl.formatMessage(buttonMessages.sendForApproval)}
               </PrimaryButton>
             ) : (
               <PrimaryButton
