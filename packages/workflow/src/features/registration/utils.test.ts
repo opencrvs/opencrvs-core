@@ -2,13 +2,15 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   convertStringToASCII,
-  sendEventNotification
+  sendEventNotification,
+  getRegistrationNumber
 } from '@workflow/features/registration/utils'
 import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { logger } from '@workflow/logger'
 import {
   testFhirBundle,
-  testFhirBundleWithIdsForDeath
+  testFhirBundleWithIdsForDeath,
+  fieldAgentPractitionerMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
 
@@ -139,5 +141,26 @@ describe('Verify utility functions', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
+  })
+  it('getRegistrationNumber function throws exception if invalid response found from resource service', async () => {
+    fetch.mockImplementationOnce(() => {
+      throw new Error('Mock Error')
+    })
+    getRegistrationNumber(
+      'BEFSW3S',
+      JSON.parse(fieldAgentPractitionerMock).id,
+      {
+        Authorization: 'bearer acd '
+      }
+    )
+    expect(
+      getRegistrationNumber(
+        'BEFSW3S',
+        JSON.parse(fieldAgentPractitionerMock).id,
+        {
+          Authorization: 'bearer acd '
+        }
+      )
+    ).rejects.toThrowError()
   })
 })

@@ -1,6 +1,8 @@
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
 
+export const GENERATE_TYPE_RN = 'registrationNumber'
+
 type ISupportedType =
   | fhir.Practitioner
   | fhir.PractitionerRole
