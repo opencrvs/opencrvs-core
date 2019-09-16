@@ -5754,6 +5754,12 @@
                       }
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "birthFieldToAttachmentTransformer"
@@ -5807,6 +5813,12 @@
                         "description": "Label for radio option Other",
                         "id": "form.field.label.docTypeOther"
                       }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
                     }
                   ],
                   "mapping": {
