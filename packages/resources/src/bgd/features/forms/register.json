@@ -5586,7 +5586,7 @@
                   "name": "uploadDocForMother",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of mothers ID",
+                    "defaultMessage": "Proof of mother's ID",
                     "description": "Label for list item Mother ID Proof",
                     "id": "form.field.label.proofOfMothersID"
                   },
@@ -5657,7 +5657,7 @@
                   "name": "uploadDocForFather",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of fathers ID",
+                    "defaultMessage": "Proof of father's ID",
                     "description": "Label for list item Father ID Proof",
                     "id": "form.field.label.proofOfFathersID"
                   },
