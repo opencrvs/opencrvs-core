@@ -4,6 +4,7 @@ interface ISelectInformantMessages {
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
   parents: MessageDescriptor
+  legalGuardian: MessageDescriptor
   birthErrorMessage: MessageDescriptor
   deathErrorMessage: MessageDescriptor
 }
@@ -25,6 +26,11 @@ const messagesToDefine: ISelectInformantMessages = {
     defaultMessage: 'Mother & Father',
     description:
       'The description that appears when selecting the parent as informant'
+  },
+  legalGuardian: {
+    id: 'register.selectinformant.legalGuardian',
+    defaultMessage: 'Legal guardian',
+    description: 'Informant option'
   },
   birthErrorMessage: {
     id: 'register.selectInformant.birthErrorMessage',
