@@ -71,7 +71,10 @@ import {
   BirthSection,
   IFormTag,
   IFormSectionGroup,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  IRadioOption,
+  RADIO_GROUP,
+  SUBSECTION
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages } from '@register/i18n/messages/views/review'
@@ -202,13 +205,13 @@ const getDocumentSections = (registerForm: IForm): IFormSection[] => {
   )
 }
 
-function renderSelectLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
-  options: ISelectOption[],
+  options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
 ) {
-  const selectedOption = options.find(option => option.value === value)
-  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  const option = options.find(option => option.value === value)
+  return option ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
@@ -267,7 +270,7 @@ const renderValue = (
     ? draft.data[section.id][field.name]
     : ''
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
-    return renderSelectLabel(value, field.options, intl)
+    return renderSelectOrRadioLabel(value, field.options, intl)
   }
   if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
     const draftData = draft.data[section.id]
@@ -288,8 +291,12 @@ const renderValue = (
   if (field.type === SEARCH_FIELD) {
     return (value as IDynamicValues).label
   }
-  if (field.hideInReview) {
+  if (field.hideValueInPreview) {
     return ''
+  }
+
+  if (field.type === RADIO_GROUP) {
+    return renderSelectOrRadioLabel(value, field.options, intl)
   }
 
   if (typeof value === 'string') {
@@ -508,7 +515,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
       type => type === field.type
     )
   }
