@@ -44,7 +44,7 @@ describe('Certificate collector test for a birth registration without father det
                   __typename: 'HumanName'
                 }
               ],
-              birthDate: '2018-08-01',
+              birthDate: new Date(),
               gender: 'male',
               __typename: 'Person'
             },
@@ -425,7 +425,7 @@ describe('Certificate collector test for a birth registration without father det
       component.update()
 
       expect(history.location.pathname).toBe(
-        '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+        '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
     })
   })
