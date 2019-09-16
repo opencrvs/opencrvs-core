@@ -288,6 +288,9 @@ const renderValue = (
   if (field.type === SEARCH_FIELD) {
     return (value as IDynamicValues).label
   }
+  if (field.hideInReview) {
+    return ''
+  }
 
   if (typeof value === 'string') {
     return value
@@ -574,7 +577,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             previewGroup => previewGroup.id === baseTag
           ) as IFormTag[])) ||
         []
-
       const values = taggedFields
         .map(field => {
           const errorsOnField = errorsOnFields[section.id][field.name]

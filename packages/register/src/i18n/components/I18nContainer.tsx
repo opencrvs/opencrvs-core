@@ -5,6 +5,8 @@ import { getLanguage, getMessages } from '@register/i18n/selectors'
 import { IStoreState } from '@register/store'
 import { IntlMessages } from '@register/i18n/reducer'
 
+import 'moment/locale/bn'
+
 type StateProps = {
   locale: string
   messages: IntlMessages

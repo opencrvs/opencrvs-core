@@ -1149,6 +1149,14 @@ const builders: IFieldBuilders = {
       )
       return createMaritalStatusBuilder(person, fieldValue as string)
     },
+    occupation: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        DECEASED_CODE,
+        DECEASED_TITLE,
+        fhirBundle
+      )
+      return createOccupationBulder(person, fieldValue as string)
+    },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const person = selectOrCreatePersonResource(
         DECEASED_CODE,
