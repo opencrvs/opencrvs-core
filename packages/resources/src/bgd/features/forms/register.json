@@ -5757,7 +5757,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     }
                   ],
                   "mapping": {
@@ -5818,7 +5818,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     }
                   ],
                   "mapping": {

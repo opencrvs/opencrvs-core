@@ -609,7 +609,7 @@ describe('Test for a free birth registration', () => {
       component = testComponent.component
     })
 
-    it('continue to review section when the mandatory fields are filled and birth event is before 45 days', async () => {
+    it('continue to payment section when the mandatory fields are filled and birth event is before 45 days', async () => {
       ;(await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT'))
         .hostNodes()
         .simulate('change', {
@@ -636,7 +636,7 @@ describe('Test for a free birth registration', () => {
         .simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+        '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
     })
   })

@@ -205,7 +205,7 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(6)
+            expect(fileInputs).toEqual(4)
           })
         })
       })
