@@ -41,6 +41,7 @@ export const offlineTransformers: IFunctionTransformer = {
     const matchedCondition = params.conditionalKeys.find(conditionalKey => {
       try {
         return conditionalKey.condition.matchValues.includes(
+          // Will throw an exception when value is not found for given key
           getValueFromApplicationDataByKey(
             templateData.application.data,
             conditionalKey.condition.key
