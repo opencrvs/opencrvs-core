@@ -17,10 +17,20 @@ import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
 import { assetHandler as bgdAssetHandler } from '@resources/bgd/features/assets/handler'
+import {
+  generatorHandler as bgdGeneratorHandler,
+  requestSchema as bgdGeneratorRequestSchema,
+  responseSchema as bgdGeneratorResponseSchema
+} from '@resources/bgd/features/generate/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
 import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
 import { assetHandler as zmbAssetHandler } from '@resources/zmb/features/assets/handler'
+import {
+  generatorHandler as zmbGeneratorHandler,
+  requestSchema as zmbGeneratorRequestSchema,
+  responseSchema as zmbGeneratorResponseSchema
+} from '@resources/zmb/features/generate/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -94,11 +104,15 @@ export async function createServer() {
   server.route({
     method: 'POST',
     path: '/bgd/generate/{type}',
-    handler: () => {
-      return
-    },
+    handler: bgdGeneratorHandler,
     options: {
       tags: ['api'],
+      validate: {
+        payload: bgdGeneratorRequestSchema
+      },
+      response: {
+        schema: bgdGeneratorResponseSchema
+      },
       description:
         'Generates registration numbers based on country specific implementation logic'
     }
@@ -150,11 +164,15 @@ export async function createServer() {
   server.route({
     method: 'POST',
     path: '/zmb/generate/{type}',
-    handler: () => {
-      return
-    },
+    handler: zmbGeneratorHandler,
     options: {
       tags: ['api'],
+      validate: {
+        payload: zmbGeneratorRequestSchema
+      },
+      response: {
+        schema: zmbGeneratorResponseSchema
+      },
       description:
         'Generates registration numbers based on country specific implementation logic'
     }
