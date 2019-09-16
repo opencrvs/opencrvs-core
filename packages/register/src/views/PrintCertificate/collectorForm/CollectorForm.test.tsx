@@ -468,7 +468,9 @@ describe('Test for a free birth registration', () => {
                   __typename: 'HumanName'
                 }
               ],
-              birthDate: '2019-08-01',
+              birthDate: new Date(
+                new Date().getTime() - 7 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               gender: 'male',
               __typename: 'Person'
             },
