@@ -73,23 +73,43 @@ describe('PDF template offline data related field transformer tests', () => {
                 key: 'child.placeOfBirth',
                 matchValues: ['INVALID']
               },
-              addressType: 'facilities',
-              addressKey: 'name',
-              formattedKeys: '{child.birthLocation}'
-            },
-            {
-              condition: {
-                key: 'child.placeOfBirth',
-                matchValues: ['INVALID']
-              },
               addressType: 'locations',
               addressKey: 'name',
               formattedKeys:
                 '{child.addressLine4}, {child.district}, {child.state}'
+            },
+            {
+              condition: {
+                key: 'child.invalid',
+                matchValues: ['INVALID']
+              },
+              addressType: 'facilities',
+              addressKey: 'name',
+              formattedKeys: '{child.birthLocation}'
             }
           ]
         })
       ).toThrowError('No condition has matched for this transformer')
+    })
+    it('Returns the expected output when no key is defined to replace as param', () => {
+      const intl = createIntl({
+        locale: 'en'
+      })
+
+      const transformedValue = offlineTransformers.OfflineAddress(data, intl, {
+        conditionalKeys: [
+          {
+            condition: {
+              key: 'child.placeOfBirth',
+              matchValues: ['HOSPITAL', 'OTHER_HEALTH_INSTITUTION']
+            },
+            addressType: 'facilities',
+            addressKey: 'name',
+            formattedKeys: 'Dummy output'
+          }
+        ]
+      })
+      expect(transformedValue).toEqual('Dummy output')
     })
   })
 })

@@ -55,27 +55,31 @@ export const offlineTransformers: IFunctionTransformer = {
       throw new Error('No condition has matched for this transformer')
     }
     const keys = matchedCondition.formattedKeys.match(/\{.*?\}/g)
-    const keyValues: { [key: string]: string } = {}
-    keys &&
-      keys.forEach(key => {
+    const keyValues: { [key: string]: string } | null =
+      keys &&
+      keys.reduce((keyValues: { [key: string]: string }, key) => {
         keyValues[key] = getValueFromApplicationDataByKey(
           templateData.application.data,
           // Getting rid of { }
           key.substr(1, key.length - 2)
         )
-      })
-    let value = matchedCondition.formattedKeys
-    Object.keys(keyValues).forEach(key => {
+        return keyValues
+      }, {})
+
+    if (!keyValues) {
+      return matchedCondition.formattedKeys
+    }
+    const value = Object.keys(keyValues).reduce((value, key) => {
       const addresses =
         templateData.resource[
           matchedCondition.addressType as keyof typeof templateData.resource
         ]
       const address = addresses[keyValues[key] as keyof typeof addresses]
-      value = value.replace(
+      return value.replace(
         new RegExp(`${key}`, 'g'),
         address[matchedCondition.addressKey] || ''
       )
-    })
+    }, matchedCondition.formattedKeys)
     return value
   }
 }
