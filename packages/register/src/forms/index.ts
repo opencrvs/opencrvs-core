@@ -306,7 +306,7 @@ export interface IFormFieldBase {
   mode?: THEME_MODE
   hidden?: boolean
   previewGroup?: string
-  hideInReview?: boolean
+  hideValueInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {

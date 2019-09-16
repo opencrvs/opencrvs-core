@@ -517,6 +517,7 @@
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.birthLocation"
                   },
+                  "previewGroup": "placeOfBirth",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -1806,6 +1807,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -2445,6 +2447,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3932,6 +3935,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4620,6 +4624,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -6541,6 +6546,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -8586,7 +8592,7 @@
                 {
                   "id": "privateHome",
                   "label": {
-                    "defaultMessage": "Address",
+                    "defaultMessage": "Private home address",
                     "description": "Tag definition for private home",
                     "id": "form.preview.tag.private.home"
                   }
@@ -9129,7 +9135,7 @@
                 {
                   "id": "otherInstitution",
                   "label": {
-                    "defaultMessage": "Address",
+                    "defaultMessage": "Other institution address",
                     "description": "Tag definition for other institution",
                     "id": "form.preview.tag.other.institution"
                   }
@@ -10077,6 +10083,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": []

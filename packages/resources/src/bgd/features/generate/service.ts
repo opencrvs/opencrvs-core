@@ -1,23 +1,20 @@
-import { getTrackingIdFromTaskResource } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getPractitionerLocations,
-  getJurisDictionalLocations
-} from '@workflow/features/user/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
+  getJurisDictionalLocations,
+  convertStringToASCII,
+  OPENCRVS_SPECIFICATION_URL
+} from '@resources/bgd/features/utils'
 import * as Verhoeff from 'node-verhoeff'
-import { convertStringToASCII } from '@workflow/features/registration/utils'
 
-export async function generateBdRegistrationNumber(
-  taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
+export async function generateRegistrationNumber(
+  trackingId: string,
+  practionerId: string
 ): Promise<string> {
   /* adding current year */
   let brn = new Date().getFullYear().toString()
-
   /* appending BBS code for district & upozila & union */
-  brn = brn.concat((await getLocationBBSCode(practitioner)) as string)
+  brn = brn.concat((await getLocationBBSCode(practionerId)) as string)
 
-  const trackingId = getTrackingIdFromTaskResource(taskResource) as string
   /* appending ascii converted tracking id */
   const brnToGenerateChecksum = brn.concat(convertStringToASCII(trackingId))
   /* appending tracking id */
@@ -29,15 +26,13 @@ export async function generateBdRegistrationNumber(
   return brn
 }
 
-export async function getLocationBBSCode(
-  practitioner: fhir.Practitioner
-): Promise<string> {
+async function getLocationBBSCode(practionerId: string): Promise<string> {
   /* getting location list for logged in practitioner */
-  if (!practitioner || !practitioner.id) {
+  if (!practionerId) {
     throw new Error('Invalid practioner data found')
   }
 
-  const locations = await getPractitionerLocations(practitioner.id)
+  const locations = await getPractitionerLocations(practionerId)
 
   const jurisDictionalLocations = getJurisDictionalLocations()
   for (const location of locations) {
