@@ -18,7 +18,17 @@ export const offlineTransformers: IFunctionTransformer = {
     return templateData.resource.assets.logo
   },
 
-  // TODO: need to document
+  /*
+    OfflineAddress allows you to get coditional address fields from offline data
+    @params: 
+      -  conditionalKeys []: it expects an array of conditional blocks.
+         - codition: holds the actual condition. Right now it's only equal matches
+         - addressType: offline address type. Ex: facilities | locations
+         - addressKey: field name of the address object. Ex: name | alias 
+         - formattedKeys: Mendatory field. It will be able to traverse through the object structure
+           and fetch the appropriate value if found otherwise will throw exception.
+           Ex: '{child.addressLine4}, {child.district}, {child.state}'
+   */
   OfflineAddress: (
     templateData: TemplateTransformerData,
     intl: IntlShape,

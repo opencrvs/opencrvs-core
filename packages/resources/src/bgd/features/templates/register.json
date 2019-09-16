@@ -262,8 +262,7 @@
       },
       {
         "field": "issuedLocation",
-        "operation": "LoggedInUserOfficeName",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserOfficeName"
       },
       {
         "field": "issuedByLabel",
@@ -278,13 +277,11 @@
       },
       {
         "field": "issuedByRole",
-        "operation": "LoggedInUserRole",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserRole"
       },
       {
         "field": "issuedBy",
-        "operation": "LoggedInUserName",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserName"
       },
       {
         "field": "issuedDateLabel",
@@ -666,8 +663,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -774,7 +770,6 @@
         {
           "field": "placeOfBirth",
           "operation": "OfflineAddress",
-          "baseData": "application,resource",
           "parameters": {
             "conditionalKeys": [
               {
@@ -801,7 +796,6 @@
         {
           "field": "bnPlaceOfBirth",
           "operation": "OfflineAddress",
-          "baseData": "application,resource",
           "parameters": {
             "conditionalKeys": [
               {
@@ -841,18 +835,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ],
       "fonts": {
@@ -1203,8 +1194,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -1311,7 +1301,6 @@
         {
           "field": "placeOfDeath",
           "operation": "OfflineAddress",
-          "baseData": "application,resource",
           "parameters": {
             "conditionalKeys": [
               {
@@ -1356,7 +1345,6 @@
         {
           "field": "bnPlaceOfDeath",
           "operation": "OfflineAddress",
-          "baseData": "application,resource",
           "parameters": {
             "conditionalKeys": [
               {
@@ -1414,18 +1402,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ],
       "fonts": {
