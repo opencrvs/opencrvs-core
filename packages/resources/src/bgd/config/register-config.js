@@ -1,5 +1,4 @@
 window.config = {
-  API_GATEWAY_URL: 'http://localhost:7070/',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
@@ -7,6 +6,7 @@ window.config = {
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
+  API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040/bgd',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days

@@ -2,9 +2,13 @@ import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType,
-  isInProgressApplication
+  isInProgressApplication,
+  getRegistrationNumber
 } from '@workflow/features/registration/utils'
-import { getRegStatusCode } from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  getRegStatusCode,
+  getTrackingIdFromTaskResource
+} from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
@@ -25,7 +29,6 @@ import {
   REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
 import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
-import { generateRegistrationNumber } from '@workflow/features/registration/brnGenerator'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -103,9 +106,13 @@ export async function markBundleAsRegistered(
   /* Setting registration number here */
   const eventType = getEventType(bundle)
   if (eventType === EVENT_TYPE.BIRTH) {
-    await pushRN(taskResource, practitioner, 'birth-registration-number')
+    await pushRN(taskResource, practitioner, 'birth-registration-number', {
+      Authorization: `Bearer ${token}`
+    })
   } else if (eventType === EVENT_TYPE.DEATH) {
-    await pushRN(taskResource, practitioner, 'death-registration-number')
+    await pushRN(taskResource, practitioner, 'death-registration-number', {
+      Authorization: `Bearer ${token}`
+    })
   }
 
   /* setting registration workflow status here */
@@ -151,18 +158,22 @@ export async function markBundleAsCertified(
 export async function pushRN(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner,
-  identifierName: string
+  identifierName: string,
+  authHeader: { Authorization: string }
 ): Promise<fhir.Task> {
   if (!taskResource) {
     throw new Error('Invalid Task resource found for registration')
   }
 
-  const brn = await generateRegistrationNumber(taskResource, practitioner)
-
+  const generatedOutput = await getRegistrationNumber(
+    getTrackingIdFromTaskResource(taskResource) as string,
+    practitioner.id || '',
+    authHeader
+  )
   if (!taskResource.identifier) {
     taskResource.identifier = []
   }
-  const brnIdentifier =
+  const rnIdentifier =
     taskResource &&
     taskResource.identifier &&
     taskResource.identifier.find(identifier => {
@@ -171,13 +182,13 @@ export async function pushRN(
         `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`
       )
     })
-  if (!brnIdentifier) {
+  if (!rnIdentifier) {
     taskResource.identifier.push({
       system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
-      value: brn
+      value: generatedOutput.registrationNumber
     })
   } else {
-    brnIdentifier.value = brn
+    rnIdentifier.value = generatedOutput.registrationNumber
   }
   return taskResource
 }

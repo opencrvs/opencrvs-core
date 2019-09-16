@@ -180,11 +180,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       graphqlMock
     )
 
-    const element = await waitForElement(
-      testComponent.component,
-      '#tab_approvals'
-    )
-    expect(element.hostNodes().text()).toContain('Sent for approval (2)')
+    const app = testComponent.component
+    const tab = await waitForElement(app, '#tab_approvals')
+    expect(tab.hostNodes().text()).toContain('Sent for approval (2)')
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
