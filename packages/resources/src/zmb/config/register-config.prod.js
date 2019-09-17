@@ -9,6 +9,7 @@ window.config = {
   API_GATEWAY_URL: 'https://gateway.{{hostname}}/',
   PERFORMANCE_URL: 'https://performance.{{hostname}}',
   RESOURCES_URL: 'https://resources.{{hostname}}/zmb',
+  MOMENT_LOCALE: 'locale/en-ie',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 36500, // 100 years =  (100 * 365) days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 36500, // 100 years =  (100 * 365) days
   CERTIFICATE_PRINT_LOWEST_CHARGE: 0, // taka

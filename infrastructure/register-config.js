@@ -9,6 +9,7 @@ window.config = {
   LOGIN_URL: 'https://login.{{hostname}}',
   PERFORMANCE_URL: 'https://performance.{{hostname}}',
   RESOURCES_URL: 'https://resources.{{hostname}}/bgd',
+  MOMENT_LOCALE: 'locale/bn',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka

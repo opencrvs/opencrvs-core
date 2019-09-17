@@ -9,6 +9,7 @@ interface Window {
     LOGIN_URL: string
     PERFORMANCE_URL: string
     RESOURCES_URL: string
+    MOMENT_LOCALE: string
     HEALTH_FACILITY_FILTER: string
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
     CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
