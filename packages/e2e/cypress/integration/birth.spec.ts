@@ -42,6 +42,11 @@ context('Birth Integration Test', () => {
     cy.get('#childBirthDate-mm').type('08')
     cy.get('#childBirthDate-yyyy').type('2018')
     cy.get('#multipleBirth').type('1')
+    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS
@@ -308,6 +313,11 @@ context('Birth Integration Test', () => {
     cy.get('#childBirthDate-mm').type('10')
     cy.get('#childBirthDate-yyyy').type('1991')
     cy.get('#multipleBirth').type('1')
+    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
+    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
+    cy.selectOption('#state', 'Dhaka', 'Dhaka')
+    cy.selectOption('#district', 'Gazipur', 'Gazipur')
+    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.wait(1000)
     cy.get('#next_section').click()
     // MOTHER DETAILS

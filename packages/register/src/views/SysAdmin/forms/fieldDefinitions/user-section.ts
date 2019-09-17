@@ -169,6 +169,7 @@ export const userSection: ISerializedFormSection = {
           label: messages.registrationOffice,
           required: true,
           initialValue: '',
+          searchableResource: 'locations',
           validate: [],
           mapping: {
             mutation: {
