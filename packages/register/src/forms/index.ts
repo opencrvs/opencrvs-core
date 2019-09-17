@@ -397,7 +397,7 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 }
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
-  searchableResource: keyof IOfflineData
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   onCompleted?: (response: string) => void
 }
 
@@ -844,7 +844,7 @@ export interface Ii18nSimpleDocumentUploaderFormField
 }
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
-  searchableResource: keyof IOfflineData
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   onCompleted?: (response: string) => void
 }
 

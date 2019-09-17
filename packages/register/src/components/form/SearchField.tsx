@@ -94,7 +94,7 @@ interface IProps {
   isFieldRequired: boolean
   onModalComplete: (label: string, value: string) => void
   offlineResources: IOfflineData
-  searchableResource: keyof IOfflineData
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
 }
 interface IState {
   searchText: string
@@ -119,13 +119,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
   handleSearch = (param: string) => {
     this.setState({
-      searchText: param
+      searchText: param,
+      showModal: true
     })
-    if (this.state.showModal === false) {
-      this.setState({
-        showModal: true
-      })
-    }
   }
 
   handleChange = (value: string | number | boolean) => {
@@ -168,7 +164,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     const offlineLocations = this.props.offlineResources[
       this.props.searchableResource
-    ] as IOfflineData['locations'] // Didn't find a best way to pass it.
+    ]
 
     let locations = Object.values(offlineLocations) as ILocation[]
     if (this.state.searchText.length > 0) {
@@ -179,12 +175,12 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       this.state.selectedValue ||
       (locations && locations.length > 0 && locations[0].name) ||
       ''
-    let selectedLocation = {} as ILocation
+
+    const selectedLocation =
+      locations.find(location => location.name === selectedValue) ||
+      ({} as ILocation)
 
     const listItems = locations.map((location, index) => {
-      if (location.name === selectedValue) {
-        selectedLocation = location
-      }
       return (
         <ItemContainer
           key={'item-container-' + index}
