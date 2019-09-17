@@ -207,6 +207,16 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             },
             description: {
               message: messages.registerActionDescriptionIncomplete
+            },
+            modal: {
+              title: {
+                message: messages.validateConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.validateConfirmationDesc,
+                payload: { completeApplication: true }
+              }
             }
           }
         }
@@ -353,7 +363,6 @@ class ReviewActionComponent extends React.Component<
                 id="validateApplicationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeApplication}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.sendForApproval)}
