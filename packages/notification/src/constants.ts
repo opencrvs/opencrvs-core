@@ -9,7 +9,9 @@ export const COUNTRY = process.env.COUNTRY || 'bgd'
 */
 export const NON_UNICODED_LANGUAGES = ['en']
 
-export const SMS_PROVIDER = process.env.SMS_PROVIDER || 'infobip'
+export const SMS_PROVIDER = process.env.SMS_PROVIDER
+  ? readFileSync(process.env.SMS_PROVIDER).toString()
+  : 'infobip'
 
 export const CLICKATELL_USER = process.env.CLICKATELL_USER_PATH
   ? readFileSync(process.env.CLICKATELL_USER_PATH).toString()
