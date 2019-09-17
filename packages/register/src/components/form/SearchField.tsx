@@ -166,7 +166,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       this.props.searchableResource
     ]
 
-    let locations = Object.values(offlineLocations) as ILocation[]
+    let locations = Object.values(offlineLocations)
     if (this.state.searchText.length > 0) {
       const rgxp = new RegExp(this.state.searchText, 'i')
       locations = locations.filter(location => location.name.match(rgxp))
