@@ -379,7 +379,7 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "previewGroup": "placeOfBirth",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -388,14 +388,6 @@
                     "id": "form.field.select.placeholder"
                   },
                   "options": [
-                    {
-                      "value": "HOSPITAL",
-                      "label": {
-                        "defaultMessage": "Hospital",
-                        "description": "Select item for hospital",
-                        "id": "form.field.label.hospital"
-                      }
-                    },
                     {
                       "value": "HEALTH_INSTITUTION",
                       "label": {
@@ -441,7 +433,7 @@
                     "id": "form.field.label.healdInstitution"
                   },
                   "previewGroup": "placeOfBirth",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
                   "validate": [],
