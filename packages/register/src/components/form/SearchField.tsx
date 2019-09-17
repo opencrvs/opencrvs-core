@@ -176,9 +176,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       (locations && locations.length > 0 && locations[0].name) ||
       ''
 
-    const selectedLocation =
-      locations.find(location => location.name === selectedValue) ||
-      ({} as ILocation)
+    const selectedLocation = locations.find(
+      location => location.name === selectedValue
+    )
 
     const listItems = locations.map((location, index) => {
       return (
@@ -261,7 +261,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
               id="modal_select"
               type="button"
               disabled={listItems.length <= 0}
-              onClick={() => this.onSelect(selectedLocation)}
+              onClick={() =>
+                selectedLocation && this.onSelect(selectedLocation)
+              }
             >
               {intl.formatMessage(buttonMessages.select)}
             </SelectButton>
