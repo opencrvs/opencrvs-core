@@ -258,11 +258,11 @@ export class RegistrationHomeView extends React.Component<
             locationIds: [registrarLocationId],
             count: 10,
             reviewStatuses: reviewStatuses,
-            inProgressSkip: 0, // TODO replace with page calc: (progressCurrentPage - 1) * 10
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
+            inProgressSkip: (progressCurrentPage - 1) * 10,
+            reviewSkip: (reviewCurrentPage - 1) * 10,
+            rejectSkip: (updatesCurrentPage - 1) * 10,
+            approvalSkip: (approvalCurrentPage - 1) * 10,
+            printSkip: (printCurrentPage - 1) * 10
           }}
           pollInterval={window.config.UI_POLLING_INTERVAL}
         >
