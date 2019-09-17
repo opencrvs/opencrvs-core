@@ -49,7 +49,7 @@ jobs:
     - stage: deploy to staging
       if: branch = master AND type = push
       install: skip
-      script: yarn deploy:staging bgd --clear-data=yes --restore-metadata=yes opencrvs-staging.jembi.org latest
+      script: yarn deploy:staging:bgd
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
