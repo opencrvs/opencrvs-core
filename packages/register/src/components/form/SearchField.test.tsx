@@ -13,6 +13,7 @@ describe('Search Field component', () => {
         fieldLabel="registrationOffice"
         fieldValue={{ label: '', value: '' }}
         onModalComplete={mock}
+        searchableResource="locations"
       />
     </IntlProvider>
   )

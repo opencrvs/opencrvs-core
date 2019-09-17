@@ -22,7 +22,10 @@ const Label = styled.label.attrs<{ size?: string; disabled?: boolean }>({})`
     ${theme.fonts.bodyBoldStyle};
     margin-left: 8px;`}
 `
-
+const CheckOuter = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 50%;
+`
 const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
   display: flex;
   justify-content: center;
@@ -98,19 +101,21 @@ export class RadioButton extends React.Component<IRadioButton> {
     const { id, name, selected, label, value, size, disabled } = this.props
     return (
       <Wrapper>
-        <Input
-          id={id}
-          disabled={disabled}
-          role="radio"
-          checked={value === selected}
-          type="radio"
-          name={name}
-          value={value.toString()}
-          onChange={disabled ? () => null : this.onChange}
-        />
-        <Check disabled={disabled} size={size}>
-          {disabled ? '' : <span />}
-        </Check>
+        <CheckOuter>
+          <Input
+            id={id}
+            disabled={disabled}
+            role="radio"
+            checked={value === selected}
+            type="radio"
+            name={name}
+            value={value.toString()}
+            onChange={disabled ? () => null : this.onChange}
+          />
+          <Check disabled={disabled} size={size}>
+            {disabled ? '' : <span />}
+          </Check>
+        </CheckOuter>
         <Label disabled={disabled} size={size} htmlFor={id}>
           {label}
         </Label>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, mockOfflineData } from '@register/tests/util'
 import { createStore } from '@register/store'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
@@ -7,12 +7,23 @@ import { ReactWrapper } from 'enzyme'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 import { deserializeFormSection } from '@register/forms/mappings/deserializer'
+import { offlineDataReady } from '@register/offline/actions'
 
 const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities,
+        assets: mockOfflineData.assets
+      })
+    )
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm
@@ -39,7 +50,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -58,7 +69,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Chittagong' }
       })
     component.update()
 
@@ -89,7 +100,7 @@ describe('Create new user page tests', () => {
         .find('#registrationOffice-id')
         .hostNodes()
         .props().value
-    ).toEqual('Nagari Union Parishad')
+    ).toEqual('CHITTAGONG')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
@@ -97,7 +108,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -123,7 +134,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -149,7 +160,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 

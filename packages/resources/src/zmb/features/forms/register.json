@@ -435,6 +435,7 @@
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
                   "validate": [],
                   "conditionals": [
                     {
@@ -4863,6 +4864,7 @@
                   },
                   "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
