@@ -258,7 +258,7 @@ export class RegistrationHomeView extends React.Component<
             locationIds: [registrarLocationId],
             count: 10,
             reviewStatuses: reviewStatuses,
-            inProgressSkip: 0,
+            inProgressSkip: 0, // TODO replace with page calc: (progressCurrentPage - 1) * 10
             reviewSkip: 0,
             rejectSkip: 0,
             approvalSkip: 0,
