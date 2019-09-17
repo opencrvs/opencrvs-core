@@ -468,7 +468,9 @@ describe('Test for a free birth registration', () => {
                   __typename: 'HumanName'
                 }
               ],
-              birthDate: '2019-08-01',
+              birthDate: new Date(
+                new Date().getTime() - 7 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               gender: 'male',
               __typename: 'Person'
             },
@@ -636,7 +638,7 @@ describe('Test for a free birth registration', () => {
         .simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
+        '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
     })
   })
