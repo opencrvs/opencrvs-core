@@ -1,7 +1,7 @@
 import { IntlShape } from 'react-intl'
 import {
   IFunctionTransformer,
-  TransformableData
+  TemplateTransformerData
 } from '@register/pdfRenderer/transformer/types'
 import { userMessages } from '@register/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
@@ -25,55 +25,69 @@ export const userTransformers: IFunctionTransformer = {
     LocalRegistrarUserName provides the username of the loggedIn user.
     format: '{firstName} {familyName}'
   */
-  LocalRegistrarUserName: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-    return getUserName(userDetails.localRegistrar)
+  LocalRegistrarUserName: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return getUserName(templateData.userDetails.localRegistrar)
   },
   /*
     LoggedInUserName provides the username of the loggedIn user.
     format: '{firstName} {familyName}'
   */
-  LoggedInUserName: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-    return getUserName(userDetails)
+  LoggedInUserName: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return getUserName(templateData.userDetails)
   },
 
   /*
     LoggedInUserOfficeName provides local office name of the loggedIn user.
   */
-  LoggedInUserOfficeName: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-    return userDetails.primaryOffice ? userDetails.primaryOffice.name || '' : ''
+  LoggedInUserOfficeName: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return templateData.userDetails.primaryOffice
+      ? templateData.userDetails.primaryOffice.name || ''
+      : ''
   },
 
   /*
     LocalRegistrarUserRole provides the branded role of the loggedIn user.
   */
-  LocalRegistrarUserRole: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-
-    return userDetails.localRegistrar.role
-      ? intl.formatMessage(userMessages[userDetails.localRegistrar.role])
+  LocalRegistrarUserRole: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return templateData.userDetails.localRegistrar.role
+      ? intl.formatMessage(
+          userMessages[templateData.userDetails.localRegistrar.role]
+        )
       : ''
   },
   /*
     LoggedInUserRole provides the branded role of the loggedIn user.
   */
-  LoggedInUserRole: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-
-    return userDetails.role
-      ? intl.formatMessage(userMessages[userDetails.role])
+  LoggedInUserRole: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return templateData.userDetails.role
+      ? intl.formatMessage(userMessages[templateData.userDetails.role])
       : ''
   },
 
   /*
     LocalRegistrarUserSignature provides the branded role of the loggedIn user.
   */
-  LocalRegistrarUserSignature: (data: TransformableData, intl: IntlShape) => {
-    const userDetails = data as IUserDetails
-    return userDetails.localRegistrar.signature
-      ? userDetails.localRegistrar.signature.data || ''
+  LocalRegistrarUserSignature: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape
+  ) => {
+    return templateData.userDetails.localRegistrar.signature
+      ? templateData.userDetails.localRegistrar.signature.data || ''
       : ''
   }
 }

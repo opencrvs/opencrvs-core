@@ -41,16 +41,11 @@ export class SearchInputWithIcon extends React.Component<IProps, IState> {
   }
 
   search = () => {
-    return (
-      this.state.searchParam && this.props.searchHandler(this.state.searchParam)
-    )
+    return this.props.searchHandler(this.state.searchParam)
   }
   searchOnEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      return (
-        this.state.searchParam &&
-        this.props.searchHandler(this.state.searchParam)
-      )
+      return this.props.searchHandler(this.state.searchParam)
     }
   }
 

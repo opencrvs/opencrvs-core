@@ -456,7 +456,7 @@
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -518,7 +518,7 @@
                     "id": "form.field.label.birthLocation"
                   },
                   "previewGroup": "placeOfBirth",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {

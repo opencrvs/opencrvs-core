@@ -5,7 +5,7 @@ services:
   # Note: these published port will override UFW rules as Docker manages it's own iptables
   # Only publish the exact ports that are required for OpenCRVS to work
   traefik:
-    image: traefik
+    image: traefik:1.7.16
     ports:
       - '80:80'
       - '443:443'
@@ -199,6 +199,8 @@ services:
       - infobip-gateway-endpoint
       - infobip-api-key
       - infobip-sender-id
+      - sms-languages
+      - sms-provider
       - jwt-public-key.{{ts}}
     environment:
       - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
@@ -208,7 +210,8 @@ services:
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - LANGUAGES=bn,en
+      - LANGUAGES=/run/secrets/sms-languages
+      - SMS_PROVIDER=/run/secrets/sms-provider
     deploy:
       replicas: 2
     networks:
@@ -347,6 +350,10 @@ secrets:
   infobip-api-key:
     external: true
   infobip-sender-id:
+    external: true
+  sms-languages:
+    external: true
+  sms-provider:
     external: true
 
 configs:
