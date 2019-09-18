@@ -28,6 +28,9 @@ const Icon = styled(Button)`
   opacity: ${(props: IButtonProps) => (props.disabled ? 0.5 : 1)};
   border: none;
   outline: none;
+  &:disabled {
+    background: none;
+  }
 `
 const PaginationLabel = styled.div`
   span:nth-child(1) {
