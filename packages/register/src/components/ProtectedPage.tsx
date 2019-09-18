@@ -56,7 +56,11 @@ class ProtectedPageComponent extends React.Component<
 
   async handleVisibilityChange(isVisible: boolean) {
     const newState = { ...this.state }
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
+    if (
+      !isVisible &&
+      !(await storage.getItem(SCREEN_LOCK)) &&
+      !this.props.location.pathname.includes('documents')
+    ) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true
