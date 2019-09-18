@@ -21,7 +21,7 @@
               "id": "child-view-group",
               "fields": [
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Given name(s)",
@@ -47,7 +47,7 @@
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Surname",
@@ -971,7 +971,7 @@
                   }
                 },
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -1025,7 +1025,7 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -1051,7 +1051,7 @@
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -2533,7 +2533,7 @@
                   }
                 },
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -2631,7 +2631,7 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -2663,7 +2663,7 @@
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -3933,7 +3933,7 @@
               "id": "deceased-view-group",
               "fields": [
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -4015,7 +4015,7 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Given name(s)",
@@ -4041,7 +4041,7 @@
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Surname",
@@ -5549,7 +5549,7 @@
                   }
                 },
                 {
-                  "name": "nationalID",
+                  "name": "applicantID",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -5592,7 +5592,7 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Given name(s)",
@@ -5631,7 +5631,7 @@
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Surname",
