@@ -655,7 +655,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
         section,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        draft.data
       ).forEach(group => {
         items = items
           .concat(

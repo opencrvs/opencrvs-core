@@ -137,18 +137,18 @@ const setInformantFields = (
         disabled: false
       },
       {
-        id: `select_informant_${INFORMANT.SELF}`,
-        option: {
-          label: intl.formatMessage(formMessages.self),
-          value: INFORMANT.SELF
-        },
-        disabled: true
-      },
-      {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
           label: intl.formatMessage(formMessages.someoneElse),
           value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SELF}`,
+        option: {
+          label: intl.formatMessage(formMessages.self),
+          value: INFORMANT.SELF
         },
         disabled: true
       }
@@ -297,7 +297,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToPrimaryApplicant,
-        registrationSection
+        registrationSection,
+        goToBirthRegistrationAsParent
       } = this.props
       this.props.modifyApplication({
         ...application,
@@ -306,12 +307,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           registration: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant
             }
           }
         }
       })
-      goToPrimaryApplicant(this.props.match.params.applicationId)
+      event === Event.BIRTH
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
+        : goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -319,8 +323,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     ) {
       const {
         application,
-        goToBirthContactPoint,
-        goToDeathContactPoint,
+        goToBirthRegistrationAsParent,
+        goToDeathRegistration,
         registrationSection,
         applicantsSection
       } = this.props
@@ -354,8 +358,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.props.modifyApplication(newApplication)
 
       this.props.location.pathname.includes(Event.BIRTH)
-        ? goToBirthContactPoint(this.props.match.params.applicationId)
-        : goToDeathContactPoint(this.props.match.params.applicationId)
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
+        : goToDeathRegistration(this.props.match.params.applicationId)
     } else if (
       event === Event.DEATH &&
       this.state.informant &&
@@ -386,6 +390,33 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       })
 
       goToDeathRegistration(this.props.match.params.applicationId)
+    } else if (
+      event === Event.BIRTH &&
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant === INFORMANT.SOMEONE_ELSE
+    ) {
+      const {
+        application,
+        registrationSection,
+        goToBirthRegistrationAsParent
+      } = this.props
+
+      this.props.modifyApplication({
+        ...application,
+        data: {
+          ...application.data,
+          [registrationSection.id]: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: this.state.informant
+            }
+          }
+        }
+      })
+
+      goToBirthRegistrationAsParent(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
