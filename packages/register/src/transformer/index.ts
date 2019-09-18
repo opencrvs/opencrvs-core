@@ -22,7 +22,8 @@ export const draftToGqlTransformer = (
     }
     getVisibleSectionGroupsBasedOnConditions(
       section,
-      draftData[section.id]
+      draftData[section.id],
+      draftData
     ).forEach(groupDef => {
       groupDef.fields.forEach(fieldDef => {
         const conditionalActions: string[] = getConditionalActionsForField(

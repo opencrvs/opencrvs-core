@@ -119,7 +119,8 @@ function getNextSectionIds(
 ) {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
-    application.data[fromSection.id] || {}
+    application.data[fromSection.id] || {},
+    application.data
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
