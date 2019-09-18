@@ -152,11 +152,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeApplication: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.approvalActionDescriptionComplete
             },
             modal: {
               title: {
@@ -171,11 +171,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeApplication: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.approvalActionDescriptionIncomplete
             }
           }
         }
@@ -184,10 +184,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.validateCompleteApplicationActionTitle
+              message: messages.approvalActionTitle,
+              payload: { completeApplication: true }
             },
             description: {
-              message: messages.validateCompleteApplicationActionDescription
+              message: messages.approvalActionDescriptionComplete
             },
             modal: {
               title: {
@@ -202,11 +203,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
-              message: messages.reviewActionTitle,
+              message: messages.approvalActionTitle,
               payload: { completeApplication: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.approvalActionDescriptionIncomplete
             }
           }
         }
@@ -356,11 +357,7 @@ class ReviewActionComponent extends React.Component<
                 disabled={!completeApplication}
                 align={ICON_ALIGNMENT.LEFT}
               >
-                {intl.formatMessage(
-                  draftApplication
-                    ? buttonMessages.sendForReview
-                    : buttonMessages.sendForApproval
-                )}
+                {intl.formatMessage(buttonMessages.sendForApproval)}
               </PrimaryButton>
             ) : (
               <PrimaryButton
