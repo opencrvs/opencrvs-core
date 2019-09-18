@@ -173,31 +173,30 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     }
     const selectedValue =
       this.state.selectedValue ||
-      (locations && locations.length > 0 && locations[0].name) ||
+      (locations && locations.length > 0 && locations[0].id) ||
       ''
 
     const selectedLocation = locations.find(
-      location => location.name === selectedValue
+      location => location.id === selectedValue
     )
-
     const listItems = locations.map((location, index) => {
       return (
         <ItemContainer
           key={'item-container-' + index}
-          selected={location.name === selectedValue}
+          selected={location.id === selectedValue}
         >
           <Item>
             <RadioButton
               id={'location-' + index}
               name="location"
               label={location.name}
-              value={location.name}
+              value={location.id}
               selected={selectedValue}
               onChange={this.handleChange}
             />
           </Item>
           <Item isRight={true} color={this.props.theme.colors.black}>
-            {location.name === selectedValue &&
+            {location.id === selectedValue &&
               intl.formatMessage(formMessages.officeLocationId, {
                 locationId: location.id
               })}
