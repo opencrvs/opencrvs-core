@@ -28,7 +28,8 @@ describe('elasticsearch db helper', () => {
         body: mockCompositionBody,
         id: 'testId',
         index: 'ocrvs',
-        type: 'compositions'
+        type: 'compositions',
+        refresh: 'wait_for'
       })
     })
 
@@ -45,7 +46,8 @@ describe('elasticsearch db helper', () => {
         id: 'testId',
         body: {
           doc: body
-        }
+        },
+        refresh: 'wait_for'
       })
     })
 

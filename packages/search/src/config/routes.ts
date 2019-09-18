@@ -31,140 +31,27 @@ export const getRoutes = () => {
         auth: {
           scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
         },
-        description:
-          'Handles indexing a new declaration and searching for duplicates'
+        description: 'Handles searching from applications'
       }
     },
     {
       method: 'POST',
-      path: '/events/birth/new-declaration',
+      path: '/events/birth/{eventType}',
       handler: birthEventHandler,
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new declaration and searching for duplicates'
+          'Handles indexing a new application and searching for duplicates or updating an existing application'
       }
     },
     {
       method: 'POST',
-      path: '/events/birth/new-validation',
-      handler: birthEventHandler,
+      path: '/events/death/{eventType}',
+      handler: deathEventHandler,
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new validation and searching for duplicates'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/mark-validated',
-      handler: birthEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating an existing declaration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/new-registration',
-      handler: birthEventHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Handles indexing a new registration and searching for duplicates'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/registration',
-      handler: birthEventHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Handles updating an existing declaration and searching for duplicates'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/mark-certified',
-      handler: birthEventHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Handles updating an existing declaration and searching for duplicates'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/birth/mark-voided',
-      handler: birthEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating an existing declaration'
-      }
-    },
-
-    {
-      method: 'POST',
-      path: '/events/death/new-declaration',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles indexing a new declaration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-validation',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles indexing a new validation'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-validated',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating an existing declaration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/new-registration',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles indexing a new registration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/registration',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating a existing declaration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-certified',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating a existing declaration'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/events/death/mark-voided',
-      handler: deathEventHandler,
-      config: {
-        tags: ['api'],
-        description: 'Handles updating a existing declaration'
+          'Handles indexing a new application or updating an existing application'
       }
     }
   ]

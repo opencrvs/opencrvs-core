@@ -12,7 +12,8 @@ export const indexComposition = async (
       index: 'ocrvs',
       type: 'compositions',
       id: compositionIdentifier,
-      body
+      body,
+      refresh: 'wait_for' // makes the call wait until the change is available via search
     })
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
@@ -30,7 +31,8 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
       id,
       body: {
         doc: body
-      }
+      },
+      refresh: 'wait_for' // makes the call wait until the change is available via search
     })
   } catch (e) {
     logger.error(`updateComposition: error: ${e}`)

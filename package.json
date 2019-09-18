@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
+    "bundlesize": "^0.18.0",
     "concurrently": "^3.5.1",
     "husky": "1.0.0-rc.13",
     "lerna": "^2.11.0",

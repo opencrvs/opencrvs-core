@@ -14,20 +14,14 @@ import {
   RegistrationHome,
   EVENT_STATUS
 } from '@register/views/RegistrationHome/RegistrationHome'
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { GridTable } from '@opencrvs/components/lib/interface'
 import {
-  COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATION_BY_COMPOSITION,
-  SEARCH_EVENTS
+  REGISTRATION_HOME_QUERY
 } from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 import { Validate } from '@opencrvs/components/lib/icons'
-
-import { Event } from '@opencrvs/register/src/forms'
-import { SUBMISSION_STATUS, storeApplication } from '@register/applications'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -126,6 +120,70 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
+const mockReviewTabData = {
+  totalItems: 2,
+  results: [
+    {
+      id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+      type: 'Birth',
+      registration: {
+        status: 'DECLARED',
+        contactNumber: '01622688231',
+        trackingId: 'BW0UTHR',
+        registrationNumber: null,
+        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+        duplicates: null,
+        createdAt: '1544188309380',
+        modifiedAt: '1544188309380'
+      },
+      dateOfBirth: '2010-10-10',
+      childName: [
+        {
+          firstNames: 'Iliyas',
+          familyName: 'Khan',
+          use: 'en'
+        },
+        {
+          firstNames: 'ইলিয়াস',
+          familyName: 'খান',
+          use: 'bn'
+        }
+      ],
+      dateOfDeath: null,
+      deceasedName: null
+    },
+    {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+      type: 'Death',
+      registration: {
+        status: 'VALIDATED',
+        trackingId: 'DW0UTHR',
+        registrationNumber: null,
+        contactNumber: null,
+        duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+        createdAt: '1544188309380',
+        modifiedAt: '1544188309380'
+      },
+      dateOfBirth: null,
+      childName: null,
+      dateOfDeath: '2007-01-01',
+      deceasedName: [
+        {
+          firstNames: 'Iliyas',
+          familyName: 'Khan',
+          use: 'en'
+        },
+        {
+          firstNames: 'ইলিয়াস',
+          familyName: 'খান',
+          use: 'bn'
+        }
+      ]
+    }
+  ]
+}
+
 describe('RegistrationHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
@@ -140,80 +198,29 @@ describe('RegistrationHome sent for review tab related tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-
-    expect(
-      testComponent.component.containsMatchingElement(Spinner as any)
-    ).toBe(true)
-  })
-  it('renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        error: new Error('boom')
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    const element = await waitForElement(
-      testComponent.component,
-      '#search-result-error-text-review'
-    )
-
-    expect(element.children().text()).toBe('An error occurred while searching')
-  })
-
   it('check sent for review tab count', async () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            countEvents: {
-              declared: 10,
-              validated: 2,
-              registered: 7,
-              rejected: 5
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 12, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -246,81 +253,25 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'DECLARED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'VALIDATED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: mockReviewTabData,
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -363,152 +314,31 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(data[0].actions).toBeDefined()
   })
 
-  it('renders only declared items for registration agents', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: SEARCH_EVENTS,
-          variables: {
-            status: [EVENT_STATUS.DECLARED],
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'DECLARED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-
-    const validateScopeToken = jwt.sign(
-      { scope: ['validate'] },
-      readFileSync('../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:gateway-user'
-      }
-    )
-    getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    const gridTable = await waitForElement(testComponent.component, GridTable)
-    const data = gridTable.prop('content')
-    const EXPECTED_DATE_OF_APPLICATION = moment(
-      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-      'YYYY-MM-DD HH:mm:ss'
-    ).fromNow()
-
-    expect(data.length).toBe(2)
-    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
-    expect(data[0].trackingId).toBe('BW0UTHR')
-    expect(data[0].event).toBe('Birth')
-    expect(data[0].actions).toBeDefined()
-  })
-
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
-          data: {}
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 12, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
+          }
         }
       }
     ]
@@ -543,20 +373,25 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 14,
-              results: searchData
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 14, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -591,17 +426,22 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: {
               totalItems: 2,
               results: [
                 {
@@ -665,7 +505,10 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       },
@@ -786,17 +629,22 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: {
               totalItems: 2,
               results: [
                 {
@@ -833,7 +681,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
                   type: 'Death',
                   registration: {
-                    status: 'DECLARED',
+                    status: 'VALIDATED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     contactNumber: null,
@@ -860,7 +708,10 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       },
@@ -974,86 +825,29 @@ describe('RegistrationHome sent for review tab related tests', () => {
   })
 
   it('redirects user to review page on review action click', async () => {
-    const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'DECLARED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: mockReviewTabData,
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -1085,86 +879,29 @@ describe('RegistrationHome sent for review tab related tests', () => {
   })
 
   it('redirects user to duplicate page on review action click', async () => {
-    const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: mockReviewTabData,
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -1199,17 +936,22 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: {
               totalItems: 2,
               results: [
                 {
@@ -1273,7 +1015,10 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
@@ -1292,173 +1037,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
     const validate = await waitForElement(testComponent.component, Validate)
 
     expect(validate).toHaveLength(1)
-  })
-
-  it('renders declared items excluding the ready to register applications', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: SEARCH_EVENTS,
-          variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            locationIds: ['123456789'],
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be7',
-                  type: 'Birth',
-                  registration: {
-                    status: 'DECLARED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde2',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7ba1',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde2',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
-
-    const customDraft = {
-      id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be7',
-      data: {},
-      event: Event.BIRTH,
-      submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER
-    }
-    store.dispatch(storeApplication(customDraft))
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    const gridTable = await waitForElement(testComponent.component, GridTable)
-
-    const data = gridTable.first().prop('content')
-
-    expect(data.length).toBe(1)
-  })
-
-  it('check declared count minus ready to review applications', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        result: {
-          data: {
-            countEvents: {
-              declared: 10,
-              validated: 2,
-              registered: 7,
-              rejected: 5
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'review'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    const reviewTab = await waitForElement(
-      testComponent.component,
-      '#tab_review'
-    )
-
-    expect(reviewTab.hostNodes().text()).toContain('Ready for review (12)')
   })
 })
 
@@ -1481,17 +1059,22 @@ describe('Tablet tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: {
               totalItems: 2,
               results: [
                 {
@@ -1555,7 +1138,10 @@ describe('Tablet tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
