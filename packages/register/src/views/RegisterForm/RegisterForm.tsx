@@ -111,26 +111,6 @@ const VIEW_TYPE = {
   HIDDEN: 'hidden'
 }
 
-const isFirstGroupConditionallyHidden = (
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup
-) => {
-  const isFirstGroup = fromSection.groups.findIndex(
-    group => group.id === fromSectionGroup.id
-  )
-  return isFirstGroup === 0 && fromSection.groups.length > 1
-}
-
-const getNextGroup = (
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup
-) => {
-  const index = fromSection.groups.findIndex(
-    group => group.id === fromSectionGroup.id
-  )
-  return fromSection.groups[index + 1]
-}
-
 function getNextSectionIds(
   sections: IFormSection[],
   fromSection: IFormSection,
@@ -146,24 +126,6 @@ function getNextSectionIds(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
   )
 
-  // The firstGroup is conditionally hidden, check for next group
-  if (
-    currentGroupIndex === -1 &&
-    Boolean(visibleGroups.length) &&
-    isFirstGroupConditionallyHidden(fromSection, fromSectionGroup)
-  ) {
-    const nextGroup = getNextGroup(fromSection, fromSectionGroup)
-    const getNextSectionId = getNextSectionIds(
-      sections,
-      fromSection,
-      nextGroup,
-      application
-    )
-    console.log(getNextSectionId)
-    return getNextSectionId
-  }
-
-  //  There is no visible group, time to goto next Section
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
       section => section.viewType !== VIEW_TYPE.HIDDEN
@@ -654,7 +616,12 @@ function mapStateToProps(
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
-  const groupId = match.params.groupId || activeSection.groups[0].id
+  const groupId =
+    match.params.groupId ||
+    getVisibleSectionGroupsBasedOnConditions(
+      activeSection,
+      application.data[activeSection.id] || {}
+    )[0].id
   const activeSectionGroup = activeSection.groups.find(
     group => group.id === groupId
   )

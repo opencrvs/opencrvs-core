@@ -18,12 +18,7 @@
                 "description": "Form section title for contact point",
                 "id": "register.selectInformant.relation"
               },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.applicant !== \"OTHER\")"
-                }
-              ],
+              "conditionals": [],
               "fields": [
                 {
                   "name": "firstNames",
