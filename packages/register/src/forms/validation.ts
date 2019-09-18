@@ -3,7 +3,8 @@ import {
   IFormField,
   IFormSectionData,
   IDynamicFormField,
-  IFormData
+  IFormData,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import {
   getConditionalActionsForField,
@@ -52,12 +53,36 @@ export function getValidationErrorsForForm(
   drafts?: IFormData
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
-    const validationErrors = getValidationErrorsForField(
+    let validationErrors = getValidationErrorsForField(
       field,
       values,
       resource,
       drafts
     )
+
+    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+      const nestedFieldsFlatted = Object.entries(field.nestedFields)
+        .map(([_, nestedField]) => nestedField)
+        .flat()
+
+      // @ts-ignore
+      validationErrors = nestedFieldsFlatted.reduce(
+        (nestedErrors, nestedField) => {
+          return {
+            ...nestedErrors,
+            // @ts-ignore
+            [nestedField.name]: getValidationErrorsForField(
+              nestedField,
+              // @ts-ignore
+              values[field.name],
+              resource,
+              drafts
+            )
+          }
+        },
+        { parent: validationErrors }
+      )
+    }
     return {
       ...errorsForAllFields,
       [field.name]: validationErrors

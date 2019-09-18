@@ -61,7 +61,8 @@ import {
   SEARCH_FIELD,
   IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
-  IAttachmentValue
+  IAttachmentValue,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import { getValidationErrorsForForm } from '@register/forms/validation'
 import { InputField } from '@register/components/form/InputField'
@@ -120,6 +121,7 @@ type GeneratedInputFieldProps = {
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
+  nestedFields?: { [key: string]: JSX.Element[] }
   value: IFormFieldValue
   touched: boolean
   error: string
@@ -133,7 +135,8 @@ function GeneratedInputField({
   resetDependentSelectValues,
   error,
   touched,
-  value
+  value,
+  nestedFields
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -210,11 +213,30 @@ function GeneratedInputField({
         <RadioGroup
           {...inputProps}
           size={fieldDefinition.size}
-          onChange={(val: string, nestedFieldName: string | null = null) => {
+          onChange={(val: string) => {
             resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(nestedFieldName || fieldDefinition.name, val)
+            onSetFieldValue(fieldDefinition.name, val)
           }}
-          nestedFields={fieldDefinition.nestedFields}
+          options={fieldDefinition.options}
+          name={fieldDefinition.name}
+          value={value as string}
+          notice={fieldDefinition.notice}
+        />
+      </InputField>
+    )
+  }
+
+  if (fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS && nestedFields) {
+    return (
+      <InputField {...inputFieldProps}>
+        <RadioGroup
+          {...inputProps}
+          size={fieldDefinition.size}
+          onChange={(val: string) => {
+            resetDependentSelectValues(fieldDefinition.name)
+            onSetFieldValue(fieldDefinition.name, val)
+          }}
+          nestedFields={nestedFields}
           options={fieldDefinition.options}
           name={fieldDefinition.name}
           value={value as string}
@@ -278,6 +300,7 @@ function GeneratedInputField({
         <TextInput
           type="tel"
           {...inputProps}
+          isSmallSized={fieldDefinition.isSmallSized}
           value={inputProps.value as string}
         />
       </InputField>
@@ -388,10 +411,29 @@ function GeneratedInputField({
 }
 
 const mapFieldsToValues = (fields: IFormField[]) =>
-  fields.reduce(
-    (memo, field) => ({ ...memo, [field.name]: field.initialValue }),
-    {}
-  )
+  fields.reduce((memo, field) => {
+    let fieldInitialValue = field.initialValue
+
+    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
+      const nestedFieldsFlatted = Object.entries(field.nestedFields)
+        .map(([_, field]) => field)
+        .flat()
+
+      const nestedInitialValues = nestedFieldsFlatted.reduce(
+        (nestedValues, nestedField) => ({
+          ...nestedValues,
+          [nestedField.name]: nestedField.initialValue
+        }),
+        {}
+      )
+      // @ts-ignore
+      fieldInitialValue = {
+        parent: field.initialValue,
+        ...nestedInitialValues
+      }
+    }
+    return { ...memo, [field.name]: fieldInitialValue }
+  }, {})
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
@@ -444,10 +486,28 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   showValidationErrors(fields: IFormField[]) {
-    const touched = fields.reduce(
-      (memo, { name }) => ({ ...memo, [name]: true }),
-      {}
-    )
+    const touched = fields.reduce((memo, field) => {
+      let fieldTouched = true
+
+      if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+        const nestedFieldsFlatted = Object.entries(field.nestedFields)
+          .map(([_, nestedField]) => nestedField)
+          .flat()
+
+        // @ts-ignore
+        fieldTouched = nestedFieldsFlatted.reduce(
+          (nestedErrors, nestedField) => {
+            return {
+              ...nestedErrors,
+              [nestedField.name]: true
+            }
+          },
+          { parent: true }
+        )
+      }
+
+      return { ...memo, [field.name]: fieldTouched }
+    }, {})
 
     this.props.setTouched(touched)
   }
@@ -509,10 +569,14 @@ class FormSectionComponent extends React.Component<Props> {
         {fieldsWithValuesDefined.map(field => {
           let error: string
           const fieldErrors = errors[field.name]
-          if (fieldErrors && fieldErrors.length > 0) {
-            const [firstError] = fieldErrors
-            error = intl.formatMessage(firstError.message, firstError.props)
+
+          if (!field.nestedFields) {
+            if (fieldErrors && fieldErrors.length > 0) {
+              const [firstError] = fieldErrors
+              error = intl.formatMessage(firstError.message, firstError.props)
+            }
           }
+
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
             values,
@@ -610,6 +674,90 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+            )
+          } else if (
+            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+            field.nestedFields
+          ) {
+            let nestedFieldElements = Object.create(null)
+            let parentError: string
+
+            const parentFieldErrors: IValidationResult[] =
+              // @ts-ignore
+              fieldErrors && fieldErrors.parent
+
+            if (parentFieldErrors && parentFieldErrors.length > 0) {
+              const [firstError] = parentFieldErrors
+              parentError = intl.formatMessage(
+                firstError.message,
+                firstError.props
+              )
+            }
+
+            nestedFieldElements = Object.keys(field.nestedFields).reduce(
+              (childElements, key) => ({
+                ...childElements,
+                [key]: field.nestedFields[key].map(nestedField => {
+                  let nestedError: string
+                  const nestedFieldErrors: IValidationResult[] =
+                    // @ts-ignore
+                    fieldErrors && fieldErrors[nestedField.name]
+
+                  if (nestedFieldErrors && nestedFieldErrors.length > 0) {
+                    const [firstError] = nestedFieldErrors
+                    nestedError = intl.formatMessage(
+                      firstError.message,
+                      firstError.props
+                    )
+                  }
+
+                  return (
+                    <FormItem key={`${field.name}.${nestedField.name}`}>
+                      <FastField name={`${field.name}.${nestedField.name}`}>
+                        {(formikFieldProps: FieldProps<any>) => (
+                          <GeneratedInputField
+                            fieldDefinition={internationaliseFieldObject(intl, {
+                              ...nestedField,
+                              name: `${field.name}.${nestedField.name}`
+                            })}
+                            onSetFieldValue={setFieldValue}
+                            resetDependentSelectValues={
+                              this.resetDependentSelectValues
+                            }
+                            {...formikFieldProps.field}
+                            touched={touched[field.name] || false}
+                            error={nestedError}
+                          />
+                        )}
+                      </FastField>
+                    </FormItem>
+                  )
+                })
+              }),
+              {}
+            )
+
+            return (
+              <FormItem key={`${field.name}.parent`}>
+                <Field name={`${field.name}.parent`}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(intl, {
+                        ...withDynamicallyGeneratedFields,
+                        name: `${field.name}.parent`
+                      })}
+                      onSetFieldValue={setFieldValue}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      nestedFields={nestedFieldElements}
+                      touched={touched[`${field.name}.parent`] || false}
+                      error={parentError}
                     />
                   )}
                 </Field>

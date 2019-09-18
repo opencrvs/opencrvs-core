@@ -4,8 +4,6 @@ import { RadioButton } from '../../interface/RadioButton'
 import { NoticeWrapper } from '../DateField'
 import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'
-import { IInputFieldProps, InputField } from '../InputField/InputField'
-import { ITextInputProps, TextInput } from '../TextInput'
 
 const Wrapper = styled.div`
   margin-top: 8px;
@@ -51,17 +49,11 @@ export interface IRadioGroupProps {
   value: string
   size?: RadioSize
   notice?: string
-  nestedFields?: { [key: string]: any[] }
-  onChange: (value: string, nestedFieldName?: string) => void
+  nestedFields?: { [key: string]: JSX.Element[] }
+  onChange: (value: string) => void
 }
 
 export class RadioGroup extends React.Component<IRadioGroupProps> {
-  change = (value: string, nestedFieldName?: string) => {
-    if (this.props.onChange) {
-      this.props.onChange(value, nestedFieldName)
-    }
-  }
-
   render() {
     const {
       options,
@@ -93,52 +85,12 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     value={option.value}
                     id={`${name}_${option.value}`}
                     selected={value}
-                    onChange={this.change}
+                    onChange={this.props.onChange}
                   />
                   {nestedFields &&
                     value === option.value &&
                     nestedFields[value] && (
-                      <NestedChildren>
-                        {nestedFields[value].map(
-                          (
-                            {
-                              id,
-                              touched,
-                              error,
-                              hideAsterisk,
-                              label,
-                              ...textInputProps
-                            },
-                            index
-                          ) => {
-                            const inputProps = {
-                              id,
-                              touched,
-                              error,
-                              hideAsterisk,
-                              label
-                            }
-
-                            return (
-                              <InputField
-                                key={`${id}_${index}`}
-                                {...inputProps}
-                              >
-                                <TextInput
-                                  {...textInputProps}
-                                  onChange={e => {
-                                    this.change(
-                                      e.target.value,
-                                      textInputProps.name
-                                    )
-                                  }}
-                                  isSmallSized={true}
-                                />
-                              </InputField>
-                            )
-                          }
-                        )}
-                      </NestedChildren>
+                      <NestedChildren>{nestedFields[value]}</NestedChildren>
                     )}
                 </div>
               )
@@ -156,7 +108,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                   value={option.value}
                   id={`${name}_${option.value}`}
                   selected={value}
-                  onChange={this.change}
+                  onChange={this.props.onChange}
                 />
               )
             })}
