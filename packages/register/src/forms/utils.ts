@@ -363,7 +363,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
-  const visibleGroups = section.groups.filter(group => {
+  return section.groups.filter(group => {
     if (!group.conditionals) {
       return true
     }
@@ -375,10 +375,6 @@ export const getVisibleSectionGroupsBasedOnConditions = (
         .includes('hide') !== true
     )
   })
-
-  console.log(visibleGroups)
-
-  return visibleGroups
 }
 
 export const getSectionFields = (
