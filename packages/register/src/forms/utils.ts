@@ -28,7 +28,9 @@ import {
   IFormSectionGroup,
   DOCUMENT_UPLOADER_WITH_OPTION,
   SEARCH_FIELD,
-  ISearchFormField
+  ISearchFormField,
+  IRadioGroupFormField,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
@@ -81,7 +83,10 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === RADIO_GROUP) {
+  if (
+    base.type === RADIO_GROUP ||
+    base.type === RADIO_GROUP_WITH_NESTED_FIELDS
+  ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
       ;(base as any).notice = intl.formatMessage(

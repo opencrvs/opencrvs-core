@@ -32,7 +32,9 @@ import {
   IFormFieldWithDynamicDefinitions,
   IFormField,
   SELECT_WITH_OPTIONS,
-  ISelectFormFieldWithOptions
+  ISelectFormFieldWithOptions,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  IRadioGroupWithNestedFieldsFormField
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 
@@ -281,6 +283,38 @@ export function deserializeFormSection(
           )
         } as IFormFieldWithDynamicDefinitions
       }
+
+      if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+        const nested = Object.keys(field.nestedFields).reduce((fields, key) => {
+          return {
+            ...fields,
+            [key]: field.nestedFields[key].map(nestedField => {
+              return {
+                ...nestedField,
+                validate: nestedField.validate.map(
+                  // @ts-ignore
+                  fieldValidationDescriptorToValidationFunction
+                ),
+                mapping: field.mapping && {
+                  query:
+                    field.mapping.query &&
+                    fieldQueryDescriptorToQueryFunction(field.mapping.query),
+                  mutation:
+                    field.mapping.mutation &&
+                    fieldMutationDescriptorToMutationFunction(
+                      field.mapping.mutation
+                    )
+                }
+              }
+            })
+          }
+        }, {})
+        return {
+          ...baseFields,
+          nestedFields: nested
+        } as IRadioGroupWithNestedFieldsFormField
+      }
+
       if (field.type === SELECT_WITH_OPTIONS) {
         return {
           ...baseFields,
