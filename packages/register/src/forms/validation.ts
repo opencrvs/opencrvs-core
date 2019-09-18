@@ -12,80 +12,102 @@ import {
 } from '@opencrvs/register/src/forms/utils'
 import { IOfflineData } from '@register/offline/reducer'
 
-export function getValidationErrorsForField(
-  field: IFormField,
-  values: IFormSectionData,
-  resources?: IOfflineData,
-  drafts?: IFormData
-) {
-  const value = values[field.name]
-  const conditionalActions = getConditionalActionsForField(
-    field,
-    values,
-    resources,
-    drafts
-  )
-  if (conditionalActions.includes('hide')) {
-    return []
+interface IFieldErrors {
+  errors: IValidationResult[]
+  nestedFields: {
+    [fieldName: string]: IValidationResult[]
   }
-
-  let validators = Array.from(field.validate)
-
-  validators.push(...getFieldValidation(field as IDynamicFormField, values))
-
-  if (field.required) {
-    validators.push(required)
-  } else if (!value) {
-    validators = []
-  }
-
-  return validators
-    .map(validator => validator(value, drafts))
-    .filter(error => error !== undefined) as IValidationResult[]
 }
 
-export type Errors = { [key: string]: IValidationResult[] }
+export type Errors = {
+  [fieldName: string]: IFieldErrors
+}
 
+const getValidationErrors = {
+  forField: function(
+    field: IFormField,
+    values: IFormSectionData,
+    resources?: IOfflineData,
+    drafts?: IFormData
+  ) {
+    const value = values[field.name]
+    const conditionalActions = getConditionalActionsForField(
+      field,
+      values,
+      resources,
+      drafts
+    )
+    if (conditionalActions.includes('hide')) {
+      return {
+        errors: [],
+        nestedFields: {}
+      }
+    }
+
+    let validators = Array.from(field.validate)
+
+    validators.push(...getFieldValidation(field as IDynamicFormField, values))
+
+    if (field.required) {
+      validators.push(required)
+    } else if (!value) {
+      validators = []
+    }
+
+    const validationResults = validators
+      .map(validator => validator(value, drafts))
+      .filter(error => error !== undefined) as IValidationResult[]
+
+    return {
+      errors: validationResults,
+      nestedFields: this.forNestedField(field, values, resources, drafts)
+    }
+  },
+  forNestedField: function(
+    field: IFormField,
+    values: IFormSectionData,
+    resource?: IOfflineData,
+    drafts?: IFormData
+  ): {
+    [fieldName: string]: IValidationResult[]
+  } {
+    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+      const nestedFieldDefinitions = Object.values(field.nestedFields).flat()
+      return nestedFieldDefinitions.reduce((nestedErrors, nestedField) => {
+        const errors = this.forField(
+          nestedField,
+          (values[field.name] as IFormSectionData)
+            .nestedFields as IFormSectionData,
+          resource,
+          drafts
+        ).errors
+
+        return {
+          ...nestedErrors,
+          [nestedField.name]: errors
+        }
+      }, {})
+    }
+
+    return {}
+  }
+}
 export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
   resource?: IOfflineData,
   drafts?: IFormData
 ) {
-  return fields.reduce((errorsForAllFields: Errors, field) => {
-    let validationErrors = getValidationErrorsForField(
-      field,
-      values,
-      resource,
-      drafts
-    )
-
-    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-      const nestedFieldsFlatted = Object.entries(field.nestedFields)
-        .map(([_, nestedField]) => nestedField)
-        .flat()
-
-      // @ts-ignore
-      validationErrors = nestedFieldsFlatted.reduce(
-        (nestedErrors, nestedField) => {
-          return {
-            ...nestedErrors,
-            // @ts-ignore
-            [nestedField.name]: getValidationErrorsForField(
-              nestedField,
-              // @ts-ignore
-              values[field.name],
-              resource,
-              drafts
-            )
-          }
-        },
-        { parent: validationErrors }
-      )
-    }
-    return {
+  return fields.reduce(
+    (errorsForAllFields: Errors, field) => ({
       ...errorsForAllFields,
-      [field.name]: validationErrors
-    }
-  }, {})
+      [field.name]: getValidationErrors.forField(
+        field,
+        values,
+        resource,
+        drafts
+      )
+    }),
+    {}
+  )
 }

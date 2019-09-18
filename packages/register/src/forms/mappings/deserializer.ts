@@ -34,7 +34,8 @@ import {
   SELECT_WITH_OPTIONS,
   ISelectFormFieldWithOptions,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  IRadioGroupWithNestedFieldsFormField
+  IRadioGroupWithNestedFieldsFormField,
+  SerializedFormField
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 
@@ -288,25 +289,26 @@ export function deserializeFormSection(
         const nested = Object.keys(field.nestedFields).reduce((fields, key) => {
           return {
             ...fields,
-            [key]: field.nestedFields[key].map(nestedField => {
-              return {
-                ...nestedField,
-                validate: nestedField.validate.map(
-                  // @ts-ignore
-                  fieldValidationDescriptorToValidationFunction
-                ),
-                mapping: field.mapping && {
-                  query:
-                    field.mapping.query &&
-                    fieldQueryDescriptorToQueryFunction(field.mapping.query),
-                  mutation:
-                    field.mapping.mutation &&
-                    fieldMutationDescriptorToMutationFunction(
-                      field.mapping.mutation
-                    )
+            [key]: field.nestedFields[key].map(
+              (nestedField: SerializedFormField) => {
+                return {
+                  ...nestedField,
+                  validate: nestedField.validate.map(
+                    fieldValidationDescriptorToValidationFunction
+                  ),
+                  mapping: field.mapping && {
+                    query:
+                      field.mapping.query &&
+                      fieldQueryDescriptorToQueryFunction(field.mapping.query),
+                    mutation:
+                      field.mapping.mutation &&
+                      fieldMutationDescriptorToMutationFunction(
+                        field.mapping.mutation
+                      )
+                  }
                 }
               }
-            })
+            )
           }
         }, {})
         return {
