@@ -378,29 +378,7 @@ type Query {
     skip: Int
   ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
-  countEventRegistrationsByStatus(
-    locationIds: [String]
-    status: String
-  ): EventRegCount
-  countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }
 

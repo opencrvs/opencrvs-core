@@ -734,9 +734,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   error,
                   data
                 }: {
-                  loading: any
-                  error?: any
-                  data: any
+                  loading: boolean
+                  error?: Error
+                  data: GQLQuery
                 }) => {
                   if (loading) {
                     return (
@@ -749,7 +749,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       />
                     )
                   }
-                  if (error) {
+                  if (error || !data.searchEvents) {
                     Sentry.captureException(error)
 
                     return (
@@ -758,7 +758,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       </ErrorText>
                     )
                   }
-                  const transformedData = transformData(data, intl)
+
+                  const transformedData = transformData(data.searchEvents, intl)
+
                   const total = transformedData.length
                   return (
                     <>

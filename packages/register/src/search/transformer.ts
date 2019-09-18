@@ -3,42 +3,24 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLQuery,
-  GQLRegStatus
+  GQLRegStatus,
+  GQLEventSearchResultSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@register/utils/data-formatting'
 import { formatLongDate } from '@register/utils/date-formatting'
-import { IApplication } from '@register/applications'
 
 export const transformData = (
-  data: GQLQuery,
-  intl: IntlShape,
-  outboxApplications: IApplication[] = [],
-  checkStatus: string[] = []
+  data: GQLEventSearchResultSet,
+  intl: IntlShape
 ) => {
   const { locale } = intl
-  if (!data.searchEvents || !data.searchEvents.results) {
+  if (!data || !data.results) {
     return []
   }
 
-  return data.searchEvents.results
+  return data.results
     .filter((req): req is GQLEventSearchSet => req !== null)
-    .filter((reg: GQLEventSearchSet) => {
-      if (outboxApplications.length === 0) {
-        return true
-      }
-      for (const application of outboxApplications) {
-        if (
-          reg.id === application.id &&
-          checkStatus.includes(application.submissionStatus || '')
-        ) {
-          return false
-        }
-      }
-
-      return true
-    })
     .map((reg: GQLEventSearchSet) => {
       let birthReg
       let deathReg
