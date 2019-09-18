@@ -8,7 +8,8 @@ import {
   FEMALE,
   OPENCRVS_SPECIFICATION_URL,
   CRUD_BIRTH_RATE_SEC,
-  TOTAL_POPULATION_SEC
+  TOTAL_POPULATION_SEC,
+  JURISDICTION_TYPE_SEC
 } from '@metrics/features/registration/metrics/constants'
 import { fetchFHIR } from '@metrics/features/registration/fhirUtils'
 import { IAuthHeader } from '@metrics/features/registration'
@@ -79,17 +80,12 @@ export const generateEmptyBirthKeyFigure = (
 }
 
 export const fetchEstimateByLocation = async (
-  locationId: string,
-  authHeader: IAuthHeader,
+  locationData: fhir.Location,
   estimatedYear: number
 ): Promise<IEstimation> => {
   let crudRate: number = 0
   let population: number = 0
 
-  const locationData: fhir.Location = await fetchLocation(
-    locationId,
-    authHeader
-  )
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
   }
@@ -132,15 +128,11 @@ export const fetchEstimateByLocation = async (
     if (!locationData.partOf || !locationData.partOf.reference) {
       throw new Error('Unable to fetch estimate data from location tree')
     }
-    return await fetchEstimateByLocation(
-      locationData.partOf.reference.split('/')[1],
-      authHeader,
-      estimatedYear
-    )
+    return await fetchEstimateByLocation(locationData, estimatedYear)
   }
   return {
     estimation: Math.round((crudRate * population) / 1000),
-    locationId
+    locationId: locationData.id as string
   }
 }
 
@@ -149,4 +141,40 @@ export const fetchLocation = async (
   authHeader: IAuthHeader
 ) => {
   return await fetchFHIR(`Location/${locationId}`, authHeader)
+}
+
+export const getDistrictLocation = async (
+  locationId: string,
+  authHeader: IAuthHeader
+) => {
+  let locationBundle: fhir.Location
+  let locationType: fhir.Identifier | undefined
+  let lId = locationId
+
+  locationBundle = await fetchLocation(lId, authHeader)
+  locationType =
+    locationBundle &&
+    locationBundle.identifier &&
+    locationBundle.identifier.find(
+      identifier =>
+        identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
+    )
+  while (!locationType || locationType.value !== 'DISTRICT') {
+    lId =
+      (locationBundle &&
+        locationBundle.partOf &&
+        locationBundle.partOf.reference &&
+        locationBundle.partOf.reference.split('/')[1]) ||
+      ''
+    locationBundle = await fetchLocation(lId, authHeader)
+    locationType =
+      locationBundle &&
+      locationBundle.identifier &&
+      locationBundle.identifier.find(
+        identifier =>
+          identifier.system ===
+          OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
+      )
+  }
+  return locationBundle
 }
