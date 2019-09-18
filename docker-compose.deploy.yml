@@ -235,8 +235,10 @@ services:
   workflow:
     secrets:
       - jwt-public-key.{{ts}}
+      - sms-languages
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - LANGUAGES=/run/secrets/sms-languages
     deploy:
       replicas: 2
     networks:

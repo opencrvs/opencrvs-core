@@ -6,7 +6,7 @@ import {
   EVENT_TYPE,
   REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL } from '@workflow/constants'
+import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
@@ -54,15 +54,14 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
 
 export async function getInformantName(
   fhirBundle: fhir.Bundle,
-  sectionCode: string = CHILD_SECTION_CODE,
-  language: string = 'bn'
+  sectionCode: string = CHILD_SECTION_CODE
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'getInformantName: Invalid FHIR bundle found for declaration'
     )
   }
-
+  const language = getDefaultLanguage()
   const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
