@@ -46,12 +46,7 @@
                 "description": "Form section title for contact point",
                 "id": "register.SelectContactPoint.heading"
               },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.applicant !== \"OTHER\")"
-                }
-              ],
+              "conditionals": [],
               "previewGroups": [
                 {
                   "id": "placeOfBirth",
