@@ -176,6 +176,16 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             },
             description: {
               message: messages.reviewActionDescriptionIncomplete
+            },
+            modal: {
+              title: {
+                message: messages.validateConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.validateConfirmationDesc,
+                payload: { completeApplication: true }
+              }
             }
           }
         }
@@ -206,7 +216,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeApplication: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.reviewActionDescriptionIncomplete
             },
             modal: {
               title: {
