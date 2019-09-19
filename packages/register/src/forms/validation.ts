@@ -12,7 +12,7 @@ import {
 } from '@opencrvs/register/src/forms/utils'
 import { IOfflineData } from '@register/offline/reducer'
 
-interface IFieldErrors {
+export interface IFieldErrors {
   errors: IValidationResult[]
   nestedFields: {
     [fieldName: string]: IValidationResult[]

@@ -24,7 +24,10 @@ import {
   getSectionFields
 } from '@register/forms/utils'
 import { flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import {
+  getValidationErrorsForForm,
+  IFieldErrors
+} from '@register/forms/validation'
 import { goToPageGroup } from '@register/navigation'
 
 import {
@@ -330,8 +333,9 @@ const getErrorsOnFieldsBySection = (
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors: IValidationResult[] =
-          errors[field.name as keyof typeof errors]
+        const validationErrors: IValidationResult[] = (errors[
+          field.name as keyof typeof errors
+        ] as IFieldErrors).errors
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]
