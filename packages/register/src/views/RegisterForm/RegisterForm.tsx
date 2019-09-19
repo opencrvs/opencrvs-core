@@ -620,7 +620,8 @@ function mapStateToProps(
     match.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(
       activeSection,
-      application.data[activeSection.id] || {}
+      application.data[activeSection.id] || {},
+      application.data
     )[0].id
   const activeSectionGroup = activeSection.groups.find(
     group => group.id === groupId
