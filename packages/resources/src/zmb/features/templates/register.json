@@ -184,7 +184,7 @@
               "birth": "child"
             },
             "format": {
-              "en": ["firstNames", "familyName"]
+              "en": ["firstNamesEng", "familyNameEng"]
             },
             "language": "en"
           }
@@ -434,7 +434,7 @@
               "death": "deceased"
             },
             "format": {
-              "en": ["firstNames", "familyName"]
+              "en": ["firstNamesEng", "familyNameEng"]
             },
             "language": "en"
           }

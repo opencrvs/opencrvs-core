@@ -9,9 +9,11 @@ import {
 import { Action } from '@register/forms'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { AppStore } from '@register/store'
-import { createClient } from '@register/utils/apolloClient'
 import { getMutationMapping } from '@register/views/DataProvider/MutationProvider'
 import { FetchResult } from 'react-apollo'
+import { REGISTRATION_HOME_QUERY } from './views/RegistrationHome/queries'
+import { getOperationName } from 'apollo-utilities'
+import { client } from '@register/utils/apolloClient'
 
 const INTERVAL_TIME = 5000
 const ALLOWED_STATUS_FOR_RETRY = [
@@ -57,7 +59,7 @@ export class SubmissionController {
 
   constructor(store: AppStore) {
     this.store = store
-    this.client = createClient(store)
+    this.client = client
   }
 
   public start = () => {
@@ -131,7 +133,12 @@ export class SubmissionController {
     this.store.dispatch(writeApplication(application))
 
     try {
-      const mutationResult = await this.client.mutate({ mutation, variables })
+      const mutationResult = await this.client.mutate({
+        mutation,
+        variables,
+        refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
+        awaitRefetchQueries: true
+      })
       this.onSuccess(application, mutationResult)
     } catch (exception) {
       this.onError(application, exception)

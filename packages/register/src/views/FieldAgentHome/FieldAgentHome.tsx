@@ -408,7 +408,7 @@ class FieldAgentHomeView extends React.Component<
 
             {tabId === TAB_ID.requireUpdates && (
               <Query
-                query={SEARCH_APPLICATIONS_USER_WISE}
+                query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                 variables={{
                   userId: userDetails ? userDetails.practitionerId : '',
                   status: [EVENT_STATUS.REJECTED],

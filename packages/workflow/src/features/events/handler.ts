@@ -195,74 +195,73 @@ export async function fhirWorkflowEventHandler(
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_IN_PROGRESS_DEC, request)
+      await forwardToOpenHim(Events.BIRTH_IN_PROGRESS_DEC, request)
       break
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
+      await forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
       break
     case Events.BIRTH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
+      await forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
       break
     case Events.DEATH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
+      await forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
       break
     case Events.BIRTH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_NEW_REG, request)
+      await forwardToOpenHim(Events.BIRTH_NEW_REG, request)
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_IN_PROGRESS_DEC, request)
+      await forwardToOpenHim(Events.DEATH_IN_PROGRESS_DEC, request)
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_NEW_DEC, request)
+      await forwardToOpenHim(Events.DEATH_NEW_DEC, request)
       break
     case Events.DEATH_NEW_REG:
       response = await createRegistrationHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_NEW_REG, request)
+      await forwardToOpenHim(Events.DEATH_NEW_REG, request)
       break
     case Events.BIRTH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_MARK_VALID, request)
+      await forwardToOpenHim(Events.BIRTH_MARK_VALID, request)
       break
     case Events.DEATH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_MARK_VALID, request)
+      await forwardToOpenHim(Events.DEATH_MARK_VALID, request)
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
-      forwardToOpenHim(Events.BIRTH_REG, request)
+      await forwardToOpenHim(Events.BIRTH_REG, request)
       break
     case Events.DEATH_MARK_REG:
       response = await markEventAsRegisteredHandler(request, h, event)
-      forwardToOpenHim(Events.DEATH_REG, request)
+      await forwardToOpenHim(Events.DEATH_REG, request)
       break
     case Events.BIRTH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
-      forwardToOpenHim(Events.BIRTH_MARK_CERT, request)
+      await forwardToOpenHim(Events.BIRTH_MARK_CERT, request)
       break
     case Events.DEATH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
-      forwardToOpenHim(Events.DEATH_MARK_CERT, request)
+      await forwardToOpenHim(Events.DEATH_MARK_CERT, request)
       break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h)
-      forwardToOpenHim(Events.BIRTH_MARK_VOID, request)
+      await forwardToOpenHim(Events.BIRTH_MARK_VOID, request)
       break
     case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h)
-      forwardToOpenHim(Events.DEATH_MARK_VOID, request)
+      await forwardToOpenHim(Events.DEATH_MARK_VOID, request)
       break
     default:
       // forward as-is to hearth
       response = await forwardToHearth(request, h)
   }
 
-  // TODO: send to event channels here
   return response
 }
 

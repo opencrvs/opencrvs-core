@@ -33,7 +33,10 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import {
+  getValidationErrorsForForm,
+  IFieldErrors
+} from '@register/forms/validation'
 import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
@@ -395,7 +398,7 @@ export const hasFormError = (
   const errors = getValidationErrorsForForm(fields, values)
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error => (error as IValidationResult[]).length > 0
+    error => (error as IFieldErrors).errors.length > 0
   )
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }

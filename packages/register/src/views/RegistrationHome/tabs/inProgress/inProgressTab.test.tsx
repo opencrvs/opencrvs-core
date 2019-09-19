@@ -20,16 +20,15 @@ import {
   mockUserResponse,
   resizeWindow
 } from '@register/tests/util'
-import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  LIST_EVENT_REGISTRATIONS_BY_STATUS
-} from '@register/views/RegistrationHome/queries'
-import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrationHome/queries'
 import { merge } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'
 import { InProgressTab, SELECTOR_ID, TAB_ID } from './inProgressTab'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
@@ -68,24 +67,6 @@ beforeAll(() => {
 
 describe('In Progress tab', () => {
   it('redirects to different route upon selection', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
-          }
-        },
-        result: {
-          data: {
-            countEventRegistrationsByStatus: {
-              count: 5
-            }
-          }
-        }
-      }
-    ]
     const localDrafts = [
       {
         id: '1',
@@ -103,9 +84,11 @@ describe('In Progress tab', () => {
       <InProgressTab
         drafts={localDrafts}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {}
+        }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     // wait for mocked data to load mockedProvider
@@ -143,25 +126,8 @@ describe('In Progress tab', () => {
       })
     )
   })
+
   it('renders two selectors with count for each', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_EVENT_REGISTRATION_BY_STATUS,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            status: EVENT_STATUS.IN_PROGRESS
-          }
-        },
-        result: {
-          data: {
-            countEventRegistrationsByStatus: {
-              count: 5
-            }
-          }
-        }
-      }
-    ]
     const localDrafts = [
       {
         id: '1',
@@ -181,9 +147,11 @@ describe('In Progress tab', () => {
         drafts={localDrafts}
         selectorId={'you'}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: { totalItems: 5 }
+        }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     // wait for mocked data to load mockedProvider
@@ -282,6 +250,9 @@ describe('In Progress tab', () => {
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+          queryData={{
+            data: {}
+          }}
         />,
         store
       )
@@ -313,6 +284,9 @@ describe('In Progress tab', () => {
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+          queryData={{
+            data: {}
+          }}
         />,
         store
       )
@@ -425,6 +399,9 @@ describe('In Progress tab', () => {
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+          queryData={{
+            data: {}
+          }}
         />,
         store
       )
@@ -455,69 +432,54 @@ describe('In Progress tab', () => {
 
   describe('When the remote drafts selector is selected', () => {
     it('renders all items returned from graphql query in inProgress tab', async () => {
-      const TIME_STAMP = 1562912635549
+      const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
-      const graphqlMock = [
-        {
-          request: {
-            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
-            variables: {
-              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
-              status: EVENT_STATUS.IN_PROGRESS,
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              listEventRegistrations: {
-                totalItems: 2,
-                results: [
-                  {
-                    id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
-                    registration: {
-                      type: 'BIRTH',
-                      trackingId: 'BQ2IDOP'
-                    },
-                    child: {
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Anik',
-                          familyName: 'Hoque'
-                        }
-                      ]
-                    },
-                    deceased: null,
-                    createdAt: TIME_STAMP
-                  },
-                  {
-                    id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
-                    registration: {
-                      type: 'DEATH',
-                      trackingId: 'DZECJZC'
-                    },
-                    child: null,
-                    deceased: null,
-                    createdAt: TIME_STAMP
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-      // @ts-ignore
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          queryData={{
+            data: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
+                  type: 'Birth',
+                  registration: {
+                    trackingId: 'BQ2IDOP',
+                    modifiedAt: TIME_STAMP
+                  },
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLBirthEventSearchSet,
+                {
+                  id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
+                  type: 'Death',
+                  registration: {
+                    trackingId: 'DZECJZC',
+                    modifiedAt: TIME_STAMP
+                  },
+                  deceasedName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLDeathEventSearchSet
+              ]
+            }
+          }}
         />,
-        store,
-        graphqlMock
+        store
       )
 
       // wait for mocked data to load mockedProvider
@@ -539,121 +501,17 @@ describe('In Progress tab', () => {
       jest.clearAllMocks()
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
-      const graphqlMock = [
-        {
-          request: {
-            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
-            variables: {
-              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
-              status: EVENT_STATUS.IN_PROGRESS,
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              listEventRegistrations: {
-                totalItems: 12,
-                results: [
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  },
-                  {
-                    id: null,
-                    registration: null,
-                    child: null,
-                    deceased: null,
-                    createdAt: null
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          queryData={{
+            data: { totalItems: 12 }
+          }}
         />,
-        store,
-        graphqlMock
+        store
       )
 
       // wait for mocked data to load mockedProvider
@@ -674,49 +532,11 @@ describe('In Progress tab', () => {
 
     it('renders expanded area for remote draft data', async () => {
       jest.clearAllMocks()
-      const TIME_STAMP = 1562912635549
+      const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
       const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const graphqlMock = [
-        {
-          request: {
-            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
-            variables: {
-              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
-              status: EVENT_STATUS.IN_PROGRESS,
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              listEventRegistrations: {
-                totalItems: 1,
-                results: [
-                  {
-                    id: applicationId,
-                    registration: {
-                      type: 'BIRTH',
-                      trackingId: 'BQ2IDOP'
-                    },
-                    child: {
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Anik',
-                          familyName: 'Hoque'
-                        }
-                      ]
-                    },
-                    deceased: null,
-                    createdAt: TIME_STAMP
-                  }
-                ]
-              }
-            }
-          }
-        },
         {
           request: {
             query: FETCH_REGISTRATION_BY_COMPOSITION,
@@ -803,6 +623,28 @@ describe('In Progress tab', () => {
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          queryData={{
+            data: {
+              totalItems: 1,
+              results: [
+                {
+                  id: applicationId,
+                  type: 'Birth',
+                  registration: {
+                    trackingId: 'BQ2IDOP',
+                    modifiedAt: TIME_STAMP
+                  },
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLBirthEventSearchSet
+              ]
+            }
+          }}
         />,
         store,
         graphqlMock
@@ -827,63 +669,44 @@ describe('In Progress tab', () => {
         testComponent.component.find('#IN_PROGRESS-0').hostNodes().length
       ).toBe(1)
     })
+
     it('redirects user to draft preview page on update click', async () => {
       jest.clearAllMocks()
-      const TIME_STAMP = 1562912635549
+      const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
       const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-      const graphqlMock = [
-        {
-          request: {
-            query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
-            variables: {
-              locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
-              status: EVENT_STATUS.IN_PROGRESS,
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              listEventRegistrations: {
-                totalItems: 1,
-                results: [
-                  {
-                    id: applicationId,
-                    registration: {
-                      type: 'BIRTH',
-                      trackingId: 'BQ2IDOP'
-                    },
-                    child: {
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Anik',
-                          familyName: 'Hoque'
-                        }
-                      ]
-                    },
-                    deceased: null,
-                    createdAt: TIME_STAMP
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
 
-      // @ts-ignore
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          queryData={{
+            data: {
+              totalItems: 1,
+              results: [
+                {
+                  id: applicationId,
+                  type: 'Birth',
+                  registration: {
+                    trackingId: 'BQ2IDOP',
+                    modifiedAt: TIME_STAMP
+                  },
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLBirthEventSearchSet
+              ]
+            }
+          }}
         />,
-        store,
-        graphqlMock
+        store
       )
 
       // wait for mocked data to load mockedProvider
@@ -930,50 +753,10 @@ describe('Tablet tests', () => {
 
   it('redirects to detail page if item is clicked', async () => {
     jest.clearAllMocks()
-    const TIME_STAMP = 1562912635549
+    const TIME_STAMP = '1562912635549'
     const drafts: IApplication[] = []
     drafts.push(createApplication(Event.BIRTH))
     const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    const graphqlMock = [
-      {
-        request: {
-          query: LIST_EVENT_REGISTRATIONS_BY_STATUS,
-          variables: {
-            locationIds: ['0627c48a-c721-4ff9-bc6e-1fba59a2332a'],
-            status: EVENT_STATUS.IN_PROGRESS,
-            count: 10,
-            skip: 0
-          }
-        },
-        result: {
-          data: {
-            listEventRegistrations: {
-              totalItems: 1,
-              results: [
-                {
-                  id: applicationId,
-                  registration: {
-                    type: 'BIRTH',
-                    trackingId: 'BQ2IDOP'
-                  },
-                  child: {
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Anik',
-                        familyName: 'Hoque'
-                      }
-                    ]
-                  },
-                  deceased: null,
-                  createdAt: TIME_STAMP
-                }
-              ]
-            }
-          }
-        }
-      }
-    ]
 
     // @ts-ignore
     const testComponent = await createTestComponent(
@@ -982,9 +765,30 @@ describe('Tablet tests', () => {
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
         registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+        queryData={{
+          data: {
+            totalItems: 1,
+            results: [
+              {
+                id: applicationId,
+                type: 'Birth',
+                registration: {
+                  trackingId: 'BQ2IDOP',
+                  modifiedAt: TIME_STAMP
+                },
+                childName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Anik',
+                    familyName: 'Hoque'
+                  }
+                ]
+              } as GQLBirthEventSearchSet
+            ]
+          }
+        }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     getItem.mockReturnValue(registerScopeToken)
