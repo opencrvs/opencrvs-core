@@ -168,8 +168,11 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     let locations = Object.values(offlineLocations)
     if (this.state.searchText.length > 0) {
-      const rgxp = new RegExp(this.state.searchText, 'i')
-      locations = locations.filter(location => location.name.match(rgxp))
+      locations = locations.filter(location =>
+        location.name
+          .toUpperCase()
+          .includes(this.state.searchText.toUpperCase())
+      )
     }
     const selectedValue =
       this.state.selectedValue ||
