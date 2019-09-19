@@ -60,6 +60,9 @@ cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastruct
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
 
+# Copy all country compose files to the server
+rsync -rP packages/resources/src/$COUNTRY/config/docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
+
 # Override configuration files with country specific files
 rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
 
@@ -70,7 +73,7 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/comp
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
-ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml --with-registry-auth opencrvs'
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.yml --with-registry-auth opencrvs'
 
 if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
     echo

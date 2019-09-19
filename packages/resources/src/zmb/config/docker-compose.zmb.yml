@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  notification:
+    secrets:
+      - clickatell-user
+      - clickatell-password
+      - clickatell-api-id
+    environment:
+      - LANGUAGES=en
+      - SMS_PROVIDER=clickatell
+      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
+      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
+      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
+
+  workflow:
+    environment:
+      - LANGUAGES=en
+
+secrets:
+  clickatell-user:
+    external: true
+  clickatell-password:
+    external: true
+  clickatell-api-id:
+    external: true
