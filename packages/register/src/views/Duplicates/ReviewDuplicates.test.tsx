@@ -884,21 +884,20 @@ describe('Review Duplicates component', () => {
         store,
         mock
       )
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
 
-      testComponent.component
-        .find('#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fff1')
-        .hostNodes()
-        .simulate('click')
-      testComponent.component.update()
+      const link = await waitForElement(
+        testComponent.component,
+        '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+      )
 
-      testComponent.component
-        .find('#not_duplicate_confirm')
-        .hostNodes()
-        .simulate('click')
+      link.hostNodes().simulate('click')
+
+      const confirm = await waitForElement(
+        testComponent.component,
+        '#not_duplicate_confirm'
+      )
+
+      confirm.hostNodes().simulate('click')
 
       await waitFor(() => assign.mock.calls.length > 0)
 
