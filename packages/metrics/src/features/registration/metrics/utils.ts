@@ -159,7 +159,10 @@ export const getDistrictLocation = async (
       identifier =>
         identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
     )
-  while (!locationType || locationType.value !== 'DISTRICT') {
+  while (
+    locationBundle &&
+    (!locationType || locationType.value !== 'DISTRICT')
+  ) {
     lId =
       (locationBundle &&
         locationBundle.partOf &&
@@ -176,5 +179,10 @@ export const getDistrictLocation = async (
           OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
       )
   }
+
+  if (!locationBundle) {
+    throw new Error('No district location found')
+  }
+
   return locationBundle
 }
