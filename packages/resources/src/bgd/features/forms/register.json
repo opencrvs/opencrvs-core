@@ -232,6 +232,12 @@
                     "description": "Form section title for contact point",
                     "id": "register.SelectContactPoint.heading"
                   },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.applicant !== \"LEGAL_GUARDIAN\")"
+                    }
+                  ],
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -319,6 +325,56 @@
                     "FATHER": [],
                     "OTHER": []
                   }
+                },
+                {
+                  "name": "contactPoint",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": "Who is the main point of contact for this application?",
+                    "description": "Form section title for contact point",
+                    "id": "register.SelectContactPoint.heading"
+                  },
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.applicant === \"LEGAL_GUARDIAN\")"
+                    }
+                  ],
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "size": "large",
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" radio option",
+                        "id": "form.field.label.application.whoseContactDetails.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" radio option",
+                        "id": "form.field.label.application.whoseContactDetails.father"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Label for \"Someone else\" radio option",
+                        "id": "form.field.label.application.whoseContactDetails.other"
+                      }
+                    }
+                  ]
                 }
               ]
             }
