@@ -1,5 +1,5 @@
 export function getAvailableLanguages() {
-  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,bn'
+  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'bn,en'
   return LANGUAGES.split(',')
 }
 

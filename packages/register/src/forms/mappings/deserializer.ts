@@ -34,7 +34,8 @@ import {
   SELECT_WITH_OPTIONS,
   ISelectFormFieldWithOptions,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  IRadioGroupWithNestedFieldsFormField
+  IRadioGroupWithNestedFieldsFormField,
+  SerializedFormField
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 
@@ -244,6 +245,21 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
+function deserializeFormField(field: SerializedFormField) {
+  return {
+    ...field,
+    validate: field.validate.map(fieldValidationDescriptorToValidationFunction),
+    mapping: field.mapping && {
+      query:
+        field.mapping.query &&
+        fieldQueryDescriptorToQueryFunction(field.mapping.query),
+      mutation:
+        field.mapping.mutation &&
+        fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
+    }
+  }
+}
+
 export function deserializeFormSection(
   section: ISerializedFormSection
 ): IFormSection {
@@ -260,20 +276,7 @@ export function deserializeFormSection(
   const groups = section.groups.map(group => ({
     ...group,
     fields: group.fields.map(field => {
-      const baseFields = {
-        ...field,
-        validate: field.validate.map(
-          fieldValidationDescriptorToValidationFunction
-        ),
-        mapping: field.mapping && {
-          query:
-            field.mapping.query &&
-            fieldQueryDescriptorToQueryFunction(field.mapping.query),
-          mutation:
-            field.mapping.mutation &&
-            fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
-        }
-      }
+      const baseFields = deserializeFormField(field)
 
       if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
         return {
@@ -285,33 +288,18 @@ export function deserializeFormSection(
       }
 
       if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-        const nested = Object.keys(field.nestedFields).reduce((fields, key) => {
-          return {
-            ...fields,
-            [key]: field.nestedFields[key].map(nestedField => {
-              return {
-                ...nestedField,
-                validate: nestedField.validate.map(
-                  // @ts-ignore
-                  fieldValidationDescriptorToValidationFunction
-                ),
-                mapping: field.mapping && {
-                  query:
-                    field.mapping.query &&
-                    fieldQueryDescriptorToQueryFunction(field.mapping.query),
-                  mutation:
-                    field.mapping.mutation &&
-                    fieldMutationDescriptorToMutationFunction(
-                      field.mapping.mutation
-                    )
-                }
-              }
-            })
-          }
-        }, {})
+        const deserializedNestedFields = Object.keys(field.nestedFields).reduce(
+          (fields, key) => {
+            return {
+              ...fields,
+              [key]: field.nestedFields[key].map(deserializeFormField)
+            }
+          },
+          {}
+        )
         return {
           ...baseFields,
-          nestedFields: nested
+          nestedFields: deserializedNestedFields
         } as IRadioGroupWithNestedFieldsFormField
       }
 

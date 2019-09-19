@@ -8,6 +8,8 @@ export default rates => {
   const compositionUuid = faker.random.uuid()
   const childFirstName = faker.name.firstName()
   const childLastName = faker.name.lastName()
+  const childFirstNameBN = 'গাজী'
+  const childLastNameBN = 'আশরাফ'
   const childGender = Math.random() > rates.femaleRate ? 'male' : 'female'
   const regDate = faker.date.past(5, new Date())
   const childDOB = faker.date.past(5, regDate)
@@ -24,6 +26,8 @@ export default rates => {
     .toString()
   const motherFirstName = faker.name.firstName()
   const motherLastName = faker.name.lastName()
+  const motherFirstNameBN = 'গাজী'
+  const motherLastNameBN = 'আশরাফ'
   const motherDOB = faker.date.past(20, earliestParentAge)
 
   const fatherNID = faker.random
@@ -34,6 +38,8 @@ export default rates => {
     .toString()
   const fatherFirstName = faker.name.firstName()
   const fatherLastName = faker.name.lastName()
+  const fatherFirstNameBN = 'গাজী'
+  const fatherLastNameBN = 'আশরাফ'
   const fatherDOB = faker.date.past(20, earliestParentAge)
 
   const dateOfMarriage = faker.date.past(5, earliestParentAge)
@@ -172,7 +178,7 @@ export default rates => {
           resourceType: 'Patient',
           active: true,
           name: [
-            { use: 'bn', given: [childFirstName], family: [childLastName] }, // TODO use bn names
+            { use: 'bn', given: [childFirstNameBN], family: [childLastNameBN] }, // TODO use bn names
             {
               use: 'en',
               given: [childFirstName],
@@ -190,7 +196,11 @@ export default rates => {
           active: true,
           identifier: [{ value: motherNID, type: 'NATIONAL_ID' }],
           name: [
-            { use: 'bn', given: [motherFirstName], family: [motherLastName] },
+            {
+              use: 'bn',
+              given: [motherFirstNameBN],
+              family: [motherLastNameBN]
+            },
             { use: 'en', given: [fatherFirstName], family: [fatherLastName] }
           ],
           birthDate: motherDOB.toISOString().substring(0, 10),
@@ -269,10 +279,14 @@ export default rates => {
           active: true,
           identifier: [{ value: fatherNID, type: 'NATIONAL_ID' }],
           name: [
-            { use: 'bn', given: [fatherFirstName], family: [fatherLastName] },
+            {
+              use: 'bn',
+              given: [fatherFirstNameBN],
+              family: [fatherLastNameBN]
+            },
             { use: 'en', given: [fatherFirstName], family: [fatherLastName] }
           ],
-          birthDate: fatherDOB.toDateString().substring(0, 10),
+          birthDate: fatherDOB.toISOString().substring(0, 10),
           maritalStatus: {
             coding: [
               {

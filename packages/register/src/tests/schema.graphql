@@ -81,6 +81,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
   APPLICANT_ID_PROOF
+  APPLICANT_ATHORITY_TO_APPLY_PROOF
 }
 
 enum AttachmentType {
@@ -110,6 +111,7 @@ enum AttachmentType {
   TAX_RECEIPT
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
+  SIGNED_AFFIDAVIT
 }
 
 enum AttendantType {
@@ -596,11 +598,6 @@ input PersonInput {
   educationalAttainment: EducationType
 }
 
-type EventCount {
-  declared: Int
-  rejected: Int
-}
-
 type Query {
   listNotifications(
     locationIds: [String]
@@ -622,25 +619,7 @@ type Query {
     skip: Int
   ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
-  countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -661,7 +640,6 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): BirthRegistrationMetrics
-  countEvents(locationIds: [String]): EventCount
   searchEvents(
     locationIds: [String]
     trackingId: String

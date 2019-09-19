@@ -5850,7 +5850,7 @@
                   "name": "paragraph",
                   "type": "PARAGRAPH",
                   "label": {
-                    "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                    "defaultMessage": "For birth registration of birth occurring within 45 days old the following documents are required:",
                     "description": "Documents Paragraph text",
                     "id": "form.section.documents.birth.requirements"
                   },
@@ -5859,11 +5859,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     },
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")  || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")"
                     }
                   ]
                 },
@@ -5871,7 +5871,7 @@
                   "name": "paragraph",
                   "type": "PARAGRAPH",
                   "label": {
-                    "defaultMessage": "For birth registration of births occurring within 45 days and and 5 years old the following documents are required:",
+                    "defaultMessage": "For birth registration of births occurring within 45 days and 5 years old the following documents are required:",
                     "description": "Documents Paragraph text",
                     "id": "form.section.documents.paragraph45daysTo5Years"
                   },
@@ -5913,7 +5913,7 @@
                   "name": "uploadDocForMother",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of mothers ID",
+                    "defaultMessage": "Proof of mother's ID",
                     "description": "Label for list item Mother ID Proof",
                     "id": "form.field.label.proofOfMothersID"
                   },
@@ -5984,7 +5984,7 @@
                   "name": "uploadDocForFather",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of fathers ID",
+                    "defaultMessage": "Proof of father's ID",
                     "description": "Label for list item Father ID Proof",
                     "id": "form.field.label.proofOfFathersID"
                   },
@@ -6081,6 +6081,12 @@
                       }
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "birthFieldToAttachmentTransformer"
@@ -6134,6 +6140,12 @@
                         "description": "Label for radio option Other",
                         "id": "form.field.label.docTypeOther"
                       }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     }
                   ],
                   "mapping": {
@@ -12092,6 +12104,43 @@
                         "description": "Label for radio option Passport",
                         "id": "form.field.label.docTypePassport"
                       }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForApplicantAthorityToApply",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of applicant's authority to apply",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.applicantAthorityToApplyProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "APPLICANT_ATHORITY_TO_APPLY_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Signed Affidavit",
+                      "label": {
+                        "defaultMessage": "Signed affidavit",
+                        "description": "Label for select option Signed Affidavit",
+                        "id": "form.field.label.docTypeSignedAffidavit"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "draftData.informant.applicantsRelationToDeceased !== \"OTHER\""
                     }
                   ],
                   "mapping": {

@@ -157,7 +157,7 @@ export type IFormFieldValue =
   | FieldValueMap
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
-interface FieldValueMap {
+export interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
@@ -262,16 +262,25 @@ type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
   queryMap: ISerializedQueryMap
 }
 
+type SerializedRadioGroupWithNestedFields = Omit<
+  IRadioGroupWithNestedFieldsFormField,
+  'nestedFields'
+> & {
+  nestedFields: { [key: string]: SerializedFormField[] }
+}
+
 export type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
       | ILoaderButton
       | ISelectFormFieldWithOptions
+      | IRadioGroupWithNestedFieldsFormField
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap,
+  | ILoaderButtonWithSerializedQueryMap
+  | SerializedRadioGroupWithNestedFields,
   'validate' | 'mapping'
 > & {
   validate: IValidatorDescriptor[]
@@ -308,8 +317,8 @@ export interface IFormFieldBase {
   mode?: THEME_MODE
   hidden?: boolean
   previewGroup?: string
-  hideValueInPreview?: boolean
   nestedFields?: { [key: string]: IFormField[] }
+  hideValueInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
