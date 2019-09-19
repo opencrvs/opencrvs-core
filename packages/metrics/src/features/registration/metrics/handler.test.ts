@@ -322,7 +322,7 @@ describe('verify metrics handler', () => {
   })
 
   it('returns empty keyfigure if no matching data found', async () => {
-    fetch.mockResponse(
+    fetch.mockResponses(
       [
         JSON.stringify({
           resourceType: 'Location',
