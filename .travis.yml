@@ -3,18 +3,13 @@ node_js:
   - 'lts/*'
 env:
   - CI=true
-script: yarn test && yarn lint
 jobs:
   include:
     - stage: tests (unit and integration)
+      script: yarn test && yarn lint && yarn build
       after_success:
         - npm install codecov -g
         - codecov
-    - stage: build
-      if: type = pull_request
-      script:
-        - yarn build
-      after_success:
         - ./node_modules/.bin/bundlesize
     - if: type = pull_request
       before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
