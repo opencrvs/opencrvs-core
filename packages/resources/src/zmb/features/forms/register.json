@@ -1259,25 +1259,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -1285,25 +1269,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ]
@@ -2905,25 +2873,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -2931,25 +2883,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ]
