@@ -5,7 +5,6 @@ import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
-import { getTransformerDataByBase } from '@register/pdfRenderer/transformer/utils'
 import { IOfflineData } from '@register/offline/reducer'
 
 /*
@@ -31,12 +30,7 @@ export function createPDF(
       definitionString = definitionString.replace(
         new RegExp(`{${transformerDef.field}}`, 'gi'),
         transformFunction(
-          getTransformerDataByBase(
-            transformerDef,
-            application,
-            userDetails,
-            offlineResource
-          ),
+          { application, userDetails, resource: offlineResource },
           intl,
           transformerDef.parameters
         ) || ''

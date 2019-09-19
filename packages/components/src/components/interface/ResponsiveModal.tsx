@@ -139,7 +139,7 @@ export class ResponsiveModal extends React.Component<IProps> {
         <ModalContent width={width}>
           <Header>
             <Title>{title}</Title>
-            <CircleButton onClick={handleClose}>
+            <CircleButton type="button" onClick={handleClose}>
               <Cross />
             </CircleButton>
           </Header>

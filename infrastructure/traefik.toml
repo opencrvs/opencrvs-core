@@ -10,10 +10,12 @@ insecureSkipVerify = true
 [entryPoints]
   [entryPoints.http]
   address = ":80"
+  compress = true
     [entryPoints.http.redirect]
     entryPoint = "https"
   [entryPoints.https]
   address = ":443"
+  compress = true
   [entryPoints.https.tls]
 
 [api]
@@ -51,3 +53,7 @@ entryPoint = "http"
   ]
 
 [retry]
+
+# Enable gzip compression
+[http.middlewares]
+  [http.middlewares.test-compress.compress]

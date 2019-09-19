@@ -1,5 +1,8 @@
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import {
+  NOTIFICATION_SERVICE_URL,
+  RESOURCE_SERVICE_URL
+} from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
@@ -181,4 +184,30 @@ export function isInProgressApplication(fhirBundle: fhir.Bundle) {
       (taskEntry.resource as fhir.Task).status === 'draft') ||
     false
   )
+}
+
+export async function getRegistrationNumber(
+  trackingId: string,
+  practitionerId: string,
+  authHeader: { Authorization: string }
+): Promise<{ registrationNumber: string }> {
+  try {
+    const response = await fetch(
+      `${RESOURCE_SERVICE_URL}generate/registrationNumber`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          trackingId,
+          practitionerId
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      }
+    )
+    return response.json()
+  } catch (err) {
+    throw new Error(`Unable to get registration number for error : ${err}`)
+  }
 }

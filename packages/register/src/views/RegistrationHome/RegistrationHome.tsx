@@ -19,7 +19,11 @@ import {
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import { IApplication, SUBMISSION_STATUS } from '@register/applications'
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  filterProcessingApplicationsFromQuery
+} from '@register/applications'
 import { Header } from '@register/components/interface/Header/Header'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
 import {
@@ -35,10 +39,7 @@ import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrationHome/NotificationToast'
-import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  COUNT_REGISTRATION_QUERY
-} from '@register/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@register/views/RegistrationHome/queries'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import * as Sentry from '@sentry/browser'
 import * as React from 'react'
@@ -54,11 +55,20 @@ import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { errorMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@register/i18n/messages/views/certificate'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface IProps extends IButtonProps {
   active?: boolean
   disabled?: boolean
   id: string
+}
+
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
 }
 
 export const IconTab = styled(Button).attrs<IProps>({})`
@@ -123,12 +133,15 @@ interface IBaseRegistrationHomeProps {
   drafts: IApplication[]
   applications: IApplication[]
   goToEvents: typeof goToEventsAction
-  outboxApplications: IApplication[]
+  storedApplications: IApplication[]
 }
 
 interface IRegistrationHomeState {
+  progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
+  approvalCurrentPage: number
+  printCurrentPage: number
   showCertificateToast: boolean
 }
 
@@ -160,8 +173,11 @@ export class RegistrationHomeView extends React.Component<
   constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
+      progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
+      approvalCurrentPage: 1,
+      printCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.applications.filter(
           item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
@@ -177,113 +193,89 @@ export class RegistrationHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  renderInProgressTabWithCount = (
-    tabId: string,
-    drafts: IApplication[],
-    registrarLocationId: string
-  ) => {
-    const { intl } = this.props
-
-    return (
-      <Query
-        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
-        variables={{
-          locationIds: [registrarLocationId],
-          status: EVENT_STATUS.IN_PROGRESS
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-
-          return (
-            <IconTab
-              id={`tab_${TAB_ID.inProgress}`}
-              key={TAB_ID.inProgress}
-              active={tabId === TAB_ID.inProgress}
-              align={ICON_ALIGNMENT.LEFT}
-              icon={() => <StatusProgress />}
-              onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
-            >
-              {intl.formatMessage(messages.inProgress)} (
-              {(drafts &&
-                drafts.filter(
-                  draft =>
-                    draft.submissionStatus ===
-                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                ).length +
-                  ((data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
-                    0)) ||
-                0}
-              )
-            </IconTab>
-          )
-        }}
-      </Query>
-    )
-  }
-
-  onPageChange = (newPageNumber: number) => {
-    if (this.props.tabId === TAB_ID.readyForReview) {
-      this.setState({ reviewCurrentPage: newPageNumber })
-    }
-    if (this.props.tabId === TAB_ID.sentForUpdates) {
-      this.setState({ updatesCurrentPage: newPageNumber })
-    }
-  }
-
   renderExpandedComponent = (itemId: string) => {
     return <RowHistoryView eventId={itemId} />
   }
 
-  count(count: number, status: string[]) {
-    const outboxCount = this.props.outboxApplications.filter(
+  subtractApplicationsWithStatus(count: number, status: string[]) {
+    const outboxCount = this.props.storedApplications.filter(
       app => app.submissionStatus && status.includes(app.submissionStatus)
     ).length
     return count - outboxCount
   }
+
+  onPageChange = (newPageNumber: number) => {
+    switch (this.props.tabId) {
+      case TAB_ID.inProgress:
+        this.setState({ progressCurrentPage: newPageNumber })
+        break
+      case TAB_ID.readyForReview:
+        this.setState({ reviewCurrentPage: newPageNumber })
+        break
+      case TAB_ID.sentForUpdates:
+        this.setState({ updatesCurrentPage: newPageNumber })
+        break
+      case TAB_ID.sentForApproval:
+        this.setState({ approvalCurrentPage: newPageNumber })
+        break
+      case TAB_ID.readyForPrint:
+        this.setState({ printCurrentPage: newPageNumber })
+        break
+      default:
+        throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
+    }
+  }
+
   render() {
-    const { theme, intl, userDetails, tabId, selectorId, drafts } = this.props
+    const {
+      theme,
+      intl,
+      userDetails,
+      tabId,
+      selectorId,
+      drafts,
+      storedApplications
+    } = this.props
+    const {
+      progressCurrentPage,
+      reviewCurrentPage,
+      updatesCurrentPage,
+      approvalCurrentPage,
+      printCurrentPage
+    } = this.state
     const registrarLocationId = userDetails && getUserLocation(userDetails).id
 
-    let parentQueryLoading = false
+    const reviewStatuses = this.userHasRegisterScope()
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
 
     return (
       <>
         <Header />
         <Query
-          query={COUNT_REGISTRATION_QUERY}
+          query={REGISTRATION_HOME_QUERY}
           variables={{
-            locationIds: [registrarLocationId]
+            locationIds: [registrarLocationId],
+            count: 10,
+            reviewStatuses: reviewStatuses,
+            inProgressSkip: (progressCurrentPage - 1) * 10,
+            reviewSkip: (reviewCurrentPage - 1) * 10,
+            rejectSkip: (updatesCurrentPage - 1) * 10,
+            approvalSkip: (approvalCurrentPage - 1) * 10,
+            printSkip: (printCurrentPage - 1) * 10
           }}
+          pollInterval={window.config.UI_POLLING_INTERVAL}
         >
           {({
             loading,
             error,
             data
           }: {
-            loading: any
-            error?: any
-            data: any
+            loading: boolean
+            error?: Error
+            data: IQueryData
           }) => {
             if (loading) {
-              parentQueryLoading = true
               return (
                 <StyledSpinner
                   id="search-result-spinner"
@@ -291,7 +283,6 @@ export class RegistrationHomeView extends React.Component<
                 />
               )
             }
-            parentQueryLoading = false
             if (error) {
               Sentry.captureException(error)
               return (
@@ -301,19 +292,32 @@ export class RegistrationHomeView extends React.Component<
               )
             }
 
-            const declaredCount = this.count(data.countEvents.declared, [
-              SUBMISSION_STATUS.READY_TO_REGISTER,
-              SUBMISSION_STATUS.REGISTERING
-            ])
+            const filteredData = filterProcessingApplicationsFromQuery(
+              data,
+              storedApplications
+            )
 
             return (
               <>
                 <TopBar>
-                  {this.renderInProgressTabWithCount(
-                    tabId,
-                    drafts,
-                    registrarLocationId as string
-                  )}
+                  <IconTab
+                    id={`tab_${TAB_ID.inProgress}`}
+                    key={TAB_ID.inProgress}
+                    active={tabId === TAB_ID.inProgress}
+                    align={ICON_ALIGNMENT.LEFT}
+                    icon={() => <StatusProgress />}
+                    onClick={() =>
+                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
+                    }
+                  >
+                    {intl.formatMessage(messages.inProgress)} (
+                    {drafts.filter(
+                      draft =>
+                        draft.submissionStatus ===
+                        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                    ).length + (filteredData.inProgressTab.totalItems || 0)}
+                    )
+                  </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.readyForReview}`}
                     key={TAB_ID.readyForReview}
@@ -325,10 +329,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyForReview)} (
-                    {this.userHasRegisterScope()
-                      ? declaredCount + data.countEvents.validated
-                      : declaredCount}
-                    )
+                    {filteredData.reviewTab.totalItems})
                   </IconTab>
                   <IconTab
                     id={`tab_${TAB_ID.sentForUpdates}`}
@@ -341,7 +342,7 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.sentForUpdates)} (
-                    {data.countEvents.rejected})
+                    {filteredData.rejectTab.totalItems})
                   </IconTab>
                   {this.userHasValidateScope() && (
                     <IconTab
@@ -355,7 +356,7 @@ export class RegistrationHomeView extends React.Component<
                       }
                     >
                       {intl.formatMessage(messages.sentForApprovals)} (
-                      {data.countEvents.validated})
+                      {filteredData.approvalTab.totalItems})
                     </IconTab>
                   )}
                   <IconTab
@@ -369,45 +370,66 @@ export class RegistrationHomeView extends React.Component<
                     }
                   >
                     {intl.formatMessage(messages.readyToPrint)} (
-                    {data.countEvents.registered})
+                    {filteredData.printTab.totalItems})
                   </IconTab>
                 </TopBar>
+                {tabId === TAB_ID.inProgress && (
+                  <InProgressTab
+                    drafts={drafts}
+                    selectorId={selectorId}
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      data: filteredData.inProgressTab
+                    }}
+                    page={progressCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.readyForReview && (
+                  <ReviewTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      data: filteredData.reviewTab
+                    }}
+                    page={reviewCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.sentForUpdates && (
+                  <RejectTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      data: filteredData.rejectTab
+                    }}
+                    page={updatesCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.sentForApproval && (
+                  <ApprovalTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      data: filteredData.approvalTab
+                    }}
+                    page={approvalCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
+                {tabId === TAB_ID.readyForPrint && (
+                  <PrintTab
+                    registrarLocationId={registrarLocationId}
+                    queryData={{
+                      data: filteredData.printTab
+                    }}
+                    page={printCurrentPage}
+                    onPageChange={this.onPageChange}
+                  />
+                )}
               </>
             )
           }}
         </Query>
-        {tabId === TAB_ID.inProgress && (
-          <InProgressTab
-            drafts={drafts}
-            selectorId={selectorId}
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.readyForReview && (
-          <ReviewTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.sentForUpdates && (
-          <RejectTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.sentForApproval && (
-          <ApprovalTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
-        {tabId === TAB_ID.readyForPrint && (
-          <PrintTab
-            registrarLocationId={registrarLocationId}
-            parentQueryLoading={parentQueryLoading}
-          />
-        )}
+
         <FABContainer>
           <FloatingActionButton
             id="new_event_declaration"
@@ -445,7 +467,7 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
-    outboxApplications: state.applicationsState.applications,
+    storedApplications: state.applicationsState.applications,
     drafts:
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(

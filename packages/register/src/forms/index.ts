@@ -19,6 +19,7 @@ import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/register/src/utils/validate'
 import { ICertificate } from '@register/applications'
+import { IOfflineData } from '@register/offline/reducer'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -317,6 +318,7 @@ export interface IFormFieldBase {
   hidden?: boolean
   previewGroup?: string
   nestedFields?: { [key: string]: IFormField[] }
+  hideValueInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -417,6 +419,7 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 }
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   onCompleted?: (response: string) => void
 }
 
@@ -876,6 +879,7 @@ export interface Ii18nSimpleDocumentUploaderFormField
 }
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   onCompleted?: (response: string) => void
 }
 

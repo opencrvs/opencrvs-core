@@ -12,13 +12,12 @@ import {
   INumberFeildConversionPayload,
   IDateFeildValuePayload,
   IFunctionTransformer,
-  TransformableData,
+  TemplateTransformerData,
   TransformerPayload,
   IFormattedFeildValuePayload
 } from '@register/pdfRenderer/transformer/types'
 import moment from 'moment'
 import { IFormSectionData } from '@register/forms'
-import { IApplication } from '@register/applications'
 
 export const fieldTransformers: IFunctionTransformer = {
   /*
@@ -28,11 +27,10 @@ export const fieldTransformers: IFunctionTransformer = {
       - MessageValues: Optional field, which will be used to replace any value on the meessage descriptor (if needed)
   */
   IntlLabel: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     let messageValues = {}
     const message = payload && (payload as IIntLabelPayload)
     if (!message) {
@@ -42,9 +40,11 @@ export const fieldTransformers: IFunctionTransformer = {
       Object.keys(message.messageValues).forEach(valueKey => {
         const messageValue =
           valueKey === 'event'
-            ? intl.formatMessage(getEventMessageDescription(application.event))
+            ? intl.formatMessage(
+                getEventMessageDescription(templateData.application.event)
+              )
             : getValueFromApplicationDataByKey(
-                application.data,
+                templateData.application.data,
                 (message.messageValues && message.messageValues[valueKey]) || ''
               )
 
@@ -66,23 +66,22 @@ export const fieldTransformers: IFunctionTransformer = {
       - format: Mendatory field. Need to provide locale wise name fields which will be concatenated together with spaces
   */
   ApplicantName: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const formatPayload = payload && (payload as IApplicantNamePayload)
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
     }
-    if (!formatPayload.key[application.event]) {
+    if (!formatPayload.key[templateData.application.event]) {
       throw new Error(
-        `No data key defined on payload for event: ${application.event}`
+        `No data key defined on payload for event: ${templateData.application.event}`
       )
     }
     const applicantObj: IFormSectionData = getValueFromApplicationDataByKey(
-      application.data,
-      formatPayload.key[application.event]
+      templateData.application.data,
+      formatPayload.key[templateData.application.event]
     )
     let applicantName = ''
     formatPayload.format[
@@ -100,16 +99,18 @@ export const fieldTransformers: IFunctionTransformer = {
       and fetch the appropriate value if found otherwise will throw exception. Ex: 'child.dob'
   */
   FieldValue: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const key = payload && (payload as IFeildValuePayload)
     if (!key) {
       throw new Error('No payload found for this transformer')
     }
-    return getValueFromApplicationDataByKey(application.data, key.valueKey)
+    return getValueFromApplicationDataByKey(
+      templateData.application.data,
+      key.valueKey
+    )
   },
 
   /*
@@ -121,19 +122,18 @@ export const fieldTransformers: IFunctionTransformer = {
       - format: Mendatory field. Formats the extracted date value by this given format.
   */
   DateFieldValue: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const formatPayload = payload && (payload as IDateFeildValuePayload)
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
     }
     const dateValue = formatPayload.key
       ? getValueFromApplicationDataByKey(
-          application.data,
-          formatPayload.key[application.event]
+          templateData.application.data,
+          formatPayload.key[templateData.application.event]
         )
       : Date.now()
 
@@ -153,11 +153,10 @@ export const fieldTransformers: IFunctionTransformer = {
       Ex: '{child.firstName}, {child.lastName}'
   */
   FormattedFieldValue: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const key = payload && (payload as IFormattedFeildValuePayload)
     if (!key) {
       throw new Error('No payload found for this transformer')
@@ -167,7 +166,7 @@ export const fieldTransformers: IFunctionTransformer = {
     keys &&
       keys.forEach(key => {
         keyValues[key] = getValueFromApplicationDataByKey(
-          application.data,
+          templateData.application.data,
           // Getting rid of { }
           key.substr(1, key.length - 2)
         )
@@ -187,17 +186,22 @@ export const fieldTransformers: IFunctionTransformer = {
     Based on matched condition, this transformer will render the result based on output type
   */
   ConditionExecutor: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const params = payload && (payload as IConditionExecutorPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')
     }
-    const fromValue = getExecutorFieldValue(params.fromKey, application)
-    const toValue = getExecutorFieldValue(params.toKey, application)
+    const fromValue = getExecutorFieldValue(
+      params.fromKey,
+      templateData.application
+    )
+    const toValue = getExecutorFieldValue(
+      params.toKey,
+      templateData.application
+    )
 
     let value = null
     params.conditions.forEach(condition => {
@@ -208,7 +212,7 @@ export const fieldTransformers: IFunctionTransformer = {
           diffInDays <= condition.maxDiff
         ) {
           value = fieldTransformers.IntlLabel(
-            application,
+            templateData,
             intl,
             condition.output
           )
@@ -226,17 +230,16 @@ export const fieldTransformers: IFunctionTransformer = {
      - conversionMap: Mendatory field. ex: { 0: '০', 1: '১'}
   */
   NumberConversion: (
-    data: TransformableData,
+    templateData: TemplateTransformerData,
     intl: IntlShape,
     payload?: TransformerPayload
   ) => {
-    const application = data as IApplication
     const params = payload && (payload as INumberFeildConversionPayload)
     if (!params) {
       throw new Error('No payload found for this transformer')
     }
     let value = getValueFromApplicationDataByKey(
-      application.data,
+      templateData.application.data,
       params.valueKey
     ) as string
     Object.keys(params.conversionMap).forEach(number => {

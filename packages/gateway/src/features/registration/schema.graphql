@@ -27,6 +27,7 @@ enum BirthRegPresence {
   MOTHER
   FATHER
   OTHER
+  LEGAL_GUARDIAN
 }
 
 enum BirthType {
@@ -73,6 +74,9 @@ enum AttachmentType {
   MEDICAL_INSTITUTION
   BIRTH_ATTENDANT
   TAX_RECEIPT
+  BROUGHT_IN_DEAD_CERTIFICATE
+  CORONERS_REPORT
+  SIGNED_AFFIDAVIT
 }
 
 enum AttachmentSubject {
@@ -87,6 +91,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
   APPLICANT_ID_PROOF
+  APPLICANT_ATHORITY_TO_APPLY_PROOF
 }
 
 enum RegistrationType {
@@ -375,29 +380,7 @@ type Query {
     skip: Int
   ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
-  countEventRegistrationsByStatus(
-    locationIds: [String]
-    status: String
-  ): EventRegCount
-  countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }
 
