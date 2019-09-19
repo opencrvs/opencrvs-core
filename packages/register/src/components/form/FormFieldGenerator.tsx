@@ -62,7 +62,8 @@ import {
   IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
-  RADIO_GROUP_WITH_NESTED_FIELDS
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  Ii18nRadioGroupWithNestedFieldsFormField
 } from '@register/forms'
 import { getValidationErrorsForForm, Errors } from '@register/forms/validation'
 import { InputField } from '@register/components/form/InputField'
@@ -121,6 +122,7 @@ type GeneratedInputFieldProps = {
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
+  resetNestedInputValues?: (field: Ii18nFormField) => void
   nestedFields?: { [key: string]: JSX.Element[] }
   value: IFormFieldValue
   touched: boolean
@@ -133,6 +135,7 @@ function GeneratedInputField({
   onBlur,
   onSetFieldValue,
   resetDependentSelectValues,
+  resetNestedInputValues,
   error,
   touched,
   value,
@@ -226,15 +229,19 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS && nestedFields) {
+  if (
+    fieldDefinition.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+    nestedFields &&
+    resetNestedInputValues
+  ) {
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
           size={fieldDefinition.size}
           onChange={(val: string) => {
-            resetDependentSelectValues(fieldDefinition.name)
-            onSetFieldValue(fieldDefinition.name, val)
+            resetNestedInputValues(fieldDefinition)
+            onSetFieldValue(`${fieldDefinition.name}.value`, val)
           }}
           nestedFields={nestedFields}
           options={fieldDefinition.options}
@@ -509,6 +516,25 @@ class FormSectionComponent extends React.Component<Props> {
     }
   }
 
+  resetNestedInputValues = (parentField: Ii18nFormField) => {
+    const parentFieldValue = (this.props.values[
+      parentField.name
+    ] as IFormSectionData).value
+    const nestedFields = (parentField as Ii18nRadioGroupWithNestedFieldsFormField)
+      .nestedFields
+    const nestedFieldsToReset = Object.keys(nestedFields)
+      .filter(key => parentFieldValue && key !== parentFieldValue)
+      .map(key => nestedFields[key])
+      .flat()
+
+    nestedFieldsToReset.forEach(nestedField => {
+      this.props.setFieldValue(
+        `${parentField.name}.nestedFields.${nestedField.name}`,
+        ''
+      )
+    })
+  }
+
   render() {
     const {
       values,
@@ -707,18 +733,19 @@ class FormSectionComponent extends React.Component<Props> {
             )
 
             return (
-              <FormItem key={`${field.name}.value`}>
+              <FormItem key={field.name}>
                 <Field name={`${field.name}.value`}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(intl, {
-                        ...withDynamicallyGeneratedFields,
-                        name: `${field.name}.value`
-                      })}
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
                       onSetFieldValue={setFieldValue}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
+                      resetNestedInputValues={this.resetNestedInputValues}
                       {...formikFieldProps.field}
                       nestedFields={nestedFieldElements}
                       touched={touched[field.name] || false}
