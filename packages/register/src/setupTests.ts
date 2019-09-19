@@ -36,6 +36,20 @@ Object.defineProperty(window, 'localStorage', {
 })
 
 /*
+ * Page Visibility
+ */
+
+let hidden = true
+Object.defineProperty(document, 'hidden', {
+  get() {
+    return hidden
+  },
+  set(bool) {
+    hidden = Boolean(bool)
+  }
+})
+
+/*
  * Storage module
  */
 
