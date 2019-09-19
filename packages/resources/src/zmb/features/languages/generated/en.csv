@@ -555,7 +555,6 @@
 "imageUploadOption.upload.overSized","File is too large. Please attach file less than 5mb","Error message for Attachment size greater than 5MD."
 "notification.declarationsSynced","As you have connectivity, we have synced {syncCount} new birth applications.","The message that appears in notification when background sync takes place"
 "notification.draftsSaved","Your draft has been saved","The message that appears in notification when save drafts button is clicked"
-"notification.newContentAvailable","We've made some updates, click here to refresh.","The message that appears in notification when new content available."
 "notification.outboxText","Outbox({num})","Application outbox text"
 "notification.processingText","{num} application processing...","Application processing text"
 "register.registrationHome.outbox.statusRegistering","Registering...","Label for application status Registering"
