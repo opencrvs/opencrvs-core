@@ -193,25 +193,9 @@ services:
 
   notification:
     secrets:
-      - clickatell-user
-      - clickatell-password
-      - clickatell-api-id
-      - infobip-gateway-endpoint
-      - infobip-api-key
-      - infobip-sender-id
-      - sms-languages
-      - sms-provider
       - jwt-public-key.{{ts}}
     environment:
-      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
-      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
-      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
-      - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
-      - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
-      - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - LANGUAGES=/run/secrets/sms-languages
-      - SMS_PROVIDER=/run/secrets/sms-provider
     deploy:
       replicas: 2
     networks:
@@ -235,10 +219,8 @@ services:
   workflow:
     secrets:
       - jwt-public-key.{{ts}}
-      - sms-languages
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - LANGUAGES=/run/secrets/sms-languages
     deploy:
       replicas: 2
     networks:
@@ -340,22 +322,6 @@ secrets:
   jwt-public-key.{{ts}}:
     external: true
   jwt-private-key.{{ts}}:
-    external: true
-  clickatell-user:
-    external: true
-  clickatell-password:
-    external: true
-  clickatell-api-id:
-    external: true
-  infobip-gateway-endpoint:
-    external: true
-  infobip-api-key:
-    external: true
-  infobip-sender-id:
-    external: true
-  sms-languages:
-    external: true
-  sms-provider:
     external: true
 
 configs:
