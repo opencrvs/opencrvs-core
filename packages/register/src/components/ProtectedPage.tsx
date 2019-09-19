@@ -4,23 +4,26 @@ import { SecureAccount } from '@register/views/SecureAccount/SecureAccountView'
 import { Unlock } from '@register/views/Unlock/Unlock'
 import { storage } from '@register/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { isMobileDevice } from '@register/utils/commonUtils'
+import { isMobileDevice, contains } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS } from '@register/utils/userUtils'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@register/applications'
 export const SCREEN_LOCK = 'screenLock'
 
+interface IProtectedPageProps {
+  unprotectedRouteElements: string[]
+}
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
 }
 class ProtectedPageComponent extends React.Component<
-  RouteComponentProps<{}>,
+  IProtectedPageProps & RouteComponentProps<{}>,
   IProtectPageState
 > {
-  constructor(props: RouteComponentProps<{}>) {
+  constructor(props: IProtectedPageProps & RouteComponentProps<{}>) {
     super(props)
     this.state = {
       secured: true,
@@ -59,7 +62,10 @@ class ProtectedPageComponent extends React.Component<
     if (
       !isVisible &&
       !(await storage.getItem(SCREEN_LOCK)) &&
-      !this.props.location.pathname.includes('documents')
+      !contains(
+        this.props.location.pathname,
+        this.props.unprotectedRouteElements
+      )
     ) {
       newState.secured = false
       if (await this.getPIN()) {
