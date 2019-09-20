@@ -409,7 +409,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'orange'
                   }
                   saveAction={{
-                    handler: () => this.props.goToHomeTab('progress'),
+                    handler: () => this.props.goToHomeTab('review'),
                     label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
