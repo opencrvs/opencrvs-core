@@ -23,7 +23,7 @@ describe('when user is selecting the Main point of contact', () => {
     history = testApp.history
     store = testApp.store
 
-    draft = createApplication(Event.BIRTH)
+    draft = createApplication(Event.DEATH)
     await store.dispatch(storeApplication(draft))
     history.replace(
       SELECT_DEATH_MAIN_CONTACT_POINT.replace(':applicationId', draft.id)

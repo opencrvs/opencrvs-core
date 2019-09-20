@@ -87,6 +87,7 @@ describe('when user has starts a new application', () => {
         history.replace(
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
+
         await waitForElement(app, '#register_form')
       })
 
