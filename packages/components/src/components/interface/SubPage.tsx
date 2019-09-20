@@ -42,7 +42,6 @@ const BodyContainer = styled(Box)`
   max-width: 940px;
   height: inherit;
   margin: auto;
-  padding: 30px 0px 30px 65px;
 `
 interface IProps {
   title?: string
