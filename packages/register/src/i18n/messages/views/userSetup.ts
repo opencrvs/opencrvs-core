@@ -97,7 +97,7 @@ const messagesToDefine: IUserSetupMessages = {
   },
   userSetupInstruction: {
     defaultMessage:
-      'Now login to your account with your user name and newly created password',
+      'Now login to your account with your username and newly created password',
     description: 'Instruction for the setup complete',
     id: 'userSetup.complete.instruction'
   },

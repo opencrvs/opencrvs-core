@@ -958,7 +958,7 @@
         "user.form.securityquestion.selectSecurityQuestion": "Select a security question",
         "user.form.securityquestion.title": "Security questions",
         "user.setup.waiting": "Setting up your account",
-        "userSetup.complete.instruction": "Now login to your account with your user name and newly created password",
+        "userSetup.complete.instruction": "Now login to your account with your username and newly created password",
         "userSetup.complete.title": "Account setup complete",
         "userSetup.landing.instruction": "You just a few steps away from completing your account set up.",
         "userSetup.landing.title": "Welcome to OpenCRVS",

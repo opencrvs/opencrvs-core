@@ -197,7 +197,7 @@ export const copyEventAddressTransformer = (fromSection: string) => (
   if (
     draftData[sectionId][field.name] === 'OTHER' ||
     draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
-    draftData[sectionId][field.name] === 'HEALTH_INSTITUTION'
+    draftData[sectionId][field.name] === 'HEALTH_FACILITY'
   ) {
     transformedData.eventLocation = { type: draftData[sectionId][field.name] }
     return transformedData
