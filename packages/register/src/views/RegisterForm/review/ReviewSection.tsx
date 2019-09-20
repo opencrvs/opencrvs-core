@@ -77,7 +77,8 @@ import {
   SEARCH_FIELD,
   IRadioOption,
   RADIO_GROUP,
-  SUBSECTION
+  SUBSECTION,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages } from '@register/i18n/messages/views/review'
@@ -300,6 +301,14 @@ const renderValue = (
 
   if (field.type === RADIO_GROUP) {
     return renderSelectOrRadioLabel(value, field.options, intl)
+  }
+
+  if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+    return renderSelectOrRadioLabel(
+      (value as IFormSectionData).value,
+      field.options,
+      intl
+    )
   }
 
   if (typeof value === 'string') {
