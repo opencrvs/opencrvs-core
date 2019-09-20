@@ -8,10 +8,7 @@ describe('Child section mutation mapping related tests', () => {
     }
     const draftData = {
       child: {
-        birthLocation: {
-          label: 'Health institute',
-          value: '54538456-fcf6-4276-86ac-122a7eb47703'
-        }
+        birthLocation: '54538456-fcf6-4276-86ac-122a7eb47703'
       }
     }
     birthEventLocationMutationTransformer(0)(

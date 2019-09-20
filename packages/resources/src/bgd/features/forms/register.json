@@ -652,19 +652,11 @@
                   },
                   "options": [
                     {
-                      "value": "HOSPITAL",
+                      "value": "HEALTH_FACILITY",
                       "label": {
-                        "defaultMessage": "Hospital",
-                        "description": "Select item for hospital",
-                        "id": "form.field.label.hospital"
-                      }
-                    },
-                    {
-                      "value": "OTHER_HEALTH_INSTITUTION",
-                      "label": {
-                        "defaultMessage": "Other Health Institution",
-                        "description": "Select item for Other Health Institution",
-                        "id": "form.field.label.otherHealthInstitution"
+                        "defaultMessage": "Health Institution",
+                        "description": "Select item for Health Institution",
+                        "id": "form.field.label.healthInstitution"
                       }
                     },
                     {
@@ -697,29 +689,24 @@
                 },
                 {
                   "name": "birthLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
-                    "defaultMessage": "Hospital / Clinic",
-                    "description": "Label for form field: Hospital or Health Institution",
-                    "id": "form.field.label.birthLocation"
+                    "defaultMessage": "Health instition",
+                    "description": "Label for form field: Health Institution",
+                    "id": "form.field.label.healdInstitution"
                   },
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
+                  "searchableResource": "facilities",
                   "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "placeOfBirth"
+                    "resource": "facilities"
                   },
+                  "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"HOSPITAL\" && values.placeOfBirth!=\"OTHER_HEALTH_INSTITUTION\")"
+                      "expression": "(values.placeOfBirth!=\"HEALTH_FACILITY\")"
                     }
                   ],
                   "mapping": {
@@ -7370,23 +7357,23 @@
               "fields": [
                 {
                   "name": "deathLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
                     "defaultMessage": "What hospital did the death occur at?",
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.deathAtFacility"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "deathPlaceAddress"
                   },
                   "mapping": {
                     "mutation": {
@@ -7394,8 +7381,8 @@
                       "parameters": []
                     },
                     "query": {
-                      "operation": "eventLocationIDQueryTransformer",
-                      "parameters": []
+                      "operation": "sectionFieldExchangeTransformer",
+                      "parameters": ["eventLocation", "id"]
                     }
                   }
                 }

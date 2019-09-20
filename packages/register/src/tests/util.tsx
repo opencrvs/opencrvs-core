@@ -2127,7 +2127,7 @@ export const mockApplicationData = {
     attendantAtBirth: 'MIDWIFE',
     birthType: 'SINGLE',
     multipleBirth: 1,
-    placeOfBirth: 'HOSPITAL',
+    placeOfBirth: 'HEALTH_FACILITY',
     birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {

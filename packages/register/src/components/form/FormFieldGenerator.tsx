@@ -353,10 +353,10 @@ function GeneratedInputField({
         fieldName={fieldDefinition.name}
         fieldLabel={fieldDefinition.label}
         isFieldRequired={fieldDefinition.required as boolean}
-        fieldValue={fieldDefinition.initialValue as IDynamicValues}
+        fieldValue={fieldDefinition.initialValue as string}
         searchableResource={fieldDefinition.searchableResource}
-        onModalComplete={(label: string, value: string) => {
-          onSetFieldValue(fieldDefinition.name, { label, value })
+        onModalComplete={(value: string) => {
+          onSetFieldValue(fieldDefinition.name, value)
         }}
       />
     )

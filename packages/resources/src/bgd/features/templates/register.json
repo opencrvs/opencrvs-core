@@ -775,7 +775,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HOSPITAL", "OTHER_HEALTH_INSTITUTION"]
+                  "matchValues": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -801,7 +801,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HOSPITAL", "OTHER_HEALTH_INSTITUTION"]
+                  "matchValues": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "alias",

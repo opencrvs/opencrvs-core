@@ -45,6 +45,7 @@ export class SearchInputWithIcon extends React.Component<IProps, IState> {
   }
   searchOnEnterPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
+      event.preventDefault()
       return this.props.searchHandler(this.state.searchParam)
     }
   }

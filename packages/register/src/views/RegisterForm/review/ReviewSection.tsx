@@ -272,7 +272,11 @@ const renderValue = (
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
-  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
+  if (
+    (field.type === SEARCH_FIELD ||
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS) &&
+    field.dynamicOptions
+  ) {
     const draftData = draft.data[section.id]
     return renderSelectDynamicLabel(
       value,
@@ -288,9 +292,6 @@ const renderValue = (
     return formatLongDate(value)
   }
 
-  if (field.type === SEARCH_FIELD) {
-    return (value as IDynamicValues).label
-  }
   if (field.hideValueInPreview) {
     return ''
   }
@@ -714,7 +715,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineResources,
       draft: { event }
     } = this.props
-
     const formSections = getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
