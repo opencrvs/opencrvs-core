@@ -5,11 +5,16 @@ import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { getDefaultLanguage } from '@login/i18n/utils'
-
+import zambiaBackground from './background-zmb.jpg'
 const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div.attrs<IPage>({})`
   ${({ theme }) => theme.gradients.gradientNightshade};
+  ${
+    window.config.COUNTRY === 'zmb'
+      ? `background: url(${zambiaBackground});`
+      : ''
+  }
   min-height: 100vh;
   display: flex;
   flex-direction: column;
