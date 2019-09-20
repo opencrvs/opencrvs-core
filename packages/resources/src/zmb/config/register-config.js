@@ -4,7 +4,7 @@ window.config = {
   COUNTRY: 'zmb',
   COUNTRY_LOGO_FILE: 'logo.png',
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
-  HEALTH_FACILITY_FILTER: 'STATE',
+  HEALTH_FACILITY_FILTER: 'DISTRICT',
   LANGUAGES: 'en',
   LOGIN_URL: 'http://localhost:3020',
   PERFORMANCE_URL: 'http://localhost:3001',
