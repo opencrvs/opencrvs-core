@@ -363,7 +363,7 @@
 "form.section.application.name","Application","Form section name for Registration"
 "form.field.label.registrationOffice","Registration Office","Registration office"
 "form.field.label.application.phone","Phone number","Input label for phone input"
-"form.section.application.title","Application","Form section title for Registration"
+"form.section.application.title","Application details","Form section title for Registration"
 "form.field.label.applicantRelation.other","Other(Specify)","Label for option Other"
 "form.field.label.relationshipPlaceHolder","eg. Grandmother","Relationship place holder"
 "form.field.SearchField.modalTitle","{fieldName, select, registrationOffice {Assigned Register Office}}","Modal title"

@@ -3,6 +3,211 @@
     "birth": {
       "sections": [
         {
+          "id": "registration",
+          "viewType": "hidden",
+          "name": {
+            "defaultMessage": "Registration",
+            "description": "Form section name for Registration",
+            "id": "form.section.application.name"
+          },
+          "title": {
+            "defaultMessage": "Registration",
+            "description": "Form section title for Registration",
+            "id": "form.section.application.title"
+          },
+          "groups": [
+            {
+              "id": "registration-view-group",
+              "fields": [
+                {
+                  "name": "presentAtBirthRegistration",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Who is present for the registration",
+                    "description": "Input label for who is present input",
+                    "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoIsPresent.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoIsPresent.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoIsPresent.father"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Other",
+                        "description": "Label for \"Other\" select option",
+                        "id": "form.field.label.application.whoIsPresent.other"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "sectionFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
+                {
+                  "name": "whoseContactDetails",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Who is the contact person for this application?",
+                    "description": "Input label for contact details person",
+                    "id": "form.field.label.application.whoseContactDetails"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.father"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": ["contact"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["contact"]
+                    }
+                  }
+                },
+                {
+                  "name": "registrationPhone",
+                  "type": "TEL",
+                  "label": {
+                    "defaultMessage": "Phone number",
+                    "description": "Input label for phone input",
+                    "id": "form.field.label.application.phone"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "phoneNumberFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": ["contactPhoneNumber"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["contactPhoneNumber"]
+                    }
+                  }
+                },
+                {
+                  "name": "phoneVerificationWarning",
+                  "type": "WARNING",
+                  "label": {
+                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
+                    "description": "Warning message to verify applicant phone number ",
+                    "id": "form.field.label.application.phoneVerificationWarning"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "commentsOrNotes",
+                  "type": "TEXTAREA",
+                  "label": {
+                    "defaultMessage": "Comments or notes",
+                    "description": "Input label for comments or notes textarea",
+                    "id": "form.field.label.application.commentsOrNotes"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "description": {
+                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
+                    "description": "Help text for the notes field",
+                    "id": "form.field.label.application.commentsOrNotes.description"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToCommentTransformer"
+                    },
+                    "query": {
+                      "operation": "commentToFieldTransformer"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "mapping": {
+            "mutation": {
+              "operation": "setBirthRegistrationSectionTransformer"
+            },
+            "query": {
+              "operation": "getBirthRegistrationSectionTransformer"
+            }
+          }
+        },
+        {
           "id": "child",
           "viewType": "form",
           "name": {
@@ -3553,211 +3758,6 @@
           "mapping": {
             "query": {
               "operation": "emptyFatherSectionTransformer"
-            }
-          }
-        },
-        {
-          "id": "registration",
-          "viewType": "hidden",
-          "name": {
-            "defaultMessage": "Registration",
-            "description": "Form section name for Registration",
-            "id": "form.section.application.name"
-          },
-          "title": {
-            "defaultMessage": "Registration",
-            "description": "Form section title for Registration",
-            "id": "form.section.application.title"
-          },
-          "groups": [
-            {
-              "id": "registration-view-group",
-              "fields": [
-                {
-                  "name": "presentAtBirthRegistration",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is present for the registration",
-                    "description": "Input label for who is present input",
-                    "id": "form.field.label.application.whoIsPresent"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH_PARENTS",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoIsPresent.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoIsPresent.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoIsPresent.father"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for \"Other\" select option",
-                        "id": "form.field.label.application.whoIsPresent.other"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "whoseContactDetails",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is the contact person for this application?",
-                    "description": "Input label for contact details person",
-                    "id": "form.field.label.application.whoseContactDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.father"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": ["contact"]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": ["contact"]
-                    }
-                  }
-                },
-                {
-                  "name": "registrationPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.application.phone"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": ["contactPhoneNumber"]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": ["contactPhoneNumber"]
-                    }
-                  }
-                },
-                {
-                  "name": "phoneVerificationWarning",
-                  "type": "WARNING",
-                  "label": {
-                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
-                    "description": "Warning message to verify applicant phone number ",
-                    "id": "form.field.label.application.phoneVerificationWarning"
-                  },
-                  "initialValue": "",
-                  "validate": []
-                },
-                {
-                  "name": "commentsOrNotes",
-                  "type": "TEXTAREA",
-                  "label": {
-                    "defaultMessage": "Comments or notes",
-                    "description": "Input label for comments or notes textarea",
-                    "id": "form.field.label.application.commentsOrNotes"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "description": {
-                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
-                    "description": "Help text for the notes field",
-                    "id": "form.field.label.application.commentsOrNotes.description"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToCommentTransformer"
-                    },
-                    "query": {
-                      "operation": "commentToFieldTransformer"
-                    }
-                  }
-                }
-              ]
-            }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setBirthRegistrationSectionTransformer"
-            },
-            "query": {
-              "operation": "getBirthRegistrationSectionTransformer"
             }
           }
         },
