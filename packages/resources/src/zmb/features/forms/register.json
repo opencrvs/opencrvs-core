@@ -242,7 +242,7 @@
                   "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Given name(s)",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.childFirstNamesEng"
                   },
@@ -268,8 +268,8 @@
                   "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Surname",
-                    "description": "Label for form field: Surname in english",
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
                     "id": "form.field.label.childFamilyNameEng"
                   },
                   "required": true,
@@ -1130,18 +1130,18 @@
                     }
                   }
                 }
+              ],
+              "previewGroups": [
+                {
+                  "id": "placeOfBirth",
+                  "label": {
+                    "defaultMessage": "Place of delivery",
+                    "description": "Label for form field: Place of delivery",
+                    "id": "form.field.label.placeOfBirth"
+                  },
+                  "fieldToRedirect": "placeOfBirth"
+                }
               ]
-            }
-          ],
-          "previewGroups": [
-            {
-              "id": "placeOfBirth",
-              "label": {
-                "defaultMessage": "Place of delivery",
-                "description": "Label for form field: Place of delivery",
-                "id": "form.field.label.placeOfBirth"
-              },
-              "fieldToRedirect": "placeOfBirth"
             }
           ]
         },
@@ -2660,36 +2660,36 @@
                     }
                   }
                 }
+              ],
+              "previewGroups": [
+                {
+                  "id": "placeOfHeritage",
+                  "label": {
+                    "defaultMessage": "Place of origin (heritage)",
+                    "description": "Tag definition for placeOfHeritage",
+                    "id": "form.preview.tag.placeOfHeritage"
+                  },
+                  "fieldToRedirect": "placeOfHeritage"
+                },
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
+                },
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
               ]
-            }
-          ],
-          "previewGroups": [
-            {
-              "id": "placeOfHeritage",
-              "label": {
-                "defaultMessage": "Place of origin (heritage)",
-                "description": "Tag definition for placeOfHeritage",
-                "id": "form.preview.tag.placeOfHeritage"
-              },
-              "fieldToRedirect": "placeOfHeritage"
-            },
-            {
-              "id": "permanentAddress",
-              "label": {
-                "defaultMessage": "Permanent address",
-                "description": "Tag definition for permanentAddress",
-                "id": "form.preview.tag.permanent.address"
-              },
-              "fieldToRedirect": "permanentAddress"
-            },
-            {
-              "id": "currentAddress",
-              "label": {
-                "defaultMessage": "Current address",
-                "description": "Tag definition for crrent address",
-                "id": "form.preview.tag.current.address"
-              },
-              "fieldToRedirect": "currentAddress"
             }
           ]
         },
@@ -4034,7 +4034,7 @@
                   "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Given name(s)",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.deceasedGivenNamesEng"
                   },
@@ -4060,8 +4060,8 @@
                   "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Surname",
-                    "description": "Label for form field: Surname in english",
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
                     "id": "form.field.label.deceasedFamilyNameEng"
                   },
                   "required": true,
@@ -5614,7 +5614,7 @@
                   "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Given name(s)",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.childFirstNamesEng"
                   },
@@ -5653,8 +5653,8 @@
                   "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Surname",
-                    "description": "Label for form field: Surname in english",
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
                     "id": "form.field.label.childFamilyNameEng"
                   },
                   "required": true,
@@ -6450,7 +6450,7 @@
                   "name": "uploadDocForApplicant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Applicant id",
+                    "defaultMessage": "Applicant ID",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.applicantIDProof"
                   },
