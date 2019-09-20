@@ -69,7 +69,12 @@ export class App extends React.Component<IAppProps> {
                       <NotificationComponent>
                         <Page>
                           <MainSection>
-                            <ProtectedPage>
+                            <ProtectedPage
+                              unprotectedRouteElements={[
+                                'documents',
+                                'affidavit'
+                              ]}
+                            >
                               <ProtectedRoute
                                 render={({
                                   location
