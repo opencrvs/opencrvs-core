@@ -51,6 +51,11 @@ export async function sendBirthDeclarationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
+  logger.info(
+    `Notification service sendBirthDeclarationConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
   try {
     await sendSMS(
       payload.msisdn,
@@ -73,6 +78,11 @@ export async function sendBirthRegistrationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
+  logger.info(
+    `Notification service sendBirthRegistrationConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
   try {
     await sendSMS(
       payload.msisdn,
@@ -94,6 +104,11 @@ export async function sendDeathDeclarationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
+  logger.info(
+    `Notification service sendDeathDeclarationConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
   try {
     await sendSMS(
       payload.msisdn,
@@ -116,6 +131,11 @@ export async function sendDeathRegistrationConfirmation(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
+  logger.info(
+    `Notification service sendDeathRegistrationConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
   try {
     await sendSMS(
       payload.msisdn,

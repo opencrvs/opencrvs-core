@@ -410,7 +410,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'orange'
                   }
                   saveAction={{
-                    handler: () => this.props.goToHomeTab('progress'),
+                    handler: () => this.props.goToHomeTab('review'),
                     label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
@@ -596,6 +596,10 @@ export function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   }))
 }
 
+function firstVisibleSection(form: IForm) {
+  return form.sections.filter(({ viewType }) => viewType !== 'hidden')[0]
+}
+
 function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
@@ -608,7 +612,7 @@ function mapStateToProps(
 ) {
   const { match, registerForm, application } = props
 
-  const sectionId = match.params.pageId || registerForm.sections[0].id
+  const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(
     section => section.id === sectionId
