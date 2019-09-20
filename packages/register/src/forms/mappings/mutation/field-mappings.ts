@@ -382,15 +382,3 @@ export const fieldToIdentifierWithTypeTransformer = (
   sectionData.identifier[0].value = draftData[sectionId][field.name]
   return transformedData
 }
-
-export const fieldNameValueTransformer = (transformedFieldName: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  transformedData[sectionId][transformedFieldName] = (draftData[sectionId][
-    field.name
-  ] as { [key: string]: string }).value
-  return transformedData
-}
