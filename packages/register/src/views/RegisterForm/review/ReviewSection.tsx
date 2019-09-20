@@ -521,6 +521,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
+  isDraft() {
+    return this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+  }
+
   getFieldValueWithErrorMessage(
     section: IFormSection,
     field: IFormField,
@@ -545,7 +549,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction: boolean = false
   ) {
-    const { intl } = this.props
+    const {
+      intl,
+      draft,
+      pageRoute,
+      writeApplication,
+      goToPageGroup
+    } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -554,7 +564,21 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          this.editLinkClickHandler(section.id, group.id, fieldName)
+          if (this.isDraft()) {
+            const application = draft
+            application.review = true
+            writeApplication(application)
+            goToPageGroup(
+              pageRoute,
+              application.id,
+              section.id,
+              group.id,
+              application.event.toLowerCase(),
+              fieldName
+            )
+          } else {
+            this.editLinkClickHandler(section.id, group.id, fieldName)
+          }
         }
       }
     }
@@ -705,7 +729,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   render() {
     const {
       intl,
-      draft,
+      draft: application,
       registerForm,
       rejectApplicationClickEvent,
       submitClickEvent,
@@ -717,7 +741,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     const formSections = getViewableSection(registerForm[event])
 
-    const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
+    const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
 
     const isComplete =
       flatten(
@@ -732,19 +756,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
-          draft
+          application
         )
       },
       value:
-        (draft.data.registration && draft.data.registration.commentsOrNotes) ||
+        (application.data.registration &&
+          application.data.registration.commentsOrNotes) ||
         '',
       ignoreMediaQuery: true
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const applicantName = getDraftApplicantFullName(draft, intl.locale)
-    const isDraft =
-      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+    const applicantName = getDraftApplicantFullName(application, intl.locale)
+    const draft = this.isDraft()
 
     return (
       <FullBodyContent>
@@ -767,7 +791,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <FormDataHeader>
-                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+                {intl.formatMessage(messages.formDataHeader, {
+                  isDraft: draft
+                })}
               </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
@@ -793,8 +819,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 alreadyRejectedApplication={
                   this.props.draft.registrationStatus === REJECTED
                 }
-                draftApplication={isDraft}
-                application={draft}
+                draftApplication={draft}
+                application={application}
                 submitApplicationAction={submitClickEvent}
                 rejectApplicationAction={rejectApplicationClickEvent}
               />
@@ -808,7 +834,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
-                  draft,
+                  application,
                   this.state.activeSection || formSections[0].id
                 )}
               >
@@ -842,10 +868,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             this.props.writeApplication(application)
             this.props.goToPageGroup(
               pageRoute,
-              draft.id,
+              application.id,
               this.state.editClickedSectionId!,
               this.state.editClickedSectionGroupId,
-              draft.event.toLowerCase(),
+              event.toLowerCase(),
               this.state.editClickFieldName
             )
           }}
