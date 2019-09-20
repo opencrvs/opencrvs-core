@@ -83,6 +83,7 @@
                 {
                   "name": "whoseContactDetails",
                   "type": "SELECT_WITH_OPTIONS",
+                  "previewGroup": "mainContact",
                   "label": {
                     "defaultMessage": "Who is the contact person for this application?",
                     "description": "Input label for contact details person",
@@ -136,6 +137,7 @@
                 {
                   "name": "registrationPhone",
                   "type": "TEL",
+                  "previewGroup": "mainContact",
                   "label": {
                     "defaultMessage": "Phone number",
                     "description": "Input label for phone input",
@@ -194,6 +196,17 @@
                       "operation": "commentToFieldTransformer"
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "mainContact",
+                  "label": {
+                    "defaultMessage": "Main contact",
+                    "description": "Preview label for applicant type + phone number",
+                    "id": "form.field.label.application.mainContact"
+                  },
+                  "fieldToRedirect": "mainContact"
                 }
               ]
             }

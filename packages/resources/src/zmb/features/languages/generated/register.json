@@ -481,6 +481,7 @@
         "form.field.label.application.whoseContactDetails.father": "Father",
         "form.field.label.application.whoseContactDetails.mother": "Mother",
         "form.field.label.application.whoseContactDetails.other": "Other",
+        "form.field.label.application.mainContact": "Main contact",
         "form.field.label.attendantAtBirth": "Attendant at birth",
         "form.field.label.attendantAtBirthLayperson": "Layperson",
         "form.field.label.attendantAtBirthTraditionalBirthAttendant": "Traditional birth attendant",
