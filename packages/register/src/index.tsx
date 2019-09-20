@@ -55,10 +55,10 @@ if (
   })
 }
 
-function onNewConentAvailable(waitingSW: ServiceWorker | null) {
+function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   if (waitingSW) {
-    const action = actions.showNewContentAvailableNotification(waitingSW)
-    store.dispatch(action)
+    waitingSW.postMessage('skipWaiting')
+    window.location.reload()
   }
 }
 
@@ -80,5 +80,5 @@ ReactDOM.render(
   document.getElementById('root')
 )
 
-registerServiceWorker(onNewConentAvailable)
+registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()

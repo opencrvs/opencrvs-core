@@ -5,7 +5,8 @@ import {
   goToEndOfForm,
   goToDocumentsSection,
   goToFatherSection,
-  goToMotherSection
+  goToMotherSection,
+  setPageVisibility
 } from '@register/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@register/navigation/routes'
 import {
@@ -87,6 +88,7 @@ describe('when user has starts a new application', () => {
         history.replace(
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
+
         await waitForElement(app, '#register_form')
       })
 
@@ -207,6 +209,16 @@ describe('when user has starts a new application', () => {
 
             expect(fileInputs).toEqual(4)
           })
+          it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
+            setPageVisibility(false)
+            await flushPromises()
+            const fileInputs = app
+              .update()
+              .find('#form_section_id_documents-view-group')
+              .find('section')
+              .children().length
+            expect(fileInputs).toEqual(4)
+          })
         })
       })
 
@@ -242,6 +254,10 @@ describe('when user has starts a new application', () => {
           expect(
             app.find('#form_section_title_mother-view-group').hostNodes()
           ).toHaveLength(1)
+        })
+        it('hides everything with pinpad if is page loses focus', async () => {
+          setPageVisibility(false)
+          await waitForElement(app, '#unlockPage')
         })
       })
       describe('when user clicks the "father" page', () => {

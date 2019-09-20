@@ -11,16 +11,19 @@ import { ProtectedAccount } from '@register/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@register/applications'
 export const SCREEN_LOCK = 'screenLock'
 
+interface IProtectedPageProps {
+  unprotectedRouteElements: string[]
+}
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
 }
 class ProtectedPageComponent extends React.Component<
-  RouteComponentProps<{}>,
+  IProtectedPageProps & RouteComponentProps<{}>,
   IProtectPageState
 > {
-  constructor(props: RouteComponentProps<{}>) {
+  constructor(props: IProtectedPageProps & RouteComponentProps<{}>) {
     super(props)
     this.state = {
       secured: true,
@@ -55,8 +58,12 @@ class ProtectedPageComponent extends React.Component<
   }
 
   async handleVisibilityChange(isVisible: boolean) {
+    const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
+    const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
+      this.props.location.pathname.includes(route)
+    )
     const newState = { ...this.state }
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
+    if (!alreadyLocked && !onUnprotectedPage) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true

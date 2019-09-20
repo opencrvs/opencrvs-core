@@ -2873,3 +2873,11 @@ export async function setPinCode(component: ReactWrapper) {
   await flushPromises()
   component.update()
 }
+
+export function setPageVisibility(isVisible: boolean) {
+  // @ts-ignore
+  document.hidden = !isVisible
+  const evt = document.createEvent('HTMLEvents')
+  evt.initEvent('visibilitychange', false, true)
+  document.dispatchEvent(evt)
+}
