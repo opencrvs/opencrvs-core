@@ -140,6 +140,7 @@ describe('ReviewForm tests', () => {
                 }
               },
               child: {
+                id: 'FAKE_ID',
                 name: [
                   {
                     use: 'bn',

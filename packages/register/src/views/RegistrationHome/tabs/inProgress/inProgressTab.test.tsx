@@ -599,6 +599,7 @@ describe('In Progress tab', () => {
                   contactPhoneNumber: '01622688231'
                 },
                 child: {
+                  id: 'FAKE_ID',
                   name: [
                     {
                       use: 'en',
