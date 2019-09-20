@@ -30,7 +30,10 @@ const getValidationErrors = {
     resources?: IOfflineData,
     drafts?: IFormData
   ) {
-    const value = values[field.name]
+    const value = field.nestedFields
+      ? (values[field.name] as IFormSectionData).value
+      : values[field.name]
+
     const conditionalActions = getConditionalActionsForField(
       field,
       values,
