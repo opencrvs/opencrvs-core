@@ -62,7 +62,7 @@ Start the development environment as described above, then:
 
 Sometimes it's nice to have the option to restart all running build processes (webpack etc). To get the dependencies and the build processes running in separate sessions you can use
 
-`yarn dev:tmux` - to start build processes and dependencies in different sessions
+`COUNTRY=<zmb|bgd> yarn dev:tmux` - to start build processes and dependencies in different sessions
 `yarn dev:tmux:kill` - to kill the tmux session
 
 You can use **ctrl + b** and arrow keys to navigate between tmux windows.

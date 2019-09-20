@@ -682,7 +682,7 @@ Tell the applicant that they will receive an SMS with a tracking ID. They will n
 "password.label.new","New password","New password label"
 "error.required.password","New password is not valid","New password required"
 "userSetup.complete.title","Account setup complete","Title for the setup complete page"
-"userSetup.complete.instruction","Now login to your account with your user name and newly created password","Instruction for the setup complete"
+"userSetup.complete.instruction","Now login to your account with your username and newly created password","Instruction for the setup complete"
 "userSetup.landing.instruction","You just a few steps away from completing your account set up.","Instruction for the account setup langing page"
 "userSetup.review.title","Your details","User setup review page title"
 "userSetup.review.header","Confirm your details","User setup review page subtitle"

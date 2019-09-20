@@ -75,6 +75,7 @@ const PdfWrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
+  overflow: scroll;
 `
 
 const Info = styled.div`

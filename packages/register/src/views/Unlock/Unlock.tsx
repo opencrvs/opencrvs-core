@@ -18,10 +18,14 @@ import { pinOps } from '@register/views/Unlock/ComparePINs'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@register/applications'
 import { messages } from '@register/i18n/messages/views/pin'
+import zambiaBackground from './background-zmb.jpg'
 
 const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
+  ${window.config.COUNTRY === 'zmb'
+    ? `background: url(${zambiaBackground});`
+    : ''}
   height: 100vh;
   display: flex;
   flex-direction: column;

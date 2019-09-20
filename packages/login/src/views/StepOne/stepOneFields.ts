@@ -5,7 +5,7 @@ export const messages: {
 } = defineMessages({
   username: {
     id: 'login.username',
-    defaultMessage: 'User Name',
+    defaultMessage: 'Username',
     description: 'The label that appears on the mobile number input'
   },
   passwordLabel: {

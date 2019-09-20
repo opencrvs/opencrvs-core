@@ -500,7 +500,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceAddressTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_INSTITUTION"'
+    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',
