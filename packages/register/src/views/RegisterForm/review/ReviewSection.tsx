@@ -541,14 +541,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
     fieldName: string,
-    value: IFormFieldValue | JSX.Element | undefined
+    value: IFormFieldValue | JSX.Element | undefined,
+    ignoreAction: boolean = false
   ) {
     const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
       value,
-      action: {
+      action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
@@ -623,7 +624,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
-        completeValue
+        completeValue,
+        field.readonly
       )
     }
   }
@@ -647,7 +649,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       group,
       field.label,
       field.name,
-      value
+      value,
+      field.readonly
     )
   }
 

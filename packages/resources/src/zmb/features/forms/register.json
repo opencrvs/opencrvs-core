@@ -23,11 +23,12 @@
                   "name": "presentAtBirthRegistration",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
-                    "defaultMessage": "Who is present for the registration",
-                    "description": "Input label for who is present input",
-                    "id": "form.field.label.application.whoIsPresent"
+                    "defaultMessage": "Who is the applicant for the registration",
+                    "description": "Input label for Applicant",
+                    "id": "form.section.applicant.name"
                   },
                   "required": false,
+                  "readonly": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
