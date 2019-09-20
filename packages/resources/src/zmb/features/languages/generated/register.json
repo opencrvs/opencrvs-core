@@ -755,7 +755,6 @@
         "newPassword.instruction": "We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.",
         "notification.declarationsSynced": "As you have connectivity, we have synced {syncCount} new birth applications.",
         "notification.draftsSaved": "Your draft has been saved",
-        "notification.newContentAvailable": "We've made some updates, click here to refresh.",
         "notification.outboxText": "Outbox({num})",
         "notification.processingText": "{num} application processing...",
         "notification.sorryError": "Sorry! Something went wrong",

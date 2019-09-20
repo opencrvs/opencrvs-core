@@ -22,7 +22,7 @@ const isLocalhost = Boolean(
 
 function registerValidSW(
   swUrl: string,
-  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
+  onNewContentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   navigator.serviceWorker
     .register(swUrl)
@@ -37,8 +37,8 @@ function registerValidSW(
                 // the fresh content will have been added to the cache.
                 // It's the perfect time to display a 'New content is
                 // available; please refresh.' message in your web app.
-                if (onNewConentAvailable) {
-                  onNewConentAvailable(registration.waiting)
+                if (onNewContentAvailable) {
+                  onNewContentAvailable(registration.waiting)
                 }
                 console.log('New content is available; please refresh.')
               } else {
@@ -59,7 +59,7 @@ function registerValidSW(
 
 function checkValidServiceWorker(
   swUrl: string,
-  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
+  onNewContentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
@@ -77,7 +77,7 @@ function checkValidServiceWorker(
         })
       } else {
         // Service worker found. Proceed as normal.
-        registerValidSW(swUrl, onNewConentAvailable)
+        registerValidSW(swUrl, onNewContentAvailable)
       }
     })
     .catch(() => {
@@ -88,7 +88,7 @@ function checkValidServiceWorker(
 }
 
 export default function register(
-  onNewConentAvailable?: (waitingSW: ServiceWorker | null) => void
+  onNewContentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   if (
     process.env.NODE_ENV === 'production' &&
@@ -113,7 +113,7 @@ export default function register(
 
       if (isLocalhost) {
         // This is running on localhost. Lets check if a service worker still exists or not.
-        checkValidServiceWorker(swUrl, onNewConentAvailable)
+        checkValidServiceWorker(swUrl, onNewContentAvailable)
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
@@ -125,7 +125,7 @@ export default function register(
         })
       } else {
         // Is not local host. Just register service worker
-        registerValidSW(swUrl, onNewConentAvailable)
+        registerValidSW(swUrl, onNewContentAvailable)
       }
     })
   }
