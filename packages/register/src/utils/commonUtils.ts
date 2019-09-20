@@ -20,11 +20,3 @@ export function isMobileDevice() {
 
   return IS_DESKTOP
 }
-
-export function contains(target: string, pattern: string[]) {
-  let value = 0
-  pattern.forEach((word: string) => {
-    value = value + Number(target.includes(word))
-  })
-  return value === 1
-}

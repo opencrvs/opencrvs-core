@@ -4,7 +4,7 @@ import { SecureAccount } from '@register/views/SecureAccount/SecureAccountView'
 import { Unlock } from '@register/views/Unlock/Unlock'
 import { storage } from '@register/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { isMobileDevice, contains } from '@register/utils/commonUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS } from '@register/utils/userUtils'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
@@ -58,15 +58,12 @@ class ProtectedPageComponent extends React.Component<
   }
 
   async handleVisibilityChange(isVisible: boolean) {
+    const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
+    const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
+      this.props.location.pathname.includes(route)
+    )
     const newState = { ...this.state }
-    if (
-      !isVisible &&
-      !(await storage.getItem(SCREEN_LOCK)) &&
-      !contains(
-        this.props.location.pathname,
-        this.props.unprotectedRouteElements
-      )
-    ) {
+    if (!alreadyLocked && !onUnprotectedPage) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true
