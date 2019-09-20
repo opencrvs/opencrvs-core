@@ -211,7 +211,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HEALTH_INSTITUTION"]
+                  "matchValues": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -479,7 +479,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["HEALTH_INSTITUTION"]
+                  "matchValues": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",

@@ -8,6 +8,12 @@ windows:
       layout: tiled
       panes:
         - apps:
-            - yarn run start:bgd
+            - COUNTRY=<%= ENV["COUNTRY"] %>
+            - LOCAL_IP=<%= ENV["LOCAL_IP"] %>
+            - '[[ -z $COUNTRY ]] && echo "Environment variable COUNTRY is required"'
+            - '[[ -z $LOCAL_IP ]] && echo "Environment variable LOCAL_IP is required"'
+            - '[[ -n $COUNTRY ]] && [[ -n $LOCAL_IP ]] && yarn start:$COUNTRY'
         - deps:
-            - yarn run compose:deps
+            - LOCAL_IP=<%= ENV["LOCAL_IP"] %>
+            - '[[ -z $LOCAL_IP ]] && echo "Environment variable LOCAL_IP is required"'
+            - '[[ -n $LOCAL_IP ]] && yarn run compose:deps'
