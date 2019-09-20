@@ -171,6 +171,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       }
       ... on BirthRegistration {
         child {
+          id
           name {
             use
             firstNames

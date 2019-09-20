@@ -140,6 +140,7 @@ describe('ReviewForm tests', () => {
                 }
               },
               child: {
+                id: '16025284-bae2-4b37-ae80-e16745b7a6b9',
                 name: [
                   {
                     use: 'bn',
@@ -153,8 +154,7 @@ describe('ReviewForm tests', () => {
                   }
                 ],
                 birthDate: '2001-01-01',
-                gender: 'male',
-                id: '16025284-bae2-4b37-ae80-e16745b7a6b9'
+                gender: 'male'
               },
               mother: {
                 name: [
