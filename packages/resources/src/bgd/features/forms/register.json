@@ -433,7 +433,7 @@
                   },
                   "options": [
                     {
-                      "value": "HEALTH_INSTITUTION",
+                      "value": "HEALTH_FACILITY",
                       "label": {
                         "defaultMessage": "Health Institution",
                         "description": "Select item for Health Institution",
@@ -480,11 +480,14 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"HEALTH_INSTITUTION\")"
+                      "expression": "(values.placeOfBirth!=\"HEALTH_FACILITY\")"
                     }
                   ],
                   "mapping": {
@@ -7349,6 +7352,9 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -7361,8 +7367,8 @@
                       "parameters": []
                     },
                     "query": {
-                      "operation": "eventLocationIDQueryTransformer",
-                      "parameters": []
+                      "operation": "sectionFieldExchangeTransformer",
+                      "parameters": ["eventLocation", "id"]
                     }
                   }
                 }

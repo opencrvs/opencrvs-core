@@ -89,10 +89,10 @@ interface IProps {
   theme: ITheme
   language: string
   fieldName: string
-  fieldValue: { [key: string]: string }
+  fieldValue: string
   fieldLabel: string
   isFieldRequired: boolean
-  onModalComplete: (label: string, value: string) => void
+  onModalComplete: (value: string) => void
   offlineResources: IOfflineData
   searchableResource: Extract<keyof IOfflineData, 'locations'>
 }
@@ -113,7 +113,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       selectedValue: '',
       showModal: false,
       showSearch: this.props.fieldValue ? false : true,
-      fieldValue: this.props.fieldValue.label || ''
+      fieldValue: this.props.fieldValue || ''
     }
   }
 
@@ -139,19 +139,19 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
   }
 
   onSelect = (value: ILocation) => {
-    this.props.onModalComplete(value.name, value.id)
+    this.props.onModalComplete(value.id)
     this.setState({
       searchText: '',
       showModal: false,
       showSearch: false,
-      fieldValue: value.name
+      fieldValue: value.id
     })
   }
 
-  changeSelection = () => {
+  changeSelection = (param: string) => {
     this.setState({
       showSearch: true,
-      searchText: this.state.fieldValue,
+      searchText: param,
       showModal: true
     })
   }
@@ -182,6 +182,11 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     const selectedLocation = locations.find(
       location => location.id === selectedValue
     )
+    const fieldLocationName =
+      (this.state.fieldValue &&
+        offlineLocations[this.state.fieldValue] &&
+        offlineLocations[this.state.fieldValue].name) ||
+      ''
     const listItems = locations.map((location, index) => {
       return (
         <ItemContainer
@@ -217,14 +222,16 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           <InputSection>
             <TextInput
               id={this.props.fieldName + '-id'}
-              value={this.state.fieldValue}
+              value={fieldLocationName}
               disabled
               className="item"
             />
             <LinkButton
               id="edit-button"
               className="item"
-              onClick={this.changeSelection}
+              onClick={() => {
+                this.changeSelection(fieldLocationName)
+              }}
             >
               {intl.formatMessage(formMessages.changeButtonLabel, {
                 fieldName
@@ -235,7 +242,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {!this.state.showModal && this.state.showSearch && (
           <SearchInputWithIcon
             placeHolderText={placeHolderText}
-            searchText={this.state.searchText}
+            searchText={fieldLocationName}
             searchHandler={this.handleSearch}
           />
         )}
@@ -274,7 +281,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           <ChildContainer>
             <SearchInputWithIcon
               placeHolderText={placeHolderText}
-              searchText={this.state.searchText}
+              searchText={fieldLocationName}
               searchHandler={this.handleSearch}
             />
             {listItems.length > 0 && <ListContainer>{listItems}</ListContainer>}

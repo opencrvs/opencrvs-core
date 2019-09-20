@@ -436,6 +436,9 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "conditionals": [
                     {
@@ -4865,6 +4868,9 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -4877,8 +4883,8 @@
                       "parameters": []
                     },
                     "query": {
-                      "operation": "eventLocationIDQueryTransformer",
-                      "parameters": []
+                      "operation": "sectionFieldExchangeTransformer",
+                      "parameters": ["eventLocation", "id"]
                     }
                   }
                 }

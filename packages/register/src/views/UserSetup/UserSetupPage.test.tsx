@@ -43,22 +43,6 @@ describe('UserSetupPage tests', () => {
   beforeEach(() => {
     store = createStore().store
   })
-  it('renders page successfully', async () => {
-    store.dispatch(checkAuth({ '?token': validToken }))
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <UserSetupPage />,
-      store
-    )
-    const app = testComponent.component
-    expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
-    expect(
-      app
-        .find('#user-setup-name-holder')
-        .hostNodes()
-        .text()
-    ).toEqual('Sahriar Nafis')
-  })
   it('renders page successfully without type', async () => {
     await store.dispatch(
       getStorageUserDetailsSuccess(JSON.stringify(userDetails))
