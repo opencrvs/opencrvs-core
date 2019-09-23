@@ -1,91 +1,52 @@
-import * as React from 'react'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions,
-  DataSection
-} from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import {
-  IApplication,
-  writeApplication,
-  SUBMISSION_STATUS,
-  IPayload
-} from '@register/applications'
-import { connect } from 'react-redux'
-import { IStoreState } from '@register/store'
-import {
-  getRegisterForm,
-  getBirthSection
-} from '@register/forms/register/application-selectors'
-import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
-import {
-  getConditionalActionsForField,
-  getVisibleSectionGroupsBasedOnConditions,
-  getSectionFields
-} from '@register/forms/utils'
-import { flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPageGroup } from '@register/navigation'
-
-import {
-  ISelectOption as SelectComponentOptions,
-  TextArea,
-  InputField
-} from '@opencrvs/components/lib/forms'
-
-import { getScope } from '@register/profile/profileSelectors'
-import { Scope } from '@register/utils/authUtils'
-import { getOfflineData } from '@register/offline/selectors'
-import {
-  OFFLINE_LOCATIONS_KEY,
-  OFFLINE_FACILITIES_KEY,
-  ILocation,
-  IOfflineData
-} from '@register/offline/reducer'
-import { getLanguage } from '@register/i18n/selectors'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape,
-  MessageDescriptor
-} from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
-  IForm,
-  IFormSection,
-  IFormField,
+  InputField,
+  ISelectOption as SelectComponentOptions,
+  TextArea
+} from '@opencrvs/components/lib/forms'
+import {
+  DataSection,
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
+import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import {
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS,
+  writeApplication
+} from '@register/applications'
+import { ReviewAction } from '@register/components/form/ReviewActionComponent'
+import {
+  BirthSection,
+  DATE,
+  Event,
+  IDynamicOptions,
   IFileValue,
+  IForm,
+  IFormField,
   IFormFieldValue,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IFormTag,
+  IRadioOption,
+  ISelectOption,
   LIST,
   PARAGRAPH,
-  SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  ISelectOption,
-  IDynamicOptions,
-  IFormSectionData,
-  WARNING,
-  DATE,
-  TEXTAREA,
-  Event,
-  Section,
-  BirthSection,
-  IFormTag,
-  IFormSectionGroup,
-  SEARCH_FIELD,
-  IRadioOption,
   RADIO_GROUP,
-  SUBSECTION
+  SEARCH_FIELD,
+  Section,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  SUBSECTION,
+  TEXTAREA,
+  WARNING
 } from '@register/forms'
-import { formatLongDate } from '@register/utils/date-formatting'
-import { messages } from '@register/i18n/messages/views/review'
-import { buttonMessages } from '@register/i18n/messages'
-import { REJECTED, BIRTH } from '@register/utils/constants'
-import { ReviewHeader } from './ReviewHeader'
-import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import { ReviewAction } from '@register/components/form/ReviewActionComponent'
-import { findDOMNode } from 'react-dom'
-import { isMobileDevice } from '@register/utils/commonUtils'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import {
+  getBirthSection,
+  getRegisterForm
+} from '@register/forms/register/application-selectors'
 import {
   birthSectionMapping,
   birthSectionTitle
@@ -94,9 +55,45 @@ import {
   deathSectionMapping,
   deathSectionTitle
 } from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
+import {
+  getConditionalActionsForField,
+  getSectionFields,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@register/forms/utils'
+import { getValidationErrorsForForm } from '@register/forms/validation'
+import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/review'
+import { getLanguage } from '@register/i18n/selectors'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { goToPageGroup } from '@register/navigation'
+import {
+  ILocation,
+  IOfflineData,
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
+import { getScope } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import { Scope } from '@register/utils/authUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
+import { BIRTH, REJECTED } from '@register/utils/constants'
+import { formatLongDate } from '@register/utils/date-formatting'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { IValidationResult } from '@register/utils/validate'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
+import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
+import { flatten, isArray } from 'lodash'
+import * as React from 'react'
+import { findDOMNode } from 'react-dom'
+import {
+  injectIntl,
+  IntlShape,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { ReviewHeader } from './ReviewHeader'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -488,6 +485,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.toggleDisplayDialog()
   }
 
+  editLinkClickHandlerForDraft = (
+    sectionId: string,
+    groupId: string,
+    fieldName: string
+  ) => {
+    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
+    const application = draft
+    application.review = true
+    writeApplication(application)
+    goToPageGroup(
+      pageRoute,
+      application.id,
+      sectionId,
+      groupId,
+      application.event.toLowerCase(),
+      fieldName
+    )
+  }
+
   userHasRegisterScope() {
     if (this.props.scope) {
       return this.props.scope && this.props.scope.includes('register')
@@ -549,13 +565,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction: boolean = false
   ) {
-    const {
-      intl,
-      draft,
-      pageRoute,
-      writeApplication,
-      goToPageGroup
-    } = this.props
+    const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
@@ -565,17 +575,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
           if (this.isDraft()) {
-            const application = draft
-            application.review = true
-            writeApplication(application)
-            goToPageGroup(
-              pageRoute,
-              application.id,
-              section.id,
-              group.id,
-              application.event.toLowerCase(),
-              fieldName
-            )
+            this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
           } else {
             this.editLinkClickHandler(section.id, group.id, fieldName)
           }
@@ -863,16 +863,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
           handleEdit={() => {
-            const application = this.props.draft
-            application.review = true
-            this.props.writeApplication(application)
-            this.props.goToPageGroup(
-              pageRoute,
-              application.id,
+            this.editLinkClickHandlerForDraft(
               this.state.editClickedSectionId!,
               this.state.editClickedSectionGroupId,
-              event.toLowerCase(),
-              this.state.editClickFieldName
+              this.state.editClickFieldName!
             )
           }}
         />
