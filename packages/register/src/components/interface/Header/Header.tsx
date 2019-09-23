@@ -57,6 +57,7 @@ import {
   buttonMessages,
   userMessages
 } from '@register/i18n/messages'
+import { grid } from '@opencrvs/components/lib/grid'
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -77,6 +78,7 @@ type IProps = IntlShapeProps & {
 interface IState {
   showMenu: boolean
   showLogoutModal: boolean
+  width: number
 }
 
 const StyledPrimaryButton = styled(IconButton)`
@@ -93,8 +95,21 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     this.state = {
       showMenu: false,
-      showLogoutModal: false
+      showLogoutModal: false,
+      width: window.innerWidth
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
   }
 
   hamburger = () => {
@@ -217,6 +232,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
+        invertIcon: <TrackingID color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -224,12 +240,14 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
+        invertIcon: <BRN color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
+        invertIcon: <Phone color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       }
     ]
@@ -243,6 +261,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
+        isMediumDevice={this.state.width <= grid.breakpoints.md}
       />
     )
   }

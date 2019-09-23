@@ -38,6 +38,7 @@ const DropDownWrapper = styled.ul`
   top: 100%;
   left: 0px;
   margin: 3px 0px;
+  cursor: pointer;
 `
 const DropDownItem = styled.li`
   display: flex;
@@ -67,6 +68,10 @@ const SelectedSearchCriteria = styled.span`
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.captionStyle};
   margin-right: 10px;
+  display: flex;
+  &.icon-only {
+    padding: 2px;
+  }
 `
 const DropDown = styled.div`
   align-items: center;
@@ -80,6 +85,7 @@ export interface ISearchType {
   label: string
   value: string
   icon: React.ReactNode
+  invertIcon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
 }
@@ -94,6 +100,7 @@ interface IProps {
   selectedSearchType?: string
   searchHandler: (searchText: string, searchType: string) => void
   onClearText?: () => void
+  isMediumDevice: boolean
 }
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -197,8 +204,12 @@ export class SearchTool extends React.Component<IProps, IState> {
           <ClearTextIcon onClick={this.onClearTextHandler} />
         )}
         <DropDown onClick={this.toggleDropdownDisplay}>
-          <SelectedSearchCriteria>
-            {this.state.selectedSearchType.label}
+          <SelectedSearchCriteria
+            className={(this.props.isMediumDevice && 'icon-only') || ''}
+          >
+            {this.props.isMediumDevice &&
+              this.state.selectedSearchType.invertIcon}
+            {!this.props.isMediumDevice && this.state.selectedSearchType.label}
           </SelectedSearchCriteria>
           <ArrowDownBlue />
         </DropDown>
