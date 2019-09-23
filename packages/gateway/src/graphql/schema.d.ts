@@ -260,6 +260,7 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
+  primaryCaregiver?: GQLPrimaryCaregiver
   createdAt?: GQLDate
   updatedAt?: GQLDate
 }
@@ -445,6 +446,21 @@ export enum GQLBirthRegPresence {
   FATHER = 'FATHER',
   OTHER = 'OTHER',
   LEGAL_GUARDIAN = 'LEGAL_GUARDIAN'
+}
+
+export interface GQLPrimaryCaregiver {
+  primaryCaregiverType?: GQLPrimaryCaregiverType
+  primaryCaregiver?: GQLRelatedPerson
+  reasonNotApplying?: string
+}
+
+export enum GQLPrimaryCaregiverType {
+  MOTHER_AND_FATHER = 'MOTHER_AND_FATHER',
+  MOTHER = 'MOTHER',
+  FATHER = 'FATHER',
+  INFORMANT = 'INFORMANT',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  OTHER = 'OTHER'
 }
 
 export interface GQLBirthRegResultSet {
@@ -693,6 +709,7 @@ export interface GQLBirthRegistrationInput {
   childrenBornAliveToMother?: number
   foetalDeathsToMother?: number
   lastPreviousLiveBirth?: GQLDate
+  primaryCaregiver?: GQLPrimaryCaregiverInput
   createdAt?: GQLDate
   updatedAt?: GQLDate
 }
@@ -778,6 +795,12 @@ export interface GQLPaymentInput {
   date?: GQLDate
 }
 
+export interface GQLPrimaryCaregiverInput {
+  primaryCaregiverType?: GQLPrimaryCaregiverType
+  primaryCaregiver?: GQLRelatedPersonInput
+  reasonNotApplying?: string
+}
+
 export interface GQLCreatedIds {
   compositionId?: string
   trackingId?: string
@@ -860,6 +883,7 @@ export interface GQLResolver {
   RelatedPerson?: GQLRelatedPersonTypeResolver
   Payment?: GQLPaymentTypeResolver
   Map?: GraphQLScalarType
+  PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -1589,6 +1613,7 @@ export interface GQLBirthRegistrationTypeResolver<TParent = any> {
   lastPreviousLiveBirth?: BirthRegistrationToLastPreviousLiveBirthResolver<
     TParent
   >
+  primaryCaregiver?: BirthRegistrationToPrimaryCaregiverResolver<TParent>
   createdAt?: BirthRegistrationToCreatedAtResolver<TParent>
   updatedAt?: BirthRegistrationToUpdatedAtResolver<TParent>
 }
@@ -1710,6 +1735,13 @@ export interface BirthRegistrationToFoetalDeathsToMotherResolver<
 }
 
 export interface BirthRegistrationToLastPreviousLiveBirthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegistrationToPrimaryCaregiverResolver<
   TParent = any,
   TResult = any
 > {
@@ -2103,6 +2135,33 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLPrimaryCaregiverTypeResolver<TParent = any> {
+  primaryCaregiverType?: PrimaryCaregiverToPrimaryCaregiverTypeResolver<TParent>
+  primaryCaregiver?: PrimaryCaregiverToPrimaryCaregiverResolver<TParent>
+  reasonNotApplying?: PrimaryCaregiverToReasonNotApplyingResolver<TParent>
+}
+
+export interface PrimaryCaregiverToPrimaryCaregiverTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PrimaryCaregiverToPrimaryCaregiverResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PrimaryCaregiverToReasonNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
