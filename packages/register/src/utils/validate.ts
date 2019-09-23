@@ -112,14 +112,16 @@ export const isAValidDateFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: IFormFieldValue) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: IFormFieldValue) => {
+export const required = (
+  message: MessageDescriptor = messages.required
+): Validation => (value: IFormFieldValue) => {
   if (typeof value === 'string') {
-    return value !== '' ? undefined : { message: messages.required }
+    return value !== '' ? undefined : { message }
   }
   if (isArray(value)) {
-    return value.length > 0 ? undefined : { message: messages.required }
+    return value.length > 0 ? undefined : { message }
   }
-  return value !== undefined ? undefined : { message: messages.required }
+  return value !== undefined ? undefined : { message }
 }
 
 export const minLength = (min: number) => (value: string) => {
