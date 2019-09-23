@@ -160,11 +160,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             },
             modal: {
               title: {
-                message: messages.submitConfirmationTitle,
+                message: messages.validateConfirmationTitle,
                 payload: { completeApplication: true }
               },
               description: {
-                message: messages.submitConfirmationDesc,
+                message: messages.validateConfirmationDesc,
                 payload: { completeApplication: true }
               }
             }
