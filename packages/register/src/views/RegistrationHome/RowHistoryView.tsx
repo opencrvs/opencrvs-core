@@ -3,8 +3,8 @@ import styled, { withTheme } from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { Query } from 'react-apollo'
-import * as Sentry from '@sentry/browser'
+import { Query } from '@register/components/Query'
+
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLDeathRegistration,
@@ -309,7 +309,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             data?: any
           }) => {
             if (error) {
-              Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
                   {intl.formatMessage(errorMessages.queryError)}

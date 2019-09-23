@@ -14,9 +14,8 @@ import {
 import { SEARCH_USERS } from '@register/sysadmin/user/queries'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap } from '@register/utils/data-formatting'
-import * as Sentry from '@sentry/browser'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { UserStatus } from './utils'
@@ -194,7 +193,6 @@ class UserTabComponent extends React.Component<IProps, IState> {
       >
         {({ error, data }: { error?: any; data: any }) => {
           if (error) {
-            Sentry.captureException(error)
             return (
               <ErrorText id="user_loading_error">
                 {intl.formatMessage(errorMessages.userQueryError)}

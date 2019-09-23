@@ -41,9 +41,8 @@ import { getUserLocation, IUserDetails } from '@register/utils/userUtils'
 import NotificationToast from '@register/views/RegistrationHome/NotificationToast'
 import { REGISTRATION_HOME_QUERY } from '@register/views/RegistrationHome/queries'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
-import * as Sentry from '@sentry/browser'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -284,7 +283,6 @@ export class RegistrationHomeView extends React.Component<
               )
             }
             if (error) {
-              Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-count">
                   {intl.formatMessage(errorMessages.queryError)}
