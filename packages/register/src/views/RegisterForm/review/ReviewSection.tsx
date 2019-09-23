@@ -272,7 +272,11 @@ const renderValue = (
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
-  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
+  if (
+    (field.type === SEARCH_FIELD ||
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS) &&
+    field.dynamicOptions
+  ) {
     const draftData = draft.data[section.id]
     return renderSelectDynamicLabel(
       value,
@@ -288,9 +292,6 @@ const renderValue = (
     return formatLongDate(value)
   }
 
-  if (field.type === SEARCH_FIELD) {
-    return (value as IDynamicValues).label
-  }
   if (field.hideValueInPreview) {
     return ''
   }
@@ -541,14 +542,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
     fieldName: string,
-    value: IFormFieldValue | JSX.Element | undefined
+    value: IFormFieldValue | JSX.Element | undefined,
+    ignoreAction: boolean = false
   ) {
     const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
       value,
-      action: {
+      action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
@@ -623,7 +625,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
-        completeValue
+        completeValue,
+        field.readonly
       )
     }
   }
@@ -647,7 +650,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       group,
       field.label,
       field.name,
-      value
+      value,
+      field.readonly
     )
   }
 
@@ -711,7 +715,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineResources,
       draft: { event }
     } = this.props
-
     const formSections = getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)

@@ -11,7 +11,6 @@ import {
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import {
-  hideNewContentAvailableNotification,
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
@@ -21,18 +20,15 @@ import {
 
 type NotificationProps = {
   language?: string
-  newContentAvailable: boolean
   configurationErrorVisible: boolean
   backgroundSyncMessageVisible: boolean
   syncCount: number
-  waitingSW: ServiceWorker | null
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
 }
 
 type DispatchProps = {
-  hideNewContentAvailableNotification: typeof hideNewContentAvailableNotification
   hideBackgroundSyncedNotification: typeof hideBackgroundSyncedNotification
   hideConfigurationErrorNotification: typeof hideConfigurationErrorNotification
   hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
@@ -43,14 +39,6 @@ type DispatchProps = {
 class Component extends React.Component<
   NotificationProps & DispatchProps & IntlShapeProps & RouteComponentProps<{}>
 > {
-  onNewContentAvailableNotificationClick = () => {
-    if (this.props.waitingSW) {
-      this.props.waitingSW.postMessage('skipWaiting')
-    }
-    this.props.hideNewContentAvailableNotification()
-    window.location.reload()
-  }
-
   hideBackgroundSyncedNotification = () => {
     this.props.hideBackgroundSyncedNotification()
   }
@@ -74,7 +62,6 @@ class Component extends React.Component<
   render() {
     const {
       children,
-      newContentAvailable,
       backgroundSyncMessageVisible,
       configurationErrorVisible,
       syncCount,
@@ -87,15 +74,6 @@ class Component extends React.Component<
     return (
       <div>
         {children}
-        {newContentAvailable && (
-          <Notification
-            id="newContentAvailableNotification"
-            show={newContentAvailable}
-            callback={this.onNewContentAvailableNotificationClick}
-          >
-            {intl.formatMessage(messages.newContentAvailable)}
-          </Notification>
-        )}
         {backgroundSyncMessageVisible && (
           <Notification
             id="backgroundSyncShowNotification"
@@ -159,12 +137,10 @@ class Component extends React.Component<
 const mapStateToProps = (store: IStoreState) => {
   return {
     language: getLanguage(store),
-    newContentAvailable: store.notification.newContentAvailable,
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
     configurationErrorVisible: store.notification.configurationErrorVisible,
     syncCount: store.notification.syncCount,
-    waitingSW: store.notification.waitingSW,
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast
@@ -172,10 +148,9 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps, NotificationProps, IStoreState>(
+  connect<NotificationProps, DispatchProps, {}, IStoreState>(
     mapStateToProps,
     {
-      hideNewContentAvailableNotification,
       hideBackgroundSyncedNotification,
       hideConfigurationErrorNotification,
       hideSubmitFormSuccessToast,
@@ -183,4 +158,4 @@ export const NotificationComponent = withRouter(
       toggleDraftSavedNotification
     }
   )(injectIntl(Component))
-) as any
+)

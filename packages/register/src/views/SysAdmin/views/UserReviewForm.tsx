@@ -9,7 +9,8 @@ import {
   IFormSection,
   IFormSectionData,
   SIMPLE_DOCUMENT_UPLOADER,
-  IAttachmentValue
+  IAttachmentValue,
+  SEARCH_FIELD
 } from '@register/forms'
 import { goToCreateUserSection, goBack } from '@register/navigation'
 import * as React from 'react'
@@ -31,6 +32,9 @@ import {
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
 import { SimpleDocumentUploader } from '@register/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { deserializeFormSection } from '@register/forms/mappings/deserializer'
+import { IStoreState } from '@register/store'
+import { getOfflineData } from '@register/offline/selectors'
+import { IOfflineData } from '@register/offline/reducer'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -41,6 +45,7 @@ export interface IUserReviewFormProps {
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
   submitForm: () => void
+  offlineResources: IOfflineData
   goBack: typeof goBack
 }
 
@@ -57,7 +62,6 @@ class UserReviewFormComponent extends React.Component<
   transformSectionData = () => {
     const { intl } = this.props
     const sections: ISectionData[] = []
-
     getVisibleSectionGroupsBasedOnConditions(
       deserializeFormSection(userSection),
       this.props.formData
@@ -105,6 +109,12 @@ class UserReviewFormComponent extends React.Component<
           files={files}
         />
       )
+    }
+
+    if (field.type === SEARCH_FIELD) {
+      const offlineLocations = this.props.offlineResources['locations']
+      const locationId = formData[field.name].toString()
+      return offlineLocations[locationId] && offlineLocations[locationId].name
     }
 
     return formData[field.name]
@@ -157,6 +167,10 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   }
 }
 export const UserReviewForm = connect(
-  null,
+  (store: IStoreState) => {
+    return {
+      offlineResources: getOfflineData(store)
+    }
+  },
   mapDispatchToProps
 )(injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent))

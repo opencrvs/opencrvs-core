@@ -26,7 +26,7 @@ const PageWrapper = styled.div`
   ${window.config.COUNTRY === 'zmb'
     ? `background: url(${zambiaBackground});`
     : ''}
-  height: 100vh;
+  height: calc(100vh + 80px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -43,6 +43,10 @@ const SpinnerWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
+`
+
+const StyledLogo = styled(Logo)`
+  margin-top: -80px;
 `
 
 const LogoutHeader = styled.a`
@@ -258,7 +262,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           <Logout />
         </LogoutHeader>
         <Container onClick={this.focusKeypad}>
-          <Logo />
+          <StyledLogo />
           {this.showName()}
 
           {this.showErrorMessage()}

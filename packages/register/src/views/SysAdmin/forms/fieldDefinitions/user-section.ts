@@ -173,7 +173,7 @@ export const userSection: ISerializedFormSection = {
           validate: [],
           mapping: {
             mutation: {
-              operation: 'fieldNameValueTransformer',
+              operation: 'fieldNameTransformer',
               parameters: ['primaryOffice']
             }
           }

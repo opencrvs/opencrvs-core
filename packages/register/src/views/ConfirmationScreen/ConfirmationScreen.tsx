@@ -30,7 +30,7 @@ const Container = styled.div`
   width: 80%;
   margin: 0 auto;
   margin-top: -55px;
-  max-width: 940px;
+  max-width: 300px;
 `
 const StyledP = styled.p`
   color: ${({ theme }) => theme.colors.copy};
