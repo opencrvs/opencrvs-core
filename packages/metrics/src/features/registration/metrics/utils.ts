@@ -28,6 +28,8 @@ export interface IPoint {
   count: number
 }
 
+export type Location = fhir.Location & { id: string }
+
 export const ageIntervals = [
   { title: '45d', minAgeInDays: -1, maxAgeInDays: 45 },
   { title: '46d - 1yr', minAgeInDays: 46, maxAgeInDays: 365 },
@@ -80,7 +82,7 @@ export const generateEmptyBirthKeyFigure = (
 }
 
 export const fetchEstimateByLocation = async (
-  locationData: fhir.Location,
+  locationData: Location,
   estimatedYear: number
 ): Promise<IEstimation> => {
   let crudRate: number = 0
@@ -132,7 +134,7 @@ export const fetchEstimateByLocation = async (
   }
   return {
     estimation: Math.round((crudRate * population) / 1000),
-    locationId: locationData.id as string
+    locationId: locationData.id
   }
 }
 
@@ -146,19 +148,13 @@ export const fetchLocation = async (
 export const getDistrictLocation = async (
   locationId: string,
   authHeader: IAuthHeader
-) => {
-  let locationBundle: fhir.Location
+): Promise<Location> => {
+  let locationBundle: Location
   let locationType: fhir.Identifier | undefined
   let lId = locationId
 
   locationBundle = await fetchLocation(lId, authHeader)
-  locationType =
-    locationBundle &&
-    locationBundle.identifier &&
-    locationBundle.identifier.find(
-      identifier =>
-        identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
-    )
+  locationType = getLocationType(locationBundle)
   while (
     locationBundle &&
     (!locationType || locationType.value !== 'DISTRICT')
@@ -170,14 +166,7 @@ export const getDistrictLocation = async (
         locationBundle.partOf.reference.split('/')[1]) ||
       ''
     locationBundle = await fetchLocation(lId, authHeader)
-    locationType =
-      locationBundle &&
-      locationBundle.identifier &&
-      locationBundle.identifier.find(
-        identifier =>
-          identifier.system ===
-          OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
-      )
+    locationType = getLocationType(locationBundle)
   }
 
   if (!locationBundle) {
@@ -185,4 +174,15 @@ export const getDistrictLocation = async (
   }
 
   return locationBundle
+}
+
+function getLocationType(locationBundle: fhir.Location) {
+  return (
+    locationBundle &&
+    locationBundle.identifier &&
+    locationBundle.identifier.find(
+      identifier =>
+        identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
+    )
+  )
 }

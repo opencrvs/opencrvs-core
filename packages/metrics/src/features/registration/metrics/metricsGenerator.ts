@@ -11,7 +11,8 @@ import {
   fetchEstimateByLocation,
   generateEmptyBirthKeyFigure,
   IPoint,
-  LABEL_FOMRAT
+  LABEL_FOMRAT,
+  Location
 } from '@metrics/features/registration/metrics/utils'
 import { readPoints } from '@metrics/influxdb/client'
 import * as moment from 'moment'
@@ -89,7 +90,7 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
 export async function fetchKeyFigures(
   timeStart: string,
   timeEnd: string,
-  location: fhir.Location
+  location: Location
 ) {
   const estimatedFigure = await fetchEstimateByLocation(
     location,
