@@ -349,16 +349,18 @@ function GeneratedInputField({
 
   if (fieldDefinition.type === SEARCH_FIELD) {
     return (
-      <SearchField
-        fieldName={fieldDefinition.name}
-        fieldLabel={fieldDefinition.label}
-        isFieldRequired={fieldDefinition.required as boolean}
-        fieldValue={fieldDefinition.initialValue as string}
-        searchableResource={fieldDefinition.searchableResource}
-        onModalComplete={(value: string) => {
-          onSetFieldValue(fieldDefinition.name, value)
-        }}
-      />
+      <InputField {...inputFieldProps}>
+        <SearchField
+          fieldName={fieldDefinition.name}
+          fieldValue={fieldDefinition.initialValue as string}
+          searchableResource={fieldDefinition.searchableResource}
+          error={inputProps.error}
+          touched={inputProps.touched}
+          onModalComplete={(value: string) => {
+            onSetFieldValue(fieldDefinition.name, value)
+          }}
+        />
+      </InputField>
     )
   }
 
@@ -401,6 +403,7 @@ interface IFormSectionProps {
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
+  requiredErrorMessage?: MessageDescriptor
 }
 
 interface IStateProps {
@@ -657,7 +660,8 @@ const FormFieldGeneratorWithFormik = withFormik<
       props.fields,
       values,
       props.resources,
-      props.draftData
+      props.draftData,
+      props.requiredErrorMessage
     )
 })(injectIntl(FormSectionComponent))
 
