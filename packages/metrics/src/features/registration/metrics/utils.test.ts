@@ -123,7 +123,7 @@ describe('verify metrics util', () => {
       })
     })
     it('Throws error if location doesnot have extension', async () => {
-      expect(fetchEstimateByLocation({}, 2017)).rejects.toThrowError(
+      expect(fetchEstimateByLocation({ id: '' }, 2017)).rejects.toThrowError(
         'Invalid location data found'
       )
     })
