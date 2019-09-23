@@ -464,6 +464,13 @@ interface IQueryData {
   [key: string]: any
 }
 
+interface ITouchedNestedFields {
+  value: boolean
+  nestedFields: {
+    [fieldName: string]: boolean
+  }
+}
+
 class FormSectionComponent extends React.Component<Props> {
   componentWillReceiveProps(nextProps: Props) {
     const userChangedForm = !isEqual(nextProps.values, this.props.values)
@@ -492,10 +499,24 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   showValidationErrors(fields: IFormField[]) {
-    const touched = fields.reduce(
-      (memo, field) => ({ ...memo, [field.name]: true }),
-      {}
-    )
+    const touched = fields.reduce((memo, field) => {
+      let fieldTouched: boolean | ITouchedNestedFields = true
+      if (field.nestedFields) {
+        fieldTouched = {
+          value: true,
+          nestedFields: Object.values(field.nestedFields)
+            .flat()
+            .reduce(
+              (nestedMemo, nestedField) => ({
+                ...nestedMemo,
+                [nestedField.name]: true
+              }),
+              {}
+            )
+        }
+      }
+      return { ...memo, [field.name]: fieldTouched }
+    }, {})
 
     this.props.setTouched(touched)
   }
@@ -706,6 +727,13 @@ class FormSectionComponent extends React.Component<Props> {
                   }
 
                   const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
+                  const nestedFieldTouched =
+                    touched[field.name] &&
+                    ((touched[field.name] as unknown) as ITouchedNestedFields)
+                      .nestedFields &&
+                    ((touched[field.name] as unknown) as ITouchedNestedFields)
+                      .nestedFields[nestedField.name]
+
                   return (
                     <FormItem key={nestedFieldName}>
                       <FastField name={nestedFieldName}>
@@ -720,7 +748,7 @@ class FormSectionComponent extends React.Component<Props> {
                               this.resetDependentSelectValues
                             }
                             {...formikFieldProps.field}
-                            touched={touched[field.name] || false}
+                            touched={nestedFieldTouched || false}
                             error={nestedError}
                           />
                         )}
@@ -748,7 +776,7 @@ class FormSectionComponent extends React.Component<Props> {
                       resetNestedInputValues={this.resetNestedInputValues}
                       {...formikFieldProps.field}
                       nestedFields={nestedFieldElements}
-                      touched={touched[field.name] || false}
+                      touched={Boolean(touched[field.name]) || false}
                       error={error}
                     />
                   )}
