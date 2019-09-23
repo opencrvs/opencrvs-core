@@ -350,7 +350,7 @@ class ReviewActionComponent extends React.Component<
                 {intl.formatMessage(buttonMessages.register)}
               </SuccessButton>
             ) : applicationToBeValidated ? (
-              <PrimaryButton
+              <SuccessButton
                 id="validateApplicationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
@@ -358,7 +358,7 @@ class ReviewActionComponent extends React.Component<
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.sendForApproval)}
-              </PrimaryButton>
+              </SuccessButton>
             ) : (
               <PrimaryButton
                 id="submit_form"
