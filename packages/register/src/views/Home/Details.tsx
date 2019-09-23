@@ -56,7 +56,8 @@ import {
   DECLARED,
   REJECT_REASON,
   REJECT_COMMENTS,
-  REGISTERED
+  REGISTERED,
+  VALIDATED
 } from '@register/utils/constants'
 import { Scope } from '@register/utils/authUtils'
 
@@ -391,6 +392,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     } else if (
       (applicationState === IN_PROGRESS ||
         applicationState === DECLARED ||
+        applicationState === VALIDATED ||
         applicationState === REJECTED) &&
       this.userHasRegisterOrValidateScope()
     ) {
@@ -406,7 +408,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
             )
           }
         >
-          {this.props.intl.formatMessage(buttonMessages.print)}
+          {this.props.intl.formatMessage(buttonMessages.review)}
         </ActionButton>
       )
     } else {
