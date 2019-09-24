@@ -20,6 +20,9 @@ import getRoles, {
 import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
+import changePasswordHandler, {
+  changePasswordRequestSchema
+} from '@user-mgnt/features/changePassword/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -46,6 +49,23 @@ export const getRoutes = () => {
         },
         response: {
           schema: resAuthSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changePassword',
+      handler: changePasswordHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Change user password',
+        notes: 'Verify account exist and change password',
+        validate: {
+          payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
         }
       }
     },
