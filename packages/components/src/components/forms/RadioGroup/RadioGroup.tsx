@@ -19,7 +19,7 @@ const LargeList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-  & div {
+  & > div {
     margin-bottom: 16px;
   }
 `

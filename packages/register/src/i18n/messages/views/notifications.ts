@@ -3,7 +3,6 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface INotificationsMessages {
   declarationsSynced: MessageDescriptor
   draftsSaved: MessageDescriptor
-  newContentAvailable: MessageDescriptor
   outboxText: MessageDescriptor
   processingText: MessageDescriptor
   statusRegistering: MessageDescriptor
@@ -30,12 +29,6 @@ const messagesToDefine: INotificationsMessages = {
     description:
       'The message that appears in notification when save drafts button is clicked',
     id: 'notification.draftsSaved'
-  },
-  newContentAvailable: {
-    defaultMessage: "We've made some updates, click here to refresh.",
-    description:
-      'The message that appears in notification when new content available.',
-    id: 'notification.newContentAvailable'
   },
   outboxText: {
     defaultMessage: 'Outbox({num})',

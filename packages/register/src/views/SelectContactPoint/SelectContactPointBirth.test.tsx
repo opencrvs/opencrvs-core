@@ -188,4 +188,15 @@ describe('when user is selecting the Main point of contact', () => {
       expect(app.find('#error_text').hostNodes()).toHaveLength(1)
     })
   })
+
+  describe('when clicked on cross button', () => {
+    it('go back to home page', async () => {
+      app
+        .find('#crcl-btn')
+        .hostNodes()
+        .simulate('click')
+
+      expect(window.location.href).toContain('/')
+    })
+  })
 })

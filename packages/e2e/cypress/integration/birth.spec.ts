@@ -172,11 +172,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('05')
     cy.get('#dateOfMarriage-mm').type('05')
     cy.get('#dateOfMarriage-yyyy').type('1990')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
@@ -212,11 +208,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('05')
     cy.get('#dateOfMarriage-mm').type('05')
     cy.get('#dateOfMarriage-yyyy').type('1990')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.get('#addressSameAsMother_false').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -446,11 +438,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('07')
     cy.get('#dateOfMarriage-mm').type('11')
     cy.get('#dateOfMarriage-yyyy').type('1975')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
@@ -486,11 +474,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('07')
     cy.get('#dateOfMarriage-mm').type('11')
     cy.get('#dateOfMarriage-yyyy').type('1975')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.get('#addressSameAsMother_false').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
@@ -619,11 +603,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('05')
     cy.get('#dateOfMarriage-mm').type('05')
     cy.get('#dateOfMarriage-yyyy').type('1990')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
@@ -659,11 +639,7 @@ context('Birth Integration Test', () => {
     cy.get('#dateOfMarriage-dd').type('05')
     cy.get('#dateOfMarriage-mm').type('05')
     cy.get('#dateOfMarriage-yyyy').type('1990')
-    cy.selectOption(
-      '#educationalAttainment',
-      'UPPER_SECONDARY_ISCED_3',
-      'Upper secondary'
-    )
+    cy.selectOption('#educationalAttainment', 'PRIMARY_ISCED_1', 'Primary')
     cy.get('#addressSameAsMother_false').click()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')

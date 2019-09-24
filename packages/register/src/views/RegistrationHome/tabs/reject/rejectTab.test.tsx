@@ -73,6 +73,7 @@ const mockUserData = {
   // TODO: When fragmentMatching work is completed, remove unnecessary result objects
   // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
   child: {
+    id: 'FAKE_ID',
     name: [
       {
         firstNames: 'Iliyas',
@@ -556,6 +557,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
                 contactPhoneNumber: '01622688231'
               },
               child: {
+                id: 'FAKE_ID',
                 name: [
                   {
                     use: 'en',

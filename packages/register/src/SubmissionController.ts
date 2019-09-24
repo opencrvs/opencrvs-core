@@ -1,4 +1,5 @@
 import ApolloClient, { ApolloError } from 'apollo-client'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import {
   IApplication,

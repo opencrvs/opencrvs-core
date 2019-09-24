@@ -25,7 +25,7 @@ import {
   QueryProvider,
   QueryContext
 } from '@register/views/DataProvider/QueryProvider'
-import * as Sentry from '@sentry/browser'
+
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import { errorMessages } from '@register/i18n/messages'
 
@@ -97,8 +97,6 @@ export class ReviewFormView extends React.Component<IProps> {
                 )
               }
               if (error) {
-                Sentry.captureException(error)
-
                 return (
                   <ErrorText id="review-error-text">
                     {intl.formatMessage(errorMessages.registrationQueryError)}

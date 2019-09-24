@@ -29,7 +29,7 @@ describe('PDF template offline data related field transformer tests', () => {
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['HOSPITAL', 'OTHER_HEALTH_INSTITUTION']
+              matchValues: ['HEALTH_FACILITY']
             },
             addressType: 'facilities',
             addressKey: 'name',
@@ -101,7 +101,7 @@ describe('PDF template offline data related field transformer tests', () => {
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['HOSPITAL', 'OTHER_HEALTH_INSTITUTION']
+              matchValues: ['HEALTH_FACILITY']
             },
             addressType: 'facilities',
             addressKey: 'name',

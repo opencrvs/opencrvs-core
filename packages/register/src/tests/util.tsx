@@ -2127,7 +2127,7 @@ export const mockApplicationData = {
     attendantAtBirth: 'MIDWIFE',
     birthType: 'SINGLE',
     multipleBirth: 1,
-    placeOfBirth: 'HOSPITAL',
+    placeOfBirth: 'HEALTH_FACILITY',
     birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {
@@ -2872,4 +2872,12 @@ export async function setPinCode(component: ReactWrapper) {
   }
   await flushPromises()
   component.update()
+}
+
+export function setPageVisibility(isVisible: boolean) {
+  // @ts-ignore
+  document.hidden = !isVisible
+  const evt = document.createEvent('HTMLEvents')
+  evt.initEvent('visibilitychange', false, true)
+  document.dispatchEvent(evt)
 }

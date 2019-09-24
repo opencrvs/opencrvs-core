@@ -319,6 +319,9 @@ export interface IFormFieldBase {
   previewGroup?: string
   nestedFields?: { [key: string]: IFormField[] }
   hideValueInPreview?: boolean
+  // This flag will only remove the change link from preview/review screen
+  // Default false
+  readonly?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -420,6 +423,7 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
   searchableResource: Extract<keyof IOfflineData, 'locations'>
+  dynamicOptions?: IDynamicOptions
   onCompleted?: (response: string) => void
 }
 

@@ -26,11 +26,9 @@ import {
   DATE,
   IDateFormField,
   IFormSectionGroup,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  SEARCH_FIELD,
-  ISearchFormField,
   IRadioGroupFormField,
-  RADIO_GROUP_WITH_NESTED_FIELDS
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {

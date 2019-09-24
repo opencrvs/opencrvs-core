@@ -23,6 +23,7 @@ import { Store } from 'redux'
 
 import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
+// eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
 

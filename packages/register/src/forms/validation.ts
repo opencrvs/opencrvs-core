@@ -11,6 +11,7 @@ import {
   getFieldValidation
 } from '@opencrvs/register/src/forms/utils'
 import { IOfflineData } from '@register/offline/reducer'
+import { MessageDescriptor } from 'react-intl'
 
 export interface IFieldErrors {
   errors: IValidationResult[]
@@ -28,7 +29,8 @@ const getValidationErrors = {
     field: IFormField,
     values: IFormSectionData,
     resources?: IOfflineData,
-    drafts?: IFormData
+    drafts?: IFormData,
+    requiredErrorMessage?: MessageDescriptor
   ) {
     const value = field.nestedFields
       ? (values[field.name] as IFormSectionData).value
@@ -52,7 +54,7 @@ const getValidationErrors = {
     validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
     if (field.required) {
-      validators.push(required)
+      validators.push(required(requiredErrorMessage))
     } else if (!value) {
       validators = []
     }
@@ -63,14 +65,21 @@ const getValidationErrors = {
 
     return {
       errors: validationResults,
-      nestedFields: this.forNestedField(field, values, resources, drafts)
+      nestedFields: this.forNestedField(
+        field,
+        values,
+        resources,
+        drafts,
+        requiredErrorMessage
+      )
     }
   },
   forNestedField: function(
     field: IFormField,
     values: IFormSectionData,
     resource?: IOfflineData,
-    drafts?: IFormData
+    drafts?: IFormData,
+    requiredErrorMessage?: MessageDescriptor
   ): {
     [fieldName: string]: IValidationResult[]
   } {
@@ -82,7 +91,8 @@ const getValidationErrors = {
           (values[field.name] as IFormSectionData)
             .nestedFields as IFormSectionData,
           resource,
-          drafts
+          drafts,
+          requiredErrorMessage
         ).errors
 
         return {
@@ -99,7 +109,8 @@ export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
   resource?: IOfflineData,
-  drafts?: IFormData
+  drafts?: IFormData,
+  requiredErrorMessage?: MessageDescriptor
 ) {
   return fields.reduce(
     (errorsForAllFields: Errors, field) => ({
@@ -108,7 +119,8 @@ export function getValidationErrorsForForm(
         field,
         values,
         resource,
-        drafts
+        drafts,
+        requiredErrorMessage
       )
     }),
     {}

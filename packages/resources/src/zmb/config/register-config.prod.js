@@ -3,7 +3,7 @@ window.config = {
   COUNTRY: 'zmb',
   COUNTRY_LOGO_FILE: 'logo.png',
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
-  HEALTH_FACILITY_FILTER: 'UPAZILA',
+  HEALTH_FACILITY_FILTER: 'DISTRICT',
   LANGUAGES: 'en',
   LOGIN_URL: 'https://login.{{hostname}}',
   API_GATEWAY_URL: 'https://gateway.{{hostname}}/',

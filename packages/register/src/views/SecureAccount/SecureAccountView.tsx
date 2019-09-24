@@ -7,7 +7,7 @@ import { CreatePin } from '@register/views/PIN/CreatePin'
 const SecurePageContainer = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
-  height: 100vh;
+  height: calc(100vh + 80px);
   text-align: center;
   width: 100%;
   position: absolute;
@@ -16,6 +16,7 @@ const SecurePageContainer = styled.div`
 const Wrapper = styled.div`
   width: 80%;
   margin: auto;
+  max-width: 300px;
 `
 const Item = styled.div.attrs<{ margin?: string }>({})`
   margin: ${({ margin }) => margin || '0px'};

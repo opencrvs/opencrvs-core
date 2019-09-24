@@ -12,8 +12,7 @@ import {
 import { NATIONAL_ID } from '@register/forms/identity'
 import {
   constantsMessages,
-  formMessages as messages,
-  formMessages
+  formMessages as messages
 } from '@register/i18n/messages'
 import { conditionals } from '@register/forms/utils'
 
@@ -173,7 +172,7 @@ export const userSection: ISerializedFormSection = {
           validate: [],
           mapping: {
             mutation: {
-              operation: 'fieldNameValueTransformer',
+              operation: 'fieldNameTransformer',
               parameters: ['primaryOffice']
             }
           }

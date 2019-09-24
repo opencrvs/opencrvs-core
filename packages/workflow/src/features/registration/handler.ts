@@ -99,10 +99,12 @@ export async function createRegistrationHandler(
         event !== Events.BIRTH_NEW_VALIDATE &&
         event !== Events.DEATH_NEW_VALIDATE)
     ) {
+      logger.info('createRegistrationHandler sending event notification')
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     }
+    logger.info('createRegistrationHandler could not send event notification')
 
     return resBundle
   } catch (error) {
@@ -146,10 +148,14 @@ export async function markEventAsRegisteredHandler(
     const msisdn = await getSharedContactMsisdn(payload)
     /* sending notification to the contact */
     if (msisdn) {
+      logger.info('markEventAsRegisteredHandler sending event notification')
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
     }
+    logger.info(
+      'markEventAsRegisteredHandler could not send event notification'
+    )
 
     return resBundle
   } catch (error) {

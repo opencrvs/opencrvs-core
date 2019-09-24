@@ -19,7 +19,6 @@ import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
 import {
   buttonMessages,
   formMessages,
-  errorMessages,
   constantsMessages
 } from '@register/i18n/messages'
 import { IOfflineData, ILocation } from '@register/offline/reducer'
@@ -53,7 +52,9 @@ const ListContainer = styled.div`
     border-top: 1px solid ${({ theme }) => theme.colors.greySmoky};
   }
 `
-const ItemContainer = styled.div.attrs<{ selected?: boolean }>({})`
+const ItemContainer = styled.div.attrs<{
+  selected?: boolean
+}>({})`
   width: 870px;
   min-height: 96px;
   display: flex;
@@ -89,10 +90,10 @@ interface IProps {
   theme: ITheme
   language: string
   fieldName: string
-  fieldValue: { [key: string]: string }
-  fieldLabel: string
-  isFieldRequired: boolean
-  onModalComplete: (label: string, value: string) => void
+  fieldValue: string
+  error?: boolean
+  touched?: boolean
+  onModalComplete: (value: string) => void
   offlineResources: IOfflineData
   searchableResource: Extract<keyof IOfflineData, 'locations'>
 }
@@ -113,7 +114,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       selectedValue: '',
       showModal: false,
       showSearch: this.props.fieldValue ? false : true,
-      fieldValue: this.props.fieldValue.label || ''
+      fieldValue: this.props.fieldValue || ''
     }
   }
 
@@ -139,25 +140,25 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
   }
 
   onSelect = (value: ILocation) => {
-    this.props.onModalComplete(value.name, value.id)
+    this.props.onModalComplete(value.id)
     this.setState({
       searchText: '',
       showModal: false,
       showSearch: false,
-      fieldValue: value.name
+      fieldValue: value.id
     })
   }
 
-  changeSelection = () => {
+  changeSelection = (param: string) => {
     this.setState({
       showSearch: true,
-      searchText: this.state.fieldValue,
+      searchText: param,
       showModal: true
     })
   }
 
   render() {
-    const { intl, fieldLabel, fieldName, isFieldRequired } = this.props
+    const { intl, fieldName } = this.props
     const placeHolderText = intl.formatMessage(
       formMessages.searchFieldPlaceHolderText
     )
@@ -168,36 +169,43 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     let locations = Object.values(offlineLocations)
     if (this.state.searchText.length > 0) {
-      const rgxp = new RegExp(this.state.searchText, 'i')
-      locations = locations.filter(location => location.name.match(rgxp))
+      locations = locations.filter(location =>
+        location.name
+          .toUpperCase()
+          .includes(this.state.searchText.toUpperCase())
+      )
     }
     const selectedValue =
       this.state.selectedValue ||
-      (locations && locations.length > 0 && locations[0].name) ||
+      (locations && locations.length > 0 && locations[0].id) ||
       ''
 
     const selectedLocation = locations.find(
-      location => location.name === selectedValue
+      location => location.id === selectedValue
     )
-
+    const fieldLocationName =
+      (this.state.fieldValue &&
+        offlineLocations[this.state.fieldValue] &&
+        offlineLocations[this.state.fieldValue].name) ||
+      ''
     const listItems = locations.map((location, index) => {
       return (
         <ItemContainer
           key={'item-container-' + index}
-          selected={location.name === selectedValue}
+          selected={location.id === selectedValue}
         >
           <Item>
             <RadioButton
               id={'location-' + index}
               name="location"
               label={location.name}
-              value={location.name}
+              value={location.id}
               selected={selectedValue}
               onChange={this.handleChange}
             />
           </Item>
           <Item isRight={true} color={this.props.theme.colors.black}>
-            {location.name === selectedValue &&
+            {location.id === selectedValue &&
               intl.formatMessage(formMessages.officeLocationId, {
                 locationId: location.id
               })}
@@ -208,21 +216,20 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     return (
       <>
-        {!this.state.showModal && (
-          <InputLabel required={isFieldRequired}>{fieldLabel}</InputLabel>
-        )}
         {!this.state.showModal && !this.state.showSearch && (
           <InputSection>
             <TextInput
               id={this.props.fieldName + '-id'}
-              value={this.state.fieldValue}
+              value={fieldLocationName}
               disabled
               className="item"
             />
             <LinkButton
               id="edit-button"
               className="item"
-              onClick={this.changeSelection}
+              onClick={() => {
+                this.changeSelection(fieldLocationName)
+              }}
             >
               {intl.formatMessage(formMessages.changeButtonLabel, {
                 fieldName
@@ -233,8 +240,10 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {!this.state.showModal && this.state.showSearch && (
           <SearchInputWithIcon
             placeHolderText={placeHolderText}
-            searchText={this.state.searchText}
+            searchText={fieldLocationName}
             searchHandler={this.handleSearch}
+            error={this.props.error}
+            touched={this.props.touched}
           />
         )}
 
@@ -272,7 +281,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           <ChildContainer>
             <SearchInputWithIcon
               placeHolderText={placeHolderText}
-              searchText={this.state.searchText}
+              searchText={fieldLocationName}
               searchHandler={this.handleSearch}
             />
             {listItems.length > 0 && <ListContainer>{listItems}</ListContainer>}
