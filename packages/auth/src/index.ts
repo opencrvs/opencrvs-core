@@ -31,6 +31,10 @@ import verifyTokenHandler, {
 import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@auth/features/verifyUser/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -153,6 +157,26 @@ export async function createServer() {
       },
       response: {
         schema: false
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
+  server.route({
+    method: 'POST',
+    path: '/verifyUser',
+    handler: verifyUserHandler,
+    options: {
+      tags: ['api'],
+      description: 'Check if user exists for given payload or not',
+      notes:
+        'Verifies user and returns nonce to use for next step of password reset flow.' +
+        'Sends an SMS to the user mobile with verification code',
+      validate: {
+        payload: reqVerifyUserSchema
+      },
+      response: {
+        schema: resVerifyUserSchema
       }
     }
   })

@@ -20,6 +20,10 @@ import getRoles, {
 import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@user-mgnt/features/verifyUser/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -168,6 +172,23 @@ export const getRoutes = () => {
           payload: searchRoleSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyUser',
+      handler: verifyUserHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Verify user',
+        notes: 'Verify account exist',
+        validate: {
+          payload: reqVerifyUserSchema
+        },
+        response: {
+          schema: resVerifyUserSchema
+        }
       }
     }
   ]
