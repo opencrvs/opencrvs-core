@@ -35,7 +35,8 @@ import {
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
   getValidationErrorsForForm,
-  IFieldErrors
+  IFieldErrors,
+  Errors
 } from '@register/forms/validation'
 import {
   OFFLINE_LOCATIONS_KEY,
@@ -394,11 +395,16 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData
 ): boolean => {
-  const errors = getValidationErrorsForForm(fields, values)
+  const errors: Errors = getValidationErrorsForForm(fields, values)
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error => (error as IFieldErrors).errors.length > 0
+    error =>
+      (error as IFieldErrors).errors.length > 0 ||
+      Object.values(error.nestedFields).some(
+        nestedFieldErrors => nestedFieldErrors.length > 0
+      )
   )
+
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 

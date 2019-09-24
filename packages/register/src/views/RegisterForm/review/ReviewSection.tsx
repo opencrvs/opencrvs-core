@@ -26,7 +26,8 @@ import {
 import { flatten, isArray } from 'lodash'
 import {
   getValidationErrorsForForm,
-  IFieldErrors
+  IFieldErrors,
+  Errors
 } from '@register/forms/validation'
 import { goToPageGroup } from '@register/navigation'
 
@@ -78,7 +79,8 @@ import {
   IRadioOption,
   RADIO_GROUP,
   SUBSECTION,
-  RADIO_GROUP_WITH_NESTED_FIELDS
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  IFormData
 } from '@register/forms'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { messages } from '@register/i18n/messages/views/review'
@@ -99,7 +101,6 @@ import {
   deathSectionTitle
 } from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 import { getDefaultLanguage } from '@register/i18n/utils'
-import { IValidationResult } from '@register/utils/validate'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 
 const RequiredField = styled.span`
@@ -194,6 +195,11 @@ type State = {
   editClickFieldName?: string
   activeSection: Section | null
 }
+
+interface IErrorsBySection {
+  [sectionId: string]: Errors
+}
+
 type FullProps = IProps & IntlShapeProps
 
 const getViewableSection = (registerForm: IForm): IFormSection[] => {
@@ -263,25 +269,25 @@ export function renderSelectDynamicLabel(
 }
 
 const renderValue = (
-  draft: IApplication,
-  section: IFormSection,
+  draftData: IFormData,
+  sectionId: string,
   field: IFormField,
   intl: IntlShape,
   offlineResources: IOfflineData,
   language: string
 ) => {
-  const value: IFormFieldValue = draft.data[section.id]
-    ? draft.data[section.id][field.name]
+  const value: IFormFieldValue = draftData[sectionId]
+    ? draftData[sectionId][field.name]
     : ''
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
   if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
-    const draftData = draft.data[section.id]
+    const sectionData = draftData[sectionId]
     return renderSelectDynamicLabel(
       value,
       field.dynamicOptions,
-      draftData,
+      sectionData,
       intl,
       offlineResources,
       language
@@ -324,7 +330,7 @@ const renderValue = (
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication
-) => {
+): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
       section,
@@ -342,16 +348,22 @@ const getErrorsOnFieldsBySection = (
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors: IValidationResult[] = (errors[
+        const validationErrors: IFieldErrors = errors[
           field.name as keyof typeof errors
-        ] as IFieldErrors).errors
+        ] as IFieldErrors
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]
           : null
 
         const informationMissing =
-          validationErrors.length > 0 || value === null ? validationErrors : []
+          validationErrors.errors.length > 0 ||
+          value === null ||
+          Object.values(validationErrors.nestedFields).some(
+            nestedErrors => nestedErrors.length > 0
+          )
+            ? validationErrors
+            : { errors: [], nestedFields: {} }
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -571,15 +583,63 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  getValueOrError = (
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) => {
+    const { intl, draft, offlineResources, language } = this.props
+    const errorsOnField = sectionErrors[section.id][field.name].errors
+    return errorsOnField.length > 0
+      ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      : field.nestedFields
+      ? Object.values(field.nestedFields)
+          .flat()
+          .reduce((groupedValues, nestedField) => {
+            const errorsOnNestedField =
+              sectionErrors[section.id][field.name].nestedFields[
+                nestedField.name
+              ] || []
+            // Value of the parentField resembles with IFormData as a nested form
+            const nestedValue = renderValue(
+              draft.data[section.id][field.name] as IFormData,
+              'nestedFields',
+              nestedField,
+              intl,
+              offlineResources,
+              language
+            )
+            return (
+              <>
+                {groupedValues}
+                {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+                {errorsOnNestedField.length > 0
+                  ? this.getFieldValueWithErrorMessage(
+                      section,
+                      field,
+                      errorsOnNestedField[0]
+                    )
+                  : nestedValue}
+              </>
+            )
+          }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+      : renderValue(
+          draft.data,
+          section.id,
+          field,
+          intl,
+          offlineResources,
+          language
+        )
+  }
+
   getPreviewGroupsField(
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
     visitedTags: string[],
-    errorsOnFields: any
+    errorsOnFields: IErrorsBySection
   ) {
-    const { intl, draft, offlineResources, language } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -598,24 +658,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ) as IFormTag[])) ||
         []
       const values = taggedFields
-        .map(field => {
-          const errorsOnField = errorsOnFields[section.id][field.name]
-
-          return errorsOnField.length > 0
-            ? this.getFieldValueWithErrorMessage(
-                section,
-                field,
-                errorsOnField[0]
-              )
-            : renderValue(
-                draft,
-                section,
-                field,
-                intl,
-                offlineResources,
-                language
-              )
-        })
+        .map(field => this.getValueOrError(section, field, errorsOnFields))
         .filter(value => value)
 
       let completeValue = values[0]
@@ -645,15 +688,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    errorsOnFields: any
+    sectionErrors: IErrorsBySection
   ) {
-    const { intl, draft, offlineResources, language } = this.props
-    const errorsOnField = errorsOnFields[section.id][field.name]
-
-    const value =
-      errorsOnField.length > 0
-        ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
-        : renderValue(draft, section, field, intl, offlineResources, language)
+    const value = this.getValueOrError(section, field, sectionErrors)
 
     return this.getRenderableField(
       section,
@@ -666,7 +703,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: any
+    errorsOnFields: IErrorsBySection
   ) => {
     const { intl, draft } = this.props
 
@@ -734,7 +771,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         // @ts-ignore
         Object.values(errorsOnFields).map(Object.values)
         // @ts-ignore
-      ).filter(errors => errors.length > 0).length === 0
+      ).filter(errors => errors.errors.length > 0).length === 0
 
     const textAreaProps = {
       id: 'additional_comments',
