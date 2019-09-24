@@ -476,6 +476,7 @@
         "form.field.label.application.whoIsPresent.father": "Father",
         "form.field.label.application.whoIsPresent.mother": "Mother",
         "form.field.label.application.whoIsPresent.other": "Other",
+        "form.field.label.application.whoIsPresent.legalGuardian": "Legal Guardian",
         "form.field.label.application.whoseContactDetails": "Who is the contact person for this application?",
         "form.field.label.application.whoseContactDetails.both": "Both Parents",
         "form.field.label.application.whoseContactDetails.father": "Father",
