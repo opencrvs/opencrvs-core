@@ -1,5 +1,6 @@
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const CRUD_BIRTH_RATE_SEC = 'id/statistics-crude-birth-rates'
+export const JURISDICTION_TYPE_SEC = 'id/jurisdiction-type'
 export const TOTAL_POPULATION_SEC = 'id/statistics-total-populations'
 export const TIME_FROM = 'timeStart'
 export const TIME_TO = 'timeEnd'
