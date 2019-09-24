@@ -1279,6 +1279,12 @@
           "groups": [
             {
               "id": "informant-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.registration || ( draftData.registration.applicant !== \"LEGAL_GUARDIAN\" && draftData.registration.applicant !== \"OTHER\" ) )"
+                }
+              ],
               "fields": [
                 {
                   "name": "iDType",
@@ -1819,7 +1825,7 @@
                   "label": {
                     "defaultMessage": "What was their permanent address?",
                     "description": "Title for the permanent address fields",
-                    "id": "form.field.label.permanentAddress"
+                    "id": "form.field.label.informantPermanentAddress"
                   },
                   "previewGroup": "permanentAddress",
                   "initialValue": "",
@@ -2471,7 +2477,7 @@
                   "label": {
                     "defaultMessage": "Is her current address the same as her permanent address?",
                     "description": "Title for the radio button to select that the mothers current address is the same as her permanent address",
-                    "id": "form.field.label.currentAddressSameAsPermanent"
+                    "id": "form.field.label.applicantsCurrentAddressSameAsPermanent"
                   },
                   "required": true,
                   "initialValue": true,
