@@ -1,6 +1,6 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServer } from '@auth/index'
-import { storePasswordChangeCode } from '@auth/features/changePassword/service'
+import { storePasswordChangeCode } from './service'
 // tslint:disable-next-line:mocha-no-side-effect-code
 const fetch = (fetchAny as unknown) as fetchAny.FetchMock
 
@@ -11,7 +11,7 @@ describe('password change', () => {
     server = await createServer()
     fetch.resetMocks()
     fetch.mockResponse('OK')
-    storePasswordChangeCode('12345', 'fake_code')
+    storePasswordChangeCode('12345', 'fake_code', 'fake_user_id')
   })
 
   describe('when a valid request is made', () => {
