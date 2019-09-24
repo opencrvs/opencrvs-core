@@ -167,13 +167,15 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     ]
 
     let locations = Object.values(offlineLocations)
-    if (this.state.searchText.length > 0) {
-      locations = locations.filter(location =>
+
+    locations = locations.filter(
+      location =>
         location.name
           .toUpperCase()
-          .includes(this.state.searchText.toUpperCase())
-      )
-    }
+          .includes(this.state.searchText.toUpperCase()) &&
+        location.type !== 'CRVS_OFFICE'
+    )
+
     const selectedValue =
       this.state.selectedValue ||
       (locations && locations.length > 0 && locations[0].id) ||
