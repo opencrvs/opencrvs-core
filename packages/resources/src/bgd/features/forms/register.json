@@ -213,7 +213,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || !draftData.registration.presentAtBirthRegistration.value || draftData.registration.presentAtBirthRegistration.value !== \"OTHER\")"
+                  "expression": "(!draftData || !draftData.registration || !draftData.registration.presentAtBirthRegistration || draftData.registration.presentAtBirthRegistration.value !== \"OTHER\")"
                 }
               ],
               "fields": [
@@ -323,7 +323,7 @@
                     "SISTER": [],
                     "OTHER_FAMILY_MEMBER": [
                       {
-                        "name": "applicantRelationshipFamily",
+                        "name": "otherRelationShip",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
@@ -341,7 +341,7 @@
                     "OFFICE_IN_CHARGE": [],
                     "OTHER": [
                       {
-                        "name": "applicantRelationshipOther",
+                        "name": "otherRelationShip",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
@@ -351,43 +351,6 @@
                         "required": true,
                         "initialValue": "",
                         "validate": []
-                      },
-                      {
-                        "name": "applicantPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": false,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "fieldValueNestingTransformer",
-                            "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
-                            ]
-                          },
-                          "query": {
-                            "operation": "nestedValueToFieldTransformer",
-                            "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
-                            ]
-                          }
-                        }
                       }
                     ]
                   }
@@ -427,7 +390,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.presentAtBirthRegistration.value !== \"LEGAL_GUARDIAN\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration && draftData.registration.presentAtBirthRegistration.value !== \"LEGAL_GUARDIAN\")"
                     }
                   ],
                   "previewGroup": "contactPointGroup",
@@ -594,6 +557,55 @@
                     ],
                     "OTHER": [
                       {
+                        "name": "contactRelationshipOther",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Relationship to child",
+                          "id": "form.field.label.applicantsRelationWithChild",
+                          "description": "Label for input Relationship to child"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "fieldValueNestingTransformer",
+                            "parameters": [
+                              "individual",
+                              {
+                                "operation": "fieldToPhoneNumberTransformer",
+                                "parameters": []
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "nestedValueToFieldTransformer",
+                            "parameters": [
+                              "individual",
+                              {
+                                "operation": "phoneNumberToFieldTransformer"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
                         "name": "registrationPhone",
                         "type": "TEL",
                         "label": {
@@ -644,7 +656,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.presentAtBirthRegistration.value === \"LEGAL_GUARDIAN\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration && draftData.registration.presentAtBirthRegistration.value === \"LEGAL_GUARDIAN\")"
                     }
                   ],
                   "previewGroup": "contactPointGroup",
@@ -763,6 +775,23 @@
                       }
                     ],
                     "OTHER": [
+                      {
+                        "name": "contactRelationshipOther",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Relationship to child",
+                          "id": "form.field.label.applicantsRelationWithChild",
+                          "description": "Label for input Relationship to child"
+                        },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "id": "form.field.label.relationshipPlaceHolder",
+                          "description": "Placeholder for input Relationship to child"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
                       {
                         "name": "registrationPhone",
                         "type": "TEL",
