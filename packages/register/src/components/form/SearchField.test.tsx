@@ -9,8 +9,6 @@ describe('Search Field component', () => {
     <IntlProvider locale="en">
       <SearchField
         fieldName="registrationOffice"
-        isFieldRequired={true}
-        fieldLabel="registrationOffice"
         fieldValue=""
         onModalComplete={mock}
         searchableResource="locations"

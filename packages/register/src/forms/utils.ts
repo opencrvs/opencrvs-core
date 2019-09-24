@@ -26,9 +26,7 @@ import {
   DATE,
   IDateFormField,
   IFormSectionGroup,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  SEARCH_FIELD,
-  ISearchFormField
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { getValidationErrorsForForm } from '@register/forms/validation'
