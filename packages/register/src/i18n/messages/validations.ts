@@ -17,6 +17,7 @@ interface IValidationMessages {
   phoneNumberFormat: MessageDescriptor
   range: MessageDescriptor
   required: MessageDescriptor
+  requiredForNewUser: MessageDescriptor
   requiredSymbol: MessageDescriptor
   validBirthRegistrationNumber: MessageDescriptor
   validDeathRegistrationNumber: MessageDescriptor
@@ -126,6 +127,12 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Required',
     description: 'The error message that appears on required fields',
     id: 'validations.required'
+  },
+  requiredForNewUser: {
+    defaultMessage: 'Required to register a new user',
+    description:
+      'The error message that appears on required fields on new user form',
+    id: 'validations.userform.required'
   },
   requiredSymbol: {
     defaultMessage: '',

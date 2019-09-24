@@ -140,6 +140,27 @@ type Payment { # -> PaymentReconciliation
   date: Date # -> .detail.date
 }
 
+enum PrimaryCaregiverType {
+  MOTHER_AND_FATHER
+  MOTHER
+  FATHER
+  INFORMANT
+  LEGAL_GUARDIAN
+  OTHER
+}
+
+input PrimaryCaregiverInput {
+  primaryCaregiverType: PrimaryCaregiverType
+  primaryCaregiver: RelatedPersonInput # -> Use for Observation.subject.reference
+  reasonNotApplying: String # -> Observation.valueString
+}
+
+type PrimaryCaregiver {
+  primaryCaregiverType: PrimaryCaregiverType
+  primaryCaregiver: RelatedPerson
+  reasonNotApplying: String
+}
+
 input CommentInput {
   user: UserInput
   comment: String
@@ -195,6 +216,7 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
+  primaryCaregiver: PrimaryCaregiverInput # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
 }
@@ -218,6 +240,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
+  primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }

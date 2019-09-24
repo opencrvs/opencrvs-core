@@ -229,10 +229,6 @@ describe('when user has starts a new application', () => {
             .find('#btn_change_child_firstNames')
             .hostNodes()
             .simulate('click')
-          app
-            .find('#edit_confirm')
-            .hostNodes()
-            .simulate('click')
         })
 
         it('renders preview page', async () => {

@@ -56,18 +56,20 @@ import {
   DECLARED,
   REJECT_REASON,
   REJECT_COMMENTS,
-  REGISTERED
+  REGISTERED,
+  VALIDATED
 } from '@register/utils/constants'
 import { Scope } from '@register/utils/authUtils'
 
 const HistoryWrapper = styled.div`
-  padding: 10px 0px;
+  padding: 10px 0px 10px 10px;
+  margin-bottom: 8px;
   flex: 1;
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  &:last-child {
+  &:last-of-type {
     margin-bottom: 0;
   }
 `
@@ -89,10 +91,10 @@ const ValueContainer = styled.div`
 `
 const StatusContainer = styled.div`
   flex: 1;
-  margin-left: 10px;
+  margin-left: 16px;
 `
 const ActionButton = styled(PrimaryButton)`
-  margin: 20px 25px 30px;
+  margin: 6px 50px 30px;
 `
 const QuerySpinner = styled(Spinner)`
   width: 70px;
@@ -391,6 +393,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     } else if (
       (applicationState === IN_PROGRESS ||
         applicationState === DECLARED ||
+        applicationState === VALIDATED ||
         applicationState === REJECTED) &&
       this.userHasRegisterOrValidateScope()
     ) {
@@ -406,7 +409,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
             )
           }
         >
-          {this.props.intl.formatMessage(buttonMessages.print)}
+          {this.props.intl.formatMessage(buttonMessages.review)}
         </ActionButton>
       )
     } else {

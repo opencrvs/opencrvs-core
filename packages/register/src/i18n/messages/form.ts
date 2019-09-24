@@ -134,13 +134,9 @@ interface IFormMessages {
   documentsTitle: MessageDescriptor
   documentsUploadName: MessageDescriptor
   educationAttainmentISCED1: MessageDescriptor
-  educationAttainmentISCED2: MessageDescriptor
-  educationAttainmentISCED3: MessageDescriptor
   educationAttainmentISCED4: MessageDescriptor
   educationAttainmentISCED5: MessageDescriptor
-  educationAttainmentISCED6: MessageDescriptor
   educationAttainmentNone: MessageDescriptor
-  educationAttainmentNotStated: MessageDescriptor
   enterResponse: MessageDescriptor
   familyName: MessageDescriptor
   father: MessageDescriptor
@@ -970,40 +966,20 @@ const messagesToDefine: IFormMessages = {
     description: 'Option for form field: ISCED1 education',
     id: 'form.field.label.educationAttainmentISCED1'
   },
-  educationAttainmentISCED2: {
-    defaultMessage: 'Lower secondary',
-    description: 'Option for form field: ISCED2 education',
-    id: 'form.field.label.educationAttainmentISCED2'
-  },
-  educationAttainmentISCED3: {
-    defaultMessage: 'Upper secondary',
-    description: 'Option for form field: ISCED3 education',
-    id: 'form.field.label.educationAttainmentISCED3'
-  },
   educationAttainmentISCED4: {
-    defaultMessage: 'Post secondary',
+    defaultMessage: 'Secondary',
     description: 'Option for form field: ISCED4 education',
     id: 'form.field.label.educationAttainmentISCED4'
   },
   educationAttainmentISCED5: {
-    defaultMessage: 'First stage tertiary',
+    defaultMessage: 'Tertiary',
     description: 'Option for form field: ISCED5 education',
     id: 'form.field.label.educationAttainmentISCED5'
-  },
-  educationAttainmentISCED6: {
-    defaultMessage: 'Second stage tertiary',
-    description: 'Option for form field: ISCED6 education',
-    id: 'form.field.label.educationAttainmentISCED6'
   },
   educationAttainmentNone: {
     defaultMessage: 'No schooling',
     description: 'Option for form field: no education',
     id: 'form.field.label.educationAttainmentNone'
-  },
-  educationAttainmentNotStated: {
-    defaultMessage: 'Not stated',
-    description: 'Option for form field: not stated education',
-    id: 'form.field.label.educationAttainmentNotStated'
   },
   enterResponse: {
     defaultMessage: 'Enter a response to your chosen security question',
