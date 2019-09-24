@@ -31,6 +31,9 @@ import verifyTokenHandler, {
 import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
+import changePasswordHandler, {
+  reqChangePasswordSchema
+} from '@auth/features/changePassword/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -150,6 +153,24 @@ export async function createServer() {
         'these are stored as individual key value pairs to that we can set their expiry TTL individually',
       validate: {
         payload: reqInvalidateTokenSchema
+      },
+      response: {
+        schema: false
+      }
+    }
+  })
+
+  // @todo
+  server.route({
+    method: 'POST',
+    path: '/changePassword',
+    handler: changePasswordHandler,
+    options: {
+      tags: ['api'],
+      description: 'Changes the user password',
+      notes: '@todo',
+      validate: {
+        payload: reqChangePasswordSchema
       },
       response: {
         schema: false
