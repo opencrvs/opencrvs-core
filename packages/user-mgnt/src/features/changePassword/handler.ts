@@ -30,7 +30,6 @@ export default async function changePasswordHandler(
   user.passwordHash = hash
 
   try {
-    // tslint:disable-next-line
     await User.update({ _id: user._id }, user)
   } catch (err) {
     logger.error(err.message)

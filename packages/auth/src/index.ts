@@ -160,7 +160,7 @@ export async function createServer() {
     }
   })
 
-  // @todo
+  // curl -H 'Content-Type: application/json' -d '{ "newPassword": "", "nonce": "" }' http://localhost:4040/changePassword
   server.route({
     method: 'POST',
     path: '/changePassword',
@@ -168,7 +168,8 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Changes the user password',
-      notes: '@todo',
+      notes:
+        'Expects the nonce parameter to be coming from the reset password journey',
       validate: {
         payload: reqChangePasswordSchema
       },
