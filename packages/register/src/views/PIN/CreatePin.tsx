@@ -212,6 +212,18 @@ class CreatePinComponent extends React.Component<IProps> {
 
   componentDidMount = () => this.focusKeypad()
 
+  componentWillMount() {
+    document.addEventListener('mouseup', this.handleClick, false)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleClick, false)
+  }
+
+  handleClick = (e: Event) => {
+    this.focusKeypad()
+  }
+
   focusKeypad = () => {
     const node =
       this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
