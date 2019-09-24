@@ -24,10 +24,9 @@ import {
   GQLHumanName,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -425,9 +424,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           }) => {
             const { intl, language } = this.props
             moment.locale(language)
-            if (error) {
-              Sentry.captureException(error)
-            } else if (loading) {
+            if (loading) {
               return (
                 <ExpansionSpinnerContainer>
                   <ListItemExpansionSpinner
@@ -750,8 +747,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                     )
                   }
                   if (error || !data.searchEvents) {
-                    Sentry.captureException(error)
-
                     return (
                       <ErrorText id="search-result-error-text">
                         {intl.formatMessage(errorMessages.queryError)}

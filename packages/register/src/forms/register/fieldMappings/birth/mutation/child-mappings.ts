@@ -2,9 +2,7 @@ import {
   IFormField,
   IFormData,
   TransformedData,
-  SEARCH_FIELD,
-  ISearchFormField,
-  IDynamicFormField
+  SEARCH_FIELD
 } from '@register/forms'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 

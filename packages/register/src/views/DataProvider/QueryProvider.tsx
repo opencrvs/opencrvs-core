@@ -3,8 +3,7 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Event, Action } from '@register/forms'
 import { getBirthQueryMappings } from '@register/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@register/views/DataProvider/death/queries'
-import { Query } from 'react-apollo'
-import * as Sentry from '@sentry/browser'
+import { Query } from '@register/components/Query'
 
 interface IQueryProviderProps {
   event: Event
@@ -49,10 +48,6 @@ class QueryProviderComponent extends React.Component<IProps> {
           error?: any
           data: any
         }) => {
-          if (error) {
-            Sentry.captureException(error)
-          }
-
           return (
             <QueryContext.Provider
               value={{

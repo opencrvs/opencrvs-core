@@ -41,9 +41,9 @@ import {
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
-import * as Sentry from '@sentry/browser'
+
 import {
   userMessages,
   constantsMessages as messages,
@@ -600,10 +600,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
               error?: any
               data: any
             }) => {
-              if (error) {
-                Sentry.captureException(error)
-                throw error
-              } else if (loading) {
+              if (loading) {
                 return (
                   <SpinnerContainer>
                     <QuerySpinner

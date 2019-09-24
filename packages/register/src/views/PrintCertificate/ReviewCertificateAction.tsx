@@ -14,7 +14,7 @@ import {
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
-import { Action, Event, IForm, ICertificate } from '@register/forms'
+import { Action, Event, IForm } from '@register/forms'
 import { constantsMessages } from '@register/i18n/messages'
 import { buttonMessages } from '@register/i18n/messages/buttons'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'

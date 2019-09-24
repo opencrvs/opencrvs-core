@@ -12,8 +12,7 @@ import {
 import { NATIONAL_ID } from '@register/forms/identity'
 import {
   constantsMessages,
-  formMessages as messages,
-  formMessages
+  formMessages as messages
 } from '@register/i18n/messages'
 import { conditionals } from '@register/forms/utils'
 
