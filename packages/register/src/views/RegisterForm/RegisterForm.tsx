@@ -127,20 +127,15 @@ function getNextSectionIds(
   )
 
   if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(section => {
-      const sectionVisibleGroups = getVisibleSectionGroupsBasedOnConditions(
-        section,
-        application.data[fromSection.id] || {},
-        application.data
-      )
-
-      if (
+    const visibleSections = sections.filter(
+      section =>
         section.viewType !== VIEW_TYPE.HIDDEN &&
-        sectionVisibleGroups.length > 0
-      ) {
-        return true
-      }
-    })
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          application.data[fromSection.id] || {},
+          application.data
+        ).length > 0
+    )
 
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id

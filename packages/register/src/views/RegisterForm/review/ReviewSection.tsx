@@ -364,17 +364,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   getVisibleSections = (formSections: IFormSection[]) => {
     const { draft } = this.props
-    return formSections.filter(section => {
-      const sectionVisibleGroups = getVisibleSectionGroupsBasedOnConditions(
-        section,
-        draft.data[section.id] || {},
-        draft.data
-      )
-
-      if (sectionVisibleGroups.length > 0) {
-        return true
-      }
-    })
+    return formSections.filter(
+      section =>
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          draft.data[section.id] || {},
+          draft.data
+        ).length > 0
+    )
   }
 
   getViewableSection = (registerForm: IForm): IFormSection[] => {
