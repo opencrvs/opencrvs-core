@@ -25,6 +25,7 @@ const Label = styled.label.attrs<{ size?: string; disabled?: boolean }>({})`
 const CheckOuter = styled.div`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 50%;
+  position: relative;
 `
 const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
   display: flex;

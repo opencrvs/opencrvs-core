@@ -65,8 +65,7 @@ const Actions = styled.div`
   padding: 32px 0;
 
   > div {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    margin-bottom: 16px;
   }
 `
 
