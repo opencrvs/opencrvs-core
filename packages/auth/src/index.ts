@@ -35,6 +35,9 @@ import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@auth/features/verifyUser/handler'
+import changePasswordHandler, {
+  reqChangePasswordSchema
+} from '@auth/features/changePassword/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -177,6 +180,25 @@ export async function createServer() {
       },
       response: {
         schema: resVerifyUserSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "newPassword": "", "nonce": "" }' http://localhost:4040/changePassword
+  server.route({
+    method: 'POST',
+    path: '/changePassword',
+    handler: changePasswordHandler,
+    options: {
+      tags: ['api'],
+      description: 'Changes the user password',
+      notes:
+        'Expects the nonce parameter to be coming from the reset password journey',
+      validate: {
+        payload: reqChangePasswordSchema
+      },
+      response: {
+        schema: false
       }
     }
   })
