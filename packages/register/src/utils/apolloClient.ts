@@ -12,6 +12,7 @@ import { showSessionExpireConfirmation } from '@register/notification/actions'
 
 import { IStoreState } from '@register/store'
 import { AnyAction, Store } from 'redux'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import TimeoutLink from '@register/utils/timeoutLink'
 

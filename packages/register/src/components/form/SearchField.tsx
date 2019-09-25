@@ -19,7 +19,6 @@ import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
 import {
   buttonMessages,
   formMessages,
-  errorMessages,
   constantsMessages
 } from '@register/i18n/messages'
 import { IOfflineData, ILocation } from '@register/offline/reducer'

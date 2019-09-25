@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from '@register/styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
