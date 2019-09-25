@@ -109,6 +109,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   componentWillMount() {
     this.loadUserPin()
     this.screenLockTimer()
+    document.addEventListener('mouseup', this.handleClick, false)
   }
 
   async loadUserPin() {
@@ -241,6 +242,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   componentDidUpdate = () => this.focusKeypad()
 
   componentDidMount = () => this.focusKeypad()
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleClick, false)
+  }
+
+  handleClick = (e: Event) => {
+    this.focusKeypad()
+  }
 
   focusKeypad = () => {
     const node =
