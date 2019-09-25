@@ -8,7 +8,8 @@ import {
   FEMALE,
   OPENCRVS_SPECIFICATION_URL,
   CRUD_BIRTH_RATE_SEC,
-  TOTAL_POPULATION_SEC
+  TOTAL_POPULATION_SEC,
+  JURISDICTION_TYPE_SEC
 } from '@metrics/features/registration/metrics/constants'
 import { fetchFHIR } from '@metrics/features/registration/fhirUtils'
 import { IAuthHeader } from '@metrics/features/registration'
@@ -26,6 +27,8 @@ export interface IPoint {
   time: string
   count: number
 }
+
+export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [
   { title: '45d', minAgeInDays: -1, maxAgeInDays: 45 },
@@ -79,17 +82,12 @@ export const generateEmptyBirthKeyFigure = (
 }
 
 export const fetchEstimateByLocation = async (
-  locationId: string,
-  authHeader: IAuthHeader,
+  locationData: Location,
   estimatedYear: number
 ): Promise<IEstimation> => {
   let crudRate: number = 0
   let population: number = 0
 
-  const locationData: fhir.Location = await fetchLocation(
-    locationId,
-    authHeader
-  )
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
   }
@@ -132,15 +130,11 @@ export const fetchEstimateByLocation = async (
     if (!locationData.partOf || !locationData.partOf.reference) {
       throw new Error('Unable to fetch estimate data from location tree')
     }
-    return await fetchEstimateByLocation(
-      locationData.partOf.reference.split('/')[1],
-      authHeader,
-      estimatedYear
-    )
+    return await fetchEstimateByLocation(locationData, estimatedYear)
   }
   return {
     estimation: Math.round((crudRate * population) / 1000),
-    locationId
+    locationId: locationData.id
   }
 }
 
@@ -149,4 +143,46 @@ export const fetchLocation = async (
   authHeader: IAuthHeader
 ) => {
   return await fetchFHIR(`Location/${locationId}`, authHeader)
+}
+
+export const getDistrictLocation = async (
+  locationId: string,
+  authHeader: IAuthHeader
+): Promise<Location> => {
+  let locationBundle: Location
+  let locationType: fhir.Identifier | undefined
+  let lId = locationId
+
+  locationBundle = await fetchLocation(lId, authHeader)
+  locationType = getLocationType(locationBundle)
+  while (
+    locationBundle &&
+    (!locationType || locationType.value !== 'DISTRICT')
+  ) {
+    lId =
+      (locationBundle &&
+        locationBundle.partOf &&
+        locationBundle.partOf.reference &&
+        locationBundle.partOf.reference.split('/')[1]) ||
+      ''
+    locationBundle = await fetchLocation(lId, authHeader)
+    locationType = getLocationType(locationBundle)
+  }
+
+  if (!locationBundle) {
+    throw new Error('No district location found')
+  }
+
+  return locationBundle
+}
+
+function getLocationType(locationBundle: fhir.Location) {
+  return (
+    locationBundle &&
+    locationBundle.identifier &&
+    locationBundle.identifier.find(
+      identifier =>
+        identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
+    )
+  )
 }

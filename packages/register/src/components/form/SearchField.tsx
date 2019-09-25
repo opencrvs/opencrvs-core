@@ -19,7 +19,6 @@ import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
 import {
   buttonMessages,
   formMessages,
-  errorMessages,
   constantsMessages
 } from '@register/i18n/messages'
 import { IOfflineData, ILocation } from '@register/offline/reducer'
@@ -53,7 +52,9 @@ const ListContainer = styled.div`
     border-top: 1px solid ${({ theme }) => theme.colors.greySmoky};
   }
 `
-const ItemContainer = styled.div.attrs<{ selected?: boolean }>({})`
+const ItemContainer = styled.div.attrs<{
+  selected?: boolean
+}>({})`
   width: 870px;
   min-height: 96px;
   display: flex;
@@ -90,8 +91,8 @@ interface IProps {
   language: string
   fieldName: string
   fieldValue: string
-  fieldLabel: string
-  isFieldRequired: boolean
+  error?: boolean
+  touched?: boolean
   onModalComplete: (value: string) => void
   offlineResources: IOfflineData
   searchableResource: Extract<keyof IOfflineData, 'locations'>
@@ -157,7 +158,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, fieldLabel, fieldName, isFieldRequired } = this.props
+    const { intl, fieldName } = this.props
     const placeHolderText = intl.formatMessage(
       formMessages.searchFieldPlaceHolderText
     )
@@ -215,9 +216,6 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     return (
       <>
-        {!this.state.showModal && (
-          <InputLabel required={isFieldRequired}>{fieldLabel}</InputLabel>
-        )}
         {!this.state.showModal && !this.state.showSearch && (
           <InputSection>
             <TextInput
@@ -244,6 +242,8 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
             placeHolderText={placeHolderText}
             searchText={fieldLocationName}
             searchHandler={this.handleSearch}
+            error={this.props.error}
+            touched={this.props.touched}
           />
         )}
 
