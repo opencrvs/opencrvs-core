@@ -1282,7 +1282,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || ( draftData.registration.applicant !== \"LEGAL_GUARDIAN\" && draftData.registration.applicant !== \"OTHER\" ) )"
+                  "expression": "(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.presentAtBirthRegistration === \"OTHER\")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")  )))"
                 }
               ],
               "fields": [

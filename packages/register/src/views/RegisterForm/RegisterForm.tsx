@@ -353,8 +353,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSectionGroup
     } = this.props
 
-    console.log(application)
-
     const nextSectionGroup = getNextSectionIds(
       registerForm.sections,
       activeSection,

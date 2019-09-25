@@ -102,7 +102,20 @@ export const gqlToDraftTransformer = (
     throw new Error('Provided query data is not valid')
   }
   const transformedData: IFormData = {}
-  formDefinition.sections.forEach(section => {
+
+  const sections = formDefinition.sections.filter(section => {
+    const sectionVisibleGroups = getVisibleSectionGroupsBasedOnConditions(
+      section,
+      queryData[section.id] || {},
+      queryData
+    )
+
+    if (sectionVisibleGroups.length > 0) {
+      return true
+    }
+  })
+
+  sections.forEach(section => {
     transformedData[section.id] = {}
     section.groups.forEach(groupDef => {
       groupDef.fields.forEach(fieldDef => {
