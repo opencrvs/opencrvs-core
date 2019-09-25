@@ -310,7 +310,7 @@ const renderValue = (
 
   if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
     return renderSelectOrRadioLabel(
-      (value as IFormSectionData).value,
+      (value && (value as IFormSectionData).value) || value,
       field.options,
       intl
     )
@@ -628,14 +628,18 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 nestedField.name
               ] || []
             // Value of the parentField resembles with IFormData as a nested form
-            const nestedValue = renderValue(
-              draft.data[section.id][field.name] as IFormData,
-              'nestedFields',
-              nestedField,
-              intl,
-              offlineResources,
-              language
-            )
+            const nestedValue =
+              (draft.data[section.id] &&
+                draft.data[section.id][field.name] &&
+                renderValue(
+                  draft.data[section.id][field.name] as IFormData,
+                  'nestedFields',
+                  nestedField,
+                  intl,
+                  offlineResources,
+                  language
+                )) ||
+              ''
             return (
               <>
                 {groupedValues}

@@ -542,13 +542,9 @@ class FormSectionComponent extends React.Component<Props> {
   }
 
   resetNestedInputValues = (parentField: Ii18nFormField) => {
-    const parentFieldValue = (this.props.values[
-      parentField.name
-    ] as IFormSectionData).value
     const nestedFields = (parentField as Ii18nRadioGroupWithNestedFieldsFormField)
       .nestedFields
     const nestedFieldsToReset = Object.keys(nestedFields)
-      .filter(key => parentFieldValue && key !== parentFieldValue)
       .map(key => nestedFields[key])
       .flat()
 

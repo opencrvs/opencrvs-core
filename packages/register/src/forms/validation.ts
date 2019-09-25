@@ -32,9 +32,10 @@ const getValidationErrors = {
     drafts?: IFormData,
     requiredErrorMessage?: MessageDescriptor
   ) {
-    const value = field.nestedFields
-      ? (values[field.name] as IFormSectionData).value
-      : values[field.name]
+    const value =
+      field.nestedFields && values[field.name]
+        ? (values[field.name] as IFormSectionData).value
+        : values[field.name]
 
     const conditionalActions = getConditionalActionsForField(
       field,
@@ -84,7 +85,10 @@ const getValidationErrors = {
     [fieldName: string]: IValidationResult[]
   } {
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-      const nestedFieldDefinitions = Object.values(field.nestedFields).flat()
+      const parentValue =
+        values[field.name] && (values[field.name] as IFormSectionData).value
+      const nestedFieldDefinitions =
+        (parentValue && field.nestedFields[parentValue as string]) || []
       return nestedFieldDefinitions.reduce((nestedErrors, nestedField) => {
         const errors = this.forField(
           nestedField,
