@@ -1,10 +1,11 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { verifyUser } from '@auth/features/verifyUser/service'
 import {
-  storeUserInformation,
-  generateAndSendVerificationCode
-} from '@auth/features/authenticate/service'
+  verifyUser,
+  storeRetrievalStepInformation,
+  RetrievalSteps
+} from '@auth/features/verifyUser/service'
+import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
 
@@ -30,7 +31,13 @@ export default async function verifyUserHandler(
     throw unauthorized()
   }
   const nonce = generateNonce()
-  await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
+  await storeRetrievalStepInformation(
+    nonce,
+    result.userId,
+    result.scope,
+    result.mobile,
+    RetrievalSteps.WAITING_FOR_VERIFICATION
+  )
 
   await generateAndSendVerificationCode(nonce, result)
 
