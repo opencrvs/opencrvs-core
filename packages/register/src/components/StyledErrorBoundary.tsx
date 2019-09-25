@@ -1,4 +1,5 @@
 import * as React from 'react'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'

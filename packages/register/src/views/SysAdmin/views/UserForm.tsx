@@ -21,7 +21,10 @@ import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { buttonMessages } from '@register/i18n/messages'
+import {
+  buttonMessages,
+  validationMessages as messages
+} from '@register/i18n/messages'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 export const FormTitle = styled.div`
@@ -107,6 +110,7 @@ class UserFormComponent extends React.Component<IFullProps> {
             onSetTouched={setTouchedFunc => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
+            requiredErrorMessage={messages.requiredForNewUser}
           />
           <Action>
             <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>

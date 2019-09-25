@@ -12,6 +12,10 @@ import {
   LOCATION_ID
 } from '@metrics/features/registration/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration/'
+import {
+  getDistrictLocation,
+  Location
+} from '@metrics/features/registration/metrics/utils'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -25,13 +29,10 @@ export async function metricsHandler(
       Authorization: request.headers.authorization
     }
 
+    const location: Location = await getDistrictLocation(locationId, authHeader)
+
     return {
-      keyFigures: await fetchKeyFigures(
-        timeStart,
-        timeEnd,
-        locationId,
-        authHeader
-      ),
+      keyFigures: await fetchKeyFigures(timeStart, timeEnd, location),
       regByAge: await regByAge(timeStart, timeEnd),
       regWithin45d: await regWithin45d(timeStart, timeEnd)
     }

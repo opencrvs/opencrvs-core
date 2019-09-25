@@ -84,17 +84,29 @@ describe('validate', () => {
           description: 'The error message that appears on required fields'
         }
       }
-      expect(required(badValue)).toEqual(response)
+      expect(required()(badValue)).toEqual(response)
+    })
+    it('Should return custom error message when supplied a bad value and custom error message', () => {
+      const badValue = ''
+      const customErrorMessageDescriptor = {
+        id: 'validations.userform.required',
+        defaultMessage: 'Required for new user',
+        description: 'The error message that appears on required fields'
+      }
+      const response = {
+        message: customErrorMessageDescriptor
+      }
+      expect(required(customErrorMessageDescriptor)(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = 'jkgjgjgkgjkj'
       const response = undefined
-      expect(required(goodValue)).toEqual(response)
+      expect(required()(goodValue)).toEqual(response)
     })
     it('should pass when supplied a good boolean value', () => {
       const goodValue = true
       const response = undefined
-      expect(required(goodValue)).toEqual(response)
+      expect(required()(goodValue)).toEqual(response)
     })
   })
 

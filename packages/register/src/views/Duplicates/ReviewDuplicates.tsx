@@ -7,7 +7,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
-import { Mutation, Query } from 'react-apollo'
+import { Mutation } from 'react-apollo'
 import styled from '@register/styledComponents'
 import {
   injectIntl,
@@ -38,7 +38,7 @@ import {
   GQLComment
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@register/utils/date-formatting'
-import * as Sentry from '@sentry/browser'
+
 import {
   userMessages,
   buttonMessages,
@@ -46,6 +46,7 @@ import {
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/duplicates'
+import { Query } from '@register/components/Query'
 
 interface IMatchParams {
   applicationId: string
@@ -399,8 +400,6 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               !data.fetchBirthRegistration ||
               !data.fetchBirthRegistration.registration
             ) {
-              Sentry.captureException(error)
-
               return (
                 <ErrorText id="duplicates-error-text">
                   {this.props.intl.formatMessage(
@@ -450,9 +449,6 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   }
 
                   if (errorDetails) {
-                    Sentry.captureException(errorDetails)
-                    console.error(errorDetails)
-
                     return (
                       <ErrorText id="duplicates-error-text">
                         {this.props.intl.formatMessage(

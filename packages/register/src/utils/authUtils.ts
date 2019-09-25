@@ -1,5 +1,6 @@
 import * as queryString from 'querystring'
 import decode from 'jwt-decode'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 
 export interface IURLParams {
