@@ -168,7 +168,7 @@ export async function createServer() {
     handler: verifyUserHandler,
     options: {
       tags: ['api'],
-      description: 'Check if user exists for given payload or not',
+      description: 'Check if user exists for given mobile number or not.',
       notes:
         'Verifies user and returns nonce to use for next step of password reset flow.' +
         'Sends an SMS to the user mobile with verification code',

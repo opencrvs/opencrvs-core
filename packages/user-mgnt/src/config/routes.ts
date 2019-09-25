@@ -181,8 +181,10 @@ export const getRoutes = () => {
       config: {
         auth: false,
         tags: ['api'],
-        description: 'Verify user',
-        notes: 'Verify account exist',
+        description:
+          'Verify user for given mobile number. Used for password reset flow.',
+        notes:
+          'As it is a public api, please take necessary caution before using it.',
         validate: {
           payload: reqVerifyUserSchema
         },
