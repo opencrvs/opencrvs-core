@@ -8,7 +8,8 @@ import {
   Select,
   TextArea,
   TextInput,
-  WarningMessage
+  WarningMessage,
+  RadioSize
 } from '@opencrvs/components/lib/forms'
 import { Paragraph, Link } from '@opencrvs/components/lib/typography'
 import {
@@ -238,7 +239,7 @@ function GeneratedInputField({
       <InputField {...inputFieldProps}>
         <RadioGroup
           {...inputProps}
-          size={fieldDefinition.size}
+          size={RadioSize.LARGE}
           onChange={(val: string) => {
             resetNestedInputValues(fieldDefinition)
             onSetFieldValue(`${fieldDefinition.name}.value`, val)

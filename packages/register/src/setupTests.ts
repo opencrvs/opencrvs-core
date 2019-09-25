@@ -49,6 +49,14 @@ Object.defineProperty(document, 'hidden', {
   }
 })
 
+Object.defineProperty(Array.prototype, 'flat', {
+  value: function() {
+    return this.reduce(function(flatted: Array<any>, toFlatten: Array<any>) {
+      return flatted.concat(toFlatten)
+    }, [])
+  }
+})
+
 /*
  * Storage module
  */
