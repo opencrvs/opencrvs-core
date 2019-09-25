@@ -100,18 +100,6 @@ class HeaderComp extends React.Component<IProps, IState> {
     }
   }
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
   hamburger = () => {
     const { userDetails, language, intl } = this.props
 
@@ -261,7 +249,6 @@ class HeaderComp extends React.Component<IProps, IState> {
         searchHandler={(text, type) =>
           props.goToSearchResult(text, type, isMobile)
         }
-        isMediumDevice={this.state.width <= grid.breakpoints.md}
       />
     )
   }

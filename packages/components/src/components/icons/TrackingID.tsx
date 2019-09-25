@@ -1,14 +1,7 @@
 import * as React from 'react'
 
 export const TrackingID = (props: React.HTMLAttributes<SVGElement>) => {
-  let stroke: string
-  switch (props.color) {
-    case 'invert':
-      stroke = 'white'
-      break
-    default:
-      stroke = '#35495D'
-  }
+  const stroke = props.color === 'invert' ? 'white' : '#35495D'
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path

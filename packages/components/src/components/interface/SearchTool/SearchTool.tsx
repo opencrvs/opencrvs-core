@@ -69,8 +69,17 @@ const SelectedSearchCriteria = styled.span`
   ${({ theme }) => theme.fonts.captionStyle};
   margin-right: 10px;
   display: flex;
-  &.icon-only {
+  & .selected-icon {
+    display: none;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 2px;
+    & .selected-icon {
+      display: flex;
+    }
+    & .selected-label {
+      display: none;
+    }
   }
 `
 const DropDown = styled.div`
@@ -100,7 +109,6 @@ interface IProps {
   selectedSearchType?: string
   searchHandler: (searchText: string, searchType: string) => void
   onClearText?: () => void
-  isMediumDevice: boolean
 }
 export class SearchTool extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -204,12 +212,13 @@ export class SearchTool extends React.Component<IProps, IState> {
           <ClearTextIcon onClick={this.onClearTextHandler} />
         )}
         <DropDown onClick={this.toggleDropdownDisplay}>
-          <SelectedSearchCriteria
-            className={(this.props.isMediumDevice && 'icon-only') || ''}
-          >
-            {this.props.isMediumDevice &&
-              this.state.selectedSearchType.invertIcon}
-            {!this.props.isMediumDevice && this.state.selectedSearchType.label}
+          <SelectedSearchCriteria>
+            <span className="selected-icon">
+              {this.state.selectedSearchType.invertIcon}
+            </span>
+            <span className="selected-label">
+              {this.state.selectedSearchType.label}
+            </span>
           </SelectedSearchCriteria>
           <ArrowDownBlue />
         </DropDown>
