@@ -3,7 +3,8 @@ import { createServerWithEnvironment } from '@auth/tests/util'
 import { createServer } from '../..'
 import * as codeService from '@auth/features/verifyCode/service'
 
-const fetch = fetchAny as any
+const fetch = fetchAny as fetchAny.FetchMock
+
 describe('verifyUser handler receives a request', () => {
   let server: any
 
@@ -29,7 +30,8 @@ describe('verifyUser handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          scope: ['admin'],
+          status: 'active',
+          scope: ['demo'],
           mobile: '+8801711111111'
         })
       )
@@ -51,6 +53,7 @@ describe('verifyUser handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          status: 'active',
           scope: ['admin'],
           mobile: '+8801711111111'
         })

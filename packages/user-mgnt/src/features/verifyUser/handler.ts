@@ -10,6 +10,7 @@ interface IVerifyPayload {
 interface IVerifyResponse {
   mobile: string
   scope: string[]
+  status: string
   id: string
 }
 
@@ -30,6 +31,7 @@ export default async function verifyUserHandler(
   const response: IVerifyResponse = {
     mobile: user.mobile,
     scope: user.scope,
+    status: user.status,
     id: user.id
   }
 
@@ -43,5 +45,6 @@ export const requestSchema = Joi.object({
 export const responseSchema = Joi.object({
   mobile: Joi.string(),
   scope: Joi.array().items(Joi.string()),
+  status: Joi.string(),
   id: Joi.string()
 })

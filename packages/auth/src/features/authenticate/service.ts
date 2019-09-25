@@ -3,7 +3,8 @@ import {
   USER_MANAGEMENT_URL,
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
-  CONFIG_TOKEN_EXPIRY_SECONDS
+  CONFIG_TOKEN_EXPIRY_SECONDS,
+  PRODUCTION
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -12,6 +13,12 @@ import * as jwt from 'jsonwebtoken'
 import { get, set } from '@auth/database'
 import * as t from 'io-ts'
 import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
+import {
+  generateVerificationCode,
+  sendVerificationCode,
+  storeVerificationCode
+} from '@auth/features/verifyCode/service'
+import { logger } from '@auth/logger'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -92,6 +99,33 @@ export async function getStoredUserInformation(nonce: string) {
     throw new UserInfoNotFoundError('user not found')
   }
   return JSON.parse(record)
+}
+
+export async function generateAndSendVerificationCode(
+  nonce: string,
+  authenticatedUser: IAuthentication
+) {
+  const isDemoUser = authenticatedUser.scope.indexOf('demo') > -1
+
+  let verificationCode
+  if (isDemoUser) {
+    verificationCode = '000000'
+    await storeVerificationCode(nonce, verificationCode)
+  } else {
+    verificationCode = await generateVerificationCode(
+      nonce,
+      authenticatedUser.mobile
+    )
+  }
+
+  if (!PRODUCTION || isDemoUser) {
+    logger.info('Sending a verification SMS', {
+      mobile: authenticatedUser.mobile,
+      verificationCode
+    })
+  } else {
+    await sendVerificationCode(authenticatedUser.mobile, verificationCode)
+  }
 }
 
 /* tslint:disable */

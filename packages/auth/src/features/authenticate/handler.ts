@@ -3,17 +3,12 @@ import * as Joi from 'joi'
 import {
   authenticate,
   storeUserInformation,
-  createToken
+  createToken,
+  generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
-import {
-  generateVerificationCode,
-  sendVerificationCode,
-  generateNonce,
-  storeVerificationCode
-} from '@auth/features/verifyCode/service'
-import { logger } from '@auth/logger'
+import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -43,24 +38,7 @@ export default async function authenticateHandler(
   const nonce = generateNonce()
   await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
 
-  const isDemoUser = result.scope.indexOf('demo') > -1
-
-  let verificationCode
-  if (isDemoUser) {
-    verificationCode = '000000'
-    await storeVerificationCode(nonce, verificationCode)
-  } else {
-    verificationCode = await generateVerificationCode(nonce, result.mobile)
-  }
-
-  if (!PRODUCTION || isDemoUser) {
-    logger.info('Sending a verification SMS', {
-      mobile: result.mobile,
-      verificationCode
-    })
-  } else {
-    await sendVerificationCode(result.mobile, verificationCode)
-  }
+  await generateAndSendVerificationCode(nonce, result)
 
   const respose: IAuthResponse = {
     mobile: result.mobile,

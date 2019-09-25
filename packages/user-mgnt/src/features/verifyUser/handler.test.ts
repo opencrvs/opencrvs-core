@@ -25,6 +25,7 @@ test('verifyUserHandler should return 200 and the user scope when the user exist
   const entry = {
     mobile: '+8801711111111',
     scope: ['test'],
+    status: 'active',
     id: '123'
   }
   mockingoose(User).toReturn(entry, 'findOne')

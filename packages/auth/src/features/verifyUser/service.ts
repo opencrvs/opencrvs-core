@@ -1,14 +1,9 @@
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
+import { IAuthentication } from '@auth/features/authenticate/service'
 
-export interface IVerifyUser {
-  mobile: string
-  scope: string[]
-  userId: string
-}
-
-export async function verifyUser(mobile: string): Promise<IVerifyUser> {
+export async function verifyUser(mobile: string): Promise<IAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
 
   const res = await fetch(url, {
@@ -24,6 +19,7 @@ export async function verifyUser(mobile: string): Promise<IVerifyUser> {
   return {
     userId: body.id,
     scope: body.scope,
+    status: body.status,
     mobile: body.mobile
   }
 }
