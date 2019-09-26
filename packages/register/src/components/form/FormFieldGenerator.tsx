@@ -353,7 +353,7 @@ function GeneratedInputField({
         <SearchField
           fieldName={fieldDefinition.name}
           fieldValue={fieldDefinition.initialValue as string}
-          searchableResource={fieldDefinition.searchableResource}
+          searchableType={fieldDefinition.searchableType}
           error={inputProps.error}
           touched={inputProps.touched}
           onModalComplete={(value: string) => {

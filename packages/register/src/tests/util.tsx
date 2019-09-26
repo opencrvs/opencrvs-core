@@ -2423,6 +2423,14 @@ export const mockOfflineData = {
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+    },
+    '0d8474da-0361-4d32-979e-af91f012340a': {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Moktarpur Union Parishad',
+      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
   },
 

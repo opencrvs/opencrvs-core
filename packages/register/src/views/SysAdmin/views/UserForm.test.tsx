@@ -50,7 +50,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -69,7 +69,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Chittagong' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -81,10 +81,10 @@ describe('Create new user page tests', () => {
     component.update()
 
     component
-      .find('#location-1')
+      .find('#location-0')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'location-1', value: 'checked' }
+        target: { id: 'location-0', value: 'checked' }
       })
     component.update()
 
@@ -100,7 +100,7 @@ describe('Create new user page tests', () => {
         .find('#registrationOffice-id')
         .hostNodes()
         .props().value
-    ).toEqual('CHITTAGONG')
+    ).toEqual('Moktarpur Union Parishad')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
@@ -108,7 +108,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -134,7 +134,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -160,7 +160,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 

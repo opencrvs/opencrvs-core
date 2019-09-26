@@ -698,7 +698,7 @@
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
+                  "searchableType": "HEALTH_FACILITY",
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -7301,7 +7301,7 @@
                   },
                   "required": true,
                   "initialValue": "",
-                  "searchableResource": "facilities",
+                  "searchableType": "HEALTH_FACILITY",
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
