@@ -1,4 +1,4 @@
-import { createServer } from '../../..'
+import { createServer } from '@auth/index'
 import * as codeService from '@auth/features/verifyCode/service'
 import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/service'
 import * as fetchAny from 'jest-fetch-mock'

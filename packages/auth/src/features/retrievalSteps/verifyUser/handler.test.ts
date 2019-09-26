@@ -1,7 +1,7 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
-import { createServer } from '../../..'
+import { createServer } from '@auth/index'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
