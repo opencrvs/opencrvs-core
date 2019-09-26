@@ -5,7 +5,15 @@ export const BRN = (props: React.HTMLAttributes<SVGElement>) => {
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path
-        d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"
+        clipRule="evenodd"
+        d="M12 15a7 7 0 100-14 7 7 0 000 14z"
+        stroke={stroke}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"
         stroke={stroke}
         strokeWidth={2}
         strokeLinecap="round"
