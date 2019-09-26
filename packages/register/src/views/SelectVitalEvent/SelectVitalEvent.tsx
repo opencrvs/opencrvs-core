@@ -32,7 +32,7 @@ const Title = styled.h4`
 `
 const Actions = styled.div`
   padding: 32px 0;
-  & div:first-child {
+  & > div {
     margin-bottom: 16px;
   }
 `

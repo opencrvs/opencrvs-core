@@ -10,12 +10,14 @@ import {
   getFieldValidation
 } from '@opencrvs/register/src/forms/utils'
 import { IOfflineData } from '@register/offline/reducer'
+import { MessageDescriptor } from 'react-intl'
 
 export function getValidationErrorsForField(
   field: IFormField,
   values: IFormSectionData,
   resources?: IOfflineData,
-  drafts?: IFormData
+  drafts?: IFormData,
+  requiredErrorMessage?: MessageDescriptor
 ) {
   const value = values[field.name]
   const conditionalActions = getConditionalActionsForField(
@@ -33,7 +35,7 @@ export function getValidationErrorsForField(
   validators.push(...getFieldValidation(field as IDynamicFormField, values))
 
   if (field.required) {
-    validators.push(required)
+    validators.push(required(requiredErrorMessage))
   } else if (!value) {
     validators = []
   }
@@ -49,14 +51,16 @@ export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
   resource?: IOfflineData,
-  drafts?: IFormData
+  drafts?: IFormData,
+  requiredErrorMessage?: MessageDescriptor
 ) {
   return fields.reduce((errorsForAllFields: Errors, field) => {
     const validationErrors = getValidationErrorsForField(
       field,
       values,
       resource,
-      drafts
+      drafts,
+      requiredErrorMessage
     )
     return {
       ...errorsForAllFields,

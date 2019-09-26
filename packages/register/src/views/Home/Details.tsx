@@ -41,9 +41,9 @@ import {
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
-import * as Sentry from '@sentry/browser'
+
 import {
   userMessages,
   constantsMessages as messages,
@@ -62,13 +62,14 @@ import {
 import { Scope } from '@register/utils/authUtils'
 
 const HistoryWrapper = styled.div`
-  padding: 10px 0px;
+  padding: 10px 0px 10px 10px;
+  margin-bottom: 8px;
   flex: 1;
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  &:last-child {
+  &:last-of-type {
     margin-bottom: 0;
   }
 `
@@ -90,10 +91,10 @@ const ValueContainer = styled.div`
 `
 const StatusContainer = styled.div`
   flex: 1;
-  margin-left: 10px;
+  margin-left: 16px;
 `
 const ActionButton = styled(PrimaryButton)`
-  margin: 20px 25px 30px;
+  margin: 6px 50px 30px;
 `
 const QuerySpinner = styled(Spinner)`
   width: 70px;
@@ -599,10 +600,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
               error?: any
               data: any
             }) => {
-              if (error) {
-                Sentry.captureException(error)
-                throw error
-              } else if (loading) {
+              if (loading) {
                 return (
                   <SpinnerContainer>
                     <QuerySpinner

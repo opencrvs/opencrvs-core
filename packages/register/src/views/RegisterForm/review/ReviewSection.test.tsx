@@ -102,15 +102,15 @@ describe('when user is in the review page', () => {
       reviewSectionComponent.update()
     })
 
-    it('edit dialog should show up', () => {
+    it('edit dialog should not show up', () => {
       expect(
         reviewSectionComponent.find('#edit_confirm').hostNodes()
-      ).toHaveLength(1)
+      ).toHaveLength(0)
     })
 
     it('clicking on edit takes user back to form', async () => {
       reviewSectionComponent
-        .find('#edit_confirm')
+        .find('#btn_change_child_familyNameEng')
         .hostNodes()
         .simulate('click')
       reviewSectionComponent.update()
@@ -257,5 +257,31 @@ describe('when user is in the review page to validate birth application', () => 
       .find('#rejectApplicationBtn')
       .hostNodes().length
     expect(rejectButton).toEqual(1)
+  })
+
+  describe('when user clicks on change link', () => {
+    beforeEach(() => {
+      reviewSectionComponent
+        .find('#btn_change_child_familyNameEng')
+        .hostNodes()
+        .simulate('click')
+      reviewSectionComponent.update()
+    })
+
+    it('edit dialog should show up', () => {
+      expect(
+        reviewSectionComponent.find('#edit_confirm').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('clicking on edit takes user back to form', async () => {
+      reviewSectionComponent
+        .find('#edit_confirm')
+        .hostNodes()
+        .simulate('click')
+      reviewSectionComponent.update()
+      await flushPromises()
+      expect(history.location.pathname).toContain('reviews')
+    })
   })
 })

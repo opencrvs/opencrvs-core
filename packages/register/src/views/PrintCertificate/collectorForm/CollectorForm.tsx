@@ -53,6 +53,7 @@ import {
   isFreeOfCost
 } from '@register/views/PrintCertificate/utils'
 import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { debounce, flatten, cloneDeep } from 'lodash'
 import * as React from 'react'

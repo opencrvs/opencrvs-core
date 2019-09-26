@@ -16,10 +16,9 @@ import {
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrationHome/queries'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 
@@ -189,7 +188,6 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
             data?: any
           }) => {
             if (error) {
-              Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
                   {intl.formatMessage(errorMessages.queryError)}

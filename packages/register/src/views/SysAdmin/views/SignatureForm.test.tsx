@@ -72,7 +72,7 @@ describe('signature upload tests', () => {
         .hostNodes()
         .text()
 
-      expect(error).toBe('Required for registration')
+      expect(error).toBe('Required to register a new user')
     })
 
     it('No error while uploading if valid file', async () => {

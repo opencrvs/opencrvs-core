@@ -6,6 +6,7 @@ import registerServiceWorker from '@register/registerServiceWorker'
 import { createStore } from '@register/store'
 import * as actions from '@register/notification/actions'
 import { storage } from '@register/storage'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@register/SubmissionController'
