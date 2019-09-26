@@ -375,13 +375,15 @@ export const getSectionFields = (
   values?: IFormSectionData,
   draftData?: IFormData
 ) => {
-  return getVisibleSectionGroupsBasedOnConditions(
+  let fields: IFormField[] = []
+
+  getVisibleSectionGroupsBasedOnConditions(
     section,
     values || {},
     draftData
-  )
-    .map(group => group.fields)
-    .flat()
+  ).forEach(group => (fields = fields.concat(group.fields)))
+
+  return fields
 }
 
 export const hasFormError = (
