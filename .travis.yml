@@ -37,6 +37,10 @@ jobs:
       services:
         - docker
 
+    - stage: update new bundlesize information
+      if: branch = master AND type = push
+      script: yarn build && ./node_modules/.bin/bundlesize
+
     - stage: build and push docker images
       if: branch = master AND type = push
       install: skip
