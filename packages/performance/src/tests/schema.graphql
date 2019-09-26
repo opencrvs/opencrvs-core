@@ -316,20 +316,6 @@ type Query {
     to: Date
   ): [Notification]
   fetchBirthRegistration(id: ID): BirthRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [BirthRegistration]
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [BirthRegistration]
 }
 
 type Registration {

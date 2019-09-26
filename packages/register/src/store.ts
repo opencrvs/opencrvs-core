@@ -42,6 +42,7 @@ import {
   IPrintFormState,
   printReducer
 } from '@register/forms/certificate/printReducer'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import {

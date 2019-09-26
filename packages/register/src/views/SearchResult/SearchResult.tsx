@@ -24,10 +24,9 @@ import {
   GQLHumanName,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -425,9 +424,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           }) => {
             const { intl, language } = this.props
             moment.locale(language)
-            if (error) {
-              Sentry.captureException(error)
-            } else if (loading) {
+            if (loading) {
               return (
                 <ExpansionSpinnerContainer>
                   <ListItemExpansionSpinner
@@ -734,9 +731,9 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   error,
                   data
                 }: {
-                  loading: any
-                  error?: any
-                  data: any
+                  loading: boolean
+                  error?: Error
+                  data: GQLQuery
                 }) => {
                   if (loading) {
                     return (
@@ -749,16 +746,16 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       />
                     )
                   }
-                  if (error) {
-                    Sentry.captureException(error)
-
+                  if (error || !data.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">
                         {intl.formatMessage(errorMessages.queryError)}
                       </ErrorText>
                     )
                   }
-                  const transformedData = transformData(data, intl)
+
+                  const transformedData = transformData(data.searchEvents, intl)
+
                   const total = transformedData.length
                   return (
                     <>

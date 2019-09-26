@@ -16,7 +16,11 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
-import { IApplication, modifyApplication } from '@register/applications'
+import {
+  IApplication,
+  modifyApplication,
+  deleteApplication
+} from '@register/applications'
 import {
   goToBirthRegistrationAsParent,
   goBack,
@@ -63,7 +67,7 @@ const Title = styled.h4`
 `
 const Actions = styled.div`
   padding: 32px 0;
-  & div:not(:last-child) {
+  & > div {
     margin-bottom: 16px;
   }
 `
@@ -222,6 +226,7 @@ interface IMatchProps {
 type IFullProps = {
   application: IApplication
   modifyApplication: typeof modifyApplication
+  deleteApplication: typeof deleteApplication
   goBack: typeof goBack
   goToHome: typeof goToHome
   goToBirthContactPoint: typeof goToBirthContactPoint
@@ -491,7 +496,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       <Container>
         <EventTopBar
           title={intl.formatMessage(titleMessage)}
-          goHome={this.props.goToHome}
+          goHome={() => {
+            this.props.deleteApplication(this.props.application)
+            this.props.goToHome()
+          }}
         />
 
         <BodyContent id="select_informant_view">
@@ -599,7 +607,8 @@ export const SelectInformant = withRouter(
       goToBirthRegistrationAsParent,
       goToPrimaryApplicant,
       goToDeathRegistration,
-      modifyApplication
+      modifyApplication,
+      deleteApplication
     }
   )(injectIntl(SelectInformantView))
 )

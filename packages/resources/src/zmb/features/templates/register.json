@@ -74,7 +74,7 @@
                         "text": "Place of birth"
                       },
                       {
-                        "text": "District, Province",
+                        "text": "{placeOfBirth}",
                         "style": "boldText"
                       },
                       "\n\n",
@@ -156,8 +156,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -205,6 +204,32 @@
           }
         },
         {
+          "field": "placeOfBirth",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "name",
+                "formattedKeys": "{child.birthLocation}"
+              },
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{child.district}, {child.state}"
+              }
+            ]
+          }
+        },
+        {
           "field": "registrationLocation",
           "operation": "FormattedFieldValue",
           "parameters": {
@@ -213,18 +238,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ]
     },
@@ -302,7 +324,7 @@
                         "text": "Place of death"
                       },
                       {
-                        "text": "District, Province",
+                        "text": "{placeOfDeath}",
                         "style": "boldText"
                       },
                       "\n\n",
@@ -384,8 +406,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -433,6 +454,41 @@
           }
         },
         {
+          "field": "placeOfDeath",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PERMANENT"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{deceased.districtPermanent}, {deceased.statePermanent}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{deathEvent.district}, {deathEvent.state}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "name",
+                "formattedKeys": "{deathEvent.deathLocation}"
+              }
+            ]
+          }
+        },
+        {
           "field": "registrationLocation",
           "operation": "FormattedFieldValue",
           "parameters": {
@@ -441,18 +497,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ]
     }

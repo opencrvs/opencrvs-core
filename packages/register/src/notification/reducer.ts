@@ -2,7 +2,6 @@ import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@register/notification/actions'
 
 export type NotificationState = {
-  newContentAvailable: boolean
   backgroundSyncMessageVisible: boolean
   configurationErrorVisible: boolean
   syncCount: number
@@ -14,7 +13,6 @@ export type NotificationState = {
 }
 
 export const initialState: NotificationState = {
-  newContentAvailable: false,
   backgroundSyncMessageVisible: false,
   configurationErrorVisible: false,
   syncCount: 0,
@@ -33,18 +31,6 @@ export const notificationReducer: LoopReducer<
   action: actions.Action
 ): NotificationState | Loop<NotificationState, actions.Action> => {
   switch (action.type) {
-    case actions.SHOW_NEW_CONTENT_AVAILABLE:
-      return {
-        ...state,
-        newContentAvailable: true,
-        waitingSW: action.payload.waitingSW
-      }
-    case actions.HIDE_NEW_CONTENT_AVAILABLE:
-      return {
-        ...state,
-        newContentAvailable: false,
-        waitingSW: null
-      }
     case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
       return {
         ...state,

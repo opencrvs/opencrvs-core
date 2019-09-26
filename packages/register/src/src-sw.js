@@ -52,6 +52,19 @@ self.addEventListener('message', event => {
 workbox.precaching.precacheAndRoute([])
 
 /*
+ * As the config file can change after the app is built, we cannot precache it
+ * as we do with other assets. Instead, we use the NetworkFirst strategy that
+ * tries to load the file, but falls back to the cached version. This version is updated
+ * when a new version is succesfully loaded.
+ * https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache
+ */
+
+workbox.routing.registerRoute(
+  '/config.js',
+  new workbox.strategies.NetworkFirst()
+)
+
+/*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
  */
 workbox.routing.registerNavigationRoute('/index.html', {

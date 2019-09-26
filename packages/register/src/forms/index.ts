@@ -19,11 +19,13 @@ import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/register/src/utils/validate'
 import { ICertificate } from '@register/applications'
+import { IOfflineData } from '@register/offline/reducer'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
+export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
 export const CHECKBOX_GROUP = 'CHECKBOX_GROUP'
 export const DATE = 'DATE'
@@ -155,7 +157,7 @@ export type IFormFieldValue =
   | FieldValueMap
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
-interface FieldValueMap {
+export interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
@@ -260,16 +262,25 @@ type ILoaderButtonWithSerializedQueryMap = Omit<ILoaderButton, 'queryMap'> & {
   queryMap: ISerializedQueryMap
 }
 
+type SerializedRadioGroupWithNestedFields = Omit<
+  IRadioGroupWithNestedFieldsFormField,
+  'nestedFields'
+> & {
+  nestedFields: { [key: string]: SerializedFormField[] }
+}
+
 export type SerializedFormField = UnionOmit<
   | Exclude<
       IFormField,
       | IFormFieldWithDynamicDefinitions
       | ILoaderButton
       | ISelectFormFieldWithOptions
+      | IRadioGroupWithNestedFieldsFormField
     >
   | SerializedSelectFormFieldWithOptions
   | SerializedFormFieldWithDynamicDefinitions
-  | ILoaderButtonWithSerializedQueryMap,
+  | ILoaderButtonWithSerializedQueryMap
+  | SerializedRadioGroupWithNestedFields,
   'validate' | 'mapping'
 > & {
   validate: IValidatorDescriptor[]
@@ -306,7 +317,11 @@ export interface IFormFieldBase {
   mode?: THEME_MODE
   hidden?: boolean
   previewGroup?: string
-  hideInReview?: boolean
+  nestedFields?: { [key: string]: IFormField[] }
+  hideValueInPreview?: boolean
+  // This flag will only remove the change link from preview/review screen
+  // Default false
+  readonly?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -323,11 +338,21 @@ export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
+export type INestedInputFields = {
+  [key: string]: IFormField[]
+}
+
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
   notice?: MessageDescriptor
+}
+
+export interface IRadioGroupWithNestedFieldsFormField
+  extends Omit<IRadioGroupFormField, 'type'> {
+  type: typeof RADIO_GROUP_WITH_NESTED_FIELDS
+  nestedFields: INestedInputFields
 }
 
 export interface IInformativeRadioGroupFormField extends IFormFieldBase {
@@ -343,6 +368,7 @@ export interface ITextFormField extends IFormFieldBase {
 
 export interface ITelFormField extends IFormFieldBase {
   type: typeof TEL
+  isSmallSized?: boolean
 }
 export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
@@ -396,6 +422,8 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 }
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
+  dynamicOptions?: IDynamicOptions
   onCompleted?: (response: string) => void
 }
 
@@ -447,6 +475,7 @@ export type IFormField =
   | ISelectFormFieldWithDynamicOptions
   | IFormFieldWithDynamicDefinitions
   | IRadioGroupFormField
+  | IRadioGroupWithNestedFieldsFormField
   | IInformativeRadioGroupFormField
   | ICheckboxGroupFormField
   | IDateFormField
@@ -751,6 +780,7 @@ export interface Ii18nFormFieldBase {
   mode?: THEME_MODE
   placeholder?: string
   hidden?: boolean
+  nestedFields?: { [key: string]: Ii18nFormField[] }
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -758,11 +788,21 @@ export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   options: SelectComponentOption[]
 }
 
+export type Ii18nNestedInputFields = {
+  [key: string]: Ii18nFormField[]
+}
+
 export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   type: typeof RADIO_GROUP
   options: RadioComponentOption[]
   size?: RadioSize
   notice?: string
+}
+
+export interface Ii18nRadioGroupWithNestedFieldsFormField
+  extends Omit<Ii18nRadioGroupFormField, 'type'> {
+  type: typeof RADIO_GROUP_WITH_NESTED_FIELDS
+  nestedFields: Ii18nNestedInputFields
 }
 
 type Name = {
@@ -792,6 +832,7 @@ export interface Ii18nTextFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL
+  isSmallSized?: boolean
 }
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
@@ -842,6 +883,7 @@ export interface Ii18nSimpleDocumentUploaderFormField
 }
 export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   onCompleted?: (response: string) => void
 }
 
@@ -875,6 +917,7 @@ export type Ii18nFormField =
   | Ii18nNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
+  | Ii18nRadioGroupWithNestedFieldsFormField
   | Ii18nInformativeRadioGroupFormField
   | Ii18nCheckboxGroupFormField
   | Ii18nDateFormField

@@ -36,6 +36,28 @@ Object.defineProperty(window, 'localStorage', {
 })
 
 /*
+ * Page Visibility
+ */
+
+const hiddenMock = jest.fn()
+Object.defineProperty(document, 'hidden', {
+  get() {
+    return hiddenMock()
+  },
+  set(bool) {
+    hiddenMock.mockReturnValue(Boolean(bool))
+  }
+})
+
+Object.defineProperty(Array.prototype, 'flat', {
+  value: function() {
+    return this.reduce(function(flatted: Array<any>, toFlatten: Array<any>) {
+      return flatted.concat(toFlatten)
+    }, [])
+  }
+})
+
+/*
  * Storage module
  */
 
@@ -141,6 +163,7 @@ beforeEach(() => {
   warn.mockReset()
   error.mockReset()
   debug.mockReset()
+  hiddenMock.mockReset()
 
   /*
    * Assign sane defaults for everything

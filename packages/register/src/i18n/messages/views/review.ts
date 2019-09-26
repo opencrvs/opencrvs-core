@@ -15,6 +15,9 @@ interface IReviewMessages {
   registerActionDescriptionIncomplete: MessageDescriptor
   registerActionTitle: MessageDescriptor
   registerConfirmationTitle: MessageDescriptor
+  approvalActionDescriptionComplete: MessageDescriptor
+  approvalActionDescriptionIncomplete: MessageDescriptor
+  approvalActionTitle: MessageDescriptor
   reviewActionDescriptionComplete: MessageDescriptor
   reviewActionDescriptionIncomplete: MessageDescriptor
   reviewActionTitle: MessageDescriptor
@@ -109,7 +112,7 @@ const messagesToDefine: IReviewMessages = {
   },
   registerActionDescription: {
     defaultMessage:
-      'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+      'By registering you confirm that you have reviewed this application and satisfied it fulfils requirements required for registration. ',
     id: 'review.actions.description'
   },
   registerActionDescriptionComplete: {
@@ -123,7 +126,7 @@ const messagesToDefine: IReviewMessages = {
     id: 'review.actions.description.registerConfirmInComplete'
   },
   registerActionTitle: {
-    defaultMessage: 'Register or reject?',
+    defaultMessage: 'Ready to register?',
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
@@ -131,9 +134,27 @@ const messagesToDefine: IReviewMessages = {
     description: 'Title for register confirmation modal',
     id: 'review.modal.title.registerConfirmation'
   },
+  approvalActionDescriptionComplete: {
+    defaultMessage:
+      'By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.',
+    description:
+      'Description for review action component when complete application',
+    id: 'approval.actions.description.Complete'
+  },
+  approvalActionDescriptionIncomplete: {
+    defaultMessage:
+      'Mandatory information is missing. Please add this information so that you can send for approval.',
+    id: 'approval.actions.description.inComplete'
+  },
+  approvalActionTitle: {
+    defaultMessage:
+      'Application {completeApplication, select, true {complete} false {incomplete}}',
+    description: 'Title for review action component',
+    id: 'approval.actions.title.applicationStatus'
+  },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
+      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the birth certificate',
     description:
       'Description for review action component when complete application',
     id: 'review.actions.description.confirmComplete'
@@ -147,7 +168,7 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionTitle: {
     defaultMessage:
-      'Application is {completeApplication, select, true {complete} false {incomplete}}',
+      'Application {completeApplication, select, true {complete} false {incomplete}}',
     description: 'Title for review action component',
     id: 'review.actions.title.applicationStatus'
   },

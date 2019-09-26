@@ -47,13 +47,13 @@ import {
   PlusTransparentWhite,
   ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import {
   SEARCH_APPLICATIONS_USER_WISE,
   COUNT_USER_WISE_APPLICATIONS
 } from '@register/search/queries'
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
-import * as Sentry from '@sentry/browser'
+
 import { HomeContent } from '@opencrvs/components/lib/layout'
 
 import {
@@ -335,7 +335,6 @@ class FieldAgentHomeView extends React.Component<
                   )
                 }
                 if (error) {
-                  Sentry.captureException(error)
                   return (
                     <ErrorText id="field-agent-home_error">
                       {intl.formatMessage(errorMessages.fieldAgentQueryError)}
@@ -408,7 +407,7 @@ class FieldAgentHomeView extends React.Component<
 
             {tabId === TAB_ID.requireUpdates && (
               <Query
-                query={SEARCH_APPLICATIONS_USER_WISE}
+                query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                 variables={{
                   userId: userDetails ? userDetails.practitionerId : '',
                   status: [EVENT_STATUS.REJECTED],
@@ -444,7 +443,6 @@ class FieldAgentHomeView extends React.Component<
                     )
                   }
                   if (error) {
-                    Sentry.captureException(error)
                     return (
                       <ErrorText id="require_updates_loading_error">
                         {intl.formatMessage(errorMessages.fieldAgentQueryError)}

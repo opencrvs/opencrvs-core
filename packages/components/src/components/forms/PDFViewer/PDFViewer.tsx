@@ -8,6 +8,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  @media (max-height: 900px) {
+    margin-top: 30%;
+    margin-bottom: 5%;
+  }
   background: ${({ theme }) => theme.colors.white};
 `
 

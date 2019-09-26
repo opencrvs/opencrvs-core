@@ -1133,7 +1133,7 @@ describe('When user is in Preview section death event', () => {
     expect(
       draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
         .eventLocation.partOf
-    ).toBe('Location/upazila')
+    ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
   })
 
   it('Should be able to submit the form', () => {
@@ -1155,7 +1155,7 @@ describe('When user is in Preview section death event', () => {
       mockDeathApplicationData
     )
     hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
-      'HEALTH_INSTITUTION'
+      'HEALTH_FACILITY'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
 
@@ -1172,7 +1172,7 @@ describe('When user is in Preview section death event', () => {
       mockDeathApplicationData
     )
     hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
-      'HEALTH_INSTITUTION'
+      'HEALTH_FACILITY'
     hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
 

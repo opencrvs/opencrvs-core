@@ -15,11 +15,15 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   ${({ theme }) => theme.gradients.gradientNightshade};
-  height: 100vh;
+  height: calc(100vh + 80px);
   width: 100%;
   position: absolute;
   overflow-y: hidden;
   overflow-x: hidden;
+`
+
+const StyledPIN = styled(PIN)`
+  margin-top: -80px;
 `
 
 const TitleText = styled.span`
@@ -129,7 +133,7 @@ class CreatePinComponent extends React.Component<IProps> {
 
     return (
       <Container>
-        <PIN />
+        <StyledPIN />
         {pin === null && !pinHasSeqDigits && !pinHasSameDigits && (
           <>
             <TitleText id="title-text">
@@ -207,6 +211,18 @@ class CreatePinComponent extends React.Component<IProps> {
   componentDidUpdate = () => this.focusKeypad()
 
   componentDidMount = () => this.focusKeypad()
+
+  componentWillMount() {
+    document.addEventListener('mouseup', this.handleClick, false)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleClick, false)
+  }
+
+  handleClick = (e: Event) => {
+    this.focusKeypad()
+  }
 
   focusKeypad = () => {
     const node =

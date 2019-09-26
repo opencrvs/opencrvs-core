@@ -1,62 +1,100 @@
 import gql from 'graphql-tag'
 
-export const COUNT_REGISTRATION_QUERY = gql`
-  query data($locationIds: [String]) {
-    countEvents(locationIds: $locationIds) {
-      declared
-      validated
-      registered
-      rejected
+const allSearchFields = `
+  id
+    type
+    registration {
+      status
+      contactNumber
+      trackingId
+      registrationNumber
+      registeredLocationId
+      duplicates
+      createdAt
+      modifiedAt
     }
-  }
-`
-
-export const COUNT_EVENT_REGISTRATION_BY_STATUS = gql`
-  query data($locationIds: [String], $status: String) {
-    countEventRegistrationsByStatus(
-      locationIds: $locationIds
-      status: $status
-    ) {
-      count
+    ... on BirthEventSearchSet {
+      dateOfBirth
+      childName {
+        firstNames
+        familyName
+        use
+      }
     }
-  }
-`
+    ... on DeathEventSearchSet {
+      dateOfDeath
+      deceasedName {
+        firstNames
+        familyName
+        use
+      }
+    }
+  `
 
-export const LIST_EVENT_REGISTRATIONS_BY_STATUS = gql`
-  query data($locationIds: [String], $status: String, $count: Int, $skip: Int) {
-    listEventRegistrations(
+export const REGISTRATION_HOME_QUERY = gql`
+  query registrationHome(
+    $locationIds: [String]
+    $count: Int
+    $inProgressSkip: Int
+    $reviewStatuses: [String]
+    $reviewSkip: Int
+    $rejectSkip: Int
+    $approvalSkip: Int
+    $printSkip: Int
+  ) {
+    inProgressTab: searchEvents(
       locationIds: $locationIds
-      status: $status
+      status: ["IN_PROGRESS"]
       count: $count
-      skip: $skip
+      skip: $inProgressSkip
     ) {
       totalItems
       results {
-        id
-        registration {
-          type
-          trackingId
-        }
-        ... on BirthRegistration {
-          child {
-            name {
-              use
-              firstNames
-              familyName
-            }
-          }
-          createdAt
-        }
-        ... on DeathRegistration {
-          deceased {
-            name {
-              use
-              firstNames
-              familyName
-            }
-          }
-          createdAt
-        }
+        ${allSearchFields}
+      }
+    }
+    reviewTab: searchEvents(
+      locationIds: $locationIds
+      status: $reviewStatuses
+      count: $count
+      skip: $reviewSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
+    rejectTab: searchEvents(
+      locationIds: $locationIds
+      status: ["REJECTED"]
+      count: $count
+      skip: $rejectSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
+    approvalTab: searchEvents(
+      locationIds: $locationIds
+      status: ["VALIDATED"]
+      count: $count
+      skip: $approvalSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
+    printTab: searchEvents(
+      locationIds: $locationIds
+      status: ["REGISTERED"]
+      count: $count
+      skip: $printSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
       }
     }
   }
@@ -85,34 +123,7 @@ export const SEARCH_EVENTS = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactNumber
-          trackingId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ${allSearchFields}
       }
     }
   }
@@ -160,6 +171,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       }
       ... on BirthRegistration {
         child {
+          id
           name {
             use
             firstNames

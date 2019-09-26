@@ -18,6 +18,7 @@ import styled from '@register/styledComponents'
 import { goBack } from '@register/navigation'
 import { getRolesQuery } from '@register/views/SysAdmin/user/queries'
 import { updateUserFormFieldDefinitions } from '@register/views/SysAdmin/forms/userReducer'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { formMessages } from '@register/i18n/messages'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'

@@ -2,7 +2,8 @@ import {
   createReviewApplication,
   getStorageApplicationsSuccess,
   IApplication,
-  storeApplication
+  storeApplication,
+  SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
 import { Event, IForm } from '@opencrvs/register/src/forms'
 
@@ -26,6 +27,7 @@ import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@register/views/RegisterForm/ReviewForm'
 import { offlineDataReady } from '@register/offline/actions'
 import { History } from 'history'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const declareScope =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
@@ -88,7 +90,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -138,6 +140,7 @@ describe('ReviewForm tests', () => {
                 }
               },
               child: {
+                id: '16025284-bae2-4b37-ae80-e16745b7a6b9',
                 name: [
                   {
                     use: 'bn',
@@ -151,8 +154,7 @@ describe('ReviewForm tests', () => {
                   }
                 ],
                 birthDate: '2001-01-01',
-                gender: 'male',
-                id: '16025284-bae2-4b37-ae80-e16745b7a6b9'
+                gender: 'male'
               },
               mother: {
                 name: [
@@ -249,7 +251,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -408,7 +410,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -508,7 +510,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -665,7 +667,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -697,6 +699,74 @@ describe('ReviewForm tests', () => {
       trackingId: 'B123456',
       type: 'birth'
     })
+  })
+  it('redirect to home when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/review')
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -742,7 +812,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            tabId: 'review',
+            pageId: 'review',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -971,7 +1041,7 @@ describe('ReviewForm tests', () => {
           match={{
             params: {
               applicationId: application.id,
-              tabId: 'review',
+              pageId: 'review',
               event: application.event.toLowerCase()
             },
             isExact: true,
@@ -1218,7 +1288,7 @@ describe('ReviewForm tests', () => {
           match={{
             params: {
               applicationId: application.id,
-              tabId: 'review',
+              pageId: 'review',
               event: application.event.toLowerCase()
             },
             isExact: true,
@@ -1306,7 +1376,7 @@ describe('ReviewForm tests', () => {
           match={{
             params: {
               draftId: application.id,
-              tabId: 'review',
+              pageId: 'review',
               event: application.event.toLowerCase()
             },
             isExact: true,

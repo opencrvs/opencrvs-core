@@ -26,12 +26,16 @@ import {
   DATE,
   IDateFormField,
   IFormSectionGroup,
-  DOCUMENT_UPLOADER_WITH_OPTION,
-  SEARCH_FIELD,
-  ISearchFormField
+  IRadioGroupFormField,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import {
+  getValidationErrorsForForm,
+  IFieldErrors,
+  Errors
+} from '@register/forms/validation'
 import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
@@ -81,7 +85,10 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === RADIO_GROUP) {
+  if (
+    base.type === RADIO_GROUP ||
+    base.type === RADIO_GROUP_WITH_NESTED_FIELDS
+  ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
       ;(base as any).notice = intl.formatMessage(
@@ -390,11 +397,16 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData
 ): boolean => {
-  const errors = getValidationErrorsForForm(fields, values)
+  const errors: Errors = getValidationErrorsForForm(fields, values)
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error => (error as IValidationResult[]).length > 0
+    error =>
+      (error as IFieldErrors).errors.length > 0 ||
+      Object.values(error.nestedFields).some(
+        nestedFieldErrors => nestedFieldErrors.length > 0
+      )
   )
+
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
@@ -496,7 +508,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceAddressTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_INSTITUTION"'
+    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',

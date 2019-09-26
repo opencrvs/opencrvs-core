@@ -3,66 +3,231 @@
     "birth": {
       "sections": [
         {
-          "id": "contact",
-          "viewType": "form",
+          "id": "registration",
+          "viewType": "hidden",
+          "name": {
+            "defaultMessage": "Registration",
+            "description": "Form section name for Registration",
+            "id": "form.section.application.name"
+          },
           "title": {
-            "defaultMessage": "Application Details",
-            "description": "Form section title for contact point",
-            "id": "register.SelectContactPoint.headings"
+            "defaultMessage": "Registration",
+            "description": "Form section title for Registration",
+            "id": "form.section.application.title"
           },
           "groups": [
             {
-              "id": "applicant-relation",
-              "title": {
-                "defaultMessage": "Who is the applicant?",
-                "description": "Form section title for contact point",
-                "id": "register.selectInformant.relation"
-              },
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.applicant !== \"OTHER\")"
-                }
-              ],
+              "id": "registration-view-group",
               "fields": [
                 {
-                  "name": "firstNames",
-                  "type": "TEXT",
+                  "name": "presentAtBirthRegistration",
+                  "type": "SELECT_WITH_OPTIONS",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
-                    "description": "Label for form field: First names",
-                    "id": "form.field.label.childFirstNames"
+                    "defaultMessage": "Who is the applicant for the registration",
+                    "description": "Input label for Applicant",
+                    "id": "form.section.applicant.name"
                   },
-                  "required": true,
+                  "required": false,
+                  "readonly": true,
                   "initialValue": "",
-                  "validate": []
-                }
-              ]
-            },
-            {
-              "id": "contact-view-group",
-              "title": {
-                "defaultMessage": "Who is the main point of contact for this application?",
-                "description": "Form section title for contact point",
-                "id": "register.SelectContactPoint.heading"
-              },
-              "conditionals": [],
-              "previewGroups": [
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoIsPresent.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoIsPresent.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoIsPresent.father"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Other",
+                        "description": "Label for \"Other\" select option",
+                        "id": "form.field.label.application.whoIsPresent.other"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "sectionFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
                 {
-                  "id": "placeOfBirth",
+                  "name": "whoseContactDetails",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "previewGroup": "mainContact",
                   "label": {
-                    "defaultMessage": "Place of delivery",
-                    "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirth"
+                    "defaultMessage": "Who is the contact person for this application?",
+                    "description": "Input label for contact details person",
+                    "id": "form.field.label.application.whoseContactDetails"
                   },
                   "required": false,
                   "initialValue": "",
-                  "fieldToRedirect": "placeOfBirth"
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.father"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": [
+                        "contact"
+                      ]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": [
+                        "contact"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "registrationPhone",
+                  "type": "TEL",
+                  "previewGroup": "mainContact",
+                  "label": {
+                    "defaultMessage": "Phone number",
+                    "description": "Input label for phone input",
+                    "id": "form.field.label.application.phone"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "phoneNumberFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": [
+                        "contactPhoneNumber"
+                      ]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": [
+                        "contactPhoneNumber"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "phoneVerificationWarning",
+                  "type": "WARNING",
+                  "label": {
+                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
+                    "description": "Warning message to verify applicant phone number ",
+                    "id": "form.field.label.application.phoneVerificationWarning"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "commentsOrNotes",
+                  "type": "TEXTAREA",
+                  "label": {
+                    "defaultMessage": "Comments or notes",
+                    "description": "Input label for comments or notes textarea",
+                    "id": "form.field.label.application.commentsOrNotes"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "description": {
+                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
+                    "description": "Help text for the notes field",
+                    "id": "form.field.label.application.commentsOrNotes.description"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToCommentTransformer"
+                    },
+                    "query": {
+                      "operation": "commentToFieldTransformer"
+                    }
+                  }
                 }
               ],
-              "fields": []
+              "previewGroups": [
+                {
+                  "id": "mainContact",
+                  "label": {
+                    "defaultMessage": "Main contact",
+                    "description": "Preview label for applicant type + phone number",
+                    "id": "form.field.label.application.mainContact"
+                  },
+                  "fieldToRedirect": "mainContact"
+                }
+              ]
             }
-          ]
+          ],
+          "mapping": {
+            "mutation": {
+              "operation": "setBirthRegistrationSectionTransformer"
+            },
+            "query": {
+              "operation": "getBirthRegistrationSectionTransformer"
+            }
+          }
         },
         {
           "id": "child",
@@ -518,7 +683,7 @@
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -528,19 +693,11 @@
                   },
                   "options": [
                     {
-                      "value": "HOSPITAL",
+                      "value": "HEALTH_FACILITY",
                       "label": {
-                        "defaultMessage": "Hospital",
-                        "description": "Select item for hospital",
-                        "id": "form.field.label.hospital"
-                      }
-                    },
-                    {
-                      "value": "OTHER_HEALTH_INSTITUTION",
-                      "label": {
-                        "defaultMessage": "Other Health Institution",
-                        "description": "Select item for Other Health Institution",
-                        "id": "form.field.label.otherHealthInstitution"
+                        "defaultMessage": "Health Institution",
+                        "description": "Select item for Health Institution",
+                        "id": "form.field.label.healthInstitution"
                       }
                     },
                     {
@@ -573,28 +730,24 @@
                 },
                 {
                   "name": "birthLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
-                    "defaultMessage": "Hospital / Clinic",
-                    "description": "Label for form field: Hospital or Health Institution",
-                    "id": "form.field.label.birthLocation"
+                    "defaultMessage": "Health instition",
+                    "description": "Label for form field: Health Institution",
+                    "id": "form.field.label.healdInstitution"
                   },
-                  "required": false,
+                  "previewGroup": "placeOfBirth",
+                  "required": true,
                   "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
+                  "searchableResource": "facilities",
                   "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "placeOfBirth"
+                    "resource": "facilities"
                   },
+                  "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"HOSPITAL\" && values.placeOfBirth!=\"OTHER_HEALTH_INSTITUTION\")"
+                      "expression": "(values.placeOfBirth!=\"HEALTH_FACILITY\")"
                     }
                   ],
                   "mapping": {
@@ -1811,25 +1964,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -1837,25 +1974,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ]
@@ -1868,6 +1989,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -2507,6 +2629,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3875,25 +3998,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -3901,25 +4008,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ],
@@ -3994,6 +4085,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4682,6 +4774,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -5352,219 +5445,6 @@
           }
         },
         {
-          "id": "registration",
-          "viewType": "hidden",
-          "name": {
-            "defaultMessage": "Registration",
-            "description": "Form section name for Registration",
-            "id": "form.section.application.name"
-          },
-          "title": {
-            "defaultMessage": "Registration",
-            "description": "Form section title for Registration",
-            "id": "form.section.application.title"
-          },
-          "groups": [
-            {
-              "id": "registration-view-group",
-              "fields": [
-                {
-                  "name": "presentAtBirthRegistration",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is present for the registration",
-                    "description": "Input label for who is present input",
-                    "id": "form.field.label.application.whoIsPresent"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH_PARENTS",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoIsPresent.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoIsPresent.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoIsPresent.father"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for \"Other\" select option",
-                        "id": "form.field.label.application.whoIsPresent.other"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "whoseContactDetails",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is the contact person for this application?",
-                    "description": "Input label for contact details person",
-                    "id": "form.field.label.application.whoseContactDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.father"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "registrationPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.application.phone"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "phoneVerificationWarning",
-                  "type": "WARNING",
-                  "label": {
-                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
-                    "description": "Warning message to verify applicant phone number ",
-                    "id": "form.field.label.application.phoneVerificationWarning"
-                  },
-                  "initialValue": "",
-                  "validate": []
-                },
-                {
-                  "name": "commentsOrNotes",
-                  "type": "TEXTAREA",
-                  "label": {
-                    "defaultMessage": "Comments or notes",
-                    "description": "Input label for comments or notes textarea",
-                    "id": "form.field.label.application.commentsOrNotes"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "description": {
-                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
-                    "description": "Help text for the notes field",
-                    "id": "form.field.label.application.commentsOrNotes.description"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToCommentTransformer"
-                    },
-                    "query": {
-                      "operation": "commentToFieldTransformer"
-                    }
-                  }
-                }
-              ]
-            }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setBirthRegistrationSectionTransformer"
-            },
-            "query": {
-              "operation": "getBirthRegistrationSectionTransformer"
-            }
-          }
-        },
-        {
           "id": "documents",
           "viewType": "form",
           "name": {
@@ -5585,7 +5465,7 @@
                   "name": "paragraph",
                   "type": "PARAGRAPH",
                   "label": {
-                    "defaultMessage": "For birth regiatration of children below 5 years old, one of the documents listed below is required:",
+                    "defaultMessage": "For birth registration of birth occurring within 45 days old the following documents are required:",
                     "description": "Documents Paragraph text",
                     "id": "form.section.documents.birth.requirements"
                   },
@@ -5594,11 +5474,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     },
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")  || !draftData.child || !draftData.child.childBirthDate"
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"after5yrs\")"
                     }
                   ]
                 },
@@ -5606,7 +5486,7 @@
                   "name": "paragraph",
                   "type": "PARAGRAPH",
                   "label": {
-                    "defaultMessage": "For birth registration of births occurring within 45 days and and 5 years old the following documents are required:",
+                    "defaultMessage": "For birth registration of births occurring within 45 days and 5 years old the following documents are required:",
                     "description": "Documents Paragraph text",
                     "id": "form.section.documents.paragraph45daysTo5Years"
                   },
@@ -5648,7 +5528,7 @@
                   "name": "uploadDocForMother",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of mothers ID",
+                    "defaultMessage": "Proof of mother's ID",
                     "description": "Label for list item Mother ID Proof",
                     "id": "form.field.label.proofOfMothersID"
                   },
@@ -5719,7 +5599,7 @@
                   "name": "uploadDocForFather",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of fathers ID",
+                    "defaultMessage": "Proof of father's ID",
                     "description": "Label for list item Father ID Proof",
                     "id": "form.field.label.proofOfFathersID"
                   },
@@ -5816,6 +5696,12 @@
                       }
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "birthFieldToAttachmentTransformer"
@@ -5869,6 +5755,12 @@
                         "description": "Label for radio option Other",
                         "id": "form.field.label.docTypeOther"
                       }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     }
                   ],
                   "mapping": {
@@ -6591,6 +6483,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -8027,7 +7920,7 @@
                       }
                     },
                     {
-                      "value": "HEALTH_INSTITUTION",
+                      "value": "HEALTH_FACILITY",
                       "label": {
                         "defaultMessage": "Health Institution",
                         "description": "Select item for Health Institution",
@@ -8063,29 +7956,29 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "values.deathPlaceAddress!=\"HEALTH_INSTITUTION\""
+                  "expression": "values.deathPlaceAddress!=\"HEALTH_FACILITY\""
                 }
               ],
               "fields": [
                 {
                   "name": "deathLocation",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "type": "SEARCH_FIELD",
                   "label": {
                     "defaultMessage": "What hospital did the death occur at?",
                     "description": "Label for form field: Hospital or Health Institution",
                     "id": "form.field.label.deathAtFacility"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "facilities",
-                    "dependency": "deathPlaceAddress"
                   },
                   "mapping": {
                     "mutation": {
@@ -8093,8 +7986,11 @@
                       "parameters": []
                     },
                     "query": {
-                      "operation": "eventLocationIDQueryTransformer",
-                      "parameters": []
+                      "operation": "sectionFieldExchangeTransformer",
+                      "parameters": [
+                        "eventLocation",
+                        "id"
+                      ]
                     }
                   }
                 }
@@ -8636,7 +8532,7 @@
                 {
                   "id": "privateHome",
                   "label": {
-                    "defaultMessage": "Address",
+                    "defaultMessage": "Private home address",
                     "description": "Tag definition for private home",
                     "id": "form.preview.tag.private.home"
                   }
@@ -9179,7 +9075,7 @@
                 {
                   "id": "otherInstitution",
                   "label": {
-                    "defaultMessage": "Address",
+                    "defaultMessage": "Other institution address",
                     "description": "Tag definition for other institution",
                     "id": "form.preview.tag.other.institution"
                   }
@@ -10127,6 +10023,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": []
@@ -11825,6 +11722,43 @@
                         "description": "Label for radio option Passport",
                         "id": "form.field.label.docTypePassport"
                       }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForApplicantAthorityToApply",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of applicant's authority to apply",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.applicantAthorityToApplyProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "APPLICANT_ATHORITY_TO_APPLY_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Signed Affidavit",
+                      "label": {
+                        "defaultMessage": "Signed affidavit",
+                        "description": "Label for select option Signed Affidavit",
+                        "id": "form.field.label.docTypeSignedAffidavit"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "draftData.informant.applicantsRelationToDeceased !== \"OTHER\""
                     }
                   ],
                   "mapping": {

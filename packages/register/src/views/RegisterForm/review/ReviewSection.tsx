@@ -1,88 +1,54 @@
-import * as React from 'react'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions,
-  DataSection
-} from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import {
-  IApplication,
-  writeApplication,
-  SUBMISSION_STATUS,
-  IPayload
-} from '@register/applications'
-import { connect } from 'react-redux'
-import { IStoreState } from '@register/store'
-import {
-  getRegisterForm,
-  getBirthSection
-} from '@register/forms/register/application-selectors'
-import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
-import {
-  getConditionalActionsForField,
-  getVisibleSectionGroupsBasedOnConditions,
-  getSectionFields
-} from '@register/forms/utils'
-import { flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPageGroup } from '@register/navigation'
-
-import {
-  ISelectOption as SelectComponentOptions,
-  TextArea,
-  InputField
-} from '@opencrvs/components/lib/forms'
-
-import { getScope } from '@register/profile/profileSelectors'
-import { Scope } from '@register/utils/authUtils'
-import { getOfflineData } from '@register/offline/selectors'
-import {
-  OFFLINE_LOCATIONS_KEY,
-  OFFLINE_FACILITIES_KEY,
-  ILocation,
-  IOfflineData
-} from '@register/offline/reducer'
-import { getLanguage } from '@register/i18n/selectors'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape,
-  MessageDescriptor
-} from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
-  IForm,
-  IFormSection,
-  IFormField,
+  InputField,
+  ISelectOption as SelectComponentOptions,
+  TextArea
+} from '@opencrvs/components/lib/forms'
+import {
+  DataSection,
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
+import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import {
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS,
+  writeApplication
+} from '@register/applications'
+import { ReviewAction } from '@register/components/form/ReviewActionComponent'
+import {
+  BirthSection,
+  DATE,
+  Event,
+  IDynamicOptions,
   IFileValue,
+  IForm,
+  IFormField,
   IFormFieldValue,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IFormTag,
+  IRadioOption,
+  ISelectOption,
   LIST,
   PARAGRAPH,
-  SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  ISelectOption,
-  IDynamicOptions,
-  IFormSectionData,
-  WARNING,
-  DATE,
-  TEXTAREA,
-  Event,
+  RADIO_GROUP,
+  SEARCH_FIELD,
   Section,
-  BirthSection,
-  IFormTag,
-  IFormSectionGroup,
-  SEARCH_FIELD
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  SUBSECTION,
+  TEXTAREA,
+  WARNING,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  IFormData
 } from '@register/forms'
-import { formatLongDate } from '@register/utils/date-formatting'
-import { messages } from '@register/i18n/messages/views/review'
-import { buttonMessages } from '@register/i18n/messages'
-import { REJECTED, BIRTH } from '@register/utils/constants'
-import { ReviewHeader } from './ReviewHeader'
-import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import { ReviewAction } from '@register/components/form/ReviewActionComponent'
-import { findDOMNode } from 'react-dom'
-import { isMobileDevice } from '@register/utils/commonUtils'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import {
+  getBirthSection,
+  getRegisterForm
+} from '@register/forms/register/application-selectors'
 import {
   birthSectionMapping,
   birthSectionTitle
@@ -91,9 +57,49 @@ import {
   deathSectionMapping,
   deathSectionTitle
 } from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
+import {
+  getConditionalActionsForField,
+  getSectionFields,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@register/forms/utils'
+import {
+  getValidationErrorsForForm,
+  Errors,
+  IFieldErrors
+} from '@register/forms/validation'
+import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/review'
+import { getLanguage } from '@register/i18n/selectors'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { goToPageGroup } from '@register/navigation'
+import {
+  ILocation,
+  IOfflineData,
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
+import { getScope } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import { Scope } from '@register/utils/authUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
+import { BIRTH, REJECTED } from '@register/utils/constants'
+import { formatLongDate } from '@register/utils/date-formatting'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import { IValidationResult } from '@register/utils/validate'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
+import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
+import { flatten, isArray } from 'lodash'
+import * as React from 'react'
+import { findDOMNode } from 'react-dom'
+import {
+  injectIntl,
+  IntlShape,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { ReviewHeader } from './ReviewHeader'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -187,6 +193,11 @@ type State = {
   editClickFieldName?: string
   activeSection: Section | null
 }
+
+interface IErrorsBySection {
+  [sectionId: string]: Errors
+}
+
 type FullProps = IProps & IntlShapeProps
 
 const getViewableSection = (registerForm: IForm): IFormSection[] => {
@@ -202,13 +213,13 @@ const getDocumentSections = (registerForm: IForm): IFormSection[] => {
   )
 }
 
-function renderSelectLabel(
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
-  options: ISelectOption[],
+  options: Array<ISelectOption | IRadioOption>,
   intl: IntlShape
 ) {
-  const selectedOption = options.find(option => option.value === value)
-  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  const option = options.find(option => option.value === value)
+  return option ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
@@ -256,25 +267,29 @@ export function renderSelectDynamicLabel(
 }
 
 const renderValue = (
-  draft: IApplication,
-  section: IFormSection,
+  draftData: IFormData,
+  sectionId: string,
   field: IFormField,
   intl: IntlShape,
   offlineResources: IOfflineData,
   language: string
 ) => {
-  const value: IFormFieldValue = draft.data[section.id]
-    ? draft.data[section.id][field.name]
+  const value: IFormFieldValue = draftData[sectionId]
+    ? draftData[sectionId][field.name]
     : ''
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
-    return renderSelectLabel(value, field.options, intl)
+    return renderSelectOrRadioLabel(value, field.options, intl)
   }
-  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
-    const draftData = draft.data[section.id]
+  if (
+    (field.type === SEARCH_FIELD ||
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS) &&
+    field.dynamicOptions
+  ) {
+    const sectionData = draftData[sectionId]
     return renderSelectDynamicLabel(
       value,
       field.dynamicOptions,
-      draftData,
+      sectionData,
       intl,
       offlineResources,
       language
@@ -285,11 +300,20 @@ const renderValue = (
     return formatLongDate(value)
   }
 
-  if (field.type === SEARCH_FIELD) {
-    return (value as IDynamicValues).label
-  }
-  if (field.hideInReview) {
+  if (field.hideValueInPreview) {
     return ''
+  }
+
+  if (field.type === RADIO_GROUP) {
+    return renderSelectOrRadioLabel(value, field.options, intl)
+  }
+
+  if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+    return renderSelectOrRadioLabel(
+      (value && (value as IFormSectionData).value) || value,
+      field.options,
+      intl
+    )
   }
 
   if (typeof value === 'string') {
@@ -305,7 +329,7 @@ const renderValue = (
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication
-) => {
+): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
       section,
@@ -324,15 +348,22 @@ const getErrorsOnFieldsBySection = (
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors: IValidationResult[] =
-          errors[field.name as keyof typeof errors]
+        const validationErrors: IFieldErrors = errors[
+          field.name as keyof typeof errors
+        ] as IFieldErrors
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]
           : null
 
         const informationMissing =
-          validationErrors.length > 0 || value === null ? validationErrors : []
+          validationErrors.errors.length > 0 ||
+          value === null ||
+          Object.values(validationErrors.nestedFields).some(
+            nestedErrors => nestedErrors.length > 0
+          )
+            ? validationErrors
+            : { errors: [], nestedFields: {} }
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -481,6 +512,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.toggleDisplayDialog()
   }
 
+  editLinkClickHandlerForDraft = (
+    sectionId: string,
+    groupId: string,
+    fieldName: string
+  ) => {
+    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
+    const application = draft
+    application.review = true
+    writeApplication(application)
+    goToPageGroup(
+      pageRoute,
+      application.id,
+      sectionId,
+      groupId,
+      application.event.toLowerCase(),
+      fieldName
+    )
+  }
+
   userHasRegisterScope() {
     if (this.props.scope) {
       return this.props.scope && this.props.scope.includes('register')
@@ -509,9 +559,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
       type => type === field.type
     )
+  }
+
+  isDraft() {
+    return this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
   }
 
   getFieldValueWithErrorMessage(
@@ -535,21 +589,80 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     fieldLabel: MessageDescriptor,
     fieldName: string,
-    value: IFormFieldValue | JSX.Element | undefined
+    value: IFormFieldValue | JSX.Element | undefined,
+    ignoreAction: boolean = false
   ) {
     const { intl } = this.props
 
     return {
       label: intl.formatMessage(fieldLabel),
       value,
-      action: {
+      action: !ignoreAction && {
         id: `btn_change_${section.id}_${fieldName}`,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          this.editLinkClickHandler(section.id, group.id, fieldName)
+          if (this.isDraft()) {
+            this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
+          } else {
+            this.editLinkClickHandler(section.id, group.id, fieldName)
+          }
         }
       }
     }
+  }
+
+  getValueOrError = (
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) => {
+    const { intl, draft, offlineResources, language } = this.props
+    const errorsOnField = sectionErrors[section.id][field.name].errors
+    return errorsOnField.length > 0
+      ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      : field.nestedFields
+      ? Object.values(field.nestedFields)
+          .flat()
+          .reduce((groupedValues, nestedField) => {
+            const errorsOnNestedField =
+              sectionErrors[section.id][field.name].nestedFields[
+                nestedField.name
+              ] || []
+            // Value of the parentField resembles with IFormData as a nested form
+            const nestedValue =
+              (draft.data[section.id] &&
+                draft.data[section.id][field.name] &&
+                renderValue(
+                  draft.data[section.id][field.name] as IFormData,
+                  'nestedFields',
+                  nestedField,
+                  intl,
+                  offlineResources,
+                  language
+                )) ||
+              ''
+            return (
+              <>
+                {groupedValues}
+                {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+                {errorsOnNestedField.length > 0
+                  ? this.getFieldValueWithErrorMessage(
+                      section,
+                      field,
+                      errorsOnNestedField[0]
+                    )
+                  : nestedValue}
+              </>
+            )
+          }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+      : renderValue(
+          draft.data,
+          section.id,
+          field,
+          intl,
+          offlineResources,
+          language
+        )
   }
 
   getPreviewGroupsField(
@@ -557,10 +670,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     group: IFormSectionGroup,
     field: IFormField,
     visitedTags: string[],
-    errorsOnFields: any
+    errorsOnFields: IErrorsBySection
   ) {
-    const { intl, draft, offlineResources, language } = this.props
-
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -579,24 +690,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ) as IFormTag[])) ||
         []
       const values = taggedFields
-        .map(field => {
-          const errorsOnField = errorsOnFields[section.id][field.name]
-
-          return errorsOnField.length > 0
-            ? this.getFieldValueWithErrorMessage(
-                section,
-                field,
-                errorsOnField[0]
-              )
-            : renderValue(
-                draft,
-                section,
-                field,
-                intl,
-                offlineResources,
-                language
-              )
-        })
+        .map(field => this.getValueOrError(section, field, errorsOnFields))
         .filter(value => value)
 
       let completeValue = values[0]
@@ -617,7 +711,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         group,
         (tagDef[0] && tagDef[0].label) || field.label,
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
-        completeValue
+        completeValue,
+        field.readonly
       )
     }
   }
@@ -626,28 +721,23 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    errorsOnFields: any
+    sectionErrors: IErrorsBySection
   ) {
-    const { intl, draft, offlineResources, language } = this.props
-    const errorsOnField = errorsOnFields[section.id][field.name]
-
-    const value =
-      errorsOnField.length > 0
-        ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
-        : renderValue(draft, section, field, intl, offlineResources, language)
+    const value = this.getValueOrError(section, field, sectionErrors)
 
     return this.getRenderableField(
       section,
       group,
       field.label,
       field.name,
-      value
+      value,
+      field.readonly
     )
   }
 
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: any
+    errorsOnFields: IErrorsBySection
   ) => {
     const { intl, draft } = this.props
 
@@ -696,7 +786,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   render() {
     const {
       intl,
-      draft,
+      draft: application,
       registerForm,
       rejectApplicationClickEvent,
       submitClickEvent,
@@ -706,17 +796,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineResources,
       draft: { event }
     } = this.props
-
     const formSections = getViewableSection(registerForm[event])
 
-    const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
+    const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
 
     const isComplete =
       flatten(
         // @ts-ignore
         Object.values(errorsOnFields).map(Object.values)
         // @ts-ignore
-      ).filter(errors => errors.length > 0).length === 0
+      ).filter(errors => errors.errors.length > 0).length === 0
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -724,19 +813,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
-          draft
+          application
         )
       },
       value:
-        (draft.data.registration && draft.data.registration.commentsOrNotes) ||
+        (application.data.registration &&
+          application.data.registration.commentsOrNotes) ||
         '',
       ignoreMediaQuery: true
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const applicantName = getDraftApplicantFullName(draft, intl.locale)
-    const isDraft =
-      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+    const applicantName = getDraftApplicantFullName(application, intl.locale)
+    const draft = this.isDraft()
 
     return (
       <FullBodyContent>
@@ -759,7 +848,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <FormDataHeader>
-                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+                {intl.formatMessage(messages.formDataHeader, {
+                  isDraft: draft
+                })}
               </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
@@ -785,8 +876,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 alreadyRejectedApplication={
                   this.props.draft.registrationStatus === REJECTED
                 }
-                draftApplication={isDraft}
-                application={draft}
+                draftApplication={draft}
+                application={application}
                 submitApplicationAction={submitClickEvent}
                 rejectApplicationAction={rejectApplicationClickEvent}
               />
@@ -800,7 +891,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
-                  draft,
+                  application,
                   this.state.activeSection || formSections[0].id
                 )}
               >
@@ -829,16 +920,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
           handleEdit={() => {
-            const application = this.props.draft
-            application.review = true
-            this.props.writeApplication(application)
-            this.props.goToPageGroup(
-              pageRoute,
-              draft.id,
+            this.editLinkClickHandlerForDraft(
               this.state.editClickedSectionId!,
               this.state.editClickedSectionGroupId,
-              draft.event.toLowerCase(),
-              this.state.editClickFieldName
+              this.state.editClickFieldName!
             )
           }}
         />

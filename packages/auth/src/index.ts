@@ -31,6 +31,9 @@ import verifyTokenHandler, {
 import invalidateTokenHandler, {
   reqInvalidateTokenSchema
 } from '@auth/features/invalidateToken/handler'
+import changePasswordHandler, {
+  reqChangePasswordSchema
+} from '@auth/features/changePassword/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -41,7 +44,7 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{"mobile": "+447111111111", "password": "test"}' http://localhost:4040/authenticate
+  // curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/authenticate
   server.route({
     method: 'POST',
     path: '/authenticate',
@@ -150,6 +153,25 @@ export async function createServer() {
         'these are stored as individual key value pairs to that we can set their expiry TTL individually',
       validate: {
         payload: reqInvalidateTokenSchema
+      },
+      response: {
+        schema: false
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "newPassword": "", "nonce": "" }' http://localhost:4040/changePassword
+  server.route({
+    method: 'POST',
+    path: '/changePassword',
+    handler: changePasswordHandler,
+    options: {
+      tags: ['api'],
+      description: 'Changes the user password',
+      notes:
+        'Expects the nonce parameter to be coming from the reset password journey',
+      validate: {
+        payload: reqChangePasswordSchema
       },
       response: {
         schema: false

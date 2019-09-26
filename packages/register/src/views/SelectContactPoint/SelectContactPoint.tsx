@@ -21,7 +21,8 @@ import {
   modifyApplication,
   setInitialApplications,
   storeApplication,
-  writeApplication
+  writeApplication,
+  deleteApplication
 } from '@register/applications'
 import { getLanguage } from '@register/i18n/selectors'
 import {
@@ -65,8 +66,7 @@ const Actions = styled.div`
   padding: 32px 0;
 
   > div {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    margin-bottom: 16px;
   }
 `
 
@@ -419,6 +419,7 @@ class SelectContactPointView extends React.Component<IFullProps, IState> {
         <EventTopBar
           title={intl.formatMessage(titleMessage)}
           goHome={() => {
+            deleteApplication(this.props.application)
             this.props.setInitialApplications()
             this.props.goToHome()
           }}

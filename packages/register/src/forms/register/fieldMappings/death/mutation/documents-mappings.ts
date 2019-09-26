@@ -11,7 +11,8 @@ export const deathDocumentForWhomFhirMapping = {
   'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
-  "Proof of Applicant's ID": 'APPLICANT_ID_PROOF'
+  "Proof of Applicant's ID": 'APPLICANT_ID_PROOF',
+  "Proof of applicant's authority to apply": 'APPLICANT_ATHORITY_TO_APPLY_PROOF'
 }
 
 export const deathSectionMapping = {
@@ -22,7 +23,8 @@ export const deathSectionMapping = {
     deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']
   ],
   [DeathSection.Applicants]: [
-    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"]
+    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
+    deathDocumentForWhomFhirMapping["Proof of applicant's authority to apply"]
   ]
 }
 
@@ -43,7 +45,8 @@ export const deathDocumentTypeFhirMapping = {
   'Certified Copy of Funeral Receipt': 'FUNERAL_RECEIPT',
   Passport: 'PASSPORT',
   'Police Brought In Dead Certificate': 'BROUGHT_IN_DEAD_CERTIFICATE',
-  'Coroners Report': 'CORONERS_REPORT'
+  'Coroners Report': 'CORONERS_REPORT',
+  'Signed Affidavit': 'SIGNED_AFFIDAVIT'
 }
 
 export function deathFieldToAttachmentTransformer(

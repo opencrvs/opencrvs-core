@@ -16,7 +16,14 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
-import { buttonMessages, formMessages } from '@register/i18n/messages'
+import {
+  buttonMessages,
+  formMessages,
+  constantsMessages
+} from '@register/i18n/messages'
+import { IOfflineData, ILocation } from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 
 const SelectButton = styled(PrimaryButton)`
   height: 40px;
@@ -45,7 +52,9 @@ const ListContainer = styled.div`
     border-top: 1px solid ${({ theme }) => theme.colors.greySmoky};
   }
 `
-const ItemContainer = styled.div.attrs<{ selected?: boolean }>({})`
+const ItemContainer = styled.div.attrs<{
+  selected?: boolean
+}>({})`
   width: 870px;
   min-height: 96px;
   display: flex;
@@ -81,22 +90,19 @@ interface IProps {
   theme: ITheme
   language: string
   fieldName: string
-  fieldValue: { [key: string]: string }
-  fieldLabel: string
-  isFieldRequired: boolean
-  onModalComplete: (label: string, value: string) => void
+  fieldValue: string
+  error?: boolean
+  touched?: boolean
+  onModalComplete: (value: string) => void
+  offlineResources: IOfflineData
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
 }
 interface IState {
   searchText: string
   selectedValue: string
   showModal: boolean
-  isSearchField: boolean
+  showSearch: boolean
   fieldValue: string
-}
-interface ILocation {
-  id: string
-  name: string
-  detailedLocation: string
 }
 
 type IFullProps = IProps & IntlShapeProps
@@ -107,14 +113,15 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       searchText: '',
       selectedValue: '',
       showModal: false,
-      isSearchField: this.props.fieldValue ? false : true,
-      fieldValue: this.props.fieldValue.label || ''
+      showSearch: this.props.fieldValue ? false : true,
+      fieldValue: this.props.fieldValue || ''
     }
   }
 
   handleSearch = (param: string) => {
     this.setState({
-      searchText: param
+      searchText: param,
+      showModal: true
     })
   }
 
@@ -124,82 +131,81 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
     })
   }
 
-  toggleSearchModal = (param?: string) => {
+  onModalClose = () => {
     this.setState({
-      searchText: param || '',
-      showModal: !this.state.showModal,
-      isSearchField: !this.state.isSearchField
+      showModal: false,
+      searchText: '',
+      showSearch: this.state.fieldValue.length === 0
     })
   }
 
-  onModalClose = () => {
-    this.toggleSearchModal()
-  }
-
-  onModalComplete = (value: ILocation) => {
-    this.props.onModalComplete(value.name, value.id)
+  onSelect = (value: ILocation) => {
+    this.props.onModalComplete(value.id)
     this.setState({
       searchText: '',
-      showModal: !this.state.showModal,
-      isSearchField: false,
-      fieldValue: value.name
+      showModal: false,
+      showSearch: false,
+      fieldValue: value.id
     })
   }
 
-  handleClick = () => {
+  changeSelection = (param: string) => {
     this.setState({
-      isSearchField: true,
-      searchText: this.state.fieldValue,
+      showSearch: true,
+      searchText: param,
       showModal: true
     })
   }
 
   render() {
-    const { intl, fieldLabel, fieldName, isFieldRequired } = this.props
+    const { intl, fieldName } = this.props
     const placeHolderText = intl.formatMessage(
       formMessages.searchFieldPlaceHolderText
     )
-    const locations: ILocation[] = [
-      {
-        id: 'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5',
-        name: 'Moktarpur Union Parishad',
-        detailedLocation: 'Moktarpur, Kaliganj, Gazipur, Dhaka'
-      },
-      {
-        id: '033518d8-7c18-482f-8633-8344ce81405d',
-        name: 'Nagari Union Parishad',
-        detailedLocation: 'Nagari, Kaliganj, Gazipur, Dhaka'
-      },
-      {
-        id: '79ad255c-7b36-4d8b-813f-971deee192eb',
-        name: 'Bhurungamari Union Parishad',
-        detailedLocation: 'Bhurungamari, Bhurungamari, Kurigram, Rangpur'
-      }
+
+    const offlineLocations = this.props.offlineResources[
+      this.props.searchableResource
     ]
-    const selectedValue = this.state.selectedValue || locations[0].name
-    let selectedLocation: ILocation = locations[0]
-    const listItems = locations.map((location: ILocation, index: number) => {
-      if (location.name === selectedValue) {
-        selectedLocation = location
-      }
+
+    let locations = Object.values(offlineLocations)
+    if (this.state.searchText.length > 0) {
+      locations = locations.filter(location =>
+        location.name
+          .toUpperCase()
+          .includes(this.state.searchText.toUpperCase())
+      )
+    }
+    const selectedValue =
+      this.state.selectedValue ||
+      (locations && locations.length > 0 && locations[0].id) ||
+      ''
+
+    const selectedLocation = locations.find(
+      location => location.id === selectedValue
+    )
+    const fieldLocationName =
+      (this.state.fieldValue &&
+        offlineLocations[this.state.fieldValue] &&
+        offlineLocations[this.state.fieldValue].name) ||
+      ''
+    const listItems = locations.map((location, index) => {
       return (
         <ItemContainer
           key={'item-container-' + index}
-          selected={location.name === selectedValue}
+          selected={location.id === selectedValue}
         >
           <Item>
             <RadioButton
               id={'location-' + index}
               name="location"
               label={location.name}
-              value={location.name}
+              value={location.id}
               selected={selectedValue}
               onChange={this.handleChange}
             />
           </Item>
-          <Item width={250}>{location.detailedLocation}</Item>
           <Item isRight={true} color={this.props.theme.colors.black}>
-            {location.name === selectedValue &&
+            {location.id === selectedValue &&
               intl.formatMessage(formMessages.officeLocationId, {
                 locationId: location.id
               })}
@@ -210,21 +216,20 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     return (
       <>
-        {!this.state.showModal && (
-          <InputLabel required={isFieldRequired}>{fieldLabel}</InputLabel>
-        )}
-        {!this.state.showModal && !this.state.isSearchField && (
+        {!this.state.showModal && !this.state.showSearch && (
           <InputSection>
             <TextInput
               id={this.props.fieldName + '-id'}
-              value={this.state.fieldValue}
+              value={fieldLocationName}
               disabled
               className="item"
             />
             <LinkButton
               id="edit-button"
               className="item"
-              onClick={this.handleClick}
+              onClick={() => {
+                this.changeSelection(fieldLocationName)
+              }}
             >
               {intl.formatMessage(formMessages.changeButtonLabel, {
                 fieldName
@@ -232,11 +237,13 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
             </LinkButton>
           </InputSection>
         )}
-        {!this.state.showModal && this.state.isSearchField && (
+        {!this.state.showModal && this.state.showSearch && (
           <SearchInputWithIcon
             placeHolderText={placeHolderText}
-            searchText={this.state.searchText}
-            searchHandler={this.toggleSearchModal}
+            searchText={fieldLocationName}
+            searchHandler={this.handleSearch}
+            error={this.props.error}
+            touched={this.props.touched}
           />
         )}
 
@@ -251,6 +258,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           handleClose={this.onModalClose}
           actions={[
             <CancelButton
+              type="button"
               key="modal_cancel"
               id="modal_cancel"
               onClick={this.onModalClose}
@@ -260,7 +268,11 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
             <SelectButton
               key="modal_select"
               id="modal_select"
-              onClick={() => this.onModalComplete(selectedLocation)}
+              type="button"
+              disabled={listItems.length <= 0}
+              onClick={() =>
+                selectedLocation && this.onSelect(selectedLocation)
+              }
             >
               {intl.formatMessage(buttonMessages.select)}
             </SelectButton>
@@ -269,10 +281,17 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           <ChildContainer>
             <SearchInputWithIcon
               placeHolderText={placeHolderText}
-              searchText={this.state.searchText}
+              searchText={fieldLocationName}
               searchHandler={this.handleSearch}
             />
-            <ListContainer>{listItems}</ListContainer>
+            {listItems.length > 0 && <ListContainer>{listItems}</ListContainer>}
+            {listItems.length <= 0 && (
+              <div>
+                <ErrorText>
+                  {intl.formatMessage(constantsMessages.noResults)}
+                </ErrorText>
+              </div>
+            )}
           </ChildContainer>
         </ResponsiveModal>
       </>
@@ -282,7 +301,8 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (store: IStoreState) => {
   return {
-    language: getLanguage(store)
+    language: getLanguage(store),
+    offlineResources: getOfflineData(store)
   }
 }
 

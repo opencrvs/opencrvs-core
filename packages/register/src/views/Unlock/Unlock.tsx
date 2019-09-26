@@ -18,11 +18,15 @@ import { pinOps } from '@register/views/Unlock/ComparePINs'
 import * as ReactDOM from 'react-dom'
 import { getCurrentUserID, IUserData } from '@register/applications'
 import { messages } from '@register/i18n/messages/views/pin'
+import zambiaBackground from './background-zmb.jpg'
 
 const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
-  height: 100vh;
+  ${window.config.COUNTRY === 'zmb'
+    ? `background: url(${zambiaBackground});`
+    : ''}
+  height: calc(100vh + 80px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -39,6 +43,10 @@ const SpinnerWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
+`
+
+const StyledLogo = styled(Logo)`
+  margin-top: -80px;
 `
 
 const LogoutHeader = styled.a`
@@ -101,6 +109,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   componentWillMount() {
     this.loadUserPin()
     this.screenLockTimer()
+    document.addEventListener('mouseup', this.handleClick, false)
   }
 
   async loadUserPin() {
@@ -234,6 +243,14 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   componentDidMount = () => this.focusKeypad()
 
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.handleClick, false)
+  }
+
+  handleClick = (e: Event) => {
+    this.focusKeypad()
+  }
+
   focusKeypad = () => {
     const node =
       this.pinKeyRef && (ReactDOM.findDOMNode(this.pinKeyRef) as HTMLElement)
@@ -254,7 +271,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           <Logout />
         </LogoutHeader>
         <Container onClick={this.focusKeypad}>
-          <Logo />
+          <StyledLogo />
           {this.showName()}
 
           {this.showErrorMessage()}

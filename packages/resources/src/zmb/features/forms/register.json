@@ -3,6 +3,225 @@
     "birth": {
       "sections": [
         {
+          "id": "registration",
+          "viewType": "hidden",
+          "name": {
+            "defaultMessage": "Registration",
+            "description": "Form section name for Registration",
+            "id": "form.section.application.name"
+          },
+          "title": {
+            "defaultMessage": "Registration",
+            "description": "Form section title for Registration",
+            "id": "form.section.application.title"
+          },
+          "groups": [
+            {
+              "id": "registration-view-group",
+              "fields": [
+                {
+                  "name": "presentAtBirthRegistration",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "label": {
+                    "defaultMessage": "Who is the applicant for the registration",
+                    "description": "Input label for Applicant",
+                    "id": "form.section.applicant.name"
+                  },
+                  "required": false,
+                  "readonly": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoIsPresent.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoIsPresent.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoIsPresent.father"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Other",
+                        "description": "Label for \"Other\" select option",
+                        "id": "form.field.label.application.whoIsPresent.other"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "sectionFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
+                {
+                  "name": "whoseContactDetails",
+                  "type": "SELECT_WITH_OPTIONS",
+                  "previewGroup": "mainContact",
+                  "label": {
+                    "defaultMessage": "Who is the contact person for this application?",
+                    "description": "Input label for contact details person",
+                    "id": "form.field.label.application.whoseContactDetails"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "BOTH",
+                      "label": {
+                        "defaultMessage": "Both Parents",
+                        "description": "Label for \"Both Parents\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.both"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for \"Mother\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for \"Father\" select option",
+                        "id": "form.field.label.application.whoseContactDetails.father"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": ["contact"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["contact"]
+                    }
+                  }
+                },
+                {
+                  "name": "registrationPhone",
+                  "type": "TEL",
+                  "previewGroup": "mainContact",
+                  "label": {
+                    "defaultMessage": "Phone number",
+                    "description": "Input label for phone input",
+                    "id": "form.field.label.application.phone"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "phoneNumberFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldNameTransformer",
+                      "parameters": ["contactPhoneNumber"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["contactPhoneNumber"]
+                    }
+                  }
+                },
+                {
+                  "name": "phoneVerificationWarning",
+                  "type": "WARNING",
+                  "label": {
+                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
+                    "description": "Warning message to verify applicant phone number ",
+                    "id": "form.field.label.application.phoneVerificationWarning"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
+                  "name": "commentsOrNotes",
+                  "type": "TEXTAREA",
+                  "label": {
+                    "defaultMessage": "Comments or notes",
+                    "description": "Input label for comments or notes textarea",
+                    "id": "form.field.label.application.commentsOrNotes"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "description": {
+                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
+                    "description": "Help text for the notes field",
+                    "id": "form.field.label.application.commentsOrNotes.description"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToCommentTransformer"
+                    },
+                    "query": {
+                      "operation": "commentToFieldTransformer"
+                    }
+                  }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "mainContact",
+                  "label": {
+                    "defaultMessage": "Main contact",
+                    "description": "Preview label for applicant type + phone number",
+                    "id": "form.field.label.application.mainContact"
+                  },
+                  "fieldToRedirect": "mainContact"
+                }
+              ]
+            }
+          ],
+          "mapping": {
+            "mutation": {
+              "operation": "setBirthRegistrationSectionTransformer"
+            },
+            "query": {
+              "operation": "getBirthRegistrationSectionTransformer"
+            }
+          }
+        },
+        {
           "id": "child",
           "viewType": "form",
           "name": {
@@ -21,10 +240,10 @@
               "id": "child-view-group",
               "fields": [
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Given name(s)",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.childFirstNamesEng"
                   },
@@ -38,26 +257,20 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     }
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Surname",
-                    "description": "Label for form field: Surname in english",
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
                     "id": "form.field.label.childFamilyNameEng"
                   },
                   "required": true,
@@ -70,17 +283,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     }
                   }
                 },
@@ -153,15 +360,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     }
                   }
                 },
@@ -343,23 +546,17 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [
-                        2
-                      ]
+                      "parameters": [2]
                     }
                   ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueSectionExchangeTransformer",
-                      "parameters": [
-                        "mother"
-                      ]
+                      "parameters": ["mother"]
                     },
                     "query": {
                       "operation": "sectionFieldExchangeTransformer",
-                      "parameters": [
-                        "mother"
-                      ]
+                      "parameters": ["mother"]
                     }
                   }
                 },
@@ -377,10 +574,7 @@
                   "validate": [
                     {
                       "operation": "range",
-                      "parameters": [
-                        0,
-                        6
-                      ]
+                      "parameters": [0, 6]
                     }
                   ],
                   "postfix": "Kg",
@@ -403,7 +597,8 @@
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
-                  "required": false,
+                  "previewGroup": "placeOfBirth",
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "placeholder": {
@@ -413,15 +608,7 @@
                   },
                   "options": [
                     {
-                      "value": "HOSPITAL",
-                      "label": {
-                        "defaultMessage": "Hospital",
-                        "description": "Select item for hospital",
-                        "id": "form.field.label.hospital"
-                      }
-                    },
-                    {
-                      "value": "HEALTH_INSTITUTION",
+                      "value": "HEALTH_FACILITY",
                       "label": {
                         "defaultMessage": "Health Institution",
                         "description": "Select item for Health Institution",
@@ -464,13 +651,18 @@
                     "description": "Label for form field: Health Institution",
                     "id": "form.field.label.healdInstitution"
                   },
-                  "required": false,
+                  "previewGroup": "placeOfBirth",
+                  "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"HEALTH_INSTITUTION\")"
+                      "expression": "(values.placeOfBirth!=\"HEALTH_FACILITY\")"
                     }
                   ],
                   "mapping": {
@@ -637,7 +829,7 @@
                   ],
                   "initialValue": "URBAN",
                   "required": false,
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "previewGroup": "placeOfBirth",
                   "validate": [],
                   "conditionals": [
@@ -661,15 +853,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        7
-                      ]
+                      "parameters": [7]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        7
-                      ]
+                      "parameters": [7]
                     }
                   }
                 },
@@ -710,15 +898,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        6
-                      ]
+                      "parameters": [6]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        6
-                      ]
+                      "parameters": [6]
                     }
                   }
                 },
@@ -759,15 +943,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        4
-                      ]
+                      "parameters": [4]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        4
-                      ]
+                      "parameters": [4]
                     }
                   }
                 },
@@ -808,15 +988,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        3
-                      ]
+                      "parameters": [3]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        3
-                      ]
+                      "parameters": [3]
                     }
                   }
                 },
@@ -857,15 +1033,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        2
-                      ]
+                      "parameters": [2]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        2
-                      ]
+                      "parameters": [2]
                     }
                   }
                 },
@@ -906,15 +1078,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        1
-                      ]
+                      "parameters": [1]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        1
-                      ]
+                      "parameters": [1]
                     }
                   }
                 },
@@ -955,30 +1123,26 @@
                   "mapping": {
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [
-                        5
-                      ]
+                      "parameters": [5]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        5
-                      ]
+                      "parameters": [5]
                     }
                   }
                 }
+              ],
+              "previewGroups": [
+                {
+                  "id": "placeOfBirth",
+                  "label": {
+                    "defaultMessage": "Place of delivery",
+                    "description": "Label for form field: Place of delivery",
+                    "id": "form.field.label.placeOfBirth"
+                  },
+                  "fieldToRedirect": "placeOfBirth"
+                }
               ]
-            }
-          ],
-          "previewGroups": [
-            {
-              "id": "placeOfBirth",
-              "label": {
-                "defaultMessage": "Place of delivery",
-                "description": "Label for form field: Place of delivery",
-                "id": "form.field.label.placeOfBirth"
-              },
-              "fieldToRedirect": "placeOfBirth"
             }
           ]
         },
@@ -1029,7 +1193,7 @@
                   }
                 },
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -1044,26 +1208,18 @@
                     },
                     {
                       "operation": "validLength",
-                      "parameters": [
-                        9
-                      ]
+                      "parameters": [9]
                     }
                   ],
                   "conditionals": [],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     }
                   }
                 },
@@ -1082,22 +1238,16 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     }
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -1114,22 +1264,16 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     }
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -1146,17 +1290,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     }
                   }
                 },
@@ -1194,9 +1332,7 @@
                           "operation": "dateLessThan",
                           "parameters": []
                         },
-                        "dependencies": [
-                          "dateOfMarriage"
-                        ]
+                        "dependencies": ["dateOfMarriage"]
                       }
                     ]
                   },
@@ -1211,15 +1347,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     }
                   }
                 },
@@ -1349,25 +1481,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -1375,25 +1491,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ]
@@ -1406,6 +1506,7 @@
                     "description": "Title for mother place of birth",
                     "id": "form.field.label.motherPlaceOfHeritage"
                   },
+                  "previewGroup": "placeOfHeritage",
                   "initialValue": "",
                   "validate": []
                 },
@@ -1432,19 +1533,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "country"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "country"]
                     }
                   }
                 },
@@ -1478,19 +1571,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "state"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "state"]
                     }
                   }
                 },
@@ -1528,19 +1613,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "district"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 0, "district"]
                     }
                   }
                 },
@@ -1573,17 +1650,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        3
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 3]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        3
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 3]
                     }
                   }
                 },
@@ -1616,17 +1687,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        1
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 1]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PLACE_OF_HERITAGE",
-                        1
-                      ]
+                      "parameters": ["PLACE_OF_HERITAGE", 1]
                     }
                   }
                 },
@@ -1638,6 +1703,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.motherPermanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -1664,19 +1730,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     }
                   }
                 },
@@ -1710,19 +1768,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     }
                   }
                 },
@@ -1760,19 +1810,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     }
                   }
                 },
@@ -1804,7 +1846,7 @@
                   ],
                   "initialValue": "URBAN",
                   "previewGroup": "permanentAddress",
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "required": false,
                   "validate": [],
                   "conditionals": [
@@ -1824,17 +1866,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     }
                   }
                 },
@@ -1871,17 +1907,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     }
                   }
                 },
@@ -1918,17 +1948,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     }
                   }
                 },
@@ -1965,17 +1989,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     }
                   }
                 },
@@ -2012,17 +2030,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     }
                   }
                 },
@@ -2059,17 +2071,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     }
                   }
                 },
@@ -2106,17 +2112,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     }
                   }
                 },
@@ -2153,21 +2153,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "copyAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        "mother",
-                        "CURRENT",
-                        "mother"
-                      ]
+                      "parameters": ["PERMANENT", "mother", "CURRENT", "mother"]
                     },
                     "query": {
                       "operation": "sameAddressFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        "mother",
-                        "CURRENT",
-                        "mother"
-                      ]
+                      "parameters": ["PERMANENT", "mother", "CURRENT", "mother"]
                     }
                   }
                 },
@@ -2179,6 +2169,7 @@
                     "description": "Title for the current address fields",
                     "id": "form.field.label.currentAddress"
                   },
+                  "previewGroup": "currentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -2212,19 +2203,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["CURRENT", 0, "country"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["CURRENT", 0, "country"]
                     }
                   }
                 },
@@ -2262,15 +2245,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
+                      "parameters": ["CURRENT"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
+                      "parameters": ["CURRENT"]
                     }
                   }
                 },
@@ -2312,15 +2291,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
+                      "parameters": ["CURRENT"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT"
-                      ]
+                      "parameters": ["CURRENT"]
                     }
                   }
                 },
@@ -2352,7 +2327,7 @@
                   ],
                   "initialValue": "URBAN",
                   "previewGroup": "currentAddress",
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "required": false,
                   "validate": [],
                   "conditionals": [
@@ -2376,17 +2351,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        7
-                      ]
+                      "parameters": ["CURRENT", 7]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        7
-                      ]
+                      "parameters": ["CURRENT", 7]
                     }
                   }
                 },
@@ -2427,17 +2396,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        6
-                      ]
+                      "parameters": ["CURRENT", 6]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        6
-                      ]
+                      "parameters": ["CURRENT", 6]
                     }
                   }
                 },
@@ -2478,17 +2441,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        4
-                      ]
+                      "parameters": ["CURRENT", 4]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        4
-                      ]
+                      "parameters": ["CURRENT", 4]
                     }
                   }
                 },
@@ -2529,17 +2486,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        3
-                      ]
+                      "parameters": ["CURRENT", 3]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        3
-                      ]
+                      "parameters": ["CURRENT", 3]
                     }
                   }
                 },
@@ -2580,17 +2531,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        2
-                      ]
+                      "parameters": ["CURRENT", 2]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        2
-                      ]
+                      "parameters": ["CURRENT", 2]
                     }
                   }
                 },
@@ -2631,17 +2576,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        1
-                      ]
+                      "parameters": ["CURRENT", 1]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        1
-                      ]
+                      "parameters": ["CURRENT", 1]
                     }
                   }
                 },
@@ -2682,50 +2621,44 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        5
-                      ]
+                      "parameters": ["CURRENT", 5]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "CURRENT",
-                        5
-                      ]
+                      "parameters": ["CURRENT", 5]
                     }
                   }
                 }
+              ],
+              "previewGroups": [
+                {
+                  "id": "placeOfHeritage",
+                  "label": {
+                    "defaultMessage": "Place of origin (heritage)",
+                    "description": "Tag definition for placeOfHeritage",
+                    "id": "form.preview.tag.placeOfHeritage"
+                  },
+                  "fieldToRedirect": "placeOfHeritage"
+                },
+                {
+                  "id": "permanentAddress",
+                  "label": {
+                    "defaultMessage": "Permanent address",
+                    "description": "Tag definition for permanentAddress",
+                    "id": "form.preview.tag.permanent.address"
+                  },
+                  "fieldToRedirect": "permanentAddress"
+                },
+                {
+                  "id": "currentAddress",
+                  "label": {
+                    "defaultMessage": "Current address",
+                    "description": "Tag definition for crrent address",
+                    "id": "form.preview.tag.current.address"
+                  },
+                  "fieldToRedirect": "currentAddress"
+                }
               ]
-            }
-          ],
-          "previewGroups": [
-            {
-              "id": "placeOfHeritage",
-              "label": {
-                "defaultMessage": "Place of origin (heritage)",
-                "description": "Tag definition for placeOfHeritage",
-                "id": "form.preview.tag.placeOfHeritage"
-              },
-              "fieldToRedirect": "placeOfHeritage"
-            },
-            {
-              "id": "permanentAddress",
-              "label": {
-                "defaultMessage": "Permanent address",
-                "description": "Tag definition for permanentAddress",
-                "id": "form.preview.tag.permanent.address"
-              },
-              "fieldToRedirect": "permanentAddress"
-            },
-            {
-              "id": "currentAddress",
-              "label": {
-                "defaultMessage": "Current address",
-                "description": "Tag definition for crrent address",
-                "id": "form.preview.tag.current.address"
-              },
-              "fieldToRedirect": "currentAddress"
             }
           ]
         },
@@ -2790,7 +2723,7 @@
                   }
                 },
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -2805,9 +2738,7 @@
                     },
                     {
                       "operation": "validLength",
-                      "parameters": [
-                        9
-                      ]
+                      "parameters": [9]
                     }
                   ],
                   "conditionals": [
@@ -2819,17 +2750,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     }
                   }
                 },
@@ -2853,17 +2778,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     }
                   }
                 },
@@ -2902,7 +2821,7 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -2925,22 +2844,16 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     }
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -2963,17 +2876,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     }
                   }
                 },
@@ -3011,9 +2918,7 @@
                           "operation": "dateLessThan",
                           "parameters": []
                         },
-                        "dependencies": [
-                          "dateOfMarriage"
-                        ]
+                        "dependencies": ["dateOfMarriage"]
                       }
                     ]
                   },
@@ -3034,15 +2939,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     }
                   }
                 },
@@ -3194,25 +3095,9 @@
                       }
                     },
                     {
-                      "value": "LOWER_SECONDARY_ISCED_2",
-                      "label": {
-                        "defaultMessage": "Lower secondary",
-                        "description": "Option for form field: ISCED2 education",
-                        "id": "form.field.label.educationAttainmentISCED2"
-                      }
-                    },
-                    {
-                      "value": "UPPER_SECONDARY_ISCED_3",
-                      "label": {
-                        "defaultMessage": "Upper secondary",
-                        "description": "Option for form field: ISCED3 education",
-                        "id": "form.field.label.educationAttainmentISCED3"
-                      }
-                    },
-                    {
                       "value": "POST_SECONDARY_ISCED_4",
                       "label": {
-                        "defaultMessage": "Post secondary",
+                        "defaultMessage": "Secondary",
                         "description": "Option for form field: ISCED4 education",
                         "id": "form.field.label.educationAttainmentISCED4"
                       }
@@ -3220,25 +3105,9 @@
                     {
                       "value": "FIRST_STAGE_TERTIARY_ISCED_5",
                       "label": {
-                        "defaultMessage": "First stage tertiary",
+                        "defaultMessage": "Tertiary",
                         "description": "Option for form field: ISCED5 education",
                         "id": "form.field.label.educationAttainmentISCED5"
-                      }
-                    },
-                    {
-                      "value": "SECOND_STAGE_TERTIARY_ISCED_6",
-                      "label": {
-                        "defaultMessage": "Second stage tertiary",
-                        "description": "Option for form field: ISCED6 education",
-                        "id": "form.field.label.educationAttainmentISCED6"
-                      }
-                    },
-                    {
-                      "value": "NOT_STATED",
-                      "label": {
-                        "defaultMessage": "Not stated",
-                        "description": "Option for form field: not stated education",
-                        "id": "form.field.label.educationAttainmentNotStated"
                       }
                     }
                   ]
@@ -3307,6 +3176,7 @@
                     "description": "Title for the permanent address fields",
                     "id": "form.field.label.fatherPermanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3353,19 +3223,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     }
                   }
                 },
@@ -3407,19 +3269,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     }
                   }
                 },
@@ -3465,19 +3319,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     }
                   }
                 },
@@ -3509,7 +3355,7 @@
                   ],
                   "initialValue": "URBAN",
                   "previewGroup": "permanentAddress",
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "required": false,
                   "validate": [],
                   "conditionals": [
@@ -3537,17 +3383,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     }
                   }
                 },
@@ -3592,17 +3432,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     }
                   }
                 },
@@ -3647,17 +3481,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     }
                   }
                 },
@@ -3702,17 +3530,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     }
                   }
                 },
@@ -3757,17 +3579,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     }
                   }
                 },
@@ -3812,17 +3628,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     }
                   }
                 },
@@ -3867,17 +3677,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     }
                   }
                 }
@@ -3907,219 +3711,6 @@
           "mapping": {
             "query": {
               "operation": "emptyFatherSectionTransformer"
-            }
-          }
-        },
-        {
-          "id": "registration",
-          "viewType": "hidden",
-          "name": {
-            "defaultMessage": "Registration",
-            "description": "Form section name for Registration",
-            "id": "form.section.application.name"
-          },
-          "title": {
-            "defaultMessage": "Registration",
-            "description": "Form section title for Registration",
-            "id": "form.section.application.title"
-          },
-          "groups": [
-            {
-              "id": "registration-view-group",
-              "fields": [
-                {
-                  "name": "presentAtBirthRegistration",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is present for the registration",
-                    "description": "Input label for who is present input",
-                    "id": "form.field.label.application.whoIsPresent"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH_PARENTS",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoIsPresent.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoIsPresent.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoIsPresent.father"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for \"Other\" select option",
-                        "id": "form.field.label.application.whoIsPresent.other"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "whoseContactDetails",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Who is the contact person for this application?",
-                    "description": "Input label for contact details person",
-                    "id": "form.field.label.application.whoseContactDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.father"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "registrationPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.application.phone"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "phoneVerificationWarning",
-                  "type": "WARNING",
-                  "label": {
-                    "defaultMessage": "Check with the applicant that the mobile phone number you have entered is correct",
-                    "description": "Warning message to verify applicant phone number ",
-                    "id": "form.field.label.application.phoneVerificationWarning"
-                  },
-                  "initialValue": "",
-                  "validate": []
-                },
-                {
-                  "name": "commentsOrNotes",
-                  "type": "TEXTAREA",
-                  "label": {
-                    "defaultMessage": "Comments or notes",
-                    "description": "Input label for comments or notes textarea",
-                    "id": "form.field.label.application.commentsOrNotes"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "description": {
-                    "defaultMessage": "Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.",
-                    "description": "Help text for the notes field",
-                    "id": "form.field.label.application.commentsOrNotes.description"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToCommentTransformer"
-                    },
-                    "query": {
-                      "operation": "commentToFieldTransformer"
-                    }
-                  }
-                }
-              ]
-            }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setBirthRegistrationSectionTransformer"
-            },
-            "query": {
-              "operation": "getBirthRegistrationSectionTransformer"
             }
           }
         },
@@ -4295,7 +3886,7 @@
               "id": "deceased-view-group",
               "fields": [
                 {
-                  "name": "nationalID",
+                  "name": "iD",
                   "type": "NUMBER",
                   "label": {
                     "defaultMessage": "National ID",
@@ -4310,26 +3901,18 @@
                     },
                     {
                       "operation": "validLength",
-                      "parameters": [
-                        9
-                      ]
+                      "parameters": [9]
                     }
                   ],
                   "conditionals": [],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "NATIONAL_ID"
-                      ]
+                      "parameters": ["id", "NATIONAL_ID"]
                     }
                   }
                 },
@@ -4348,17 +3931,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": [
-                        "id",
-                        "SOCIAL_SECURITY_NO"
-                      ]
+                      "parameters": ["id", "SOCIAL_SECURITY_NO"]
                     }
                   }
                 },
@@ -4391,10 +3968,10 @@
                   }
                 },
                 {
-                  "name": "firstNames",
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Given name(s)",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.deceasedGivenNamesEng"
                   },
@@ -4408,26 +3985,20 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "firstNames"
-                      ]
+                      "parameters": ["en", "firstNames"]
                     }
                   }
                 },
                 {
-                  "name": "familyName",
+                  "name": "familyNameEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Surname",
-                    "description": "Label for form field: Surname in english",
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
                     "id": "form.field.label.deceasedFamilyNameEng"
                   },
                   "required": true,
@@ -4440,17 +4011,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": [
-                        "en",
-                        "familyName"
-                      ]
+                      "parameters": ["en", "familyName"]
                     }
                   }
                 },
@@ -4621,6 +4186,7 @@
                     "description": "Title for the residential address fields",
                     "id": "form.field.label.permanentAddress"
                   },
+                  "previewGroup": "permanentAddress",
                   "initialValue": "",
                   "validate": []
                 },
@@ -4647,19 +4213,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "country"
-                      ]
+                      "parameters": ["PERMANENT", 0, "country"]
                     }
                   }
                 },
@@ -4693,19 +4251,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "state"
-                      ]
+                      "parameters": ["PERMANENT", 0, "state"]
                     }
                   }
                 },
@@ -4743,19 +4293,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        0,
-                        "district"
-                      ]
+                      "parameters": ["PERMANENT", 0, "district"]
                     }
                   }
                 },
@@ -4787,7 +4329,7 @@
                   ],
                   "initialValue": "URBAN",
                   "previewGroup": "permanentAddress",
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "required": false,
                   "validate": [],
                   "conditionals": [
@@ -4807,17 +4349,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        7
-                      ]
+                      "parameters": ["PERMANENT", 7]
                     }
                   }
                 },
@@ -4854,17 +4390,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        6
-                      ]
+                      "parameters": ["PERMANENT", 6]
                     }
                   }
                 },
@@ -4901,17 +4431,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        4
-                      ]
+                      "parameters": ["PERMANENT", 4]
                     }
                   }
                 },
@@ -4948,17 +4472,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        3
-                      ]
+                      "parameters": ["PERMANENT", 3]
                     }
                   }
                 },
@@ -4995,17 +4513,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        2
-                      ]
+                      "parameters": ["PERMANENT", 2]
                     }
                   }
                 },
@@ -5042,17 +4554,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        1
-                      ]
+                      "parameters": ["PERMANENT", 1]
                     }
                   }
                 },
@@ -5089,17 +4595,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": [
-                        "PERMANENT",
-                        5
-                      ]
+                      "parameters": ["PERMANENT", 5]
                     }
                   }
                 }
@@ -5159,15 +4659,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
-                      "parameters": [
-                        "deceased"
-                      ]
+                      "parameters": ["deceased"]
                     },
                     "query": {
                       "operation": "deceasedDateToFieldTransformation",
-                      "parameters": [
-                        "deceased"
-                      ]
+                      "parameters": ["deceased"]
                     }
                   }
                 }
@@ -5238,15 +4734,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "mannerOfDeath"
-                      ]
+                      "parameters": ["mannerOfDeath"]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "mannerOfDeath"
-                      ]
+                      "parameters": ["mannerOfDeath"]
                     }
                   }
                 }
@@ -5277,7 +4769,7 @@
                       }
                     },
                     {
-                      "value": "HEALTH_INSTITUTION",
+                      "value": "HEALTH_FACILITY",
                       "label": {
                         "defaultMessage": "Health Institution",
                         "description": "Select item for Health Institution",
@@ -5297,9 +4789,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "copyEventAddressTransformer",
-                      "parameters": [
-                        "deceased"
-                      ]
+                      "parameters": ["deceased"]
                     },
                     "query": {
                       "operation": "deathPlaceToFieldTransformer"
@@ -5313,7 +4803,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "values.deathPlaceAddress!=\"HEALTH_INSTITUTION\""
+                  "expression": "values.deathPlaceAddress!=\"HEALTH_FACILITY\""
                 }
               ],
               "fields": [
@@ -5327,6 +4817,10 @@
                   },
                   "required": true,
                   "initialValue": "",
+                  "searchableResource": "facilities",
+                  "dynamicOptions": {
+                    "resource": "facilities"
+                  },
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -5339,8 +4833,8 @@
                       "parameters": []
                     },
                     "query": {
-                      "operation": "eventLocationIDQueryTransformer",
-                      "parameters": []
+                      "operation": "sectionFieldExchangeTransformer",
+                      "parameters": ["eventLocation", "id"]
                     }
                   }
                 }
@@ -5511,7 +5005,7 @@
                   ],
                   "initialValue": "URBAN",
                   "required": false,
-                  "hideInReview": true,
+                  "hideValueInPreview": true,
                   "validate": [],
                   "conditionals": [
                     {
@@ -5530,15 +5024,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        7
-                      ]
+                      "parameters": [7]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        7
-                      ]
+                      "parameters": [7]
                     }
                   }
                 },
@@ -5575,15 +5065,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        6
-                      ]
+                      "parameters": [6]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        6
-                      ]
+                      "parameters": [6]
                     }
                   }
                 },
@@ -5620,15 +5106,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        4
-                      ]
+                      "parameters": [4]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        4
-                      ]
+                      "parameters": [4]
                     }
                   }
                 },
@@ -5665,15 +5147,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        3
-                      ]
+                      "parameters": [3]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        3
-                      ]
+                      "parameters": [3]
                     }
                   }
                 },
@@ -5710,15 +5188,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        2
-                      ]
+                      "parameters": [2]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        2
-                      ]
+                      "parameters": [2]
                     }
                   }
                 },
@@ -5755,15 +5229,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        1
-                      ]
+                      "parameters": [1]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        1
-                      ]
+                      "parameters": [1]
                     }
                   }
                 },
@@ -5800,15 +5270,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
-                      "parameters": [
-                        5
-                      ]
+                      "parameters": [5]
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        5
-                      ]
+                      "parameters": [5]
                     }
                   }
                 }
@@ -5938,15 +5404,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
+                      "parameters": ["causeOfDeathMethod"]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
+                      "parameters": ["causeOfDeathMethod"]
                     }
                   }
                 },
@@ -5966,23 +5428,17 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [
-                        17
-                      ]
+                      "parameters": [17]
                     }
                   ],
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeath"
-                      ]
+                      "parameters": ["causeOfDeath"]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeath"
-                      ]
+                      "parameters": ["causeOfDeath"]
                     }
                   }
                 }
@@ -6009,322 +5465,12 @@
               "id": "informant-view-group",
               "fields": [
                 {
-                  "name": "iDType",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Type of ID",
-                    "description": "Label for form field: Existing ID",
-                    "id": "form.field.label.applicantsIdType"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
-                      "value": "NATIONAL_ID",
-                      "label": {
-                        "defaultMessage": "National ID",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
-                      }
-                    },
-                    {
-                      "value": "DRIVING_LICENSE",
-                      "label": {
-                        "defaultMessage": "Drivers License",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeDrivingLicense"
-                      }
-                    },
-                    {
-                      "value": "BIRTH_REGISTRATION_NUMBER",
-                      "label": {
-                        "defaultMessage": "Birth Registration Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
-                      }
-                    },
-                    {
-                      "value": "REFUGEE_NUMBER",
-                      "label": {
-                        "defaultMessage": "Refugee Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeRefugeeNumber"
-                      }
-                    },
-                    {
-                      "value": "ALIEN_NUMBER",
-                      "label": {
-                        "defaultMessage": "Alien Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeAlienNumber"
-                      }
-                    },
-                    {
-                      "value": "NO_ID",
-                      "label": {
-                        "defaultMessage": "No ID available",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNoID"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToIdentifierTransformer",
-                          "parameters": [
-                            "type"
-                          ]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "identifierToFieldTransformer",
-                          "parameters": [
-                            "type"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToIdentifierTransformer",
-                          "parameters": [
-                            "otherType"
-                          ]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "identifierToFieldTransformer",
-                          "parameters": [
-                            "otherType"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantID",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "iDType",
-                      "labelMapper": {
-                        "operation": "identityNameMapper"
-                      }
-                    },
-                    "type": {
-                      "kind": "dynamic",
-                      "dependency": "iDType",
-                      "typeMapper": {
-                        "operation": "identityTypeMapper"
-                      }
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "validIDNumber",
-                          "parameters": []
-                        },
-                        "dependencies": [
-                          "iDType"
-                        ]
-                      }
-                    ]
-                  },
-                  "label": {
-                    "defaultMessage": "ID Number",
-                    "description": "Label for form field: ID Number",
-                    "id": "form.field.label.iD"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || values.iDType === \"NO_ID\""
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToIdentifierTransformer",
-                          "parameters": [
-                            "id"
-                          ]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "identifierToFieldTransformer",
-                          "parameters": [
-                            "id"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "fetchButton",
-                  "type": "FETCH_BUTTON",
-                  "label": {
-                    "defaultMessage": "Retrieve Informant's Details",
-                    "description": "Label for loader button",
-                    "id": "form.field.label.fetchInformantDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "queryMap": {
-                    "BIRTH_REGISTRATION_NUMBER": {
-                      "query": {
-                        "operation": "FETCH_REGISTRATION"
-                      },
-                      "inputs": [
-                        {
-                          "name": "identifier",
-                          "valueField": "applicantID"
-                        }
-                      ],
-                      "responseTransformer": {
-                        "operation": "transformRegistrationData"
-                      },
-                      "modalInfoText": {
-                        "defaultMessage": "Birth Registration Number",
-                        "description": "Label for loader button",
-                        "id": "form.field.label.fetchRegistrationModalInfo"
-                      },
-                      "errorText": {
-                        "defaultMessage": "No registration found for provided BRN",
-                        "description": "Label for fetch modal error title",
-                        "id": "form.field.label.fetchRegistrationModalErrorText"
-                      }
-                    },
-                    "NATIONAL_ID": {
-                      "query": {
-                        "operation": "FETCH_PERSON"
-                      },
-                      "inputs": [
-                        {
-                          "name": "identifier",
-                          "valueField": "applicantID"
-                        }
-                      ],
-                      "responseTransformer": {
-                        "operation": "transformInformantData"
-                      },
-                      "modalInfoText": {
-                        "defaultMessage": "National ID",
-                        "description": "Label for loader button",
-                        "id": "form.field.label.fetchPersonByNIDModalInfo"
-                      },
-                      "errorText": {
-                        "defaultMessage": "No person found for provided NID",
-                        "description": "Label for fetch modal error title",
-                        "id": "form.field.label.fetchPersonByNIDModalErrorText"
-                      }
-                    }
-                  },
-                  "querySelectorInput": {
-                    "name": "identifierType",
-                    "valueField": "iDType"
-                  },
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
-                    }
-                  ],
-                  "modalTitle": {
-                    "defaultMessage": "Checking",
-                    "description": "Label for fetch modal title",
-                    "id": "form.field.label.fetchIdentifierModalTitle"
-                  },
-                  "successTitle": {
-                    "defaultMessage": "ID valid",
-                    "description": "Label for fetch modal success title",
-                    "id": "form.field.label.fetchIdentifierModalSuccessTitle"
-                  },
-                  "errorTitle": {
-                    "defaultMessage": "Invalid Id",
-                    "description": "Label for fetch modal error title",
-                    "id": "form.field.label.fetchIdentifierModalErrorTitle"
-                  }
-                },
-                {
                   "name": "nationality",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
                     "defaultMessage": "Nationality",
                     "description": "Label for form field: Nationality",
-                    "id": "form.field.label.applicants.nationality"
+                    "id": "form.field.label.deceased.nationality"
                   },
                   "required": false,
                   "initialValue": "ZMB",
@@ -6359,147 +5505,55 @@
                   }
                 },
                 {
-                  "name": "applicantFirstNames",
+                  "name": "applicantID",
+                  "type": "NUMBER",
+                  "label": {
+                    "defaultMessage": "National ID",
+                    "description": "Option for form field: Type of ID",
+                    "id": "form.field.label.iDTypeNationalID"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "numeric"
+                    },
+                    {
+                      "operation": "validLength",
+                      "parameters": [9]
+                    }
+                  ],
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToIdentityTransformer",
+                          "parameters": ["id", "NATIONAL_ID"]
+                        }
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "identityToFieldTransformer",
+                          "parameters": ["id", "NATIONAL_ID"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "firstNamesEng",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.applicantsGivenNames"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToNameTransformer",
-                          "parameters": [
-                            "bn",
-                            "firstNames"
-                          ]
-                        },
-                        "name"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "nameToFieldTransformer",
-                          "parameters": [
-                            "bn",
-                            "firstNames"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantFamilyName",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
-                    "description": "Label for form field: Family name",
-                    "id": "form.field.label.applicantsFamilyName"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "bengaliOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToNameTransformer",
-                          "parameters": [
-                            "bn",
-                            "familyName"
-                          ]
-                        },
-                        "name"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "nameToFieldTransformer",
-                          "parameters": [
-                            "bn",
-                            "familyName"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantFirstNamesEng",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: Given names in english",
-                    "id": "form.field.label.applicantsGivenNamesEng"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "englishOnlyNameFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToNameTransformer",
-                          "parameters": [
-                            "en",
-                            "firstNames"
-                          ]
-                        },
-                        "name"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "nameToFieldTransformer",
-                          "parameters": [
-                            "en",
-                            "firstNames"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantFamilyNameEng",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.applicantsFamilyNameEng"
+                    "id": "form.field.label.childFirstNamesEng"
                   },
                   "required": true,
                   "initialValue": "",
@@ -6515,10 +5569,7 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": [
-                            "en",
-                            "familyName"
-                          ]
+                          "parameters": ["en", "firstNames"]
                         },
                         "name"
                       ]
@@ -6529,31 +5580,25 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": [
-                            "en",
-                            "familyName"
-                          ]
+                          "parameters": ["en", "firstNames"]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "name": "applicantBirthDate",
-                  "type": "DATE",
+                  "name": "familyNameEng",
+                  "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Date of Birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.applicantsDateOfBirth"
+                    "defaultMessage": "Last name",
+                    "description": "Label for form field: Last name in english",
+                    "id": "form.field.label.childFamilyNameEng"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
-                    },
-                    {
-                      "operation": "isDateInPast"
+                      "operation": "englishOnlyNameFormat"
                     }
                   ],
                   "mapping": {
@@ -6562,11 +5607,10 @@
                       "parameters": [
                         "individual",
                         {
-                          "operation": "fieldNameTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
-                        }
+                          "operation": "fieldToNameTransformer",
+                          "parameters": ["en", "familyName"]
+                        },
+                        "name"
                       ]
                     },
                     "query": {
@@ -6574,10 +5618,8 @@
                       "parameters": [
                         "individual",
                         {
-                          "operation": "fieldValueTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "operation": "nameToFieldTransformer",
+                          "parameters": ["en", "familyName"]
                         }
                       ]
                     }
@@ -6661,17 +5703,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueSectionExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "relationship"
-                      ]
+                      "parameters": ["informant", "relationship"]
                     },
                     "query": {
                       "operation": "sectionFieldExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "relationship"
-                      ]
+                      "parameters": ["informant", "relationship"]
                     }
                   }
                 },
@@ -6689,17 +5725,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueSectionExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "otherRelationship"
-                      ]
+                      "parameters": ["informant", "otherRelationship"]
                     },
                     "query": {
                       "operation": "sectionFieldExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "otherRelationship"
-                      ]
+                      "parameters": ["informant", "otherRelationship"]
                     }
                   },
                   "conditionals": [
@@ -6748,786 +5778,16 @@
                   }
                 },
                 {
-                  "name": "currentAddress",
+                  "name": "permanentAddress",
                   "type": "SUBSECTION",
                   "label": {
-                    "defaultMessage": "Current Address",
-                    "description": "Title for the current address fields",
-                    "id": "form.field.label.currentAddress"
+                    "defaultMessage": "What is their residential address?",
+                    "description": "Title for the permanent address fields",
+                    "id": "form.field.label.informantPermanentAddress"
                   },
                   "initialValue": "",
-                  "validate": [],
-                  "conditionals": []
-                },
-                {
-                  "name": "country",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Country",
-                    "description": "Title for the country select",
-                    "id": "form.field.label.country"
-                  },
-                  "required": true,
-                  "initialValue": "ZMB",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": {
-                    "resource": "countries"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        },
-                        "name"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "state",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Division",
-                    "description": "Title for the state select",
-                    "id": "form.field.label.state"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "country"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "district",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "District",
-                    "description": "Title for the district select",
-                    "id": "form.field.label.district"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "state"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine4",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "district"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            6
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            6
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
-                  "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            4
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            4
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine3CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Ward",
-                    "description": "Title for the address line 3 option 2",
-                    "id": "form.field.label.addressLine3CityOption"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            5
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            5
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            3
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            3
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1CityOption",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            2
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            2
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCodeCityOption",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.currentAddressSameAsPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            0,
-                            "postalCode"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            0,
-                            "postalCode"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine1",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Street and house number",
-                    "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            1
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            1
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "postCode",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.country"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.state"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.district"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            0,
-                            "postalCode"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            0,
-                            "postalCode"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantPermanentAddressSameAsCurrent",
-                  "type": "RADIO_GROUP",
-                  "label": {
-                    "defaultMessage": "Is applicant’s permanent address the same as their current address?",
-                    "description": "Title for the radio button to select that the applicants current address is the same as their permanent address",
-                    "id": "form.field.label.applicantsCurrentAddressSameAsPermanent"
-                  },
-                  "required": true,
-                  "initialValue": true,
-                  "validate": [],
-                  "options": [
-                    {
-                      "value": true,
-                      "label": {
-                        "defaultMessage": "Yes",
-                        "description": "confirmation label for yes / no radio button",
-                        "id": "form.field.label.confirm"
-                      }
-                    },
-                    {
-                      "value": false,
-                      "label": {
-                        "defaultMessage": "No",
-                        "description": "deny label for yes / no radio button",
-                        "id": "form.field.label.deny"
-                      }
-                    }
-                  ],
-                  "conditionals": [],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "copyAddressTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            "informant",
-                            "PERMANENT",
-                            "informant",
-                            true,
-                            "individual"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "sameAddressFieldTransformer",
-                          "parameters": [
-                            "CURRENT",
-                            "individual",
-                            "PERMANENT",
-                            "individual"
-                          ]
-                        }
-                      ]
-                    }
-                  }
+                  "previewGroup": "permanentAddress",
+                  "validate": []
                 },
                 {
                   "name": "countryPermanent",
@@ -7537,6 +5797,7 @@
                     "description": "Title for the country select",
                     "id": "form.field.label.country"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "ZMB",
                   "validate": [],
@@ -7548,12 +5809,6 @@
                   "options": {
                     "resource": "countries"
                   },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
-                    }
-                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueNestingTransformer",
@@ -7561,11 +5816,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "country"
-                          ]
+                          "parameters": ["PERMANENT", 0, "country"]
                         },
                         "address"
                       ]
@@ -7576,11 +5827,7 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "country"
-                          ]
+                          "parameters": ["PERMANENT", 0, "country"]
                         }
                       ]
                     }
@@ -7590,10 +5837,11 @@
                   "name": "statePermanent",
                   "type": "SELECT_WITH_DYNAMIC_OPTIONS",
                   "label": {
-                    "defaultMessage": "Division",
+                    "defaultMessage": "Province",
                     "description": "Title for the state select",
                     "id": "form.field.label.state"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7610,10 +5858,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -7623,11 +5867,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "state"
-                          ]
+                          "parameters": ["PERMANENT", 0, "state"]
                         },
                         "address"
                       ]
@@ -7638,11 +5878,7 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "state"
-                          ]
+                          "parameters": ["PERMANENT", 0, "state"]
                         }
                       ]
                     }
@@ -7656,6 +5892,7 @@
                     "description": "Title for the district select",
                     "id": "form.field.label.district"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -7676,10 +5913,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -7689,11 +5922,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "district"
-                          ]
+                          "parameters": ["PERMANENT", 0, "district"]
                         },
                         "address"
                       ]
@@ -7704,36 +5933,43 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "district"
-                          ]
+                          "parameters": ["PERMANENT", 0, "district"]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "name": "addressLine4Permanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "name": "ruralOrUrbanPermanent",
+                  "type": "RADIO_GROUP",
                   "label": {
-                    "defaultMessage": "Upazila (Thana) / City",
-                    "description": "Title for the address line 4",
-                    "id": "form.field.label.addressLine4"
+                    "defaultMessage": " ",
+                    "description": "Empty label for form field",
+                    "id": "form.field.label.emptyLabel"
                   },
-                  "required": true,
-                  "initialValue": "",
+                  "options": [
+                    {
+                      "label": {
+                        "defaultMessage": "Urban address",
+                        "id": "form.field.label.urban",
+                        "description": "Label for form field checkbox option Urban"
+                      },
+                      "value": "URBAN"
+                    },
+                    {
+                      "label": {
+                        "defaultMessage": "Rural address",
+                        "id": "form.field.label.rural",
+                        "description": "Label for form field checkbox option Rural"
+                      },
+                      "value": "RURAL"
+                    }
+                  ],
+                  "initialValue": "URBAN",
+                  "previewGroup": "permanentAddress",
+                  "hideValueInPreview": true,
+                  "required": false,
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "districtPermanent"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -7746,10 +5982,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
                     }
                   ],
                   "mapping": {
@@ -7759,10 +5991,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            6
-                          ]
+                          "parameters": ["PERMANENT", 7]
                         },
                         "address"
                       ]
@@ -7773,35 +6002,24 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            6
-                          ]
+                          "parameters": ["PERMANENT", 7]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "name": "addressLine3Permanent",
-                  "type": "SELECT_WITH_DYNAMIC_OPTIONS",
+                  "name": "addressChiefPermanent",
+                  "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Union / Municipality / Cantonement",
-                    "description": "Title for the address line 3 option 1",
-                    "id": "form.field.label.addressLine3"
+                    "id": "form.field.label.addressChief",
+                    "defaultMessage": "Chief",
+                    "description": "The lable for form field chief"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "dynamicOptions": {
-                    "resource": "locations",
-                    "dependency": "addressLine4Permanent"
-                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -7817,15 +6035,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
                     }
                   ],
                   "mapping": {
@@ -7835,10 +6045,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            4
-                          ]
+                          "parameters": ["PERMANENT", 6]
                         },
                         "address"
                       ]
@@ -7849,10 +6056,61 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            4
-                          ]
+                          "parameters": ["PERMANENT", 6]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "addressLine4CityOptionPermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Town",
+                    "description": "Title for the address line 4",
+                    "id": "form.field.label.addressLine4CityOption"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.statePermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.districtPermanent"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 4]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 4]
                         }
                       ]
                     }
@@ -7862,10 +6120,11 @@
                   "name": "addressLine3CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Ward",
+                    "defaultMessage": "Residential Area",
                     "description": "Title for the address line 3 option 2",
                     "id": "form.field.label.addressLine3CityOption"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -7884,11 +6143,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -7898,10 +6153,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            5
-                          ]
+                          "parameters": ["PERMANENT", 3]
                         },
                         "address"
                       ]
@@ -7912,77 +6164,7 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            5
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "addressLine2Permanent",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Area / Ward / Mouja / Village",
-                    "description": "Title for the address line 2",
-                    "id": "form.field.label.addressLine2"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            3
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            3
-                          ]
+                          "parameters": ["PERMANENT", 3]
                         }
                       ]
                     }
@@ -7992,10 +6174,11 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street and house number",
+                    "defaultMessage": "Street / Plot Number",
                     "description": "Title for the address line 1",
-                    "id": "form.field.label.addressLine1"
+                    "id": "form.field.label.addressLine2CityOption"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8014,11 +6197,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -8028,10 +6207,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            2
-                          ]
+                          "parameters": ["PERMANENT", 2]
                         },
                         "address"
                       ]
@@ -8042,36 +6218,24 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            2
-                          ]
+                          "parameters": ["PERMANENT", 2]
                         }
                       ]
                     }
                   }
                 },
                 {
-                  "name": "postCodeCityOptionPermanent",
-                  "type": "TEL",
+                  "name": "numberOptionPermanent",
+                  "type": "NUMBER",
                   "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
+                    "defaultMessage": "Number",
+                    "description": "Title for the number field",
+                    "id": "form.field.label.number"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
+                  "validate": [],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -8087,11 +6251,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4Permanent))"
+                      "expression": "values.ruralOrUrbanPermanent !== \"URBAN\""
                     }
                   ],
                   "mapping": {
@@ -8101,11 +6261,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "postalCode"
-                          ]
+                          "parameters": ["PERMANENT", 1]
                         },
                         "address"
                       ]
@@ -8116,11 +6272,7 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "postalCode"
-                          ]
+                          "parameters": ["PERMANENT", 1]
                         }
                       ]
                     }
@@ -8130,10 +6282,11 @@
                   "name": "addressLine1Permanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street and house number",
+                    "defaultMessage": "Village",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine1"
                   },
+                  "previewGroup": "permanentAddress",
                   "required": false,
                   "initialValue": "",
                   "validate": [],
@@ -8152,15 +6305,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
+                      "expression": "values.ruralOrUrbanPermanent !== \"RURAL\""
                     }
                   ],
                   "mapping": {
@@ -8170,10 +6315,7 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            1
-                          ]
+                          "parameters": ["PERMANENT", 5]
                         },
                         "address"
                       ]
@@ -8184,93 +6326,22 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            1
-                          ]
+                          "parameters": ["PERMANENT", 5]
                         }
                       ]
                     }
                   }
-                },
+                }
+              ],
+              "previewGroups": [
                 {
-                  "name": "postCodePermanent",
-                  "type": "TEL",
+                  "id": "permanentAddress",
                   "label": {
-                    "defaultMessage": "Postcode",
-                    "description": "Title for the postcode field",
-                    "id": "form.field.label.postCode"
+                    "defaultMessage": "Residential address",
+                    "description": "Preview groups label for form field: residential address",
+                    "id": "form.field.previewGroups.permanentAddress"
                   },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "numeric"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        4
-                      ]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.countryPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.statePermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.districtPermanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantPermanentAddressSameAsCurrent"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToAddressTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "postalCode"
-                          ]
-                        },
-                        "address"
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "addressToFieldTransformer",
-                          "parameters": [
-                            "PERMANENT",
-                            0,
-                            "postalCode"
-                          ]
-                        }
-                      ]
-                    }
-                  }
+                  "fieldToRedirect": "countryPermanent"
                 }
               ]
             }
@@ -8316,7 +6387,7 @@
                   "name": "uploadDocForApplicant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Applicant id",
+                    "defaultMessage": "Applicant ID",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.applicantIDProof"
                   },

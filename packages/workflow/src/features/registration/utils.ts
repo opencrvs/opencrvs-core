@@ -40,6 +40,7 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
+  logger.info(`sendEventNotification method for event: ${event}`)
   // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_NEW_DEC:
@@ -91,6 +92,15 @@ async function sendDeclarationNotification(
   smsType: string,
   authHeader: { Authorization: string }
 ) {
+  logger.info(
+    `Sending declaration sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
+      {
+        trackingid: getTrackingId(fhirBundle),
+        msisdn,
+        name: await getInformantName(fhirBundle, recipientSectionCode)
+      }
+    )}`
+  )
   try {
     await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
       method: 'POST',
@@ -116,6 +126,14 @@ async function sendRegistrationNotification(
   smsType: string,
   authHeader: { Authorization: string }
 ) {
+  logger.info(
+    `Sending registration sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
+      {
+        msisdn,
+        name: await getInformantName(fhirBundle, recipientSectionCode)
+      }
+    )}`
+  )
   try {
     await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
       method: 'POST',

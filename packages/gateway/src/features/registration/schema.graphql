@@ -76,6 +76,7 @@ enum AttachmentType {
   TAX_RECEIPT
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
+  SIGNED_AFFIDAVIT
 }
 
 enum AttachmentSubject {
@@ -90,6 +91,7 @@ enum AttachmentSubject {
   DECEASED_DEATH_PROOF
   DECEASED_BIRTH_PROOF
   APPLICANT_ID_PROOF
+  APPLICANT_ATHORITY_TO_APPLY_PROOF
 }
 
 enum RegistrationType {
@@ -136,6 +138,27 @@ type Payment { # -> PaymentReconciliation
   amount: Float # .detail.amount
   outcome: PaymentOutcomeType # -> .outcome
   date: Date # -> .detail.date
+}
+
+enum PrimaryCaregiverType {
+  MOTHER_AND_FATHER
+  MOTHER
+  FATHER
+  INFORMANT
+  LEGAL_GUARDIAN
+  OTHER
+}
+
+input PrimaryCaregiverInput {
+  primaryCaregiverType: PrimaryCaregiverType
+  primaryCaregiver: RelatedPersonInput # -> Use for Observation.subject.reference
+  reasonNotApplying: String # -> Observation.valueString
+}
+
+type PrimaryCaregiver {
+  primaryCaregiverType: PrimaryCaregiverType
+  primaryCaregiver: RelatedPerson
+  reasonNotApplying: String
 }
 
 input CommentInput {
@@ -193,6 +216,7 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
+  primaryCaregiver: PrimaryCaregiverInput # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
 }
@@ -216,6 +240,7 @@ type BirthRegistration implements EventRegistration { # -> Composition
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
+  primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
 }
@@ -378,29 +403,7 @@ type Query {
     skip: Int
   ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
-  listDeathRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): DeathRegResultSet
   fetchEventRegistration(id: ID!): EventRegistration
-  listEventRegistrations(
-    locationIds: [String]
-    status: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): EventRegResultSet
-  countEventRegistrationsByStatus(
-    locationIds: [String]
-    status: String
-  ): EventRegCount
-  countEventRegistrations(locationIds: [String]): RegistrationCount
   fetchRegistration(id: ID!): EventRegistration
 }
 

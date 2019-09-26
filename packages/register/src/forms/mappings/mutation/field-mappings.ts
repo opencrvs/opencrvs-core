@@ -197,7 +197,7 @@ export const copyEventAddressTransformer = (fromSection: string) => (
   if (
     draftData[sectionId][field.name] === 'OTHER' ||
     draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
-    draftData[sectionId][field.name] === 'HEALTH_INSTITUTION'
+    draftData[sectionId][field.name] === 'HEALTH_FACILITY'
   ) {
     transformedData.eventLocation = { type: draftData[sectionId][field.name] }
     return transformedData
@@ -380,17 +380,5 @@ export const fieldToIdentifierWithTypeTransformer = (
   }
   sectionData.identifier[0].system = identifierType
   sectionData.identifier[0].value = draftData[sectionId][field.name]
-  return transformedData
-}
-
-export const fieldNameValueTransformer = (transformedFieldName: string) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField
-) => {
-  transformedData[sectionId][transformedFieldName] = (draftData[sectionId][
-    field.name
-  ] as { [key: string]: string }).value
   return transformedData
 }

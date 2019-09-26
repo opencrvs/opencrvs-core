@@ -262,8 +262,7 @@
       },
       {
         "field": "issuedLocation",
-        "operation": "LoggedInUserOfficeName",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserOfficeName"
       },
       {
         "field": "issuedByLabel",
@@ -278,13 +277,11 @@
       },
       {
         "field": "issuedByRole",
-        "operation": "LoggedInUserRole",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserRole"
       },
       {
         "field": "issuedBy",
-        "operation": "LoggedInUserName",
-        "baseData": "userdetails"
+        "operation": "LoggedInUserName"
       },
       {
         "field": "issuedDateLabel",
@@ -530,7 +527,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": "Dhaka Medical Hospital, Dhaka",
+                                "text": "{placeOfBirth}",
                                 "style": "subHeader"
                               }
                             ],
@@ -542,7 +539,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": "ঢাকা মেডিকেল হসপিটাল, ঢাকা",
+                                "text": "{bnPlaceOfBirth}",
                                 "style": "bnSubHeader"
                               }
                             ]
@@ -666,8 +663,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -772,6 +768,58 @@
           }
         },
         {
+          "field": "placeOfBirth",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "name",
+                "formattedKeys": "{child.birthLocation}"
+              },
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+              }
+            ]
+          }
+        },
+        {
+          "field": "bnPlaceOfBirth",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "alias",
+                "formattedKeys": "{child.birthLocation}"
+              },
+              {
+                "condition": {
+                  "key": "child.placeOfBirth",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "alias",
+                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+              }
+            ]
+          }
+        },
+        {
           "field": "registrationLocation",
           "operation": "FormattedFieldValue",
           "parameters": {
@@ -787,18 +835,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ],
       "fonts": {
@@ -1021,7 +1066,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": "Dhaka Medical Hospital, Dhaka",
+                                "text": "{placeOfDeath}",
                                 "style": "subHeader"
                               }
                             ],
@@ -1033,7 +1078,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": "ঢাকা মেডিকেল হসপিটাল, ঢাকা",
+                                "text": "{bnPlaceOfDeath}",
                                 "style": "bnSubHeader"
                               }
                             ]
@@ -1149,8 +1194,7 @@
       "transformers": [
         {
           "field": "countryLogo",
-          "operation": "OfflineCompanyLogo",
-          "baseData": "resource"
+          "operation": "OfflineCompanyLogo"
         },
         {
           "field": "registrationNumber",
@@ -1255,6 +1299,94 @@
           }
         },
         {
+          "field": "placeOfDeath",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PERMANENT"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["CURRENT"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "name",
+                "formattedKeys": "{deathEvent.deathLocation}"
+              }
+            ]
+          }
+        },
+        {
+          "field": "bnPlaceOfDeath",
+          "operation": "OfflineAddress",
+          "parameters": {
+            "conditionalKeys": [
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PERMANENT"]
+                },
+                "addressType": "locations",
+                "addressKey": "alias",
+                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["CURRENT"]
+                },
+                "addressType": "locations",
+                "addressKey": "alias",
+                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "alias",
+                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["HEALTH_FACILITY"]
+                },
+                "addressType": "facilities",
+                "addressKey": "alias",
+                "formattedKeys": "{deathEvent.deathLocation}"
+              }
+            ]
+          }
+        },
+        {
           "field": "registrationLocation",
           "operation": "FormattedFieldValue",
           "parameters": {
@@ -1270,18 +1402,15 @@
         },
         {
           "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserSignature"
         },
         {
           "field": "registrarName",
-          "operation": "LocalRegistrarUserName",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserName"
         },
         {
           "field": "role",
-          "operation": "LocalRegistrarUserRole",
-          "baseData": "userdetails"
+          "operation": "LocalRegistrarUserRole"
         }
       ],
       "fonts": {

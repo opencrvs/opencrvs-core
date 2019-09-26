@@ -2126,7 +2126,9 @@ export const mockApplicationData = {
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
     birthType: 'SINGLE',
-    multipleBirth: 1
+    multipleBirth: 1,
+    placeOfBirth: 'HEALTH_FACILITY',
+    birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -2284,13 +2286,13 @@ export const mockDeathApplicationData = {
     deathLocation: '',
     addressType: '',
     country: 'BGD',
-    state: 'state',
-    district: 'district',
-    addressLine4: 'upazila',
-    addressLine3: 'union',
+    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2: '',
-    addressLine1: '',
-    postCode: ''
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200'
   },
   causeOfDeath: {
     causeOfDeathEstablished: false,
@@ -2870,4 +2872,12 @@ export async function setPinCode(component: ReactWrapper) {
   }
   await flushPromises()
   component.update()
+}
+
+export function setPageVisibility(isVisible: boolean) {
+  // @ts-ignore
+  document.hidden = !isVisible
+  const evt = document.createEvent('HTMLEvents')
+  evt.initEvent('visibilitychange', false, true)
+  document.dispatchEvent(evt)
 }

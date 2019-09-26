@@ -61,9 +61,9 @@ const mobilePhonePatternTable: { [key: string]: IMobilePhonePattern } = {
     num: '11'
   },
   zmb: {
-    pattern: /^09(5|6|7){1}[0-9]{7}$/,
+    pattern: /^0(7|9)[0-9]{1}[0-9]{7}$/,
     example: '0970545855',
-    start: '09[5|6|7]',
+    start: '0[7|9]',
     num: '10'
   }
 }
@@ -112,14 +112,16 @@ export const isAValidDateFormat = (value: string): boolean => {
 export const requiredSymbol: Validation = (value: IFormFieldValue) =>
   value ? undefined : { message: messages.requiredSymbol }
 
-export const required: Validation = (value: IFormFieldValue) => {
+export const required = (
+  message: MessageDescriptor = messages.required
+): Validation => (value: IFormFieldValue) => {
   if (typeof value === 'string') {
-    return value !== '' ? undefined : { message: messages.required }
+    return value !== '' ? undefined : { message }
   }
   if (isArray(value)) {
-    return value.length > 0 ? undefined : { message: messages.required }
+    return value.length > 0 ? undefined : { message }
   }
-  return value !== undefined ? undefined : { message: messages.required }
+  return value !== undefined ? undefined : { message }
 }
 
 export const minLength = (min: number) => (value: string) => {
