@@ -20,6 +20,10 @@ import getRoles, {
 import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@user-mgnt/features/verifyUser/handler'
 import changePasswordHandler, {
   changePasswordRequestSchema
 } from '@user-mgnt/features/changePassword/handler'
@@ -188,6 +192,25 @@ export const getRoutes = () => {
           payload: searchRoleSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyUser',
+      handler: verifyUserHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description:
+          'Verify user for given mobile number. Used for password reset flow.',
+        notes:
+          'As it is a public api, please take necessary caution before using it.',
+        validate: {
+          payload: reqVerifyUserSchema
+        },
+        response: {
+          schema: resVerifyUserSchema
+        }
       }
     }
   ]
