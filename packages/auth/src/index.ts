@@ -39,6 +39,10 @@ import changePasswordHandler, {
   reqChangePasswordSchema
 } from '@auth/features/changePassword/handler'
 
+import verifySecurityQuestionHandler, {
+  verifySecurityQuestionSchema
+} from '@auth/features/verifySecurityAnswer/handler'
+
 export async function createServer() {
   const server = new Hapi.Server({
     host: AUTH_HOST,
@@ -180,6 +184,22 @@ export async function createServer() {
       },
       response: {
         schema: resVerifyUserSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "questionKey": "", "answer": "", "nonce": "" }' http://localhost:4040/verifyUser
+  server.route({
+    method: 'POST',
+    path: '/verifySecurityAnswer',
+    handler: verifySecurityQuestionHandler,
+    options: {
+      tags: ['api'],
+      description: 'Checks if the submitted security question answer is right',
+      notes:
+        'Verifies security answer and updates the nonce information so that it can be used for changing the password',
+      validate: {
+        payload: verifySecurityQuestionSchema
       }
     }
   })

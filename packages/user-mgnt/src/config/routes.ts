@@ -27,6 +27,9 @@ import verifyUserHandler, {
 import changePasswordHandler, {
   changePasswordRequestSchema
 } from '@user-mgnt/features/changePassword/handler'
+import verifySecurityAnswer, {
+  verifySecurityRequestSchema
+} from '@user-mgnt/features/verifySecurityAnswer/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -53,6 +56,19 @@ export const getRoutes = () => {
         },
         response: {
           schema: resAuthSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifySecurityAnswer',
+      handler: verifySecurityAnswer,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Verifies sent security question answer is correct',
+        validate: {
+          payload: verifySecurityRequestSchema
         }
       }
     },

@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
 import { IAuthentication } from '@auth/features/authenticate/service'
-import { get, set } from '@auth/database'
+import { get, set, del } from '@auth/database'
 
 export enum RetrievalSteps {
   WAITING_FOR_VERIFICATION = 'WAITING_FOR_VERIFICATION',
@@ -63,7 +63,10 @@ export async function getRetrievalStepInformation(
 ): Promise<IRetrievalStepInformation> {
   const record = await get(`retrieval_step_${nonce}`)
   if (record === null) {
-    throw new Error('password/username retrieval step information found')
+    throw new Error('password/username retrieval step information not found')
   }
   return JSON.parse(record)
+}
+export async function deleteRetrievalStepInformation(nonce: string) {
+  await del(`retrieval_step_${nonce}`)
 }

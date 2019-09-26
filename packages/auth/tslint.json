@@ -10,7 +10,7 @@
     "no-submodule-imports": false,
     "no-unused-variable": [true],
     "object-literal-sort-keys": false,
-    "no-relative-imports": true,
+    "no-relative-imports": [true, "allow-siblings"],
     "max-classes-per-file": false,
     "semicolon": [false, "never"],
     "ordered-imports": false,
