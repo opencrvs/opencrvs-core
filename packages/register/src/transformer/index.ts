@@ -1,8 +1,32 @@
-import { IForm, IFormData, TransformedData } from '@register/forms'
+import { IForm, IFormData, TransformedData, IFormField } from '@register/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
+
+const handleNestedFieldsMapping = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  fieldDef: IFormField
+) => {
+  var tempFormField: IFormField
+  for (var index in fieldDef.nestedFields) {
+    for (var nestedIndex in fieldDef.nestedFields[index]) {
+      tempFormField = fieldDef.nestedFields[index][nestedIndex]
+      tempFormField &&
+        tempFormField.mapping &&
+        tempFormField.mapping.mutation &&
+        tempFormField.mapping.mutation(
+          transformedData,
+          draftData,
+          sectionId,
+          fieldDef,
+          tempFormField
+        )
+    }
+  }
+}
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -52,6 +76,12 @@ export const draftToGqlTransformer = (
         ) {
           if (fieldDef.mapping && fieldDef.mapping.mutation) {
             fieldDef.mapping.mutation(
+              transformedData,
+              draftData,
+              section.id,
+              fieldDef
+            )
+            handleNestedFieldsMapping(
               transformedData,
               draftData,
               section.id,

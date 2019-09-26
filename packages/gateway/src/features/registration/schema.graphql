@@ -19,6 +19,7 @@ enum RegistrationContactType {
   BOTH
   MOTHER
   FATHER
+  OTHER
 }
 
 enum BirthRegPresence {
@@ -285,6 +286,7 @@ input RegistrationInput {
   page: String
   book: String
   contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType

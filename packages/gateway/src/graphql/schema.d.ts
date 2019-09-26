@@ -303,7 +303,8 @@ export interface GQLRegistration {
 export enum GQLRegistrationContactType {
   BOTH = 'BOTH',
   MOTHER = 'MOTHER',
-  FATHER = 'FATHER'
+  FATHER = 'FATHER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLRegWorkflow {
@@ -388,7 +389,16 @@ export enum GQLRelationshipType {
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY',
   OTHER = 'OTHER',
-  INFORMANT = 'INFORMANT'
+  INFORMANT = 'INFORMANT',
+  GRANDFATHER = 'GRANDFATHER',
+  GRANDMOTHER = 'GRANDMOTHER',
+  BROTHER = 'BROTHER',
+  SISTER = 'SISTER',
+  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
+  INSTITUTION_HEAD_PLACE_OF_BIRTH = 'INSTITUTION_HEAD_PLACE_OF_BIRTH',
+  HOUSE_OWNER = 'HOUSE_OWNER',
+  OPERATOR = 'OPERATOR',
+  OFFICE_IN_CHARGE = 'OFFICE_IN_CHARGE'
 }
 
 export interface GQLPayment {
@@ -722,6 +732,7 @@ export interface GQLRegistrationInput {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType

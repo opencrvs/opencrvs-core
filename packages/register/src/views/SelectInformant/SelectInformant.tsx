@@ -41,7 +41,8 @@ import {
   Event,
   BirthSection,
   DeathSection,
-  IFormSection
+  IFormSection,
+  IFormSectionData
 } from '@register/forms'
 import { phoneNumberFormat } from '@register/utils/validate'
 import {
@@ -257,8 +258,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         (this.props.application &&
           this.props.application.data &&
           this.props.application.data[registrationSection.id] &&
-          (this.props.application.data[registrationSection.id]
-            .presentAtBirthRegistration as string)) ||
+          this.props.application.data[registrationSection.id]
+            .presentAtBirthRegistration &&
+          ((this.props.application.data[registrationSection.id]
+            .presentAtBirthRegistration as IFormSectionData)
+            .value as string)) ||
         (this.props.application &&
           this.props.application.data &&
           this.props.application.data[applicantsSection.id] &&
@@ -312,8 +316,14 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           registration: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: this.state.informant
+              presentAtBirthRegistration: {
+                value: this.state.informant,
+                nestedFields: {}
+              },
+              applicant: {
+                value: this.state.informant,
+                nestedFields: {}
+              }
             }
           }
         }
@@ -343,8 +353,14 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         newApplication.data[registrationSection.id] = {
           ...application.data[registrationSection.id],
           ...{
-            presentAtBirthRegistration: this.state.informant,
-            applicant: this.state.informant
+            presentAtBirthRegistration: {
+              value: this.state.informant,
+              nestedFields: {}
+            },
+            applicant: {
+              value: this.state.informant,
+              nestedFields: {}
+            }
           }
         }
       } else {
@@ -407,20 +423,43 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         goToBirthRegistrationAsParent
       } = this.props
 
-      this.props.modifyApplication({
+      const modifiedApplicationData = {
         ...application,
         data: {
           ...application.data,
           [registrationSection.id]: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant,
-              applicant: this.state.informant
+              presentAtBirthRegistration: {
+                value: this.state.informant,
+                nestedFields:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .presentAtBirthRegistration &&
+                    (this.props.application.data[registrationSection.id]
+                      .presentAtBirthRegistration as IFormSectionData)
+                      .nestedFields) ||
+                  {}
+              },
+              applicant: {
+                value: this.state.informant,
+                nestedFields:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).nestedFields) ||
+                  {}
+              }
             }
           }
         }
-      })
-
+      }
+      this.props.modifyApplication(modifiedApplicationData)
       goToBirthRegistrationAsParent(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
