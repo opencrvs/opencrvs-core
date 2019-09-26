@@ -20,6 +20,13 @@ import getRoles, {
 import activateUser, {
   requestSchema as activateUserRequestSchema
 } from '@user-mgnt/features/activateUser/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@user-mgnt/features/verifyUser/handler'
+import changePasswordHandler, {
+  changePasswordRequestSchema
+} from '@user-mgnt/features/changePassword/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -46,6 +53,23 @@ export const getRoutes = () => {
         },
         response: {
           schema: resAuthSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changePassword',
+      handler: changePasswordHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Change user password',
+        notes: 'Verify account exist and change password',
+        validate: {
+          payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
         }
       }
     },
@@ -168,6 +192,25 @@ export const getRoutes = () => {
           payload: searchRoleSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyUser',
+      handler: verifyUserHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description:
+          'Verify user for given mobile number. Used for password reset flow.',
+        notes:
+          'As it is a public api, please take necessary caution before using it.',
+        validate: {
+          payload: reqVerifyUserSchema
+        },
+        response: {
+          schema: resVerifyUserSchema
+        }
       }
     }
   ]
