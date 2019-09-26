@@ -3,8 +3,10 @@ import {
   IFormData,
   IFormFieldValue,
   IAttachment,
-  TransformedData
+  TransformedData,
+  IFormSectionData
 } from '@register/forms'
+import { set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -184,6 +186,28 @@ export const sectionFieldToBundleFieldTransformer = (
     transformedData[transformedFieldName] = draftData[sectionId][field.name]
   } else {
     transformedData[field.name] = draftData[sectionId][field.name]
+  }
+  return transformedData
+}
+
+export const nestedRadioFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformedFieldName) {
+    set(
+      transformedData,
+      transformedFieldName,
+      (draftData[sectionId][field.name] as IFormSectionData).value
+    )
+  } else {
+    transformedData[field.name] = (draftData[sectionId][
+      field.name
+    ] as IFormSectionData).value
   }
   return transformedData
 }

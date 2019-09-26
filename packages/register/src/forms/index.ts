@@ -176,14 +176,16 @@ export type IFormFieldMutationMapFunction = (
   transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
-  fieldDefinition: IFormField
+  fieldDefinition: IFormField,
+  nestedFieldDefinition?: IFormField
 ) => void
 
 export type IFormFieldQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
   sectionId: string,
-  fieldDefinition: IFormField
+  fieldDefinition: IFormField,
+  nestedFieldDefinition?: IFormField
 ) => void
 
 /*

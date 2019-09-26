@@ -17,193 +17,6 @@
           },
           "groups": [
             {
-              "id": "registration-view-group",
-              "conditionals": [
-                {
-                  "action": "hide",
-                  "expression": "true"
-                }
-              ],
-              "fields": [
-                {
-                  "name": "presentAtBirthRegistration",
-                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
-                  "label": {
-                    "defaultMessage": "Applicant",
-                    "description": "Input label for who is present input",
-                    "id": "form.section.applicant.name"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH_PARENTS",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoIsPresent.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoIsPresent.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoIsPresent.father"
-                      }
-                    },
-                    {
-                      "value": "LEGAL_GUARDIAN",
-                      "label": {
-                        "defaultMessage": "Legal Guardian",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoIsPresent.legalGuardian"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for \"Other\" select option",
-                        "id": "form.field.label.application.whoIsPresent.other"
-                      }
-                    }
-                  ],
-                  "nestedFields": {
-                    "BOTH_PARENTS": [],
-                    "MOTHER": [],
-                    "FATHER": [],
-                    "LEGAL_GUARDIAN": [],
-                    "OTHER": []
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
-                  "name": "whoseContactDetails",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "previewGroup": "mainContact",
-                  "label": {
-                    "defaultMessage": "Who is the contact person for this application?",
-                    "description": "Input label for contact details person",
-                    "id": "form.field.label.application.whoseContactDetails"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "BOTH",
-                      "label": {
-                        "defaultMessage": "Both Parents",
-                        "description": "Label for \"Both Parents\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.both"
-                      }
-                    },
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" select option",
-                        "id": "form.field.label.application.whoseContactDetails.father"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contact"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "registrationPhone",
-                  "type": "TEL",
-                  "previewGroup": "mainContact",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.application.phone"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": [
-                        "contactPhoneNumber"
-                      ]
-                    }
-                  }
-                }
-              ],
-              "previewGroups": [
-                {
-                  "id": "mainContact",
-                  "label": {
-                    "defaultMessage": "Main contact",
-                    "description": "Preview label for applicant type + phone number",
-                    "id": "form.field.label.application.mainContact"
-                  },
-                  "fieldToRedirect": "mainContact"
-                }
-              ]
-            },
-            {
               "id": "applicant-relation",
               "title": {
                 "defaultMessage": "Who is the applicant?",
@@ -217,6 +30,30 @@
                 }
               ],
               "fields": [
+                {
+                  "name": "presentAtBirthRegistration",
+                  "hideValueInPreview": true,
+                  "type": "TEXT",
+                  "required": true,
+                  "hidden": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "label": {
+                    "defaultMessage": "Who is present for the birth registration?",
+                    "description": "Form section title for contact point",
+                    "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
                 {
                   "name": "applicant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
@@ -332,7 +169,15 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          }
+                        }
                       }
                     ],
                     "INSTITUTION_HEAD_PLACE_OF_BIRTH": [],
@@ -350,9 +195,29 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          }
+                        }
                       }
                     ]
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
                   }
                 }
               ]
@@ -643,6 +508,18 @@
                         }
                       }
                     ]
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
                   }
                 },
                 {
@@ -776,7 +653,7 @@
                     ],
                     "OTHER": [
                       {
-                        "name": "contactRelationshipOther",
+                        "name": "contactRelationship",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Relationship to child",
@@ -790,10 +667,18 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyTransformer",
+                            "parameters": [
+                              "registration.contactRelationship"
+                            ]
+                          }
+                        }
                       },
                       {
-                        "name": "registrationPhone",
+                        "name": "contactPhoneNumber",
                         "type": "TEL",
                         "label": {
                           "defaultMessage": "Phone number",
@@ -809,40 +694,31 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
-                            ]
-                          },
-                          "query": {
-                            "operation": "nestedValueToFieldTransformer",
-                            "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
                       }
                     ]
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
                   }
                 }
               ]
             }
-          ],
-          "mapping": {
-            "mutation": {
-              "operation": "setBirthRegistrationSectionTransformer"
-            },
-            "query": {
-              "operation": "getBirthRegistrationSectionTransformer"
-            }
-          }
+          ]
         },
         {
           "id": "child",

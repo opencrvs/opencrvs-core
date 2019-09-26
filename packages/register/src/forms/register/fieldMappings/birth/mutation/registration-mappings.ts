@@ -1,15 +1,18 @@
 import {
-  IFormData,
+  GQLAttachment,
+  GQLPerson,
+  GQLRelatedPerson,
+  GQLRelationshipType
+} from '@opencrvs/gateway/src/graphql/schema'
+import {
   ICertificate,
   IFileValue,
+  IFormData,
+  IFormField,
+  IFormSectionData,
   TransformedData
 } from '@register/forms'
-import {
-  GQLRelatedPerson,
-  GQLRelationshipType,
-  GQLPerson,
-  GQLAttachment
-} from '@opencrvs/gateway/src/graphql/schema'
+import { set } from 'lodash'
 
 export function transformCertificateData(
   transformedData: TransformedData,
@@ -89,4 +92,27 @@ export function setBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+}
+
+export const changeHirerchyTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  const nestedFieldValueObj: IFormSectionData = (draftData[sectionId][
+    field.name
+  ] as IFormSectionData).nestedFields as IFormSectionData
+  if (transformedFieldName) {
+    set(
+      transformedData,
+      transformedFieldName,
+      nestedFieldValueObj[nestedField.name]
+    )
+  } else {
+    transformedData[nestedField.name] = nestedFieldValueObj[nestedField.name]
+  }
+
+  return transformedData
 }
