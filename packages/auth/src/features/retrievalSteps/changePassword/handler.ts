@@ -1,13 +1,14 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import { changePassword } from '@auth/features/changePassword/service'
+import { unauthorized } from 'boom'
+
+import { changePassword } from '@auth/features/retrievalSteps/changePassword/service'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
   deleteRetrievalStepInformation
-} from '@auth/features/verifyUser/service'
-import { unauthorized } from 'boom'
+} from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
   newPassword: string

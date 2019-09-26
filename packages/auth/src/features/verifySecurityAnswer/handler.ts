@@ -8,7 +8,7 @@ import {
   getRetrievalStepInformation,
   RetrievalSteps,
   storeRetrievalStepInformation
-} from '@auth/features/verifyUser/service'
+} from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
   questionKey: string
@@ -46,10 +46,9 @@ export default async function verifySecurityQuestionHandler(
   await storeRetrievalStepInformation(
     payload.nonce,
     retrivalStepInformation.userId,
-    retrivalStepInformation.scope,
     retrivalStepInformation.mobile,
     RetrievalSteps.SECURITY_Q_VERIFIED,
-    retrivalStepInformation.question
+    retrivalStepInformation.securityQuestionKey
   )
 
   return h.response().code(200)

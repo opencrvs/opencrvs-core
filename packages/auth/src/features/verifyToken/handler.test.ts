@@ -1,6 +1,6 @@
-import { createServer } from '../..'
-import { get, setex } from '../../database'
-import { INVALID_TOKEN_NAMESPACE } from '../../constants'
+import { createServer } from '@auth/index'
+import { get, setex } from '@auth/database'
+import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
 
 describe('verify token handler', () => {
   let server: any

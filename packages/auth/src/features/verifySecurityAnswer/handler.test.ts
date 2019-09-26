@@ -4,8 +4,8 @@ import {
   RetrievalSteps,
   storeRetrievalStepInformation,
   getRetrievalStepInformation
-} from '@auth/features/verifyUser/service'
-// tslint:disable-next-line:mocha-no-side-effect-code
+} from '@auth/features/retrievalSteps/verifyUser/service'
+
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('security question answer checking', () => {
@@ -18,9 +18,9 @@ describe('security question answer checking', () => {
     await storeRetrievalStepInformation(
       'TEST_NONCE',
       '123',
-      [],
       '1231231',
-      RetrievalSteps.NUMBER_VERIFIED
+      RetrievalSteps.NUMBER_VERIFIED,
+      'TEST_SECURITY_QUESTION_KEY'
     )
   })
 
@@ -50,9 +50,9 @@ describe('security question answer checking', () => {
         storeRetrievalStepInformation(
           'TEST_NONCE',
           '123',
-          [],
           '1231231',
-          RetrievalSteps.WAITING_FOR_VERIFICATION
+          RetrievalSteps.WAITING_FOR_VERIFICATION,
+          'TEST_SECURITY_QUESTION_KEY'
         )
       )
       it('responds with an error', async () => {

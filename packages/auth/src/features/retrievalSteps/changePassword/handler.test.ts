@@ -3,9 +3,8 @@ import { createServer } from '@auth/index'
 import {
   storeRetrievalStepInformation,
   RetrievalSteps
-} from '@auth/features/verifyUser/service'
+} from '@auth/features/retrievalSteps/verifyUser/service'
 
-// tslint:disable-next-line:mocha-no-side-effect-code
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('password change', () => {
@@ -18,9 +17,9 @@ describe('password change', () => {
     storeRetrievalStepInformation(
       '12345',
       'fake_user_id',
-      [],
       'mobile',
-      RetrievalSteps.SECURITY_Q_VERIFIED
+      RetrievalSteps.SECURITY_Q_VERIFIED,
+      'TEST_SECURITY_QUESTION_KEY'
     )
   })
 
