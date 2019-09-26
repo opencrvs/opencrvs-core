@@ -302,7 +302,8 @@ const getErrorsOnFieldsBySection = (
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
       section,
-      draft.data[section.id]
+      draft.data[section.id],
+      draft.data
     )
 
     const errors = getValidationErrorsForForm(
