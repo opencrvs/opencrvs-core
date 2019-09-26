@@ -1,7 +1,7 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
-import { verifySecurityAnswer } from './service'
+import { verifySecurityAnswer, IVerifySecurityAnswerResponse } from './service'
 
 import { unauthorized } from 'boom'
 import {
@@ -11,9 +11,13 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
-  questionKey: string
   answer: string
   nonce: string
+}
+
+interface IResponse {
+  matched: boolean
+  questionKey?: string
 }
 
 export default async function verifySecurityQuestionHandler(
@@ -31,11 +35,11 @@ export default async function verifySecurityQuestionHandler(
   if (retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED) {
     return unauthorized()
   }
-
+  let verificationResult: IVerifySecurityAnswerResponse
   try {
-    await verifySecurityAnswer(
+    verificationResult = await verifySecurityAnswer(
       retrivalStepInformation.userId,
-      payload.questionKey,
+      retrivalStepInformation.securityQuestionKey,
       payload.answer
     )
   } catch (err) {
@@ -47,15 +51,27 @@ export default async function verifySecurityQuestionHandler(
     payload.nonce,
     retrivalStepInformation.userId,
     retrivalStepInformation.mobile,
-    RetrievalSteps.SECURITY_Q_VERIFIED,
-    retrivalStepInformation.securityQuestionKey
+    verificationResult.matched
+      ? RetrievalSteps.SECURITY_Q_VERIFIED
+      : RetrievalSteps.NUMBER_VERIFIED,
+    verificationResult.questionKey // in case of miss-match, updating the new key otherwise same key
   )
 
-  return h.response().code(200)
+  const response: IResponse = {
+    matched: verificationResult.matched
+  }
+  if (!verificationResult.matched) {
+    response.questionKey = verificationResult.questionKey
+  }
+  return response
 }
 
 export const verifySecurityQuestionSchema = Joi.object({
-  questionKey: Joi.string(),
   answer: Joi.string(),
   nonce: Joi.string()
+})
+
+export const verifySecurityQuestionResSchema = Joi.object({
+  matched: Joi.bool(),
+  questionKey: Joi.string().optional()
 })

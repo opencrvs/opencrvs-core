@@ -4,11 +4,16 @@ import { unauthorized } from 'boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
+import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
 
 interface IVerifySecurityAnswer {
   userId: string
   questionKey: string
   answer: string
+}
+interface IVerifySecurityAnswerResponse {
+  matched: boolean
+  questionKey: string
 }
 
 export default async function verifySecurityAnswer(
@@ -24,23 +29,40 @@ export default async function verifySecurityAnswer(
     throw unauthorized()
   }
 
-  const answers = user.securityQuestionAnswers || []
+  const questionAnswers = user.securityQuestionAnswers || []
 
-  const isCorrect = answers.some(
+  const isCorrect = questionAnswers.some(
     securityQNA =>
       securityQNA.questionKey === payload.questionKey &&
       generateHash(payload.answer.toLowerCase(), user.salt) ===
         securityQNA.answerHash
   )
-
-  if (isCorrect) {
-    return h.response().code(200)
+  let response: IVerifySecurityAnswerResponse
+  try {
+    response = {
+      matched: isCorrect,
+      questionKey: isCorrect
+        ? payload.questionKey
+        : // will throw exception if securityQnA is empty
+          getRandomQuestionKey(
+            user.securityQuestionAnswers,
+            payload.questionKey
+          )
+    }
+  } catch (error) {
+    logger.error(`Unable to get security questions for user: ${payload.userId}`)
+    throw unauthorized()
   }
-  return unauthorized()
+  return response
 }
 
 export const verifySecurityRequestSchema = Joi.object({
   userId: Joi.string().required(),
   questionKey: Joi.string().required(),
   answer: Joi.string().required()
+})
+
+export const verifySecurityResponseSchema = Joi.object({
+  matched: Joi.bool(),
+  questionKey: Joi.string()
 })

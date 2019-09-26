@@ -14,7 +14,12 @@ describe('security question answer checking', () => {
   beforeEach(async () => {
     server = await createServer()
     fetch.resetMocks()
-    fetch.mockResponse('')
+    fetch.mockResponse(
+      JSON.stringify({
+        matched: true,
+        questionKey: 'TEST_SECURITY_QUESTION_KEY'
+      })
+    )
     await storeRetrievalStepInformation(
       'TEST_NONCE',
       '123',
@@ -31,7 +36,6 @@ describe('security question answer checking', () => {
         method: 'POST',
         url: '/verifySecurityAnswer',
         payload: {
-          questionKey: 'TEST_QUESTION',
           answer: 'something',
           nonce: 'TEST_NONCE'
         }
@@ -39,6 +43,8 @@ describe('security question answer checking', () => {
     })
     it('responds with ok', () => {
       expect(res.statusCode).toBe(200)
+      expect(JSON.parse(res.payload).matched).toBe(true)
+      expect(JSON.parse(res.payload).questionKey).toBeUndefined()
     })
     it('updates the nonce status', async () => {
       expect((await getRetrievalStepInformation('TEST_NONCE')).status).toBe(
@@ -60,7 +66,6 @@ describe('security question answer checking', () => {
           method: 'POST',
           url: '/verifySecurityAnswer',
           payload: {
-            questionKey: 'TEST_QUESTION',
             answer: 'something',
             nonce: 'TEST_NONCE'
           }
@@ -71,19 +76,26 @@ describe('security question answer checking', () => {
     })
   })
   describe('when submitted security answer is incorrect', () => {
-    beforeEach(() => fetch.mockReject(new Error()))
-    it('responds with an error', async () => {
+    beforeEach(() =>
+      fetch.mockResponse(
+        JSON.stringify({
+          matched: false,
+          questionKey: 'ANOTHER_KEY'
+        })
+      )
+    )
+    it('responds with matched as false', async () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifySecurityAnswer',
         payload: {
-          questionKey: 'TEST_QUESTION',
           answer: 'something',
           nonce: 'TEST_NONCE'
         }
       })
 
-      expect(res.statusCode).toBe(401)
+      expect(JSON.parse(res.payload).matched).toBe(false)
+      expect(JSON.parse(res.payload).questionKey).toBe('ANOTHER_KEY')
     })
   })
 })

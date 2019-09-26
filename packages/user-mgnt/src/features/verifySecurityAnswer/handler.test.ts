@@ -27,8 +27,16 @@ const mockUser: Partial<IUser & { _id: string }> = {
   catchmentAreaIds: [],
   securityQuestionAnswers: [
     {
-      questionKey: 'TEST_QUESTION',
-      answerHash: generateHash('correct answer', '12345')
+      questionKey: 'TEST_QUESTION_1',
+      answerHash: generateHash('correct answer for q1', '12345')
+    },
+    {
+      questionKey: 'TEST_QUESTION_2',
+      answerHash: generateHash('correct answer for q2', '12345')
+    },
+    {
+      questionKey: 'TEST_QUESTION_3',
+      answerHash: generateHash('correct answer for q3', '12345')
     }
   ],
   scope: ['register'],
@@ -47,21 +55,6 @@ beforeEach(async () => {
 })
 
 describe('verifying a security question answer', () => {
-  it('responds with an error code when answer is incorrect', async () => {
-    mockingoose(User).toReturn(mockUser, 'findOne')
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/verifySecurityAnswer',
-      payload: {
-        userId: '5d10885374be318fa7689f0b',
-        questionKey: 'TEST_QUESTION',
-        answer: 'incorrect answer'
-      }
-    })
-
-    expect(res.statusCode).toBe(401)
-  })
   it('responds with an error code when user id is incorrect', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
@@ -70,7 +63,7 @@ describe('verifying a security question answer', () => {
       url: '/verifySecurityAnswer',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        questionKey: 'TEST_QUESTION',
+        questionKey: 'TEST_QUESTION_1',
         answer: 'incorrect answer'
       }
     })
@@ -88,14 +81,14 @@ describe('verifying a security question answer', () => {
       url: '/verifySecurityAnswer',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        questionKey: 'TEST_QUESTION',
+        questionKey: 'TEST_QUESTION_1',
         answer: 'correct answer'
       }
     })
 
     expect(res.statusCode).toBe(401)
   })
-  it('responds with an ok code when answer is correct', async () => {
+  it('responds with matched as true when answer is correct', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
 
     const res = await server.server.inject({
@@ -103,11 +96,28 @@ describe('verifying a security question answer', () => {
       url: '/verifySecurityAnswer',
       payload: {
         userId: '5d10885374be318fa7689f0b',
-        questionKey: 'TEST_QUESTION',
-        answer: 'correct answer'
+        questionKey: 'TEST_QUESTION_1',
+        answer: 'correct answer for q1'
       }
     })
 
-    expect(res.statusCode).toBe(200)
+    expect(res.result.matched).toBe(true)
+  })
+  it('responds with matched as false and a new questionKey when answer is incorrect', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/verifySecurityAnswer',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        questionKey: 'TEST_QUESTION_1',
+        answer: 'incorrect answer for q1'
+      }
+    })
+
+    expect(res.result.matched).toBe(false)
+    expect(res.result.questionKey).toBeDefined()
+    expect(res.result.questionKey).not.toBe('TEST_QUESTION_1')
   })
 })

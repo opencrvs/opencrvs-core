@@ -42,10 +42,10 @@ import verifyNumberHandler, {
 import changePasswordHandler, {
   reqChangePasswordSchema
 } from '@auth/features/retrievalSteps/changePassword/handler'
-
 import verifySecurityQuestionHandler, {
-  verifySecurityQuestionSchema
-} from '@auth/features/verifySecurityAnswer/handler'
+  verifySecurityQuestionSchema,
+  verifySecurityQuestionResSchema
+} from '@auth/features/retrievalSteps/verifySecurityAnswer/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -194,22 +194,6 @@ export async function createServer() {
     }
   })
 
-  // curl -H 'Content-Type: application/json' -d '{ "questionKey": "", "answer": "", "nonce": "" }' http://localhost:4040/verifyUser
-  server.route({
-    method: 'POST',
-    path: '/verifySecurityAnswer',
-    handler: verifySecurityQuestionHandler,
-    options: {
-      tags: ['api'],
-      description: 'Checks if the submitted security question answer is right',
-      notes:
-        'Verifies security answer and updates the nonce information so that it can be used for changing the password',
-      validate: {
-        payload: verifySecurityQuestionSchema
-      }
-    }
-  })
-
   // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
   server.route({
     method: 'POST',
@@ -231,6 +215,28 @@ export async function createServer() {
     }
   })
 
+  // curl -H 'Content-Type: application/json' -d '{ "questionKey": "", "answer": "", "nonce": "" }' http://localhost:4040/verifyUser
+  server.route({
+    method: 'POST',
+    path: '/verifySecurityAnswer',
+    handler: verifySecurityQuestionHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Third step of password or username retrieval steps.' +
+        'Checks if the submitted security question answer is right',
+      notes:
+        'Verifies security answer and updates the nonce information so that it can be used for changing the password' +
+        'In-case of a wrong answer, it will return an another question key.',
+      validate: {
+        payload: verifySecurityQuestionSchema
+      },
+      response: {
+        schema: verifySecurityQuestionResSchema
+      }
+    }
+  })
+
   // curl -H 'Content-Type: application/json' -d '{ "newPassword": "", "nonce": "" }' http://localhost:4040/changePassword
   server.route({
     method: 'POST',
@@ -238,7 +244,8 @@ export async function createServer() {
     handler: changePasswordHandler,
     options: {
       tags: ['api'],
-      description: 'Changes the user password',
+      description:
+        'Final step of password retrieval step.' + 'Changes the user password',
       notes:
         'Expects the nonce parameter to be coming from the reset password journey',
       validate: {
