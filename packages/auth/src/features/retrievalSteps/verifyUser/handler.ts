@@ -4,7 +4,7 @@ import {
   verifyUser,
   storeRetrievalStepInformation,
   RetrievalSteps
-} from '@auth/features/verifyUser/service'
+} from '@auth/features/retrievalSteps/verifyUser/service'
 import { generateAndSendVerificationCode } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
@@ -34,9 +34,9 @@ export default async function verifyUserHandler(
   await storeRetrievalStepInformation(
     nonce,
     result.userId,
-    result.scope,
     result.mobile,
-    RetrievalSteps.WAITING_FOR_VERIFICATION
+    RetrievalSteps.WAITING_FOR_VERIFICATION,
+    result.securityQuestionKey
   )
 
   await generateAndSendVerificationCode(nonce, result)

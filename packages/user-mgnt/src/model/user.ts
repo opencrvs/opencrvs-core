@@ -12,7 +12,7 @@ interface IIdentifier {
   system: string
   value: string
 }
-interface ISecurityQuestionAnswer {
+export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
 }

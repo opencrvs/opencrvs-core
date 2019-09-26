@@ -1,7 +1,10 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, {
+  IUserModel,
+  ISecurityQuestionAnswer
+} from '@user-mgnt/model/user'
 
 interface IVerifyPayload {
   mobile: string
@@ -11,6 +14,7 @@ interface IVerifyResponse {
   mobile: string
   scope: string[]
   status: string
+  securityQuestionKey: string
   id: string
 }
 
@@ -32,10 +36,24 @@ export default async function verifyUserHandler(
     mobile: user.mobile,
     scope: user.scope,
     status: user.status,
+    securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id
   }
 
   return response
+}
+
+function getRandomQuestionKey(
+  securityQuestionAnswers: ISecurityQuestionAnswer[] | undefined
+): string {
+  if (!securityQuestionAnswers || securityQuestionAnswers.length === 0) {
+    throw new Error('No security questions found')
+  }
+
+  return securityQuestionAnswers[
+    // tslint:disable-next-line
+    Math.floor(Math.random() * securityQuestionAnswers.length)
+  ].questionKey
 }
 
 export const requestSchema = Joi.object({
@@ -46,5 +64,6 @@ export const responseSchema = Joi.object({
   mobile: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
+  securityQuestionKey: Joi.string(),
   id: Joi.string()
 })

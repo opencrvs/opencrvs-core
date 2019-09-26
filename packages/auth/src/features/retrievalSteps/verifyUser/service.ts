@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
-import { IAuthentication } from '@auth/features/authenticate/service'
 import { get, set } from '@auth/database'
 
 export enum RetrievalSteps {
@@ -11,13 +10,12 @@ export enum RetrievalSteps {
 }
 export interface IRetrievalStepInformation {
   userId: string
-  scope: string[]
   mobile: string
   status: string
-  question?: string
+  securityQuestionKey: string
 }
 
-export async function verifyUser(mobile: string): Promise<IAuthentication> {
+export async function verifyUser(mobile: string) {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
 
   const res = await fetch(url, {
@@ -34,26 +32,25 @@ export async function verifyUser(mobile: string): Promise<IAuthentication> {
     userId: body.id,
     scope: body.scope,
     status: body.status,
-    mobile: body.mobile
+    mobile: body.mobile,
+    securityQuestionKey: body.securityQuestionKey
   }
 }
 
 export async function storeRetrievalStepInformation(
   nonce: string,
   userId: string,
-  scope: string[],
   mobile: string,
   status: RetrievalSteps,
-  question?: string
+  securityQuestionKey: string
 ) {
   return set(
     `retrieval_step_${nonce}`,
     JSON.stringify({
       userId,
-      scope,
       mobile,
       status: status.toString(),
-      question
+      securityQuestionKey
     })
   )
 }

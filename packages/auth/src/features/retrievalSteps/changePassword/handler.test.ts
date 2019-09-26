@@ -1,5 +1,5 @@
 import * as fetchAny from 'jest-fetch-mock'
-import { createServer } from '@auth/index'
+import { createServer } from '../../..'
 import { storePasswordChangeCode } from './service'
 
 // tslint:disable-next-line:mocha-no-side-effect-code

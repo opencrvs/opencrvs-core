@@ -34,10 +34,14 @@ import invalidateTokenHandler, {
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
-} from '@auth/features/verifyUser/handler'
+} from '@auth/features/retrievalSteps/verifyUser/handler'
+import verifyNumberHandler, {
+  requestSchema as reqVerifyNumberSchema,
+  responseSchema as resVerifyNumberSchema
+} from '@auth/features/retrievalSteps/verifyNumber/handler'
 import changePasswordHandler, {
   reqChangePasswordSchema
-} from '@auth/features/changePassword/handler'
+} from '@auth/features/retrievalSteps/changePassword/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -171,7 +175,9 @@ export async function createServer() {
     handler: verifyUserHandler,
     options: {
       tags: ['api'],
-      description: 'Check if user exists for given mobile number or not.',
+      description:
+        'First step of password or username retrieval steps.' +
+        'Check if user exists for given mobile number or not.',
       notes:
         'Verifies user and returns nonce to use for next step of password reset flow.' +
         'Sends an SMS to the user mobile with verification code',
@@ -180,6 +186,27 @@ export async function createServer() {
       },
       response: {
         schema: resVerifyUserSchema
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
+  server.route({
+    method: 'POST',
+    path: '/verifyNumber',
+    handler: verifyNumberHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Second step of password or username retrieval steps.' +
+        'Check if provided verification code is valid or not.',
+      notes:
+        'Verifies code for given nonce and returns a random security question for that user.',
+      validate: {
+        payload: reqVerifyNumberSchema
+      },
+      response: {
+        schema: resVerifyNumberSchema
       }
     }
   })

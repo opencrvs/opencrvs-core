@@ -4,7 +4,7 @@ import * as Joi from 'joi'
 import {
   changePassword,
   getPasswordChangeCodeDetails
-} from '@auth/features/changePassword/service'
+} from '@auth/features/retrievalSteps/changePassword/service'
 
 interface IPayload {
   newPassword: string
