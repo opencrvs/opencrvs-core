@@ -358,6 +358,7 @@ describe('admin service', () => {
           name: 'Barisal',
           alias: 'বরিশাল',
           physicalType: 'Jurisdiction',
+          jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
@@ -366,6 +367,7 @@ describe('admin service', () => {
           name: 'Chittagong',
           alias: 'চট্টগ্রাম',
           physicalType: 'Jurisdiction',
+          jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
@@ -374,6 +376,7 @@ describe('admin service', () => {
           name: 'Dhaka',
           alias: 'ঢাকা',
           physicalType: 'Jurisdiction',
+          jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
@@ -382,6 +385,7 @@ describe('admin service', () => {
           name: 'Khulna',
           alias: 'খুলনা',
           physicalType: 'Jurisdiction',
+          jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         },
@@ -390,6 +394,7 @@ describe('admin service', () => {
           name: 'Rajshahi',
           alias: 'রাজশাহী',
           physicalType: 'Jurisdiction',
+          jurisdictionType: 'DIVISION',
           type: 'ADMIN_STRUCTURE',
           partOf: 'Location/0'
         }

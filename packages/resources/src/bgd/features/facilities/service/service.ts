@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { generateLocationResource } from '@resources/bgd/features/administrative/scripts/service'
+import { generateLocationResource } from '@resources/bgd/features/facilities/scripts/service'
 import { FHIR_URL } from '@resources/constants'
 import { ILocation } from '@resources/bgd/features/utils'
 
