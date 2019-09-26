@@ -153,39 +153,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           true: {
             title: {
               message: messages.approvalActionTitle,
-              payload: { completeApplication: true }
-            },
-            description: {
-              message: messages.approvalActionDescriptionComplete
-            },
-            modal: {
-              title: {
-                message: messages.submitConfirmationTitle,
-                payload: { completeApplication: true }
-              },
-              description: {
-                message: messages.submitConfirmationDesc,
-                payload: { completeApplication: true }
-              }
-            }
-          },
-          false: {
-            title: {
-              message: messages.approvalActionTitle,
-              payload: { completeApplication: false }
-            },
-            description: {
-              message: messages.approvalActionDescriptionIncomplete
-            }
-          }
-        }
-      },
-      false: {
-        completionStatus: {
-          true: {
-            title: {
-              message: messages.approvalActionTitle,
-              payload: { completeApplication: true }
+              payload: { draftStatus: true }
             },
             description: {
               message: messages.approvalActionDescriptionComplete
@@ -203,7 +171,39 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           },
           false: {
             title: {
+              message: messages.reviewActionTitle,
+              payload: { completeApplication: false }
+            },
+            description: {
+              message: messages.approvalActionDescriptionIncomplete
+            }
+          }
+        }
+      },
+      false: {
+        completionStatus: {
+          true: {
+            title: {
               message: messages.approvalActionTitle,
+              payload: { draftStatus: false }
+            },
+            description: {
+              message: messages.approvalActionDescriptionComplete
+            },
+            modal: {
+              title: {
+                message: messages.validateConfirmationTitle,
+                payload: { completeApplication: true }
+              },
+              description: {
+                message: messages.validateConfirmationDesc,
+                payload: { completeApplication: true }
+              }
+            }
+          },
+          false: {
+            title: {
+              message: messages.reviewActionTitle,
               payload: { completeApplication: false }
             },
             description: {
@@ -350,7 +350,7 @@ class ReviewActionComponent extends React.Component<
                 {intl.formatMessage(buttonMessages.register)}
               </SuccessButton>
             ) : applicationToBeValidated ? (
-              <PrimaryButton
+              <SuccessButton
                 id="validateApplicationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
@@ -358,7 +358,7 @@ class ReviewActionComponent extends React.Component<
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.sendForApproval)}
-              </PrimaryButton>
+              </SuccessButton>
             ) : (
               <PrimaryButton
                 id="submit_form"
