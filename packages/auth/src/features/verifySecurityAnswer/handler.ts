@@ -24,12 +24,11 @@ export default async function verifySecurityQuestionHandler(
 
   const retrivalStepInformation = await getRetrievalStepInformation(
     payload.nonce
-  )
+  ).catch(() => {
+    throw unauthorized()
+  })
 
-  if (
-    !retrivalStepInformation ||
-    retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED
-  ) {
+  if (retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED) {
     return unauthorized()
   }
 

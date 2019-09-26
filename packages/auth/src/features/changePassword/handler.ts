@@ -7,6 +7,7 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/verifyUser/service'
+import { unauthorized } from 'boom'
 
 interface IPayload {
   newPassword: string
@@ -20,11 +21,11 @@ export default async function changePasswordHandler(
   const payload = request.payload as IPayload
   const retrivalStepInformation = await getRetrievalStepInformation(
     payload.nonce
-  )
-  if (
-    !retrivalStepInformation ||
-    retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED
-  ) {
+  ).catch(() => {
+    throw unauthorized()
+  })
+
+  if (retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
     return h.response().code(401)
   }
   await changePassword(retrivalStepInformation.userId, payload.newPassword)
