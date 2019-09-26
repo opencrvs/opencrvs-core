@@ -5,6 +5,7 @@ import { IUserData } from './applications'
 import { noop } from 'lodash'
 import * as CommonUtils from '@register/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
+import 'core-js/features/array/flat'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
@@ -46,14 +47,6 @@ Object.defineProperty(document, 'hidden', {
   },
   set(bool) {
     hiddenMock.mockReturnValue(Boolean(bool))
-  }
-})
-
-Object.defineProperty(Array.prototype, 'flat', {
-  value: function() {
-    return this.reduce(function(flatted: Array<any>, toFlatten: Array<any>) {
-      return flatted.concat(toFlatten)
-    }, [])
   }
 })
 
