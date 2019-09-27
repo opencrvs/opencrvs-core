@@ -42,6 +42,7 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
+  FETCH_BUTTON,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   IFormData
 } from '@register/forms'
@@ -87,7 +88,6 @@ import { isMobileDevice } from '@register/utils/commonUtils'
 import { BIRTH, REJECTED } from '@register/utils/constants'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import { IValidationResult } from '@register/utils/validate'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import { flatten, isArray } from 'lodash'
 import * as React from 'react'
@@ -199,19 +199,6 @@ interface IErrorsBySection {
 }
 
 type FullProps = IProps & IntlShapeProps
-
-const getViewableSection = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ id, viewType }) =>
-      id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
-  )
-}
-
-const getDocumentSections = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ hasDocumentSection }) => hasDocumentSection
-  )
-}
 
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,
@@ -333,7 +320,8 @@ const getErrorsOnFieldsBySection = (
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
       section,
-      draft.data[section.id]
+      draft.data[section.id],
+      draft.data
     )
 
     const errors = getValidationErrorsForForm(
@@ -400,7 +388,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     window.removeEventListener('scroll', this.onScroll)
   }
 
-  docSections = getDocumentSections(
+  getVisibleSections = (formSections: IFormSection[]) => {
+    const { draft } = this.props
+    return formSections.filter(
+      section =>
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          draft.data[section.id] || {},
+          draft.data
+        ).length > 0
+    )
+  }
+
+  getViewableSection = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ id, viewType }) =>
+        id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  getDocumentSections = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ hasDocumentSection }) => hasDocumentSection
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  docSections = this.getDocumentSections(
     this.props.registerForm[this.props.draft.event]
   )
 
@@ -558,7 +575,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
       type => type === field.type
     )
   }
@@ -752,7 +769,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
         section,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        draft.data
       ).forEach(group => {
         items = items
           .concat(
@@ -795,13 +813,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registerForm,
       rejectApplicationClickEvent,
       submitClickEvent,
-      pageRoute,
       registrationSection,
       documentsSection,
       offlineResources,
       draft: { event }
     } = this.props
-    const formSections = getViewableSection(registerForm[event])
+    const formSections = this.getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
 

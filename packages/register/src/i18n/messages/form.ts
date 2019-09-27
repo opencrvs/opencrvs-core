@@ -286,6 +286,7 @@ interface IFormMessages {
   firstName: MessageDescriptor
   lastName: MessageDescriptor
   relationship: MessageDescriptor
+  informantPermanentAdress: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -640,6 +641,11 @@ const messagesToDefine: IFormMessages = {
     description:
       'Title for the radio button to select that the mothers current address is the same as her permanent address',
     id: 'form.field.label.currentAddressSameAsPermanent'
+  },
+  informantPermanentAdress: {
+    defaultMessage: 'What is their permanent address?',
+    description: 'Title of informant permanent adress ',
+    id: 'form.field.label.informantPermanentAddress'
   },
   dateOfMarriage: {
     defaultMessage: 'Date of marriage',

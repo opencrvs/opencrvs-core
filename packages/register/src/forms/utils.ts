@@ -362,7 +362,8 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData
+  values: IFormSectionData,
+  draftData?: IFormData
 ): IFormSectionGroup[] => {
   return section.groups.filter(group => {
     if (!group.conditionals) {
@@ -380,12 +381,17 @@ export const getVisibleSectionGroupsBasedOnConditions = (
 
 export const getSectionFields = (
   section: IFormSection,
-  values?: IFormSectionData
+  values?: IFormSectionData,
+  draftData?: IFormData
 ) => {
   let fields: IFormField[] = []
-  getVisibleSectionGroupsBasedOnConditions(section, values || {}).forEach(
-    group => (fields = fields.concat(group.fields))
-  )
+
+  getVisibleSectionGroupsBasedOnConditions(
+    section,
+    values || {},
+    draftData
+  ).forEach(group => (fields = fields.concat(group.fields)))
+
   return fields
 }
 
