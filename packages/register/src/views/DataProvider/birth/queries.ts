@@ -16,6 +16,32 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         gender
       }
+      informant {
+        id
+        individual {
+          id
+          identifier {
+            id
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          birthDate
+          address {
+            type
+            line
+            district
+            state
+            postalCode
+            country
+          }
+        }
+      }
       mother {
         id
         name {
@@ -198,6 +224,32 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           value
         }
       }
+      informant {
+        id
+        individual {
+          id
+          identifier {
+            id
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          birthDate
+          address {
+            type
+            line
+            district
+            state
+            postalCode
+            country
+          }
+        }
+      }
       registration {
         id
         contact
@@ -226,7 +278,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
-
         trackingId
         registrationNumber
       }

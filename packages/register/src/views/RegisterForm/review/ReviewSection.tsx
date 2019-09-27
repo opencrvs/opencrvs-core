@@ -43,7 +43,8 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING
+  WARNING,
+  FETCH_BUTTON
 } from '@register/forms'
 import {
   getBirthSection,
@@ -198,19 +199,6 @@ interface IErrorsBySection {
 }
 
 type FullProps = IProps & IntlShapeProps
-
-const getViewableSection = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ id, viewType }) =>
-      id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
-  )
-}
-
-const getDocumentSections = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ hasDocumentSection }) => hasDocumentSection
-  )
-}
 
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,
@@ -400,7 +388,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     window.removeEventListener('scroll', this.onScroll)
   }
 
-  docSections = getDocumentSections(
+  getVisibleSections = (formSections: IFormSection[]) => {
+    const { draft } = this.props
+    return formSections.filter(
+      section =>
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          draft.data[section.id] || {},
+          draft.data
+        ).length > 0
+    )
+  }
+
+  getViewableSection = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ id, viewType }) =>
+        id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  getDocumentSections = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ hasDocumentSection }) => hasDocumentSection
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  docSections = this.getDocumentSections(
     this.props.registerForm[this.props.draft.event]
   )
 
@@ -558,7 +575,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION].find(
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
       type => type === field.type
     )
   }
@@ -797,13 +814,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       registerForm,
       rejectApplicationClickEvent,
       submitClickEvent,
-      pageRoute,
       registrationSection,
       documentsSection,
       offlineResources,
       draft: { event }
     } = this.props
-    const formSections = getViewableSection(registerForm[event])
+    const formSections = this.getViewableSection(registerForm[event])
 
     const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
 

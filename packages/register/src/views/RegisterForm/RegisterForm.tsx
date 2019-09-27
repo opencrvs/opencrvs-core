@@ -128,14 +128,22 @@ function getNextSectionIds(
 
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
-      section => section.viewType !== VIEW_TYPE.HIDDEN
+      section =>
+        section.viewType !== VIEW_TYPE.HIDDEN &&
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          application.data[fromSection.id] || {},
+          application.data
+        ).length > 0
     )
+
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
     )
     if (currentIndex === visibleSections.length - 1) {
       return null
     }
+
     return {
       sectionId: visibleSections[currentIndex + 1].id,
       groupId: visibleSections[currentIndex + 1].groups[0].id

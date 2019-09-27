@@ -156,6 +156,7 @@ describe('ReviewForm tests', () => {
                 birthDate: '2001-01-01',
                 gender: 'male'
               },
+              informant: null,
               mother: {
                 name: [
                   {
@@ -208,10 +209,6 @@ describe('ReviewForm tests', () => {
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
-              informant: {
-                relationship: 'Informant Relation',
-                otherRelationship: 'Other Relation'
-              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -326,6 +323,7 @@ describe('ReviewForm tests', () => {
               },
               child: null,
               mother: null,
+              informant: null,
               father: {
                 name: [
                   {
@@ -371,10 +369,6 @@ describe('ReviewForm tests', () => {
                   }
                 ],
                 id: '526362a1-aa8e-4848-af35-41524f9e7e85'
-              },
-              informant: {
-                relationship: 'Informant Relation',
-                otherRelationship: 'Other Relation'
               },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
@@ -472,10 +466,7 @@ describe('ReviewForm tests', () => {
               child: null,
               mother: null,
               father: null,
-              informant: {
-                relationship: 'Informant Relation',
-                otherRelationship: 'Other Relation'
-              },
+              informant: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -584,6 +575,7 @@ describe('ReviewForm tests', () => {
                 }
               },
               child: null,
+              informant: null,
               mother: {
                 name: [
                   {
@@ -632,10 +624,6 @@ describe('ReviewForm tests', () => {
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
-              informant: {
-                relationship: 'Informant Relation',
-                otherRelationship: 'Other Relation'
-              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
