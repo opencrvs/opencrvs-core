@@ -78,7 +78,6 @@ type IProps = IntlShapeProps & {
 interface IState {
   showMenu: boolean
   showLogoutModal: boolean
-  width: number
 }
 
 const StyledPrimaryButton = styled(IconButton)`
@@ -95,8 +94,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     this.state = {
       showMenu: false,
-      showLogoutModal: false,
-      width: window.innerWidth
+      showLogoutModal: false
     }
   }
 
