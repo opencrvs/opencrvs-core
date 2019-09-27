@@ -26,7 +26,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
+                  "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"OTHER\" || draftData.registration.presentAtBirthRegistration === \"BOTH_PARENTS\" )"
                 }
               ],
               "fields": [
@@ -236,6 +236,67 @@
                       ]
                     }
                   }
+                }
+              ]
+            },
+            {
+              "id": "primary-applicant",
+              "title": {
+                "defaultMessage": "Who is the primary applicant for this application?",
+                "description": "Form section title for primary applicant",
+                "id": "register.primaryApplicant.registerNewEventHeading"
+              },
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"BOTH_PARENTS\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "paragraph",
+                  "type": "PARAGRAPH",
+                  "label": {
+                    "defaultMessage": "This person is responsible for providing accurate information in this application.",
+                    "description": "Documents Paragraph text",
+                    "id": "register.primaryApplicant.description"
+                  },
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": []
+                },
+                {
+                  "name": "applicant",
+                  "type": "RADIO_GROUP",
+                  "label": {
+                    "defaultMessage": "Who is the primary applicant for this application?",
+                    "description": "Form section title for primary applicant",
+                    "id": "register.primaryApplicant.registerNewEventHeading"
+                  },
+                  "hideHeader": true,
+                  "size": "large",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Mother as applicant",
+                        "id": "form.field.label.applicantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Father as applicant",
+                        "id": "form.field.label.applicantRelation.father"
+                      }
+                    }
+                  ],
+                  "conditionals": []
                 }
               ]
             },

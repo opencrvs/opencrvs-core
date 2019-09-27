@@ -48,9 +48,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toContain(
-        '/events/birth/registration/contact'
-      )
+      const expectation = `/drafts/${draft.id}/events/birth`
+      expect(window.location.pathname).toContain(expectation)
     })
   })
   describe('when click continue without select anything', () => {
@@ -93,9 +92,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toContain(
-        '/events/birth/registration/contact'
-      )
+      const expectation = `/drafts/${draft.id}/events/birth`
+      expect(window.location.pathname).toContain(expectation)
     })
   })
 
@@ -111,7 +109,7 @@ describe('when user is selecting the informant', () => {
         .simulate('click')
 
       expect(
-        app.find('#primary_applicant_selection_view').hostNodes()
+        app.find('#form_section_id_primary-applicant').hostNodes()
       ).toHaveLength(1)
     })
   })

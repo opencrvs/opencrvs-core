@@ -2821,7 +2821,7 @@ export async function goToSection(component: ReactWrapper, nth: number) {
 }
 
 export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 4)
+  await goToSection(component, 5)
   await waitForElement(component, '#review_header')
 }
 

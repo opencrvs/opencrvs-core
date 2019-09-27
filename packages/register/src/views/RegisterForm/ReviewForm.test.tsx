@@ -5,7 +5,7 @@ import {
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
-import { Event, IForm } from '@opencrvs/register/src/forms'
+import { Event, IForm, IFormSectionData } from '@opencrvs/register/src/forms'
 
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
@@ -208,9 +208,14 @@ describe('ReviewForm tests', () => {
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
+              informant: {
+                relationship: 'Informant Relation',
+                otherRelationship: 'Other Relation'
+              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
@@ -367,9 +372,14 @@ describe('ReviewForm tests', () => {
                 ],
                 id: '526362a1-aa8e-4848-af35-41524f9e7e85'
               },
+              informant: {
+                relationship: 'Informant Relation',
+                otherRelationship: 'Other Relation'
+              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'FATHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
@@ -431,8 +441,10 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
-    expect(data.data.registration.registrationPhone).toBe('01733333333')
+    expect(
+      ((data.data.registration.contactPoint as IFormSectionData)
+        .nestedFields as IFormSectionData).contactPhoneNumber
+    ).toBe('01733333333')
   })
   it('when registration has attachment', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -460,9 +472,14 @@ describe('ReviewForm tests', () => {
               child: null,
               mother: null,
               father: null,
+              informant: {
+                relationship: 'Informant Relation',
+                otherRelationship: 'Other Relation'
+              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: [
                   {
@@ -615,9 +632,14 @@ describe('ReviewForm tests', () => {
                 id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
               },
               father: null,
+              informant: {
+                relationship: 'Informant Relation',
+                otherRelationship: 'Other Relation'
+              },
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: [
@@ -689,13 +711,23 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
     expect(data.data.registration).toEqual({
-      _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
-      whoseContactDetails: 'MOTHER',
       presentAtBirthRegistration: 'MOTHER_ONLY',
-      registrationPhone: '01733333333',
-      commentsOrNotes: 'This is a note',
+      applicant: {
+        value: 'Informant Relation',
+        nestedFields: {
+          otherRelationShip: 'Other Relation'
+        }
+      },
+      contactPoint: {
+        value: 'MOTHER',
+        nestedFields: {
+          registrationPhone: 'Contact Relation',
+          contactRelationship: 'Contact Relation',
+          contactPhoneNumber: '01733333333'
+        }
+      },
+      _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
       trackingId: 'B123456',
       type: 'birth'
     })
@@ -1337,8 +1369,13 @@ describe('ReviewForm tests', () => {
                 child: null,
                 mother: null,
                 father: null,
+                informant: {
+                  relationship: 'Informant Relation',
+                  otherRelationship: 'Other Relation'
+                },
                 registration: {
                   contact: 'MOTHER',
+                  contactRelationship: 'Contact Relation',
                   attachments: null,
                   status: null,
                   type: 'BIRTH'
