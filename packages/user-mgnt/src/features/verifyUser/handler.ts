@@ -24,7 +24,6 @@ export default async function verifyUserHandler(
 ) {
   const { mobile } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne({ mobile })
 
   if (!user) {
@@ -43,16 +42,22 @@ export default async function verifyUserHandler(
   return response
 }
 
-function getRandomQuestionKey(
-  securityQuestionAnswers: ISecurityQuestionAnswer[] | undefined
+export function getRandomQuestionKey(
+  securityQuestionAnswers: ISecurityQuestionAnswer[] | undefined,
+  questionKeyToSkip?: string
 ): string {
   if (!securityQuestionAnswers || securityQuestionAnswers.length === 0) {
     throw new Error('No security questions found')
   }
 
-  return securityQuestionAnswers[
+  const filteredQuestions = questionKeyToSkip
+    ? securityQuestionAnswers.filter(
+        securityQnA => securityQnA.questionKey !== questionKeyToSkip
+      )
+    : securityQuestionAnswers
+  return filteredQuestions[
     // tslint:disable-next-line
-    Math.floor(Math.random() * securityQuestionAnswers.length)
+    Math.floor(Math.random() * filteredQuestions.length)
   ].questionKey
 }
 

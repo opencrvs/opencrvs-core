@@ -8,13 +8,15 @@ import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
-  Event
+  Event,
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
 
 import { formMessages } from '@register/i18n/messages'
 import { waitForElement } from '@register/tests/wait-for-element'
+import { phoneNumberFormat } from '@register/utils/validate'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -161,5 +163,144 @@ describe('when user is in the register section', () => {
         .hostNodes()
         .prop('type')
     ).toEqual('tel')
+  })
+})
+
+describe('when field definition has nested fields', () => {
+  let component: ReactWrapper<{}, {}>
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    const draft = createApplication(Event.BIRTH)
+    store.dispatch(storeApplication(draft))
+    const modifyDraft = jest.fn()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="registration"
+        onChange={modifyDraft}
+        setAllFieldsDirty={false}
+        fields={[
+          {
+            name: 'applicant',
+            type: RADIO_GROUP_WITH_NESTED_FIELDS,
+            label: {
+              defaultMessage: 'Applicant',
+              description: 'Form section name for Applicant',
+              id: 'form.section.applicant.name'
+            },
+            required: true,
+            initialValue: '',
+            validate: [],
+            options: [
+              {
+                value: 'FATHER',
+                label: {
+                  defaultMessage: 'Father',
+                  description: 'Label for option Father',
+                  id: 'form.field.label.applicantRelation.father'
+                }
+              },
+              {
+                value: 'MOTHER',
+                label: {
+                  defaultMessage: 'Mother',
+                  description: 'Label for option Mother',
+                  id: 'form.field.label.applicantRelation.mother'
+                }
+              }
+            ],
+            nestedFields: {
+              FATHER: [
+                {
+                  name: 'applicantPhoneFather',
+                  type: TEL,
+                  label: {
+                    defaultMessage: 'Phone number',
+                    description: 'Input label for phone input',
+                    id: 'form.field.label.phoneNumber'
+                  },
+                  required: false,
+                  initialValue: '',
+                  validate: [phoneNumberFormat]
+                }
+              ],
+              MOTHER: [
+                {
+                  name: 'applicantPhoneMother',
+                  type: TEL,
+                  label: {
+                    defaultMessage: 'Phone number',
+                    description: 'Input label for phone input',
+                    id: 'form.field.label.phoneNumber'
+                  },
+                  required: false,
+                  initialValue: '',
+                  validate: [phoneNumberFormat]
+                }
+              ]
+            }
+          }
+        ]}
+      />,
+      store
+    )
+
+    component = testComponent.component
+  })
+
+  it('renders radio group with nested fields', () => {
+    expect(component.find('#applicant').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('when clicking on a radio option renders nested fields', () => {
+    component
+      .find('#applicant_MOTHER')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+    component.update()
+
+    expect(
+      component.find(
+        'input[name="applicant.nestedFields.applicantPhoneMother"]'
+      )
+    ).toHaveLength(1)
+  })
+
+  it('changing radio button resets nested field values', () => {
+    component
+      .find('#applicant_MOTHER')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+
+    component
+      .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+      .simulate('change', {
+        target: {
+          name: 'applicant.nestedFields.applicantPhoneMother',
+          value: '01912345678'
+        }
+      })
+
+    expect(
+      component
+        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .props().value
+    ).toEqual('01912345678')
+
+    component
+      .find('#applicant_FATHER')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+
+    component
+      .find('#applicant_MOTHER')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+
+    expect(
+      component
+        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .props().value
+    ).toEqual('')
   })
 })

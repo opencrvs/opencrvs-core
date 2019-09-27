@@ -1,5 +1,5 @@
 import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '../..'
+import { createServer } from '@auth/index'
 
 describe('resend handler receives a request', () => {
   let server: any

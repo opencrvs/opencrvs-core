@@ -26,18 +26,20 @@ export default async function verifyNumberHandler(
 ): Promise<IVerifyNumberResponse> {
   const payload = request.payload as IVerifyNumberPayload
   let retrievalStepInfo: IRetrievalStepInformation
-  try {
-    // Looks for step1 data. Throws exception if not found
-    retrievalStepInfo = await getRetrievalStepInformation(payload.nonce)
-    // Throws exception if not ready for step2
-    if (
-      retrievalStepInfo.status !==
-      RetrievalSteps.WAITING_FOR_VERIFICATION.toString()
-    ) {
-      throw new Error(
-        `Proper status not found for given nonce: ${payload.nonce}`
-      )
+  // Looks for step1 data. Throws exception if not found
+  retrievalStepInfo = await getRetrievalStepInformation(payload.nonce).catch(
+    () => {
+      throw unauthorized()
     }
+  )
+  // Throws exception if not ready for step2
+  if (
+    retrievalStepInfo.status !==
+    RetrievalSteps.WAITING_FOR_VERIFICATION.toString()
+  ) {
+    throw unauthorized()
+  }
+  try {
     // Matchs verification code. Throws exception if doesn't
     await checkVerificationCode(payload.nonce, payload.code)
   } catch (err) {

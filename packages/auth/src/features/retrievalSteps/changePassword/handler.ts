@@ -1,10 +1,14 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 
+import { unauthorized } from 'boom'
+
+import { changePassword } from '@auth/features/retrievalSteps/changePassword/service'
 import {
-  changePassword,
-  getPasswordChangeCodeDetails
-} from '@auth/features/retrievalSteps/changePassword/service'
+  getRetrievalStepInformation,
+  RetrievalSteps,
+  deleteRetrievalStepInformation
+} from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IPayload {
   newPassword: string
@@ -16,11 +20,17 @@ export default async function changePasswordHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IPayload
-  const code = await getPasswordChangeCodeDetails(payload.nonce)
-  if (!code) {
+  const retrivalStepInformation = await getRetrievalStepInformation(
+    payload.nonce
+  ).catch(() => {
+    throw unauthorized()
+  })
+
+  if (retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
     return h.response().code(401)
   }
-  await changePassword(code.userId, payload.newPassword)
+  await changePassword(retrivalStepInformation.userId, payload.newPassword)
+  await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }
 

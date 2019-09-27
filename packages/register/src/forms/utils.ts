@@ -26,10 +26,16 @@ import {
   DATE,
   IDateFormField,
   IFormSectionGroup,
+  IRadioGroupFormField,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import {
+  getValidationErrorsForForm,
+  IFieldErrors,
+  Errors
+} from '@register/forms/validation'
 import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
@@ -79,7 +85,10 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === RADIO_GROUP) {
+  if (
+    base.type === RADIO_GROUP ||
+    base.type === RADIO_GROUP_WITH_NESTED_FIELDS
+  ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
       ;(base as any).notice = intl.formatMessage(
@@ -353,7 +362,8 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData
+  values: IFormSectionData,
+  draftData?: IFormData
 ): IFormSectionGroup[] => {
   return section.groups.filter(group => {
     if (!group.conditionals) {
@@ -371,12 +381,17 @@ export const getVisibleSectionGroupsBasedOnConditions = (
 
 export const getSectionFields = (
   section: IFormSection,
-  values?: IFormSectionData
+  values?: IFormSectionData,
+  draftData?: IFormData
 ) => {
   let fields: IFormField[] = []
-  getVisibleSectionGroupsBasedOnConditions(section, values || {}).forEach(
-    group => (fields = fields.concat(group.fields))
-  )
+
+  getVisibleSectionGroupsBasedOnConditions(
+    section,
+    values || {},
+    draftData
+  ).forEach(group => (fields = fields.concat(group.fields)))
+
   return fields
 }
 
@@ -384,11 +399,16 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData
 ): boolean => {
-  const errors = getValidationErrorsForForm(fields, values)
+  const errors: Errors = getValidationErrorsForForm(fields, values)
 
   const fieldListWithErrors = Object.values(errors).filter(
-    error => (error as IValidationResult[]).length > 0
+    error =>
+      (error as IFieldErrors).errors.length > 0 ||
+      Object.values(error.nestedFields).some(
+        nestedFieldErrors => nestedFieldErrors.length > 0
+      )
   )
+
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
