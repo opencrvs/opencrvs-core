@@ -57,7 +57,7 @@ export function getRandomQuestionKey(
     : securityQuestionAnswers
   return filteredQuestions[
     // tslint:disable-next-line
-    Math.floor(Math.random() * securityQuestionAnswers.length)
+    Math.floor(Math.random() * filteredQuestions.length)
   ].questionKey
 }
 
