@@ -291,6 +291,7 @@ export interface GQLRegistration {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -1787,6 +1788,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
+  contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -1834,6 +1836,13 @@ export interface RegistrationToBookResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -646,6 +646,16 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
+function createInformantRelationshio(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
+    valueString: fieldValue
+  })
+}
+
 function createInformantShareContactNumber(
   resource: fhir.Task,
   fieldValue: string
@@ -1664,6 +1674,14 @@ const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
+    },
+    contactRelationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantRelationshio(taskResource, fieldValue)
     },
     contactPhoneNumber: (
       fhirBundle: ITemplatedBundle,
