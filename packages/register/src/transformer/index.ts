@@ -1,23 +1,34 @@
-import { IForm, IFormData, TransformedData, IFormField } from '@register/forms'
+import {
+  IForm,
+  IFormData,
+  TransformedData,
+  IFormField,
+  IFormFieldMapping,
+  IFormFieldMutationMapFunction,
+  IFormFieldQueryMapFunction
+} from '@register/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
 
-const nestedFieldsMutationMapping = (
+const nestedFieldsMapping = (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
-  fieldDef: IFormField
+  fieldDef: IFormField,
+  mappingKey: keyof IFormFieldMapping
 ) => {
-  var tempFormField: IFormField
-  for (var index in fieldDef.nestedFields) {
-    for (var nestedIndex in fieldDef.nestedFields[index]) {
+  let tempFormField: IFormField
+  for (let index in fieldDef.nestedFields) {
+    for (let nestedIndex in fieldDef.nestedFields[index]) {
       tempFormField = fieldDef.nestedFields[index][nestedIndex]
       tempFormField &&
         tempFormField.mapping &&
-        tempFormField.mapping.mutation &&
-        tempFormField.mapping.mutation(
+        tempFormField.mapping[mappingKey] &&
+        (tempFormField.mapping[mappingKey] as
+          | IFormFieldMutationMapFunction
+          | IFormFieldQueryMapFunction)(
           transformedData,
           draftData,
           sectionId,
@@ -81,11 +92,12 @@ export const draftToGqlTransformer = (
               section.id,
               fieldDef
             )
-            nestedFieldsMutationMapping(
+            nestedFieldsMapping(
               transformedData,
               draftData,
               section.id,
-              fieldDef
+              fieldDef,
+              'mutation'
             )
           } else {
             transformedData[section.id][fieldDef.name] =
@@ -121,30 +133,6 @@ export const draftToGqlTransformer = (
   return transformedData
 }
 
-const nestedFieldsQueryMapping = (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  fieldDef: IFormField
-) => {
-  var tempFormField: IFormField
-  for (var index in fieldDef.nestedFields) {
-    for (var nestedIndex in fieldDef.nestedFields[index]) {
-      tempFormField = fieldDef.nestedFields[index][nestedIndex]
-      tempFormField &&
-        tempFormField.mapping &&
-        tempFormField.mapping.query &&
-        tempFormField.mapping.query(
-          transformedData,
-          draftData,
-          sectionId,
-          fieldDef,
-          tempFormField
-        )
-    }
-  }
-}
-
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any
@@ -167,11 +155,12 @@ export const gqlToDraftTransformer = (
             section.id,
             fieldDef
           )
-          nestedFieldsQueryMapping(
+          nestedFieldsMapping(
             transformedData,
             queryData,
             section.id,
-            fieldDef
+            fieldDef,
+            'query'
           )
         } else if (
           queryData[section.id] &&
