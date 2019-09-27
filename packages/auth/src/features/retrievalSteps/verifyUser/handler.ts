@@ -40,6 +40,7 @@ export default async function verifyUserHandler(
   await storeRetrievalStepInformation(
     nonce,
     result.userId,
+    result.username,
     result.mobile,
     isUserNameRetrievalFlow
       ? RetrievalSteps.NUMBER_VERIFIED

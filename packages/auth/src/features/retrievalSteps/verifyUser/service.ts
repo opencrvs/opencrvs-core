@@ -13,6 +13,7 @@ export enum RetrievalSteps {
 }
 export interface IRetrievalStepInformation {
   userId: string
+  username: string
   mobile: string
   status: string
   securityQuestionKey: string
@@ -33,6 +34,7 @@ export async function verifyUser(mobile: string) {
   const body = await res.json()
   return {
     userId: body.id,
+    username: body.username,
     scope: body.scope,
     status: body.status,
     mobile: body.mobile,
@@ -43,6 +45,7 @@ export async function verifyUser(mobile: string) {
 export async function storeRetrievalStepInformation(
   nonce: string,
   userId: string,
+  username: string,
   mobile: string,
   status: RetrievalSteps,
   securityQuestionKey: string
@@ -51,6 +54,7 @@ export async function storeRetrievalStepInformation(
     `retrieval_step_${nonce}`,
     JSON.stringify({
       userId,
+      username,
       mobile,
       status: status.toString(),
       securityQuestionKey

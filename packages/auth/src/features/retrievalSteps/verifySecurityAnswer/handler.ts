@@ -52,6 +52,7 @@ export default async function verifySecurityQuestionHandler(
   await storeRetrievalStepInformation(
     payload.nonce,
     retrivalStepInformation.userId,
+    retrivalStepInformation.username,
     retrivalStepInformation.mobile,
     verificationResult.matched
       ? RetrievalSteps.SECURITY_Q_VERIFIED

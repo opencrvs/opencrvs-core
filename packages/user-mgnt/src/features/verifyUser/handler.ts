@@ -16,6 +16,7 @@ interface IVerifyResponse {
   status: string
   securityQuestionKey: string
   id: string
+  username: string
 }
 
 export default async function verifyUserHandler(
@@ -36,7 +37,8 @@ export default async function verifyUserHandler(
     scope: user.scope,
     status: user.status,
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
-    id: user.id
+    id: user.id,
+    username: user.username
   }
 
   return response
@@ -70,5 +72,6 @@ export const responseSchema = Joi.object({
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
-  id: Joi.string()
+  id: Joi.string(),
+  username: Joi.string()
 })

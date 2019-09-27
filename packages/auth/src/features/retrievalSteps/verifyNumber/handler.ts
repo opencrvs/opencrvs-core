@@ -50,6 +50,7 @@ export default async function verifyNumberHandler(
   await storeRetrievalStepInformation(
     payload.nonce,
     retrievalStepInfo.userId,
+    retrievalStepInfo.username,
     retrievalStepInfo.mobile,
     RetrievalSteps.NUMBER_VERIFIED,
     retrievalStepInfo.securityQuestionKey

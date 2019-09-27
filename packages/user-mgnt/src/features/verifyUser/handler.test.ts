@@ -27,7 +27,8 @@ test('verifyUserHandler should return 200 and the user scope when the user exist
     scope: ['test'],
     status: 'active',
     securityQuestionAnswers: [{ questionKey: 'sample', answerHash: '##' }],
-    id: '123'
+    id: '123',
+    username: 'user'
   }
   mockingoose(User).toReturn(entry, 'findOne')
 
@@ -45,7 +46,8 @@ test('verifyUserHandler should throw when no security question answer found', as
     mobile: '+8801711111111',
     scope: ['test'],
     status: 'active',
-    id: '123'
+    id: '123',
+    username: 'user'
   }
   mockingoose(User).toReturn(entry, 'findOne')
 
