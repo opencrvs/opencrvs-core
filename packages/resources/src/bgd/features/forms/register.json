@@ -691,7 +691,7 @@
                   "name": "birthLocation",
                   "type": "SEARCH_FIELD",
                   "label": {
-                    "defaultMessage": "Health instition",
+                    "defaultMessage": "Health institution",
                     "description": "Label for form field: Health Institution",
                     "id": "form.field.label.healdInstitution"
                   },
