@@ -95,6 +95,7 @@ interface IProps {
   touched?: boolean
   onModalComplete: (value: string) => void
   offlineResources: IOfflineData
+  searchableResource: Extract<keyof IOfflineData, 'locations'>
   searchableType: string
 }
 interface IState {
@@ -163,7 +164,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       formMessages.searchFieldPlaceHolderText
     )
 
-    const offlineLocations = this.props.offlineResources.facilities
+    const offlineLocations = this.props.offlineResources[
+      this.props.searchableResource
+    ]
 
     let locations = Object.values(offlineLocations)
 

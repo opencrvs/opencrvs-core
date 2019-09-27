@@ -50,7 +50,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -69,7 +69,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -100,7 +100,7 @@ describe('Create new user page tests', () => {
         .find('#registrationOffice-id')
         .hostNodes()
         .props().value
-    ).toEqual('Moktarpur Union Parishad')
+    ).toEqual('Barisal')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
@@ -108,7 +108,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -134,7 +134,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -160,7 +160,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 

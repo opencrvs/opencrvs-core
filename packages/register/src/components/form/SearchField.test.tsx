@@ -11,7 +11,8 @@ describe('Search Field component', () => {
         fieldName="registrationOffice"
         fieldValue=""
         onModalComplete={mock}
-        searchableType="CRVS_OFFICE"
+        searchableResource="locations"
+        searchableType="ADMIN_STRUCTURE"
       />
     </IntlProvider>
   )
