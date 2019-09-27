@@ -156,6 +156,7 @@ describe('ReviewForm tests', () => {
                 birthDate: '2001-01-01',
                 gender: 'male'
               },
+              informant: null,
               mother: {
                 name: [
                   {
@@ -321,6 +322,7 @@ describe('ReviewForm tests', () => {
               },
               child: null,
               mother: null,
+              informant: null,
               father: {
                 name: [
                   {
@@ -460,6 +462,7 @@ describe('ReviewForm tests', () => {
               child: null,
               mother: null,
               father: null,
+              informant: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
@@ -567,6 +570,7 @@ describe('ReviewForm tests', () => {
                 }
               },
               child: null,
+              informant: null,
               mother: {
                 name: [
                   {
