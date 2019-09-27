@@ -1,10 +1,15 @@
 import { AxiosError } from 'axios'
-import { RouterAction } from 'react-router-redux'
+import { RouterAction, push, goBack as back } from 'react-router-redux'
 import {
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
 } from '@login/utils/authApi'
+import {
+  STEP_ONE,
+  PHONE_NUMBER_VERIFICATION,
+  FORGOTTEN_ITEM
+} from '@login/navigation/routes'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -159,7 +164,16 @@ export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
 })
+export function goBack() {
+  return back()
+}
 export const gotoApp = (appId: string): GoToAppAction => ({
   type: GOTO_APP,
   payload: appId
 })
+export function goToForgottenItemForm() {
+  return push(FORGOTTEN_ITEM)
+}
+export function goToPhoneNumberVerificationForm() {
+  return push(PHONE_NUMBER_VERIFICATION)
+}
