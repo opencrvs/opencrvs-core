@@ -14,6 +14,7 @@ import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { getDefaultLanguage } from './i18n/utils'
+import { ForgottenItem } from './views/resetCredentialsForm/forgottenItem'
 
 export const store = createStore()
 export class App extends React.Component {
@@ -31,6 +32,9 @@ export class App extends React.Component {
                     </Route>
                     <Route exact path={routes.STEP_TWO}>
                       <StepTwoContainer />
+                    </Route>
+                    <Route exact path={routes.FORGOTTEN_ITEM}>
+                      <ForgottenItem />
                     </Route>
                   </Switch>
                 </DarkPageContainer>
