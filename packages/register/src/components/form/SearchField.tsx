@@ -165,7 +165,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
 
     const offlineLocations = this.props.offlineResources.facilities
 
-    let locations = Object.values(this.props.offlineResources)
+    let locations = Object.values(offlineLocations)
 
     locations = locations.filter(
       location =>
