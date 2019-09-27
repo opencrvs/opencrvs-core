@@ -48,6 +48,7 @@ describe('Certificate collector test for a birth registration without father det
               gender: 'male',
               __typename: 'Person'
             },
+            informant: null,
             mother: {
               id: '22aa4ca0-e5ec-49ec-8574-39a799f57a65',
               name: [
@@ -541,6 +542,7 @@ describe('Test for a free birth registration', () => {
               telecom: null,
               __typename: 'Person'
             },
+            informant: null,
             father: null,
             registration: {
               id: '1440d427-7890-4a37-8f36-e9f65d725034',
@@ -849,6 +851,7 @@ describe('Certificate collector test for a birth registration with father detail
               registrationNumber: '2019333494B16ASJM7',
               __typename: 'Registration'
             },
+            informant: null,
             attendantAtBirth: null,
             weightAtBirth: null,
             birthType: null,
