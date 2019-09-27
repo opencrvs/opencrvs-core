@@ -24,6 +24,7 @@ import {
   IDynamicOptions,
   IFileValue,
   IForm,
+  IFormData,
   IFormField,
   IFormFieldValue,
   IFormSection,
@@ -35,15 +36,14 @@ import {
   LIST,
   PARAGRAPH,
   RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
   SEARCH_FIELD,
   Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  IFormData
+  WARNING
 } from '@register/forms'
 import {
   getBirthSection,
@@ -63,8 +63,8 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
 import {
-  getValidationErrorsForForm,
   Errors,
+  getValidationErrorsForForm,
   IFieldErrors
 } from '@register/forms/validation'
 import { buttonMessages } from '@register/i18n/messages'
@@ -87,7 +87,6 @@ import { isMobileDevice } from '@register/utils/commonUtils'
 import { BIRTH, REJECTED } from '@register/utils/constants'
 import { formatLongDate } from '@register/utils/date-formatting'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import { IValidationResult } from '@register/utils/validate'
 import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
 import { flatten, isArray } from 'lodash'
 import * as React from 'react'
@@ -756,6 +755,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 field =>
                   this.isVisibleField(field, section) && !this.isViewOnly(field)
               )
+              .filter(field => !Boolean(field.hideInPreview))
               .map(field => {
                 return field.previewGroup
                   ? this.getPreviewGroupsField(

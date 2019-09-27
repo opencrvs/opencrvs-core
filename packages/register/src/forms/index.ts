@@ -324,6 +324,7 @@ export interface IFormFieldBase {
   // This flag will only remove the change link from preview/review screen
   // Default false
   readonly?: boolean
+  hideInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {

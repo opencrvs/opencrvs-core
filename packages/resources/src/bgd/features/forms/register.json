@@ -26,16 +26,17 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.registration || !draftData.registration.presentAtBirthRegistration || draftData.registration.presentAtBirthRegistration.value !== \"OTHER\")"
+                  "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
                 }
               ],
               "fields": [
                 {
                   "name": "presentAtBirthRegistration",
-                  "hideValueInPreview": true,
                   "type": "TEXT",
                   "required": true,
+                  "readonly": true,
                   "hidden": true,
+                  "hideInPreview": true,
                   "initialValue": "",
                   "validate": [],
                   "label": {
@@ -45,7 +46,7 @@
                   },
                   "mapping": {
                     "mutation": {
-                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "operation": "sectionFieldToBundleFieldTransformer",
                       "parameters": []
                     },
                     "query": {
@@ -64,6 +65,7 @@
                   },
                   "required": false,
                   "readonly": true,
+                  "hideHeader": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -173,7 +175,13 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "changeHirerchyTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
                               "informant.otherRelationship"
                             ]
@@ -199,7 +207,13 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "changeHirerchyTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
                               "informant.otherRelationship"
                             ]
@@ -216,8 +230,10 @@
                       ]
                     },
                     "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
                     }
                   }
                 }
@@ -256,7 +272,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration && draftData.registration.presentAtBirthRegistration.value !== \"LEGAL_GUARDIAN\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
                     }
                   ],
                   "previewGroup": "contactPointGroup",
@@ -322,22 +338,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
@@ -361,22 +370,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
@@ -400,22 +402,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
@@ -451,22 +446,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
@@ -488,22 +476,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactPhoneNumber"
                             ]
                           }
                         }
@@ -518,8 +499,10 @@
                       ]
                     },
                     "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     }
                   }
                 },
@@ -534,7 +517,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration && draftData.registration.presentAtBirthRegistration.value === \"LEGAL_GUARDIAN\")"
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
                     }
                   ],
                   "previewGroup": "contactPointGroup",
@@ -592,22 +575,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactRelationship"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactRelationship"
                             ]
                           }
                         }
@@ -631,22 +607,15 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "fieldValueNestingTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
-                              }
+                              "registration.contactRelationship"
                             ]
                           },
                           "query": {
-                            "operation": "nestedValueToFieldTransformer",
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "individual",
-                              {
-                                "operation": "phoneNumberToFieldTransformer"
-                              }
+                              "registration.contactRelationship"
                             ]
                           }
                         }
@@ -671,7 +640,13 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "changeHirerchyTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactRelationship"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
                               "registration.contactRelationship"
                             ]
@@ -695,7 +670,13 @@
                         ],
                         "mapping": {
                           "mutation": {
-                            "operation": "changeHirerchyTransformer",
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
                               "registration.contactPhoneNumber"
                             ]
@@ -712,14 +693,24 @@
                       ]
                     },
                     "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     }
                   }
                 }
               ]
             }
-          ]
+          ],
+          "mapping": {
+            "mutation": {
+              "operation": "setBirthRegistrationSectionTransformer"
+            },
+            "query": {
+              "operation": "getBirthRegistrationSectionTransformer"
+            }
+          }
         },
         {
           "id": "child",

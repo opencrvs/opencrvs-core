@@ -4,7 +4,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
 
-const handleNestedFieldsMapping = (
+const nestedFieldsMutationMapping = (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
@@ -81,7 +81,7 @@ export const draftToGqlTransformer = (
               section.id,
               fieldDef
             )
-            handleNestedFieldsMapping(
+            nestedFieldsMutationMapping(
               transformedData,
               draftData,
               section.id,
@@ -121,6 +121,30 @@ export const draftToGqlTransformer = (
   return transformedData
 }
 
+const nestedFieldsQueryMapping = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  fieldDef: IFormField
+) => {
+  var tempFormField: IFormField
+  for (var index in fieldDef.nestedFields) {
+    for (var nestedIndex in fieldDef.nestedFields[index]) {
+      tempFormField = fieldDef.nestedFields[index][nestedIndex]
+      tempFormField &&
+        tempFormField.mapping &&
+        tempFormField.mapping.query &&
+        tempFormField.mapping.query(
+          transformedData,
+          draftData,
+          sectionId,
+          fieldDef,
+          tempFormField
+        )
+    }
+  }
+}
+
 export const gqlToDraftTransformer = (
   formDefinition: IForm,
   queryData: any
@@ -138,6 +162,12 @@ export const gqlToDraftTransformer = (
       groupDef.fields.forEach(fieldDef => {
         if (fieldDef.mapping && fieldDef.mapping.query) {
           fieldDef.mapping.query(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef
+          )
+          nestedFieldsQueryMapping(
             transformedData,
             queryData,
             section.id,

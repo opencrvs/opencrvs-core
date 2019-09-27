@@ -1,8 +1,9 @@
-import { IFormData, Event } from '@register/forms'
+import { IFormData, Event, TransformedData, IFormField } from '@register/forms'
 import {
   GQLRegWorkflow,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
+import { get } from 'lodash'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -68,4 +69,26 @@ export function getBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+}
+
+export const changeHirerchyQueryTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: TransformedData,
+  queryData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  if (transformedFieldName) {
+    transformedData[sectionId][field.name]['nestedFields'][
+      nestedField.name
+    ] = get(queryData, transformedFieldName)
+  } else {
+    transformedData[sectionId][field.name]['nestedFields'][
+      nestedField.name
+    ] = get(queryData, nestedField.name)
+  }
+
+  return transformedData
 }

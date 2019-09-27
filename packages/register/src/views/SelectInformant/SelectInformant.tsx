@@ -1,66 +1,65 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import {
+  InputField,
+  IRadioOption as RadioComponentOption,
+  TextInput
+} from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
+  deleteApplication,
   IApplication,
-  modifyApplication,
-  deleteApplication
+  modifyApplication
 } from '@register/applications'
 import {
-  goToBirthRegistrationAsParent,
-  goBack,
-  goToHome,
-  goToBirthContactPoint,
-  goToDeathContactPoint,
-  goToPrimaryApplicant,
-  goToDeathRegistration
-} from '@register/navigation'
-import { IStoreState } from '@register/store'
-
-import {
-  InputField,
-  TextInput,
-  IRadioOption as RadioComponentOption
-} from '@opencrvs/components/lib/forms'
-import {
-  Event,
   BirthSection,
   DeathSection,
+  Event,
   IFormSection,
   IFormSectionData
 } from '@register/forms'
-import { phoneNumberFormat } from '@register/utils/validate'
-import {
-  PHONE_NO_FIELD_STRING,
-  RADIO_BUTTON_LARGE_STRING,
-  INFORMANT_FIELD_STRING
-} from '@register/utils/constants'
-import { messages } from '@register/i18n/messages/views/selectInformant'
-import { constantsMessages } from '@register/i18n/messages/constants'
-import {
-  validationMessages,
-  formMessages,
-  buttonMessages
-} from '@register/i18n/messages'
 import {
   getBirthSection,
   getDeathSection
 } from '@register/forms/register/application-selectors'
+import {
+  buttonMessages,
+  formMessages,
+  validationMessages
+} from '@register/i18n/messages'
+import { constantsMessages } from '@register/i18n/messages/constants'
+import { messages } from '@register/i18n/messages/views/selectInformant'
+import {
+  goBack,
+  goToBirthContactPoint,
+  goToBirthRegistrationAsParent,
+  goToDeathContactPoint,
+  goToDeathRegistration,
+  goToHome,
+  goToPrimaryApplicant
+} from '@register/navigation'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import {
+  INFORMANT_FIELD_STRING,
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING
+} from '@register/utils/constants'
+import { phoneNumberFormat } from '@register/utils/validate'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -258,11 +257,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         (this.props.application &&
           this.props.application.data &&
           this.props.application.data[registrationSection.id] &&
-          this.props.application.data[registrationSection.id]
-            .presentAtBirthRegistration &&
-          ((this.props.application.data[registrationSection.id]
-            .presentAtBirthRegistration as IFormSectionData)
-            .value as string)) ||
+          (this.props.application.data[registrationSection.id]
+            .presentAtBirthRegistration as string)) ||
         (this.props.application &&
           this.props.application.data &&
           this.props.application.data[applicantsSection.id] &&
@@ -316,10 +312,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           registration: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: {
-                value: this.state.informant,
-                nestedFields: {}
-              },
+              presentAtBirthRegistration: this.state.informant,
               applicant: {
                 value: this.state.informant,
                 nestedFields: {}
@@ -353,10 +346,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         newApplication.data[registrationSection.id] = {
           ...application.data[registrationSection.id],
           ...{
-            presentAtBirthRegistration: {
-              value: this.state.informant,
-              nestedFields: {}
-            },
+            presentAtBirthRegistration: this.state.informant,
             applicant: {
               value: this.state.informant,
               nestedFields: {}
@@ -430,21 +420,17 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           [registrationSection.id]: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: {
-                value: this.state.informant,
-                nestedFields:
+              presentAtBirthRegistration: this.state.informant,
+              applicant: {
+                value:
                   (this.props.application &&
                     this.props.application.data &&
                     this.props.application.data[registrationSection.id] &&
                     this.props.application.data[registrationSection.id]
-                      .presentAtBirthRegistration &&
+                      .applicant &&
                     (this.props.application.data[registrationSection.id]
-                      .presentAtBirthRegistration as IFormSectionData)
-                      .nestedFields) ||
-                  {}
-              },
-              applicant: {
-                value: this.state.informant,
+                      .applicant as IFormSectionData).value) ||
+                  '',
                 nestedFields:
                   (this.props.application &&
                     this.props.application.data &&

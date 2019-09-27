@@ -94,7 +94,9 @@ export function setBirthRegistrationSectionTransformer(
   }
 }
 
-export const changeHirerchyTransformer = (transformedFieldName?: string) => (
+export const changeHirerchyMutationTransformer = (
+  transformedFieldName?: string
+) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
