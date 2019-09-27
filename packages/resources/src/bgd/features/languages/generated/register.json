@@ -824,7 +824,7 @@
         "register.form.informationMissing": "Information missing",
         "register.form.missingFieldsDescription": "The following information will be submitted for validation. Please\n    make sure all required details have been filled in correctly. There\n    are {numberOfErrors} missing mandatory fields in your form:",
         "register.form.modal.areYouReadyToSubmit": "Are you ready to submit?",
-        "register.form.modal.desc.validateConfirmation": "This application will be sent to the registrar from them to approve.",
+        "register.form.modal.desc.validateConfirmation": "This application will be sent to the registrar for them to approve.",
         "register.form.modal.submitDescription": "By clicking “Submit” you confirm that the informant has read and reviewed the information and understands that this information will be shared with Civil Registration authorities.",
         "register.form.modal.title.submitConfirmation": "{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}",
         "register.form.modal.title.validateConfirmation": "Send for approval?",
