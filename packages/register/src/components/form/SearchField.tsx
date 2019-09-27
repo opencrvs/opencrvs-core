@@ -163,9 +163,9 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
       formMessages.searchFieldPlaceHolderText
     )
 
-    const offlineLocations = this.props.offlineResources['facilities']
+    const offlineLocations = this.props.offlineResources.facilities
 
-    let locations = Object.values(offlineLocations)
+    let locations = Object.values(this.props.offlineResources)
 
     locations = locations.filter(
       location =>
@@ -174,7 +174,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
           .includes(this.state.searchText.toUpperCase()) &&
         location.type === this.props.searchableType
     )
-    console.log(locations)
+
     const selectedValue =
       this.state.selectedValue ||
       (locations && locations.length > 0 && locations[0].id) ||
