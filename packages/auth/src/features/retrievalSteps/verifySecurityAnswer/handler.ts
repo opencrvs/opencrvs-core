@@ -17,7 +17,7 @@ interface IPayload {
 
 interface IResponse {
   matched: boolean
-  questionKey?: string
+  securityQuestionKey?: string
 }
 
 export default async function verifySecurityQuestionHandler(
@@ -32,7 +32,9 @@ export default async function verifySecurityQuestionHandler(
     throw unauthorized()
   })
 
-  if (retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED) {
+  if (
+    retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED.toString()
+  ) {
     return unauthorized()
   }
   let verificationResult: IVerifySecurityAnswerResponse
@@ -61,17 +63,17 @@ export default async function verifySecurityQuestionHandler(
     matched: verificationResult.matched
   }
   if (!verificationResult.matched) {
-    response.questionKey = verificationResult.questionKey
+    response.securityQuestionKey = verificationResult.questionKey
   }
   return response
 }
 
 export const verifySecurityQuestionSchema = Joi.object({
-  answer: Joi.string(),
-  nonce: Joi.string()
+  answer: Joi.string().required(),
+  nonce: Joi.string().required()
 })
 
 export const verifySecurityQuestionResSchema = Joi.object({
-  matched: Joi.bool(),
-  questionKey: Joi.string().optional()
+  matched: Joi.bool().required(),
+  securityQuestionKey: Joi.string().optional()
 })

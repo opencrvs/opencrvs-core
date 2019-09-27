@@ -3,6 +3,9 @@ import { USER_MANAGEMENT_URL } from '@auth/constants'
 import { resolve } from 'url'
 import { get, set, del } from '@auth/database'
 
+export const RETRIEVAL_FLOW_USER_NAME = 'username'
+export const RETRIEVAL_FLOW_PASSWORD = 'password'
+
 export enum RetrievalSteps {
   WAITING_FOR_VERIFICATION = 'WAITING_FOR_VERIFICATION',
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
