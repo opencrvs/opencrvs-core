@@ -117,10 +117,6 @@ describe('Certificate collector test for a birth registration without father det
               __typename: 'Person'
             },
             father: null,
-            informant: {
-              relationship: 'Informant Relation',
-              otherRelationship: 'Other Relation'
-            },
             registration: {
               id: '1440d427-7890-4a37-8f36-e9f65d725034',
               contact: 'MOTHER',
@@ -547,12 +543,8 @@ describe('Test for a free birth registration', () => {
               telecom: null,
               __typename: 'Person'
             },
-            informant: null,
             father: null,
-            informant: {
-              relationship: 'Informant Relation',
-              otherRelationship: 'Other Relation'
-            },
+            informant: null,
             registration: {
               id: '1440d427-7890-4a37-8f36-e9f65d725034',
               contact: 'MOTHER',
@@ -830,10 +822,7 @@ describe('Certificate collector test for a birth registration with father detail
               telecom: null,
               __typename: 'Person'
             },
-            informant: {
-              relationship: 'Informant Relation',
-              otherRelationship: 'Other Relation'
-            },
+            informant: null,
             registration: {
               id: '015bbd91-dd5a-4ed4-aa09-1edd14d6ad21',
               contact: 'MOTHER',
@@ -866,7 +855,6 @@ describe('Certificate collector test for a birth registration with father detail
               registrationNumber: '2019333494B16ASJM7',
               __typename: 'Registration'
             },
-            informant: null,
             attendantAtBirth: null,
             weightAtBirth: null,
             birthType: null,

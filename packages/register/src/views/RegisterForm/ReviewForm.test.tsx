@@ -702,10 +702,8 @@ describe('ReviewForm tests', () => {
     expect(data.data.registration).toEqual({
       presentAtBirthRegistration: 'MOTHER_ONLY',
       applicant: {
-        value: 'Informant Relation',
-        nestedFields: {
-          otherRelationShip: 'Other Relation'
-        }
+        value: undefined,
+        nestedFields: { otherRelationShip: undefined }
       },
       contactPoint: {
         value: 'MOTHER',
