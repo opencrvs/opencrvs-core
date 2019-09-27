@@ -9,7 +9,8 @@ import {
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
-  DeathSection
+  DeathSection,
+  TEXT
 } from '@register/forms'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
 import * as profileSelectors from '@register/profile/profileSelectors'
@@ -406,7 +407,26 @@ describe('when form has a field that has nested fields in definitions', () => {
               description: 'Form section title for Deceased',
               id: 'form.section.deceased.title'
             },
-            groups: []
+            groups: [
+              {
+                id: 'deceased',
+                fields: [
+                  {
+                    name: 'firstNames',
+                    type: TEXT,
+                    label: {
+                      defaultMessage: 'First name(s)',
+                      description: 'Label for form field: Given names',
+                      id: 'form.field.label.childFirstNamesEng'
+                    },
+                    required: true,
+                    initialValue: '',
+                    validate: [],
+                    conditionals: []
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
