@@ -11,7 +11,7 @@ export interface ISpinner {
 const styledSpinner = styled.div.attrs<ISpinner>({})
 
 const StyledSpinner = styledSpinner`
-  width: auto;
+  width: ${({ size }) => (size ? `${size}px` : 'auto')};
   display:flex;
   justify-content: center;
   & svg {
