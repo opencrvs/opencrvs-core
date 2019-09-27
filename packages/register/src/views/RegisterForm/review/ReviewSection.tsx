@@ -620,40 +620,47 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields
-      ? Object.values(field.nestedFields)
-          .flat()
-          .reduce((groupedValues, nestedField) => {
-            const errorsOnNestedField =
-              sectionErrors[section.id][field.name].nestedFields[
-                nestedField.name
-              ] || []
-            // Value of the parentField resembles with IFormData as a nested form
-            const nestedValue =
-              (draft.data[section.id] &&
-                draft.data[section.id][field.name] &&
-                renderValue(
-                  draft.data[section.id][field.name] as IFormData,
-                  'nestedFields',
-                  nestedField,
-                  intl,
-                  offlineResources,
-                  language
-                )) ||
-              ''
-            return (
-              <>
-                {groupedValues}
-                {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-                {errorsOnNestedField.length > 0
-                  ? this.getFieldValueWithErrorMessage(
-                      section,
-                      field,
-                      errorsOnNestedField[0]
-                    )
-                  : nestedValue}
-              </>
-            )
-          }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+      ? (
+          (draft.data[section.id] &&
+            draft.data[section.id][field.name] &&
+            (draft.data[section.id][field.name] as IFormSectionData).value &&
+            field.nestedFields[
+              (draft.data[section.id][field.name] as IFormSectionData)
+                .value as string
+            ]) ||
+          []
+        ).reduce((groupedValues, nestedField) => {
+          const errorsOnNestedField =
+            sectionErrors[section.id][field.name].nestedFields[
+              nestedField.name
+            ] || []
+          // Value of the parentField resembles with IFormData as a nested form
+          const nestedValue =
+            (draft.data[section.id] &&
+              draft.data[section.id][field.name] &&
+              renderValue(
+                draft.data[section.id][field.name] as IFormData,
+                'nestedFields',
+                nestedField,
+                intl,
+                offlineResources,
+                language
+              )) ||
+            ''
+          return (
+            <>
+              {groupedValues}
+              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+              {errorsOnNestedField.length > 0
+                ? this.getFieldValueWithErrorMessage(
+                    section,
+                    field,
+                    errorsOnNestedField[0]
+                  )
+                : nestedValue}
+            </>
+          )
+        }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
       : renderValue(
           draft.data,
           section.id,
