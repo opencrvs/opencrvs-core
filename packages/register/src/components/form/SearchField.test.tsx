@@ -12,6 +12,7 @@ describe('Search Field component', () => {
         fieldValue=""
         onModalComplete={mock}
         searchableResource="locations"
+        searchableType="ADMIN_STRUCTURE"
       />
     </IntlProvider>
   )

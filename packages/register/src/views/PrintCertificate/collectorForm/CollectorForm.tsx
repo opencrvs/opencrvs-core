@@ -317,6 +317,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           event={event}
           action={Action.LOAD_CERTIFICATE_APPLICATION}
           payload={{ id: applicationId }}
+          fetchPolicy="no-cache"
         >
           <QueryContext.Consumer>
             {({ loading, error, data, dataKey }) => {
