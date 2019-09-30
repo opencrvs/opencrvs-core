@@ -8,7 +8,9 @@ import {
 import {
   STEP_ONE,
   PHONE_NUMBER_VERIFICATION,
-  FORGOTTEN_ITEM
+  FORGOTTEN_ITEM,
+  RECOVERY_CODE_ENTRY,
+  SECURITY_QUESTION
 } from '@login/navigation/routes'
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
@@ -176,4 +178,10 @@ export function goToForgottenItemForm() {
 }
 export function goToPhoneNumberVerificationForm() {
   return push(PHONE_NUMBER_VERIFICATION)
+}
+export function goToRecoveryCodeEntryForm() {
+  return push(RECOVERY_CODE_ENTRY)
+}
+export function goToSecurityQuestionForm() {
+  return push(SECURITY_QUESTION)
 }
