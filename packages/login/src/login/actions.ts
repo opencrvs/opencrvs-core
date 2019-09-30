@@ -179,9 +179,13 @@ export function goToForgottenItemForm() {
 export function goToPhoneNumberVerificationForm() {
   return push(PHONE_NUMBER_VERIFICATION)
 }
-export function goToRecoveryCodeEntryForm() {
-  return push(RECOVERY_CODE_ENTRY)
+export function goToRecoveryCodeEntryForm(nonce: string) {
+  return push(RECOVERY_CODE_ENTRY, {
+    nonce
+  })
 }
-export function goToSecurityQuestionForm() {
-  return push(SECURITY_QUESTION)
+export function goToSecurityQuestionForm(nonce: string) {
+  return push(SECURITY_QUESTION, {
+    nonce
+  })
 }

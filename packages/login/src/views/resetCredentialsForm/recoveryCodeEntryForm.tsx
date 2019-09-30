@@ -8,6 +8,8 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
+import { RouteComponentProps, withRouter } from 'react-router'
+import { authApi } from '@login/utils/authApi'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -16,10 +18,11 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps {
+interface BaseProps extends RouteComponentProps<{}, {}, { nonce: string }> {
   goBack: typeof goBack
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
 }
+
 interface State {
   recoveryCode: string
   touched: boolean
@@ -46,9 +49,18 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = () => {
-    if (!this.state.error) {
-      this.props.goToSecurityQuestionForm()
+  handleContinue = async () => {
+    if (this.state.error) {
+      return
+    }
+    try {
+      const { nonce } = await authApi.verifyNumber(
+        this.props.location.state.nonce,
+        this.state.recoveryCode
+      )
+      this.props.goToSecurityQuestionForm(nonce)
+    } catch (error) {
+      // @todo error handling
     }
   }
 
@@ -115,4 +127,4 @@ export const RecoveryCodeEntry = connect(
     goBack,
     goToSecurityQuestionForm
   }
-)(injectIntl(RecoveryCodeEntryComponent))
+)(withRouter(injectIntl(RecoveryCodeEntryComponent)))

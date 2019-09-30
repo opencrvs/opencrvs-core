@@ -73,9 +73,58 @@ const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   })
 }
 
+interface IUserVerifyResponse {
+  nonce: string
+}
+
+const verifyUser = (mobile: string): Promise<IUserVerifyResponse> => {
+  return request({
+    url: resolve(window.config.AUTH_API_URL, 'verifyUser'),
+    method: 'POST',
+    data: { mobile }
+  })
+}
+
+interface IVerifyNumberResponse {
+  nonce: string
+  securityQuestionKey: string
+}
+
+const verifyNumber = (
+  nonce: string,
+  code: string
+): Promise<IVerifyNumberResponse> => {
+  return request({
+    url: resolve(window.config.AUTH_API_URL, 'verifyNumber'),
+    method: 'POST',
+    data: { nonce, code }
+  })
+}
+
+export type IVerifySecurityAnswerResponse =
+  | {
+      matched: false
+      securityQuestionKey: string
+    }
+  | { matched: true }
+
+const verifySecurityAnswer = (
+  nonce: string,
+  answer: string
+): Promise<IVerifySecurityAnswerResponse> => {
+  return request({
+    url: resolve(window.config.AUTH_API_URL, 'verifySecurityAnswer'),
+    method: 'POST',
+    data: { nonce, answer }
+  })
+}
+
 export const authApi = {
   request,
   authenticate,
   verifyCode,
-  resendSMS
+  resendSMS,
+  verifyNumber,
+  verifyUser,
+  verifySecurityAnswer
 }

@@ -8,6 +8,8 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
+import { authApi, IVerifySecurityAnswerResponse } from '@login/utils/authApi'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -16,7 +18,7 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps {
+interface BaseProps extends RouteComponentProps<{}, {}, { nonce: string }> {
   goBack: typeof goBack
 }
 interface State {
@@ -45,7 +47,23 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = () => {}
+  handleContinue = async () => {
+    if (this.state.error) {
+      return
+    }
+
+    let result: IVerifySecurityAnswerResponse
+
+    try {
+      result = await authApi.verifySecurityAnswer(
+        this.props.location.state.nonce,
+        this.state.answer
+      )
+      // @todo
+    } catch (error) {
+      // @todo error handling
+    }
+  }
 
   render() {
     const { intl, goBack } = this.props
@@ -98,9 +116,11 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
   }
 }
 
-export const SecurityQuestion = connect(
-  null,
-  {
-    goBack
-  }
-)(injectIntl(SecurityQuestionComponent))
+export const SecurityQuestion = withRouter(
+  connect(
+    null,
+    {
+      goBack
+    }
+  )(injectIntl(SecurityQuestionComponent))
+)

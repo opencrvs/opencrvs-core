@@ -39,12 +39,16 @@ export class App extends React.Component {
                     <Route exact path={routes.FORGOTTEN_ITEM}>
                       <ForgottenItem />
                     </Route>
-                    <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
-                      <PhoneNumberVerification />
-                    </Route>
-                    <Route exact path={routes.RECOVERY_CODE_ENTRY}>
-                      <RecoveryCodeEntry />
-                    </Route>
+                    <Route
+                      component={PhoneNumberVerification}
+                      exact
+                      path={routes.PHONE_NUMBER_VERIFICATION}
+                    ></Route>
+                    <Route
+                      exact
+                      path={routes.RECOVERY_CODE_ENTRY}
+                      component={RecoveryCodeEntry}
+                    ></Route>
                     <Route exact path={routes.SECURITY_QUESTION}>
                       <SecurityQuestion />
                     </Route>

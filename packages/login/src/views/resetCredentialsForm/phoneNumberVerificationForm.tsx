@@ -9,6 +9,8 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
+import { authApi } from '@login/utils/authApi'
+import { convertToMSISDN } from '@login/utils/dataCleanse'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -47,10 +49,18 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = () => {
-    if (!this.state.error && this.state.phone) {
-      this.props.goToRecoveryCodeEntryForm()
-    } else {
+  handleContinue = async () => {
+    if (!this.state.phone) {
+      this.setState({ error: true })
+      return
+    }
+    try {
+      const { nonce } = await authApi.verifyUser(
+        convertToMSISDN(this.state.phone, window.config.COUNTRY)
+      )
+      this.props.goToRecoveryCodeEntryForm(nonce)
+    } catch (err) {
+      // @todo this needs a better error handling
       this.setState({ error: true })
     }
   }
