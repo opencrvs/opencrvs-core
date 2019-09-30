@@ -39,13 +39,16 @@ import verifyNumberHandler, {
   requestSchema as reqVerifyNumberSchema,
   responseSchema as resVerifyNumberSchema
 } from '@auth/features/retrievalSteps/verifyNumber/handler'
-import changePasswordHandler, {
-  reqChangePasswordSchema
-} from '@auth/features/retrievalSteps/changePassword/handler'
 import verifySecurityQuestionHandler, {
   verifySecurityQuestionSchema,
   verifySecurityQuestionResSchema
 } from '@auth/features/retrievalSteps/verifySecurityAnswer/handler'
+import changePasswordHandler, {
+  reqChangePasswordSchema
+} from '@auth/features/retrievalSteps/changePassword/handler'
+import sendUserNameHandler, {
+  requestSchema as reqSendUserNameSchema
+} from '@auth/features/retrievalSteps/sendUserName/handler'
 
 export async function createServer() {
   const server = new Hapi.Server({
@@ -245,11 +248,32 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description:
-        'Final step of password retrieval step.' + 'Changes the user password',
+        'Final step of password retrieval flow.' + 'Changes the user password',
       notes:
         'Expects the nonce parameter to be coming from the reset password journey',
       validate: {
         payload: reqChangePasswordSchema
+      },
+      response: {
+        schema: false
+      }
+    }
+  })
+
+  // curl -H 'Content-Type: application/json' -d '{ "nonce": "" }' http://localhost:4040/sendUserName
+  server.route({
+    method: 'POST',
+    path: '/sendUserName',
+    handler: sendUserNameHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Final step of username retrieval flow.' +
+        'Sends the username to user mobile number',
+      notes:
+        'Expects the nonce parameter to be coming from the retrieve username journey',
+      validate: {
+        payload: reqSendUserNameSchema
       },
       response: {
         schema: false

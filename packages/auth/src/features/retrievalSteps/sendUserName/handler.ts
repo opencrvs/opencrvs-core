@@ -36,6 +36,6 @@ export default async function sendUserNameHandler(
   return h.response().code(200)
 }
 
-export const reqChangePasswordSchema = Joi.object({
-  nonce: Joi.string()
+export const requestSchema = Joi.object({
+  nonce: Joi.string().required()
 })

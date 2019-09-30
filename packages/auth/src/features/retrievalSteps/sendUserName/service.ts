@@ -4,7 +4,7 @@ import { resolve } from 'url'
 import { createToken } from '@auth/features/authenticate/service'
 
 export async function sendUserName(mobile: string, username: string) {
-  const url = resolve(NOTIFICATION_SERVICE_URL, '/sendUserName')
+  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserNameSMS')
 
   const res = await fetch(url, {
     method: 'POST',
