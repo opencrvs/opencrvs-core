@@ -38,7 +38,17 @@ export const ENGLISH_STATE = {
       'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
     'validations.mobilePhoneRegex': '0[0-9]{9,10}',
     'validations.mobileNumberFormat': '07123456789',
-    'validations.requiredSymbol': 'x'
-    // 'context.messageId': 'Translation',
+    'validations.requiredSymbol': 'x',
+    'userSetup.securityQuestions.birthTown': 'What city were you born in?',
+    'userSetup.securityQuestions.favoriteFood': 'What is your favorite food?',
+    'userSetup.securityQuestions.favoriteMovie': 'What is your favorite movie?',
+    'userSetup.securityQuestions.favoriteSong': 'What is your favorite song?',
+    'userSetup.securityQuestions.favoriteTeacher':
+      'What is the name of your favorite school teacher?',
+    'userSetup.securityQuestions.firstChildName':
+      "What is your first child's name?",
+    'userSetup.securityQuestions.hightSchool':
+      'What is the name of your high school?',
+    'userSetup.securityQuestions.motherName': "What is your mother's name?"
   }
 }

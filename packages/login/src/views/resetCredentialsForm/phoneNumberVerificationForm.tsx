@@ -56,10 +56,13 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     }
     try {
       const { nonce } = await authApi.verifyUser(
-        convertToMSISDN(this.state.phone, window.config.COUNTRY)
+        convertToMSISDN(this.state.phone, window.config.COUNTRY),
+        'password'
       )
       this.props.goToRecoveryCodeEntryForm(nonce)
     } catch (err) {
+      console.log(err)
+
       // @todo this needs a better error handling
       this.setState({ error: true })
     }

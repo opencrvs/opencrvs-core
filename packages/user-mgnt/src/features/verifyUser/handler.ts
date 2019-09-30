@@ -1,6 +1,6 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { unauthorized } from 'boom'
+import { unauthorized, conflict } from 'boom'
 import User, {
   IUserModel,
   ISecurityQuestionAnswer
@@ -32,6 +32,13 @@ export default async function verifyUserHandler(
     throw unauthorized()
   }
 
+  if (
+    !user.securityQuestionAnswers ||
+    !isNonEmptyArray(user.securityQuestionAnswers)
+  ) {
+    throw conflict("User doesn't have security questions")
+  }
+
   const response: IVerifyResponse = {
     mobile: user.mobile,
     scope: user.scope,
@@ -44,14 +51,16 @@ export default async function verifyUserHandler(
   return response
 }
 
+function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
+  return arr.length > 0
+}
+
+type NonEmptyArray<T> = [T, ...T[]]
+
 export function getRandomQuestionKey(
-  securityQuestionAnswers: ISecurityQuestionAnswer[] | undefined,
+  securityQuestionAnswers: NonEmptyArray<ISecurityQuestionAnswer>,
   questionKeyToSkip?: string
 ): string {
-  if (!securityQuestionAnswers || securityQuestionAnswers.length === 0) {
-    throw new Error('No security questions found')
-  }
-
   const filteredQuestions = questionKeyToSkip
     ? securityQuestionAnswers.filter(
         securityQnA => securityQnA.questionKey !== questionKeyToSkip

@@ -184,8 +184,12 @@ export function goToRecoveryCodeEntryForm(nonce: string) {
     nonce
   })
 }
-export function goToSecurityQuestionForm(nonce: string) {
+export function goToSecurityQuestionForm(
+  nonce: string,
+  securityQuestionKey: string
+) {
   return push(SECURITY_QUESTION, {
-    nonce
+    nonce,
+    securityQuestionKey
   })
 }

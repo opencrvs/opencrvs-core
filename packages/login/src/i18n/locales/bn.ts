@@ -36,7 +36,16 @@ export const BENGALI_STATE = {
       'সঠিক মোবাইল নম্বর হতে হবে এবং শূন্য দিয়ে শুরু হতে হবে।',
     'validations.mobilePhoneRegex': '017[0-9]{9,10}',
     'validations.mobileNumberFormat': '01723456789',
-    'validations.requiredSymbol': 'x'
-    // 'context.messageId': 'Translation',
+    'validations.requiredSymbol': 'x',
+    'userSetup.securityQuestions.birthTown': 'কোন শহরে আপনার জন্ম হয়?',
+    'userSetup.securityQuestions.favoriteFood': 'আপনার প্রিয় খাদ্য কি?',
+    'userSetup.securityQuestions.favoriteMovie': 'আপনার প্রিয় সিনেমা কি?',
+    'userSetup.securityQuestions.favoriteSong': 'আপনার প্রিয় গান কি?',
+    'userSetup.securityQuestions.favoriteTeacher':
+      'আপনার প্রিয় স্কুল শিক্ষকের নাম কি?',
+    'userSetup.securityQuestions.firstChildName':
+      'আপনার প্রথম সন্তানের নাম কি?',
+    'userSetup.securityQuestions.hightSchool': 'আপনার উচ্চ বিদ্যালয় নাম কি?',
+    'userSetup.securityQuestions.motherName': 'আপনার মা এর নাম কি?'
   }
 }
