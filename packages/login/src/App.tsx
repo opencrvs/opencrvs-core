@@ -15,6 +15,9 @@ import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { getDefaultLanguage } from './i18n/utils'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
+import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
+import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntryForm'
+import { SecurityQuestion } from './views/resetCredentialsForm/securityQestionForm'
 
 export const store = createStore()
 export class App extends React.Component {
@@ -35,6 +38,15 @@ export class App extends React.Component {
                     </Route>
                     <Route exact path={routes.FORGOTTEN_ITEM}>
                       <ForgottenItem />
+                    </Route>
+                    <Route exact path={routes.PHONE_NUMBER_VERIFICATION}>
+                      <PhoneNumberVerification />
+                    </Route>
+                    <Route exact path={routes.RECOVERY_CODE_ENTRY}>
+                      <RecoveryCodeEntry />
+                    </Route>
+                    <Route exact path={routes.SECURITY_QUESTION}>
+                      <SecurityQuestion />
                     </Route>
                   </Switch>
                 </DarkPageContainer>
