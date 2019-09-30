@@ -30,7 +30,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/birth/registration',
+      path: '/events/birth/mark-registered',
       handler: birthRegistrationHandler,
       config: {
         tags: ['api']

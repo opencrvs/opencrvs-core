@@ -36,14 +36,17 @@ describe('Verify point generation', () => {
     )
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
-      'update-reg',
+      'mark-existing-application-registered',
       {
         Authorization: 'Bearer mock-token'
       }
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg', gender: 'male' },
+      tags: {
+        reg_status: 'mark-existing-application-registered',
+        gender: 'male'
+      },
       fields: {
         current_status: 'registered',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -72,12 +75,19 @@ describe('Verify point generation', () => {
 
     Date.now = jest.fn(() => 1552380296600) // 12-03-2019
     fetch.mockResponseOnce(JSON.stringify({}))
-    const point = await generateBirthRegPoint(payload, 'update-reg', {
-      Authorization: 'Bearer mock-token'
-    })
+    const point = await generateBirthRegPoint(
+      payload,
+      'mark-existing-application-registered',
+      {
+        Authorization: 'Bearer mock-token'
+      }
+    )
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg', gender: 'male' },
+      tags: {
+        reg_status: 'mark-existing-application-registered',
+        gender: 'male'
+      },
       fields: {
         current_status: 'registered',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -100,14 +110,17 @@ describe('Verify point generation', () => {
     )
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
-      'update-reg',
+      'mark-existing-application-registered',
       {
         Authorization: 'Bearer mock-token'
       }
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
-      tags: { reg_status: 'update-reg', gender: 'male' },
+      tags: {
+        reg_status: 'mark-existing-application-registered',
+        gender: 'male'
+      },
       fields: {
         current_status: 'registered',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -123,7 +136,7 @@ describe('Verify point generation', () => {
       fullUrl: 'urn:uuid:048d3e42-40c3-4e46-81f0-e3869251b74a'
     }
     expect(
-      generateBirthRegPoint(payload, 'update-reg', {
+      generateBirthRegPoint(payload, 'mark-existing-application-registered', {
         Authorization: 'Bearer mock-token'
       })
     ).rejects.toThrowError('No child found!')
