@@ -18,6 +18,7 @@ import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
 import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
 import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntryForm'
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQestionForm'
+import { UpdatePassword } from './views/resetCredentialsForm/updatePassword'
 
 export const store = createStore()
 export class App extends React.Component {
@@ -51,6 +52,9 @@ export class App extends React.Component {
                     ></Route>
                     <Route exact path={routes.SECURITY_QUESTION}>
                       <SecurityQuestion />
+                    </Route>
+                    <Route exact path={routes.UPDATE_PASSWORD}>
+                      <UpdatePassword />
                     </Route>
                   </Switch>
                 </DarkPageContainer>

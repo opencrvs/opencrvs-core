@@ -8,13 +8,25 @@ interface ResetCredentialsFormMessages {
   passwordResetRecoveryCodeEntryFormBodyHeader: MessageDescriptor
   passwordResetRecoveryCodeEntryFormBodySubheader: MessageDescriptor
   passwordResetSecurityQuestionFormBodySubheader: MessageDescriptor
+  passwordResetUpdateFormBodyHeader: MessageDescriptor
+  passwordResetUpdateFormBodySubheader: MessageDescriptor
+  passwordLengthCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
+  passwordCaseCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
+  passwordNumberCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
+  passwordResetUpdateFormValidationMsg: MessageDescriptor
   usernameOptionLabel: MessageDescriptor
   passwordOptionLabel: MessageDescriptor
   passwordResetFormTitle: MessageDescriptor
   phoneNumberFieldLabel: MessageDescriptor
   verificationCodeFieldLabel: MessageDescriptor
   answerFieldLabel: MessageDescriptor
+  newPasswordLabel: MessageDescriptor
+  confirmPasswordLabel: MessageDescriptor
+  matchedPasswordMsg: MessageDescriptor
+  mismatchedPasswordMsg: MessageDescriptor
+  passwordRequiredMsg: MessageDescriptor
   continueButtonLabel: MessageDescriptor
+  confirmButtonLabel: MessageDescriptor
   error: MessageDescriptor
 }
 
@@ -69,6 +81,39 @@ const messagesToDefine: ResetCredentialsFormMessages = {
       'Form body subheader used for security question step of password reset form'
   },
 
+  // Password confirmation form messages
+  passwordResetUpdateFormBodyHeader: {
+    defaultMessage: 'Choose a new password',
+    description: 'New Password header',
+    id: 'newPassword.header'
+  },
+  passwordResetUpdateFormBodySubheader: {
+    defaultMessage:
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    description: 'New Password instruction',
+    id: 'newPassword.instruction'
+  },
+  passwordLengthCharacteristicsForPasswordResetUpdateForm: {
+    defaultMessage: '{min} characters minimum',
+    description: 'Password validation',
+    id: 'password.minLength'
+  },
+  passwordCaseCharacteristicsForPasswordResetUpdateForm: {
+    defaultMessage: 'Contain upper and lower cases',
+    description: 'Password validation',
+    id: 'password.cases'
+  },
+  passwordNumberCharacteristicsForPasswordResetUpdateForm: {
+    defaultMessage: 'At least one number',
+    description: 'Password validation',
+    id: 'password.number'
+  },
+  passwordResetUpdateFormValidationMsg: {
+    defaultMessage: 'Password must have:',
+    description: 'Password validation message',
+    id: 'password.validation.msg'
+  },
+
   usernameOptionLabel: {
     id: 'option.username',
     defaultMessage: 'My username',
@@ -99,10 +144,40 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     defaultMessage: 'Answer',
     description: 'Label used for answer input field'
   },
+  newPasswordLabel: {
+    defaultMessage: 'New password:',
+    description: 'New password label',
+    id: 'password.label.new'
+  },
+  confirmPasswordLabel: {
+    defaultMessage: 'Confirm new password',
+    description: 'Confirm password label',
+    id: 'password.label.confirm'
+  },
+  matchedPasswordMsg: {
+    defaultMessage: 'Passwords match',
+    description: 'Password validation',
+    id: 'password.match'
+  },
+  mismatchedPasswordMsg: {
+    defaultMessage: 'Passwords do not match',
+    description: 'Password validation',
+    id: 'password.mismatch'
+  },
+  passwordRequiredMsg: {
+    defaultMessage: 'New password is not valid',
+    description: 'New password required',
+    id: 'error.required.password'
+  },
   continueButtonLabel: {
     id: 'label.button.continue',
     defaultMessage: 'Continue',
     description: 'Label used for continue button'
+  },
+  confirmButtonLabel: {
+    id: 'label.button.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Label used for confirm button'
   },
   error: {
     id: 'label.error',
