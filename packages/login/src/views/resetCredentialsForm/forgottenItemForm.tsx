@@ -45,7 +45,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, goBack } = this.props
     const forgottenItems = [
       {
         id: 'usernameOption',
@@ -74,7 +74,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
             {intl.formatMessage(messages.forgottenItemFormBodyHeader)}
           </Title>
 
-          <Actions id="select_parent_informant">
+          <Actions id="forgotten-item-options">
             {this.state.error && (
               <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
             )}
