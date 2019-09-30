@@ -26,7 +26,9 @@ test('verifyUserHandler should return 200 and the user scope when the user exist
     mobile: '+8801711111111',
     scope: ['test'],
     status: 'active',
-    id: '123'
+    securityQuestionAnswers: [{ questionKey: 'sample', answerHash: '##' }],
+    id: '123',
+    username: 'user'
   }
   mockingoose(User).toReturn(entry, 'findOne')
 
@@ -37,6 +39,24 @@ test('verifyUserHandler should return 200 and the user scope when the user exist
   })
 
   expect([...res.result.scope]).toMatchObject(['test'])
+})
+
+test('verifyUserHandler should throw when no security question answer found', async () => {
+  const entry = {
+    mobile: '+8801711111111',
+    scope: ['test'],
+    status: 'active',
+    id: '123',
+    username: 'user'
+  }
+  mockingoose(User).toReturn(entry, 'findOne')
+
+  const res = await server.server.inject({
+    method: 'POST',
+    url: '/verifyUser',
+    payload: { mobile: '+8801711111111' }
+  })
+  expect(res.result.statusCode).toBe(500)
 })
 
 test('verifyUserHandler should throw when User.findOne throws', async () => {
