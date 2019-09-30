@@ -7,7 +7,7 @@ import {
 
 const fetch = fetchAny as fetchAny.FetchMock
 
-describe('password change', () => {
+describe('username reminder', () => {
   let server: any
 
   beforeEach(async () => {
@@ -28,21 +28,19 @@ describe('password change', () => {
     it('returns OK', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/changePassword',
+        url: '/sendUserName',
         payload: {
-          newPassword: 'newpass',
           nonce: '12345'
         }
       })
 
       expect(res.statusCode).toBe(200)
     })
-    it('calls user-management service to change the password', async () => {
+    it('calls notification service to send the username', async () => {
       await server.server.inject({
         method: 'POST',
-        url: '/changePassword',
+        url: '/sendUserName',
         payload: {
-          newPassword: 'newpass',
           nonce: '12345'
         }
       })
@@ -54,9 +52,8 @@ describe('password change', () => {
     it('responds with an error', async () => {
       const res = await server.server.inject({
         method: 'POST',
-        url: '/changePassword',
+        url: '/sendUserName',
         payload: {
-          newPassword: 'newpass',
           nonce: '54332'
         }
       })
@@ -77,9 +74,8 @@ describe('password change', () => {
 
       const res = await server.server.inject({
         method: 'POST',
-        url: '/changePassword',
+        url: '/sendUserName',
         payload: {
-          newPassword: 'newpass',
           nonce: '12345'
         }
       })

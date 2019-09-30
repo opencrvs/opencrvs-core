@@ -186,7 +186,6 @@ export async function retrieveUserName(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
-  // TODO: need to remove this once dev env check code is here
   logger.info(`Username: ${payload.username}`)
   try {
     await sendSMS(

@@ -23,6 +23,7 @@ describe('security question answer checking', () => {
     await storeRetrievalStepInformation(
       'TEST_NONCE',
       '123',
+      'face_user_name',
       '1231231',
       RetrievalSteps.NUMBER_VERIFIED,
       'TEST_SECURITY_QUESTION_KEY'
@@ -56,6 +57,7 @@ describe('security question answer checking', () => {
         storeRetrievalStepInformation(
           'TEST_NONCE',
           '123',
+          'face_user_name',
           '1231231',
           RetrievalSteps.WAITING_FOR_VERIFICATION,
           'TEST_SECURITY_QUESTION_KEY'
@@ -95,7 +97,7 @@ describe('security question answer checking', () => {
       })
 
       expect(JSON.parse(res.payload).matched).toBe(false)
-      expect(JSON.parse(res.payload).questionKey).toBe('ANOTHER_KEY')
+      expect(JSON.parse(res.payload).securityQuestionKey).toBe('ANOTHER_KEY')
     })
   })
 })

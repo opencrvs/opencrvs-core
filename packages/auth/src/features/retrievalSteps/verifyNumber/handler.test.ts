@@ -16,6 +16,7 @@ describe('verifyNumber handler receives a request', () => {
     fetch.mockResponse(
       JSON.stringify({
         userId: '1',
+        username: 'fake_user_name',
         status: 'active',
         scope: ['demo'],
         mobile: '+8801711111111',
@@ -25,7 +26,7 @@ describe('verifyNumber handler receives a request', () => {
     const stepOneRes = await server.server.inject({
       method: 'POST',
       url: '/verifyUser',
-      payload: { mobile: '+8801711111111' }
+      payload: { mobile: '+8801711111111', retrieveFlow: 'password' }
     })
 
     const res = await server.server.inject({
@@ -50,6 +51,7 @@ describe('verifyNumber handler receives a request', () => {
       .spyOn(retrievalService, 'getRetrievalStepInformation')
       .mockResolvedValueOnce({
         userId: '123',
+        username: 'fake_user_name',
         mobile: '+8801711111111',
         status: 'NUMBER_VERIFIED',
         securityQuestionKey: 'dummyKey'

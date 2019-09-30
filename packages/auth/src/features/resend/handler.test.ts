@@ -21,7 +21,8 @@ describe('resend handler receives a request', () => {
         method: 'POST',
         url: '/resendSms',
         payload: {
-          nonce: '12345'
+          nonce: '12345',
+          retrievalFlow: true
         }
       })
 
