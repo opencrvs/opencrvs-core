@@ -14,6 +14,10 @@ interface ResetCredentialsFormMessages {
   passwordCaseCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
   passwordNumberCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
   passwordResetUpdateFormValidationMsg: MessageDescriptor
+
+  passwordUpdateSuccessPageTitle: MessageDescriptor
+  passwordUpdateSuccessPageSubtitle: MessageDescriptor
+
   usernameOptionLabel: MessageDescriptor
   passwordOptionLabel: MessageDescriptor
   passwordResetFormTitle: MessageDescriptor
@@ -27,6 +31,7 @@ interface ResetCredentialsFormMessages {
   passwordRequiredMsg: MessageDescriptor
   continueButtonLabel: MessageDescriptor
   confirmButtonLabel: MessageDescriptor
+  loginButtonLabel: MessageDescriptor
   error: MessageDescriptor
 }
 
@@ -114,6 +119,18 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     id: 'password.validation.msg'
   },
 
+  // Password update success page messages
+  passwordUpdateSuccessPageTitle: {
+    defaultMessage: 'Passowrd reset successful',
+    description: 'Title for password update success page',
+    id: 'title.password.update.success.page'
+  },
+  passwordUpdateSuccessPageSubtitle: {
+    defaultMessage: 'You can now login with your new password',
+    description: 'Subtitle for password update success page',
+    id: 'subtitle.password.update.success.page'
+  },
+
   usernameOptionLabel: {
     id: 'option.username',
     defaultMessage: 'My username',
@@ -178,6 +195,11 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     id: 'label.button.confirm',
     defaultMessage: 'Confirm',
     description: 'Label used for confirm button'
+  },
+  loginButtonLabel: {
+    defaultMessage: 'Login',
+    description: 'Label used for login button',
+    id: 'label.button.login'
   },
   error: {
     id: 'label.error',
