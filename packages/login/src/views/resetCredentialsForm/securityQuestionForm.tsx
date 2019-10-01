@@ -1,7 +1,8 @@
 import {
   FORGOTTEN_ITEMS,
   goBack,
-  goToUpdatePasswordForm
+  goToUpdatePasswordForm,
+  goToSuccessPage
 } from '@login/login/actions'
 import {
   authApi,
@@ -81,6 +82,7 @@ interface BaseProps
   > {
   goBack: typeof goBack
   goToUpdatePasswordForm: typeof goToUpdatePasswordForm
+  goToSuccessPage: typeof goToSuccessPage
 }
 interface State {
   answer: string
@@ -128,9 +130,17 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
         this.setState({ questionKey: result.securityQuestionKey })
         return
       }
-      this.props.goToUpdatePasswordForm(result.nonce)
+      if (
+        this.props.location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME
+      ) {
+        await authApi.sendUserName(this.props.location.state.nonce)
+        this.props.goToSuccessPage(this.props.location.state.forgottenItem)
+      } else {
+        this.props.goToUpdatePasswordForm(result.nonce)
+      }
     } catch (error) {
       // @todo error handling
+      this.setState({ error: true })
     }
   }
 
@@ -201,7 +211,8 @@ export const SecurityQuestion = withRouter(
     null,
     {
       goBack,
-      goToUpdatePasswordForm
+      goToUpdatePasswordForm,
+      goToSuccessPage
     }
   )(injectIntl(SecurityQuestionComponent))
 )

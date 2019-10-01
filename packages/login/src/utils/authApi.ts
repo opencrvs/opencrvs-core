@@ -86,6 +86,7 @@ const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
 
 interface IUserVerifyResponse {
   nonce: string
+  securityQuestionKey?: string
 }
 
 const verifyUser = (
@@ -141,6 +142,14 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   })
 }
 
+const sendUserName = (nonce: string): Promise<void> => {
+  return request({
+    url: resolve(window.config.AUTH_API_URL, 'sendUserName'),
+    method: 'POST',
+    data: { nonce }
+  })
+}
+
 export const authApi = {
   request,
   authenticate,
@@ -149,5 +158,6 @@ export const authApi = {
   verifyNumber,
   verifyUser,
   verifySecurityAnswer,
-  changePassword
+  changePassword,
+  sendUserName
 }
