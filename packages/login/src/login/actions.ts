@@ -196,3 +196,6 @@ export function goToSecurityQuestionForm(
 export function goToUpdatePasswordForm(nonce: string) {
   return push(UPDATE_PASSWORD, { nonce })
 }
+export function goToHome() {
+  return push(STEP_ONE)
+}
