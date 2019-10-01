@@ -103,9 +103,9 @@ export async function createRegistrationHandler(
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
+    } else {
+      logger.info('createRegistrationHandler could not send event notification')
     }
-    logger.info('createRegistrationHandler could not send event notification')
-
     return resBundle
   } catch (error) {
     logger.error(
@@ -152,10 +152,11 @@ export async function markEventAsRegisteredHandler(
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
+    } else {
+      logger.info(
+        'markEventAsRegisteredHandler could not send event notification'
+      )
     }
-    logger.info(
-      'markEventAsRegisteredHandler could not send event notification'
-    )
 
     return resBundle
   } catch (error) {
