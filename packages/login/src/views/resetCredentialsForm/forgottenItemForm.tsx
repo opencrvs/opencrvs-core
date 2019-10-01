@@ -1,8 +1,4 @@
-import {
-  goBack,
-  goToPhoneNumberVerificationForm,
-  FORGOTTEN_ITEMS
-} from '@login/login/actions'
+import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { RadioButton, SubPage } from '@opencrvs/components/lib/interface'
@@ -21,7 +17,7 @@ const Actions = styled.div`
 `
 
 interface BaseProps {
-  goBack: typeof goBack
+  goToHome: typeof goToHome
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
 }
 interface State {
@@ -50,7 +46,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, goBack } = this.props
+    const { intl, goToHome } = this.props
     const forgottenItems = [
       {
         id: 'usernameOption',
@@ -73,7 +69,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
         <SubPage
           title={intl.formatMessage(messages.forgottenItemFormTitle)}
           emptyTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
-          goBack={goBack}
+          goBack={goToHome}
         >
           <form onSubmit={this.handleContinue}>
             <Title>
@@ -119,7 +115,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
 export const ForgottenItem = connect(
   null,
   {
-    goBack,
+    goToHome,
     goToPhoneNumberVerificationForm
   }
 )(injectIntl(ForgottenItemComponent))

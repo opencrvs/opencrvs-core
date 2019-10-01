@@ -1,9 +1,10 @@
 import {
-  goBack,
-  goToRecoveryCodeEntryForm,
   FORGOTTEN_ITEMS,
+  goToForgottenItemForm,
+  goToRecoveryCodeEntryForm,
   goToSecurityQuestionForm
 } from '@login/login/actions'
+import { authApi } from '@login/utils/authApi'
 import { phoneNumberFormat } from '@login/utils/validate'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
@@ -11,11 +12,10 @@ import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
-import { authApi } from '@login/utils/authApi'
-import { RouteComponentProps, withRouter } from 'react-router'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -24,9 +24,8 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps
-  extends RouteComponentProps<{}, {}, { forgottenItem: string }> {
-  goBack: typeof goBack
+interface BaseProps {
+  goToForgottenItemForm: typeof goToForgottenItemForm
   goToRecoveryCodeEntryForm: typeof goToRecoveryCodeEntryForm
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
 }
@@ -90,7 +89,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, goBack } = this.props
+    const { intl, goToForgottenItemForm } = this.props
     const error = this.state.error && phoneNumberFormat(this.state.phone)
 
     return (
@@ -102,7 +101,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
             forgottenItem: this.props.location.state.forgottenItem
           })}
-          goBack={goBack}
+          goBack={goToForgottenItemForm}
         >
           <form onSubmit={this.handleContinue}>
             <Title>
@@ -156,7 +155,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
 export const PhoneNumberVerification = connect(
   null,
   {
-    goBack,
+    goToForgottenItemForm,
     goToRecoveryCodeEntryForm,
     goToSecurityQuestionForm
   }
