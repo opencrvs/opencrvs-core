@@ -36,7 +36,8 @@ class ForgottenItemComponent extends React.Component<Props, State> {
     }
   }
 
-  handleContinue = () => {
+  handleContinue = (event: React.FormEvent) => {
+    event.preventDefault()
     if (this.state.forgottenItem === '') {
       this.setState({ error: true })
     } else {
@@ -70,39 +71,41 @@ class ForgottenItemComponent extends React.Component<Props, State> {
           emptyTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
           goBack={goBack}
         >
-          <Title>
-            {intl.formatMessage(messages.forgottenItemFormBodyHeader)}
-          </Title>
+          <form onSubmit={this.handleContinue}>
+            <Title>
+              {intl.formatMessage(messages.forgottenItemFormBodyHeader)}
+            </Title>
 
-          <Actions id="forgotten-item-options">
-            {this.state.error && (
-              <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
-            )}
-            {forgottenItems.map(item => {
-              return (
-                <RadioButton
-                  id={item.id}
-                  size="large"
-                  key={item.id}
-                  name="forgottenItemOptions"
-                  label={item.option.label}
-                  value={item.option.value}
-                  selected={
-                    this.state.forgottenItem === item.option.value
-                      ? item.option.value
-                      : ''
-                  }
-                  onChange={() =>
-                    this.setState({ forgottenItem: item.option.value })
-                  }
-                />
-              )
-            })}
-          </Actions>
+            <Actions id="forgotten-item-options">
+              {this.state.error && (
+                <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
+              )}
+              {forgottenItems.map(item => {
+                return (
+                  <RadioButton
+                    id={item.id}
+                    size="large"
+                    key={item.id}
+                    name="forgottenItemOptions"
+                    label={item.option.label}
+                    value={item.option.value}
+                    selected={
+                      this.state.forgottenItem === item.option.value
+                        ? item.option.value
+                        : ''
+                    }
+                    onChange={() =>
+                      this.setState({ forgottenItem: item.option.value })
+                    }
+                  />
+                )
+              })}
+            </Actions>
 
-          <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButtonLabel)}
-          </PrimaryButton>
+            <PrimaryButton id="continue">
+              {intl.formatMessage(messages.continueButtonLabel)}
+            </PrimaryButton>
+          </form>
         </SubPage>
       </>
     )

@@ -129,7 +129,8 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
       continuePressed: false
     }))
   }
-  whatNext = async () => {
+  whatNext = async (event: React.FormEvent) => {
+    event.preventDefault()
     this.setState(() => ({
       continuePressed: true,
       passwordMismatched:
@@ -158,115 +159,119 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
           emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
           goBack={goBack}
         >
-          <Header>
-            {intl.formatMessage(messages.passwordResetUpdateFormBodyHeader)}
-          </Header>
-          <Instruction>
-            {intl.formatMessage(messages.passwordResetUpdateFormBodySubheader)}
-          </Instruction>
-          <GlobalError id="GlobalError">
-            {this.state.continuePressed && this.state.passwordMismatched && (
-              <WarningMessage>
-                {intl.formatMessage(messages.mismatchedPasswordMsg)}
-              </WarningMessage>
-            )}
-            {this.state.continuePressed &&
-              this.state.newPassword.length === 0 && (
+          <form onSubmit={this.whatNext}>
+            <Header>
+              {intl.formatMessage(messages.passwordResetUpdateFormBodyHeader)}
+            </Header>
+            <Instruction>
+              {intl.formatMessage(
+                messages.passwordResetUpdateFormBodySubheader
+              )}
+            </Instruction>
+            <GlobalError id="GlobalError">
+              {this.state.continuePressed && this.state.passwordMismatched && (
                 <WarningMessage>
-                  {intl.formatMessage(messages.passwordRequiredMsg)}
+                  {intl.formatMessage(messages.mismatchedPasswordMsg)}
                 </WarningMessage>
               )}
-          </GlobalError>
-          <PasswordContents>
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.newPasswordLabel)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="NewPassword"
-                type="password"
-                touched={true}
-                value={this.state.newPassword}
-                onChange={this.checkPasswordStrength}
-                error={
-                  this.state.continuePressed &&
-                  this.state.newPassword.length === 0
-                }
-              />
-            </InputField>
-            <ValidationRulesSection>
-              <div>
-                {intl.formatMessage(
-                  messages.passwordResetUpdateFormValidationMsg
+              {this.state.continuePressed &&
+                this.state.newPassword.length === 0 && (
+                  <WarningMessage>
+                    {intl.formatMessage(messages.passwordRequiredMsg)}
+                  </WarningMessage>
                 )}
-              </div>
-              <div>
-                {this.state.validLength && <TickOn />}
-                {!this.state.validLength && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordLengthCharacteristicsForPasswordResetUpdateForm,
-                    { min: 8 }
-                  )}
-                </span>
-              </div>
-              <div>
-                {this.state.hasCases && <TickOn />}
-                {!this.state.hasCases && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordCaseCharacteristicsForPasswordResetUpdateForm
-                  )}
-                </span>
-              </div>
-              <div>
-                {this.state.hasNumber && <TickOn />}
-                {!this.state.hasNumber && <TickOff />}
-                <span>
-                  {intl.formatMessage(
-                    messages.passwordNumberCharacteristicsForPasswordResetUpdateForm
-                  )}
-                </span>
-              </div>
-            </ValidationRulesSection>
-
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.confirmPasswordLabel)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="ConfirmPassword"
-                type="password"
+            </GlobalError>
+            <PasswordContents>
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.newPasswordLabel)}
                 touched={true}
-                error={
-                  this.state.continuePressed && this.state.passwordMismatched
-                }
-                value={this.state.confirmPassword}
-                onChange={this.matchPassword}
-              />
-            </InputField>
-            {this.state.passwordMismatched && (
-              <PasswordMismatch>
-                {intl.formatMessage(messages.mismatchedPasswordMsg)}
-              </PasswordMismatch>
-            )}
-            {this.state.passwordMatched && (
-              <PasswordMatch>
-                {intl.formatMessage(messages.matchedPasswordMsg)}
-              </PasswordMatch>
-            )}
-          </PasswordContents>
-          <Action>
-            <PrimaryButton id="Continue" onClick={this.whatNext}>
-              {intl.formatMessage(messages.confirmButtonLabel)}
-            </PrimaryButton>
-          </Action>
+                required={false}
+                optionalLabel=""
+              >
+                <TextInput
+                  id="NewPassword"
+                  type="password"
+                  touched={true}
+                  value={this.state.newPassword}
+                  onChange={this.checkPasswordStrength}
+                  error={
+                    this.state.continuePressed &&
+                    this.state.newPassword.length === 0
+                  }
+                />
+              </InputField>
+              <ValidationRulesSection>
+                <div>
+                  {intl.formatMessage(
+                    messages.passwordResetUpdateFormValidationMsg
+                  )}
+                </div>
+                <div>
+                  {this.state.validLength && <TickOn />}
+                  {!this.state.validLength && <TickOff />}
+                  <span>
+                    {intl.formatMessage(
+                      messages.passwordLengthCharacteristicsForPasswordResetUpdateForm,
+                      { min: 8 }
+                    )}
+                  </span>
+                </div>
+                <div>
+                  {this.state.hasCases && <TickOn />}
+                  {!this.state.hasCases && <TickOff />}
+                  <span>
+                    {intl.formatMessage(
+                      messages.passwordCaseCharacteristicsForPasswordResetUpdateForm
+                    )}
+                  </span>
+                </div>
+                <div>
+                  {this.state.hasNumber && <TickOn />}
+                  {!this.state.hasNumber && <TickOff />}
+                  <span>
+                    {intl.formatMessage(
+                      messages.passwordNumberCharacteristicsForPasswordResetUpdateForm
+                    )}
+                  </span>
+                </div>
+              </ValidationRulesSection>
+
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.confirmPasswordLabel)}
+                touched={true}
+                required={false}
+                optionalLabel=""
+              >
+                <TextInput
+                  id="ConfirmPassword"
+                  type="password"
+                  touched={true}
+                  error={
+                    this.state.continuePressed && this.state.passwordMismatched
+                  }
+                  value={this.state.confirmPassword}
+                  onChange={this.matchPassword}
+                />
+              </InputField>
+              {this.state.passwordMismatched && (
+                <PasswordMismatch>
+                  {intl.formatMessage(messages.mismatchedPasswordMsg)}
+                </PasswordMismatch>
+              )}
+              {this.state.passwordMatched && (
+                <PasswordMatch>
+                  {intl.formatMessage(messages.matchedPasswordMsg)}
+                </PasswordMatch>
+              )}
+            </PasswordContents>
+            <Action>
+              <PrimaryButton id="Continue">
+                {intl.formatMessage(messages.confirmButtonLabel)}
+              </PrimaryButton>
+            </Action>
+          </form>
         </SubPage>
       </>
     )

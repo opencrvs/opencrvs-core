@@ -49,7 +49,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = async () => {
+  handleContinue = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (!this.state.phone) {
       this.setState({ error: true })
       return
@@ -79,47 +80,49 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
           goBack={goBack}
         >
-          <Title>
-            {intl.formatMessage(
-              messages.passwordResetPhoneNumberConfirmationFormBodyHeader
-            )}
-          </Title>
-          {intl.formatMessage(
-            messages.passwordResetPhoneNumberConfirmationFormBodySubheader
-          )}
-
-          <Actions id="phone-number-verification">
-            <InputField
-              id="phone-number"
-              key="phoneNumberFieldContainer"
-              label={this.props.intl.formatMessage(
-                messages.phoneNumberFieldLabel
+          <form onSubmit={this.handleContinue}>
+            <Title>
+              {intl.formatMessage(
+                messages.passwordResetPhoneNumberConfirmationFormBodyHeader
               )}
-              touched={this.state.touched}
-              error={
-                error
-                  ? this.props.intl.formatMessage(error.message, error.props)
-                  : ''
-              }
-              hideAsterisk={true}
-            >
-              <TextInput
-                id="phone-number-input"
-                type="tel"
-                key="phoneNumberInputField"
-                name="phoneNumberInput"
-                isSmallSized={true}
-                value={this.state.phone}
-                onChange={e => this.handleChange(e.target.value)}
-                touched={this.state.touched}
-                error={this.state.error}
-              />
-            </InputField>
-          </Actions>
+            </Title>
+            {intl.formatMessage(
+              messages.passwordResetPhoneNumberConfirmationFormBodySubheader
+            )}
 
-          <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButtonLabel)}
-          </PrimaryButton>
+            <Actions id="phone-number-verification">
+              <InputField
+                id="phone-number"
+                key="phoneNumberFieldContainer"
+                label={this.props.intl.formatMessage(
+                  messages.phoneNumberFieldLabel
+                )}
+                touched={this.state.touched}
+                error={
+                  error
+                    ? this.props.intl.formatMessage(error.message, error.props)
+                    : ''
+                }
+                hideAsterisk={true}
+              >
+                <TextInput
+                  id="phone-number-input"
+                  type="tel"
+                  key="phoneNumberInputField"
+                  name="phoneNumberInput"
+                  isSmallSized={true}
+                  value={this.state.phone}
+                  onChange={e => this.handleChange(e.target.value)}
+                  touched={this.state.touched}
+                  error={this.state.error}
+                />
+              </InputField>
+            </Actions>
+
+            <PrimaryButton id="continue">
+              {intl.formatMessage(messages.continueButtonLabel)}
+            </PrimaryButton>
+          </form>
         </SubPage>
       </>
     )

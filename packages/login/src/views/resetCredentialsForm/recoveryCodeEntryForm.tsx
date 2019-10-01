@@ -49,7 +49,8 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = async () => {
+  handleContinue = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (this.state.error) {
       return
     }
@@ -74,47 +75,49 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
           emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
           goBack={goBack}
         >
-          <Title>
-            {intl.formatMessage(
-              messages.passwordResetRecoveryCodeEntryFormBodyHeader
-            )}
-          </Title>
-          {intl.formatMessage(
-            messages.passwordResetRecoveryCodeEntryFormBodySubheader
-          )}
-
-          <Actions id="recovery-code-verification">
-            <InputField
-              id="recovery-code"
-              key="recoveryCodeFieldContainer"
-              label={this.props.intl.formatMessage(
-                messages.verificationCodeFieldLabel
+          <form onSubmit={this.handleContinue}>
+            <Title>
+              {intl.formatMessage(
+                messages.passwordResetRecoveryCodeEntryFormBodyHeader
               )}
-              touched={this.state.touched}
-              error={
-                this.state.error
-                  ? this.props.intl.formatMessage(messages.error)
-                  : ''
-              }
-              hideAsterisk={true}
-            >
-              <TextInput
-                id="recovery-code-input"
-                type="number"
-                key="recoveryCodeInputField"
-                name="recoveryCodeInput"
-                isSmallSized={true}
-                value={this.state.recoveryCode}
-                onChange={e => this.handleChange(e.target.value)}
-                touched={this.state.touched}
-                error={this.state.error}
-              />
-            </InputField>
-          </Actions>
+            </Title>
+            {intl.formatMessage(
+              messages.passwordResetRecoveryCodeEntryFormBodySubheader
+            )}
 
-          <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(messages.continueButtonLabel)}
-          </PrimaryButton>
+            <Actions id="recovery-code-verification">
+              <InputField
+                id="recovery-code"
+                key="recoveryCodeFieldContainer"
+                label={this.props.intl.formatMessage(
+                  messages.verificationCodeFieldLabel
+                )}
+                touched={this.state.touched}
+                error={
+                  this.state.error
+                    ? this.props.intl.formatMessage(messages.error)
+                    : ''
+                }
+                hideAsterisk={true}
+              >
+                <TextInput
+                  id="recovery-code-input"
+                  type="number"
+                  key="recoveryCodeInputField"
+                  name="recoveryCodeInput"
+                  isSmallSized={true}
+                  value={this.state.recoveryCode}
+                  onChange={e => this.handleChange(e.target.value)}
+                  touched={this.state.touched}
+                  error={this.state.error}
+                />
+              </InputField>
+            </Actions>
+
+            <PrimaryButton id="continue">
+              {intl.formatMessage(messages.continueButtonLabel)}
+            </PrimaryButton>
+          </form>
         </SubPage>
       </>
     )

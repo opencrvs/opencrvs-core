@@ -102,7 +102,8 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
     })
   }
 
-  handleContinue = async () => {
+  handleContinue = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (this.state.error) {
       return
     }
@@ -126,7 +127,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, goBack, location } = this.props
+    const { intl, goBack } = this.props
 
     return (
       <>
@@ -135,43 +136,47 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
           emptyTitle={intl.formatMessage(sharedMessages.passwordResetFormTitle)}
           goBack={goBack}
         >
-          <Title>{intl.formatMessage(messages[this.state.questionKey])}</Title>
-          {intl.formatMessage(
-            sharedMessages.passwordResetSecurityQuestionFormBodySubheader
-          )}
+          <form onSubmit={this.handleContinue}>
+            <Title>
+              {intl.formatMessage(messages[this.state.questionKey])}
+            </Title>
+            {intl.formatMessage(
+              sharedMessages.passwordResetSecurityQuestionFormBodySubheader
+            )}
 
-          <Actions id="security-answer">
-            <InputField
-              id="security-answer"
-              key="securityAnswerFieldContainer"
-              label={this.props.intl.formatMessage(
-                sharedMessages.answerFieldLabel
-              )}
-              touched={this.state.touched}
-              error={
-                this.state.error
-                  ? this.props.intl.formatMessage(sharedMessages.error)
-                  : ''
-              }
-              hideAsterisk={true}
-            >
-              <TextInput
-                id="security-answer-input"
-                type="text"
-                key="securityAnswerInputField"
-                name="securityAnswerInput"
-                isSmallSized={true}
-                value={this.state.answer}
-                onChange={e => this.handleChange(e.target.value)}
+            <Actions id="security-answer">
+              <InputField
+                id="security-answer"
+                key="securityAnswerFieldContainer"
+                label={this.props.intl.formatMessage(
+                  sharedMessages.answerFieldLabel
+                )}
                 touched={this.state.touched}
-                error={this.state.error}
-              />
-            </InputField>
-          </Actions>
+                error={
+                  this.state.error
+                    ? this.props.intl.formatMessage(sharedMessages.error)
+                    : ''
+                }
+                hideAsterisk={true}
+              >
+                <TextInput
+                  id="security-answer-input"
+                  type="text"
+                  key="securityAnswerInputField"
+                  name="securityAnswerInput"
+                  isSmallSized={true}
+                  value={this.state.answer}
+                  onChange={e => this.handleChange(e.target.value)}
+                  touched={this.state.touched}
+                  error={this.state.error}
+                />
+              </InputField>
+            </Actions>
 
-          <PrimaryButton id="continue" onClick={this.handleContinue}>
-            {intl.formatMessage(sharedMessages.continueButtonLabel)}
-          </PrimaryButton>
+            <PrimaryButton id="continue">
+              {intl.formatMessage(sharedMessages.continueButtonLabel)}
+            </PrimaryButton>
+          </form>
         </SubPage>
       </>
     )
