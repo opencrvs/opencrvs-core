@@ -646,7 +646,7 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   })
 }
 
-function createInformantRelationshio(resource: fhir.Task, fieldValue: string) {
+function createInformantRelationship(resource: fhir.Task, fieldValue: string) {
   if (!resource.extension) {
     resource.extension = []
   }
@@ -1681,7 +1681,7 @@ const builders: IFieldBuilders = {
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return createInformantRelationshio(taskResource, fieldValue)
+      return createInformantRelationship(taskResource, fieldValue)
     },
     contactPhoneNumber: (
       fhirBundle: ITemplatedBundle,

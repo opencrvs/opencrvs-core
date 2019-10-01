@@ -884,6 +884,38 @@ describe('Registration type resolvers', () => {
 
       expect(contact).toEqual('MOTHER')
     })
+
+    it('returns contact relationship from the task if other contact person', async () => {
+      const extensionOtherContactPerson = [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'OTHER'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-relationship',
+          valueString: 'Friend'
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '01733333333'
+        }
+      ]
+
+      const mockTaskWithOtherContact = {
+        ...mockTask,
+        extension: extensionOtherContactPerson
+      }
+      const contact = await typeResolvers.Registration.contact(
+        mockTaskWithOtherContact
+      )
+      const contactRelationship = await typeResolvers.Registration.contactRelationship(
+        mockTaskWithOtherContact
+      )
+      expect(contact).toBe('OTHER')
+      expect(contactRelationship).toBe('Friend')
+    })
+
     it('returns contact person phone number from the task', async () => {
       // @ts-ignore
       const contactNumber = await typeResolvers.Registration.contactPhoneNumber(
