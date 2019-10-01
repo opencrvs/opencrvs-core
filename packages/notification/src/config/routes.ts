@@ -1,19 +1,20 @@
+import { smsHandler, requestSchema } from '@notification/features/sms/handler'
 import {
-  smsHandler,
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
-  sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation,
-  sendUserCredentials,
-  retrieveUserName
-} from '@notification/features/sms/handler'
-import {
-  requestSchema,
   declarationNotificationSchema,
-  registrationNotificationSchema,
+  registrationNotificationSchema
+} from '@notification/features/sms/birth-handler'
+import {
+  sendDeathDeclarationConfirmation,
+  sendDeathRegistrationConfirmation
+} from '@notification/features/sms/death-handler'
+import {
+  sendUserCredentials,
+  retrieveUserName,
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema
-} from '@notification/features/sms/payload-schema'
+} from '@notification/features/sms/user-handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -67,6 +68,21 @@ export default function getRoutes() {
     {
       method: 'POST',
       path: '/birthRegistrationSMS',
+      handler: sendBirthRegistrationConfirmation,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user for birth registration entry',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: registrationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birthRejectionSMS',
       handler: sendBirthRegistrationConfirmation,
       config: {
         tags: ['api'],
