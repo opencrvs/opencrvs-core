@@ -2,8 +2,10 @@ import { smsHandler, requestSchema } from '@notification/features/sms/handler'
 import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
+  sendBirthRejectionConfirmation,
   declarationNotificationSchema,
-  registrationNotificationSchema
+  registrationNotificationSchema,
+  rejectionNotificationSchema
 } from '@notification/features/sms/birth-handler'
 import {
   sendDeathDeclarationConfirmation,
@@ -18,6 +20,7 @@ import {
 
 const enum RouteScope {
   DECLARE = 'declare',
+  VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
   SYSADMIN = 'sysadmin'
@@ -58,7 +61,12 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user for birth declaration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
         },
         validate: {
           payload: declarationNotificationSchema
@@ -83,15 +91,16 @@ export default function getRoutes() {
     {
       method: 'POST',
       path: '/birthRejectionSMS',
-      handler: sendBirthRegistrationConfirmation,
+      handler: sendBirthRejectionConfirmation,
       config: {
         tags: ['api'],
-        description: 'Sends an sms to a user for birth registration entry',
+        description:
+          'Sends an sms to a user for birth application rejection entry',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
         },
         validate: {
-          payload: registrationNotificationSchema
+          payload: rejectionNotificationSchema
         }
       }
     },
@@ -103,7 +112,12 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user for death declaration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
         },
         validate: {
           payload: declarationNotificationSchema
