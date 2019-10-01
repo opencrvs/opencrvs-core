@@ -5,6 +5,10 @@ import User, {
   IUserModel,
   ISecurityQuestionAnswer
 } from '@user-mgnt/model/user'
+import {
+  isNonEmptyArray,
+  NonEmptyArray
+} from '@user-mgnt/utils/non-empty-array'
 
 interface IVerifyPayload {
   mobile: string
@@ -50,12 +54,6 @@ export default async function verifyUserHandler(
 
   return response
 }
-
-function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
-  return arr.length > 0
-}
-
-type NonEmptyArray<T> = [T, ...T[]]
 
 export function getRandomQuestionKey(
   securityQuestionAnswers: NonEmptyArray<ISecurityQuestionAnswer>,
