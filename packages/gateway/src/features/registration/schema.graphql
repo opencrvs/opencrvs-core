@@ -160,10 +160,15 @@ input PrimaryCaregiverInput {
   reasonsNotApplying: [ReasonsNotApplyingInput]
 }
 
-type PrimaryCaregiver {
+type ReasonsNotApplying {
   primaryCaregiverType: PrimaryCaregiverType
-  primaryCaregiver: RelatedPerson
   reasonNotApplying: String
+  isDeceased: Boolean
+}
+
+type PrimaryCaregiver {
+  primaryCaregiver: Person
+  reasonsNotApplying: [ReasonsNotApplying]
 }
 
 input CommentInput {
