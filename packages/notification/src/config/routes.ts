@@ -9,7 +9,8 @@ import {
 } from '@notification/features/sms/birth-handler'
 import {
   sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation
+  sendDeathRegistrationConfirmation,
+  sendDeathRejectionConfirmation
 } from '@notification/features/sms/death-handler'
 import {
   sendUserCredentials,
@@ -136,6 +137,22 @@ export default function getRoutes() {
         },
         validate: {
           payload: registrationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deathRejectionSMS',
+      handler: sendDeathRejectionConfirmation,
+      config: {
+        tags: ['api'],
+        description:
+          'Sends an sms to a user for death application rejection entry',
+        auth: {
+          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        validate: {
+          payload: rejectionNotificationSchema
         }
       }
     },
