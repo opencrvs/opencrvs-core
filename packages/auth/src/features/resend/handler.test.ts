@@ -1,5 +1,5 @@
 import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '../..'
+import { createServer } from '@auth/index'
 
 describe('resend handler receives a request', () => {
   let server: any
@@ -21,7 +21,8 @@ describe('resend handler receives a request', () => {
         method: 'POST',
         url: '/resendSms',
         payload: {
-          nonce: '12345'
+          nonce: '12345',
+          retrievalFlow: true
         }
       })
 

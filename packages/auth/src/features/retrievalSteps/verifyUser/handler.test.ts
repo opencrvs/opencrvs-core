@@ -1,7 +1,7 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '../..'
 import * as codeService from '@auth/features/verifyCode/service'
+import { createServer } from '@auth/index'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -18,7 +18,7 @@ describe('verifyUser handler receives a request', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
-        payload: { mobile: '+8801711111111' }
+        payload: { mobile: '+8801711111111', retrieveFlow: 'password' }
       })
 
       expect(res.statusCode).toBe(401)
@@ -30,15 +30,17 @@ describe('verifyUser handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          username: 'fake_user_name',
           status: 'active',
           scope: ['demo'],
-          mobile: '+8801711111111'
+          mobile: '+8801711111111',
+          securityQuestionKey: 'dummyKey'
         })
       )
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
-        payload: { mobile: '+8801711111111' }
+        payload: { mobile: '+8801711111111', retrieveFlow: 'username' }
       })
 
       expect(JSON.parse(res.payload).nonce).toBe('12345')
@@ -46,16 +48,18 @@ describe('verifyUser handler receives a request', () => {
     it('generates a mobile verification code and sends it to sms gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
-      const reloadedCodeService = require('../verifyCode/service')
+      const reloadedCodeService = require('../../verifyCode/service')
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
 
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
+          username: 'fake_user_name',
           status: 'active',
           scope: ['admin'],
-          mobile: '+8801711111111'
+          mobile: '+8801711111111',
+          securityQuestionKey: 'dummyKey'
         })
       )
       const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
@@ -63,7 +67,7 @@ describe('verifyUser handler receives a request', () => {
       await server.server.inject({
         method: 'POST',
         url: '/verifyUser',
-        payload: { mobile: '+8801711111111' }
+        payload: { mobile: '+8801711111111', retrieveFlow: 'password' }
       })
 
       expect(spy).toHaveBeenCalled()
