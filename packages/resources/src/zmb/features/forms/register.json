@@ -647,14 +647,15 @@
                   "name": "birthLocation",
                   "type": "SEARCH_FIELD",
                   "label": {
-                    "defaultMessage": "Health instition",
+                    "defaultMessage": "Health institution",
                     "description": "Label for form field: Health Institution",
-                    "id": "form.field.label.healdInstitution"
+                    "id": "form.field.label.healthInstitution"
                   },
                   "previewGroup": "placeOfBirth",
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "searchableType": "HEALTH_FACILITY",
                   "dynamicOptions": {
                     "resource": "facilities"
                   },
@@ -4818,6 +4819,7 @@
                   "required": true,
                   "initialValue": "",
                   "searchableResource": "facilities",
+                  "searchableType": "HEALTH_FACILITY",
                   "dynamicOptions": {
                     "resource": "facilities"
                   },

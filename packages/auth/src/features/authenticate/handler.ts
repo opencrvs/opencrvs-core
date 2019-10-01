@@ -38,7 +38,7 @@ export default async function authenticateHandler(
   const nonce = generateNonce()
   await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
 
-  await generateAndSendVerificationCode(nonce, result)
+  await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
 
   const respose: IAuthResponse = {
     mobile: result.mobile,

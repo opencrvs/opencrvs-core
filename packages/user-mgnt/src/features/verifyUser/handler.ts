@@ -1,7 +1,10 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import User, {
+  IUserModel,
+  ISecurityQuestionAnswer
+} from '@user-mgnt/model/user'
 
 interface IVerifyPayload {
   mobile: string
@@ -11,7 +14,9 @@ interface IVerifyResponse {
   mobile: string
   scope: string[]
   status: string
+  securityQuestionKey: string
   id: string
+  username: string
 }
 
 export default async function verifyUserHandler(
@@ -20,7 +25,6 @@ export default async function verifyUserHandler(
 ) {
   const { mobile } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne({ mobile })
 
   if (!user) {
@@ -32,10 +36,31 @@ export default async function verifyUserHandler(
     mobile: user.mobile,
     scope: user.scope,
     status: user.status,
-    id: user.id
+    securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
+    id: user.id,
+    username: user.username
   }
 
   return response
+}
+
+export function getRandomQuestionKey(
+  securityQuestionAnswers: ISecurityQuestionAnswer[] | undefined,
+  questionKeyToSkip?: string
+): string {
+  if (!securityQuestionAnswers || securityQuestionAnswers.length === 0) {
+    throw new Error('No security questions found')
+  }
+
+  const filteredQuestions = questionKeyToSkip
+    ? securityQuestionAnswers.filter(
+        securityQnA => securityQnA.questionKey !== questionKeyToSkip
+      )
+    : securityQuestionAnswers
+  return filteredQuestions[
+    // tslint:disable-next-line
+    Math.floor(Math.random() * filteredQuestions.length)
+  ].questionKey
 }
 
 export const requestSchema = Joi.object({
@@ -46,5 +71,7 @@ export const responseSchema = Joi.object({
   mobile: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
-  id: Joi.string()
+  securityQuestionKey: Joi.string(),
+  id: Joi.string(),
+  username: Joi.string()
 })

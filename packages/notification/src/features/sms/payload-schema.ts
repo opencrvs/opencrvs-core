@@ -23,3 +23,8 @@ export const userCredentialsNotificationSchema = Joi.object({
   username: Joi.string().required(),
   password: Joi.string().required()
 })
+
+export const retrieveUserNameNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  username: Joi.string().required()
+})

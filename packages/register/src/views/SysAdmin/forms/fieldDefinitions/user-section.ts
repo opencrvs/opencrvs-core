@@ -169,6 +169,7 @@ export const userSection: ISerializedFormSection = {
           required: true,
           initialValue: '',
           searchableResource: 'locations',
+          searchableType: 'ADMIN_STRUCTURE',
           validate: [],
           mapping: {
             mutation: {
