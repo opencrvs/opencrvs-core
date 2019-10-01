@@ -1,4 +1,8 @@
-import { goBack, goToPhoneNumberVerificationForm } from '@login/login/actions'
+import {
+  goBack,
+  goToPhoneNumberVerificationForm,
+  FORGOTTEN_ITEMS
+} from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { RadioButton, SubPage } from '@opencrvs/components/lib/interface'
@@ -41,7 +45,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
     if (this.state.forgottenItem === '') {
       this.setState({ error: true })
     } else {
-      this.props.goToPhoneNumberVerificationForm()
+      this.props.goToPhoneNumberVerificationForm(this.state.forgottenItem)
     }
   }
 

@@ -1,4 +1,8 @@
-import { goBack, goToSecurityQuestionForm } from '@login/login/actions'
+import {
+  goBack,
+  goToSecurityQuestionForm,
+  FORGOTTEN_ITEMS
+} from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { SubPage } from '@opencrvs/components/lib/interface'
@@ -18,7 +22,12 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps extends RouteComponentProps<{}, {}, { nonce: string }> {
+interface BaseProps
+  extends RouteComponentProps<
+    {},
+    {},
+    { forgottenItem: FORGOTTEN_ITEMS; nonce: string }
+  > {
   goBack: typeof goBack
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
 }
@@ -59,7 +68,11 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
         this.props.location.state.nonce,
         this.state.recoveryCode
       )
-      this.props.goToSecurityQuestionForm(nonce, securityQuestionKey)
+      this.props.goToSecurityQuestionForm(
+        nonce,
+        securityQuestionKey,
+        this.props.location.state.forgottenItem
+      )
     } catch (error) {
       // @todo error handling
     }
@@ -71,8 +84,12 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     return (
       <>
         <SubPage
-          title={intl.formatMessage(messages.passwordResetFormTitle)}
-          emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
+          title={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: this.props.location.state.forgottenItem
+          })}
+          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: this.props.location.state.forgottenItem
+          })}
           goBack={goBack}
         >
           <form onSubmit={this.handleContinue}>

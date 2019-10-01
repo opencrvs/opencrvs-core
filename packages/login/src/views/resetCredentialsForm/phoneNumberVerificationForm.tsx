@@ -1,4 +1,8 @@
-import { goBack, goToRecoveryCodeEntryForm } from '@login/login/actions'
+import {
+  goBack,
+  goToRecoveryCodeEntryForm,
+  FORGOTTEN_ITEMS
+} from '@login/login/actions'
 import { phoneNumberFormat } from '@login/utils/validate'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
@@ -6,11 +10,12 @@ import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled, { consolidateStreamedStyles } from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
 import { authApi } from '@login/utils/authApi'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
+import { RouteComponentProps } from 'react-router'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -29,7 +34,9 @@ interface State {
   error: boolean
 }
 
-type Props = BaseProps & WrappedComponentProps
+type Props = BaseProps &
+  RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
+  WrappedComponentProps
 
 class PhoneNumberVerificationComponent extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -51,16 +58,20 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
 
   handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!this.state.phone) {
+    if (!this.state.phone || this.state.error) {
       this.setState({ error: true })
       return
     }
     try {
       const { nonce } = await authApi.verifyUser(
-        convertToMSISDN(this.state.phone, window.config.COUNTRY),
-        'password'
+        // convertToMSISDN(this.state.phone, window.config.COUNTRY),
+        this.state.phone,
+        this.props.location.state.forgottenItem
       )
-      this.props.goToRecoveryCodeEntryForm(nonce)
+      this.props.goToRecoveryCodeEntryForm(
+        nonce,
+        this.props.location.state.forgottenItem
+      )
     } catch (err) {
       console.log(err)
 
@@ -76,8 +87,12 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     return (
       <>
         <SubPage
-          title={intl.formatMessage(messages.passwordResetFormTitle)}
-          emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
+          title={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: this.props.location.state.forgottenItem
+          })}
+          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: this.props.location.state.forgottenItem
+          })}
           goBack={goBack}
         >
           <form onSubmit={this.handleContinue}>

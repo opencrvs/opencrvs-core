@@ -1,19 +1,23 @@
-import { goBack, goToUpdatePasswordForm } from '@login/login/actions'
+import {
+  FORGOTTEN_ITEMS,
+  goBack,
+  goToUpdatePasswordForm
+} from '@login/login/actions'
+import {
+  authApi,
+  IVerifySecurityAnswerResponse,
+  QUESTION_KEYS
+} from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages as sharedMessages } from './resetCredentialsForm'
-import {
-  authApi,
-  IVerifySecurityAnswerResponse,
-  QUESTION_KEYS
-} from '@login/utils/authApi'
-import { RouteComponentProps, withRouter } from 'react-router'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -69,7 +73,11 @@ interface BaseProps
   extends RouteComponentProps<
     {},
     {},
-    { nonce: string; securityQuestionKey: QUESTION_KEYS }
+    {
+      forgottenItem: FORGOTTEN_ITEMS
+      nonce: string
+      securityQuestionKey: QUESTION_KEYS
+    }
   > {
   goBack: typeof goBack
   goToUpdatePasswordForm: typeof goToUpdatePasswordForm
@@ -132,8 +140,13 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
     return (
       <>
         <SubPage
-          title={intl.formatMessage(sharedMessages.passwordResetFormTitle)}
-          emptyTitle={intl.formatMessage(sharedMessages.passwordResetFormTitle)}
+          title={intl.formatMessage(sharedMessages.credentialsResetFormTitle, {
+            forgottenItem: this.props.location.state.forgottenItem
+          })}
+          emptyTitle={intl.formatMessage(
+            sharedMessages.credentialsResetFormTitle,
+            { forgottenItem: this.props.location.state.forgottenItem }
+          )}
           goBack={goBack}
         >
           <form onSubmit={this.handleContinue}>

@@ -1,11 +1,11 @@
-import { goBack } from '@login/login/actions'
+import { goBack, FORGOTTEN_ITEMS, goToSuccessPage } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   TextInput,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { TickOff, TickOn, Check } from '@opencrvs/components/lib/icons'
 import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -59,6 +59,12 @@ const ValidationRulesSection = styled.div`
     }
   }
 `
+const ConfirmButton = styled(PrimaryButton)`
+  display: flex;
+  & svg {
+    margin-right: 16px;
+  }
+`
 
 type State = {
   newPassword: string
@@ -73,6 +79,7 @@ type State = {
 
 interface IProps extends RouteComponentProps<{}, {}, { nonce: string }> {
   goBack: typeof goBack
+  goToSuccessPage: typeof goToSuccessPage
 }
 
 type IFullProps = IProps & IntlShapeProps
@@ -148,6 +155,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
         this.props.location.state.nonce,
         this.state.newPassword
       )
+      this.props.goToSuccessPage(FORGOTTEN_ITEMS.PASSWORD)
     }
   }
   render = () => {
@@ -155,8 +163,12 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
     return (
       <>
         <SubPage
-          title={intl.formatMessage(messages.passwordResetFormTitle)}
-          emptyTitle={intl.formatMessage(messages.passwordResetFormTitle)}
+          title={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+          })}
+          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
+            forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+          })}
           goBack={goBack}
         >
           <form onSubmit={this.whatNext}>
@@ -267,7 +279,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
               )}
             </PasswordContents>
             <Action>
-              <PrimaryButton id="Continue">
+              <PrimaryButton id="confirm-button">
                 {intl.formatMessage(messages.confirmButtonLabel)}
               </PrimaryButton>
             </Action>
@@ -281,6 +293,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
 export const UpdatePassword = connect(
   null,
   {
-    goBack
+    goBack,
+    goToSuccessPage
   }
 )(withRouter(injectIntl(UpdatePasswordComponent)))

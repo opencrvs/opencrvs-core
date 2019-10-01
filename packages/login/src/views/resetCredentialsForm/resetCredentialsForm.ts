@@ -14,13 +14,11 @@ interface ResetCredentialsFormMessages {
   passwordCaseCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
   passwordNumberCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
   passwordResetUpdateFormValidationMsg: MessageDescriptor
-
-  passwordUpdateSuccessPageTitle: MessageDescriptor
-  passwordUpdateSuccessPageSubtitle: MessageDescriptor
-
+  successPageTitle: MessageDescriptor
+  successPageSubtitle: MessageDescriptor
   usernameOptionLabel: MessageDescriptor
   passwordOptionLabel: MessageDescriptor
-  passwordResetFormTitle: MessageDescriptor
+  credentialsResetFormTitle: MessageDescriptor
   phoneNumberFieldLabel: MessageDescriptor
   verificationCodeFieldLabel: MessageDescriptor
   answerFieldLabel: MessageDescriptor
@@ -120,12 +118,12 @@ const messagesToDefine: ResetCredentialsFormMessages = {
   },
 
   // Password update success page messages
-  passwordUpdateSuccessPageTitle: {
+  successPageTitle: {
     defaultMessage: 'Passowrd reset successful',
     description: 'Title for password update success page',
     id: 'title.password.update.success.page'
   },
-  passwordUpdateSuccessPageSubtitle: {
+  successPageSubtitle: {
     defaultMessage: 'You can now login with your new password',
     description: 'Subtitle for password update success page',
     id: 'subtitle.password.update.success.page'
@@ -141,9 +139,10 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     defaultMessage: 'My password',
     description: 'Option used for password'
   },
-  passwordResetFormTitle: {
+  credentialsResetFormTitle: {
     id: 'title.form.passwordReset',
-    defaultMessage: 'Password reset',
+    defaultMessage:
+      '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
     description: 'Form title used for password reset form'
   },
   phoneNumberFieldLabel: {

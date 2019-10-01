@@ -40,10 +40,10 @@ export class PasswordUpdateSuccessView extends React.Component<
             <LightLogo />
           </LogoContainer>
           <TitleHolder>
-            {intl.formatMessage(messages.passwordUpdateSuccessPageTitle)}
+            {intl.formatMessage(messages.successPageTitle)}
           </TitleHolder>
           <InstructionHolder>
-            {intl.formatMessage(messages.passwordUpdateSuccessPageSubtitle)}
+            {intl.formatMessage(messages.successPageSubtitle)}
           </InstructionHolder>
           <LoginButton id="login-button" onClick={goToHome}>
             {intl.formatMessage(messages.loginButtonLabel)}
