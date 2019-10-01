@@ -1,19 +1,19 @@
 import {
-  goBack,
-  goToSecurityQuestionForm,
-  FORGOTTEN_ITEMS
+  FORGOTTEN_ITEMS,
+  goToPhoneNumberVerificationForm,
+  goToSecurityQuestionForm
 } from '@login/login/actions'
+import { authApi } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { authApi } from '@login/utils/authApi'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -28,7 +28,7 @@ interface BaseProps
     {},
     { forgottenItem: FORGOTTEN_ITEMS; nonce: string }
   > {
-  goBack: typeof goBack
+  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
 }
 
@@ -79,18 +79,19 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, goBack } = this.props
+    const { intl, goToPhoneNumberVerificationForm } = this.props
+    const { forgottenItem } = this.props.location.state
 
     return (
       <>
         <SubPage
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: this.props.location.state.forgottenItem
+            forgottenItem
           })}
           emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: this.props.location.state.forgottenItem
+            forgottenItem
           })}
-          goBack={goBack}
+          goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
           <form onSubmit={this.handleContinue}>
             <Title>
@@ -144,7 +145,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
 export const RecoveryCodeEntry = connect(
   null,
   {
-    goBack,
+    goToPhoneNumberVerificationForm,
     goToSecurityQuestionForm
   }
 )(withRouter(injectIntl(RecoveryCodeEntryComponent)))

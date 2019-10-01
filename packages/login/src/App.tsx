@@ -13,7 +13,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { ThemeProvider } from 'styled-components'
 import { getDefaultLanguage } from './i18n/utils'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
-import { PasswordUpdateSuccessPage } from './views/resetCredentialsForm/passwordUpdateSuccessPage'
+import { ResetCredentialsSuccessPage } from './views/resetCredentialsForm/resetCredentialsSuccessPage'
 import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
 import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntryForm'
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
@@ -49,15 +49,21 @@ export class App extends React.Component {
                       path={routes.RECOVERY_CODE_ENTRY}
                       component={RecoveryCodeEntry}
                     ></Route>
-                    <Route exact path={routes.SECURITY_QUESTION}>
-                      <SecurityQuestion />
-                    </Route>
-                    <Route exact path={routes.UPDATE_PASSWORD}>
-                      <UpdatePassword />
-                    </Route>
-                    <Route exact path={routes.SUCCESS}>
-                      <PasswordUpdateSuccessPage />
-                    </Route>
+                    <Route
+                      exact
+                      path={routes.SECURITY_QUESTION}
+                      component={SecurityQuestion}
+                    ></Route>
+                    <Route
+                      exact
+                      path={routes.UPDATE_PASSWORD}
+                      component={UpdatePassword}
+                    ></Route>
+                    <Route
+                      exact
+                      path={routes.SUCCESS}
+                      component={ResetCredentialsSuccessPage}
+                    ></Route>
                   </Switch>
                 </DarkPageContainer>
               </ConnectedRouter>

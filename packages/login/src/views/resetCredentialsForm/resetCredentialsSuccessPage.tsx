@@ -1,4 +1,4 @@
-import { goToHome } from '@login/login/actions'
+import { goToHome, FORGOTTEN_ITEMS } from '@login/login/actions'
 import { storage } from '@login/storage'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { LightLogo } from '@opencrvs/components/lib/icons'
@@ -12,6 +12,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from './resetCredentialsForm'
+import { RouteComponentProps } from 'react-router'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -25,25 +26,33 @@ const LoginButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
-export class PasswordUpdateSuccessView extends React.Component<
-  { goToHome: typeof goToHome } & IntlShapeProps
+export class ResetCredentialsSuccessView extends React.Component<
+  { goToHome: typeof goToHome } & RouteComponentProps<
+    {},
+    {},
+    { forgottenItem: FORGOTTEN_ITEMS }
+  > &
+    IntlShapeProps
 > {
   async componentDidMount() {
     await storage.removeItem('USER_DETAILS')
   }
   render() {
     const { intl, goToHome } = this.props
+    const { forgottenItem } = this.props.location.state
     return (
       <Page>
-        <Container id="password-update-success-page">
+        <Container id="reset-credentials-success-page">
           <LogoContainer>
             <LightLogo />
           </LogoContainer>
           <TitleHolder>
-            {intl.formatMessage(messages.successPageTitle)}
+            {intl.formatMessage(messages.successPageTitle, { forgottenItem })}
           </TitleHolder>
           <InstructionHolder>
-            {intl.formatMessage(messages.successPageSubtitle)}
+            {intl.formatMessage(messages.successPageSubtitle, {
+              forgottenItem
+            })}
           </InstructionHolder>
           <LoginButton id="login-button" onClick={goToHome}>
             {intl.formatMessage(messages.loginButtonLabel)}
@@ -54,9 +63,9 @@ export class PasswordUpdateSuccessView extends React.Component<
   }
 }
 
-export const PasswordUpdateSuccessPage = connect(
+export const ResetCredentialsSuccessPage = connect(
   null,
   {
     goToHome
   }
-)(injectIntl(PasswordUpdateSuccessView))
+)(injectIntl(ResetCredentialsSuccessView))

@@ -119,12 +119,14 @@ const messagesToDefine: ResetCredentialsFormMessages = {
 
   // Password update success page messages
   successPageTitle: {
-    defaultMessage: 'Passowrd reset successful',
+    defaultMessage:
+      '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful}}',
     description: 'Title for password update success page',
     id: 'title.password.update.success.page'
   },
   successPageSubtitle: {
-    defaultMessage: 'You can now login with your new password',
+    defaultMessage:
+      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
     description: 'Subtitle for password update success page',
     id: 'subtitle.password.update.success.page'
   },

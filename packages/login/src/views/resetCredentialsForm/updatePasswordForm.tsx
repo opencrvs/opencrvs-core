@@ -1,19 +1,24 @@
-import { goBack, FORGOTTEN_ITEMS, goToSuccessPage } from '@login/login/actions'
+import {
+  FORGOTTEN_ITEMS,
+  goBack,
+  goToPhoneNumberVerificationForm,
+  goToSuccessPage
+} from '@login/login/actions'
+import { authApi } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   TextInput,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { TickOff, TickOn, Check } from '@opencrvs/components/lib/icons'
+import { Check, TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages } from './resetCredentialsForm'
-import { RouteComponentProps, withRouter } from 'react-router'
-import { authApi } from '@login/utils/authApi'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -78,7 +83,7 @@ type State = {
 }
 
 interface IProps extends RouteComponentProps<{}, {}, { nonce: string }> {
-  goBack: typeof goBack
+  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
   goToSuccessPage: typeof goToSuccessPage
 }
 
@@ -160,16 +165,18 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
   }
   render = () => {
     const { intl } = this.props
+    const forgottenItem = FORGOTTEN_ITEMS.PASSWORD
+
     return (
       <>
         <SubPage
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+            forgottenItem
           })}
           emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+            forgottenItem
           })}
-          goBack={goBack}
+          goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
           <form onSubmit={this.whatNext}>
             <Header>
@@ -293,7 +300,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
 export const UpdatePassword = connect(
   null,
   {
-    goBack,
+    goToPhoneNumberVerificationForm,
     goToSuccessPage
   }
 )(withRouter(injectIntl(UpdatePasswordComponent)))
