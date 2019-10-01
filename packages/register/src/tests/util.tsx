@@ -2193,9 +2193,11 @@ export const mockApplicationData = {
     addressSameAsMother: true
   },
   registration: {
-    whoseContactDetails: 'MOTHER',
+    whoseContactDetails: {
+      value: 'MOTHER',
+      nestedFields: { registrationPhone: '01557394986' }
+    },
     presentAtBirthRegistration: 'BOTH_PARENTS',
-    registrationPhone: '01557394986',
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -2332,7 +2334,10 @@ export const mockDeathApplicationData = {
 }
 
 export const mockBirthRegistrationSectionData = {
-  whoseContactDetails: 'MOTHER',
+  whoseContactDetails: {
+    value: 'MOTHER',
+    nestedFields: { registrationPhone: '01557394986' }
+  },
   presentAtBirthRegistration: 'BOTH_PARENTS',
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
