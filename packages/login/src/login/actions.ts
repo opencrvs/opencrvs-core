@@ -6,7 +6,6 @@ import {
   ITokenResponse
 } from '@login/utils/authApi'
 import {
-  STEP_ONE,
   PHONE_NUMBER_VERIFICATION,
   FORGOTTEN_ITEM,
   RECOVERY_CODE_ENTRY,
@@ -194,6 +193,6 @@ export function goToSecurityQuestionForm(
     securityQuestionKey
   })
 }
-export function goToUpdatePasswordForm() {
-  return push(UPDATE_PASSWORD)
+export function goToUpdatePasswordForm(nonce: string) {
+  return push(UPDATE_PASSWORD, { nonce })
 }

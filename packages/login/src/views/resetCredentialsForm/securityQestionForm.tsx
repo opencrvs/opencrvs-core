@@ -1,4 +1,4 @@
-import { goBack } from '@login/login/actions'
+import { goBack, goToUpdatePasswordForm } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { SubPage } from '@opencrvs/components/lib/interface'
@@ -72,6 +72,7 @@ interface BaseProps
     { nonce: string; securityQuestionKey: QUESTION_KEYS }
   > {
   goBack: typeof goBack
+  goToUpdatePasswordForm: typeof goToUpdatePasswordForm
 }
 interface State {
   answer: string
@@ -116,8 +117,9 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 
       if (!result.matched) {
         this.setState({ questionKey: result.securityQuestionKey })
+        return
       }
-      // @todo to the next view
+      this.props.goToUpdatePasswordForm(result.nonce)
     } catch (error) {
       // @todo error handling
     }
@@ -180,7 +182,8 @@ export const SecurityQuestion = withRouter(
   connect(
     null,
     {
-      goBack
+      goBack,
+      goToUpdatePasswordForm
     }
   )(injectIntl(SecurityQuestionComponent))
 )

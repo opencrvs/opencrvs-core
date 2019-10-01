@@ -115,12 +115,12 @@ const verifyNumber = (
   })
 }
 
-export type IVerifySecurityAnswerResponse =
+export type IVerifySecurityAnswerResponse = { nonce: string } & (
   | {
       matched: false
       securityQuestionKey: QUESTION_KEYS
     }
-  | { matched: true }
+  | { matched: true })
 
 const verifySecurityAnswer = (
   nonce: string,
@@ -133,6 +133,14 @@ const verifySecurityAnswer = (
   })
 }
 
+const changePassword = (nonce: string, newPassword: string): Promise<void> => {
+  return request({
+    url: resolve(window.config.AUTH_API_URL, 'changePassword'),
+    method: 'POST',
+    data: { nonce, newPassword }
+  })
+}
+
 export const authApi = {
   request,
   authenticate,
@@ -140,5 +148,6 @@ export const authApi = {
   resendSMS,
   verifyNumber,
   verifyUser,
-  verifySecurityAnswer
+  verifySecurityAnswer,
+  changePassword
 }

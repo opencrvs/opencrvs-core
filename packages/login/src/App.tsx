@@ -50,12 +50,16 @@ export class App extends React.Component {
                       path={routes.RECOVERY_CODE_ENTRY}
                       component={RecoveryCodeEntry}
                     ></Route>
-                    <Route exact path={routes.SECURITY_QUESTION}>
-                      <SecurityQuestion />
-                    </Route>
-                    <Route exact path={routes.UPDATE_PASSWORD}>
-                      <UpdatePassword />
-                    </Route>
+                    <Route
+                      exact
+                      path={routes.SECURITY_QUESTION}
+                      component={SecurityQuestion}
+                    ></Route>
+                    <Route
+                      exact
+                      path={routes.UPDATE_PASSWORD}
+                      component={UpdatePassword}
+                    ></Route>
                   </Switch>
                 </DarkPageContainer>
               </ConnectedRouter>

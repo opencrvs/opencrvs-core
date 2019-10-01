@@ -17,6 +17,7 @@ interface IPayload {
 
 interface IResponse {
   matched: boolean
+  nonce: string
   securityQuestionKey?: string
 }
 
@@ -61,7 +62,8 @@ export default async function verifySecurityQuestionHandler(
   )
 
   const response: IResponse = {
-    matched: verificationResult.matched
+    matched: verificationResult.matched,
+    nonce: payload.nonce
   }
   if (!verificationResult.matched) {
     response.securityQuestionKey = verificationResult.questionKey
@@ -76,5 +78,6 @@ export const verifySecurityQuestionSchema = Joi.object({
 
 export const verifySecurityQuestionResSchema = Joi.object({
   matched: Joi.bool().required(),
-  securityQuestionKey: Joi.string().optional()
+  securityQuestionKey: Joi.string().optional(),
+  nonce: Joi.string().required()
 })

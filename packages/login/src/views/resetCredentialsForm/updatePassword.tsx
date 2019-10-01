@@ -12,6 +12,8 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from './resetCredentialsForm'
+import { RouteComponentProps, withRouter } from 'react-router'
+import { authApi } from '@login/utils/authApi'
 
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -69,7 +71,7 @@ type State = {
   continuePressed: boolean
 }
 
-interface IProps {
+interface IProps extends RouteComponentProps<{}, {}, { nonce: string }> {
   goBack: typeof goBack
 }
 
@@ -127,7 +129,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
       continuePressed: false
     }))
   }
-  whatNext = () => {
+  whatNext = async () => {
     this.setState(() => ({
       continuePressed: true,
       passwordMismatched:
@@ -141,6 +143,10 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
       this.state.hasNumber &&
       this.state.validLength
     ) {
+      await authApi.changePassword(
+        this.props.location.state.nonce,
+        this.state.newPassword
+      )
     }
   }
   render = () => {
@@ -272,4 +278,4 @@ export const UpdatePassword = connect(
   {
     goBack
   }
-)(injectIntl(UpdatePasswordComponent))
+)(withRouter(injectIntl(UpdatePasswordComponent)))
