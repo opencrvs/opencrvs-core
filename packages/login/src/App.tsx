@@ -17,7 +17,7 @@ import { getDefaultLanguage } from './i18n/utils'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
 import { PhoneNumberVerification } from './views/resetCredentialsForm/phoneNumberVerificationForm'
 import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntryForm'
-import { SecurityQuestion } from './views/resetCredentialsForm/securityQestionForm'
+import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePassword'
 import { PasswordUpdateSuccessPage } from './views/resetCredentialsForm/passwordUpdateSuccessPage'
 
