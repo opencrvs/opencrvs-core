@@ -149,10 +149,15 @@ enum PrimaryCaregiverType {
   OTHER
 }
 
-input PrimaryCaregiverInput {
-  primaryCaregiverType: PrimaryCaregiverType
-  primaryCaregiver: RelatedPersonInput # -> Use for Observation.subject.reference
+input ReasonsNotApplyingInput {
+  primaryCaregiverType: PrimaryCaregiverType # -> Observation.valueString
   reasonNotApplying: String # -> Observation.valueString
+  isDeceased: Boolean
+}
+
+input PrimaryCaregiverInput {
+  primaryCaregiver: PersonInput # -> Use for Observation.subject.reference
+  reasonsNotApplying: [ReasonsNotApplyingInput]
 }
 
 type PrimaryCaregiver {

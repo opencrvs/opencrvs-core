@@ -34,6 +34,12 @@ export const DEATH_ENCOUNTER_CODE = 'death-encounter'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
+export const REASON_MOTHER_NOT_APPLYING = 'reason-mother-not-applying'
+export const REASON_FATHER_NOT_APPLYING = 'reason-father-not-applying'
+export const REASON_CAREGIVER_NOT_APPLYING = 'reason-caregiver-not-applying'
+export const PRIMARY_CAREGIVER = 'primary-caregiver'
+export const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
+export const PRIMARY_CAREGIVER_TITLE = "Primary caregiver's details"
 
 export function createPersonSection(
   refUuid: string,

@@ -796,9 +796,14 @@ export interface GQLPaymentInput {
 }
 
 export interface GQLPrimaryCaregiverInput {
+  primaryCaregiver?: GQLPersonInput
+  reasonsNotApplying?: Array<GQLReasonsNotApplyingInput | null>
+}
+
+export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
-  primaryCaregiver?: GQLRelatedPersonInput
   reasonNotApplying?: string
+  isDeceased?: boolean
 }
 
 export interface GQLCreatedIds {
