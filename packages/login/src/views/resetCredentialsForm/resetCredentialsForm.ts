@@ -39,7 +39,7 @@ const messagesToDefine: ResetCredentialsFormMessages = {
   // Forgotten item form messages
   forgottenItemFormTitle: {
     id: 'title.form.forgottenItem',
-    defaultMessage: 'Forgotten username or password',
+    defaultMessage: "Can't login",
     description: 'Title used for forgotten item form'
   },
   forgottenItemFormBodyHeader: {
