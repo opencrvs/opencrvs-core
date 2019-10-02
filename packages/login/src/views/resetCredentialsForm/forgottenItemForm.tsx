@@ -1,7 +1,10 @@
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { RadioButton, SubPage } from '@opencrvs/components/lib/interface'
+import {
+  ActionPageLight,
+  RadioButton
+} from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -66,9 +69,8 @@ class ForgottenItemComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <SubPage
+        <ActionPageLight
           title={intl.formatMessage(messages.forgottenItemFormTitle)}
-          emptyTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
           goBack={goToHome}
         >
           <form onSubmit={this.handleContinue}>
@@ -106,7 +108,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
               {intl.formatMessage(messages.continueButtonLabel)}
             </PrimaryButton>
           </form>
-        </SubPage>
+        </ActionPageLight>
       </>
     )
   }

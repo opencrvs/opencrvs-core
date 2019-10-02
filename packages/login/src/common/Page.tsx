@@ -15,7 +15,6 @@ const StyledPage = styled.div.attrs<IPage>({})`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  margin-top: -280px;
   * {
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
@@ -66,7 +65,6 @@ export class Page extends React.Component<IPage & RouteComponentProps<{}>> {
     const { children } = this.props
     return (
       <div>
-        <LoginHeader />
         <StyledPage {...this.props}>{children}</StyledPage>
       </div>
     )

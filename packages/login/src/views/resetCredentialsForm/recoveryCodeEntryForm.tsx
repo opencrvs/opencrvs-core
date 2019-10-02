@@ -6,7 +6,7 @@ import {
 import { authApi } from '@login/utils/authApi'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
-import { SubPage } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -93,11 +93,8 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <SubPage
+        <ActionPageLight
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem
-          })}
-          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
             forgottenItem
           })}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
@@ -160,7 +157,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
               {intl.formatMessage(messages.continueButtonLabel)}
             </PrimaryButton>
           </form>
-        </SubPage>
+        </ActionPageLight>
       </>
     )
   }

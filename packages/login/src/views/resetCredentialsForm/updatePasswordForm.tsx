@@ -1,6 +1,5 @@
 import {
   FORGOTTEN_ITEMS,
-  goBack,
   goToPhoneNumberVerificationForm,
   goToSuccessPage
 } from '@login/login/actions'
@@ -12,7 +11,7 @@ import {
   WarningMessage
 } from '@opencrvs/components/lib/forms'
 import { Check, TickOff, TickOn } from '@opencrvs/components/lib/icons'
-import { SubPage } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -169,11 +168,8 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
 
     return (
       <>
-        <SubPage
+        <ActionPageLight
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem
-          })}
-          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
             forgottenItem
           })}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
@@ -287,7 +283,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
               </PrimaryButton>
             </Action>
           </form>
-        </SubPage>
+        </ActionPageLight>
       </>
     )
   }

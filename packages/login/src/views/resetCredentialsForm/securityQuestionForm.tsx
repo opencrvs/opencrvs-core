@@ -1,8 +1,8 @@
 import {
   FORGOTTEN_ITEMS,
   goToPhoneNumberVerificationForm,
-  goToUpdatePasswordForm,
-  goToSuccessPage
+  goToSuccessPage,
+  goToUpdatePasswordForm
 } from '@login/login/actions'
 import {
   authApi,
@@ -11,7 +11,6 @@ import {
 } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
-import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -19,6 +18,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages as sharedMessages } from './resetCredentialsForm'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -150,14 +150,10 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <SubPage
+        <ActionPageLight
           title={intl.formatMessage(sharedMessages.credentialsResetFormTitle, {
             forgottenItem
           })}
-          emptyTitle={intl.formatMessage(
-            sharedMessages.credentialsResetFormTitle,
-            { forgottenItem }
-          )}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
           <form onSubmit={this.handleContinue}>
@@ -201,7 +197,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
               {intl.formatMessage(sharedMessages.continueButtonLabel)}
             </PrimaryButton>
           </form>
-        </SubPage>
+        </ActionPageLight>
       </>
     )
   }

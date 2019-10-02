@@ -8,7 +8,7 @@ import { authApi } from '@login/utils/authApi'
 import { phoneNumberFormat } from '@login/utils/validate'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
-import { SubPage } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -95,11 +95,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <SubPage
+        <ActionPageLight
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
-            forgottenItem: this.props.location.state.forgottenItem
-          })}
-          emptyTitle={intl.formatMessage(messages.credentialsResetFormTitle, {
             forgottenItem: this.props.location.state.forgottenItem
           })}
           goBack={goToForgottenItemForm}
@@ -147,7 +144,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
               {intl.formatMessage(messages.continueButtonLabel)}
             </PrimaryButton>
           </form>
-        </SubPage>
+        </ActionPageLight>
       </>
     )
   }
