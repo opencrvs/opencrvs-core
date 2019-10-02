@@ -87,7 +87,7 @@ export const changeHirerchyQueryTransformer = (
   } else {
     transformedData[sectionId][field.name]['nestedFields'][
       nestedField.name
-    ] = get(queryData, nestedField.name)
+    ] = get(queryData, `${sectionId}.${nestedField.name}`)
   }
 
   return transformedData

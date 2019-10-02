@@ -1,9 +1,12 @@
-import { setBirthRegistrationSectionTransformer } from '@register/forms/register/fieldMappings/birth/mutation/registration-mappings'
+import {
+  setBirthRegistrationSectionTransformer,
+  changeHirerchyMutationTransformer
+} from '@register/forms/register/fieldMappings/birth/mutation/registration-mappings'
 import {
   mockApplicationData,
   mockBirthRegistrationSectionData
 } from '@register/tests/util'
-import { TransformedData } from '@register/forms'
+import { TransformedData, IFormField } from '@register/forms'
 import { cloneDeep } from 'lodash'
 
 describe('Birth registration mutation mapping related tests', () => {
@@ -66,5 +69,25 @@ describe('Birth registration mutation mapping related tests', () => {
         hasShowedVerifiedDocument: true
       }
     ])
+  })
+
+  it('changeHierarchyMutation transformer test', () => {
+    const transformedData: TransformedData = {
+      registrationPhone: ''
+    }
+
+    const mockBirthApplication = cloneDeep(mockApplicationData)
+    mockBirthApplication.registration = mockBirthRegistrationSectionData
+    const field = { name: 'whoseContactDetails' } as IFormField
+    changeHirerchyMutationTransformer()(
+      transformedData,
+      mockBirthApplication,
+      'registration',
+      field,
+      { name: 'registrationPhone' } as IFormField
+    )
+    expect(transformedData).toEqual({
+      registrationPhone: '01557394986'
+    })
   })
 })

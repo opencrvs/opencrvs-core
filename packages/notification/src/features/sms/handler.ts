@@ -46,6 +46,10 @@ interface ICredentialsPayload extends ISMSPayload {
   password: string
 }
 
+interface IRetrieveUserNamePayload extends ISMSPayload {
+  username: string
+}
+
 export async function sendBirthDeclarationConfirmation(
   request: HapiRequest,
   h: Hapi.ResponseToolkit
@@ -166,6 +170,28 @@ export async function sendUserCredentials(
       request.i18n.__('userCredentialsNotification', {
         username: payload.username,
         password: payload.password
+      }),
+      /* send unicoded sms if provided local is not in non unicoded set */
+      NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0
+    )
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function retrieveUserName(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IRetrieveUserNamePayload
+  logger.info(`Username: ${payload.username}`)
+  try {
+    await sendSMS(
+      payload.msisdn,
+      request.i18n.__('retieveUserNameNotification', {
+        username: payload.username
       }),
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(request.i18n.getLocale()) < 0

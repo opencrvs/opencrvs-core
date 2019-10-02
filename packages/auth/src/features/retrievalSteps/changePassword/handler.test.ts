@@ -1,8 +1,10 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServer } from '@auth/index'
-import { storePasswordChangeCode } from './service'
+import {
+  storeRetrievalStepInformation,
+  RetrievalSteps
+} from '@auth/features/retrievalSteps/verifyUser/service'
 
-// tslint:disable-next-line:mocha-no-side-effect-code
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('password change', () => {
@@ -12,7 +14,14 @@ describe('password change', () => {
     server = await createServer()
     fetch.resetMocks()
     fetch.mockResponse('OK')
-    storePasswordChangeCode('12345', 'fake_code', 'fake_user_id')
+    storeRetrievalStepInformation(
+      '12345',
+      'fake_user_id',
+      'fake_user_name',
+      'mobile',
+      RetrievalSteps.SECURITY_Q_VERIFIED,
+      'TEST_SECURITY_QUESTION_KEY'
+    )
   })
 
   describe('when a valid request is made', () => {
@@ -49,6 +58,29 @@ describe('password change', () => {
         payload: {
           newPassword: 'newpass',
           nonce: '54332'
+        }
+      })
+
+      expect(res.statusCode).toBe(401)
+    })
+  })
+  describe('when invalid status found on retrieval step data', () => {
+    it('responds with an error', async () => {
+      await storeRetrievalStepInformation(
+        '12345',
+        'fake_user_id',
+        'fake_user_name',
+        'mobile',
+        RetrievalSteps.NUMBER_VERIFIED,
+        'TEST_SECURITY_QUESTION_KEY'
+      )
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/changePassword',
+        payload: {
+          newPassword: 'newpass',
+          nonce: '12345'
         }
       })
 

@@ -112,7 +112,9 @@ class UserReviewFormComponent extends React.Component<
     }
 
     if (field.type === SEARCH_FIELD) {
-      const offlineLocations = this.props.offlineResources['locations']
+      const offlineLocations = this.props.offlineResources[
+        field.searchableResource
+      ]
       const locationId = formData[field.name].toString()
       return offlineLocations[locationId] && offlineLocations[locationId].name
     }

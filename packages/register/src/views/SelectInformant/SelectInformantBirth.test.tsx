@@ -114,6 +114,24 @@ describe('when user is selecting the informant', () => {
     })
   })
 
+  describe('when select someone else', () => {
+    it('takes user to the select applicant relationship view', () => {
+      app
+        .find('#select_informant_OTHER')
+        .hostNodes()
+        .simulate('change')
+
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      expect(
+        app.find('#form_section_id_applicant-relation').hostNodes()
+      ).toHaveLength(1)
+    })
+  })
+
   describe('when clicked on cross button', () => {
     it('go back to home page', async () => {
       app

@@ -14,8 +14,8 @@
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
     "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",
     "save:testData": "yarn prep:employees:bgd && yarn save:testLocations && yarn save:testEmployees",
-    "populate:bgd": "bash populateBgd.sh",
-    "populate:zmb": "bash populateZmb.sh",
+    "createReferenceData:bgd": "bash createReferenceDataBgd.sh",
+    "createReferenceData:zmb": "bash createReferenceDataZmb.sh",
     "db:backup:create": "DEV=true ./backup-metadata.sh $1",
     "db:backup:restore": "DEV=true ./restore-metadata.sh $1",
     "db:clear:all": "DEV=true ./clear-all-data.sh $1"

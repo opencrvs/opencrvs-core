@@ -544,7 +544,7 @@ describe('Verify handler', () => {
     }
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/registration',
+      url: '/events/birth/new-registration',
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -1018,7 +1018,7 @@ describe('Verify handler', () => {
     }
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/registration',
+      url: '/events/birth/new-registration',
       headers: {
         Authorization: `Bearer ${token}`
       },

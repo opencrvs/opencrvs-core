@@ -1,9 +1,9 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
-import { createServer } from '../..'
+import { createServer } from '@auth/index'
 import * as codeService from '@auth/features/verifyCode/service'
 
-const fetch = fetchAny as any
+const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {
   let server: any
 
