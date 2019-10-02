@@ -4,6 +4,7 @@ import {
   storeRetrievalStepInformation,
   RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
+import { logger } from '@auth/logger'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -36,6 +37,7 @@ describe('username reminder', () => {
       expect(res.statusCode).toBe(200)
     })
     it('calls notification service to send the username', async () => {
+      const spy = jest.spyOn(logger, 'info')
       await server.server.inject({
         method: 'POST',
         url: '/sendUserName',
@@ -44,7 +46,7 @@ describe('username reminder', () => {
         }
       })
 
-      expect(fetch.mock.calls).toHaveLength(1)
+      expect(spy.mock.calls).toHaveLength(1)
     })
   })
   describe('when an invalid nonce is supplied', () => {
