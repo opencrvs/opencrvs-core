@@ -1,7 +1,12 @@
 export const ENGLISH_STATE = {
   lang: 'en',
   messages: {
+    'buttons.confirm': 'Confirm',
+    'buttons.continue': 'Continue',
     'buttons.login': 'Login',
+    'constants.phoneNumber': 'Phone number',
+    'error.required.password': 'New password is not valid',
+    'label.error': 'Invalid input',
     'login.stepOneInstruction': 'Please enter your Username and password.',
     'login.username': 'Username',
     'login.mobileLabel': 'Mobile number',
@@ -31,6 +36,41 @@ export const ENGLISH_STATE = {
     'login.manager.performanceAppTitle': 'Performance Management',
     'login.manager.performanceAppDescription':
       "Analyse the performance of a particular area of your country in it's Civil Registration.",
+    'resetCredentials.form.title':
+      '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
+    'resetCredentials.forgottenItem.form.title': "Can't login",
+    'resetCredentials.forgottenItem.form.body.header':
+      'What have you forgotten?',
+    'resetCredentials.label.field.verificationCode':
+      'Verification code (6 digits)',
+    'resetCredentials.label.field.answer': 'Answer',
+    'resetCredentials.option.username': 'My username',
+    'resetCredentials.option.password': 'My password',
+    'resetCredentials.phoneNumberConfirmation.form.body.header':
+      'What is your phone number?',
+    'resetCredentials.phoneNumberConfirmation.form.body.subheader':
+      'This is the number assoricated with your account',
+    'resetCredentials.recoveryCodeEntry.form.body.header':
+      'Enter the 6-digit recovery code',
+    'resetCredentials.recoveryCodeEntry.form.body.subheader':
+      "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?",
+    'resetCredentials.securityQuestion.form.body.subheader':
+      'This is one of the security questions you choose when setting up your account',
+    'resetCredentials.success.page.title':
+      '{forgottenItem, select, username {Username reminder sent} password {Password reset successful}}',
+    'resetCredentials.success.page.subtitle':
+      '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
+    'newPassword.header': 'Choose a new password',
+    'newPassword.instruction':
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    'password.label.confirm': 'Confirm password',
+    'password.label.new': 'New password',
+    'password.cases': 'Contain upper and lower cases',
+    'password.match': 'Passwords match',
+    'password.minLength': '{min} characters minimum',
+    'password.mismatch': 'Passwords do not match',
+    'password.number': 'At least one number',
+    'password.validation.msg': 'Password must have:',
     'validations.required': 'required',
     'validations.minLength': 'Must be {min} characters or more',
     'validations.numberRequired': 'Must be number',

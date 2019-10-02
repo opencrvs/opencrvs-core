@@ -95,13 +95,9 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
         >
           <form onSubmit={this.handleContinue}>
             <Title>
-              {intl.formatMessage(
-                messages.passwordResetRecoveryCodeEntryFormBodyHeader
-              )}
+              {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
             </Title>
-            {intl.formatMessage(
-              messages.passwordResetRecoveryCodeEntryFormBodySubheader
-            )}
+            {intl.formatMessage(messages.recoveryCodeEntryFormBodySubheader)}
 
             <Actions id="recovery-code-verification">
               <InputField

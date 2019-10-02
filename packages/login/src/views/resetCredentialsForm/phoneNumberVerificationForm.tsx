@@ -106,11 +106,11 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           <form onSubmit={this.handleContinue}>
             <Title>
               {intl.formatMessage(
-                messages.passwordResetPhoneNumberConfirmationFormBodyHeader
+                messages.phoneNumberConfirmationFormBodyHeader
               )}
             </Title>
             {intl.formatMessage(
-              messages.passwordResetPhoneNumberConfirmationFormBodySubheader
+              messages.phoneNumberConfirmationFormBodySubheader
             )}
 
             <Actions id="phone-number-verification">

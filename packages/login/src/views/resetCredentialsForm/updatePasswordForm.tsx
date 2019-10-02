@@ -180,12 +180,10 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
         >
           <form onSubmit={this.whatNext}>
             <Header>
-              {intl.formatMessage(messages.passwordResetUpdateFormBodyHeader)}
+              {intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
             </Header>
             <Instruction>
-              {intl.formatMessage(
-                messages.passwordResetUpdateFormBodySubheader
-              )}
+              {intl.formatMessage(messages.passwordUpdateFormBodySubheader)}
             </Instruction>
             <GlobalError id="GlobalError">
               {this.state.continuePressed && this.state.passwordMismatched && (
@@ -222,16 +220,14 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
               </InputField>
               <ValidationRulesSection>
                 <div>
-                  {intl.formatMessage(
-                    messages.passwordResetUpdateFormValidationMsg
-                  )}
+                  {intl.formatMessage(messages.passwordUpdateFormValidationMsg)}
                 </div>
                 <div>
                   {this.state.validLength && <TickOn />}
                   {!this.state.validLength && <TickOff />}
                   <span>
                     {intl.formatMessage(
-                      messages.passwordLengthCharacteristicsForPasswordResetUpdateForm,
+                      messages.passwordLengthCharacteristicsForPasswordUpdateForm,
                       { min: 8 }
                     )}
                   </span>
@@ -241,7 +237,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                   {!this.state.hasCases && <TickOff />}
                   <span>
                     {intl.formatMessage(
-                      messages.passwordCaseCharacteristicsForPasswordResetUpdateForm
+                      messages.passwordCaseCharacteristicsForPasswordUpdateForm
                     )}
                   </span>
                 </div>
@@ -250,7 +246,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
                   {!this.state.hasNumber && <TickOff />}
                   <span>
                     {intl.formatMessage(
-                      messages.passwordNumberCharacteristicsForPasswordResetUpdateForm
+                      messages.passwordNumberCharacteristicsForPasswordUpdateForm
                     )}
                   </span>
                 </div>

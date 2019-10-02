@@ -165,7 +165,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
               {intl.formatMessage(messages[this.state.questionKey])}
             </Title>
             {intl.formatMessage(
-              sharedMessages.passwordResetSecurityQuestionFormBodySubheader
+              sharedMessages.securityQuestionFormBodySubheader
             )}
 
             <Actions id="security-answer">

@@ -3,17 +3,17 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface ResetCredentialsFormMessages {
   forgottenItemFormTitle: MessageDescriptor
   forgottenItemFormBodyHeader: MessageDescriptor
-  passwordResetPhoneNumberConfirmationFormBodyHeader: MessageDescriptor
-  passwordResetPhoneNumberConfirmationFormBodySubheader: MessageDescriptor
-  passwordResetRecoveryCodeEntryFormBodyHeader: MessageDescriptor
-  passwordResetRecoveryCodeEntryFormBodySubheader: MessageDescriptor
-  passwordResetSecurityQuestionFormBodySubheader: MessageDescriptor
-  passwordResetUpdateFormBodyHeader: MessageDescriptor
-  passwordResetUpdateFormBodySubheader: MessageDescriptor
-  passwordLengthCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
-  passwordCaseCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
-  passwordNumberCharacteristicsForPasswordResetUpdateForm: MessageDescriptor
-  passwordResetUpdateFormValidationMsg: MessageDescriptor
+  phoneNumberConfirmationFormBodyHeader: MessageDescriptor
+  phoneNumberConfirmationFormBodySubheader: MessageDescriptor
+  recoveryCodeEntryFormBodyHeader: MessageDescriptor
+  recoveryCodeEntryFormBodySubheader: MessageDescriptor
+  securityQuestionFormBodySubheader: MessageDescriptor
+  passwordUpdateFormBodyHeader: MessageDescriptor
+  passwordUpdateFormBodySubheader: MessageDescriptor
+  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordUpdateFormValidationMsg: MessageDescriptor
   successPageTitle: MessageDescriptor
   successPageSubtitle: MessageDescriptor
   usernameOptionLabel: MessageDescriptor
@@ -36,171 +36,168 @@ interface ResetCredentialsFormMessages {
 const messagesToDefine: ResetCredentialsFormMessages = {
   // Forgotten item form messages
   forgottenItemFormTitle: {
-    id: 'title.form.forgottenItem',
+    id: 'resetCredentials.forgottenItem.form.title',
     defaultMessage: "Can't login",
     description: 'Title used for forgotten item form'
   },
   forgottenItemFormBodyHeader: {
-    id: 'header.body.form.forgottenItem',
+    id: 'resetCredentials.forgottenItem.form.body.header',
     defaultMessage: 'What have you forgotten?',
     description: 'Body header for forgotten item form'
   },
 
   // Phone number confirmation form messages
-  passwordResetPhoneNumberConfirmationFormBodyHeader: {
-    id: 'header.body.form.phoneNumberConfirmation.passwordreset',
+  phoneNumberConfirmationFormBodyHeader: {
+    id: 'resetCredentials.phoneNumberConfirmation.form.body.header',
     defaultMessage: 'What is your phone number?',
     description:
-      'Form body header used in the body of phone number confirmation step of password reset form'
+      'Form body header used in the body of phone number confirmation step'
   },
-  passwordResetPhoneNumberConfirmationFormBodySubheader: {
-    id: 'subheader.body.form.phoneNumberConfirmation.passwordreset',
+  phoneNumberConfirmationFormBodySubheader: {
+    id: 'resetCredentials.phoneNumberConfirmation.form.body.subheader',
     defaultMessage: 'This is the number assoricated with your account',
     description:
-      'Form body subheader used in the body of phone number confirmation step of password reset form'
+      'Form body subheader used in the body of phone number confirmation step'
   },
 
   // Recovery code entry form messages
-  passwordResetRecoveryCodeEntryFormBodyHeader: {
-    id: 'header.body.form.recoveryCodeEntry.passwordReset',
+  recoveryCodeEntryFormBodyHeader: {
+    id: 'resetCredentials.recoveryCodeEntry.form.body.header',
     defaultMessage: 'Enter the 6-digit recovery code',
-    description:
-      'Form body header used for recovery code entry step of password reset form'
+    description: 'Form body header used for recovery code entry step'
   },
-  passwordResetRecoveryCodeEntryFormBodySubheader: {
-    id: 'subheader.body.form.recoveryCodeEntry.passwordReset',
+  recoveryCodeEntryFormBodySubheader: {
+    id: 'resetCredentials.recoveryCodeEntry.form.body.subheader',
     defaultMessage:
       "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?",
-    description:
-      'Form body subheader used for recovery code entry step of password reset form'
+    description: 'Form body subheader used for recovery code entry step'
   },
 
   // Security question form messages
-  passwordResetSecurityQuestionFormBodySubheader: {
-    id: 'subheader.body.form.securityQuestion.passwordReset',
+  securityQuestionFormBodySubheader: {
+    id: 'resetCredentials.securityQuestion.form.body.subheader',
     defaultMessage:
       'This is one of the security questions you choose when setting up your account',
-    description:
-      'Form body subheader used for security question step of password reset form'
+    description: 'Form body subheader used for security question step'
   },
 
   // Password confirmation form messages
-  passwordResetUpdateFormBodyHeader: {
+  passwordUpdateFormBodyHeader: {
+    id: 'newPassword.header',
     defaultMessage: 'Choose a new password',
-    description: 'New Password header',
-    id: 'newPassword.header'
+    description: 'New Password header'
   },
-  passwordResetUpdateFormBodySubheader: {
+  passwordUpdateFormBodySubheader: {
+    id: 'newPassword.instruction',
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
-    description: 'New Password instruction',
-    id: 'newPassword.instruction'
+    description: 'New Password instruction'
   },
-  passwordLengthCharacteristicsForPasswordResetUpdateForm: {
+  passwordLengthCharacteristicsForPasswordUpdateForm: {
+    id: 'password.minLength',
     defaultMessage: '{min} characters minimum',
-    description: 'Password validation',
-    id: 'password.minLength'
+    description: 'Password validation'
   },
-  passwordCaseCharacteristicsForPasswordResetUpdateForm: {
+  passwordCaseCharacteristicsForPasswordUpdateForm: {
+    id: 'password.cases',
     defaultMessage: 'Contain upper and lower cases',
-    description: 'Password validation',
-    id: 'password.cases'
+    description: 'Password validation'
   },
-  passwordNumberCharacteristicsForPasswordResetUpdateForm: {
+  passwordNumberCharacteristicsForPasswordUpdateForm: {
+    id: 'password.number',
     defaultMessage: 'At least one number',
-    description: 'Password validation',
-    id: 'password.number'
+    description: 'Password validation'
   },
-  passwordResetUpdateFormValidationMsg: {
+  passwordUpdateFormValidationMsg: {
+    id: 'password.validation.msg',
     defaultMessage: 'Password must have:',
-    description: 'Password validation message',
-    id: 'password.validation.msg'
+    description: 'Password validation message'
   },
 
   // Password update success page messages
   successPageTitle: {
+    id: 'resetCredentials.success.page.title',
     defaultMessage:
       '{forgottenItem, select, username {Username reminder sent} password {Passowrd reset successful}}',
-    description: 'Title for password update success page',
-    id: 'title.password.update.success.page'
+    description: 'Title for success page'
   },
   successPageSubtitle: {
+    id: 'resetCredentials.success.page.subtitle',
     defaultMessage:
       '{forgottenItem, select, username {Check your phone for a reminder of your username} password {You can now login with your new password}}',
-    description: 'Subtitle for password update success page',
-    id: 'subtitle.password.update.success.page'
+    description: 'Subtitle for success page'
   },
 
   usernameOptionLabel: {
-    id: 'option.username',
+    id: 'resetCredentials.option.username',
     defaultMessage: 'My username',
     description: 'Option used for username'
   },
   passwordOptionLabel: {
-    id: 'option.password',
+    id: 'resetCredentials.option.password',
     defaultMessage: 'My password',
     description: 'Option used for password'
   },
   credentialsResetFormTitle: {
-    id: 'title.form.passwordReset',
+    id: 'resetCredentials.form.title',
     defaultMessage:
       '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
-    description: 'Form title used for password reset form'
+    description: 'Title used reset credentials forms'
   },
   phoneNumberFieldLabel: {
-    id: 'label.field.phoneNumber',
+    id: 'constants.phoneNumber',
     defaultMessage: 'Phone number',
     description: 'Label used for phone number input field'
   },
   verificationCodeFieldLabel: {
-    id: 'label.field.verificationCode',
+    id: 'resetCredentials.label.field.verificationCode',
     defaultMessage: 'Verification code (6 digits)',
     description: 'Label used for verification code input field'
   },
   answerFieldLabel: {
-    id: 'label.field.answer',
+    id: 'resetCredentials.label.field.answer',
     defaultMessage: 'Answer',
     description: 'Label used for answer input field'
   },
   newPasswordLabel: {
+    id: 'password.label.new',
     defaultMessage: 'New password:',
-    description: 'New password label',
-    id: 'password.label.new'
+    description: 'New password label'
   },
   confirmPasswordLabel: {
+    id: 'password.label.confirm',
     defaultMessage: 'Confirm new password',
-    description: 'Confirm password label',
-    id: 'password.label.confirm'
+    description: 'Confirm password label'
   },
   matchedPasswordMsg: {
+    id: 'password.match',
     defaultMessage: 'Passwords match',
-    description: 'Password validation',
-    id: 'password.match'
+    description: 'Password validation'
   },
   mismatchedPasswordMsg: {
+    id: 'password.mismatch',
     defaultMessage: 'Passwords do not match',
-    description: 'Password validation',
-    id: 'password.mismatch'
+    description: 'Password validation'
   },
   passwordRequiredMsg: {
+    id: 'error.required.password',
     defaultMessage: 'New password is not valid',
-    description: 'New password required',
-    id: 'error.required.password'
+    description: 'New password required'
   },
   continueButtonLabel: {
-    id: 'label.button.continue',
+    id: 'buttons.continue',
     defaultMessage: 'Continue',
     description: 'Label used for continue button'
   },
   confirmButtonLabel: {
-    id: 'label.button.confirm',
+    id: 'buttons.confirm',
     defaultMessage: 'Confirm',
     description: 'Label used for confirm button'
   },
   loginButtonLabel: {
+    id: 'buttons.login',
     defaultMessage: 'Login',
-    description: 'Label used for login button',
-    id: 'label.button.login'
+    description: 'Label used for login button'
   },
   error: {
     id: 'label.error',
