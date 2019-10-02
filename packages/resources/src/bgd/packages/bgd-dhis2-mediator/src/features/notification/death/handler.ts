@@ -5,9 +5,9 @@ import {
   createBundle
 } from '@search/features/fhir/service'
 import {
-  fetchLocationByIdentifier,
-  postBundle
-} from '@search/features/fhir/utils'
+  postBundle,
+  fetchLocationByFullBBSCode
+} from '@search/features/fhir/api'
 
 export interface IDeathNotification {
   deceased: {
@@ -112,7 +112,10 @@ export async function deathNotificationHandler(
   )
 
   const locationId = notification.union_death_ocurred.id
-  const location = await fetchLocationByIdentifier(locationId)
+  const location = await fetchLocationByFullBBSCode(
+    locationId,
+    request.headers.authorization
+  )
 
   const encounter = createDeathEncounterEntry(
     `Location/${location.id}`,
@@ -127,7 +130,7 @@ export async function deathNotificationHandler(
 
   const bundle = createBundle(entries)
 
-  await postBundle(bundle)
+  await postBundle(bundle, request.headers.authorization)
 
   return h.response().code(201)
 }

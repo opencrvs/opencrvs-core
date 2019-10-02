@@ -18,6 +18,7 @@ export function createComposition(
   encounterSectionRef: string
 ) {
   return {
+    fullUrl: `urn:uuid:${uuid()}`,
     resource: {
       identifier: {
         system: 'urn:ietf:rfc:3986',
@@ -26,17 +27,21 @@ export function createComposition(
       resourceType: 'Composition',
       status: 'final',
       type: {
-        coding: {
-          system: 'http://opencrvs.org/specs/types',
-          code: 'birth-notification'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-types',
+            code: 'birth-notification'
+          }
+        ],
         text: 'Birth Notification'
       },
       class: {
-        coding: {
-          system: 'http://opencrvs.org/specs/classes',
-          code: 'crvs-document'
-        },
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/classes',
+            code: 'crvs-document'
+          }
+        ],
         text: 'CRVS Document'
       },
       subject: {
@@ -47,12 +52,27 @@ export function createComposition(
       title: 'Birth Notification',
       section: [
         {
+          title: 'Child details',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'child-details'
+              }
+            ],
+            text: 'Child details'
+          },
+          entry: [{ reference: subjectRef }]
+        },
+        {
           title: "Mother's details",
           code: {
-            coding: {
-              system: 'http://opencrvs.org/specs/sections',
-              code: 'mother-details'
-            },
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: 'mother-details'
+              }
+            ],
             text: "Mother's details"
           },
           text: '',
@@ -93,7 +113,7 @@ export function createPersonEntry(
   nid: string | null,
   firstNames: [string] | null,
   lastName: string,
-  addressObject: {} | null,
+  addressObject: {} | null, // TODO
   gender: 'male' | 'female' | 'unknown',
   phoneNumber: string | null,
   birthDate: string | null
@@ -209,6 +229,26 @@ export function createDeathEncounterEntry(
       subject: {
         reference: subjectRef
       }
+    }
+  }
+}
+
+export function createTaskEntry(
+  compositionRef: string,
+  eventType: 'BIRTH' | 'DEATH'
+) {
+  return {
+    fullUrl: `urn:uuid:${uuid()}`,
+    resource: {
+      resourceType: 'Task',
+      status: 'draft',
+      code: {
+        coding: [{ system: 'http://opencrvs.org/specs/types', code: eventType }]
+      },
+      focus: {
+        reference: compositionRef
+      },
+      lastModified: new Date().toISOString()
     }
   }
 }

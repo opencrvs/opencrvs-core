@@ -19,6 +19,8 @@ export function getScope(role: string): string[] {
       return ['register', 'performance', 'certify', 'config', 'teams', 'demo']
     case 'LOCAL_SYSTEM_ADMIN':
       return ['sysadmin', 'demo']
+    case 'API_USER':
+      return ['declare', 'api']
     default:
       return ['declare', 'demo']
   }
@@ -74,6 +76,8 @@ export function createUsers(users: IUserModel[]) {
     types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
     active: true
   })
+
+  // Add API USER ROLE?
 
   const roles = [
     fieldAgentRole,

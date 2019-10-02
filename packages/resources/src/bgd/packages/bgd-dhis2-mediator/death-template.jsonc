@@ -61,7 +61,7 @@
     "name": "Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar"
   },
   "union_death_ocurred": { // Required!
-    "id": "1", // These ids must match BBS codes
+    "id": "1", // These ids must match BBS codes - this must be the full union code up until union level - http://203.112.218.65:8008/PageWebMenuContent.aspx?MenuKey=150
     "name": "Alokbali"
   }
 }

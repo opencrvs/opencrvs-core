@@ -62,21 +62,25 @@ export default async function authenticateHandler(
     await sendVerificationCode(result.mobile, verificationCode)
   }
 
-  const respose: IAuthResponse = {
+  const response: IAuthResponse = {
     mobile: result.mobile,
     status: result.status,
     nonce
   }
 
-  if (respose.status && respose.status === 'pending') {
-    respose.token = await createToken(
+  const isPendingUser = response.status && response.status === 'pending'
+  const isAPIUser = result.scope.indexOf('api') > -1
+
+  // directly send the token if the user is pending or an API user
+  if (isPendingUser || isAPIUser) {
+    response.token = await createToken(
       result.userId,
       result.scope,
       WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
   }
-  return respose
+  return response
 }
 
 export const requestSchema = Joi.object({

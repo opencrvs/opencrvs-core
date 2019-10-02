@@ -2,12 +2,14 @@ import * as Hapi from 'hapi'
 import {
   createPersonEntry,
   createBirthEncounterEntry,
-  createBundle
+  createBundle,
+  createTaskEntry,
+  createComposition
 } from '@search/features/fhir/service'
 import {
-  fetchLocationByIdentifier,
-  postBundle
-} from '@search/features/fhir/utils'
+  postBundle,
+  fetchLocationByFullBBSCode
+} from '@search/features/fhir/api'
 
 export interface IBirthNotification {
   child: {
@@ -77,7 +79,9 @@ export async function birthNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification = request.payload as IBirthNotification
+  const notification = JSON.parse(
+    request.payload as string
+  ) as IBirthNotification
 
   const child = createPersonEntry(
     null,
@@ -98,7 +102,7 @@ export async function birthNotificationHandler(
     null
   )
   const father = createPersonEntry(
-    null,
+    notification.father.nid || null,
     notification.father.first_names_en || null,
     notification.father.last_name_en,
     notification.permanent_address,
@@ -108,14 +112,27 @@ export async function birthNotificationHandler(
   )
 
   const locationId = notification.union_birth_ocurred.id
-  const location = await fetchLocationByIdentifier(locationId)
+  const location = await fetchLocationByFullBBSCode(
+    locationId,
+    request.headers.authorization
+  )
 
   const encounter = createBirthEncounterEntry(
     `Location/${location.id}`,
     child.fullUrl
   )
 
+  const composition = createComposition(
+    child.fullUrl,
+    mother.fullUrl,
+    father.fullUrl,
+    encounter.fullUrl
+  )
+  const task = createTaskEntry(composition.fullUrl, 'BIRTH')
+
   const entries: fhir.BundleEntry[] = []
+  entries.push(composition)
+  entries.push(task)
   entries.push(child)
   entries.push(mother)
   entries.push(father)
@@ -123,7 +140,7 @@ export async function birthNotificationHandler(
 
   const bundle = createBundle(entries)
 
-  await postBundle(bundle)
+  await postBundle(bundle, request.headers.authorization)
 
   return h.response().code(201)
 }
