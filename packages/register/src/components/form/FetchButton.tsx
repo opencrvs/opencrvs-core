@@ -55,6 +55,7 @@ const Backdrop = styled.div`
 
 const ModalContent = styled.div`
   width: 30vw;
+  min-width: 305px;
   border-radius: 2px;
   background-color: ${({ theme }) => theme.colors.white};
   padding: 30px 30px 60px 30px;

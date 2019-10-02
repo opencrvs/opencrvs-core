@@ -4,13 +4,15 @@ import {
   sendBirthRegistrationConfirmation,
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation,
-  sendUserCredentials
+  sendUserCredentials,
+  retrieveUserName
 } from '@notification/features/sms/handler'
 import {
   requestSchema,
   declarationNotificationSchema,
   registrationNotificationSchema,
-  userCredentialsNotificationSchema
+  userCredentialsNotificationSchema,
+  retrieveUserNameNotificationSchema
 } from '@notification/features/sms/payload-schema'
 
 const enum RouteScope {
@@ -119,6 +121,18 @@ export default function getRoutes() {
         },
         validate: {
           payload: userCredentialsNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/retrieveUserNameSMS',
+      handler: retrieveUserName,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with username',
+        validate: {
+          payload: retrieveUserNameNotificationSchema
         }
       }
     }

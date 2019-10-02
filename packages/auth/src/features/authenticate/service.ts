@@ -103,28 +103,26 @@ export async function getStoredUserInformation(nonce: string) {
 
 export async function generateAndSendVerificationCode(
   nonce: string,
-  authenticatedUser: IAuthentication
+  mobile: string,
+  scope: string[]
 ) {
-  const isDemoUser = authenticatedUser.scope.indexOf('demo') > -1
+  const isDemoUser = scope.indexOf('demo') > -1
 
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
     await storeVerificationCode(nonce, verificationCode)
   } else {
-    verificationCode = await generateVerificationCode(
-      nonce,
-      authenticatedUser.mobile
-    )
+    verificationCode = await generateVerificationCode(nonce, mobile)
   }
 
   if (!PRODUCTION || isDemoUser) {
     logger.info('Sending a verification SMS', {
-      mobile: authenticatedUser.mobile,
+      mobile: mobile,
       verificationCode
     })
   } else {
-    await sendVerificationCode(authenticatedUser.mobile, verificationCode)
+    await sendVerificationCode(mobile, verificationCode)
   }
 }
 
