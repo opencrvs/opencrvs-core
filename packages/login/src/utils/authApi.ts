@@ -68,11 +68,11 @@ const authenticate = (data: IAuthenticationData) => {
   })
 }
 
-const resendSMS = (nonce: string) => {
+const resendSMS = (nonce: string, retrievalFlow = false) => {
   return request({
     url: resolve(window.config.AUTH_API_URL, '/resendSms'),
     method: 'POST',
-    data: { nonce }
+    data: { nonce, retrievalFlow }
   })
 }
 

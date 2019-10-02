@@ -1,39 +1,6 @@
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface ResetCredentialsFormMessages {
-  forgottenItemFormTitle: MessageDescriptor
-  forgottenItemFormBodyHeader: MessageDescriptor
-  phoneNumberConfirmationFormBodyHeader: MessageDescriptor
-  phoneNumberConfirmationFormBodySubheader: MessageDescriptor
-  recoveryCodeEntryFormBodyHeader: MessageDescriptor
-  recoveryCodeEntryFormBodySubheader: MessageDescriptor
-  securityQuestionFormBodySubheader: MessageDescriptor
-  passwordUpdateFormBodyHeader: MessageDescriptor
-  passwordUpdateFormBodySubheader: MessageDescriptor
-  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
-  passwordUpdateFormValidationMsg: MessageDescriptor
-  successPageTitle: MessageDescriptor
-  successPageSubtitle: MessageDescriptor
-  usernameOptionLabel: MessageDescriptor
-  passwordOptionLabel: MessageDescriptor
-  credentialsResetFormTitle: MessageDescriptor
-  phoneNumberFieldLabel: MessageDescriptor
-  verificationCodeFieldLabel: MessageDescriptor
-  answerFieldLabel: MessageDescriptor
-  newPasswordLabel: MessageDescriptor
-  confirmPasswordLabel: MessageDescriptor
-  matchedPasswordMsg: MessageDescriptor
-  mismatchedPasswordMsg: MessageDescriptor
-  passwordRequiredMsg: MessageDescriptor
-  continueButtonLabel: MessageDescriptor
-  confirmButtonLabel: MessageDescriptor
-  loginButtonLabel: MessageDescriptor
-  error: MessageDescriptor
-}
-
-const messagesToDefine: ResetCredentialsFormMessages = {
+const messagesToDefine = {
   // Forgotten item form messages
   forgottenItemFormTitle: {
     id: 'resetCredentials.forgottenItem.form.title',
@@ -59,7 +26,6 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     description:
       'Form body subheader used in the body of phone number confirmation step'
   },
-
   // Recovery code entry form messages
   recoveryCodeEntryFormBodyHeader: {
     id: 'resetCredentials.recoveryCodeEntry.form.body.header',
@@ -72,7 +38,17 @@ const messagesToDefine: ResetCredentialsFormMessages = {
       "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?",
     description: 'Form body subheader used for recovery code entry step'
   },
-
+  codeResentTitle: {
+    id: 'resetCredentials.codeResentTitle',
+    defaultMessage: 'Verification code resent',
+    description:
+      'The title that appears in step two of the form after resend button click'
+  },
+  resentSMS: {
+    id: 'resetCredentials.codeResentSubtitle',
+    defaultMessage: 'We just resent you another code to {number}.',
+    description: 'The message that appears when the resend button is clicked.'
+  },
   // Security question form messages
   securityQuestionFormBodySubheader: {
     id: 'resetCredentials.securityQuestion.form.body.subheader',
@@ -203,9 +179,12 @@ const messagesToDefine: ResetCredentialsFormMessages = {
     id: 'label.error',
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
+  },
+  resend: {
+    id: 'resetCredentials.resendMobile',
+    defaultMessage: 'Resend SMS',
+    description: 'Text for button that resends SMS verification code'
   }
 }
 
-export const messages: ResetCredentialsFormMessages = defineMessages(
-  messagesToDefine
-)
+export const messages = defineMessages(messagesToDefine)

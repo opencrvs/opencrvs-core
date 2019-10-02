@@ -52,13 +52,14 @@ export default async function verifySecurityQuestionHandler(
   // Updates nonce status
   await storeRetrievalStepInformation(
     payload.nonce,
-    retrivalStepInformation.userId,
-    retrivalStepInformation.username,
-    retrivalStepInformation.mobile,
     verificationResult.matched
       ? RetrievalSteps.SECURITY_Q_VERIFIED
       : RetrievalSteps.NUMBER_VERIFIED,
-    verificationResult.questionKey // in case of miss-match, updating the new key otherwise same key
+    {
+      ...retrivalStepInformation,
+      // in case of miss-match, updating the new key otherwise same key
+      securityQuestionKey: verificationResult.questionKey
+    }
   )
 
   const response: IResponse = {

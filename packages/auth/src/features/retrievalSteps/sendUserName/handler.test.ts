@@ -14,14 +14,13 @@ describe('username reminder', () => {
     server = await createServer()
     fetch.resetMocks()
     fetch.mockResponse('OK')
-    storeRetrievalStepInformation(
-      '12345',
-      'fake_user_id',
-      'fake_user_name',
-      'mobile',
-      RetrievalSteps.SECURITY_Q_VERIFIED,
-      'TEST_SECURITY_QUESTION_KEY'
-    )
+    storeRetrievalStepInformation('12345', RetrievalSteps.SECURITY_Q_VERIFIED, {
+      userId: '123',
+      username: 'fake_user_name',
+      mobile: '123123123',
+      securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+      scope: []
+    })
   })
 
   describe('when a valid request is made', () => {
@@ -65,11 +64,14 @@ describe('username reminder', () => {
     it('responds with an error', async () => {
       await storeRetrievalStepInformation(
         '12345',
-        'fake_user_id',
-        'fake_user_name',
-        'mobile',
         RetrievalSteps.NUMBER_VERIFIED,
-        'TEST_SECURITY_QUESTION_KEY'
+        {
+          userId: '123',
+          username: 'fake_user_name',
+          mobile: '123123123',
+          securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+          scope: []
+        }
       )
 
       const res = await server.server.inject({

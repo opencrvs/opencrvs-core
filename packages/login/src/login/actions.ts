@@ -14,7 +14,7 @@ import {
   STEP_ONE,
   SUCCESS
 } from '@login/navigation/routes'
-import { ForgottenItem } from '@login/views/resetCredentialsForm/forgottenItemForm'
+
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -189,10 +189,12 @@ export function goToPhoneNumberVerificationForm(forgottenItem: string) {
 }
 export function goToRecoveryCodeEntryForm(
   nonce: string,
+  mobile: string,
   forgottenItem: string
 ) {
   return push(RECOVERY_CODE_ENTRY, {
     nonce,
+    mobile,
     forgottenItem
   })
 }

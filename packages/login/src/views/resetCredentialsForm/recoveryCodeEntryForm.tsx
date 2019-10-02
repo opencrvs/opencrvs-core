@@ -4,7 +4,7 @@ import {
   goToSecurityQuestionForm
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import { InputField, TextInput } from '@opencrvs/components/lib/forms'
 import { SubPage } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
@@ -26,7 +26,7 @@ interface BaseProps
   extends RouteComponentProps<
     {},
     {},
-    { forgottenItem: FORGOTTEN_ITEMS; nonce: string }
+    { forgottenItem: FORGOTTEN_ITEMS; nonce: string; mobile: string }
   > {
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
@@ -36,6 +36,7 @@ interface State {
   recoveryCode: string
   touched: boolean
   error: boolean
+  resentSMS: boolean
 }
 
 type Props = BaseProps & WrappedComponentProps
@@ -46,7 +47,8 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     this.state = {
       recoveryCode: '',
       touched: false,
-      error: true
+      error: true,
+      resentSMS: false
     }
   }
 
@@ -54,7 +56,8 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     this.setState({
       error: value.length !== 6,
       recoveryCode: value,
-      touched: true
+      touched: true,
+      resentSMS: false
     })
   }
 
@@ -78,9 +81,15 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
     }
   }
 
+  resendSMS = async () => {
+    await authApi.resendSMS(this.props.location.state.nonce, true)
+    this.setState({ resentSMS: true })
+  }
   render() {
     const { intl, goToPhoneNumberVerificationForm } = this.props
     const { forgottenItem } = this.props.location.state
+
+    const { resentSMS } = this.state
 
     return (
       <>
@@ -94,11 +103,31 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
           <form onSubmit={this.handleContinue}>
-            <Title>
-              {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
-            </Title>
-            {intl.formatMessage(messages.recoveryCodeEntryFormBodySubheader)}
-
+            {resentSMS && (
+              <>
+                <Title>{intl.formatMessage(messages.codeResentTitle)}</Title>
+                {intl.formatMessage(messages.resentSMS, {
+                  number: this.props.location.state.mobile
+                })}
+              </>
+            )}
+            {!resentSMS && (
+              <>
+                <Title>
+                  {intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
+                </Title>
+                {intl.formatMessage(
+                  messages.recoveryCodeEntryFormBodySubheader
+                )}
+              </>
+            )}{' '}
+            <LinkButton
+              onClick={this.resendSMS}
+              id="retrieve-login-mobile-resend"
+              type="button"
+            >
+              {intl.formatMessage(messages.resend)}
+            </LinkButton>
             <Actions id="recovery-code-verification">
               <InputField
                 id="recovery-code"
@@ -127,7 +156,6 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
                 />
               </InputField>
             </Actions>
-
             <PrimaryButton id="continue">
               {intl.formatMessage(messages.continueButtonLabel)}
             </PrimaryButton>
