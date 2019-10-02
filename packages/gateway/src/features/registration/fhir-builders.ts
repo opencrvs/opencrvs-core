@@ -35,7 +35,8 @@ import {
   CAUSE_OF_DEATH_METHOD_CODE,
   PRIMARY_CAREGIVER,
   PRIMARY_CAREGIVER_CODE,
-  PRIMARY_CAREGIVER_TITLE
+  PRIMARY_CAREGIVER_TITLE,
+  PARENT_DETAILS
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -2588,6 +2589,23 @@ const builders: IFieldBuilders = {
           )
         }
       }
+    },
+    parentDetailsType: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const observation = selectOrCreateObservationResource(
+        BIRTH_ENCOUNTER_CODE,
+        OBSERVATION_CATEGORY_PROCEDURE_CODE,
+        OBSERVATION_CATEGORY_PROCEDURE_DESC,
+        PARENT_DETAILS,
+        'Parent details',
+        fhirBundle,
+        context
+      )
+
+      observation.valueString = fieldValue
     }
   },
   childrenBornAliveToMother: (

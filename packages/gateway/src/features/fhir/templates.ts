@@ -40,6 +40,7 @@ export const REASON_CAREGIVER_NOT_APPLYING = 'reason-caregiver-not-applying'
 export const PRIMARY_CAREGIVER = 'primary-caregiver'
 export const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
 export const PRIMARY_CAREGIVER_TITLE = "Primary caregiver's details"
+export const PARENT_DETAILS = 'parent-details'
 
 export function createPersonSection(
   refUuid: string,

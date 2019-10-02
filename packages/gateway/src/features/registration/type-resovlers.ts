@@ -28,7 +28,8 @@ import {
   REASON_MOTHER_NOT_APPLYING,
   REASON_FATHER_NOT_APPLYING,
   REASON_CAREGIVER_NOT_APPLYING,
-  PRIMARY_CAREGIVER
+  PRIMARY_CAREGIVER,
+  PARENT_DETAILS
 } from '@gateway/features/fhir/templates'
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
@@ -608,6 +609,21 @@ export const typeResolvers: GQLResolver = {
       }
 
       return reasons
+    },
+    parentDetailsType: async (primaryCaregiver, _, authHeader) => {
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          primaryCaregiver.encounterSection.entry[0].reference
+        }&code=${PARENT_DETAILS}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
     }
   },
 
