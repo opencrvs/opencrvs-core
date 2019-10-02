@@ -914,7 +914,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
                   application,
-                  this.state.activeSection || formSections[0].id
+                  this.state.activeSection || this.docSections[0].id
                 )}
               >
                 <ZeroDocument>
