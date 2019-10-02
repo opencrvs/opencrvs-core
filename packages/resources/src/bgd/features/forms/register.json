@@ -267,7 +267,7 @@
                 },
                 {
                   "name": "applicant",
-                  "type": "RADIO_GROUP",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
                     "defaultMessage": "Who is the primary applicant for this application?",
                     "description": "Form section title for primary applicant",
@@ -296,7 +296,25 @@
                       }
                     }
                   ],
-                  "conditionals": []
+                  "nestedFields": {
+                    "MOTHER": [],
+                    "FATHER": []
+                  },
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
+                    }
+                  }
                 }
               ]
             },

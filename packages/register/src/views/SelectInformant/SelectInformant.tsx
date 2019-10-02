@@ -332,7 +332,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToBirthRegistrationAsParent,
-        goToDeathRegistration,
+        goToDeathContactPoint,
         registrationSection,
         applicantsSection
       } = this.props
@@ -370,7 +370,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
 
       this.props.location.pathname.includes(Event.BIRTH)
         ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-        : goToDeathRegistration(this.props.match.params.applicationId)
+        : goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
       event === Event.DEATH &&
       this.state.informant &&
@@ -382,7 +382,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     ) {
       const {
         application,
-        goToDeathRegistration,
+        goToDeathContactPoint,
         applicantsSection
       } = this.props
       this.props.modifyApplication({
@@ -400,7 +400,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         }
       })
 
-      goToDeathRegistration(this.props.match.params.applicationId)
+      goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
       event === Event.BIRTH &&
       this.state.informant &&
