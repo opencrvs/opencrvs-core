@@ -20,6 +20,7 @@ enum RegistrationContactType {
   MOTHER
   FATHER
   OTHER
+  APPLICANT
 }
 
 enum BirthRegPresence {

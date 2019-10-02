@@ -305,7 +305,8 @@ export enum GQLRegistrationContactType {
   BOTH = 'BOTH',
   MOTHER = 'MOTHER',
   FATHER = 'FATHER',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  APPLICANT = 'APPLICANT'
 }
 
 export interface GQLRegWorkflow {

@@ -323,6 +323,52 @@
               ],
               "fields": [
                 {
+                  "name": "applicant",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "readonly": true,
+                  "hidden": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
+                    }
+                  ],
+                  "label": {
+                    "defaultMessage": "Applicant",
+                    "description": "Form section title for contact point",
+                    "id": "form.section.applicant.name"
+                  },
+                  "options": [
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Option for form field: Legal Guardian",
+                        "id": "register.selectinformant.legalGuardian"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "LEGAL_GUARDIAN": []
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "informant.relationship"
+                      ]
+                    }
+                  }
+                },
+                {
                   "name": "contactPoint",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
@@ -489,36 +535,6 @@
                         "required": true,
                         "initialValue": "",
                         "validate": []
-                      },
-                      {
-                        "name": "registrationPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": false,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber"
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber"
-                            ]
-                          }
-                        }
                       },
                       {
                         "name": "registrationPhone",
@@ -1996,7 +2012,9 @@
                         "individual",
                         {
                           "operation": "fieldToIdentifierTransformer",
-                          "parameters": ["type"]
+                          "parameters": [
+                            "type"
+                          ]
                         }
                       ]
                     },
@@ -2006,7 +2024,9 @@
                         "individual",
                         {
                           "operation": "identifierToFieldTransformer",
-                          "parameters": ["type"]
+                          "parameters": [
+                            "type"
+                          ]
                         }
                       ]
                     }
@@ -2036,7 +2056,9 @@
                         "individual",
                         {
                           "operation": "fieldToIdentifierTransformer",
-                          "parameters": ["otherType"]
+                          "parameters": [
+                            "otherType"
+                          ]
                         }
                       ]
                     },
@@ -2046,7 +2068,9 @@
                         "individual",
                         {
                           "operation": "identifierToFieldTransformer",
-                          "parameters": ["otherType"]
+                          "parameters": [
+                            "otherType"
+                          ]
                         }
                       ]
                     }
@@ -2075,7 +2099,9 @@
                           "operation": "validIDNumber",
                           "parameters": []
                         },
-                        "dependencies": ["iDType"]
+                        "dependencies": [
+                          "iDType"
+                        ]
                       }
                     ]
                   },
@@ -2100,7 +2126,9 @@
                         "individual",
                         {
                           "operation": "fieldToIdentifierTransformer",
-                          "parameters": ["id"]
+                          "parameters": [
+                            "id"
+                          ]
                         }
                       ]
                     },
@@ -2110,7 +2138,9 @@
                         "individual",
                         {
                           "operation": "identifierToFieldTransformer",
-                          "parameters": ["id"]
+                          "parameters": [
+                            "id"
+                          ]
                         }
                       ]
                     }
@@ -2265,7 +2295,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["bn", "firstNames"]
+                          "parameters": [
+                            "bn",
+                            "firstNames"
+                          ]
                         },
                         "name"
                       ]
@@ -2276,7 +2309,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["bn", "firstNames"]
+                          "parameters": [
+                            "bn",
+                            "firstNames"
+                          ]
                         }
                       ]
                     }
@@ -2304,7 +2340,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["bn", "familyName"]
+                          "parameters": [
+                            "bn",
+                            "familyName"
+                          ]
                         },
                         "name"
                       ]
@@ -2315,7 +2354,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["bn", "familyName"]
+                          "parameters": [
+                            "bn",
+                            "familyName"
+                          ]
                         }
                       ]
                     }
@@ -2343,7 +2385,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         },
                         "name"
                       ]
@@ -2354,7 +2399,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         }
                       ]
                     }
@@ -2382,7 +2430,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         },
                         "name"
                       ]
@@ -2393,7 +2444,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         }
                       ]
                     }
@@ -2424,7 +2478,9 @@
                         "individual",
                         {
                           "operation": "fieldNameTransformer",
-                          "parameters": ["birthDate"]
+                          "parameters": [
+                            "birthDate"
+                          ]
                         }
                       ]
                     },
@@ -2434,7 +2490,9 @@
                         "individual",
                         {
                           "operation": "fieldValueTransformer",
-                          "parameters": ["birthDate"]
+                          "parameters": [
+                            "birthDate"
+                          ]
                         }
                       ]
                     }
@@ -2479,7 +2537,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 0, "country"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "country"
+                          ]
                         },
                         "address"
                       ]
@@ -2490,7 +2552,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 0, "country"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "country"
+                          ]
                         }
                       ]
                     }
@@ -2530,7 +2596,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 0, "state"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "state"
+                          ]
                         },
                         "address"
                       ]
@@ -2541,7 +2611,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 0, "state"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "state"
+                          ]
                         }
                       ]
                     }
@@ -2585,7 +2659,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 0, "district"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "district"
+                          ]
                         },
                         "address"
                       ]
@@ -2596,7 +2674,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 0, "district"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "district"
+                          ]
                         }
                       ]
                     }
@@ -2644,7 +2726,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 6]
+                          "parameters": [
+                            "PERMANENT",
+                            6
+                          ]
                         },
                         "address"
                       ]
@@ -2655,7 +2740,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 6]
+                          "parameters": [
+                            "PERMANENT",
+                            6
+                          ]
                         }
                       ]
                     }
@@ -2711,7 +2799,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 4]
+                          "parameters": [
+                            "PERMANENT",
+                            4
+                          ]
                         },
                         "address"
                       ]
@@ -2722,7 +2813,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 4]
+                          "parameters": [
+                            "PERMANENT",
+                            4
+                          ]
                         }
                       ]
                     }
@@ -2769,7 +2863,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 5]
+                          "parameters": [
+                            "PERMANENT",
+                            5
+                          ]
                         },
                         "address"
                       ]
@@ -2780,7 +2877,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 5]
+                          "parameters": [
+                            "PERMANENT",
+                            5
+                          ]
                         }
                       ]
                     }
@@ -2827,7 +2927,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 3]
+                          "parameters": [
+                            "PERMANENT",
+                            3
+                          ]
                         },
                         "address"
                       ]
@@ -2838,7 +2941,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 3]
+                          "parameters": [
+                            "PERMANENT",
+                            3
+                          ]
                         }
                       ]
                     }
@@ -2885,7 +2991,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 2]
+                          "parameters": [
+                            "PERMANENT",
+                            2
+                          ]
                         },
                         "address"
                       ]
@@ -2896,7 +3005,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 2]
+                          "parameters": [
+                            "PERMANENT",
+                            2
+                          ]
                         }
                       ]
                     }
@@ -2919,7 +3031,9 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [4]
+                      "parameters": [
+                        4
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -2951,7 +3065,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 0, "postalCode"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "postalCode"
+                          ]
                         },
                         "address"
                       ]
@@ -2962,7 +3080,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 0, "postalCode"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "postalCode"
+                          ]
                         }
                       ]
                     }
@@ -3009,7 +3131,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 1]
+                          "parameters": [
+                            "PERMANENT",
+                            1
+                          ]
                         },
                         "address"
                       ]
@@ -3020,7 +3145,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 1]
+                          "parameters": [
+                            "PERMANENT",
+                            1
+                          ]
                         }
                       ]
                     }
@@ -3043,7 +3171,9 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [4]
+                      "parameters": [
+                        4
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -3075,7 +3205,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["PERMANENT", 0, "postalCode"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "postalCode"
+                          ]
                         },
                         "address"
                       ]
@@ -3086,7 +3220,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["PERMANENT", 0, "postalCode"]
+                          "parameters": [
+                            "PERMANENT",
+                            0,
+                            "postalCode"
+                          ]
                         }
                       ]
                     }
@@ -3209,7 +3347,9 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         },
                         "name"
                       ]
@@ -3220,7 +3360,9 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         }
                       ]
                     }
@@ -3264,7 +3406,9 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         },
                         "address"
                       ]
@@ -3275,7 +3419,9 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         }
                       ]
                     }
@@ -3323,7 +3469,9 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         },
                         "address"
                       ]
@@ -3334,7 +3482,9 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT"]
+                          "parameters": [
+                            "CURRENT"
+                          ]
                         }
                       ]
                     }
@@ -3381,7 +3531,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 6]
+                          "parameters": [
+                            "CURRENT",
+                            6
+                          ]
                         },
                         "address"
                       ]
@@ -3392,7 +3545,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 6]
+                          "parameters": [
+                            "CURRENT",
+                            6
+                          ]
                         }
                       ]
                     }
@@ -3452,7 +3608,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 4]
+                          "parameters": [
+                            "CURRENT",
+                            4
+                          ]
                         },
                         "address"
                       ]
@@ -3463,7 +3622,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 4]
+                          "parameters": [
+                            "CURRENT",
+                            4
+                          ]
                         }
                       ]
                     }
@@ -3518,7 +3680,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 5]
+                          "parameters": [
+                            "CURRENT",
+                            5
+                          ]
                         },
                         "address"
                       ]
@@ -3529,7 +3694,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 5]
+                          "parameters": [
+                            "CURRENT",
+                            5
+                          ]
                         }
                       ]
                     }
@@ -3580,7 +3748,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 3]
+                          "parameters": [
+                            "CURRENT",
+                            3
+                          ]
                         },
                         "address"
                       ]
@@ -3591,7 +3762,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 3]
+                          "parameters": [
+                            "CURRENT",
+                            3
+                          ]
                         }
                       ]
                     }
@@ -3646,7 +3820,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 2]
+                          "parameters": [
+                            "CURRENT",
+                            2
+                          ]
                         },
                         "address"
                       ]
@@ -3657,7 +3834,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 2]
+                          "parameters": [
+                            "CURRENT",
+                            2
+                          ]
                         }
                       ]
                     }
@@ -3680,7 +3860,9 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [4]
+                      "parameters": [
+                        4
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -3720,7 +3902,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 0, "postalCode"]
+                          "parameters": [
+                            "CURRENT",
+                            0,
+                            "postalCode"
+                          ]
                         },
                         "address"
                       ]
@@ -3731,7 +3917,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 0, "postalCode"]
+                          "parameters": [
+                            "CURRENT",
+                            0,
+                            "postalCode"
+                          ]
                         }
                       ]
                     }
@@ -3782,7 +3972,10 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 1]
+                          "parameters": [
+                            "CURRENT",
+                            1
+                          ]
                         },
                         "address"
                       ]
@@ -3793,7 +3986,10 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 1]
+                          "parameters": [
+                            "CURRENT",
+                            1
+                          ]
                         }
                       ]
                     }
@@ -3816,7 +4012,9 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [4]
+                      "parameters": [
+                        4
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -3852,7 +4050,11 @@
                         "individual",
                         {
                           "operation": "fieldToAddressTransformer",
-                          "parameters": ["CURRENT", 0, "postalCode"]
+                          "parameters": [
+                            "CURRENT",
+                            0,
+                            "postalCode"
+                          ]
                         },
                         "address"
                       ]
@@ -3863,7 +4065,11 @@
                         "individual",
                         {
                           "operation": "addressToFieldTransformer",
-                          "parameters": ["CURRENT", 0, "postalCode"]
+                          "parameters": [
+                            "CURRENT",
+                            0,
+                            "postalCode"
+                          ]
                         }
                       ]
                     }
