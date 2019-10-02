@@ -145,8 +145,7 @@ export function selectOrCreateObservationResource(
   observationCode: string,
   observationDescription: string,
   fhirBundle: ITemplatedBundle,
-  context: any,
-  fieldValue?: string
+  context: any
 ): fhir.Observation {
   let observation = fhirBundle.entry.find(entry => {
     if (
@@ -164,9 +163,6 @@ export function selectOrCreateObservationResource(
         obCode => obCode.code === observationCode
       )
     if (obCoding) {
-      if (fieldValue) {
-        return fieldValue === observationEntry.valueString
-      }
       return true
     }
     return false
@@ -219,7 +215,7 @@ export function updateObservationInfo(
   return observation
 }
 
-export function selectLastObservationResource(
+export function selectObservationResource(
   observationCode: string,
   fhirBundle: ITemplatedBundle
 ): fhir.Observation | undefined {

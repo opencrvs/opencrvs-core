@@ -26,7 +26,9 @@ import {
   CERTIFICATE_DOCS_CODE,
   PRIMARY_CAREGIVER_CODE,
   REASON_MOTHER_NOT_APPLYING,
-  REASON_FATHER_NOT_APPLYING
+  REASON_FATHER_NOT_APPLYING,
+  REASON_CAREGIVER_NOT_APPLYING,
+  PRIMARY_CAREGIVER
 } from '@gateway/features/fhir/templates'
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
@@ -544,7 +546,8 @@ export const typeResolvers: GQLResolver = {
   ReasonsNotApplying: {
     primaryCaregiverType: reasonNotApplying =>
       reasonNotApplying.primaryCaregiverType,
-    reasonNotApplying: reasonNotApplying => reasonNotApplying.reasonNotApplying
+    reasonNotApplying: reasonNotApplying => reasonNotApplying.reasonNotApplying,
+    isDeceased: reasonNotApplying => reasonNotApplying.isDeceased
   },
 
   PrimaryCaregiver: {
@@ -562,31 +565,47 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )) as fhir.Bundle
       const reasons: any[] = []
+      let primaryCaregiverType
+      let reasonCaregiverNotApplying
+
       if (!observations.entry) {
         return reasons
       }
-      observations.entry.forEach(resource => {
-        const observation = resource.resource as fhir.Observation
-        if (
+
+      observations.entry.forEach(observationResource => {
+        const observation = observationResource.resource as fhir.Observation
+        const observationCode =
           observation.code &&
           observation.code.coding &&
-          observation.code.coding[0].code === REASON_MOTHER_NOT_APPLYING
-        ) {
+          observation.code.coding[0].code
+        const reasonNotApplying =
+          observation.valueString !== 'DECEASED' ? observation.valueString : ''
+        const isDeceased = observation.valueString === 'DECEASED' ? true : false
+        const careGiverType =
+          observationCode === REASON_MOTHER_NOT_APPLYING
+            ? 'MOTHER'
+            : observationCode === REASON_FATHER_NOT_APPLYING
+            ? 'FATHER'
+            : ''
+        if (careGiverType) {
           reasons.push({
-            primaryCaregiverType: 'MOTHER',
-            reasonNotApplying: observation.valueString
+            primaryCaregiverType: careGiverType,
+            reasonNotApplying,
+            isDeceased
           })
-        } else if (
-          observation.code &&
-          observation.code.coding &&
-          observation.code.coding[0].code === REASON_FATHER_NOT_APPLYING
-        ) {
-          reasons.push({
-            primaryCaregiverType: 'FATHER',
-            reasonNotApplying: observation.valueString
-          })
+        } else if (observationCode === REASON_CAREGIVER_NOT_APPLYING) {
+          reasonCaregiverNotApplying = observation.valueString
+        } else if (observationCode === PRIMARY_CAREGIVER) {
+          primaryCaregiverType = observation.valueString
         }
       })
+
+      if (primaryCaregiver && reasonCaregiverNotApplying) {
+        reasons.push({
+          primaryCaregiverType,
+          reasonNotApplying: reasonCaregiverNotApplying
+        })
+      }
 
       return reasons
     }

@@ -57,7 +57,7 @@ import {
   setInformantReference,
   fetchFHIR,
   setPrimaryCaregiverReference,
-  selectLastObservationResource,
+  selectObservationResource,
   getReasonCodeAndDesc
 } from '@gateway/features/fhir/utils'
 import {
@@ -2512,8 +2512,7 @@ const builders: IFieldBuilders = {
           PRIMARY_CAREGIVER,
           'Primary caregiver',
           fhirBundle,
-          context,
-          fieldValue
+          context
         )
 
         observation.valueString = fieldValue
@@ -2528,32 +2527,66 @@ const builders: IFieldBuilders = {
         fieldValue: string,
         context: any
       ) => {
-        const primaryCaregiverObservation = selectLastObservationResource(
-          PRIMARY_CAREGIVER,
-          fhirBundle
-        )
-        const type =
-          (primaryCaregiverObservation &&
-            primaryCaregiverObservation.valueString) ||
-          PRIMARY_CAREGIVER
-        const codeAndDesc = getReasonCodeAndDesc(type)
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          codeAndDesc.code,
-          codeAndDesc.desc,
-          fhirBundle,
-          context,
-          fieldValue
-        )
+        if (fieldValue) {
+          const primaryCaregiverObservation = selectObservationResource(
+            PRIMARY_CAREGIVER,
+            fhirBundle
+          )
+          const type =
+            (primaryCaregiverObservation &&
+              primaryCaregiverObservation.valueString) ||
+            PRIMARY_CAREGIVER
+          const codeAndDesc = getReasonCodeAndDesc(type)
+          const observation = selectOrCreateObservationResource(
+            BIRTH_ENCOUNTER_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_DESC,
+            codeAndDesc.code,
+            codeAndDesc.desc,
+            fhirBundle,
+            context
+          )
 
-        observation.valueString = fieldValue
-        setPrimaryCaregiverReference(
-          PRIMARY_CAREGIVER_CODE,
-          observation,
-          fhirBundle
-        )
+          observation.valueString = fieldValue
+          setPrimaryCaregiverReference(
+            PRIMARY_CAREGIVER_CODE,
+            observation,
+            fhirBundle
+          )
+        }
+      },
+      isDeceased: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: boolean,
+        context: any
+      ) => {
+        if (fieldValue) {
+          const primaryCaregiverObservation = selectObservationResource(
+            PRIMARY_CAREGIVER,
+            fhirBundle
+          )
+          const type =
+            (primaryCaregiverObservation &&
+              primaryCaregiverObservation.valueString) ||
+            PRIMARY_CAREGIVER
+          const codeAndDesc = getReasonCodeAndDesc(type)
+          const observation = selectOrCreateObservationResource(
+            BIRTH_ENCOUNTER_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_DESC,
+            codeAndDesc.code,
+            codeAndDesc.desc,
+            fhirBundle,
+            context
+          )
+
+          observation.valueString = 'DECEASED'
+          setPrimaryCaregiverReference(
+            PRIMARY_CAREGIVER_CODE,
+            observation,
+            fhirBundle
+          )
+        }
       }
     }
   },
