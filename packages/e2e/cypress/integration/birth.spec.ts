@@ -403,12 +403,14 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
     cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_MOTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
+    cy.wait(1000)
     cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
