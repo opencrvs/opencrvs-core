@@ -3,13 +3,7 @@ import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
 import { ApplicationIcon, Cross, VerticalThreeDots } from '../icons'
 import { ToggleMenu } from '.'
-const TopBarOuter = styled.div`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-  height: 92px;
-`
+
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 64px;
@@ -18,7 +12,10 @@ const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  top: 0;
   width: 100%;
+  position: fixed;
+  z-index: 1;
 `
 const TopBarTitle = styled.h4`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
@@ -51,43 +48,40 @@ interface IToggleMenuItem {
 export const EventTopBar = (props: IProps) => {
   const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
   return (
-    <TopBarOuter id="eventtopbar">
-      <TopBar>
-        <Item>
-          <ApplicationIcon color={iconColor} />{' '}
-          <TopBarTitle>{title}</TopBarTitle>
-        </Item>
-        <Item>
-          {goHome && (
-            <CircleButton id="crcl-btn" onClick={goHome}>
-              <Cross />
-            </CircleButton>
-          )}
-          {saveAction && (
-            <TertiaryButton onClick={saveAction.handler} id="save_draft">
-              {saveAction.label}
-            </TertiaryButton>
-          )}
+    <TopBar>
+      <Item>
+        <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
+      </Item>
+      <Item>
+        {goHome && (
+          <CircleButton id="crcl-btn" onClick={goHome}>
+            <Cross />
+          </CircleButton>
+        )}
+        {saveAction && (
+          <TertiaryButton onClick={saveAction.handler} id="save_draft">
+            {saveAction.label}
+          </TertiaryButton>
+        )}
 
-          {exitAction && (
-            <TertiaryButton onClick={exitAction.handler} id="exit_top_bar">
-              {exitAction.label}
-            </TertiaryButton>
-          )}
+        {exitAction && (
+          <TertiaryButton onClick={exitAction.handler} id="exit_top_bar">
+            {exitAction.label}
+          </TertiaryButton>
+        )}
 
-          {menuItems && (
-            <ToggleMenu
-              id="eventToggleMenu"
-              toggleButton={
-                <CircleButton>
-                  <VerticalThreeDots />
-                </CircleButton>
-              }
-              menuItems={menuItems}
-            />
-          )}
-        </Item>
-      </TopBar>
-    </TopBarOuter>
+        {menuItems && (
+          <ToggleMenu
+            id="eventToggleMenu"
+            toggleButton={
+              <CircleButton>
+                <VerticalThreeDots />
+              </CircleButton>
+            }
+            menuItems={menuItems}
+          />
+        )}
+      </Item>
+    </TopBar>
   )
 }
