@@ -1,4 +1,37 @@
 import { v4 as uuid } from 'uuid'
+// tslint:disable-next-line:no-relative-imports
+import { fetchAllAddressLocations } from './api'
+
+export interface IIncomingAddress {
+  division: {
+    id: string
+    name: string
+  }
+  district: {
+    id: string
+    name: string
+  }
+  upazila: {
+    id: string
+    name: string
+  }
+  city_corporation: {
+    id: string
+    name: string
+  }
+  municipality: {
+    id: string
+    name: string
+  }
+  ward: {
+    id: string
+    name: string
+  }
+  union: {
+    id: string
+    name: string
+  }
+}
 
 export function createBundle(entries: fhir.BundleEntry[]) {
   return {
@@ -12,6 +45,7 @@ export function createBundle(entries: fhir.BundleEntry[]) {
 }
 
 export function createComposition(
+  eventType: 'BIRTH' | 'DEATH',
   subjectRef: string,
   motherSectionRef: string,
   fatherSectionRef: string,
@@ -30,10 +64,13 @@ export function createComposition(
         coding: [
           {
             system: 'http://opencrvs.org/doc-types',
-            code: 'birth-notification'
+            // TODO support for notification event detection in workflow 'death-notification'
+            code:
+              eventType === 'BIRTH' ? 'birth-notification' : 'death-declaration'
           }
         ],
-        text: 'Birth Notification'
+        text:
+          eventType === 'BIRTH' ? 'Birth Notification' : 'Death Notification'
       },
       class: {
         coding: [
@@ -49,18 +86,20 @@ export function createComposition(
       },
       date: new Date().toISOString(),
       author: [],
-      title: 'Birth Notification',
+      title:
+        eventType === 'BIRTH' ? 'Birth Notification' : 'Death Notification',
       section: [
         {
-          title: 'Child details',
+          title: eventType === 'BIRTH' ? 'Child details' : 'Deceased details',
           code: {
             coding: [
               {
-                system: 'http://opencrvs.org/doc-sections',
-                code: 'child-details'
+                system: 'http://opencrvs.org/specs/sections',
+                code:
+                  eventType === 'BIRTH' ? 'child-details' : 'deceased-details'
               }
             ],
-            text: 'Child details'
+            text: eventType === 'BIRTH' ? 'Child details' : 'Deceased details'
           },
           entry: [{ reference: subjectRef }]
         },
@@ -92,15 +131,16 @@ export function createComposition(
           entry: [{ reference: fatherSectionRef }]
         },
         {
-          title: 'Birth encounter',
+          title: eventType === 'BIRTH' ? 'Birth encounter' : 'Death encounter',
           code: {
             coding: [
               {
                 system: 'http://opencrvs.org/specs/sections',
-                code: 'birth-encounter'
+                code:
+                  eventType === 'BIRTH' ? 'birth-encounter' : 'death-encounter'
               }
             ],
-            text: 'Birth encounter'
+            text: eventType === 'BIRTH' ? 'Birth encounter' : 'Death encounter'
           },
           entry: [{ reference: encounterSectionRef }]
         }
@@ -109,14 +149,15 @@ export function createComposition(
   }
 }
 
-export function createPersonEntry(
+export async function createPersonEntry(
   nid: string | null,
   firstNames: [string] | null,
   lastName: string,
-  addressObject: {} | null, // TODO
+  addressObject: IIncomingAddress | null,
   gender: 'male' | 'female' | 'unknown',
   phoneNumber: string | null,
-  birthDate: string | null
+  birthDate: string | null,
+  authHeader: string
 ) {
   return {
     fullUrl: `urn:uuid:${uuid()}`,
@@ -149,7 +190,14 @@ export function createPersonEntry(
             }
           ]
         : [],
-      address: addressObject ? [addressObject] : [],
+      address: addressObject
+        ? [
+            await convertAddressObjToFHIRPermanentAddress(
+              addressObject,
+              authHeader
+            )
+          ]
+        : [],
       birthDate
     }
   }
@@ -199,7 +247,7 @@ export function createDeathEncounterEntry(
   subjectRef: string
 ) {
   return {
-    fullUrl: `urn:uuid:${uuid}`, // use this to refer to the resource before it's created
+    fullUrl: `urn:uuid:${uuid()}`, // use this to refer to the resource before it's created
     resource: {
       resourceType: 'Encounter',
       status: 'finished',
@@ -250,5 +298,35 @@ export function createTaskEntry(
       },
       lastModified: new Date().toISOString()
     }
+  }
+}
+
+export async function convertAddressObjToFHIRPermanentAddress(
+  addressObject: IIncomingAddress,
+  authHeader: string
+) {
+  const fhirLocations = await fetchAllAddressLocations(
+    addressObject,
+    authHeader
+  )
+
+  return {
+    type: 'PERMANENT',
+    line: [
+      '',
+      '',
+      '',
+      (fhirLocations.union && fhirLocations.union.id) ||
+        (fhirLocations.municipality && fhirLocations.municipality.id) ||
+        '',
+      (fhirLocations.ward && fhirLocations.ward.id) || '',
+      (fhirLocations.upazila && fhirLocations.upazila.id) ||
+        (fhirLocations.cityCorp && fhirLocations.cityCorp.id) ||
+        ''
+    ],
+    district: (fhirLocations.district && fhirLocations.district.id) || '',
+    state: (fhirLocations.division && fhirLocations.division.id) || '',
+    postalCode: '',
+    country: 'BGD'
   }
 }

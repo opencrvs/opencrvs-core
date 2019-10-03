@@ -4,12 +4,10 @@ import {
   createBirthEncounterEntry,
   createBundle,
   createTaskEntry,
-  createComposition
+  createComposition,
+  IIncomingAddress
 } from '@search/features/fhir/service'
-import {
-  postBundle,
-  fetchLocationByFullBBSCode
-} from '@search/features/fhir/api'
+import { postBundle, fetchUnionByFullBBSCode } from '@search/features/fhir/api'
 
 export interface IBirthNotification {
   child: {
@@ -33,36 +31,7 @@ export interface IBirthNotification {
     last_name_bn: string
     nid?: string
   }
-  permanent_address: {
-    division?: {
-      id: string
-      name: string
-    }
-    district?: {
-      id: string
-      name: string
-    }
-    upazila?: {
-      id: string
-      name: string
-    }
-    city_corporation?: {
-      id: string
-      name: string
-    }
-    municipality?: {
-      id: string
-      name: string
-    }
-    ward?: {
-      id: string
-      name: string
-    }
-    union: {
-      id: string
-      name: string
-    }
-  }
+  permanent_address: IIncomingAddress
   phone_number: string
   date_birth: string
   place_of_birth?: {
@@ -83,39 +52,46 @@ export async function birthNotificationHandler(
     request.payload as string
   ) as IBirthNotification
 
-  const child = createPersonEntry(
+  const child = await createPersonEntry(
     null,
     notification.child.first_names_en || null,
     notification.child.last_name_en,
     null,
     notification.child.sex || 'unknown',
     null,
-    notification.date_birth
+    notification.date_birth,
+    request.headers.authorization
   )
-  const mother = createPersonEntry(
+  const mother = await createPersonEntry(
     notification.mother.nid || null,
     notification.mother.first_names_en || null,
     notification.mother.last_name_en,
     notification.permanent_address,
     'female',
     notification.phone_number,
-    null
+    null,
+    request.headers.authorization
   )
-  const father = createPersonEntry(
+  const father = await createPersonEntry(
     notification.father.nid || null,
     notification.father.first_names_en || null,
     notification.father.last_name_en,
     notification.permanent_address,
     'male',
     notification.phone_number,
-    null
+    null,
+    request.headers.authorization
   )
 
   const locationId = notification.union_birth_ocurred.id
-  const location = await fetchLocationByFullBBSCode(
+  const location = await fetchUnionByFullBBSCode(
     locationId,
     request.headers.authorization
   )
+
+  if (!location) {
+    throw new Error('Could not find union by full BBS code')
+  }
 
   const encounter = createBirthEncounterEntry(
     `Location/${location.id}`,
@@ -123,6 +99,7 @@ export async function birthNotificationHandler(
   )
 
   const composition = createComposition(
+    'BIRTH',
     child.fullUrl,
     mother.fullUrl,
     father.fullUrl,

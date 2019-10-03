@@ -1,13 +1,16 @@
 import fetch from 'node-fetch'
 
 const body = {
-  child: {
+  deceased: {
     // Required!
     first_names_en: ['Import'],
     last_name_en: 'Test', // Required!
     first_names_bn: ['ঞমড়গপট'],
     last_name_bn: 'ঠডুট', // Required!
-    sex: 'male'
+    sex: 'male',
+    nid: null,
+    nid_spouse: null,
+    date_birth: '1565097042000'
   },
   father: {
     first_names_en: ['Dad'],
@@ -55,12 +58,13 @@ const body = {
     }
   },
   phone_number: '+88071111111', // Required!
-  date_birth: '1565097042000', // Required!
-  place_of_birth: {
+  death_date: '1565097042000', // Required!
+  cause_death_a_immediate: 'I64',
+  place_of_death: {
     id: '1', // These ids must match Central HRIS MoHFW APU Facility List ids for institution
     name: 'Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar'
   },
-  union_birth_ocurred: {
+  union_death_ocurred: {
     // Required!
     id: '30333494', // These ids must match BBS codes
     name: 'Alokbali'
@@ -80,7 +84,7 @@ const body = {
   // tslint:disable-next-line:no-console
   console.log(authResBody)
 
-  const res = await fetch('http://localhost:8040/notification/birth', {
+  const res = await fetch('http://localhost:8040/notification/death', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
