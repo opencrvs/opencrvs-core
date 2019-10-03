@@ -4,7 +4,8 @@ import { Select, ISelectOption as SelectComponentOptions } from './../forms'
 import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`
-  position: sticky;
+  width: calc(50vw - 50px);
+  position: fixed;
   top: 94px;
   background-color: ${({ theme }) => theme.colors.background};
   outline: 2px solid ${({ theme }) => theme.colors.chartAreaGradientStart};
