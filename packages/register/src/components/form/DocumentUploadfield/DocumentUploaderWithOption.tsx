@@ -63,16 +63,21 @@ type DocumentFields = {
   documentType: string
   documentData: string
 }
+
+type FileId = number
+type IFileValueWithId = IFileValue & { id?: FileId }
+
 type IState = {
   errorMessage: string
   fields: DocumentFields
-  uploadedDocuments: IFileValue[]
-  previewImage: IFileValue | null
+  uploadedDocuments: IFileValueWithId[]
+  previewImage: IFileValueWithId | null
+  filesBeingProcessed: FileId[]
   dropDownOptions: ISelectOption[]
 }
 
 export const getBase64String = (file: File) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string | ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {
@@ -95,6 +100,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       previewImage: null,
       uploadedDocuments: this.props.files || [],
       dropDownOptions: this.initializeDropDownOption(),
+      filesBeingProcessed: [],
       fields: {
         documentType: EMPTY_STRING,
         documentData: EMPTY_STRING
@@ -133,81 +139,88 @@ class DocumentUploaderWithOptionComp extends React.Component<
     return isValid
   }
 
-  handleFileChange = (uploadedImage: File) => {
+  processImage = async (uploadedImage: File) => {
+    console.time('total')
+    console.time('calculate base64')
+    let fileAsBase64 = await getBase64String(uploadedImage)
+    console.timeEnd('calculate base64')
+    const base64Data = fileAsBase64.toString().split('base64,')[1]
+    const buffer = new Buffer(base64Data, 'base64')
+    console.time('read to JIMP')
+    const image = await Jimp.read(buffer)
+    console.timeEnd('read to JIMP')
+
+    if (!ALLOWED_IMAGE_TYPE.includes(image.getMIME())) {
+      this.setState({
+        errorMessage: this.props.intl.formatMessage(messages.uploadError)
+      })
+      throw new Error('File type not supported')
+    }
+
+    if (uploadedImage.size > 5242880) {
+      this.setState({
+        errorMessage: this.props.intl.formatMessage(messages.overSized)
+      })
+      throw new Error(this.props.intl.formatMessage(messages.overSized))
+    }
+
+    if (uploadedImage.size > 2097152) {
+      console.time('resize')
+      fileAsBase64 = await image
+        .resize(2000, Jimp.AUTO)
+        .quality(70)
+        .getBase64Async(image.getMIME())
+      console.timeEnd('resize')
+    }
+
+    const optionValues = [this.props.extraValue, this.state.fields.documentType]
+
+    let tempOptions = this.state.dropDownOptions
+    remove(
+      tempOptions,
+      (option: ISelectOption) => option.value === this.state.fields.documentType
+    )
+
+    this.setState(
+      prevState => {
+        const newDocument: IFileValue = {
+          optionValues,
+          type: uploadedImage.type,
+          data: fileAsBase64.toString()
+        }
+
+        return {
+          ...prevState,
+          errorMessage: EMPTY_STRING,
+          fields: {
+            documentType: EMPTY_STRING,
+            documentData: EMPTY_STRING
+          },
+          uploadedDocuments: [...prevState.uploadedDocuments, newDocument],
+          dropDownOptions: tempOptions
+        }
+      },
+      () => {
+        console.timeEnd('total')
+        this.props.onComplete(this.state.uploadedDocuments)
+      }
+    )
+  }
+
+  handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
-    getBase64String(uploadedImage).then(data => {
-      let base64String = data as string
-      base64String = base64String.split('base64,')[1]
-      Jimp.read(new Buffer(base64String, 'base64'))
-        .then(buffer => {
-          if (!ALLOWED_IMAGE_TYPE.includes(buffer.getMIME())) {
-            this.setState({
-              errorMessage: this.props.intl.formatMessage(messages.uploadError)
-            })
-            throw new Error('File type not supported')
-          } else if (uploadedImage.size > 5242880) {
-            this.setState({
-              errorMessage: this.props.intl.formatMessage(messages.overSized)
-            })
-            throw new Error(this.props.intl.formatMessage(messages.overSized))
-          } else if (uploadedImage.size > 2097152) {
-            return buffer
-              .resize(2000, Jimp.AUTO)
-              .quality(70)
-              .getBase64Async(buffer.getMIME())
-          }
-          return data as string
-        })
-        .then(buffer => {
-          const optionValues = [
-            this.props.extraValue,
-            this.state.fields.documentType
-          ]
 
-          let tempOptions = this.state.dropDownOptions
-          remove(
-            tempOptions,
-            (option: ISelectOption) =>
-              option.value === this.state.fields.documentType
-          )
-
-          this.setState(
-            prevState => {
-              const newDocument: IFileValue = {
-                optionValues,
-                type: uploadedImage.type,
-                data: buffer
-              }
-
-              return {
-                ...prevState,
-                errorMessage: EMPTY_STRING,
-                fields: {
-                  documentType: EMPTY_STRING,
-                  documentData: EMPTY_STRING
-                },
-                uploadedDocuments: [
-                  ...prevState.uploadedDocuments,
-                  newDocument
-                ],
-                dropDownOptions: tempOptions
-              }
-            },
-            () => {
-              this.props.onComplete(this.state.uploadedDocuments)
-            }
-          )
-        })
-        .catch(e => {
-          this.setState({
-            errorMessage:
-              this.state.errorMessage ||
-              this.props.intl.formatMessage(messages.uploadError)
-          })
-        })
-    })
+    try {
+      await this.processImage(uploadedImage)
+    } catch (e) {
+      this.setState({
+        errorMessage:
+          this.state.errorMessage ||
+          this.props.intl.formatMessage(messages.uploadError)
+      })
+    }
   }
 
   onDelete = (image: IFileValue | IAttachmentValue) => {
