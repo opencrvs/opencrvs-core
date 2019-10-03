@@ -135,8 +135,7 @@ function reducer(
         return loop(
           {
             ...state,
-            offlineData,
-            offlineDataLoaded
+            offlineData
           },
           Cmd.list([
             // Try loading data regardless as it might have been updated.
