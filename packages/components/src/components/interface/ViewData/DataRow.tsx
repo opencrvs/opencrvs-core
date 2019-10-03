@@ -31,6 +31,9 @@ const Label = styled.label`
   flex: 1;
   margin-right: 16px;
   max-width: 40%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    max-width: 100%;
+  }
 `
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
