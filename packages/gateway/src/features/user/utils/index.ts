@@ -1,4 +1,4 @@
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { USER_MANAGEMENT_URL, COUNTRY } from '@gateway/constants'
 import fetch from 'node-fetch'
 import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
@@ -22,6 +22,12 @@ export const convertToLocal = (
     callingCountries[countryCode].countryCallingCodes[0],
     '0'
   )
+}
+
+export const convertToInternational = (mobileWithoutCountryCode: string) => {
+  const countryCode =
+    callingCountries[COUNTRY.toUpperCase()].countryCallingCodes[0]
+  return countryCode + mobileWithoutCountryCode.replace('0', '')
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
