@@ -2,11 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { PaperClip } from '@opencrvs/components/lib/icons'
 import { IFileValue, IAttachmentValue } from '@register/forms'
+import { Spinner } from '@opencrvs/components/lib/interface'
 
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-const PreviewLink = styled.p`
+const PreviewLink = styled.div`
   color: ${({ theme }) => theme.colors.primary};
   padding: 5px 10px;
   margin: 10px 0px;
@@ -22,8 +23,13 @@ const PreviewLink = styled.p`
   }
 `
 
+const ProcessingSpinner = styled(Spinner)`
+  margin-left: auto;
+`
+
 type IProps = {
   documents?: IFileValue[] | null
+  processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
   label?: string
   onSelect: (document: IFileValue | IAttachmentValue) => void
@@ -31,7 +37,7 @@ type IProps = {
 
 export class DocumentListPreview extends React.Component<IProps> {
   render() {
-    const { documents, label, attachment } = this.props
+    const { documents, processingDocuments, label, attachment } = this.props
     return (
       <Wrapper>
         {documents &&
@@ -39,6 +45,17 @@ export class DocumentListPreview extends React.Component<IProps> {
             <PreviewLink key={key} onClick={_ => this.props.onSelect(document)}>
               <PaperClip />
               <span>{document.optionValues[1]}</span>
+            </PreviewLink>
+          ))}
+        {processingDocuments &&
+          processingDocuments.map(({ label }) => (
+            <PreviewLink key={label}>
+              <PaperClip />
+              <span>{label}</span>
+              <ProcessingSpinner
+                size={30}
+                id={`document_${label}_processing`}
+              />
             </PreviewLink>
           ))}
         {attachment && attachment.data && label && (
