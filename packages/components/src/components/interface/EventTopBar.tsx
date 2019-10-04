@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
 import { ApplicationIcon, Cross, VerticalThreeDots } from '../icons'
 import { ToggleMenu } from '.'
+
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   height: 64px;
@@ -47,7 +48,7 @@ interface IToggleMenuItem {
 export const EventTopBar = (props: IProps) => {
   const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
   return (
-    <TopBar id="eventtopbar">
+    <TopBar>
       <Item>
         <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
       </Item>

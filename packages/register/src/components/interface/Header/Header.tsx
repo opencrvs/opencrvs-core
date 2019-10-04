@@ -277,22 +277,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (
-      userDetails &&
-      userDetails.role &&
-      SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      menuItems = [
-        {
-          key: 'sysadmin',
-          title: intl.formatMessage(messages.systemTitle),
-          onClick: goToHome,
-          selected: true
-        }
-      ]
-    }
-
-    const rightMenu = [
+    let rightMenu = [
       {
         element: (
           <StyledPrimaryButton
@@ -310,6 +295,27 @@ class HeaderComp extends React.Component<IProps, IState> {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+
+      rightMenu = [
+        {
+          element: <ProfileMenu key="profileMenu" />
+        }
+      ]
+    }
 
     const mobileHeaderActionProps = this.props.mobileSearchBar
       ? {
