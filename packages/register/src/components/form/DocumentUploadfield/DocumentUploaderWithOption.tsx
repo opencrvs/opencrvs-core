@@ -16,6 +16,8 @@ import { remove, clone } from 'lodash'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/imageUpload'
 
+const MAX_IMAGE_WIDTH_OR_HEIGHT = 2500
+
 const UploaderWrapper = styled.div`
   margin-bottom: 20px;
 `
@@ -153,7 +155,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
     if (uploadedImage.size > 2097152) {
       const [resized] = await resizeAndRotate([uploadedImage], {
-        maxSize: 2000
+        maxSize: MAX_IMAGE_WIDTH_OR_HEIGHT
       })
       return resized
     }
