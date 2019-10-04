@@ -26,7 +26,7 @@ import {
   QueryContext
 } from '@register/views/DataProvider/QueryProvider'
 
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@register/navigation/routes'
 import { errorMessages } from '@register/i18n/messages'
 
 interface IReviewProps {
@@ -153,6 +153,7 @@ function mapStatetoProps(
   props: RouteComponentProps<{
     pageRoute: string
     pageId: string
+    groupId: string
     applicationId: string
     event: string
   }>
@@ -175,7 +176,7 @@ function mapStatetoProps(
     applicationId: match.params.applicationId,
     event: getEvent(match.params.event),
     registerForm: form,
-    pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+    pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
     duplicate: history.location.state && history.location.state.duplicate
   }
 }

@@ -39,7 +39,8 @@ function isFormPage(pathname: string): boolean {
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM) ||
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE) ||
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE_GROUP) ||
-    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE)
+    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE) ||
+    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP)
   ) {
     return true
   }
