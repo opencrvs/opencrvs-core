@@ -10,7 +10,7 @@ import {
   IUserSearchPayload,
   IUserPayload
 } from '@gateway/features/user/type-resovlers'
-import { convertToInternational } from '@gateway/features/user/utils'
+import { convertToMSISDN } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -131,7 +131,7 @@ function createUserPayload(user: GQLUserInput): IUserPayload {
     identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: user.email || '',
-    mobile: convertToInternational(user.mobile as string),
+    mobile: convertToMSISDN(user.mobile as string),
     signature: user.signature
   }
 }

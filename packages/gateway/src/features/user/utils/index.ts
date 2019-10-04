@@ -24,10 +24,13 @@ export const convertToLocal = (
   )
 }
 
-export const convertToInternational = (mobileWithoutCountryCode: string) => {
+export const convertToMSISDN = (phoneWithoutCountryCode: string) => {
   const countryCode =
     callingCountries[COUNTRY.toUpperCase()].countryCallingCodes[0]
-  return countryCode + mobileWithoutCountryCode.replace('0', '')
+
+  return phoneWithoutCountryCode.startsWith('0')
+    ? `${countryCode}${phoneWithoutCountryCode.substring(1)}`
+    : `${countryCode}${phoneWithoutCountryCode}`
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
