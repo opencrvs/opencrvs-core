@@ -154,6 +154,9 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 24px;
+  }
 `
 const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
