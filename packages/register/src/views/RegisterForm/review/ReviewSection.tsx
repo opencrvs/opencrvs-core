@@ -157,6 +157,9 @@ const FormData = styled.div`
 `
 const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.h3Style}
+  }
 `
 const InputWrapper = styled.div`
   margin-top: 56px;

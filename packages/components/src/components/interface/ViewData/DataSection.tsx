@@ -8,6 +8,9 @@ const Container = styled.div`
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
   margin-bottom: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.h5Style};
+  }
 `
 interface IProps {
   id?: string
