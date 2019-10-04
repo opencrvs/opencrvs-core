@@ -296,6 +296,15 @@ interface IFormMessages {
   reasonParentsNotApplying: MessageDescriptor
   motherDeceasedLabel: MessageDescriptor
   fatherDeceasedLabel: MessageDescriptor
+  primaryCaregiverTypeLabel: MessageDescriptor
+  motherCaregiverTypeLabel: MessageDescriptor
+  fatherCaregiverTypeLabel: MessageDescriptor
+  legalGuardianCaregiverTypeLabel: MessageDescriptor
+  parentsCaregiverTypeLabel: MessageDescriptor
+  informantCaregiverTypeLabel: MessageDescriptor
+  otherCaregiverTypeLabel: MessageDescriptor
+  nameFieldLabel: MessageDescriptor
+  reasonNotApplyingFieldLabel: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1800,6 +1809,51 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Father has died',
     description: 'Label for form field: fatherIsDeceased',
     id: 'form.field.label.fatherIsDeceased'
+  },
+  primaryCaregiverTypeLabel: {
+    defaultMessage: 'Who is looking after the child?',
+    description: 'Question to ask the user about caregiver',
+    id: 'form.field.label.primaryCaregiverType'
+  },
+  motherCaregiverTypeLabel: {
+    defaultMessage: 'Mother',
+    description: 'label for mother radio button',
+    id: 'form.field.label.caregiver.mother'
+  },
+  fatherCaregiverTypeLabel: {
+    defaultMessage: 'Father',
+    description: 'label for father radio button',
+    id: 'form.field.label.caregiver.father'
+  },
+  parentsCaregiverTypeLabel: {
+    defaultMessage: 'Mother and father',
+    description: 'label for parents radio button',
+    id: 'form.field.label.caregiver.parents'
+  },
+  legalGuardianCaregiverTypeLabel: {
+    defaultMessage: 'Legal Guardian',
+    description: 'label for legal guardian radio button',
+    id: 'form.field.label.caregiver.legalGuardian'
+  },
+  informantCaregiverTypeLabel: {
+    defaultMessage: 'Applicant is the primary caregiver',
+    description: 'label for informant radio button',
+    id: 'form.field.label.caregiver.informant'
+  },
+  otherCaregiverTypeLabel: {
+    defaultMessage: 'Other caregiver',
+    description: 'label for other caregiver radio button',
+    id: 'form.field.label.caregiver.other'
+  },
+  nameFieldLabel: {
+    defaultMessage: 'Name',
+    description: 'Label for form field: name',
+    id: 'form.field.label.name'
+  },
+  reasonNotApplyingFieldLabel: {
+    defaultMessage: 'Reason not applying',
+    description: 'Label for form field: ReasonNotApplying',
+    id: 'form.field.label.ReasonNotApplying'
   }
 }
 

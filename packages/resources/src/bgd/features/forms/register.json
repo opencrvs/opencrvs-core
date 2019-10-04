@@ -3485,6 +3485,164 @@
                   }
                 }
               ]
+            },
+            {
+              "id": "caregiver-details-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.presentAtBirthRegistration === \"OTHER\")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")  )))"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "primaryCaregiverType",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "size": "large",
+                  "label": {
+                    "defaultMessage": "Who is looking after the child?",
+                    "description": "Question to ask the user about caregiver",
+                    "id": "form.field.label.primaryCaregiverType"
+                  },
+                  "required": false,
+                  "readonly": true,
+                  "hideHeader": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER_AND_FATHER",
+                      "label": {
+                        "defaultMessage": "Mother and father",
+                        "description": "label for parents radio button",
+                        "id": "form.field.label.caregiver.parents"
+                      }
+                    },
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "label for mother radio button",
+                        "id": "form.field.label.caregiver.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "label for father radio button",
+                        "id": "form.field.label.caregiver.father"
+                      }
+                    },
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "label for Legal guardian radio button",
+                        "id": "form.field.label.caregiver.legalGuardian"
+                      }
+                    },
+                    {
+                      "value": "INFORMANT",
+                      "label": {
+                        "defaultMessage": "Applicant is the primary caregiver",
+                        "description": "label for informant radio button",
+                        "id": "form.field.label.caregiver.informant"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Other caregiver",
+                        "description": "label for Other caregiver radio button",
+                        "id": "form.field.label.caregiver.other"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "MOTHER_AND_FATHER": [],
+                    "MOTHER": [],
+                    "FATHER": [],
+                    "LEGAL_GUARDIAN": [
+                      {
+                        "name": "name",
+                        "type": "TEXT",
+                        "label": {
+                          "id": "form.field.label.name",
+                          "defaultMessage": "Name",
+                          "description": "field label for name"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
+                      {
+                        "name": "phone",
+                        "type": "TEL",
+                        "label": {
+                          "id": "form.field.label.application.phone",
+                          "defaultMessage": "Phone number",
+                          "description": "field label for phone"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
+                      {
+                        "name": "reasonNotApplying",
+                        "type": "TEXT",
+                        "label": {
+                          "id": "form.field.label.reasonNotApplying",
+                          "defaultMessage": "Reason not applying",
+                          "description": "field label for reasonNotApplying"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      }
+                    ],
+                    "INFORMANT": [],
+                    "OTHER": [
+                      {
+                        "name": "name",
+                        "type": "TEXT",
+                        "label": {
+                          "id": "form.field.label.name",
+                          "defaultMessage": "Name",
+                          "description": "field label for name"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
+                      {
+                        "name": "phone",
+                        "type": "TEL",
+                        "label": {
+                          "id": "form.field.label.application.phone",
+                          "defaultMessage": "Phone number",
+                          "description": "field label for phone"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      },
+                      {
+                        "name": "reasonNotApplying",
+                        "type": "TEXT",
+                        "label": {
+                          "id": "form.field.label.reasonNotApplying",
+                          "defaultMessage": "Reason not applying",
+                          "description": "field label for reasonNotApplying"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": []
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           ]
         },
