@@ -6,3 +6,4 @@ export * from '@register/forms/register/fieldMappings/death/mutation/applicant-m
 export * from '@register/forms/register/fieldMappings/death/mutation/event-mappings'
 export * from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 export * from '@register/forms/register/fieldMappings/death/mutation/applicant-mapping'
+export * from '@register/forms/register/fieldMappings/birth/mutation/primary-caregiver-mappings'
