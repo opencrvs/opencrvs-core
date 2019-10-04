@@ -3282,6 +3282,213 @@
           }
         },
         {
+          "id": "primaryCaregiver",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "Parents details",
+            "description": "Form section name or title for primary caregiver",
+            "id": "form.section.primaryCaregiver.nameOrTitle"
+          },
+          "title": {
+            "defaultMessage": "Parents details",
+            "description": "Form section name or title for primary caregiver",
+            "id": "form.section.primaryCaregiver.nameOrTitle"
+          },
+          "groups": [
+            {
+              "id": "parent-details-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.presentAtBirthRegistration === \"OTHER\")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")  )))"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "parentDetailsType",
+                  "type": "RADIO_GROUP",
+                  "size": "large",
+                  "label": {
+                    "defaultMessage": "Do you have the mother and father's details?",
+                    "description": "Question to ask the user if they have the parents details",
+                    "id": "form.field.label.parentDetailsType"
+                  },
+                  "required": true,
+                  "initialValue": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER_AND_FATHER",
+                      "label": {
+                        "defaultMessage": "Yes",
+                        "description": "confirmation label for parents radio button",
+                        "id": "buttons.yes"
+                      }
+                    },
+                    {
+                      "value": "MOTHER_ONLY",
+                      "label": {
+                        "defaultMessage": "Only the mother's",
+                        "description": "deny label for mother radio button",
+                        "id": "form.field.label.radio.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER_ONLY",
+                      "label": {
+                        "defaultMessage": "Only the father's",
+                        "description": "deny label for father radio button",
+                        "id": "form.field.label.radio.father"
+                      }
+                    },
+                    {
+                      "value": "NONE",
+                      "label": {
+                        "defaultMessage": "No",
+                        "description": "confirmation label for No radio button",
+                        "id": "buttons.no"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "parent-not-applying-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.presentAtBirthRegistration === \"OTHER\")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")  )))"
+                }
+              ],
+              "title": {
+                "defaultMessage": "Why are the mother and father not applying?",
+                "description": "Form group name for reason parents are not applying",
+                "id": "form.group.reasonNotApplying.parents"
+              },
+              "fields": [
+                {
+                  "name": "reasonMotherNotApplying",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Reason for mother",
+                    "description": "Label for form field: reasonMotherNotApplying",
+                    "id": "form.field.label.reasonMotherNotApplying"
+                  },
+                  "validate": [],
+                  "required": false,
+                  "initialValue": "",
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(!draftData || !draftData.primaryCaregiver || draftData.primaryCaregiver.motherIsDeceased)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToReasonsArrayTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "reasonNotApplying",
+                        "primaryCaregiverType",
+                        "MOTHER"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "motherIsDeceased",
+                  "type": "CHECKBOX_GROUP",
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "Label for form field: motherIsDeceased",
+                    "id": "print.certificate.noLabel"
+                  },
+                  "validate": [],
+                  "initialValue": [],
+                  "options": [
+                    {
+                      "value": true,
+                      "label": {
+                        "defaultMessage": "Mother has died",
+                        "description": "Label for form field: motherIsDeceased",
+                        "id": "form.field.label.motherIsDeceased"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToReasonsArrayTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "isDeceased",
+                        "primaryCaregiverType",
+                        "MOTHER"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "reasonFatherNotApplying",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Reason for father",
+                    "description": "Label for form field: reasonFatherNotApplying",
+                    "id": "form.field.label.reasonFatherNotApplying"
+                  },
+                  "validate": [],
+                  "required": false,
+                  "initialValue": "",
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToReasonsArrayTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "reasonNotApplying",
+                        "primaryCaregiverType",
+                        "FATHER"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "fatherIsDeceased",
+                  "type": "CHECKBOX_GROUP",
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "Label for form field: fatherIsDeceased",
+                    "id": "form.field.label.fatherIsDeceased"
+                  },
+                  "validate": [],
+                  "required": false,
+                  "initialValue": "",
+                  "options": [
+                    {
+                      "value": true,
+                      "label": {
+                        "defaultMessage": "Father has died",
+                        "description": "Label for form field: fatherIsDeceased",
+                        "id": "print.certificate.noLabel"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToReasonsArrayTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "isDeceased",
+                        "primaryCaregiverType",
+                        "FATHER"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
           "id": "mother",
           "viewType": "form",
           "name": {

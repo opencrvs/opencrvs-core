@@ -287,6 +287,15 @@ interface IFormMessages {
   lastName: MessageDescriptor
   relationship: MessageDescriptor
   informantPermanentAdress: MessageDescriptor
+  primaryCaregiverNameOrTitle: MessageDescriptor
+  parentDetailsType: MessageDescriptor
+  motherRadioButton: MessageDescriptor
+  fatherRadioButton: MessageDescriptor
+  reasonMotherNotApplying: MessageDescriptor
+  reasonFatherNotApplying: MessageDescriptor
+  reasonParentsNotApplying: MessageDescriptor
+  motherDeceasedLabel: MessageDescriptor
+  fatherDeceasedLabel: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1746,6 +1755,51 @@ const messagesToDefine: IFormMessages = {
     description:
       "Input label for certificate collector's relationship to the subject",
     id: 'form.field.label.relationship'
+  },
+  primaryCaregiverNameOrTitle: {
+    defaultMessage: 'Parents details',
+    description: 'Form section name or title for primary caregiver',
+    id: 'form.section.primaryCaregiver.nameOrTitle'
+  },
+  parentDetailsType: {
+    defaultMessage: "Do you have the mother and father's details?",
+    description: 'Question to ask the user if they have the parents details',
+    id: 'form.field.label.parentDetailsType'
+  },
+  motherRadioButton: {
+    defaultMessage: "Only the mother's",
+    description: 'confirmation label for mother radio button',
+    id: 'form.field.label.radio.mother'
+  },
+  fatherRadioButton: {
+    defaultMessage: "Only the father's",
+    description: 'confirmation label for father radio button',
+    id: 'form.field.label.radio.father'
+  },
+  reasonMotherNotApplying: {
+    defaultMessage: 'Reason for mother',
+    description: 'Label for form field: reasonMotherNotApplying',
+    id: 'form.field.label.reasonMotherNotApplying'
+  },
+  reasonFatherNotApplying: {
+    defaultMessage: 'Reason for father',
+    description: 'Label for form field: reasonFatherNotApplying',
+    id: 'form.field.label.reasonFatherNotApplying'
+  },
+  reasonParentsNotApplying: {
+    defaultMessage: 'Why are the mother and father not applying?',
+    description: 'Form group name for reason parents are not applying',
+    id: 'form.group.reasonNotApplying.parents'
+  },
+  motherDeceasedLabel: {
+    defaultMessage: 'Mother has died',
+    description: 'Label for form field: motherIsDeceased',
+    id: 'form.field.label.motherIsDeceased'
+  },
+  fatherDeceasedLabel: {
+    defaultMessage: 'Father has died',
+    description: 'Label for form field: fatherIsDeceased',
+    id: 'form.field.label.fatherIsDeceased'
   }
 }
 
