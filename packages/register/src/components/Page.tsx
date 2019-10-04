@@ -113,7 +113,7 @@ class Component extends React.Component<
         }
       }, 0)
     }
-    if (this.props.loadingError) {
+    if (this.props.loadingError && navigator.onLine) {
       this.props.showConfigurationErrorNotification()
     }
   }

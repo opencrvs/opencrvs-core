@@ -850,7 +850,7 @@
         "register.registrationHome.table.label.registeredDate": "Application registered",
         "register.registrationHome.validated.registrar.tooltip": "Application has been validated by a registration agent",
         "register.registrationHome.validated.registrationAgent.tooltip": "Application has been validated and waiting for approval",
-        "register.SelectContactPoint.birthRelationshipLabel": "RelationShip to child",
+        "register.SelectContactPoint.birthRelationshipLabel": "Relationship to child",
         "register.SelectContactPoint.error": "Please select a main point of contact",
         "register.SelectContactPoint.heading": "Who is the main point of contact for this application?",
         "register.SelectContactPoint.phoneNoError": "Not a valid mobile number",
