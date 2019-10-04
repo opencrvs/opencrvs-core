@@ -173,20 +173,14 @@ class DocumentUploaderWithOptionComp extends React.Component<
       this.state.fields.documentType
     ]
 
-    // Mark file as being processed
-    await new Promise(resolve =>
-      this.setState(
-        state => ({
-          filesBeingProcessed: [
-            ...state.filesBeingProcessed,
-            {
-              label: optionValues[1]
-            }
-          ]
-        }),
-        resolve
-      )
-    )
+    this.setState(state => ({
+      filesBeingProcessed: [
+        ...state.filesBeingProcessed,
+        {
+          label: optionValues[1]
+        }
+      ]
+    }))
 
     try {
       // Start processing
