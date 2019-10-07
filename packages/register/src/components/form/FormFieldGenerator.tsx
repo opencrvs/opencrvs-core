@@ -501,6 +501,13 @@ class FormSectionComponent extends React.Component<Props> {
     if (this.props.onSetTouched) {
       this.props.onSetTouched(this.props.setTouched)
     }
+
+    if (window.location.hash) {
+      setTimeout(() => {
+        const newScroll = document.documentElement.scrollTop - 100
+        window.scrollTo(0, newScroll)
+      }, 0)
+    }
   }
 
   showValidationErrors(fields: IFormField[]) {
