@@ -89,6 +89,7 @@ enum RelationshipType {
   HOUSE_OWNER
   OPERATOR
   OFFICE_IN_CHARGE
+  LEGAL_GUARDIAN
 }
 
 input IdentityInput {
