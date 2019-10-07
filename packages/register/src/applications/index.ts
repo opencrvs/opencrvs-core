@@ -185,13 +185,11 @@ export interface IUserData {
 
 export interface IApplicationsState {
   userID: string
-  initialApplicationsLoaded: boolean
   applications: IApplication[]
 }
 
 const initialState = {
   userID: '',
-  initialApplicationsLoaded: false,
   applications: []
 }
 
@@ -443,13 +441,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         return {
           ...state,
           userID: userData.userID,
-          applications: userData.applications,
-          initialApplicationsLoaded: true
+          applications: userData.applications
         }
       }
       return {
-        ...state,
-        initialApplicationsLoaded: true
+        ...state
       }
     default:
       return state

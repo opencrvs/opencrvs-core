@@ -72,7 +72,8 @@ export const resolvers: GQLResolver = {
     async queryPersonByIdentifier(_, { identifier }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare')
       ) {
         const personBundle = await fetchFHIR(
           `/Patient?identifier=${identifier}`,
@@ -86,7 +87,7 @@ export const resolvers: GQLResolver = {
         return person
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     }
