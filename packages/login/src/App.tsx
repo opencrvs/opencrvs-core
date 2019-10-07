@@ -2,11 +2,12 @@ import { DarkPageContainer, PageContainer } from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import * as routes from '@login/navigation/routes'
-import { createStore, history } from '@login/store'
+import { createStore, AppStore } from '@login/store'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
+import { History } from 'history'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
 import { ConnectedRouter } from 'react-router-redux'
@@ -19,15 +20,21 @@ import { RecoveryCodeEntry } from './views/resetCredentialsForm/recoveryCodeEntr
 import { SecurityQuestion } from './views/resetCredentialsForm/securityQuestionForm'
 import { UpdatePassword } from './views/resetCredentialsForm/updatePasswordForm'
 
-export const store = createStore()
-export class App extends React.Component {
+export const { store, history } = createStore()
+
+interface IAppProps {
+  store: AppStore
+  history: History
+}
+
+export class App extends React.Component<IAppProps> {
   public render() {
     return (
       <ErrorBoundary>
-        <Provider store={store}>
+        <Provider store={this.props.store}>
           <IntlContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-              <ConnectedRouter history={history}>
+              <ConnectedRouter history={this.props.history}>
                 <Switch>
                   <Route exact path={routes.STEP_ONE}>
                     <DarkPageContainer>
