@@ -379,9 +379,10 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.requireUpdates, {
-                          total: navigator.onLine
-                            ? data.searchEvents.totalItems
-                            : '?'
+                          total:
+                            navigator.onLine && data
+                              ? data.searchEvents.totalItems
+                              : '?'
                         })}
                       </IconTab>
                     </TopBar>
