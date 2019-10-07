@@ -309,6 +309,10 @@ export function isCityLocation(
   }
 }
 
+export function isDefaultCountry(countryCode: string): boolean {
+  return countryCode === window.config.COUNTRY.toUpperCase()
+}
+
 interface IVars {
   [key: string]: any
 }
@@ -437,6 +441,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.countryPermanent'
   },
+  isDefaultCountryPermanent: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.countryPermanent)'
+  },
   statePermanent: {
     action: 'hide',
     expression: '!values.statePermanent'
@@ -456,6 +464,10 @@ export const conditionals: IConditionals = {
   country: {
     action: 'hide',
     expression: '!values.country'
+  },
+  isDefaultCountry: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.country)'
   },
   state: {
     action: 'hide',

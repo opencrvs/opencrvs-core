@@ -31,6 +31,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           line
           district
           state
+          city
           postalCode
           country
         }
@@ -61,6 +62,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             line
             district
             state
+            city
             postalCode
             country
           }
@@ -89,6 +91,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           line
           district
           state
+          city
           postalCode
           country
         }
@@ -130,6 +133,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           line
           district
           state
+          city
           postalCode
           country
         }
@@ -161,6 +165,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             line
             district
             state
+            city
             postalCode
             country
           }
@@ -204,6 +209,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           line
           district
           state
+          city
           postalCode
           country
         }

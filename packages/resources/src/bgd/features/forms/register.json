@@ -787,6 +787,10 @@
                     {
                       "action": "hide",
                       "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
                     }
                   ],
                   "mapping": {
@@ -1231,6 +1235,237 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine3"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "postalCode"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "postalCode"]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalState",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "State",
+                    "description": "Title for the international state select",
+                    "id": "form.field.label.internationalState"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "state"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "state"]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalDistrict",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the international district select",
+                    "id": "form.field.label.internationalDistrict"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "district"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "district"]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalCity",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "City / Town",
+                    "description": "Title for the international city select",
+                    "id": "form.field.label.internationalCity"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "city"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "city"]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine1",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 1",
+                    "description": "Title for the international address line 1 select",
+                    "id": "form.field.label.internationalAddressLine1"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [7]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [7]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine2",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 2",
+                    "description": "Title for the international address line 2 select",
+                    "id": "form.field.label.internationalAddressLine2"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [8]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [8]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine3",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 3",
+                    "description": "Title for the international address line 3 select",
+                    "id": "form.field.label.internationalAddressLine3"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [9]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [9]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalPostcode",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Postcode / Zip",
+                    "description": "Title for the international postcode",
+                    "id": "form.field.label.internationalPostcode"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
                     },
                     {
                       "action": "hide",

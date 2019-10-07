@@ -305,14 +305,26 @@ export const eventLocationQueryTransformer = (
   const eventLocation = queryData.eventLocation as fhir.Location
   const address = eventLocation.address as IAddress
   const line = address.line as string[]
+  const country = address.country
   if (lineNumber > 0) {
     transformedData[sectionId][field.name] = line[lineNumber - 1]
   } else if (
-    address[transformedFieldName ? transformedFieldName : field.name]
+    address[transformedFieldName ? transformedFieldName : field.name] &&
+    country === window.config.COUNTRY
   ) {
     transformedData[sectionId][field.name] =
       address[transformedFieldName ? transformedFieldName : field.name]
+  } else if (
+    address[transformedFieldName ? transformedFieldName : field.name] &&
+    country !== window.config.COUNTRY &&
+    field.name !== 'state' &&
+    field.name !== 'district'
+  ) {
+    // do not set selects for state and district if country is not the default country
+    transformedData[sectionId][field.name] =
+      address[transformedFieldName ? transformedFieldName : field.name]
   }
+
   return transformedData
 }
 
