@@ -83,7 +83,7 @@ export function getTrackingId(fhirBundle: fhir.Bundle) {
   const resource =
     fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
   if (!resource) {
-    throw new Error('No resource found')
+    throw new Error('getTrackingId: Invalid FHIR bundle found for declaration')
   }
   switch (resource.resourceType) {
     case 'Composition':

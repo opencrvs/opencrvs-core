@@ -87,7 +87,7 @@ export const resolvers: GQLResolver = {
         return person
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     }
