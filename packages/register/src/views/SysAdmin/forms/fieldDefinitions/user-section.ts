@@ -39,7 +39,13 @@ export const userSection: ISerializedFormSection = {
           label: messages.firstNameBn,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat' }],
+          validate: [
+            { operation: 'bengaliOnlyNameFormat' },
+            {
+              operation: 'maxLength',
+              parameters: [250]
+            }
+          ],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -53,7 +59,13 @@ export const userSection: ISerializedFormSection = {
           label: messages.lastNameBn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'bengaliOnlyNameFormat' }],
+          validate: [
+            { operation: 'bengaliOnlyNameFormat' },
+            {
+              operation: 'maxLength',
+              parameters: [250]
+            }
+          ],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -67,7 +79,13 @@ export const userSection: ISerializedFormSection = {
           label: messages.firstNameEn,
           required: false,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validate: [
+            { operation: 'englishOnlyNameFormat' },
+            {
+              operation: 'maxLength',
+              parameters: [250]
+            }
+          ],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',
@@ -81,7 +99,13 @@ export const userSection: ISerializedFormSection = {
           label: messages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [{ operation: 'englishOnlyNameFormat' }],
+          validate: [
+            { operation: 'englishOnlyNameFormat' },
+            {
+              operation: 'maxLength',
+              parameters: [250]
+            }
+          ],
           mapping: {
             mutation: {
               operation: 'fieldToNameTransformer',

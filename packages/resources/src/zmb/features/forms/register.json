@@ -252,6 +252,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -278,6 +282,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -1260,6 +1268,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -1286,6 +1298,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -2834,6 +2850,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "conditionals": [
@@ -2866,6 +2886,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "conditionals": [
@@ -3981,6 +4005,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -4007,6 +4035,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -5562,6 +5594,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
@@ -5601,6 +5637,10 @@
                   "validate": [
                     {
                       "operation": "englishOnlyNameFormat"
+                    },
+                    {
+                      "operation": "maxLength",
+                      "parameters": [250]
                     }
                   ],
                   "mapping": {
