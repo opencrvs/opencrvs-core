@@ -11,11 +11,11 @@ import {
   upazilaMock,
   unionMock,
   officeMock,
-  testFhirBundleForDeath,
+  testDeathFhirBundle,
   testFhirBundleWithIdsForDeath,
   motherMock,
   compositionMock,
-  testDeathFhirBundle,
+  deathCompositionMock,
   testInProgressFhirBundle,
   testInProgressDeathFhirBundle
 } from '@workflow/test/utils'
@@ -362,7 +362,7 @@ describe('Verify handler', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/fhir',
-        payload: testFhirBundleForDeath,
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -493,7 +493,7 @@ describe('Verify handler', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/fhir',
-        payload: testFhirBundleForDeath,
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -1187,7 +1187,24 @@ describe('markEventAsRegisteredHandler handler', () => {
           ]
         })
       ],
-      [compositionMock, { status: 200 }],
+      [deathCompositionMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: 'MOTHER'
+              }
+            ]
+          },
+          patient: {
+            reference: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7'
+          }
+        })
+      ],
       [motherMock, { status: 200 }]
     )
     const taskBundle = {
