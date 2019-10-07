@@ -64,6 +64,9 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
 }
 
 function onBackGroundSync() {
+  if (typeof BroadcastChannel === 'undefined') {
+    return
+  }
   const channel = new BroadcastChannel(
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
