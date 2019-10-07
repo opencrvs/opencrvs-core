@@ -6,6 +6,7 @@ import {
   getRegistrationNumber
 } from '@workflow/features/registration/utils'
 import {
+  getFromFhir,
   getRegStatusCode,
   getTrackingIdFromTaskResource
 } from '@workflow/features/registration/fhir/fhir-utils'
@@ -29,6 +30,7 @@ import {
   REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
 import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
+import { logger } from '@workflow/logger'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -53,7 +55,7 @@ export async function modifyRegistrationBundle(
   setupRegistrationType(taskResource, eventType)
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(
+  await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
     isInProgressApplication(fhirBundle)
@@ -82,7 +84,7 @@ export async function markBundleAsValidated(
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
-  setupRegistrationWorkflow(
+  await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_VALIDATED
@@ -116,7 +118,7 @@ export async function markBundleAsRegistered(
   }
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(
+  await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_REGISTERED
@@ -140,7 +142,7 @@ export async function markBundleAsCertified(
   const practitioner = await getLoggedInPractitionerResource(token)
 
   /* setting registration workflow status here */
-  setupRegistrationWorkflow(
+  await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
     REG_STATUS_CERTIFIED
@@ -265,14 +267,17 @@ export function setupRegistrationType(
   return taskResource
 }
 
-export function setupRegistrationWorkflow(
+export async function setupRegistrationWorkflow(
   taskResource: fhir.Task,
   tokenpayload: ITokenPayload,
   defaultStatus?: string
-): fhir.Task {
+): Promise<fhir.Task> {
   const regStatusCodeString = defaultStatus
     ? defaultStatus
     : getRegStatusCode(tokenpayload)
+
+  // Checking for duplicate status update
+  await checkForDuplicateStatusUpdate(taskResource, regStatusCodeString)
 
   if (!taskResource.businessStatus) {
     taskResource.businessStatus = {}
@@ -382,4 +387,30 @@ export function setupAuthorOnNotes(
     }
   })
   return taskResource
+}
+
+export async function checkForDuplicateStatusUpdate(
+  taskResource: fhir.Task,
+  regStatusCode: string
+) {
+  if (
+    taskResource &&
+    taskResource.id &&
+    regStatusCode !== REG_STATUS_CERTIFIED
+  ) {
+    const existingTaskResource: fhir.Task = await getFromFhir(
+      `/Task/${taskResource.id}`
+    )
+    const existingRegStatusCode =
+      existingTaskResource &&
+      existingTaskResource.businessStatus &&
+      existingTaskResource.businessStatus.coding &&
+      existingTaskResource.businessStatus.coding.find(code => {
+        return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+      })
+    if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
+      logger.error(`Application is already in ${regStatusCode} state`)
+      throw new Error(`Application is already in ${regStatusCode} state`)
+    }
+  }
 }
