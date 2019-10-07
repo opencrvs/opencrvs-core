@@ -21,6 +21,8 @@ export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:applicationId/events/${Even
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'
+export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
+  '/reviews/:applicationId/events/:event/parent/:pageId/group/:groupId'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
