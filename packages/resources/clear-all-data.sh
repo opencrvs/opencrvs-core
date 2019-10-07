@@ -15,4 +15,5 @@ docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval
 
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
 
-curl -X POST 'http://localhost:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/"
+docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
+
