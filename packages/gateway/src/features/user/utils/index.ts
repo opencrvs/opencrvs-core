@@ -1,4 +1,4 @@
-import { USER_MANAGEMENT_URL, COUNTRY } from '@gateway/constants'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
 import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
@@ -22,15 +22,6 @@ export const convertToLocal = (
     callingCountries[countryCode].countryCallingCodes[0],
     '0'
   )
-}
-
-export const convertToMSISDN = (phoneWithoutCountryCode: string) => {
-  const countryCode =
-    callingCountries[COUNTRY.toUpperCase()].countryCallingCodes[0]
-
-  return phoneWithoutCountryCode.startsWith('0')
-    ? `${countryCode}${phoneWithoutCountryCode.substring(1)}`
-    : `${countryCode}${phoneWithoutCountryCode}`
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
