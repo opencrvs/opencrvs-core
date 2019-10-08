@@ -28,33 +28,21 @@ const body = {
   },
   permanent_address: {
     division: {
-      id: '3', // These ids must match BBS codes
+      id: '30', // These ids must match BBS codes
       name: 'Dhaka'
     },
     district: {
-      id: '29', // These ids must match BBS codes
-      name: 'Narsingdi'
+      id: '33', // These ids must match BBS codes
+      name: '?'
     },
     upazila: {
-      id: '229', // These ids must match BBS codes
-      name: 'Narsingdi'
-    },
-    city_corporation: {
-      id: '', // These ids must match BBS codes
-      name: ''
-    },
-    municipality: {
-      id: '200', // These ids must match BBS codes
-      name: 'Narsingdi Pourushoba'
-    },
-    ward: {
-      id: '1', // These ids must match BBS codes
-      name: 'Urban Ward No-04'
+      id: '34', // These ids must match BBS codes
+      name: '?'
     },
     union: {
       // Required!
-      id: '4143', // These ids must match BBS codes
-      name: 'Alokbali'
+      id: '94', // These ids must match BBS codes
+      name: '?'
     }
   },
   phone_number: '+88071111111', // Required!
