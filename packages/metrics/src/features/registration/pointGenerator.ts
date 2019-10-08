@@ -7,9 +7,14 @@ import {
 import {
   getSectionBySectionCode,
   getRegLastLocation,
-  fetchParentLocationByLocationID
+  fetchParentLocationByLocationID,
+  getTask,
+  getPreviousTask
 } from '@metrics/features/registration/fhirUtils'
-import { getAgeInDays } from '@metrics/features/registration/utils'
+import {
+  getAgeInDays,
+  getDurationInSeconds
+} from '@metrics/features/registration/utils'
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,
@@ -52,7 +57,8 @@ const generatePointLocations = async (
   }
   locations.locationLevel5 = locationLevel5
   let locationID: string = locations.locationLevel5
-  // tslint:disable-next-line
+
+  // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
     if (!locationID) {
@@ -62,4 +68,40 @@ const generatePointLocations = async (
   }
 
   return locations
+}
+
+export async function generateEventDurationPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const currentTask = getTask(payload)
+
+  if (!currentTask || !currentTask.lastModified) {
+    throw new Error('Current task not found')
+  }
+  const previousTask = await getPreviousTask(currentTask, authHeader)
+
+  if (!previousTask || !previousTask.lastModified) {
+    throw new Error('Previous task not found')
+  }
+
+  const fields = {
+    duration_in_seconds: getDurationInSeconds(
+      previousTask.lastModified,
+      currentTask.lastModified
+    ),
+    current_task_id: currentTask.id,
+    previous_task_id: previousTask.id
+  }
+
+  const tags = {
+    current_status: 'REGISTERED',
+    previous_status: 'DECLARED'
+  }
+
+  return {
+    measurement: 'application_event_duration',
+    tags,
+    fields
+  }
 }

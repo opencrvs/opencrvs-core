@@ -36,6 +36,45 @@ export function getSectionBySectionCode(
   return personEntry.resource as fhir.Patient
 }
 
+function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
+  return resource.resourceType === 'Task'
+}
+
+function findPreviousTask(historyResponseBundle: fhir.Bundle) {
+  return (
+    historyResponseBundle.entry &&
+    historyResponseBundle.entry
+      .map(entry => entry.resource)
+      .filter((resource): resource is fhir.Task =>
+        Boolean(resource && isTaskResource(resource))
+      )
+      .find(resource => {
+        if (!resource.businessStatus || !resource.businessStatus.coding) {
+          return false
+        }
+
+        return resource.businessStatus.coding.some(
+          coding => coding.code === 'DECLARED'
+        )
+      })
+  )
+}
+
+export function getTask(bundle: fhir.Bundle) {
+  return getResourceByType<fhir.Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+}
+export async function getPreviousTask(
+  task: fhir.Task,
+  authHeader: IAuthHeader
+) {
+  const taskHistory = (await fetchFHIR(
+    `Task/${task.id}/_history`,
+    authHeader
+  )) as fhir.Bundle
+
+  return findPreviousTask(taskHistory)
+}
+
 export function getRegLastLocation(bundle: fhir.Bundle) {
   const task: fhir.Task = getResourceByType(
     bundle,
@@ -66,10 +105,10 @@ export async function fetchParentLocationByLocationID(
   return location && location.partOf && location.partOf.reference
 }
 
-export function getResourceByType(
+export function getResourceByType<T = fhir.Resource>(
   bundle: fhir.Bundle,
   type: string
-): fhir.Resource | undefined {
+): T | undefined {
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -80,7 +119,7 @@ export function getResourceByType(
         return entry.resource.resourceType === type
       }
     })
-  return bundleEntry && (bundleEntry.resource as fhir.Resource)
+  return bundleEntry && (bundleEntry.resource as T)
 }
 
 export enum FHIR_RESOURCE_TYPE {
@@ -88,12 +127,12 @@ export enum FHIR_RESOURCE_TYPE {
   TASK = 'Task'
 }
 
-export const fetchFHIR = (
+export function fetchFHIR<T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method: string = 'GET',
-  body: string | undefined = undefined
-) => {
+  body?: string
+) {
   return fetch(`${fhirUrl}${suffix}`, {
     method,
     headers: {
@@ -103,7 +142,7 @@ export const fetchFHIR = (
     body
   })
     .then(response => {
-      return response.json()
+      return response.json() as Promise<T>
     })
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
