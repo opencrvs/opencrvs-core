@@ -1,6 +1,6 @@
 import fetch from 'node-fetch'
 
-const body = {
+export const body = {
   deceased: {
     // Required!
     first_names_en: ['Import'],
@@ -58,36 +58,39 @@ const body = {
     name: 'Alokbali'
   }
 }
-;(async () => {
-  const authRes = await fetch('http://localhost:4040/authenticate', {
-    method: 'POST',
-    body: JSON.stringify({
-      username: 'api.user',
-      password: 'test'
+
+if (!module.parent) {
+  ;(async () => {
+    const authRes = await fetch('http://localhost:4040/authenticate', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'api.user',
+        password: 'test'
+      })
     })
+
+    const authResBody = await authRes.json()
+
+    // tslint:disable-next-line:no-console
+    console.log(authResBody)
+
+    const res = await fetch('http://localhost:8040/notification/death', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        Authorization: authResBody.token
+      }
+    })
+
+    const resBody = await res.text()
+
+    // tslint:disable-next-line:no-console
+    console.log(`${res.statusText} - ${res.status}`)
+    // tslint:disable-next-line:no-console
+    console.log(resBody)
+  })().catch(err => {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
   })
-
-  const authResBody = await authRes.json()
-
-  // tslint:disable-next-line:no-console
-  console.log(authResBody)
-
-  const res = await fetch('http://localhost:8040/notification/death', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      Authorization: authResBody.token
-    }
-  })
-
-  const resBody = await res.text()
-
-  // tslint:disable-next-line:no-console
-  console.log(`${res.statusText} - ${res.status}`)
-  // tslint:disable-next-line:no-console
-  console.log(resBody)
-})().catch(err => {
-  // tslint:disable-next-line:no-console
-  console.log(err)
-  process.exit(1)
-})
+}
