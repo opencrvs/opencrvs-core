@@ -21,7 +21,7 @@ export async function newBirthRegistrationHandler(
         }
       )
     )
-    writePoints(points)
+    await writePoints(points)
   } catch (err) {
     return internal(err)
   }

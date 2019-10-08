@@ -1,13 +1,10 @@
 import { createServer } from '@metrics/index'
-import { readPoints } from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { mocked } from 'ts-jest/utils'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
-
-jest.mock('@metrics/influxdb/client.ts')
+const influxClient = require('@metrics/influxdb/client')
 
 describe('verify metrics handler', () => {
   let server: any
@@ -284,7 +281,7 @@ describe('verify metrics handler', () => {
         })
       ]
     )
-    mocked(readPoints).mockImplementation(() => {
+    influxClient.readPoints.mockImplementation(() => {
       return [
         {
           total: 28334,
@@ -579,7 +576,7 @@ describe('verify metrics handler', () => {
         })
       ]
     )
-    mocked(readPoints).mockImplementation(() => {
+    influxClient.readPoints.mockImplementation(() => {
       return null
     })
 
