@@ -7,7 +7,7 @@ const fetch = fetchAny as any
 
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
     fetch.mockResponses(
       [
         JSON.stringify({
@@ -73,7 +73,7 @@ describe('Verify point generation', () => {
       gender: 'male'
     }
 
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
     fetch.mockResponseOnce(JSON.stringify({}))
     const point = await generateBirthRegPoint(
       payload,
@@ -96,7 +96,7 @@ describe('Verify point generation', () => {
     })
   })
   it('Populates partial location tree in-case data unavailibility', async () => {
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
     fetch.mockResponses(
       [
         JSON.stringify({
