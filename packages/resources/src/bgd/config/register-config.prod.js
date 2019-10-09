@@ -12,5 +12,7 @@ window.config = {
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50 // taka
+  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50, // taka
+  SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
+  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
 }
