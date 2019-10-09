@@ -5,6 +5,7 @@
     "tslint-microsoft-contrib"
   ],
   "rules": {
+    "mocha-no-side-effect-code": false,
     "no-duplicate-variable": true,
     "no-implicit-dependencies": false,
     "no-submodule-imports": false,

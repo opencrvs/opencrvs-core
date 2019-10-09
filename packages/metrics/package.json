@@ -77,7 +77,7 @@
       "node"
     ],
     "testEnvironment": "node",
-    "setupFiles": [
+    "setupFilesAfterEnv": [
       "./test/setupJest.ts"
     ],
     "modulePaths": [

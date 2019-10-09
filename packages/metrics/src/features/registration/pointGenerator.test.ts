@@ -1,39 +1,19 @@
 import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
 import { testPayload } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
-import * as fetchAny from 'jest-fetch-mock'
 
-const fetch = fetchAny as any
+import * as api from '@metrics/api'
+const fetchLocation = api.fetchLocation as jest.Mock
+const fetchParentLocationByLocationID = api.fetchParentLocationByLocationID as jest.Mock
 
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          id: '1',
-          partOf: {
-            reference: 'Location/4'
-          }
-        })
-      ],
-      [
-        JSON.stringify({
-          id: '2',
-          partOf: {
-            reference: 'Location/3'
-          }
-        })
-      ],
-      [
-        JSON.stringify({
-          id: '3',
-          partOf: {
-            reference: 'Location/2'
-          }
-        })
-      ]
-    )
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',
@@ -74,7 +54,9 @@ describe('Verify point generation', () => {
     }
 
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
-    fetch.mockResponseOnce(JSON.stringify({}))
+    fetchLocation.mockReset()
+    fetchLocation.mockResolvedValueOnce({})
+
     const point = await generateBirthRegPoint(
       payload,
       'mark-existing-application-registered',
@@ -97,17 +79,10 @@ describe('Verify point generation', () => {
   })
   it('Populates partial location tree in-case data unavailibility', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          id: '1',
-          partOf: {
-            reference: 'Location/4'
-          }
-        })
-      ],
-      [JSON.stringify({})]
-    )
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce(null)
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',

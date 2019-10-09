@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`When an existing application is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "current_task_id": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+    "duration_in_seconds": 170630,
+    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "current_status": "REGISTERED",
+    "previous_status": "DECLARED",
+  },
+}
+`;
