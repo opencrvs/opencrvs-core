@@ -5,6 +5,8 @@
     "tslint-microsoft-contrib"
   ],
   "rules": {
+    "no-string-based-set-timeout": false,
+    "mocha-no-side-effect-code": false,
     "no-duplicate-variable": true,
     "no-implicit-dependencies": false,
     "no-submodule-imports": false,

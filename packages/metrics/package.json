@@ -7,10 +7,11 @@
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "node build/dist/src/index.js",
-    "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
+    "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "precommit": "tslint --project ./tsconfig.json && lint-staged",
+    "lint": "tslint --project ./tsconfig.json",
+    "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "postbuild": "ef-tspm",
@@ -77,7 +78,7 @@
       "node"
     ],
     "testEnvironment": "node",
-    "setupFiles": [
+    "setupFilesAfterEnv": [
       "./test/setupJest.ts"
     ],
     "modulePaths": [

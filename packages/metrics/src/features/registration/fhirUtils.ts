@@ -1,6 +1,5 @@
-import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl } from '@metrics/constants'
+import { fetchTaskHistory } from '@metrics/api'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -60,18 +59,19 @@ function findPreviousTask(historyResponseBundle: fhir.Bundle) {
   )
 }
 
-export function getTask(bundle: fhir.Bundle) {
-  return getResourceByType<fhir.Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
-}
-export async function getPreviousTask(
-  task: fhir.Task,
-  authHeader: IAuthHeader
-) {
-  const taskHistory = (await fetchFHIR(
-    `Task/${task.id}/_history`,
-    authHeader
-  )) as fhir.Bundle
+export type Task = fhir.Task & { id: string }
+export type Composition = fhir.Composition & { id: string }
 
+export function getTask(bundle: fhir.Bundle) {
+  return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+}
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export async function getPreviousTask(task: Task, authHeader: IAuthHeader) {
+  const taskHistory = await fetchTaskHistory(task.id, authHeader)
   return findPreviousTask(taskHistory)
 }
 
@@ -97,14 +97,6 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   )
 }
 
-export async function fetchParentLocationByLocationID(
-  locationID: string,
-  authHeader: IAuthHeader
-) {
-  const location = await fetchFHIR(locationID, authHeader)
-  return location && location.partOf && location.partOf.reference
-}
-
 export function getResourceByType<T = fhir.Resource>(
   bundle: fhir.Bundle,
   type: string
@@ -125,26 +117,4 @@ export function getResourceByType<T = fhir.Resource>(
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task'
-}
-
-export function fetchFHIR<T = any>(
-  suffix: string,
-  authHeader: IAuthHeader,
-  method: string = 'GET',
-  body?: string
-) {
-  return fetch(`${fhirUrl}${suffix}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      ...authHeader
-    },
-    body
-  })
-    .then(response => {
-      return response.json() as Promise<T>
-    })
-    .catch(error => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
 }
