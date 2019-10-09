@@ -2,18 +2,20 @@ import { TransformedData, IFormData, IFormField } from '@register/forms'
 
 export const fieldToReasonsArrayTransformer = (
   transformedArrayName: string,
-  transformedFieldName: string,
-  extraField: string,
-  extraValue: string
+  transformedFieldName?: string,
+  extraField?: string
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
-  const fieldvalue = draftData[sectionId][field.name]
+  const fieldValue = draftData[sectionId][field.name]
+  const transFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
 
-  if (!fieldvalue) {
+  if (!fieldValue) {
     return
   } else {
     if (!transformedData[sectionId][transformedArrayName]) {
@@ -23,18 +25,31 @@ export const fieldToReasonsArrayTransformer = (
     const transformedArray = transformedData[sectionId][transformedArrayName]
 
     // @ts-ignore
-    let transformedField = transformedArray.find(field => {
-      return field[extraField] && field[extraField] === extraValue
+    let transformedField = transformedArray.find(transField => {
+      if (extraField) {
+        return (
+          transField[extraField] && transField[extraField] === field.extraValue
+        )
+      }
+      return (
+        transField[transFieldName] && transField[transFieldName] === fieldValue
+      )
     })
 
     if (!transformedField) {
       transformedField = {}
-      transformedField[extraField] = extraValue
-      transformedField[transformedFieldName] = fieldvalue
+      transformedField[transFieldName] = fieldValue
+
+      if (extraField) {
+        transformedField[extraField] = field.extraValue
+      }
+
       transformedArray.push(transformedField)
     } else {
-      transformedField[transformedFieldName] = fieldvalue
+      transformedField[transFieldName] = fieldValue
     }
+
+    console.log(transformedData)
 
     return transformedData
   }

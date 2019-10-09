@@ -3378,20 +3378,15 @@
                   "validate": [],
                   "required": false,
                   "initialValue": "",
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(!draftData || !draftData.primaryCaregiver || draftData.primaryCaregiver.motherIsDeceased)"
-                    }
-                  ],
+                  "extraValue": "MOTHER",
+                  "conditionals": [],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToReasonsArrayTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "reasonNotApplying",
-                        "primaryCaregiverType",
-                        "MOTHER"
+                        "primaryCaregiverType"
                       ]
                     }
                   }
@@ -3405,7 +3400,8 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
-                  "initialValue": [],
+                  "initialValue": "",
+                  "extraValue": "MOTHER",
                   "options": [
                     {
                       "value": true,
@@ -3422,8 +3418,7 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType",
-                        "MOTHER"
+                        "primaryCaregiverType"
                       ]
                     }
                   }
@@ -3439,14 +3434,14 @@
                   "validate": [],
                   "required": false,
                   "initialValue": "",
+                  "extraValue": "FATHER",
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToReasonsArrayTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "reasonNotApplying",
-                        "primaryCaregiverType",
-                        "FATHER"
+                        "primaryCaregiverType"
                       ]
                     }
                   }
@@ -3462,6 +3457,7 @@
                   "validate": [],
                   "required": false,
                   "initialValue": "",
+                  "extraValue": "FATHER",
                   "options": [
                     {
                       "value": true,
@@ -3478,8 +3474,7 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType",
-                        "FATHER"
+                        "primaryCaregiverType"
                       ]
                     }
                   }
@@ -3574,7 +3569,18 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          }
+                        }
                       },
                       {
                         "name": "phone",
@@ -3586,7 +3592,18 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToPhoneNumberTransformer",
+                                "parameters": []
+                              }
+                            ]
+                          }
+                        }
                       },
                       {
                         "name": "reasonNotApplying",
@@ -3598,7 +3615,23 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "extraValue": "LEGAL_GUARDIAN",
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToReasonsArrayTransformer",
+                                "parameters": [
+                                  "reasonsNotApplying",
+                                  "reasonNotApplying",
+                                  "primaryCaregiverType"
+                                ]
+                              }
+                            ]
+                          }
+                        }
                       }
                     ],
                     "INFORMANT": [],
@@ -3613,7 +3646,18 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          }
+                        }
                       },
                       {
                         "name": "phone",
@@ -3625,7 +3669,18 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToPhoneNumberTransformer",
+                                "parameters": []
+                              }
+                            ]
+                          }
+                        }
                       },
                       {
                         "name": "reasonNotApplying",
@@ -3637,9 +3692,39 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "extraValue": "OTHER",
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToReasonsArrayTransformer",
+                                "parameters": [
+                                  "reasonsNotApplying",
+                                  "reasonNotApplying",
+                                  "primaryCaregiverType"
+                                ]
+                              }
+                            ]
+                          }
+                        }
                       }
                     ]
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedFieldTransformer",
+                      "parameters": [
+                        {
+                          "operation": "fieldToReasonsArrayTransformer",
+                          "parameters": [
+                            "reasonsNotApplying",
+                            "primaryCaregiverType"
+                          ]
+                        }
+                      ]
+                    }
                   }
                 }
               ]

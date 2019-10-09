@@ -11,33 +11,37 @@ interface IPersonName {
   [key: string]: string
 }
 
-export const nestedFieldTransformer = (
-  nestedKey: string,
-  nestedTransformer?: any
-) => (
+export const nestedFieldTransformer = (nestedTransformer?: any) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
-  field: IFormField
+  field: IFormField,
+  nestedField?: IFormField
 ) => {
   const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+  let partialDraftData: IFormData = {}
 
-  if (!field.nestedFields) {
-    return transformedData
+  if (!nestedField) {
+    const parentData: IFormSectionData = {}
+    parentData[field.name] = fieldValueObj.value as IFormSectionData
+    partialDraftData[sectionId] = parentData
+  } else if (nestedField) {
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+    if (
+      nestedField.extraValue &&
+      nestedField.extraValue !== fieldValueObj.value
+    ) {
+      return transformedData
+    }
   }
 
-  const nestedField = field.nestedFields[fieldValueObj.value as string].find(
-    formField => {
-      return formField.name === nestedKey
-    }
-  )
-
-  const nestedDraftData: IFormData = {}
-
-  nestedDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
-
   if (nestedTransformer) {
-    nestedTransformer(transformedData, nestedDraftData, sectionId, nestedField)
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
   }
 }
 
