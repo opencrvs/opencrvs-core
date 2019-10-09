@@ -30,7 +30,6 @@ export default async function updateTaskHandler(
     ) {
       throw new Error('Task has no entry')
     }
-
     const res = await fetch(`${HEARTH_URL}/Task/${taskId}`, {
       method: 'PUT',
       body: JSON.stringify(payload.entry[0].resource),

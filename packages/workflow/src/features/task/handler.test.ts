@@ -10,6 +10,7 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
+  taskResouceMock,
   testFhirBundleWithIdsForDeath
 } from '@workflow/test/utils'
 
@@ -24,6 +25,7 @@ describe('Verify handler', () => {
     fetch.resetMocks()
     server = await createServer()
     fetch.mockResponses(
+      [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],

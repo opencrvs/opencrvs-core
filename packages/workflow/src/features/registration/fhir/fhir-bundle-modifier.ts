@@ -394,23 +394,24 @@ export async function checkForDuplicateStatusUpdate(
   regStatusCode: string
 ) {
   if (
-    taskResource &&
-    taskResource.id &&
-    regStatusCode !== REG_STATUS_CERTIFIED
+    !taskResource ||
+    !taskResource.id ||
+    regStatusCode === REG_STATUS_CERTIFIED
   ) {
-    const existingTaskResource: fhir.Task = await getFromFhir(
-      `/Task/${taskResource.id}`
-    )
-    const existingRegStatusCode =
-      existingTaskResource &&
-      existingTaskResource.businessStatus &&
-      existingTaskResource.businessStatus.coding &&
-      existingTaskResource.businessStatus.coding.find(code => {
-        return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-      })
-    if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
-      logger.error(`Application is already in ${regStatusCode} state`)
-      throw new Error(`Application is already in ${regStatusCode} state`)
-    }
+    return
+  }
+  const existingTaskResource: fhir.Task = await getFromFhir(
+    `/Task/${taskResource.id}`
+  )
+  const existingRegStatusCode =
+    existingTaskResource &&
+    existingTaskResource.businessStatus &&
+    existingTaskResource.businessStatus.coding &&
+    existingTaskResource.businessStatus.coding.find(code => {
+      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    })
+  if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
+    logger.error(`Application is already in ${regStatusCode} state`)
+    throw new Error(`Application is already in ${regStatusCode} state`)
   }
 }

@@ -565,6 +565,50 @@ export const testFhirTaskBundle = {
   ]
 }
 
+export const taskResouceMock = JSON.stringify({
+  resourceType: 'Task',
+  status: 'requested',
+  code: {
+    coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
+  },
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: { reference: 'DUMMY' }
+    }
+  ],
+  note: [
+    {
+      text: 'reason=Misspelling&comment=CHild name was misspelled',
+      time: '2018-11-28T15:13:57.492Z',
+      authorString: ''
+    }
+  ],
+  focus: {
+    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+  },
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: 'B1mW7jA'
+    }
+  ],
+  businessStatus: {
+    coding: [
+      { system: 'http://opencrvs.org/specs/reg-status', code: 'DECLARED' }
+    ]
+  },
+  meta: {
+    lastUpdated: '2018-11-29T15:11:13.041+00:00',
+    versionId: 'f2efacc4-b00c-4ee9-a9f0-4a33870e64ae'
+  },
+  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+})
+
 export const userMock = JSON.stringify({
   mobile: '+880711111111'
 })
