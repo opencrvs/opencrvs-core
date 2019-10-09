@@ -3575,8 +3575,15 @@
                             "operation": "nestedFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToNameTransformer",
-                                "parameters": ["en", "familyName"]
+                                "operation": "fieldValueNestingTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "fieldToNameTransformer",
+                                    "parameters": ["en", "familyName"]
+                                  },
+                                  "name"
+                                ]
                               }
                             ]
                           }
@@ -3598,8 +3605,15 @@
                             "operation": "nestedFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
+                                "operation": "fieldValueNestingTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "fieldToPhoneNumberTransformer",
+                                    "parameters": []
+                                  },
+                                  "phone"
+                                ]
                               }
                             ]
                           }
@@ -3652,8 +3666,15 @@
                             "operation": "nestedFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToNameTransformer",
-                                "parameters": ["en", "familyName"]
+                                "operation": "fieldValueNestingTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "fieldToNameTransformer",
+                                    "parameters": ["en", "familyName"]
+                                  },
+                                  "name"
+                                ]
                               }
                             ]
                           }
@@ -3675,8 +3696,15 @@
                             "operation": "nestedFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToPhoneNumberTransformer",
-                                "parameters": []
+                                "operation": "fieldValueNestingTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "fieldToPhoneNumberTransformer",
+                                    "parameters": []
+                                  },
+                                  "phone"
+                                ]
                               }
                             ]
                           }
