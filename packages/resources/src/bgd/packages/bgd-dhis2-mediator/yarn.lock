@@ -3926,6 +3926,13 @@ onetime@^2.0.0:
   dependencies:
     mimic-fn "^1.0.0"
 
+openhim-mediator-utils@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/openhim-mediator-utils/-/openhim-mediator-utils-0.2.3.tgz#3d1d65d6fef5a5f82eb5b1b83a9590c0054fcb4b"
+  integrity sha1-PR1l1v71pfgutbG4OpWQwAVPy0s=
+  dependencies:
+    request "^2.63.0"
+
 oppsy@2.x.x:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/oppsy/-/oppsy-2.0.1.tgz#91da3b4cc5cc6527dae3f04d67c7db87e4e4448c"
@@ -4396,7 +4403,7 @@ request-promise-native@^1.0.5:
     stealthy-require "^1.1.1"
     tough-cookie "^2.3.3"
 
-request@^2.87.0:
+request@^2.63.0, request@^2.87.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==

@@ -70,7 +70,7 @@ if (!module.parent) {
     // tslint:disable-next-line:no-console
     console.log(authResBody)
 
-    const res = await fetch('http://localhost:8040/notification/birth', {
+    const res = await fetch('http://localhost:5001/notification/birth', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {

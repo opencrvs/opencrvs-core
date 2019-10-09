@@ -7,11 +7,18 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  RUN_AS_MEDIATOR,
+  OPENHIM_URL,
+  OPENHIM_USER,
+  OPENHIM_PASSWORD,
+  TRUST_SELF_SIGNED,
+  MEDIATOR_URN
 } from '@search/constants'
 import getPlugins from '@search/config/plugins'
 import { getRoutes } from '@search/config/routes'
 import { readFileSync } from 'fs'
+import * as utils from 'openhim-mediator-utils'
 // tslint:disable-next-line:no-relative-imports TODO fix
 import { validateFunc } from '../../../../../../commons'
 
@@ -46,6 +53,40 @@ export async function createServer() {
   server.route(routes)
 
   async function start() {
+    if (RUN_AS_MEDIATOR === 'true') {
+      await new Promise((resolve, reject) => {
+        utils.registerMediator(
+          {
+            apiURL: OPENHIM_URL,
+            username: OPENHIM_USER,
+            password: OPENHIM_PASSWORD,
+            trustSelfSigned: TRUST_SELF_SIGNED === 'true'
+          },
+          {
+            urn: MEDIATOR_URN,
+            version: '1.0.0',
+            name: 'OpenCRVS DHIS2 Mediator',
+            endpoints: [
+              {
+                name: 'OpenCRVS DHIS Mediator',
+                host: HOST,
+                port: 8040
+              }
+            ]
+          },
+          (err: Error) => (err ? reject(err) : resolve())
+        )
+      })
+
+      utils.activateHeartbeat({
+        apiURL: OPENHIM_URL,
+        username: OPENHIM_USER,
+        password: OPENHIM_PASSWORD,
+        trustSelfSigned: TRUST_SELF_SIGNED === 'true',
+        urn: MEDIATOR_URN
+      })
+    }
+
     await server.start()
     server.log('info', `Search server started on ${HOST}:${PORT}`)
   }

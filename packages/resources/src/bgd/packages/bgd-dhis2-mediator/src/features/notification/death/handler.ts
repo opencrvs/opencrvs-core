@@ -8,6 +8,7 @@ import {
   IIncomingAddress
 } from '@search/features/fhir/service'
 import { postBundle, fetchUnionByFullBBSCode } from '@search/features/fhir/api'
+import { RUN_AS_MEDIATOR, MEDIATOR_URN, FHIR_URL } from '@search/constants'
 
 export interface IDeathNotification {
   deceased: {
@@ -121,7 +122,32 @@ export async function deathNotificationHandler(
 
   const bundle = createBundle(entries)
 
+  const startTime = new Date().toISOString()
   await postBundle(bundle, request.headers.authorization)
+  const endTime = new Date().toISOString()
+
+  if (RUN_AS_MEDIATOR) {
+    return h
+      .response({
+        'x-mediator-urn': MEDIATOR_URN,
+        status: 'Successful',
+        response: { status: 201 },
+        orchestrations: [
+          {
+            name: 'Submit converted birth bundle',
+            request: {
+              path: FHIR_URL,
+              method: 'POST',
+              timestamp: startTime,
+              body: JSON.stringify(bundle)
+            },
+            response: { status: 200, timestamp: endTime }
+          }
+        ]
+      })
+      .code(201)
+      .header('Content-Type', 'application/json+openhim')
+  }
 
   return h.response().code(201)
 }

@@ -33,6 +33,7 @@
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.6.0",
     "node-verhoeff": "^0.0.11",
+    "openhim-mediator-utils": "^0.2.3",
     "short-uid": "^0.1.0",
     "uuid": "^3.3.3",
     "winston": "^3.0.0"
