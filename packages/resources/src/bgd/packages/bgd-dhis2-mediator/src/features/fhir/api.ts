@@ -8,7 +8,7 @@ interface IIdentifier {
   value: string
 }
 
-async function fetchLocationByIdentifiersAndParent(
+export async function fetchLocationByIdentifiersAndParent(
   identifiers: IIdentifier[],
   partOfRef: string,
   authHeader: string
@@ -181,7 +181,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('District does not have a partOf reference')
     }
 
-    result.municipality = await fetchLocationByIdentifiersAndParent(
+    result.cityCorp = await fetchLocationByIdentifiersAndParent(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
