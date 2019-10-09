@@ -1,18 +1,7 @@
-import { callingCountries } from 'country-data'
-import { COUNTRY, NON_UNICODED_LANGUAGES } from '@notification/constants'
+import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 import { HapiRequest } from '@notification/features/sms/handler'
 import { internal } from 'boom'
 import { sendSMS } from '@notification/features/sms/service'
-
-export const convertToMSISDN = (phone: string) => {
-  const countryCode =
-    callingCountries[COUNTRY.toUpperCase()].countryCallingCodes[0]
-  return phone.startsWith(countryCode)
-    ? phone
-    : phone.startsWith('0')
-    ? `${countryCode}${phone.substring(1)}`
-    : `${countryCode}${phone}`
-}
 
 interface ISMSMessagePayload {
   name?: string
