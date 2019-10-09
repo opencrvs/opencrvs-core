@@ -80,7 +80,9 @@ class ForgottenItemComponent extends React.Component<Props, State> {
 
             <Actions id="forgotten-item-options">
               {this.state.error && (
-                <ErrorText>{intl.formatMessage(messages.error)}</ErrorText>
+                <ErrorText id="error-text">
+                  {intl.formatMessage(messages.error)}
+                </ErrorText>
               )}
               {forgottenItems.map(item => {
                 return (

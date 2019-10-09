@@ -96,6 +96,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     return (
       <>
         <ActionPageLight
+          id="page-title"
           title={intl.formatMessage(messages.credentialsResetFormTitle, {
             forgottenItem: this.props.location.state.forgottenItem
           })}

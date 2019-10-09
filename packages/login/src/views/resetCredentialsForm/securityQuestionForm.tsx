@@ -151,6 +151,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
     return (
       <>
         <ActionPageLight
+          id="page-title"
           title={intl.formatMessage(sharedMessages.credentialsResetFormTitle, {
             forgottenItem
           })}
