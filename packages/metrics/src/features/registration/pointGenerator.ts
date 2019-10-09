@@ -9,7 +9,9 @@ import {
   getRegLastLocation,
   getTask,
   getPreviousTask,
-  getComposition
+  getComposition,
+  APPLICATION_STATUS,
+  getApplicationStatus
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -73,6 +75,7 @@ const generatePointLocations = async (
 
 export async function generateEventDurationPoint(
   payload: fhir.Bundle,
+  previousState: APPLICATION_STATUS,
   authHeader: IAuthHeader
 ) {
   const composition = getComposition(payload)
@@ -85,7 +88,11 @@ export async function generateEventDurationPoint(
   if (!currentTask || !currentTask.lastModified) {
     throw new Error('Current task not found')
   }
-  const previousTask = await getPreviousTask(currentTask, authHeader)
+  const previousTask = await getPreviousTask(
+    currentTask,
+    previousState,
+    authHeader
+  )
 
   if (!previousTask || !previousTask.lastModified) {
     throw new Error('Previous task not found')
@@ -102,8 +109,8 @@ export async function generateEventDurationPoint(
   }
 
   const tags = {
-    current_status: 'REGISTERED',
-    previous_status: 'DECLARED'
+    current_status: getApplicationStatus(currentTask),
+    previous_status: getApplicationStatus(previousTask)
   }
 
   return {

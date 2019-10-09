@@ -39,8 +39,13 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
 
-function findPreviousTask(historyResponseBundle: fhir.Bundle) {
-  return (
+export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED'
+
+function findPreviousTask(
+  historyResponseBundle: fhir.Bundle,
+  previousState: APPLICATION_STATUS
+) {
+  const task =
     historyResponseBundle.entry &&
     historyResponseBundle.entry
       .map(entry => entry.resource)
@@ -53,10 +58,14 @@ function findPreviousTask(historyResponseBundle: fhir.Bundle) {
         }
 
         return resource.businessStatus.coding.some(
-          coding => coding.code === 'DECLARED'
+          coding => coding.code === previousState
         )
       })
-  )
+
+  if (!task) {
+    return null
+  }
+  return task as Task
 }
 
 export type Task = fhir.Task & { id: string }
@@ -70,9 +79,27 @@ export function getComposition(bundle: fhir.Bundle) {
   return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
 }
 
-export async function getPreviousTask(task: Task, authHeader: IAuthHeader) {
+export async function getPreviousTask(
+  task: Task,
+  previousState: APPLICATION_STATUS,
+  authHeader: IAuthHeader
+) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
-  return findPreviousTask(taskHistory)
+  return findPreviousTask(taskHistory, previousState)
+}
+
+export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
+  if (!task.businessStatus || !task.businessStatus.coding) {
+    return null
+  }
+
+  const coding = task.businessStatus.coding.find(
+    ({ system }) => system === 'http://opencrvs.org/specs/reg-status'
+  )
+  if (!coding) {
+    return null
+  }
+  return coding.code as APPLICATION_STATUS
 }
 
 export function getRegLastLocation(bundle: fhir.Bundle) {
