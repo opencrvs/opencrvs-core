@@ -34,6 +34,7 @@ export const BENGALI_STATE = {
     'login.manager.performanceAppTitle': 'কর্মদক্ষতা ব্যবস্থাপনা',
     'login.manager.performanceAppDescription':
       'নাগরিক নিবন্ধনের ক্ষেত্রে দেশের নির্দিষ্ট এলাকার কর্মদক্ষতা বিশ্লেষণ করুন',
+    'resend.sms': 'এসএমএস পুনরায় পাঠান',
     'resetCredentials.form.title':
       '{forgottenItem, select, username {ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ} password {পাসওয়ার্ড পুনরায় সেট করুন}}',
     'resetCredentials.forgottenItem.form.title': 'লগইন হচ্ছেনা',
@@ -50,6 +51,10 @@ export const BENGALI_STATE = {
       '৬-সংখ্যার পুনরুদ্ধার কোড লিখুন',
     'resetCredentials.recoveryCodeEntry.form.body.subheader':
       'পুনরুদ্ধার কোডটি আপনার ফোন নম্বরটিতে প্রেরণ করা হয়েছে। কোডটি লিখুন। কোড পৌঁছায়নি?',
+    'resetCredentials.recoveryCodeEntry.codeResent.form.body.header':
+      'যাচাই কোড পুনরায় পাঠানো হয়েছে',
+    'resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader':
+      'আপনাকে {number} নম্বরে একটি কোড প্রেরণ করা হয়েছে।',
     'resetCredentials.securityQuestion.form.body.subheader':
       'আপনি অ্যাকাউন্ট সেট আপ করার সময় যে সুরক্ষা প্রশ্নগুলি চয়ন করেছিলেন এটি তার মধ্যে একটি',
     'resetCredentials.success.page.title':

@@ -39,13 +39,13 @@ const messagesToDefine = {
     description: 'Form body subheader used for recovery code entry step'
   },
   codeResentTitle: {
-    id: 'resetCredentials.codeResentTitle',
+    id: 'resetCredentials.recoveryCodeEntry.codeResent.form.body.header',
     defaultMessage: 'Verification code resent',
     description:
       'The title that appears in step two of the form after resend button click'
   },
   resentSMS: {
-    id: 'resetCredentials.codeResentSubtitle',
+    id: 'resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader',
     defaultMessage: 'We just resent you another code to {number}.',
     description: 'The message that appears when the resend button is clicked.'
   },
@@ -181,7 +181,7 @@ const messagesToDefine = {
     description: 'Generic error message for invalid form nput'
   },
   resend: {
-    id: 'resetCredentials.resendMobile',
+    id: 'resend.sms',
     defaultMessage: 'Resend SMS',
     description: 'Text for button that resends SMS verification code'
   }

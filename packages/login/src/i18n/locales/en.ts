@@ -36,6 +36,7 @@ export const ENGLISH_STATE = {
     'login.manager.performanceAppTitle': 'Performance Management',
     'login.manager.performanceAppDescription':
       "Analyse the performance of a particular area of your country in it's Civil Registration.",
+    'resend.sms': 'Resend SMS',
     'resetCredentials.form.title':
       '{forgottenItem, select, username {Username reminder request} password {Password reset}}',
     'resetCredentials.forgottenItem.form.title': "Can't login",
@@ -54,6 +55,10 @@ export const ENGLISH_STATE = {
       'Enter the 6-digit recovery code',
     'resetCredentials.recoveryCodeEntry.form.body.subheader':
       "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?",
+    'resetCredentials.recoveryCodeEntry.codeResent.form.body.header':
+      'Verification code resent',
+    'resetCredentials.recoveryCodeEntry.codeResent.form.body.subheader':
+      'We just resent you another code to {number}.',
     'resetCredentials.securityQuestion.form.body.subheader':
       'This is one of the security questions you choose when setting up your account',
     'resetCredentials.success.page.title':
