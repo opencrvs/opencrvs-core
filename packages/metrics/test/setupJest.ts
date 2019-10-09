@@ -1,5 +1,6 @@
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
+import { readFileSync } from 'fs'
 
 jest.setMock('node-fetch', { default: fetch })
 jest.mock('@metrics/influxdb/client', () => ({
@@ -8,7 +9,9 @@ jest.mock('@metrics/influxdb/client', () => ({
   readPoints: jest.fn()
 }))
 
-const taskHistory = require('./data/task-history-response.json')
+const taskHistory = JSON.parse(
+  readFileSync(join(__dirname, './data/task-history-response.json')).toString()
+)
 
 jest.mock('@metrics/api', () => ({
   __esModule: true,
