@@ -506,6 +506,20 @@ class FormSectionComponent extends React.Component<Props> {
       setTimeout(() => {
         const newScroll = document.documentElement.scrollTop - 100
         window.scrollTo(0, newScroll)
+
+        const focusedElementId = window.location.hash.replace('#', '')
+        const focusedElement = document.querySelector(
+          `input[id*="${focusedElementId}"]`
+        ) as HTMLElement
+        if (focusedElement === null) {
+          // Handling for Select
+          ;(document.querySelector(
+            `${window.location.hash} input`
+          ) as HTMLElement).focus()
+        } else {
+          // Handling for Input
+          focusedElement && focusedElement.focus()
+        }
       }, 0)
     }
   }

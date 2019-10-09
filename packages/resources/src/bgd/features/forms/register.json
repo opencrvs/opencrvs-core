@@ -3258,7 +3258,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -3267,7 +3267,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -4996,7 +4996,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -5005,7 +5005,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -6966,7 +6966,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -6975,7 +6975,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -9090,7 +9090,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -9099,7 +9099,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -12636,7 +12636,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -12645,7 +12645,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
