@@ -2,12 +2,18 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { PaperClip } from '@opencrvs/components/lib/icons'
 import { IFileValue, IAttachmentValue } from '@register/forms'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { withTheme, ITheme } from '@register/styledComponents'
 
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-const PreviewLink = styled.p`
-  color: ${({ theme }) => theme.colors.primary};
+const PreviewLink = styled.div<{ disabled?: boolean }>`
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.disabled : theme.colors.primary};
+  font-style: normal;
+  text-decoration-line: underline;
   padding: 5px 10px;
   margin: 10px 0px;
   display: flex;
@@ -22,16 +28,28 @@ const PreviewLink = styled.p`
   }
 `
 
+const ProcessingSpinner = styled(Spinner)`
+  margin-left: auto;
+`
+
 type IProps = {
   documents?: IFileValue[] | null
+  processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
   label?: string
+  theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
 }
 
-export class DocumentListPreview extends React.Component<IProps> {
+class DocumentListPreviewComponent extends React.Component<IProps> {
   render() {
-    const { documents, label, attachment } = this.props
+    const {
+      documents,
+      processingDocuments,
+      label,
+      attachment,
+      theme
+    } = this.props
     return (
       <Wrapper>
         {documents &&
@@ -39,6 +57,17 @@ export class DocumentListPreview extends React.Component<IProps> {
             <PreviewLink key={key} onClick={_ => this.props.onSelect(document)}>
               <PaperClip />
               <span>{document.optionValues[1]}</span>
+            </PreviewLink>
+          ))}
+        {processingDocuments &&
+          processingDocuments.map(({ label }) => (
+            <PreviewLink disabled={true} key={label}>
+              <PaperClip stroke={theme.colors.disabled} />
+              <span>{label}</span>
+              <ProcessingSpinner
+                size={24}
+                id={`document_${label}_processing`}
+              />
             </PreviewLink>
           ))}
         {attachment && attachment.data && label && (
@@ -51,3 +80,5 @@ export class DocumentListPreview extends React.Component<IProps> {
     )
   }
 }
+
+export const DocumentListPreview = withTheme(DocumentListPreviewComponent)

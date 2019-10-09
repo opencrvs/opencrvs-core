@@ -248,11 +248,11 @@ export async function fhirWorkflowEventHandler(
       await forwardToOpenHim(Events.DEATH_MARK_CERT, request)
       break
     case Events.BIRTH_MARK_VOID:
-      response = await updateTaskHandler(request, h)
+      response = await updateTaskHandler(request, h, event)
       await forwardToOpenHim(Events.BIRTH_MARK_VOID, request)
       break
     case Events.DEATH_MARK_VOID:
-      response = await updateTaskHandler(request, h)
+      response = await updateTaskHandler(request, h, event)
       await forwardToOpenHim(Events.DEATH_MARK_VOID, request)
       break
     default:

@@ -6,3 +6,6 @@ export * from '@register/forms/register/fieldMappings/death/mutation/applicant-m
 export * from '@register/forms/register/fieldMappings/death/mutation/event-mappings'
 export * from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
 export * from '@register/forms/register/fieldMappings/death/mutation/applicant-mapping'
+
+// user form mappings
+export * from '@register/views/SysAdmin/forms/fieldMappings/user/mutation/user-mappings'
