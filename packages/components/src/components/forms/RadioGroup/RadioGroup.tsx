@@ -38,9 +38,15 @@ export enum RadioSize {
   LARGE = 'large',
   NORMAL = 'normal'
 }
+
+interface conditionals {
+  action: string
+  expression: string
+}
 export interface IRadioOption {
   label: string
   value: string | boolean
+  conditionals?: conditionals[]
 }
 
 export interface IRadioGroupProps {

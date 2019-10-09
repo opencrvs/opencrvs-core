@@ -31,31 +31,6 @@
               ],
               "fields": [
                 {
-                  "name": "presentAtBirthRegistration",
-                  "type": "TEXT",
-                  "required": true,
-                  "readonly": true,
-                  "hidden": true,
-                  "hideInPreview": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "label": {
-                    "defaultMessage": "Who is present for the birth registration?",
-                    "description": "Form section title for contact point",
-                    "id": "form.field.label.application.whoIsPresent"
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": []
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": []
-                    }
-                  }
-                },
-                {
                   "name": "applicant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
@@ -341,6 +316,31 @@
               ],
               "fields": [
                 {
+                  "name": "presentAtBirthRegistration",
+                  "type": "TEXT",
+                  "required": true,
+                  "readonly": true,
+                  "hidden": true,
+                  "hideInPreview": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "label": {
+                    "defaultMessage": "Who is present for the birth registration?",
+                    "description": "Form section title for contact point",
+                    "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "sectionFieldToBundleFieldTransformer",
+                      "parameters": []
+                    },
+                    "query": {
+                      "operation": "bundleFieldToSectionFieldTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
+                {
                   "name": "applicant",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "readonly": true,
@@ -394,12 +394,7 @@
                     "description": "Form section title for contact point",
                     "id": "register.SelectContactPoint.headings"
                   },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
-                    }
-                  ],
+                  "conditionals": [],
                   "previewGroup": "contactPointGroup",
                   "required": false,
                   "initialValue": "",
@@ -417,7 +412,13 @@
                         "defaultMessage": "Applicant",
                         "description": "Label for \"Applicant\" radio option",
                         "id": "form.field.label.application.whoseContactDetails.applicant"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "MOTHER",
@@ -556,200 +557,6 @@
                       },
                       {
                         "name": "registrationPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": false,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber"
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactPhoneNumber"
-                            ]
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "mapping": {
-                    "mutation": {
-                      "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "registration.contact"
-                      ]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": [
-                        "registration.contact"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "contactPoint",
-                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
-                  "label": {
-                    "defaultMessage": " ",
-                    "description": "Form section title for contact point",
-                    "id": "register.SelectContactPoint.headings"
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
-                    }
-                  ],
-                  "previewGroup": "contactPointGroup",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "size": "large",
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "options": [
-                    {
-                      "value": "MOTHER",
-                      "label": {
-                        "defaultMessage": "Mother",
-                        "description": "Label for \"Mother\" radio option",
-                        "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
-                    },
-                    {
-                      "value": "FATHER",
-                      "label": {
-                        "defaultMessage": "Father",
-                        "description": "Label for \"Father\" radio option",
-                        "id": "form.field.label.application.whoseContactDetails.father"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Someone else",
-                        "description": "Label for \"Someone else\" radio option",
-                        "id": "form.field.label.someoneElse"
-                      }
-                    }
-                  ],
-                  "nestedFields": {
-                    "MOTHER": [
-                      {
-                        "name": "registrationPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": false,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          }
-                        }
-                      }
-                    ],
-                    "FATHER": [
-                      {
-                        "name": "registrationPhone",
-                        "type": "TEL",
-                        "label": {
-                          "defaultMessage": "Phone number",
-                          "description": "Input label for phone input",
-                          "id": "form.field.label.phoneNumber"
-                        },
-                        "required": false,
-                        "initialValue": "",
-                        "validate": [
-                          {
-                            "operation": "phoneNumberFormat"
-                          }
-                        ],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          }
-                        }
-                      }
-                    ],
-                    "OTHER": [
-                      {
-                        "name": "contactRelationship",
-                        "type": "TEXT",
-                        "label": {
-                          "defaultMessage": "Relationship to child",
-                          "id": "form.field.label.applicantsRelationWithChild",
-                          "description": "Label for input Relationship to child"
-                        },
-                        "placeholder": {
-                          "defaultMessage": "eg. Grandmother",
-                          "id": "form.field.label.relationshipPlaceHolder",
-                          "description": "Placeholder for input Relationship to child"
-                        },
-                        "required": true,
-                        "initialValue": "",
-                        "validate": [],
-                        "mapping": {
-                          "mutation": {
-                            "operation": "changeHirerchyMutationTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          },
-                          "query": {
-                            "operation": "changeHirerchyQueryTransformer",
-                            "parameters": [
-                              "registration.contactRelationship"
-                            ]
-                          }
-                        }
-                      },
-                      {
-                        "name": "contactPhoneNumber",
                         "type": "TEL",
                         "label": {
                           "defaultMessage": "Phone number",

@@ -112,17 +112,16 @@ describe('when draft data is transformed to graphql', () => {
     registrationPhone: '01736478884',
     whoseContactDetails: 'MOTHER',
     applicant: {
-      value: 'OTHER',
+      value: 'MOTHER',
       nestedFields: {
-        otherRelationShip: 'Friend'
+        otherRelationShip: ''
       }
     },
     contactPoint: {
       value: 'OTHER',
       nestedFields: {
-        registrationPhone: '',
-        contactRelationship: 'grandma',
-        contactPhoneNumber: '01736478884'
+        contactRelationshipOther: 'grandma',
+        registrationPhone: '01736478884'
       }
     }
   }

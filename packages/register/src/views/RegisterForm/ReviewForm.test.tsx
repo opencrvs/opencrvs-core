@@ -437,7 +437,7 @@ describe('ReviewForm tests', () => {
       .prop('application') as IApplication
     expect(
       ((data.data.registration.contactPoint as IFormSectionData)
-        .nestedFields as IFormSectionData).contactPhoneNumber
+        .nestedFields as IFormSectionData).registrationPhone
     ).toBe('01733333333')
   })
   it('when registration has attachment', async () => {
@@ -700,17 +700,14 @@ describe('ReviewForm tests', () => {
       .find(RegisterForm)
       .prop('application') as IApplication
     expect(data.data.registration).toEqual({
-      presentAtBirthRegistration: 'MOTHER_ONLY',
       applicant: {
-        value: undefined,
-        nestedFields: { otherRelationShip: undefined }
+        nestedFields: {}
       },
+      presentAtBirthRegistration: 'MOTHER_ONLY',
       contactPoint: {
         value: 'MOTHER',
         nestedFields: {
-          registrationPhone: 'Contact Relation',
-          contactRelationship: 'Contact Relation',
-          contactPhoneNumber: '01733333333'
+          registrationPhone: '01733333333'
         }
       },
       _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',

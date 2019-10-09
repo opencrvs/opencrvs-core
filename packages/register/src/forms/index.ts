@@ -70,6 +70,7 @@ export interface ISelectOption {
 export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
+  conditionals?: RadioComponentOption['conditionals']
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']

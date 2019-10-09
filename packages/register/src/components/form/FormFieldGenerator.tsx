@@ -19,7 +19,8 @@ import {
   getFieldLabel,
   getFieldOptionsByValueMapper,
   getFieldType,
-  getQueryData
+  getQueryData,
+  getVisibleOptions
 } from '@register/forms/utils'
 
 import styled, { keyframes } from '@register/styledComponents'
@@ -128,6 +129,7 @@ type GeneratedInputFieldProps = {
   value: IFormFieldValue
   touched: boolean
   error: string
+  draftData?: IFormData
 }
 
 function GeneratedInputField({
@@ -140,7 +142,8 @@ function GeneratedInputField({
   error,
   touched,
   value,
-  nestedFields
+  nestedFields,
+  draftData
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -235,6 +238,10 @@ function GeneratedInputField({
     nestedFields &&
     resetNestedInputValues
   ) {
+    const visibleRadioOptions = getVisibleOptions(
+      fieldDefinition.options,
+      draftData as IFormData
+    )
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup
@@ -245,7 +252,7 @@ function GeneratedInputField({
             onSetFieldValue(`${fieldDefinition.name}.value`, val)
           }}
           nestedFields={nestedFields}
-          options={fieldDefinition.options}
+          options={visibleRadioOptions}
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
@@ -697,6 +704,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </Field>
@@ -749,6 +757,7 @@ class FormSectionComponent extends React.Component<Props> {
                             {...formikFieldProps.field}
                             touched={nestedFieldTouched || false}
                             error={nestedError}
+                            draftData={draftData}
                           />
                         )}
                       </FastField>
@@ -777,6 +786,7 @@ class FormSectionComponent extends React.Component<Props> {
                       nestedFields={nestedFieldElements}
                       touched={Boolean(touched[field.name]) || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </Field>
@@ -799,6 +809,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </FastField>
