@@ -1056,3 +1056,30 @@ describe('When an existing application is marked registered', () => {
     expect(applicationEventPoint).toMatchSnapshot()
   })
 })
+describe('When an existing application is marked certified', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/mark-certified-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/mark-certified',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'application_event_duration'
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(applicationEventPoint).toMatchSnapshot()
+  })
+})

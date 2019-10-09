@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`When an existing application is marked certified writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "application_id": "1744fc19-95be-434b-8bc9-a76d6b81551b",
+    "current_task_id": "dcf1644e-362d-414f-b0cc-2b240eea8591",
+    "duration_in_seconds": 94381,
+    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "current_status": "CERTIFIED",
+    "previous_status": "REGISTERED",
+  },
+}
+`;
+
 exports[`When an existing application is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
