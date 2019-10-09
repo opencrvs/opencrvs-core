@@ -8,7 +8,8 @@ import {
   getSectionBySectionCode,
   getRegLastLocation,
   getTask,
-  getPreviousTask
+  getPreviousTask,
+  getComposition
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -74,7 +75,12 @@ export async function generateEventDurationPoint(
   payload: fhir.Bundle,
   authHeader: IAuthHeader
 ) {
+  const composition = getComposition(payload)
   const currentTask = getTask(payload)
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
 
   if (!currentTask || !currentTask.lastModified) {
     throw new Error('Current task not found')
@@ -90,6 +96,7 @@ export async function generateEventDurationPoint(
       previousTask.lastModified,
       currentTask.lastModified
     ),
+    application_id: composition.id,
     current_task_id: currentTask.id,
     previous_task_id: previousTask.id
   }

@@ -60,9 +60,16 @@ function findPreviousTask(historyResponseBundle: fhir.Bundle) {
 }
 
 export type Task = fhir.Task & { id: string }
+export type Composition = fhir.Composition & { id: string }
+
 export function getTask(bundle: fhir.Bundle) {
   return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
 export async function getPreviousTask(task: Task, authHeader: IAuthHeader) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
   return findPreviousTask(taskHistory)

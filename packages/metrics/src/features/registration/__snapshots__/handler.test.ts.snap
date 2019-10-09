@@ -3,6 +3,7 @@
 exports[`When an existing application is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
+    "application_id": "80433e78-7042-4837-b888-a79c0181bf4e",
     "current_task_id": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
     "duration_in_seconds": 170630,
     "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
