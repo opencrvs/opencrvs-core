@@ -10,7 +10,7 @@ Run the configuration script with:
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
 ```
 
-Replace <inventory_file> with the correct inventory file and use `-k` option if you need supply an ssh password. These files contain the list of servers which are to be configured. If you are setting up a new set of servers, you will need to create a new file. Some files have been provide for the QA and staging environments.
+Replace <inventory_file> with the correct inventory file and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
 
 Once this command is finished the servers are now prepared for an OpenCRVS deployment.
 
@@ -39,13 +39,32 @@ sudo usermod -aG docker $USER
 
 Note: the Ansible script will install the UFW firewall, however, Docker manages it's own iptables. This means that even if there are UFW rules to block certain ports these will be overridden for ports where Docker is publishing a container port. Ensure only the necessary ports are published via the docker-compose files. Only the necessary ports are published by default, however, you may want to check this when doing security audits.
 
-Now, from the root folder of the repository run the deployment as follows:
+Synthetic records will need to be created, enabling SSL and permanently directing the following subdomains for the Traefik SSL cert to be succcessfully generated:
+
+api.<your_domain>
+auth.<your_domain>
+gateway.<your_domain>
+login.<your_domain>
+openhim.<your_domain>
+openhim-api.<your_domain>
+performance.<your_domain>
+register.<your_domain>
+resources.<your_domain>
+styleguide.<your_domain>
+
+Now, in the package.json file in the root folder of the repository, amend the deployment script appropriately:
 
 ```
-yarn deploy <server_hostname> <version>
+"deploy": "SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> bash deploy.sh",
 ```
 
-Version can be any git commit hash, git tag or 'latest'
+Then, run the deployment like so:
+
+```
+yarn deploy <<insert country code>> --clear-data=yes --restore-metadata=yes <<insert host domain e.g.: opencrvs.your_country.org>> <<insert version e.g.: latest>>
+```
+
+Version can be any git commit hash, git tag, dockerhub tag or 'latest'
 
 ## Enabling encryption
 
@@ -53,4 +72,13 @@ For production servers we offer the ability to setup an encrypted /data folder f
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
+```
+
+## Enabling Mongo replica sets
+
+Mongo is enabled with replica sets in order to provide backup in case a node fails. When the deploy script runs, the mongo-rs-init container waits 20s before trying to setup the replica set. If the mongo instances aren't up by then then there is a chance that the deployment will fail. You can recognise this by the following error in the opencrvs_mongo service logs `Unable to reach primary for set rs0`. Run `docker service ls` to see if the replicas have scaled or not. Running the following commands manually scales the replica set, and allows you to continue.
+
+```
+docker service scale opencrvs_mongo-rs-init=0
+docker service scale opencrvs_mongo-rs-init=1
 ```
