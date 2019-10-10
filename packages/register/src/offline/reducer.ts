@@ -138,10 +138,7 @@ function reducer(
             offlineData,
             offlineDataLoaded
           },
-          Cmd.list([
-            // Try loading data regardless as it might have been updated.
-            navigator.onLine ? dataLoadingCmds : Cmd.none
-          ])
+          Cmd.list([Cmd.none])
         )
       }
       return loop(state, dataLoadingCmds)
@@ -247,9 +244,13 @@ function reducer(
     }
 
     case actions.READY: {
+      console.log('READY')
+
+      const offlineDataLoaded = isOfflineDataLoaded(action.payload)
       return {
         ...state,
-        offlineData: action.payload
+        offlineData: action.payload,
+        offlineDataLoaded
       }
     }
 
