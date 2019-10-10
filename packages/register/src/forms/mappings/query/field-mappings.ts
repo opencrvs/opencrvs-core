@@ -2,7 +2,8 @@ import {
   IFormField,
   IFormData,
   IAttachment,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IFormSectionData
 } from '@register/forms'
 import {
   GQLHumanName,
@@ -376,5 +377,83 @@ export const nestedValueToFieldTransformer = (
     transformedData[sectionId][field.name] =
       clonedData[nestedFieldName][field.name]
   }
+  return transformedData
+}
+
+export const reasonsNotApplyingToFieldValueTransformer = (
+  transformedArrayName: string,
+  transformedFieldName: string,
+  extraField?: string,
+  extraValues?: string[]
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = queryData[sectionId]
+  let fieldValue
+  if (!sectionData) {
+    return transformedData
+  }
+
+  const transformedArray = sectionData[
+    transformedArrayName
+  ] as IFormSectionData[]
+
+  transformedArray.forEach(arrayField => {
+    const value = arrayField[transformedFieldName]
+    if (
+      (extraField &&
+        (arrayField[extraField] === field.extraValue ||
+          (extraValues &&
+            extraValues.includes(arrayField[extraField] as string)))) ||
+      (extraValues && extraValues.includes(value as string))
+    ) {
+      fieldValue = value
+    }
+  })
+
+  if (fieldValue) {
+    transformedData[sectionId][field.name] = fieldValue
+  }
+
+  return transformedData
+}
+
+export const valueToNestedRadioFieldTransformer = (
+  transformMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  const tempDraftData = {} as IFormData
+  tempDraftData[sectionId] = {}
+  let fieldValue
+
+  if (transformMethod) {
+    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
+  }
+  if (nestedField) {
+    fieldValue = tempDraftData[sectionId][nestedField.name]
+  } else {
+    fieldValue = tempDraftData[sectionId][field.name]
+  }
+
+  let transformedFieldData = transformedData[sectionId][field.name]
+
+  if (!transformedFieldData) {
+    transformedData[sectionId][field.name] = {
+      value: fieldValue,
+      nestedFields: {}
+    }
+  } else if (nestedField) {
+    // @ts-ignore
+    transformedFieldData.nestedFields[nestedField.name] = fieldValue
+  }
+
   return transformedData
 }
