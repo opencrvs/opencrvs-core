@@ -16,13 +16,13 @@
     "test:integration:death": "ts-node src/test/death-integration.ts",
     "build": "tsc",
     "postbuild": "ef-tspm",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "docker:build": "docker build -t jembi/ocrvs-bgd-dhis2-mediator -f Dockerfile ../../../../../..",
+    "docker:push": "docker push jembi/ocrvs-bgd-dhis2-mediator"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
-    "country-data": "^0.0.31",
-    "elasticsearch": "^15.2.0",
     "good": "^8.1.1",
     "good-console": "^7.1.0",
     "good-squeeze": "^5.1.0",
@@ -41,7 +41,6 @@
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
     "@types/boom": "^7.2.0",
-    "@types/elasticsearch": "^5.0.30",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",

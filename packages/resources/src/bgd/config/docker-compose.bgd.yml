@@ -17,6 +17,25 @@ services:
     environment:
       - LANGUAGES=bn,en
 
+  bgd-dhis2-mediator:
+    image: jembi/bgd-dhis2-mediator
+    secrets:
+      - jwt-public-key.{{ts}}
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - AUTH_URL=http://auth:4040
+      - CHECK_INVALID_TOKEN=true
+      - FHIR_URL=http://openhim-core:5001/fhir
+      # TODO need to secure some of these for production
+      - OPENHIM_USER=root@openhim.org
+      - OPENHIM_PASSWORD=password
+      - OPENHIM_URL=https://openhim-core:8080
+      - TRUST_SELF_SIGNED=true
+    deploy:
+      replicas: 1
+    networks:
+      - overlay_net
+
 secrets:
   infobip-gateway-endpoint:
     external: true

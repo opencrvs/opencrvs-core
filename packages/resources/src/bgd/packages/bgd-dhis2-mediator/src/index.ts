@@ -19,7 +19,7 @@ import getPlugins from '@bgd-dhis2-mediator/config/plugins'
 import { getRoutes } from '@bgd-dhis2-mediator/config/routes'
 import { readFileSync } from 'fs'
 import * as utils from 'openhim-mediator-utils'
-import { validateFunc } from '@opencrvs/commons'
+import { validateFunc } from '@bgd-dhis2-mediator/token-verifier'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
