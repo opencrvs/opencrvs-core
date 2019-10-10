@@ -508,14 +508,15 @@ class FormSectionComponent extends React.Component<Props> {
         window.scrollTo(0, newScroll)
 
         const focusedElementId = window.location.hash.replace('#', '')
-        const focusedElement = document.querySelector(
+        let focusedElement = document.querySelector(
           `input[id*="${focusedElementId}"]`
         ) as HTMLElement
         if (focusedElement === null) {
           // Handling for Select
-          ;(document.querySelector(
+          focusedElement = document.querySelector(
             `${window.location.hash} input`
-          ) as HTMLElement).focus()
+          ) as HTMLElement
+          focusedElement && focusedElement.focus()
         } else {
           // Handling for Input
           focusedElement && focusedElement.focus()
