@@ -6,9 +6,16 @@ import {
   createTaskEntry,
   createComposition,
   IIncomingAddress
-} from '@search/features/fhir/service'
-import { postBundle, fetchUnionByFullBBSCode } from '@search/features/fhir/api'
-import { RUN_AS_MEDIATOR, MEDIATOR_URN, FHIR_URL } from '@search/constants'
+} from '@bgd-dhis2-mediator/features/fhir/service'
+import {
+  postBundle,
+  fetchUnionByFullBBSCode
+} from '@bgd-dhis2-mediator/features/fhir/api'
+import {
+  RUN_AS_MEDIATOR,
+  MEDIATOR_URN,
+  FHIR_URL
+} from '@bgd-dhis2-mediator/constants'
 
 export interface IBirthNotification {
   child: {

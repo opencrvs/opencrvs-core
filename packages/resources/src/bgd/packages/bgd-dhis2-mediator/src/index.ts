@@ -14,13 +14,12 @@ import {
   OPENHIM_PASSWORD,
   TRUST_SELF_SIGNED,
   MEDIATOR_URN
-} from '@search/constants'
-import getPlugins from '@search/config/plugins'
-import { getRoutes } from '@search/config/routes'
+} from '@bgd-dhis2-mediator/constants'
+import getPlugins from '@bgd-dhis2-mediator/config/plugins'
+import { getRoutes } from '@bgd-dhis2-mediator/config/routes'
 import { readFileSync } from 'fs'
 import * as utils from 'openhim-mediator-utils'
-// tslint:disable-next-line:no-relative-imports TODO fix
-import { validateFunc } from '../../../../../../commons'
+import { validateFunc } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -41,7 +40,7 @@ export async function createServer() {
     verifyOptions: {
       algorithms: ['RS256'],
       issuer: 'opencrvs:auth-service'
-      // audience: 'opencrvs:bgd-dhis2-integration-user'
+      // audience: 'opencrvs:bgd-dhis2-integration-user' TODO enable this once we have API user that support it
     },
     validate: (payload: any, request: Hapi.Request) =>
       validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)

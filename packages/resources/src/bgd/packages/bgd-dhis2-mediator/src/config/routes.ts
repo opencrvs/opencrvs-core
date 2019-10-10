@@ -1,5 +1,5 @@
-import { birthNotificationHandler } from '@search/features/notification/birth/handler'
-import { deathNotificationHandler } from '@search/features/notification/death/handler'
+import { birthNotificationHandler } from '@bgd-dhis2-mediator/features/notification/birth/handler'
+import { deathNotificationHandler } from '@bgd-dhis2-mediator/features/notification/death/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -28,7 +28,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE] // TODO is this the correct scope for notification
+          scope: [RouteScope.DECLARE] // TODO we need to add a scope for notification and allow API user to be created with this scope
         },
         description:
           'Handles transformation and submission of birth notification'
@@ -41,7 +41,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE] // TODO is this the correct scope for notification
+          scope: [RouteScope.DECLARE] // TODO we need to add a scope for notification and allow API user to be created with this scope
         },
         description:
           'Handles transformation and submission of death notification'

@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": { "@resources/*": ["./*"] },
+    "paths": {
+      "@resources/*": [
+        "./*"
+      ]
+    },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -16,9 +24,17 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest", "geojson"]
+    "types": [
+      "fhir",
+      "jest",
+      "geojson"
+    ]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "tslint-rules"
+  ],
   "exclude": [
     "node_modules",
     "build",

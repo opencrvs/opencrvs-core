@@ -1,6 +1,5 @@
 import { v4 as uuid } from 'uuid'
-// tslint:disable-next-line:no-relative-imports
-import { fetchAllAddressLocations } from './api'
+import { fetchAllAddressLocations } from '@bgd-dhis2-mediator/features/fhir/api'
 
 export interface IIncomingAddress {
   division: {
@@ -64,7 +63,7 @@ export function createComposition(
         coding: [
           {
             system: 'http://opencrvs.org/doc-types',
-            // TODO support for notification event detection in workflow 'death-notification'
+            // TODO add support for notification event detection in workflow 'death-notification'
             code:
               eventType === 'BIRTH' ? 'birth-notification' : 'death-declaration'
           }

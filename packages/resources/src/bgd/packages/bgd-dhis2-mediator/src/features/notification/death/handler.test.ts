@@ -1,7 +1,5 @@
-// tslint:disable-next-line:no-relative-imports
-import { deathNotificationHandler } from './handler'
-// tslint:disable-next-line:no-relative-imports
-import { body } from '../../../test/death-integration'
+import { deathNotificationHandler } from '@bgd-dhis2-mediator/features/notification/death/handler'
+import { body } from '@bgd-dhis2-mediator/test/death-integration'
 import * as fetchMock from 'jest-fetch-mock'
 
 let fetch: fetchMock.FetchMock

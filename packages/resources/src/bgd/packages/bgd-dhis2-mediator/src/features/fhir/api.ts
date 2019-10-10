@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
-import { FHIR_URL } from '@search/constants'
-// tslint:disable-next-line:no-relative-imports
-import { IIncomingAddress } from './service'
+import { FHIR_URL } from '@bgd-dhis2-mediator/constants'
+import { IIncomingAddress } from '@bgd-dhis2-mediator/features/fhir/service'
 
 interface IIdentifier {
   system: string

@@ -1,11 +1,10 @@
 import * as fetchMock from 'jest-fetch-mock'
-// tslint:disable-next-line:no-relative-imports
 import {
   fetchLocationByIdentifiersAndParent,
   fetchHierarchicalBangladeshLocations,
   fetchAllAddressLocations,
   postBundle
-} from './api'
+} from '@bgd-dhis2-mediator/features/fhir/api'
 
 let fetch: fetchMock.FetchMock
 

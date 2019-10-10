@@ -92,7 +92,7 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "@search/(.*)": "<rootDir>/src/$1"
+      "@bgd-dhis2-mediator/(.*)": "<rootDir>/src/$1"
     },
     "coverageReporters": [
       "json",

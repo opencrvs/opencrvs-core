@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": { "@search/*": ["./*"] },
+    "paths": {
+      "@bgd-dhis2-mediator/*": [
+        "./*"
+      ]
+    },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -16,13 +24,15 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
   "include": [
     "src/**/*.ts",
     "typings",
-    "tslint-rules",
-    "__mocks__/elasticsearch.ts"
+    "tslint-rules"
   ],
   "exclude": [
     "node_modules",

@@ -1,7 +1,5 @@
-// tslint:disable-next-line:no-relative-imports
-import { birthNotificationHandler } from './handler'
-// tslint:disable-next-line:no-relative-imports
-import { body } from '../../../test/birth-integration'
+import { birthNotificationHandler } from '@bgd-dhis2-mediator/features/notification/birth/handler'
+import { body } from '@bgd-dhis2-mediator/test/birth-integration'
 import * as fetchMock from 'jest-fetch-mock'
 
 let fetch: fetchMock.FetchMock
