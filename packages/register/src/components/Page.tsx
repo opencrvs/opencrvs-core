@@ -19,6 +19,7 @@ import { changeLanguage } from '@register/i18n/actions'
 import { Ii18n } from '@register/type/i18n'
 import { USER_DETAILS } from '@register/utils/userUtils'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -82,6 +83,7 @@ const StyledSpinner = styled(Spinner)`
 
 interface IPageProps {
   language?: string
+  initialApplicationsLoaded: boolean
   offlineDataLoaded: boolean
   loadingError: boolean
 }
@@ -132,8 +134,12 @@ class Component extends React.Component<
   }
 
   render() {
-    const { offlineDataLoaded, children } = this.props
-    if (offlineDataLoaded) {
+    const {
+      initialApplicationsLoaded,
+      offlineDataLoaded,
+      children
+    } = this.props
+    if (offlineDataLoaded && initialApplicationsLoaded) {
       return (
         <div id="readyApplication">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -148,6 +154,7 @@ class Component extends React.Component<
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
     language: getLanguage(store),
+    initialApplicationsLoaded: getInitialApplicationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store)
   }
