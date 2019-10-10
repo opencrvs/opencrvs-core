@@ -3744,7 +3744,7 @@
                   "validate": []
                 },
                 {
-                  "name": "uploadDocPlaceAndDOB",
+                  "name": "uploadDocForChildDOB",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of Place and Date of Birth of Child",
