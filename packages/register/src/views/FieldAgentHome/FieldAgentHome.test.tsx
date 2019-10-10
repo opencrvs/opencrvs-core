@@ -95,46 +95,6 @@ describe('FieldAgentHome tests', () => {
     expect(element.hostNodes()).toHaveLength(1)
   })
 
-  it('renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_USER_WISE_APPLICATIONS,
-          variables: {
-            status: [EVENT_STATUS.REJECTED],
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        error: new Error('boom')
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <FieldAgentHome
-        match={{
-          params: {
-            tabId: 'progress'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    const app = testComponent.component.update()
-
-    expect(app.find('#field-agent-home_error').hostNodes()).toHaveLength(1)
-  })
-
   it('renders page with three tabs', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -538,7 +498,6 @@ describe('FieldAgentHome tests', () => {
       store.dispatch(storeApplication(failedApplication))
 
       component.update()
-
       expect(component.find('#waiting0').hostNodes()).toHaveLength(1)
       expect(component.find('#submitting1').hostNodes()).toHaveLength(1)
       expect(component.find('#submitted2').hostNodes()).toHaveLength(1)

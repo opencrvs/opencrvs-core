@@ -73,10 +73,16 @@ const UnderLayBackground = styled.div.attrs<{ background: string }>({})`
 const Title = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle}
   margin-bottom: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyBoldStyle}
+  }
 `
 const Description = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   margin-bottom: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyStyle}
+  }
 `
 
 const ActionContainer = styled.div`

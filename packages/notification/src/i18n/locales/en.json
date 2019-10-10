@@ -1,8 +1,10 @@
 {
   "birthDeclarationNotification": "Birth registration tracking ID for {{name}} is {{trackingid}}. You will get an SMS within 2 days with progress and next steps.",
   "birthRegistrationNotification": "Congratulations, the birth of {{name}} has been registered. Visit your local registration office with your ID to collect the certificate.",
+  "birthRejectionNotification": "Birth registration application for {{name}} ( Tracking ID: {{trackingid}} ) has been rejected. Please visit your local registration office for more information.",
   "deathDeclarationNotification": "Death registration tracking ID for {{name}} is {{trackingid}}. You will get an SMS within 2 days with progress and next steps.",
   "deathRegistrationNotification": "The death of {{name}} has been registered. Visit your local registration office with your ID to collect the certificate.",
+  "deathRejectionNotification": "Death registration application for {{name}} ( Tracking ID: {{trackingid}} ) has been rejected. Please visit your local registration office for more information.",
   "userCredentialsNotification": "You can login to OpenCRVS with this temporary username: {{username}} and password: {{password}}",
   "retieveUserNameNotification": "Your username for OpenCRVS is: {{username}}"
 }
