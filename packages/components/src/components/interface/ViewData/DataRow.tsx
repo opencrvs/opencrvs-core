@@ -33,11 +33,15 @@ const Label = styled.label`
   max-width: 40%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
   }
 `
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   flex: 1;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyStyle};
+  }
 `
 
 const PlaceHolder = styled.div`

@@ -1,8 +1,10 @@
 {
   "birthDeclarationNotification": "{{name}} এর জন্য জন্ম নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। অগ্রগতি এবং পরবর্তী পদক্ষেপের সাথে আপনি 2 দিনের মধ্যে একটি এসএমএস পাবেন।",
   "birthRegistrationNotification": "অভিনন্দন, {{name}} এর জন্ম নিবন্ধিত হয়েছে। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি নিয়ে আপনার স্থানীয় নিবন্ধন অফিসে যান",
+  "birthRejectionNotification": "{{name}} এর জন্ম নিবন্ধন আবেদনটি (ট্র্যাকিং আইডি: {{trackingid}}) বাতিল করা হয়েছে। পরবর্তী পদক্ষেপের জন্য আপনার স্থানীয় নিবন্ধন অফিসে যান।",
   "deathDeclarationNotification": "{{name}} এর জন্য মৃত্যু নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। অগ্রগতি এবং পরবর্তী পদক্ষেপের সাথে আপনি 2 দিনের মধ্যে একটি এসএমএস পাবেন।",
   "deathRegistrationNotification": "{{name}} এর মৃত্যু নিবন্ধিত হয়েছে। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি দিয়ে আপনার স্থানীয় নিবন্ধন অফিসে যান।",
+  "deathRejectionNotification": "{{name}} এর মৃত্যু নিবন্ধন আবেদনটি (ট্র্যাকিং আইডি: {{trackingid}}) বাতিল করা হয়েছে। পরবর্তী পদক্ষেপের জন্য আপনার স্থানীয় নিবন্ধন অফিসে যান।",
   "userCredentialsNotification": "OpenCRVS এ লগইন করতে ব্যাবহার করুন, username: {{username}} এবং password: {{password}}",
   "retieveUserNameNotification": "আপনার OpenCRVS এর username হল: {{username}}"
 }

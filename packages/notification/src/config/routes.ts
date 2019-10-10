@@ -1,22 +1,27 @@
+import { smsHandler, requestSchema } from '@notification/features/sms/handler'
 import {
-  smsHandler,
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
-  sendDeathDeclarationConfirmation,
-  sendDeathRegistrationConfirmation,
-  sendUserCredentials,
-  retrieveUserName
-} from '@notification/features/sms/handler'
-import {
-  requestSchema,
+  sendBirthRejectionConfirmation,
   declarationNotificationSchema,
   registrationNotificationSchema,
+  rejectionNotificationSchema
+} from '@notification/features/sms/birth-handler'
+import {
+  sendDeathDeclarationConfirmation,
+  sendDeathRegistrationConfirmation,
+  sendDeathRejectionConfirmation
+} from '@notification/features/sms/death-handler'
+import {
+  sendUserCredentials,
+  retrieveUserName,
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema
-} from '@notification/features/sms/payload-schema'
+} from '@notification/features/sms/user-handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
+  VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
   SYSADMIN = 'sysadmin'
@@ -57,7 +62,12 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Sends an sms to a user for birth declaration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
         },
         validate: {
           payload: declarationNotificationSchema
@@ -81,13 +91,34 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
+      path: '/birthRejectionSMS',
+      handler: sendBirthRejectionConfirmation,
+      config: {
+        tags: ['api'],
+        description:
+          'Sends an sms to a user for birth application rejection entry',
+        auth: {
+          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        validate: {
+          payload: rejectionNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/deathDeclarationSMS',
       handler: sendDeathDeclarationConfirmation,
       config: {
         tags: ['api'],
         description: 'Sends an sms to a user for death declaration entry',
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.REGISTER, RouteScope.CERTIFY]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
         },
         validate: {
           payload: declarationNotificationSchema
@@ -106,6 +137,22 @@ export default function getRoutes() {
         },
         validate: {
           payload: registrationNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deathRejectionSMS',
+      handler: sendDeathRejectionConfirmation,
+      config: {
+        tags: ['api'],
+        description:
+          'Sends an sms to a user for death application rejection entry',
+        auth: {
+          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        validate: {
+          payload: rejectionNotificationSchema
         }
       }
     },
