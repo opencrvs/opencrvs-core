@@ -90,6 +90,7 @@ enum RelationshipType {
   OPERATOR
   OFFICE_IN_CHARGE
   LEGAL_GUARDIAN
+  BOTH_PARENTS
 }
 
 input IdentityInput {

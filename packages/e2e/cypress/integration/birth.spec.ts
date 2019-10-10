@@ -131,6 +131,7 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
     cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_FATHER').click()
@@ -298,6 +299,7 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     // SELECT APPLICANT
     cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
     cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_MOTHER').click()
