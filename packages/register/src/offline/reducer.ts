@@ -244,8 +244,6 @@ function reducer(
     }
 
     case actions.READY: {
-      console.log('READY')
-
       const offlineDataLoaded = isOfflineDataLoaded(action.payload)
       return {
         ...state,
