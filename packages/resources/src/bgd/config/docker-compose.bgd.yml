@@ -18,7 +18,7 @@ services:
       - LANGUAGES=bn,en
 
   bgd-dhis2-mediator:
-    image: jembi/bgd-dhis2-mediator
+    image: jembi/ocrvs-bgd-dhis2-mediator
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -42,4 +42,6 @@ secrets:
   infobip-api-key:
     external: true
   infobip-sender-id:
+    external: true
+  jwt-public-key.{{ts}}:
     external: true

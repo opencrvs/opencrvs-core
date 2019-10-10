@@ -1,5 +1,11 @@
 import fetch from 'node-fetch'
 
+const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
+const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
+
+// tslint:disable-next-line:no-console
+console.log(`Connecting to auth: ${AUTH_URL} openhim: ${OPENHIM_URL}`)
+
 export const body = {
   deceased: {
     // Required!
@@ -61,7 +67,7 @@ export const body = {
 
 if (!module.parent) {
   ;(async () => {
-    const authRes = await fetch('http://localhost:4040/authenticate', {
+    const authRes = await fetch(`${AUTH_URL}/authenticate`, {
       method: 'POST',
       body: JSON.stringify({
         username: 'api.user',
@@ -74,7 +80,7 @@ if (!module.parent) {
     // tslint:disable-next-line:no-console
     console.log(authResBody)
 
-    const res = await fetch('http://localhost:5001/notification/death', {
+    const res = await fetch(`${OPENHIM_URL}/notification/death`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {

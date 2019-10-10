@@ -14,6 +14,8 @@
     "test:compilation": "tsc --noEmit",
     "test:integration:birth": "ts-node src/test/birth-integration.ts",
     "test:integration:death": "ts-node src/test/death-integration.ts",
+    "test:integration:birth:staging": "AUTH_URL=https://auth.opencrvs-staging.jembi.org OPENHIM_URL=https://api.opencrvs-staging.jembi.org ts-node src/test/birth-integration.ts",
+    "test:integration:death:staging": "AUTH_URL=https://auth.opencrvs-staging.jembi.org OPENHIM_URL=https://api.opencrvs-staging.jembi.org ts-node src/test/death-integration.ts",
     "build": "tsc",
     "postbuild": "ef-tspm",
     "build:clean": "rm -rf build",
