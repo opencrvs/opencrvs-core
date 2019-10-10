@@ -242,8 +242,30 @@ describe('when user has starts a new application', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
-      })
 
+        it('should go to input field when user press change button to edit information', async () => {
+          const backToReviewButton = await waitForElement(
+            app,
+            '#back-to-review-button'
+          )
+
+          backToReviewButton.hostNodes().simulate('click')
+
+          const changeNameButton = await waitForElement(
+            app,
+            '#btn_change_child_firstNames'
+          )
+
+          changeNameButton.hostNodes().simulate('click')
+
+          const firstNamesEngInputField = await waitForElement(
+            app,
+            '#firstNamesEng'
+          )
+
+          expect(firstNamesEngInputField.hostNodes()).toHaveLength(1)
+        })
+      })
       describe('when user clicks the "mother" page', () => {
         beforeEach(() => goToMotherSection(app))
         it('changes to the mother details section', () => {
