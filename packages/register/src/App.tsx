@@ -164,6 +164,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={
+                                              routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
+                                            }
+                                            component={ReviewForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.REGISTRAR_HOME}
                                             component={RegistrationHome}
                                           />

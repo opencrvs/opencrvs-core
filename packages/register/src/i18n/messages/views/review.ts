@@ -136,7 +136,7 @@ const messagesToDefine: IReviewMessages = {
   },
   approvalActionDescriptionComplete: {
     defaultMessage:
-      'By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready for approval.',
+      'By sending for approval you confirm that the application is ready for approval.',
     description:
       'Description for review action component when complete application',
     id: 'approval.actions.description.Complete'
@@ -148,7 +148,7 @@ const messagesToDefine: IReviewMessages = {
   },
   approvalActionTitle: {
     defaultMessage:
-      'Application {completeApplication, select, true {complete} false {incomplete}}',
+      'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
     description: 'Title for review action component',
     id: 'approval.actions.title.applicationStatus'
   },
@@ -196,7 +196,7 @@ const messagesToDefine: IReviewMessages = {
   },
   validateConfirmationDesc: {
     defaultMessage:
-      'This application will be sent to the registrar from them to approve.',
+      'This application will be sent to the registrar for them to approve.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },

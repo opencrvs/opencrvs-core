@@ -90,22 +90,25 @@ export async function createRegistrationHandler(
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
 
-    const msisdn = await getSharedContactMsisdn(payload)
-    /* sending notification to the contact */
     if (
-      msisdn &&
-      (event !== Events.BIRTH_IN_PROGRESS_DEC &&
-        event !== Events.DEATH_IN_PROGRESS_DEC &&
-        event !== Events.BIRTH_NEW_VALIDATE &&
-        event !== Events.DEATH_NEW_VALIDATE)
+      event === Events.BIRTH_IN_PROGRESS_DEC ||
+      event === Events.DEATH_IN_PROGRESS_DEC ||
+      event === Events.BIRTH_NEW_VALIDATE ||
+      event === Events.DEATH_NEW_VALIDATE
     ) {
-      logger.info('createRegistrationHandler sending event notification')
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
+      return resBundle
     }
-    logger.info('createRegistrationHandler could not send event notification')
 
+    /* sending notification to the contact */
+    const msisdn = await getSharedContactMsisdn(payload)
+    if (!msisdn) {
+      logger.info('createRegistrationHandler could not send event notification')
+      return resBundle
+    }
+    logger.info('createRegistrationHandler sending event notification')
+    sendEventNotification(payload, event, msisdn, {
+      Authorization: request.headers.authorization
+    })
     return resBundle
   } catch (error) {
     logger.error(
@@ -152,10 +155,11 @@ export async function markEventAsRegisteredHandler(
       sendEventNotification(payload, event, msisdn, {
         Authorization: request.headers.authorization
       })
+    } else {
+      logger.info(
+        'markEventAsRegisteredHandler could not send event notification'
+      )
     }
-    logger.info(
-      'markEventAsRegisteredHandler could not send event notification'
-    )
 
     return resBundle
   } catch (error) {

@@ -1,56 +1,42 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
-import { getStoredUserInformation } from '@auth/features/authenticate/service'
 import {
-  generateVerificationCode,
-  sendVerificationCode
-} from '@auth/features/verifyCode/service'
-import { PRODUCTION } from '@auth/constants'
-import { logger } from '@auth/logger'
+  getStoredUserInformation,
+  generateAndSendVerificationCode
+} from '@auth/features/authenticate/service'
+import { getRetrievalStepInformation } from '@auth/features/retrievalSteps/verifyUser/service'
 
 interface IRefreshPayload {
   nonce: string
+  retrievalFlow?: boolean
 }
 
 export default async function refreshHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { nonce } = request.payload as IRefreshPayload
+  const { nonce, retrievalFlow } = request.payload as IRefreshPayload
 
   let userInformation
   try {
-    userInformation = await getStoredUserInformation(nonce)
+    userInformation = retrievalFlow
+      ? await getRetrievalStepInformation(nonce)
+      : await getStoredUserInformation(nonce)
   } catch (err) {
     return unauthorized()
   }
 
   const { mobile, scope } = userInformation
 
-  const isDemoUser = scope.indexOf('demo') > -1
-
-  let verificationCode
-  if (isDemoUser) {
-    verificationCode = '000000'
-  } else {
-    verificationCode = await generateVerificationCode(nonce, mobile)
-  }
-
-  if (!PRODUCTION || isDemoUser) {
-    logger.info('Resending a verification SMS', {
-      mobile,
-      verificationCode
-    })
-  } else {
-    await sendVerificationCode(mobile, verificationCode)
-  }
+  await generateAndSendVerificationCode(nonce, mobile, scope)
 
   return { nonce }
 }
 
 export const requestSchema = Joi.object({
-  nonce: Joi.string()
+  nonce: Joi.string(),
+  retrievalFlow: Joi.boolean().optional()
 })
 export const responseSchma = Joi.object({
   nonce: Joi.string()

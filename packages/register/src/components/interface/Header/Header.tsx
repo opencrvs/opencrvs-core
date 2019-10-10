@@ -57,6 +57,7 @@ import {
   buttonMessages,
   userMessages
 } from '@register/i18n/messages'
+import { grid } from '@opencrvs/components/lib/grid'
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -217,6 +218,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
+        invertIcon: <TrackingID color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -224,12 +226,14 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
+        invertIcon: <BRN color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
+        invertIcon: <Phone color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       }
     ]
@@ -273,22 +277,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (
-      userDetails &&
-      userDetails.role &&
-      SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      menuItems = [
-        {
-          key: 'sysadmin',
-          title: intl.formatMessage(messages.systemTitle),
-          onClick: goToHome,
-          selected: true
-        }
-      ]
-    }
-
-    const rightMenu = [
+    let rightMenu = [
       {
         element: (
           <StyledPrimaryButton
@@ -306,6 +295,27 @@ class HeaderComp extends React.Component<IProps, IState> {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+
+      rightMenu = [
+        {
+          element: <ProfileMenu key="profileMenu" />
+        }
+      ]
+    }
 
     const mobileHeaderActionProps = this.props.mobileSearchBar
       ? {

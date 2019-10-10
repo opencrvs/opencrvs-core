@@ -29,7 +29,10 @@ import {
   certCollectorGroupForBirthAppWithoutFatherDetails
 } from '@register/forms/certificate/fieldDefinitions/collectorSection'
 import { getVisibleSectionGroupsBasedOnConditions } from '@register/forms/utils'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import {
+  getValidationErrorsForForm,
+  IFieldErrors
+} from '@register/forms/validation'
 import { buttonMessages, errorMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
 import {
@@ -133,8 +136,9 @@ const getErrorsOnFieldsBySection = (
 
   return {
     [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] =
-        errors[field.name as keyof typeof errors]
+      const validationErrors: IValidationResult[] = (errors[
+        field.name as keyof typeof errors
+      ] as IFieldErrors).errors
 
       const value = draft.data[sectionId]
         ? draft.data[sectionId][field.name]
@@ -313,6 +317,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           event={event}
           action={Action.LOAD_CERTIFICATE_APPLICATION}
           payload={{ id: applicationId }}
+          fetchPolicy="no-cache"
         >
           <QueryContext.Consumer>
             {({ loading, error, data, dataKey }) => {

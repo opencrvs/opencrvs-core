@@ -39,15 +39,18 @@ describe('Verify handler', () => {
     )
   })
   it('updateTaskHandler returns OK for a correctly authenticated user for birth', async () => {
-    fetch.mockResponse(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            response: { resourceType: 'Task' }
-          }
-        ]
-      })
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: { resourceType: 'Task' }
+            }
+          ]
+        })
+      ],
+      [JSON.stringify('')]
     )
 
     const token = jwt.sign(

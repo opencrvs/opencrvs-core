@@ -7,14 +7,16 @@ import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@register/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@register/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
-import * as Jimp from 'jimp'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
+import { getBase64Strings as resizeAndRotate } from 'exif-rotate-js/lib'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/imageUpload'
+
+const MAX_IMAGE_WIDTH_OR_HEIGHT = 2500
 
 const UploaderWrapper = styled.div`
   margin-bottom: 20px;
@@ -63,16 +65,18 @@ type DocumentFields = {
   documentType: string
   documentData: string
 }
+
 type IState = {
   errorMessage: string
   fields: DocumentFields
   uploadedDocuments: IFileValue[]
   previewImage: IFileValue | null
+  filesBeingProcessed: Array<{ label: string }>
   dropDownOptions: ISelectOption[]
 }
 
 export const getBase64String = (file: File) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<string | ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {
@@ -95,6 +99,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
       previewImage: null,
       uploadedDocuments: this.props.files || [],
       dropDownOptions: this.initializeDropDownOption(),
+      filesBeingProcessed: [],
       fields: {
         documentType: EMPTY_STRING,
         documentData: EMPTY_STRING
@@ -133,81 +138,110 @@ class DocumentUploaderWithOptionComp extends React.Component<
     return isValid
   }
 
-  handleFileChange = (uploadedImage: File) => {
+  processImage = async (uploadedImage: File) => {
+    if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
+      this.setState({
+        errorMessage: this.props.intl.formatMessage(messages.uploadError)
+      })
+      throw new Error('File type not supported')
+    }
+
+    if (uploadedImage.size > 5242880) {
+      this.setState({
+        errorMessage: this.props.intl.formatMessage(messages.overSized)
+      })
+      throw new Error(this.props.intl.formatMessage(messages.overSized))
+    }
+
+    if (uploadedImage.size > 2097152) {
+      const [resized] = await resizeAndRotate([uploadedImage], {
+        maxSize: MAX_IMAGE_WIDTH_OR_HEIGHT
+      })
+      return resized
+    }
+
+    const fileAsBase64 = await getBase64String(uploadedImage)
+    return fileAsBase64.toString()
+  }
+
+  handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
-    getBase64String(uploadedImage).then(data => {
-      let base64String = data as string
-      base64String = base64String.split('base64,')[1]
-      Jimp.read(new Buffer(base64String, 'base64'))
-        .then(buffer => {
-          if (!ALLOWED_IMAGE_TYPE.includes(buffer.getMIME())) {
-            this.setState({
-              errorMessage: this.props.intl.formatMessage(messages.uploadError)
-            })
-            throw new Error('File type not supported')
-          } else if (uploadedImage.size > 5242880) {
-            this.setState({
-              errorMessage: this.props.intl.formatMessage(messages.overSized)
-            })
-            throw new Error(this.props.intl.formatMessage(messages.overSized))
-          } else if (uploadedImage.size > 2097152) {
-            return buffer
-              .resize(2000, Jimp.AUTO)
-              .quality(70)
-              .getBase64Async(buffer.getMIME())
-          }
-          return data as string
-        })
-        .then(buffer => {
-          const optionValues = [
-            this.props.extraValue,
-            this.state.fields.documentType
-          ]
 
-          let tempOptions = this.state.dropDownOptions
-          remove(
-            tempOptions,
-            (option: ISelectOption) =>
-              option.value === this.state.fields.documentType
+    let fileAsBase64: string
+    const optionValues: [IFormFieldValue, string] = [
+      this.props.extraValue,
+      this.state.fields.documentType
+    ]
+
+    this.setState(state => ({
+      filesBeingProcessed: [
+        ...state.filesBeingProcessed,
+        {
+          label: optionValues[1]
+        }
+      ]
+    }))
+
+    const minimumProcessingTime = new Promise(resolve =>
+      setTimeout(resolve, 2000)
+    )
+    try {
+      // Start processing
+      ;[fileAsBase64] = await Promise.all([
+        this.processImage(uploadedImage),
+        minimumProcessingTime
+      ])
+    } catch (error) {
+      console.error(error)
+
+      this.setState({
+        errorMessage:
+          this.state.errorMessage ||
+          this.props.intl.formatMessage(messages.uploadError),
+        // Remove from processing files
+        filesBeingProcessed: this.state.filesBeingProcessed.filter(
+          ({ label }) => label !== optionValues[1]
+        )
+      })
+      return
+    }
+
+    let tempOptions = this.state.dropDownOptions
+
+    remove(
+      tempOptions,
+      (option: ISelectOption) => option.value === this.state.fields.documentType
+    )
+
+    this.setState(
+      prevState => {
+        const newDocument: IFileValue = {
+          optionValues,
+          type: uploadedImage.type,
+          data: fileAsBase64.toString()
+        }
+
+        return {
+          ...prevState,
+          errorMessage: EMPTY_STRING,
+          fields: {
+            documentType: EMPTY_STRING,
+            documentData: EMPTY_STRING
+          },
+          uploadedDocuments: [...prevState.uploadedDocuments, newDocument],
+          dropDownOptions: tempOptions,
+          // Remove from processing files
+          filesBeingProcessed: this.state.filesBeingProcessed.filter(
+            ({ label }) => label !== optionValues[1]
           )
-
-          this.setState(
-            prevState => {
-              const newDocument: IFileValue = {
-                optionValues,
-                type: uploadedImage.type,
-                data: buffer
-              }
-
-              return {
-                ...prevState,
-                errorMessage: EMPTY_STRING,
-                fields: {
-                  documentType: EMPTY_STRING,
-                  documentData: EMPTY_STRING
-                },
-                uploadedDocuments: [
-                  ...prevState.uploadedDocuments,
-                  newDocument
-                ],
-                dropDownOptions: tempOptions
-              }
-            },
-            () => {
-              this.props.onComplete(this.state.uploadedDocuments)
-            }
-          )
-        })
-        .catch(e => {
-          this.setState({
-            errorMessage:
-              this.state.errorMessage ||
-              this.props.intl.formatMessage(messages.uploadError)
-          })
-        })
-    })
+        }
+      },
+      () => {
+        this.props.onComplete(this.state.uploadedDocuments)
+      }
+    )
   }
 
   onDelete = (image: IFileValue | IAttachmentValue) => {
@@ -247,6 +281,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
         <Label>{label}</Label>
         <DocumentListPreview
+          processingDocuments={this.state.filesBeingProcessed}
           documents={this.state.uploadedDocuments}
           onSelect={this.selectForPreview}
         />

@@ -117,6 +117,7 @@ export class TextInput extends React.Component<ITextInputProps> {
     return (
       <StyledInput
         innerRef={this.$element}
+        name={props.id}
         {...this.props}
         autocomplete={false}
       />

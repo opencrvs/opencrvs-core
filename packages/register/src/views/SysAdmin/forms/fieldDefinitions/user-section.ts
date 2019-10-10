@@ -98,7 +98,7 @@ export const userSection: ISerializedFormSection = {
           validate: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
-              operation: 'fieldNameTransformer',
+              operation: 'msisdnTransformer',
               parameters: ['mobile']
             }
           }
@@ -169,6 +169,7 @@ export const userSection: ISerializedFormSection = {
           required: true,
           initialValue: '',
           searchableResource: 'locations',
+          searchableType: 'ADMIN_STRUCTURE',
           validate: [],
           mapping: {
             mutation: {

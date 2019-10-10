@@ -841,6 +841,75 @@ export const compositionMock = JSON.stringify({
   id: '95035079-ec2c-451c-b514-664e838e8a5b'
 })
 
+export const deathCompositionMock = JSON.stringify({
+  identifier: {
+    system: 'urn:ietf:rfc:3986',
+    value: '98df1315-47fd-4fc8-a505-9439ad7c6778'
+  },
+  resourceType: 'Composition',
+  status: 'preliminary',
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/doc-types',
+        code: 'death-declaration'
+      }
+    ],
+    text: 'Death Declaration'
+  },
+  class: {
+    coding: [
+      { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+    ],
+    text: 'CRVS Document'
+  },
+  title: 'Death Declaration',
+  section: [
+    {
+      title: 'Deceased details',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'deceased-details'
+          }
+        ],
+        text: 'Deceased details'
+      },
+      entry: [{ reference: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' }]
+    },
+    {
+      title: "Informant's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'informant-details'
+          }
+        ],
+        text: "Informant's details"
+      },
+      entry: [{ reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' }]
+    },
+    {
+      title: 'Death encounter',
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'death-encounter'
+          }
+        ],
+        text: 'Death encounter'
+      },
+      entry: [{ reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' }]
+    }
+  ],
+  subject: {},
+  date: '2019-02-11',
+  author: []
+})
+
 export const motherMock = JSON.stringify({
   resourceType: 'Patient',
   active: true,
@@ -929,179 +998,6 @@ export const motherMock = JSON.stringify({
   },
   id: '0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
 })
-
-export const testFhirBundleForDeath = {
-  resourceType: 'Bundle',
-  type: 'document',
-  entry: [
-    {
-      fullUrl: `urn:uuid:888`,
-      resource: {
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: '0ab5e4cd-a49b-4bf3-b03a-08b2e65e642a'
-        },
-        resourceType: 'Composition',
-        status: 'preliminary',
-        type: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-types',
-              code: 'death-declaration'
-            }
-          ],
-          text: 'Death Declaration'
-        },
-        class: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-classes',
-              code: 'crvs-document'
-            }
-          ],
-          text: 'CRVS Document'
-        },
-        subject: {},
-        date: '2018-05-23T14:44:58+02:00',
-        author: [],
-        title: 'Birth Declaration',
-        section: [
-          {
-            title: 'Child details',
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'child-details'
-                }
-              ],
-              text: 'Child details'
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
-              }
-            ]
-          },
-          {
-            title: "Mother's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'mother-details'
-                }
-              ],
-              text: "Mother's details"
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
-              }
-            ]
-          },
-          {
-            title: "Father's details",
-            code: {
-              coding: [
-                {
-                  system: 'http://opencrvs.org/doc-sections',
-                  code: 'father-details'
-                }
-              ],
-              text: "Father's details"
-            },
-            entry: [
-              {
-                reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-      resource: {
-        resourceType: 'Task',
-        status: 'requested',
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: 'DEATH'
-            }
-          ]
-        },
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/paper-form-id',
-            value: '12345678'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B5WGYJE'
-          }
-        ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'MOTHER'
-          }
-        ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662',
-      resource: {
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            family: ['অনিক'],
-            given: ['অনিক'],
-            use: 'bn'
-          }
-        ],
-        gender: 'male'
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
-      resource: {
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jane'],
-            family: ['Doe']
-          }
-        ],
-        gender: 'female',
-        telecom: [
-          {
-            system: 'phone',
-            value: '+8801622688231'
-          }
-        ]
-      }
-    },
-    {
-      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
-      resource: {
-        resourceType: 'Patient',
-        active: true,
-        name: [
-          {
-            given: ['Jack'],
-            family: ['Doe']
-          }
-        ],
-        gender: 'male'
-      }
-    }
-  ]
-}
 
 export const testDeathFhirBundle = {
   resourceType: 'Bundle',

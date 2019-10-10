@@ -10,6 +10,7 @@ export interface IFonts {
   h2Style: string
   h3Style: string
   h4Style: string
+  h5Style: string
   englishTextFont: string
   subtitleStyle: string
   captionStyle: string
@@ -70,6 +71,10 @@ export const fonts = (language: string): IFonts => {
       line-height: 18px;
       font-weight: normal;
       letter-spacing: 0.4px;`,
+    h5Style: `font-family: ${semiBoldFont};
+      font-size: 21px;
+      font-weight: normal;
+      line-height: 31px;`,
     h4Style: `font-family: ${semiBoldFont};
       font-size: 24px;
       font-weight: normal;
