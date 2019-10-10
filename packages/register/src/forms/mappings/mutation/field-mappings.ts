@@ -11,40 +11,6 @@ interface IPersonName {
   [key: string]: string
 }
 
-export const nestedFieldTransformer = (nestedTransformer?: any) => (
-  transformedData: TransformedData,
-  draftData: IFormData,
-  sectionId: string,
-  field: IFormField,
-  nestedField?: IFormField
-) => {
-  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
-  let partialDraftData: IFormData = {}
-
-  if (!nestedField) {
-    const parentData: IFormSectionData = {}
-    parentData[field.name] = fieldValueObj.value as IFormSectionData
-    partialDraftData[sectionId] = parentData
-  } else if (nestedField) {
-    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
-    if (
-      nestedField.extraValue &&
-      nestedField.extraValue !== fieldValueObj.value
-    ) {
-      return transformedData
-    }
-  }
-
-  if (nestedTransformer) {
-    nestedTransformer(
-      transformedData,
-      partialDraftData,
-      sectionId,
-      nestedField || field
-    )
-  }
-}
-
 export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
@@ -416,4 +382,91 @@ export const fieldToIdentifierWithTypeTransformer = (
   sectionData.identifier[0].system = identifierType
   sectionData.identifier[0].value = draftData[sectionId][field.name]
   return transformedData
+}
+
+export const nestedRadioFieldTransformer = (nestedTransformer?: any) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField?: IFormField
+) => {
+  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+  let partialDraftData: IFormData = {}
+
+  if (!nestedField) {
+    const parentData: IFormSectionData = {}
+    parentData[field.name] = fieldValueObj.value as IFormSectionData
+    partialDraftData[sectionId] = parentData
+  } else if (nestedField) {
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+    if (
+      nestedField.extraValue &&
+      nestedField.extraValue !== fieldValueObj.value
+    ) {
+      return transformedData
+    }
+  }
+
+  if (nestedTransformer) {
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
+  }
+}
+
+export const fieldToReasonsNotApplyingTransformer = (
+  transformedArrayName: string,
+  transformedFieldName?: string,
+  extraField?: string
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldValue = draftData[sectionId][field.name]
+  const transFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
+
+  if (!fieldValue) {
+    return
+  } else {
+    if (!transformedData[sectionId][transformedArrayName]) {
+      transformedData[sectionId][transformedArrayName] = []
+    }
+
+    const transformedArray = transformedData[sectionId][transformedArrayName]
+
+    // @ts-ignore
+    let transformedField = transformedArray.find(transField => {
+      if (extraField) {
+        return (
+          transField[extraField] && transField[extraField] === field.extraValue
+        )
+      }
+      return (
+        transField[transFieldName] && transField[transFieldName] === fieldValue
+      )
+    })
+
+    if (!transformedField) {
+      transformedField = {}
+      transformedField[transFieldName] = fieldValue
+
+      if (extraField) {
+        transformedField[extraField] = field.extraValue
+      }
+
+      transformedArray.push(transformedField)
+    } else {
+      transformedField[transFieldName] = fieldValue
+    }
+
+    return transformedData
+  }
 }

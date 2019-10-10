@@ -3382,7 +3382,15 @@
                   "conditionals": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToReasonsArrayTransformer",
+                      "operation": "fieldToReasonsNotApplyingTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "reasonNotApplying",
+                        "primaryCaregiverType"
+                      ]
+                    },
+                    "query": {
+                      "operation": "reasonsNotApplyingToFieldValueTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "reasonNotApplying",
@@ -3414,7 +3422,15 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToReasonsArrayTransformer",
+                      "operation": "fieldToReasonsNotApplyingTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "isDeceased",
+                        "primaryCaregiverType"
+                      ]
+                    },
+                    "query": {
+                      "operation": "reasonsNotApplyingToFieldValueTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
@@ -3437,7 +3453,15 @@
                   "extraValue": "FATHER",
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToReasonsArrayTransformer",
+                      "operation": "fieldToReasonsNotApplyingTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "reasonNotApplying",
+                        "primaryCaregiverType"
+                      ]
+                    },
+                    "query": {
+                      "operation": "reasonsNotApplyingToFieldValueTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "reasonNotApplying",
@@ -3470,7 +3494,15 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldToReasonsArrayTransformer",
+                      "operation": "fieldToReasonsNotApplyingTransformer",
+                      "parameters": [
+                        "reasonsNotApplying",
+                        "isDeceased",
+                        "primaryCaregiverType"
+                      ]
+                    },
+                    "query": {
+                      "operation": "reasonsNotApplyingToFieldValueTransformer",
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
@@ -3572,7 +3604,7 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
                                 "operation": "fieldValueNestingTransformer",
@@ -3583,6 +3615,21 @@
                                     "parameters": ["en", "familyName"]
                                   },
                                   "name"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nestedValueToFieldTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "nameToFieldTransformer",
+                                    "parameters": ["en", "familyName"]
+                                  }
                                 ]
                               }
                             ]
@@ -3602,7 +3649,7 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
                                 "operation": "fieldValueNestingTransformer",
@@ -3613,6 +3660,20 @@
                                     "parameters": []
                                   },
                                   "phone"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nestedValueToFieldTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "phoneNumberToFieldTransformer"
+                                  }
                                 ]
                               }
                             ]
@@ -3633,14 +3694,28 @@
                         "extraValue": "LEGAL_GUARDIAN",
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToReasonsArrayTransformer",
+                                "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
                                   "reasonsNotApplying",
                                   "reasonNotApplying",
                                   "primaryCaregiverType"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "reasonsNotApplyingToFieldValueTransformer",
+                                "parameters": [
+                                  "reasonsNotApplying",
+                                  "reasonNotApplying",
+                                  "primaryCaregiverType",
+                                  ["LEGAL_GUARDIAN"]
                                 ]
                               }
                             ]
@@ -3663,7 +3738,7 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
                                 "operation": "fieldValueNestingTransformer",
@@ -3674,6 +3749,21 @@
                                     "parameters": ["en", "familyName"]
                                   },
                                   "name"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nestedValueToFieldTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "nameToFieldTransformer",
+                                    "parameters": ["en", "familyName"]
+                                  }
                                 ]
                               }
                             ]
@@ -3693,7 +3783,7 @@
                         "validate": [],
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
                                 "operation": "fieldValueNestingTransformer",
@@ -3704,6 +3794,20 @@
                                     "parameters": []
                                   },
                                   "phone"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nestedValueToFieldTransformer",
+                                "parameters": [
+                                  "primaryCaregiver",
+                                  {
+                                    "operation": "phoneNumberToFieldTransformer"
+                                  }
                                 ]
                               }
                             ]
@@ -3724,14 +3828,28 @@
                         "extraValue": "OTHER",
                         "mapping": {
                           "mutation": {
-                            "operation": "nestedFieldTransformer",
+                            "operation": "nestedRadioFieldTransformer",
                             "parameters": [
                               {
-                                "operation": "fieldToReasonsArrayTransformer",
+                                "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
                                   "reasonsNotApplying",
                                   "reasonNotApplying",
                                   "primaryCaregiverType"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "reasonsNotApplyingToFieldValueTransformer",
+                                "parameters": [
+                                  "reasonsNotApplying",
+                                  "reasonNotApplying",
+                                  "primaryCaregiverType",
+                                  ["OTHER"]
                                 ]
                               }
                             ]
@@ -3742,13 +3860,27 @@
                   },
                   "mapping": {
                     "mutation": {
-                      "operation": "nestedFieldTransformer",
+                      "operation": "nestedRadioFieldTransformer",
                       "parameters": [
                         {
-                          "operation": "fieldToReasonsArrayTransformer",
+                          "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
                             "reasonsNotApplying",
                             "primaryCaregiverType"
+                          ]
+                        }
+                      ]
+                    },
+                    "query": {
+                      "operation": "valueToNestedRadioFieldTransformer",
+                      "parameters": [
+                        {
+                          "operation": "reasonsNotApplyingToFieldValueTransformer",
+                          "parameters": [
+                            "reasonsNotApplying",
+                            "primaryCaregiverType",
+                            "",
+                            ["OTHER", "LEGAL_GUARDIAN"]
                           ]
                         }
                       ]
