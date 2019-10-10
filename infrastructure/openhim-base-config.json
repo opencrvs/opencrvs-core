@@ -205,7 +205,7 @@
           "port": 9090,
           "path": "",
           "pathTransform": "",
-          "primary": false,
+          "primary": true,
           "username": "",
           "password": "",
           "forwardAuthHeader": true,
