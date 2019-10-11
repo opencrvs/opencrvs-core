@@ -77,6 +77,8 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
+  margin-left: -24px;
+  margin-top: -24px;
   top: 50%;
   left: 50%;
 `

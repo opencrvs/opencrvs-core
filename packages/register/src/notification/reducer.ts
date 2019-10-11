@@ -4,7 +4,6 @@ import * as actions from '@register/notification/actions'
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
   configurationErrorVisible: boolean
-  syncCount: number
   waitingSW: ServiceWorker | null
   sessionExpired: boolean
   saveDraftClicked: boolean
@@ -15,7 +14,6 @@ export type NotificationState = {
 export const initialState: NotificationState = {
   backgroundSyncMessageVisible: false,
   configurationErrorVisible: false,
-  syncCount: 0,
   waitingSW: null,
   sessionExpired: false,
   saveDraftClicked: false,
@@ -34,8 +32,7 @@ export const notificationReducer: LoopReducer<
     case actions.SHOW_BACKGROUND_SYNC_TRIGGERED:
       return {
         ...state,
-        backgroundSyncMessageVisible: true,
-        syncCount: action.payload.syncCount
+        backgroundSyncMessageVisible: true
       }
     case actions.HIDE_BACKGROUND_SYNC_TRIGGERED:
       return {
