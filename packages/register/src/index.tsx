@@ -71,8 +71,7 @@ function onBackGroundSync() {
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
   channel.onmessage = e => {
-    const syncCount = typeof e.data === 'number' ? e.data : 0
-    const action = actions.showBackgroundSyncedNotification(syncCount)
+    const action = actions.showBackgroundSyncedNotification()
     store.dispatch(action)
   }
 }

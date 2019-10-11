@@ -19,7 +19,7 @@ interface INotificationsMessages {
 const messagesToDefine: INotificationsMessages = {
   declarationsSynced: {
     defaultMessage:
-      'As you have connectivity, we have synced {syncCount} new birth declarations.',
+      'As you have connectivity, we can synchronize your applications.',
     description:
       'The message that appears in notification when background sync takes place',
     id: 'notification.declarationsSynced'
