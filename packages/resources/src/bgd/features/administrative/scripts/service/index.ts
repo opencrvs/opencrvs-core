@@ -9,11 +9,12 @@ import {
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
+export const A2I_LOCATION_REFERENCE_IDENTIFIER = `${ORG_URL}/specs/id/a2i-internal-reference`
 const composeFhirLocation = (
   location: IOISFLocation,
   jurisdictionType: string,
   partOfReference: string,
-  oisfA2IParams?: string
+  oisfA2IParams: string
 ): fhir.Location => {
   return {
     resourceType: 'Location',
@@ -29,11 +30,15 @@ const composeFhirLocation = (
       {
         system: `${ORG_URL}/specs/id/jurisdiction-type`,
         value: jurisdictionType
+      },
+      {
+        // Reference to the route params used internally in OISF/A2I to find this location
+        system: A2I_LOCATION_REFERENCE_IDENTIFIER,
+        value: oisfA2IParams
       }
     ],
     name: titleCase(location.name), // English name
     alias: [location.nameBn], // Bangla name in element 0
-    description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
     status: 'active',
     mode: 'instance',
     partOf: {

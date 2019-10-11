@@ -10,3 +10,5 @@ ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/assign-emp
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/prepare-statistical-data.ts
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/add-statistical-data.ts
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/update-statistical-data.ts
+ts-node -r tsconfig-paths/register src/bgd/features/generate/sequenceNumbers/scripts/prepare-sequence-number-data.ts
+ts-node -r tsconfig-paths/register src/bgd/features/generate/sequenceNumbers/scripts/update-sequence-number-data.ts
