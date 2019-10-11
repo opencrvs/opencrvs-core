@@ -17,7 +17,9 @@ const fieldNameMapping = {
   [deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address']]:
     'uploadDocForDeceasedPermanentAddress',
   [deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']]:
-    'uploadDocForDeceasedDOB'
+    'uploadDocForDeceasedDOB',
+  [deathDocumentForWhomFhirMapping['Proof of Death of Deceased']]:
+    'uploadDocForDeceasedDeath'
 }
 
 export function deathAttachmentToFieldTransformer(

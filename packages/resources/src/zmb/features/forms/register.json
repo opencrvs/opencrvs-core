@@ -3796,7 +3796,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front Of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option front of national ID",
@@ -3804,7 +3804,7 @@
                       }
                     },
                     {
-                      "value": "Back Of National ID'",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID'",
                         "description": "Label for select option back of national ID'",
@@ -3835,7 +3835,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front Of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option front of national ID",
@@ -3843,7 +3843,7 @@
                       }
                     },
                     {
-                      "value": "Back Of National ID'",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID",
                         "description": "Label for select option back of national ID'",
@@ -6399,7 +6399,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option radio option NID front",
@@ -6407,7 +6407,7 @@
                       }
                     },
                     {
-                      "value": "Back of National ID",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID",
                         "description": "Label for select option radio option NID back",
