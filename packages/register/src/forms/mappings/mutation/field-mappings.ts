@@ -421,14 +421,15 @@ export const nestedRadioFieldTransformer = (nestedTransformer?: any) => (
 export const fieldToReasonsNotApplyingTransformer = (
   transformedArrayName: string,
   transformedFieldName?: string,
-  extraField?: string
+  extraField?: string,
+  transformeValueArrayToBoolean?: boolean
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
-  const fieldValue = draftData[sectionId][field.name]
+  let fieldValue = draftData[sectionId][field.name]
   const transFieldName = transformedFieldName
     ? transformedFieldName
     : field.name
@@ -436,6 +437,11 @@ export const fieldToReasonsNotApplyingTransformer = (
   if (!fieldValue) {
     return
   } else {
+    if (transformeValueArrayToBoolean) {
+      const valueArray = fieldValue as IFormFieldValue[]
+      fieldValue = valueArray.length > 0
+    }
+
     if (!transformedData[sectionId][transformedArrayName]) {
       transformedData[sectionId][transformedArrayName] = []
     }

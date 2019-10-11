@@ -3380,6 +3380,7 @@
                   "initialValue": "",
                   "extraValue": "MOTHER",
                   "conditionals": [],
+                  "previewGroup": "reasonMotherNotApplying",
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToReasonsNotApplyingTransformer",
@@ -3408,11 +3409,13 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
-                  "initialValue": "",
+                  "initialValue": [],
                   "extraValue": "MOTHER",
+                  "required": false,
+                  "previewGroup": "reasonMotherNotApplying",
                   "options": [
                     {
-                      "value": true,
+                      "value": "deceased",
                       "label": {
                         "defaultMessage": "Mother has died",
                         "description": "Label for form field: motherIsDeceased",
@@ -3426,7 +3429,8 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType"
+                        "primaryCaregiverType",
+                        true
                       ]
                     },
                     "query": {
@@ -3434,7 +3438,9 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType"
+                        "primaryCaregiverType",
+                        "",
+                        ["deceased"]
                       ]
                     }
                   }
@@ -3450,6 +3456,7 @@
                   "validate": [],
                   "required": false,
                   "initialValue": "",
+                  "previewGroup": "reasonFatherNotApplying",
                   "extraValue": "FATHER",
                   "mapping": {
                     "mutation": {
@@ -3474,21 +3481,22 @@
                   "name": "fatherIsDeceased",
                   "type": "CHECKBOX_GROUP",
                   "label": {
-                    "defaultMessage": " ",
+                    "defaultMessage": "",
                     "description": "Label for form field: fatherIsDeceased",
-                    "id": "form.field.label.fatherIsDeceased"
+                    "id": "print.certificate.noLabel"
                   },
                   "validate": [],
-                  "required": false,
-                  "initialValue": "",
+                  "initialValue": [],
                   "extraValue": "FATHER",
+                  "required": false,
+                  "previewGroup": "reasonFatherNotApplying",
                   "options": [
                     {
-                      "value": true,
+                      "value": "deceased",
                       "label": {
                         "defaultMessage": "Father has died",
                         "description": "Label for form field: fatherIsDeceased",
-                        "id": "print.certificate.noLabel"
+                        "id": "form.field.label.fatherIsDeceased"
                       }
                     }
                   ],
@@ -3498,7 +3506,8 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType"
+                        "primaryCaregiverType",
+                        true
                       ]
                     },
                     "query": {
@@ -3506,7 +3515,9 @@
                       "parameters": [
                         "reasonsNotApplying",
                         "isDeceased",
-                        "primaryCaregiverType"
+                        "primaryCaregiverType",
+                        "",
+                        ["deceased"]
                       ]
                     }
                   }
@@ -3531,8 +3542,6 @@
                     "description": "Question to ask the user about caregiver",
                     "id": "form.field.label.primaryCaregiverType"
                   },
-                  "required": false,
-                  "readonly": true,
                   "hideHeader": true,
                   "initialValue": "",
                   "validate": [],

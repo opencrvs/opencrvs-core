@@ -384,7 +384,8 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   transformedArrayName: string,
   transformedFieldName: string,
   extraField?: string,
-  extraValues?: string[]
+  extraValues?: string[],
+  transformedFieldValue?: string[]
 ) => (
   transformedData: IFormData,
   queryData: any,
@@ -415,7 +416,7 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   })
 
   if (fieldValue) {
-    transformedData[sectionId][field.name] = fieldValue
+    transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
   }
 
   return transformedData
