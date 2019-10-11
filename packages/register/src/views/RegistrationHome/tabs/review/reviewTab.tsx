@@ -116,8 +116,6 @@ class ReviewTabComponent extends React.Component<
             )
         })
       }
-      console.log('reg.dateOfEvent: ', reg.dateOfEvent)
-      console.log('reg.createdAt: ', reg.createdAt)
       return {
         ...reg,
         eventTimeElapsed:
