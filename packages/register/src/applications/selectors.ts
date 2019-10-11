@@ -10,3 +10,8 @@ function getKey<K extends keyof IApplicationsState>(
 ) {
   return getDraftsState(store)[key]
 }
+
+export const getInitialApplicationsLoaded = (
+  store: IStoreState
+): IApplicationsState['initialApplicationsLoaded'] =>
+  getKey(store, 'initialApplicationsLoaded')
