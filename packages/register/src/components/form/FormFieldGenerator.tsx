@@ -501,6 +501,28 @@ class FormSectionComponent extends React.Component<Props> {
     if (this.props.onSetTouched) {
       this.props.onSetTouched(this.props.setTouched)
     }
+
+    if (window.location.hash) {
+      setTimeout(() => {
+        const newScroll = document.documentElement.scrollTop - 100
+        window.scrollTo(0, newScroll)
+
+        const focusedElementId = window.location.hash.replace('#', '')
+        let focusedElement = document.querySelector(
+          `input[id*="${focusedElementId}"]`
+        ) as HTMLElement
+        if (focusedElement === null) {
+          // Handling for Select
+          focusedElement = document.querySelector(
+            `${window.location.hash} input`
+          ) as HTMLElement
+          focusedElement && focusedElement.focus()
+        } else {
+          // Handling for Input
+          focusedElement && focusedElement.focus()
+        }
+      }, 0)
+    }
   }
 
   showValidationErrors(fields: IFormField[]) {
