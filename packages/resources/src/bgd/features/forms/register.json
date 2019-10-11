@@ -3369,6 +3369,12 @@
               "fields": [
                 {
                   "name": "reasonMotherNotApplying",
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString())"
+                    }
+                  ],
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Reason for mother",
@@ -3379,7 +3385,6 @@
                   "required": false,
                   "initialValue": "",
                   "extraValue": "MOTHER",
-                  "conditionals": [],
                   "previewGroup": "reasonMotherNotApplying",
                   "mapping": {
                     "mutation": {
@@ -3447,6 +3452,12 @@
                 },
                 {
                   "name": "reasonFatherNotApplying",
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString())"
+                    }
+                  ],
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Reason for father",
@@ -3521,6 +3532,26 @@
                       ]
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "reasonMotherNotApplying",
+                  "label": {
+                    "defaultMessage": "Reason for mother",
+                    "description": "Label for form field: reasonMotherNotApplying",
+                    "id": "form.field.label.reasonMotherNotApplying"
+                  },
+                  "fieldToRedirect": "reasonMotherNotApplying"
+                },
+                {
+                  "id": "reasonFatherNotApplying",
+                  "label": {
+                    "defaultMessage": "Reason for father",
+                    "description": "Label for form field: reasonFatherNotApplying",
+                    "id": "form.field.label.reasonFatherNotApplying"
+                  },
+                  "fieldToRedirect": "reasonFatherNotApplying"
                 }
               ]
             },
