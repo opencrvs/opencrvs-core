@@ -6,9 +6,10 @@ import { storage } from '@register/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS } from '@register/utils/userUtils'
+import { USER_DETAILS, IUserDetails } from '@register/utils/userUtils'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@register/applications'
+import * as LogRocket from 'logrocket'
 export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectedPageProps {
@@ -48,11 +49,14 @@ class ProtectedPageComponent extends React.Component<
     } else {
       newState.pinExists = false
     }
-    const userDetails = JSON.parse(
+    const userDetails: IUserDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
     if (userDetails && userDetails.status && userDetails.status === 'pending') {
       newState.pendingUser = true
+    }
+    if (userDetails && userDetails.practitionerId) {
+      LogRocket.identify(userDetails.practitionerId)
     }
     this.setState(newState)
   }
