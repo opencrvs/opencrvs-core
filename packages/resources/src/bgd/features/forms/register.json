@@ -466,13 +466,25 @@
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           }
                         }
@@ -498,13 +510,25 @@
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           }
                         }
@@ -530,13 +554,25 @@
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           }
                         }
@@ -574,13 +610,25 @@
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
                             "parameters": [
-                              "registration.contactPhoneNumber"
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
                             ]
                           }
                         }
