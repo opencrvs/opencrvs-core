@@ -88,8 +88,12 @@ describe('when user has starts a new application', () => {
         history.replace(
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
-
         await waitForElement(app, '#register_form')
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await waitForElement(app, '#form_section_id_child-view-group')
       })
 
       describe('when user types in something and press continue', () => {

@@ -867,6 +867,7 @@
         "register.SelectContactPoint.phoneNoError": "Not a valid mobile number",
         "register.SelectContactPoint.phoneNoLabel": "Phone number",
         "register.SelectContactPoint.title": "Birth application",
+        "register.selectInformant.relation": "Who is the applicant?",
         "register.selectInformant.birthErrorMessage": "Please select who is present and applying",
         "register.selectInformant.birthInformantTitle": "Who is applying for birth registration?",
         "register.selectInformant.daughter": "Daughter",

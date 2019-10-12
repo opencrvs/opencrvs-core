@@ -293,6 +293,7 @@ export interface GQLRegistration {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -305,7 +306,9 @@ export interface GQLRegistration {
 export enum GQLRegistrationContactType {
   BOTH = 'BOTH',
   MOTHER = 'MOTHER',
-  FATHER = 'FATHER'
+  FATHER = 'FATHER',
+  OTHER = 'OTHER',
+  APPLICANT = 'APPLICANT'
 }
 
 export interface GQLRegWorkflow {
@@ -390,7 +393,18 @@ export enum GQLRelationshipType {
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY',
   OTHER = 'OTHER',
-  INFORMANT = 'INFORMANT'
+  INFORMANT = 'INFORMANT',
+  GRANDFATHER = 'GRANDFATHER',
+  GRANDMOTHER = 'GRANDMOTHER',
+  BROTHER = 'BROTHER',
+  SISTER = 'SISTER',
+  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
+  INSTITUTION_HEAD_PLACE_OF_BIRTH = 'INSTITUTION_HEAD_PLACE_OF_BIRTH',
+  HOUSE_OWNER = 'HOUSE_OWNER',
+  OPERATOR = 'OPERATOR',
+  OFFICE_IN_CHARGE = 'OFFICE_IN_CHARGE',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  BOTH_PARENTS = 'BOTH_PARENTS'
 }
 
 export interface GQLPayment {
@@ -724,6 +738,7 @@ export interface GQLRegistrationInput {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
@@ -1778,6 +1793,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
+  contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -1825,6 +1841,13 @@ export interface RegistrationToBookResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -19,7 +19,8 @@ import {
   getFieldLabel,
   getFieldOptionsByValueMapper,
   getFieldType,
-  getQueryData
+  getQueryData,
+  getVisibleOptions
 } from '@register/forms/utils'
 
 import styled, { keyframes } from '@register/styledComponents'
@@ -92,7 +93,7 @@ import {
   FormikValues
 } from 'formik'
 import { IOfflineData } from '@register/offline/reducer'
-import { isEqual } from 'lodash'
+import { isEqual, flatten } from 'lodash'
 import { IValidationResult } from '@register/utils/validate'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 import { IStoreState } from '@register/store'
@@ -128,6 +129,7 @@ type GeneratedInputFieldProps = {
   value: IFormFieldValue
   touched: boolean
   error: string
+  draftData?: IFormData
 }
 
 function GeneratedInputField({
@@ -140,7 +142,8 @@ function GeneratedInputField({
   error,
   touched,
   value,
-  nestedFields
+  nestedFields,
+  draftData
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -235,6 +238,10 @@ function GeneratedInputField({
     nestedFields &&
     resetNestedInputValues
   ) {
+    const visibleRadioOptions = getVisibleOptions(
+      fieldDefinition.options,
+      draftData as IFormData
+    )
     return (
       <InputField {...inputFieldProps}>
         <RadioGroup
@@ -245,7 +252,7 @@ function GeneratedInputField({
             onSetFieldValue(`${fieldDefinition.name}.value`, val)
           }}
           nestedFields={nestedFields}
-          options={fieldDefinition.options}
+          options={visibleRadioOptions}
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
@@ -427,7 +434,7 @@ const mapFieldsToValues = (fields: IFormField[]) =>
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
-      const nestedFieldsFlatted = Object.values(field.nestedFields).flat()
+      const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
       const nestedInitialValues = nestedFieldsFlatted.reduce(
         (nestedValues, nestedField) => ({
@@ -531,15 +538,13 @@ class FormSectionComponent extends React.Component<Props> {
       if (field.nestedFields) {
         fieldTouched = {
           value: true,
-          nestedFields: Object.values(field.nestedFields)
-            .flat()
-            .reduce(
-              (nestedMemo, nestedField) => ({
-                ...nestedMemo,
-                [nestedField.name]: true
-              }),
-              {}
-            )
+          nestedFields: flatten(Object.values(field.nestedFields)).reduce(
+            (nestedMemo, nestedField) => ({
+              ...nestedMemo,
+              [nestedField.name]: true
+            }),
+            {}
+          )
         }
       }
       return { ...memo, [field.name]: fieldTouched }
@@ -567,9 +572,9 @@ class FormSectionComponent extends React.Component<Props> {
   resetNestedInputValues = (parentField: Ii18nFormField) => {
     const nestedFields = (parentField as Ii18nRadioGroupWithNestedFieldsFormField)
       .nestedFields
-    const nestedFieldsToReset = Object.keys(nestedFields)
-      .map(key => nestedFields[key])
-      .flat()
+    const nestedFieldsToReset = flatten(
+      Object.keys(nestedFields).map(key => nestedFields[key])
+    )
 
     nestedFieldsToReset.forEach(nestedField => {
       this.props.setFieldValue(
@@ -721,6 +726,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </Field>
@@ -773,6 +779,7 @@ class FormSectionComponent extends React.Component<Props> {
                             {...formikFieldProps.field}
                             touched={nestedFieldTouched || false}
                             error={nestedError}
+                            draftData={draftData}
                           />
                         )}
                       </FastField>
@@ -801,6 +808,7 @@ class FormSectionComponent extends React.Component<Props> {
                       nestedFields={nestedFieldElements}
                       touched={Boolean(touched[field.name]) || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </Field>
@@ -823,6 +831,7 @@ class FormSectionComponent extends React.Component<Props> {
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
                       error={error}
+                      draftData={draftData}
                     />
                   )}
                 </FastField>
