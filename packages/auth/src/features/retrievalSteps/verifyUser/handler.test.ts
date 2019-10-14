@@ -13,8 +13,18 @@ describe('verifyUser handler receives a request', () => {
   })
 
   describe('user management service says user is not valid', () => {
-    it('returns a 401 response to client', async () => {
+    it('returns a 401 response to client when error occurs', async () => {
       fetch.mockReject(new Error())
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/verifyUser',
+        payload: { mobile: '+8801711111111', retrieveFlow: 'password' }
+      })
+
+      expect(res.statusCode).toBe(401)
+    })
+    it('returns a 401 response to client when the fetch call responses with a bad request response', async () => {
+      fetch.mockResponse('{}', { status: 400 })
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyUser',

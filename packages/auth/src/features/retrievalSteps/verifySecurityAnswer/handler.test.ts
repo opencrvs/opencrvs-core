@@ -22,11 +22,14 @@ describe('security question answer checking', () => {
     )
     await storeRetrievalStepInformation(
       'TEST_NONCE',
-      '123',
-      'face_user_name',
-      '1231231',
       RetrievalSteps.NUMBER_VERIFIED,
-      'TEST_SECURITY_QUESTION_KEY'
+      {
+        userId: '123',
+        username: 'fake_user_name',
+        mobile: '123123123',
+        securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+        scope: []
+      }
     )
   })
 
@@ -56,13 +59,17 @@ describe('security question answer checking', () => {
       beforeEach(() =>
         storeRetrievalStepInformation(
           'TEST_NONCE',
-          '123',
-          'face_user_name',
-          '1231231',
           RetrievalSteps.WAITING_FOR_VERIFICATION,
-          'TEST_SECURITY_QUESTION_KEY'
+          {
+            userId: '123',
+            username: 'fake_user_name',
+            mobile: '123123123',
+            securityQuestionKey: 'TEST_SECURITY_QUESTION_KEY',
+            scope: []
+          }
         )
       )
+
       it('responds with an error', async () => {
         res = await server.server.inject({
           method: 'POST',

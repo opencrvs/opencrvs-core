@@ -122,8 +122,21 @@ describe('when user is previewing the form data', () => {
       commentsOrNotes: 'comments',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationCertificateLanguage: ['en'],
-      registrationPhone: '01736478884',
-      whoseContactDetails: 'MOTHER'
+      whoseContactDetails: 'MOTHER',
+      applicant: {
+        value: 'OTHER',
+        nestedFields: {
+          otherRelationShip: 'Friend'
+        }
+      },
+      contactPoint: {
+        value: 'OTHER',
+        nestedFields: {
+          registrationPhone: '',
+          contactRelationship: 'grandma',
+          contactPhoneNumber: '01717000000'
+        }
+      }
     }
 
     beforeEach(async () => {

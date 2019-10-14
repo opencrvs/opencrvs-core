@@ -49,18 +49,15 @@ export default async function verifyNumberHandler(
   // Update retrievalstep info with new status NUMBER_VERIFIED
   await storeRetrievalStepInformation(
     payload.nonce,
-    retrievalStepInfo.userId,
-    retrievalStepInfo.username,
-    retrievalStepInfo.mobile,
     RetrievalSteps.NUMBER_VERIFIED,
-    retrievalStepInfo.securityQuestionKey
+    retrievalStepInfo
   )
   // Returns the securityQuestionKey with nonce
-  const respose: IVerifyNumberResponse = {
+  const response: IVerifyNumberResponse = {
     securityQuestionKey: retrievalStepInfo.securityQuestionKey,
     nonce: payload.nonce
   }
-  return respose
+  return response
 }
 
 export const requestSchema = Joi.object({

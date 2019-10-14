@@ -2639,7 +2639,7 @@
                     "description": "Tag definition for placeOfHeritage",
                     "id": "form.preview.tag.placeOfHeritage"
                   },
-                  "fieldToRedirect": "placeOfHeritage"
+                  "fieldToRedirect": "countryPlaceOfHeritage"
                 },
                 {
                   "id": "permanentAddress",
@@ -2648,7 +2648,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -2657,7 +2657,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -3695,7 +3695,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 },
                 {
                   "id": "currentAddress",
@@ -3704,7 +3704,7 @@
                     "description": "Tag definition for crrent address",
                     "id": "form.preview.tag.current.address"
                   },
-                  "fieldToRedirect": "currentAddress"
+                  "fieldToRedirect": "country"
                 }
               ]
             }
@@ -3744,7 +3744,7 @@
                   "validate": []
                 },
                 {
-                  "name": "uploadDocPlaceAndDOB",
+                  "name": "uploadDocForChildDOB",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of Place and Date of Birth of Child",
@@ -3796,7 +3796,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front Of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option front of national ID",
@@ -3804,7 +3804,7 @@
                       }
                     },
                     {
-                      "value": "Back Of National ID'",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID'",
                         "description": "Label for select option back of national ID'",
@@ -3835,7 +3835,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front Of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option front of national ID",
@@ -3843,7 +3843,7 @@
                       }
                     },
                     {
-                      "value": "Back Of National ID'",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID",
                         "description": "Label for select option back of national ID'",
@@ -4613,7 +4613,7 @@
                     "description": "Tag definition for permanentAddress",
                     "id": "form.preview.tag.permanent.address"
                   },
-                  "fieldToRedirect": "permanentAddress"
+                  "fieldToRedirect": "countryPermanent"
                 }
               ]
             }
@@ -6399,7 +6399,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "Front of National ID",
+                      "value": "National ID (front)",
                       "label": {
                         "defaultMessage": "Front of national ID",
                         "description": "Label for select option radio option NID front",
@@ -6407,7 +6407,7 @@
                       }
                     },
                     {
-                      "value": "Back of National ID",
+                      "value": "National ID (back)",
                       "label": {
                         "defaultMessage": "Back of national ID",
                         "description": "Label for select option radio option NID back",
