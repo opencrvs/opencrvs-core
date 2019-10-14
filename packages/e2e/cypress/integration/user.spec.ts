@@ -54,7 +54,7 @@ context('User Integration Test', () => {
       'FAVORITE_MOVIE',
       'What is your favorite movie?'
     )
-    cy.get('#answer-1').type('Dilwale Dulhania Le Jayenge')
+    cy.get('#answer-1').type('Joker')
     cy.get('#question-2').should('exist')
     cy.selectOption(
       '#question-2',
@@ -67,5 +67,92 @@ context('User Integration Test', () => {
     cy.get('#Confirm').click()
     // WELCOME MESSAGE
     cy.get('#setup-login-button').click()
+  })
+
+  it('should reset username successfully', () => {
+    cy.get('#login-forgot-password').click()
+
+    // Forgotten item form appears
+    cy.get('#forgotten-item-form').should('be.visible')
+    cy.get('#usernameOption').click()
+    cy.get('#continue').click()
+
+    // Phone number verification form appears
+    cy.get('#phone-number-verification-form').should('be.visible')
+    cy.get('#phone-number-input').type('01756987123')
+    cy.get('#continue').click()
+
+    // Security question form appears
+    cy.get('#security-question-form').should('be.visible')
+    cy.get('#question').then($q => {
+      const question = $q.text()
+      let answer
+      if (question === 'আপনার প্রিয় খাদ্য কি?') {
+        answer = 'Burger'
+      } else if (question === 'আপনার প্রিয় সিনেমা কি?') {
+        answer = 'Joker'
+      } else {
+        answer = 'Dhaka'
+      }
+
+      cy.get('#security-answer-input').type(answer)
+    })
+    cy.get('#continue').click()
+
+    // Success page appears
+    cy.url().should('include', 'success')
+    cy.get('#login-button').click()
+
+    // Login page appears
+    cy.get('#login-step-one-box').should('be.visible')
+  })
+
+  it('should reset password successfully', () => {
+    cy.get('#login-forgot-password').click()
+
+    // Forgotten item form appears
+    cy.get('#forgotten-item-form').should('be.visible')
+    cy.get('#passwordOption').click()
+    cy.get('#continue').click()
+
+    // Phone number verification form appears
+    cy.get('#phone-number-verification-form').should('be.visible')
+    cy.get('#phone-number-input').type('01756987123')
+    cy.get('#continue').click()
+
+    // Recovery code entry form appears
+    cy.get('#recovery-code-entry-form').should('be.visible')
+    cy.get('#recovery-code-input').type('000000')
+    cy.get('#continue').click()
+
+    // Security question form appears
+    cy.get('#security-question-form').should('be.visible')
+    cy.get('#question').then($q => {
+      const question = $q.text()
+      let answer
+      if (question === 'আপনার প্রিয় খাদ্য কি?') {
+        answer = 'Burger'
+      } else if (question === 'আপনার প্রিয় সিনেমা কি?') {
+        answer = 'Joker'
+      } else {
+        answer = 'Dhaka'
+      }
+
+      cy.get('#security-answer-input').type(answer)
+    })
+    cy.get('#continue').click()
+
+    // Password update form appears
+    cy.get('#password-update-form').should('be.visible')
+    cy.get('#NewPassword').type('Asdf1234')
+    cy.get('#ConfirmPassword').type('Asdf1234')
+    cy.get('#continue-button').click()
+
+    // Success page appears
+    cy.url().should('include', 'success')
+    cy.get('#login-button').click()
+
+    // Login page appears
+    cy.get('#login-step-one-box').should('be.visible')
   })
 })
