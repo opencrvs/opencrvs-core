@@ -862,3 +862,43 @@ test('creates task with contact other relationship', async () => {
     )
   ).toBe(true)
 })
+
+test('build bundle for primaryCaregive', async () => {
+  const fhir: fhir.Bundle = await buildFHIRBundle(
+    {
+      primaryCaregiver: {
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        primaryCaregiver: {
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Sahriar',
+              familyName: 'Toufiq'
+            }
+          ]
+        },
+        reasonsNotApplying: [
+          {
+            primaryCaregiverType: 'MOTHER',
+            isDeceased: true
+          },
+          {
+            reasonNotApplying: 'Sick',
+            primaryCaregiverType: 'FATHER'
+          },
+          {
+            primaryCaregiverType: 'LEGAL_GUARDIAN',
+            reasonNotApplying: 'Not present'
+          }
+        ]
+      }
+    },
+    'BIRTH' as EVENT_TYPE
+  )
+
+  expect(fhir).toBeDefined()
+  expect(fhir.entry.length).toBe(7)
+  expect(fhir.entry[2].resource.resourceType).toBe('Observation')
+  const observation = fhir.entry[2].resource as fhir.Observation
+  expect(observation.valueString).toBe('MOTHER_AND_FATHER')
+})
