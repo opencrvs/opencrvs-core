@@ -4,7 +4,8 @@ import {
   IFormFieldValue,
   IAttachment,
   TransformedData,
-  IFormSectionData
+  IFormSectionData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
 import { set } from 'lodash'
 
@@ -407,7 +408,9 @@ export const fieldToIdentifierWithTypeTransformer = (
   return transformedData
 }
 
-export const nestedRadioFieldTransformer = (nestedTransformer?: any) => (
+export const nestedRadioFieldTransformer = (
+  nestedTransformer?: IFormFieldMutationMapFunction
+) => (
   transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
@@ -469,9 +472,9 @@ export const fieldToReasonsNotApplyingTransformer = (
       transformedData[sectionId][transformedArrayName] = []
     }
 
-    const transformedArray = transformedData[sectionId][transformedArrayName]
+    const transformedArray: TransformedData[] =
+      transformedData[sectionId][transformedArrayName]
 
-    // @ts-ignore
     let transformedField = transformedArray.find(transField => {
       if (extraField) {
         return (
@@ -495,7 +498,5 @@ export const fieldToReasonsNotApplyingTransformer = (
     } else {
       transformedField[transFieldName] = fieldValue
     }
-
-    return transformedData
   }
 }

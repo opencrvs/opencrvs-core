@@ -419,8 +419,6 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   if (fieldValue) {
     transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
   }
-
-  return transformedData
 }
 
 export const valueToNestedRadioFieldTransformer = (
@@ -456,7 +454,6 @@ export const valueToNestedRadioFieldTransformer = (
     // @ts-ignore
     transformedFieldData.nestedFields[nestedField.name] = fieldValue
   }
-  return transformedData
 }
 
 export const bundleFieldToNestedRadioFieldTransformer = (

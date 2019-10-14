@@ -4013,7 +4013,6 @@
                     "description": "Question to ask the user if they have the parents details",
                     "id": "form.field.label.parentDetailsType"
                   },
-                  "required": true,
                   "initialValue": true,
                   "validate": [],
                   "options": [
@@ -4082,7 +4081,6 @@
                     "id": "form.field.label.reasonMotherNotApplying"
                   },
                   "validate": [],
-                  "required": false,
                   "initialValue": "",
                   "extraValue": "MOTHER",
                   "previewGroup": "reasonMotherNotApplying",
@@ -4145,7 +4143,9 @@
                         "isDeceased",
                         "primaryCaregiverType",
                         "",
-                        ["deceased"]
+                        [
+                          "deceased"
+                        ]
                       ]
                     }
                   }
@@ -4165,7 +4165,6 @@
                     "id": "form.field.label.reasonFatherNotApplying"
                   },
                   "validate": [],
-                  "required": false,
                   "initialValue": "",
                   "previewGroup": "reasonFatherNotApplying",
                   "extraValue": "FATHER",
@@ -4228,7 +4227,9 @@
                         "isDeceased",
                         "primaryCaregiverType",
                         "",
-                        ["deceased"]
+                        [
+                          "deceased"
+                        ]
                       ]
                     }
                   }
@@ -4273,7 +4274,6 @@
                     "description": "Question to ask the user about caregiver",
                     "id": "form.field.label.primaryCaregiverType"
                   },
-                  "hideHeader": true,
                   "initialValue": "",
                   "validate": [],
                   "options": [
@@ -4339,7 +4339,6 @@
                           "defaultMessage": "Name",
                           "description": "field label for name"
                         },
-                        "required": true,
                         "initialValue": "",
                         "validate": [],
                         "mapping": {
@@ -4352,7 +4351,10 @@
                                   "primaryCaregiver",
                                   {
                                     "operation": "fieldToNameTransformer",
-                                    "parameters": ["en", "familyName"]
+                                    "parameters": [
+                                      "en",
+                                      "familyName"
+                                    ]
                                   },
                                   "name"
                                 ]
@@ -4368,7 +4370,10 @@
                                   "primaryCaregiver",
                                   {
                                     "operation": "nameToFieldTransformer",
-                                    "parameters": ["en", "familyName"]
+                                    "parameters": [
+                                      "en",
+                                      "familyName"
+                                    ]
                                   }
                                 ]
                               }
@@ -4384,9 +4389,12 @@
                           "defaultMessage": "Phone number",
                           "description": "field label for phone"
                         },
-                        "required": true,
                         "initialValue": "",
-                        "validate": [],
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
                         "mapping": {
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
@@ -4428,7 +4436,6 @@
                           "defaultMessage": "Reason not applying",
                           "description": "field label for reasonNotApplying"
                         },
-                        "required": true,
                         "initialValue": "",
                         "validate": [],
                         "extraValue": "LEGAL_GUARDIAN",
@@ -4455,7 +4462,9 @@
                                   "reasonsNotApplying",
                                   "reasonNotApplying",
                                   "primaryCaregiverType",
-                                  ["LEGAL_GUARDIAN"]
+                                  [
+                                    "LEGAL_GUARDIAN"
+                                  ]
                                 ]
                               }
                             ]
@@ -4473,7 +4482,6 @@
                           "defaultMessage": "Name",
                           "description": "field label for name"
                         },
-                        "required": true,
                         "initialValue": "",
                         "validate": [],
                         "mapping": {
@@ -4486,7 +4494,10 @@
                                   "primaryCaregiver",
                                   {
                                     "operation": "fieldToNameTransformer",
-                                    "parameters": ["en", "familyName"]
+                                    "parameters": [
+                                      "en",
+                                      "familyName"
+                                    ]
                                   },
                                   "name"
                                 ]
@@ -4502,7 +4513,10 @@
                                   "primaryCaregiver",
                                   {
                                     "operation": "nameToFieldTransformer",
-                                    "parameters": ["en", "familyName"]
+                                    "parameters": [
+                                      "en",
+                                      "familyName"
+                                    ]
                                   }
                                 ]
                               }
@@ -4518,9 +4532,12 @@
                           "defaultMessage": "Phone number",
                           "description": "field label for phone"
                         },
-                        "required": true,
                         "initialValue": "",
-                        "validate": [],
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
                         "mapping": {
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
@@ -4562,7 +4579,6 @@
                           "defaultMessage": "Reason not applying",
                           "description": "field label for reasonNotApplying"
                         },
-                        "required": true,
                         "initialValue": "",
                         "validate": [],
                         "extraValue": "OTHER",
@@ -4589,7 +4605,9 @@
                                   "reasonsNotApplying",
                                   "reasonNotApplying",
                                   "primaryCaregiverType",
-                                  ["OTHER"]
+                                  [
+                                    "OTHER"
+                                  ]
                                 ]
                               }
                             ]
@@ -4620,7 +4638,10 @@
                             "reasonsNotApplying",
                             "primaryCaregiverType",
                             "",
-                            ["OTHER", "LEGAL_GUARDIAN"]
+                            [
+                              "OTHER",
+                              "LEGAL_GUARDIAN"
+                            ]
                           ]
                         }
                       ]
