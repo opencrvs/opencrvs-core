@@ -248,5 +248,68 @@ describe('when draft data is transformed to graphql', () => {
         true
       )
     })
+
+    it('transform primary caregiver data to gql data', () => {
+      const data = {
+        child: {},
+        father: {},
+        mother: {},
+        registration: {
+          presentAtBirthRegistration: 'LEGAL_GUARDIAN',
+          registrationPhone: '01736478884',
+          whoseContactDetails: 'MOTHER'
+        },
+        primaryCaregiver: {
+          parentDetailsType: 'MOTHER_AND_FATHER',
+          primaryCaregiverType: {
+            value: 'LEGAL_GUARDIAN',
+            nestedFields: {
+              name: 'Alex',
+              phone: '01686942106',
+              reasonNotApplying: 'sick'
+            }
+          },
+          reasonFatherNotApplying: '',
+          reasonMotherNotApplying: 'sick',
+          fatherIsDeceased: ['deceased']
+        },
+        documents: {}
+      }
+      const transformedData = {
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        primaryCaregiver: {
+          name: [
+            {
+              use: 'en',
+              familyName: 'Alex'
+            }
+          ],
+          telecom: [
+            {
+              system: 'phone',
+              value: '01686942106'
+            }
+          ]
+        },
+        reasonsNotApplying: [
+          {
+            primaryCaregiverType: 'MOTHER',
+            reasonNotApplying: 'sick'
+          },
+          {
+            primaryCaregiverType: 'FATHER',
+            isDeceased: true
+          },
+          {
+            primaryCaregiverType: 'LEGAL_GUARDIAN',
+            reasonNotApplying: 'sick'
+          }
+        ]
+      }
+
+      expect(draftToGqlTransformer(form, data).primaryCaregiver).toEqual(
+        transformedData
+      )
+    })
   })
 })
