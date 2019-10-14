@@ -73,7 +73,7 @@ class ForgottenItemComponent extends React.Component<Props, State> {
           title={intl.formatMessage(messages.forgottenItemFormTitle)}
           goBack={goToHome}
         >
-          <form onSubmit={this.handleContinue}>
+          <form id="forgotten-item-form" onSubmit={this.handleContinue}>
             <Title>
               {intl.formatMessage(messages.forgottenItemFormBodyHeader)}
             </Title>

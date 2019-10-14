@@ -157,8 +157,8 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
           })}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
-          <form onSubmit={this.handleContinue}>
-            <Title>
+          <form id="security-question-form" onSubmit={this.handleContinue}>
+            <Title id="question">
               {intl.formatMessage(messages[this.state.questionKey])}
             </Title>
             {intl.formatMessage(

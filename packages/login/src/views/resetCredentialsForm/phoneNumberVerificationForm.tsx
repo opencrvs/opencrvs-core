@@ -16,6 +16,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages } from './resetCredentialsForm'
+import { convertToMSISDN } from '@login/utils/dataCleanse'
 
 const Actions = styled.div`
   padding: 32px 0;
@@ -65,7 +66,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     }
     try {
       const { nonce, securityQuestionKey } = await authApi.verifyUser(
-        this.state.phone,
+        convertToMSISDN(this.state.phone, window.config.COUNTRY),
         this.props.location.state.forgottenItem
       )
       if (securityQuestionKey) {
@@ -102,7 +103,10 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
           })}
           goBack={goToForgottenItemForm}
         >
-          <form onSubmit={this.handleContinue}>
+          <form
+            id="phone-number-verification-form"
+            onSubmit={this.handleContinue}
+          >
             <Title>
               {intl.formatMessage(
                 messages.phoneNumberConfirmationFormBodyHeader

@@ -99,7 +99,7 @@ class RecoveryCodeEntryComponent extends React.Component<Props, State> {
           })}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
-          <form onSubmit={this.handleContinue}>
+          <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
             {resentSMS && (
               <>
                 <Title>{intl.formatMessage(messages.codeResentTitle)}</Title>

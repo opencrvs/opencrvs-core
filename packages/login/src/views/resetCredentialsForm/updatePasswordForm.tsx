@@ -174,7 +174,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
           })}
           goBack={() => goToPhoneNumberVerificationForm(forgottenItem)}
         >
-          <form onSubmit={this.whatNext}>
+          <form id="password-update-form" onSubmit={this.whatNext}>
             <Header>
               {intl.formatMessage(messages.passwordUpdateFormBodyHeader)}
             </Header>
