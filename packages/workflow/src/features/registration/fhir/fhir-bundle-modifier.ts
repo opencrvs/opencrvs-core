@@ -276,9 +276,6 @@ export async function setupRegistrationWorkflow(
     ? defaultStatus
     : getRegStatusCode(tokenpayload)
 
-  // Checking for duplicate status update
-  await checkForDuplicateStatusUpdate(taskResource, regStatusCodeString)
-
   if (!taskResource.businessStatus) {
     taskResource.businessStatus = {}
   }
@@ -297,6 +294,9 @@ export async function setupRegistrationWorkflow(
       code: regStatusCodeString
     })
   }
+  // Checking for duplicate status update
+  await checkForDuplicateStatusUpdate(taskResource)
+
   return taskResource
 }
 
@@ -389,14 +389,20 @@ export function setupAuthorOnNotes(
   return taskResource
 }
 
-export async function checkForDuplicateStatusUpdate(
-  taskResource: fhir.Task,
-  regStatusCode: string
-) {
+export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
+  const regStatusCode =
+    taskResource &&
+    taskResource.businessStatus &&
+    taskResource.businessStatus.coding &&
+    taskResource.businessStatus.coding.find(code => {
+      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    })
+
   if (
     !taskResource ||
     !taskResource.id ||
-    regStatusCode === REG_STATUS_CERTIFIED
+    !regStatusCode ||
+    regStatusCode.code === REG_STATUS_CERTIFIED
   ) {
     return
   }

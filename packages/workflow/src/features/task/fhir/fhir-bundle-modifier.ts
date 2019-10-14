@@ -6,7 +6,6 @@ import {
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import { REG_STATUS_REJECTED } from '@workflow/features/registration/fhir/constants'
 
 export async function modifyTaskBundle(
   fhirBundle: fhir.Bundle,
@@ -21,10 +20,7 @@ export async function modifyTaskBundle(
     throw new Error('Invalid FHIR bundle found for task')
   }
   // Checking for duplicate status update
-  await checkForDuplicateStatusUpdate(
-    fhirBundle.entry[0].resource as fhir.Task,
-    REG_STATUS_REJECTED
-  )
+  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as fhir.Task)
 
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
   const practitioner = await getLoggedInPractitionerResource(token)

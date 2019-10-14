@@ -565,6 +565,41 @@ export const testFhirTaskBundle = {
   ]
 }
 
+export const testDeathFhirTaskBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+      resource: {
+        id: '222',
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'death-registration'
+            }
+          ]
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/death-tracking-id',
+            value: 'D5WGYJE'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            { system: 'http://opencrvs.org/specs/reg-status', code: 'REJECTED' }
+          ]
+        }
+      }
+    }
+  ]
+}
+
 export const taskResouceMock = JSON.stringify({
   resourceType: 'Task',
   status: 'requested',

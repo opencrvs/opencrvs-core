@@ -11,7 +11,7 @@ import {
   officeMock,
   testFhirTaskBundle,
   taskResouceMock,
-  testFhirBundleWithIdsForDeath
+  testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 
 import * as fetchAny from 'jest-fetch-mock'
@@ -100,7 +100,7 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'PUT',
       url: '/fhir/Task/123',
-      payload: testFhirBundleWithIdsForDeath,
+      payload: testDeathFhirTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`
       }
