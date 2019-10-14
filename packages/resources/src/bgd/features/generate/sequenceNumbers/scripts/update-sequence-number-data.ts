@@ -1,10 +1,13 @@
 import chalk from 'chalk'
 import {
   ILocationSequenceNumber,
-  getLocationsByIdentifier
+  matchLocationWithA2IRef
 } from '@resources/bgd/features/utils'
 import * as fs from 'fs'
-import { SEQUENCE_NUMBER_SOURCE } from '@resources/bgd/constants'
+import {
+  ADMIN_STRUCTURE_SOURCE,
+  SEQUENCE_NUMBER_SOURCE
+} from '@resources/bgd/constants'
 import LocationSequenceNumber, {
   ILocationSequenceNumberModel
 } from '@resources/bgd/features/generate/sequenceNumbers/model/locationSequenceNumber'
@@ -21,15 +24,15 @@ const municipalitiesNumbers = JSON.parse(
 )
 
 async function prepareAndSaveLocationSequenceNumber(
+  locations: fhir.Location[],
   locWiseSeqNumbers: ILocationSequenceNumber[]
 ): Promise<ILocationSequenceNumberModel[]> {
   const locationsWiseSeqNumbers: ILocationSequenceNumberModel[] = []
-
   for (const locWiseSeqNum of locWiseSeqNumbers) {
-    const locations: fhir.Location[] = await getLocationsByIdentifier(
-      locWiseSeqNum.reference
+    const location = locations.find(loc =>
+      matchLocationWithA2IRef(loc, locWiseSeqNum.reference)
     )
-    if (!locations || locations.length === 0) {
+    if (!location) {
       // tslint:disable-next-line:no-console
       console.log(
         `${chalk.red('Warning:')} No location can be found that matches: ${
@@ -38,6 +41,8 @@ async function prepareAndSaveLocationSequenceNumber(
       )
       continue
     }
+    // tslint:disable-next-line:no-console
+    console.log(`Saving sequence number for location: ${location.id}`)
     locationsWiseSeqNumbers.push(
       new LocationSequenceNumber({
         locationId: locations[0].id,
@@ -56,19 +61,32 @@ export default async function saveSequenceNumberData() {
     )}`
   )
 
+  const unions = JSON.parse(
+    fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`).toString()
+  )
   // Preparing union wise sequence numbers
   let sequenceNumberModels = await prepareAndSaveLocationSequenceNumber(
+    unions.unions,
     unionsNumbers
   )
 
+  const municipalities = JSON.parse(
+    fs
+      .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`)
+      .toString()
+  )
   // Preparing municipality wise sequence numbers
   sequenceNumberModels = sequenceNumberModels.concat(
-    await prepareAndSaveLocationSequenceNumber(municipalitiesNumbers)
+    await prepareAndSaveLocationSequenceNumber(
+      municipalities.municipalities,
+      municipalitiesNumbers
+    )
   )
-
+  if (sequenceNumberModels.length === 0) {
+    return false
+  }
   // Storing sequence numbers on resource db
   createLocationWiseSeqNumbers(sequenceNumberModels)
-
   return true
 }
 

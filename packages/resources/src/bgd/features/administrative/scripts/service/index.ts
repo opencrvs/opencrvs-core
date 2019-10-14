@@ -5,7 +5,8 @@ import {
   sendToFhir,
   IOISFLocation,
   ILocation,
-  titleCase
+  titleCase,
+  getA2iInternalRefIndentifierOfLocation
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
@@ -159,16 +160,21 @@ export function generateLocationResource(
 
 export async function getLocationsByParentDivisions(
   jurisdictionType: string,
-  parentDivisions: fhir.Location[]
+  parentLocations: fhir.Location[]
 ): Promise<fhir.Location[]> {
   let locations: fhir.Location[] = []
   let queryRoute: string
   let queryResult: fhir.Location[] = []
-  for (const parentDivision of parentDivisions) {
-    queryRoute = `${jurisdictionType}?${parentDivision.description}`
+  for (const parentLocation of parentLocations) {
+    const parentIdentifier = getA2iInternalRefIndentifierOfLocation(
+      parentLocation
+    )
+    queryRoute = parentIdentifier
+      ? `${jurisdictionType}?${parentIdentifier.value}`
+      : `${jurisdictionType}`
     queryResult = await fetchAndComposeLocations(
       queryRoute,
-      parentDivision.id as string,
+      parentLocation.id as string,
       jurisdictionType.toUpperCase()
     )
     locations = appendLocations(locations, queryResult)

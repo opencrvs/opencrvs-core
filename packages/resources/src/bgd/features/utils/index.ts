@@ -96,14 +96,21 @@ export function matchLocationWithA2IRef(
   location: fhir.Location,
   a2IReference: string
 ) {
-  const refIdentifier =
+  const refIdentifier = getA2iInternalRefIndentifierOfLocation(location)
+
+  return refIdentifier ? refIdentifier.value === a2IReference : false
+}
+
+export function getA2iInternalRefIndentifierOfLocation(
+  location: fhir.Location
+) {
+  return (
     location.identifier &&
     location.identifier.find(
       identifier => identifier.system === A2I_LOCATION_REFERENCE_IDENTIFIER
     )
-  return refIdentifier ? refIdentifier.value === a2IReference : false
+  )
 }
-
 export const getFromFhir = (suffix: string) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
