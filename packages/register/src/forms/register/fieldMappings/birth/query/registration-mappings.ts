@@ -1,8 +1,16 @@
-import { IFormData, Event } from '@register/forms'
+import {
+  IFormData,
+  Event,
+  TransformedData,
+  IFormField,
+  IFormFieldQueryMapFunction
+} from '@register/forms'
 import {
   GQLRegWorkflow,
   GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
+import { get, cloneDeep } from 'lodash'
+import { callingCountries } from 'country-data'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -68,4 +76,56 @@ export function getBirthRegistrationSectionTransformer(
       sectionId
     )
   }
+}
+
+const convertToLocal = (mobileWithCountryCode: string, countryCode: string) => {
+  countryCode = countryCode.toUpperCase()
+  return mobileWithCountryCode.replace(
+    callingCountries[countryCode].countryCallingCodes[0],
+    '0'
+  )
+}
+
+export const localPhoneTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  queryData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  let fieldName = transformedFieldName || field.name
+  const msisdnPhone = (get(queryData, fieldName as string) as unknown) as string
+  const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
+  transformedData[sectionId][field.name] = localPhone
+  return transformedData
+}
+
+export const changeHirerchyQueryTransformer = (
+  transformedFieldName?: string,
+  transformerMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: TransformedData,
+  queryData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  if (transformedFieldName) {
+    transformedData[sectionId][field.name]['nestedFields'][
+      nestedField.name
+    ] = get(queryData, transformedFieldName)
+
+    if (transformerMethod) {
+      const clonedTransformedData = cloneDeep(transformedData)
+      transformerMethod(clonedTransformedData, queryData, sectionId, field)
+
+      transformedData[sectionId][field.name]['nestedFields'][nestedField.name] =
+        clonedTransformedData[sectionId][field.name]
+    }
+  } else {
+    transformedData[sectionId][field.name]['nestedFields'][
+      nestedField.name
+    ] = get(queryData, `${sectionId}.${nestedField.name}`)
+  }
+
+  return transformedData
 }

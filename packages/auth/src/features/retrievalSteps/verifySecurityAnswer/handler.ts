@@ -17,6 +17,7 @@ interface IPayload {
 
 interface IResponse {
   matched: boolean
+  nonce: string
   securityQuestionKey?: string
 }
 
@@ -26,22 +27,23 @@ export default async function verifySecurityQuestionHandler(
 ) {
   const payload = request.payload as IPayload
 
-  const retrivalStepInformation = await getRetrievalStepInformation(
+  const retrievalStepInformation = await getRetrievalStepInformation(
     payload.nonce
   ).catch(() => {
     throw unauthorized()
   })
 
   if (
-    retrivalStepInformation.status !== RetrievalSteps.NUMBER_VERIFIED.toString()
+    retrievalStepInformation.status !==
+    RetrievalSteps.NUMBER_VERIFIED.toString()
   ) {
     return unauthorized()
   }
   let verificationResult: IVerifySecurityAnswerResponse
   try {
     verificationResult = await verifySecurityAnswer(
-      retrivalStepInformation.userId,
-      retrivalStepInformation.securityQuestionKey,
+      retrievalStepInformation.userId,
+      retrievalStepInformation.securityQuestionKey,
       payload.answer
     )
   } catch (err) {
@@ -51,17 +53,19 @@ export default async function verifySecurityQuestionHandler(
   // Updates nonce status
   await storeRetrievalStepInformation(
     payload.nonce,
-    retrivalStepInformation.userId,
-    retrivalStepInformation.username,
-    retrivalStepInformation.mobile,
     verificationResult.matched
       ? RetrievalSteps.SECURITY_Q_VERIFIED
       : RetrievalSteps.NUMBER_VERIFIED,
-    verificationResult.questionKey // in case of miss-match, updating the new key otherwise same key
+    {
+      ...retrievalStepInformation,
+      // in case of miss-match, updating the new key otherwise same key
+      securityQuestionKey: verificationResult.questionKey
+    }
   )
 
   const response: IResponse = {
-    matched: verificationResult.matched
+    matched: verificationResult.matched,
+    nonce: payload.nonce
   }
   if (!verificationResult.matched) {
     response.securityQuestionKey = verificationResult.questionKey
@@ -76,5 +80,6 @@ export const verifySecurityQuestionSchema = Joi.object({
 
 export const verifySecurityQuestionResSchema = Joi.object({
   matched: Joi.bool().required(),
-  securityQuestionKey: Joi.string().optional()
+  securityQuestionKey: Joi.string().optional(),
+  nonce: Joi.string().required()
 })

@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import styled, { ThemeProvider } from '@register/styledComponents'
 import { I18nContainer } from '@register/i18n/components/I18nContainer'
-import { createStore, AppStore } from '@register/store'
+import { AppStore } from '@register/store'
 import { ProtectedRoute } from '@register/components/ProtectedRoute'
 import * as routes from '@register/navigation/routes'
 import { NotificationComponent } from '@register/components/Notification'
@@ -50,7 +50,6 @@ const MainSection = styled.section`
   flex-grow: 8;
   background: ${({ theme }) => theme.colors.background};
 `
-export const store = createStore()
 
 export class App extends React.Component<IAppProps> {
   public render() {

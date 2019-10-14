@@ -53,8 +53,9 @@ describe('verifyNumber handler receives a request', () => {
         userId: '123',
         username: 'fake_user_name',
         mobile: '+8801711111111',
-        status: 'NUMBER_VERIFIED',
-        securityQuestionKey: 'dummyKey'
+        status: 'NUMBER_VERIFIED' as retrievalService.RetrievalSteps,
+        securityQuestionKey: 'dummyKey',
+        scope: []
       })
     const res = await server.server.inject({
       method: 'POST',

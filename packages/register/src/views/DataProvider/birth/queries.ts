@@ -108,9 +108,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           value
         }
       }
+      informant {
+        relationship
+        otherRelationship
+      }
       registration {
         id
         contact
+        contactRelationship
         contactPhoneNumber
         attachments {
           data

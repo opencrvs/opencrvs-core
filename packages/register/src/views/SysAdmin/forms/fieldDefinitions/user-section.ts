@@ -98,8 +98,8 @@ export const userSection: ISerializedFormSection = {
           validate: [{ operation: 'phoneNumberFormat' }],
           mapping: {
             mutation: {
-              operation: 'fieldNameTransformer',
-              parameters: ['mobile']
+              operation: 'msisdnTransformer',
+              parameters: ['user.mobile']
             }
           }
         },

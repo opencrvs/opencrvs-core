@@ -12,7 +12,6 @@ import {
   INFOBIP_GATEWAY_ENDPOINT
 } from '@notification/constants'
 import { logger } from '@notification/logger'
-import { convertToMSISDN } from '@notification/features/sms/utils'
 
 async function sendSMSClickatell(
   msisdn: string,
@@ -23,7 +22,7 @@ async function sendSMSClickatell(
     user: CLICKATELL_USER,
     password: CLICKATELL_PASSWORD,
     api_id: CLICKATELL_API_ID,
-    to: convertToMSISDN(msisdn),
+    to: msisdn,
     text: message,
     unicode: 0
   }
@@ -58,7 +57,7 @@ async function sendSMSClickatell(
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
     from: INFOBIP_SENDER_ID,
-    to: convertToMSISDN(to),
+    to,
     text
   })
   const headers = {

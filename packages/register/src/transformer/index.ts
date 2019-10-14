@@ -1,8 +1,43 @@
-import { IForm, IFormData, TransformedData } from '@register/forms'
+import {
+  IForm,
+  IFormData,
+  TransformedData,
+  IFormField,
+  IFormFieldMapping,
+  IFormFieldMutationMapFunction,
+  IFormFieldQueryMapFunction
+} from '@register/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
+
+const nestedFieldsMapping = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  fieldDef: IFormField,
+  mappingKey: keyof IFormFieldMapping
+) => {
+  let tempFormField: IFormField
+  for (let index in fieldDef.nestedFields) {
+    for (let nestedIndex in fieldDef.nestedFields[index]) {
+      tempFormField = fieldDef.nestedFields[index][nestedIndex]
+      tempFormField &&
+        tempFormField.mapping &&
+        tempFormField.mapping[mappingKey] &&
+        (tempFormField.mapping[mappingKey] as
+          | IFormFieldMutationMapFunction
+          | IFormFieldQueryMapFunction)(
+          transformedData,
+          draftData,
+          sectionId,
+          fieldDef,
+          tempFormField
+        )
+    }
+  }
+}
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -56,6 +91,13 @@ export const draftToGqlTransformer = (
               draftData,
               section.id,
               fieldDef
+            )
+            nestedFieldsMapping(
+              transformedData,
+              draftData,
+              section.id,
+              fieldDef,
+              'mutation'
             )
           } else {
             transformedData[section.id][fieldDef.name] =
@@ -122,6 +164,13 @@ export const gqlToDraftTransformer = (
             queryData,
             section.id,
             fieldDef
+          )
+          nestedFieldsMapping(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef,
+            'query'
           )
         } else if (
           queryData[section.id] &&

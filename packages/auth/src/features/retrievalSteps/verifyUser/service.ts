@@ -11,14 +11,6 @@ export enum RetrievalSteps {
   NUMBER_VERIFIED = 'NUMBER_VERIFIED',
   SECURITY_Q_VERIFIED = 'SECURITY_Q_VERIFIED'
 }
-export interface IRetrievalStepInformation {
-  userId: string
-  username: string
-  mobile: string
-  status: string
-  securityQuestionKey: string
-}
-
 export async function verifyUser(mobile: string) {
   const url = resolve(USER_MANAGEMENT_URL, '/verifyUser')
 
@@ -42,29 +34,28 @@ export async function verifyUser(mobile: string) {
   }
 }
 
+export interface IRetrievalStepInformation {
+  userId: string
+  username: string
+  mobile: string
+  securityQuestionKey: string
+  scope: string[]
+  status: RetrievalSteps
+}
 export async function storeRetrievalStepInformation(
   nonce: string,
-  userId: string,
-  username: string,
-  mobile: string,
   status: RetrievalSteps,
-  securityQuestionKey: string
+  retrievalStepInformation: Omit<IRetrievalStepInformation, 'status'>
 ) {
   return set(
     `retrieval_step_${nonce}`,
-    JSON.stringify({
-      userId,
-      username,
-      mobile,
-      status: status.toString(),
-      securityQuestionKey
-    })
+    JSON.stringify({ ...retrievalStepInformation, status })
   )
 }
 
 export async function getRetrievalStepInformation(
   nonce: string
-): Promise<IRetrievalStepInformation> {
+): Promise<IRetrievalStepInformation & { status: RetrievalSteps }> {
   const record = await get(`retrieval_step_${nonce}`)
   if (record === null) {
     throw new Error('password/username retrieval step information not found')

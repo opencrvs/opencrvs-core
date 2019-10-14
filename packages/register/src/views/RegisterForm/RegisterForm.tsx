@@ -116,7 +116,7 @@ function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   application: IApplication
-) {
+): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
     application.data[fromSection.id] || {},
@@ -628,7 +628,6 @@ function mapStateToProps(
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
-
   const groupId =
     match.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(
@@ -636,7 +635,6 @@ function mapStateToProps(
       application.data[activeSection.id] || {},
       application.data
     )[0].id
-
   const activeSectionGroup = activeSection.groups.find(
     group => group.id === groupId
   )

@@ -1,4 +1,7 @@
-import { fieldToIdentityTransformer } from '@register/forms/mappings/mutation/field-mappings'
+import {
+  fieldToIdentityTransformer,
+  nestedRadioFieldToBundleFieldTransformer
+} from '@register/forms/mappings/mutation/field-mappings'
 import { IFormField } from '@register/forms'
 
 describe('Mutation FieldMapping', () => {
@@ -47,5 +50,38 @@ describe('Mutation FieldMapping', () => {
       field as IFormField
     )
     expect(result).toEqual(expectedResult)
+  })
+
+  describe('For nested fields', () => {
+    const factory = nestedRadioFieldToBundleFieldTransformer()
+
+    const draftData = {
+      registration: {
+        registrationPhone: {
+          value: '01711111111'
+        }
+      }
+    }
+
+    const expectedResult = {
+      registrationPhone: '01711111111'
+    }
+
+    const sectionId = 'registration'
+    const field = { name: 'registrationPhone' } as IFormField
+
+    it('should return a valid JSON for parent field having nested fields', () => {
+      const transformedData = {
+        registrationPhone: ''
+      }
+
+      const result = factory(
+        transformedData,
+        draftData,
+        sectionId,
+        field as IFormField
+      )
+      expect(result).toEqual(expectedResult)
+    })
   })
 })

@@ -20,7 +20,6 @@
     "@opencrvs/commons": "^1.0.0-alpha.1.1",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
-    "country-data": "^0.0.31",
     "dotenv": "^6.1.0",
     "good": "^8.1.1",
     "good-console": "^7.1.0",

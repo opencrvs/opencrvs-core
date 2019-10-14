@@ -45,6 +45,7 @@ import {
 import { Validation, IValidationResult } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 
 interface IRange {
   start: number
@@ -383,19 +384,35 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   })
 }
 
+export const getVisibleOptions = (
+  radioOptions: CRadioOption[],
+  draftData: IFormData
+): CRadioOption[] => {
+  return radioOptions.filter(option => {
+    if (!option.conditionals) {
+      return true
+    }
+    return (
+      option.conditionals
+        // eslint-disable-next-line no-eval
+        .filter(conditional => eval(conditional.expression))
+        .map((conditional: IConditional) => conditional.action)
+        .includes('hide') !== true
+    )
+  })
+}
+
 export const getSectionFields = (
   section: IFormSection,
   values?: IFormSectionData,
   draftData?: IFormData
 ) => {
   let fields: IFormField[] = []
-
   getVisibleSectionGroupsBasedOnConditions(
     section,
     values || {},
     draftData
   ).forEach(group => (fields = fields.concat(group.fields)))
-
   return fields
 }
 
