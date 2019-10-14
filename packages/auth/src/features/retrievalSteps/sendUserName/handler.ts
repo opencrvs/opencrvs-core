@@ -21,26 +21,26 @@ export default async function sendUserNameHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IPayload
-  const retrivalStepInformation = await getRetrievalStepInformation(
+  const retrievalStepInformation = await getRetrievalStepInformation(
     payload.nonce
   ).catch(() => {
     throw unauthorized()
   })
 
-  if (retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
     return h.response().code(401)
   }
 
-  const isDemoUser = retrivalStepInformation.scope.indexOf('demo') > -1
+  const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
   if (!PRODUCTION || isDemoUser) {
     logger.info('Sending a verification SMS', {
-      mobile: retrivalStepInformation.mobile,
-      username: retrivalStepInformation.username
+      mobile: retrievalStepInformation.mobile,
+      username: retrievalStepInformation.username
     })
   } else {
     await sendUserName(
-      retrivalStepInformation.mobile,
-      retrivalStepInformation.username
+      retrievalStepInformation.mobile,
+      retrievalStepInformation.username
     )
   }
   await deleteRetrievalStepInformation(payload.nonce)
