@@ -187,12 +187,7 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeath').type('Brain Stroke')
     cy.wait(500)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
@@ -447,12 +442,7 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeath').type('Coronary artery disease')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
@@ -603,12 +593,7 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeath').type('Chronic Obstructive Pulmonary Disease')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
