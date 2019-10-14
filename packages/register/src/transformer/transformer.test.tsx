@@ -110,7 +110,20 @@ describe('when draft data is transformed to graphql', () => {
     presentAtBirthRegistration: 'MOTHER_ONLY',
     registrationCertificateLanguage: ['en'],
     registrationPhone: '01736478884',
-    whoseContactDetails: 'MOTHER'
+    whoseContactDetails: 'MOTHER',
+    applicant: {
+      value: 'MOTHER',
+      nestedFields: {
+        otherRelationShip: ''
+      }
+    },
+    contactPoint: {
+      value: 'OTHER',
+      nestedFields: {
+        contactRelationshipOther: 'grandma',
+        registrationPhone: '01736478884'
+      }
+    }
   }
 
   beforeEach(async () => {
@@ -189,10 +202,9 @@ describe('when draft data is transformed to graphql', () => {
         registration,
         documents: { imageUploader: '' }
       }
-
       expect(
         draftToGqlTransformer(form, data).registration.contactPhoneNumber
-      ).toBe('01736478884')
+      ).toBe('+8801736478884')
     })
 
     it('Pass false as fathersDetailsExist on father section', () => {

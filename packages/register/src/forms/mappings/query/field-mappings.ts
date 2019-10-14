@@ -1,19 +1,20 @@
 import {
-  IFormField,
-  IFormData,
+  GQLAddress,
+  GQLAttachment,
+  GQLComment,
+  GQLHumanName,
+  GQLRegWorkflow
+} from '@opencrvs/gateway/src/graphql/schema'
+import {
   IAttachment,
+  IFormData,
+  IFormField,
   IFormFieldQueryMapFunction,
+  TransformedData,
   IFormSectionData
 } from '@register/forms'
-import {
-  GQLHumanName,
-  GQLAddress,
-  GQLRegWorkflow,
-  GQLComment,
-  GQLAttachment
-} from '@opencrvs/gateway/src/graphql/schema'
-import { cloneDeep } from 'lodash'
 import { EMPTY_STRING } from '@register/utils/constants'
+import { cloneDeep, get } from 'lodash'
 
 interface IName {
   [key: string]: any
@@ -455,6 +456,19 @@ export const valueToNestedRadioFieldTransformer = (
     // @ts-ignore
     transformedFieldData.nestedFields[nestedField.name] = fieldValue
   }
-
   return transformedData
+}
+
+export const bundleFieldToNestedRadioFieldTransformer = (
+  transformedFieldName: string
+) => (
+  transformedData: TransformedData,
+  queryData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  transformedData[sectionId][field.name] = {
+    value: get(queryData, transformedFieldName),
+    nestedFields: {}
+  }
 }

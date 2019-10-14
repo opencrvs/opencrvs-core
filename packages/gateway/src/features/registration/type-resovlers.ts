@@ -261,6 +261,13 @@ export const typeResolvers: GQLResolver = {
       )
       return (contact && contact.valueString) || null
     },
+    contactRelationship: task => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
     contactPhoneNumber: task => {
       const contactNumber = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
