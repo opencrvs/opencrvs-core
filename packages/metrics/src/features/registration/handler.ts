@@ -1,6 +1,9 @@
 import * as Hapi from 'hapi'
 import { writePoints } from '@metrics/influxdb/client'
-import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
+import {
+  generateBirthRegPoint,
+  generateEventDurationPoint
+} from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
 
 export async function newBirthRegistrationHandler(
@@ -18,7 +21,7 @@ export async function newBirthRegistrationHandler(
         }
       )
     )
-    writePoints(points)
+    await writePoints(points)
   } catch (err) {
     return internal(err)
   }
@@ -30,18 +33,21 @@ export async function birthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const points = []
   try {
-    points.push(
-      await generateBirthRegPoint(
+    const points = await Promise.all([
+      generateEventDurationPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
+      generateBirthRegPoint(
         request.payload as fhir.Bundle,
         'mark-existing-application-registered',
         {
           Authorization: request.headers.authorization
         }
       )
-    )
-    writePoints(points)
+    ])
+
+    await writePoints(points)
   } catch (err) {
     return internal(err)
   }

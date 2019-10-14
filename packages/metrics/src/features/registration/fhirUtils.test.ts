@@ -3,7 +3,7 @@ import {
   getRegLastLocation,
   getResourceByType,
   FHIR_RESOURCE_TYPE
-} from './fhirUtils'
+} from '@metrics/features/registration/fhirUtils'
 
 describe('fhirUtils', () => {
   it('throw error when no person section is found', () => {

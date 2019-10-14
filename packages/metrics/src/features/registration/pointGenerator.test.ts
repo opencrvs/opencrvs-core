@@ -1,39 +1,19 @@
 import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
 import { testPayload } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
-import * as fetchAny from 'jest-fetch-mock'
 
-const fetch = fetchAny as any
+import * as api from '@metrics/api'
+const fetchLocation = api.fetchLocation as jest.Mock
+const fetchParentLocationByLocationID = api.fetchParentLocationByLocationID as jest.Mock
 
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          id: '1',
-          partOf: {
-            reference: 'Location/4'
-          }
-        })
-      ],
-      [
-        JSON.stringify({
-          id: '2',
-          partOf: {
-            reference: 'Location/3'
-          }
-        })
-      ],
-      [
-        JSON.stringify({
-          id: '3',
-          partOf: {
-            reference: 'Location/2'
-          }
-        })
-      ]
-    )
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',
@@ -73,8 +53,10 @@ describe('Verify point generation', () => {
       gender: 'male'
     }
 
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
-    fetch.mockResponseOnce(JSON.stringify({}))
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
+    fetchLocation.mockReset()
+    fetchLocation.mockResolvedValueOnce({})
+
     const point = await generateBirthRegPoint(
       payload,
       'mark-existing-application-registered',
@@ -96,18 +78,11 @@ describe('Verify point generation', () => {
     })
   })
   it('Populates partial location tree in-case data unavailibility', async () => {
-    Date.now = jest.fn(() => 1552380296600) // 12-03-2019
-    fetch.mockResponses(
-      [
-        JSON.stringify({
-          id: '1',
-          partOf: {
-            reference: 'Location/4'
-          }
-        })
-      ],
-      [JSON.stringify({})]
-    )
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce(null)
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',

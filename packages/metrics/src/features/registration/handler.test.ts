@@ -5,17 +5,18 @@ import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
 
-describe('Verify handler', () => {
+const token = jwt.sign(
+  { scope: ['declare'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:metrics-user'
+  }
+)
+
+describe('When a new registration event is received', () => {
   let server: any
-  const token = jwt.sign(
-    { scope: ['declare'] },
-    readFileSync('../auth/test/cert.key'),
-    {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:metrics-user'
-    }
-  )
 
   beforeEach(async () => {
     server = await createServer()
@@ -1026,5 +1027,32 @@ describe('Verify handler', () => {
     })
 
     expect(res.statusCode).toBe(500)
+  })
+})
+
+describe('When an existing application is marked registered', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the delta between DECLARED and REGISTERED states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/mark-registered-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/mark-registered',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'application_event_duration'
+    )
+    expect(res.statusCode).toBe(200)
+    expect(applicationEventPoint).toMatchSnapshot()
   })
 })

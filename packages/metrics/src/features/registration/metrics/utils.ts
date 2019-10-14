@@ -11,8 +11,8 @@ import {
   TOTAL_POPULATION_SEC,
   JURISDICTION_TYPE_SEC
 } from '@metrics/features/registration/metrics/constants'
-import { fetchFHIR } from '@metrics/features/registration/fhirUtils'
 import { IAuthHeader } from '@metrics/features/registration'
+import { fetchLocation } from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -136,13 +136,6 @@ export const fetchEstimateByLocation = async (
     estimation: Math.round((crudRate * population) / 1000),
     locationId: locationData.id
   }
-}
-
-export const fetchLocation = async (
-  locationId: string,
-  authHeader: IAuthHeader
-) => {
-  return await fetchFHIR(`Location/${locationId}`, authHeader)
 }
 
 export const getDistrictLocation = async (
