@@ -31,6 +31,9 @@ const TitleContainer = styled.div`
 `
 const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h4Style}
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.h5Style}
+  }
 `
 const Image = styled.img`
   height: 104px;

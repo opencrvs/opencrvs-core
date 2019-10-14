@@ -2,13 +2,19 @@ import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
 import { HEARTH_URL } from '@workflow/constants'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
-import { getEntryId } from '@workflow/features/registration/fhir/fhir-utils'
+import {
+  getEntryId,
+  getSharedContactMsisdn
+} from '@workflow/features/registration/fhir/fhir-utils'
 import { getToken } from '@workflow/utils/authUtils'
 import { logger } from '@workflow/logger'
+import { sendEventNotification } from '@workflow/features/registration/utils'
+import { Events } from '@workflow/features/events/handler'
 
 export default async function updateTaskHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+  h: Hapi.ResponseToolkit,
+  event: Events
 ) {
   try {
     const payload = await modifyTaskBundle(
@@ -36,6 +42,20 @@ export default async function updateTaskHandler(
         `FHIR put to /fhir failed with [${
           res.status
         }] body: ${await res.text()}`
+      )
+    }
+    const msisdn = await getSharedContactMsisdn(payload)
+    /* sending notification to the contact */
+    if (msisdn) {
+      logger.info(
+        'updateTaskHandler(reject application) sending event notification'
+      )
+      sendEventNotification(payload, event, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    } else {
+      logger.info(
+        'updateTaskHandler(reject application) could not send event notification'
       )
     }
 

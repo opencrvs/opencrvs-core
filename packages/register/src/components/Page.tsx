@@ -6,7 +6,6 @@ import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import { setInitialApplications } from '@register/applications'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 import {
   getOfflineDataLoaded,
   getOfflineLoadingError
@@ -20,6 +19,7 @@ import { changeLanguage } from '@register/i18n/actions'
 import { Ii18n } from '@register/type/i18n'
 import { USER_DETAILS } from '@register/utils/userUtils'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -77,6 +77,8 @@ const StyledPage = styled.div.attrs<IPageProps>({})`
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
+  margin-left: -24px;
+  margin-top: -24px;
   top: 50%;
   left: 50%;
 `
@@ -113,7 +115,7 @@ class Component extends React.Component<
         }
       }, 0)
     }
-    if (this.props.loadingError) {
+    if (this.props.loadingError && navigator.onLine) {
       this.props.showConfigurationErrorNotification()
     }
   }
@@ -139,8 +141,7 @@ class Component extends React.Component<
       offlineDataLoaded,
       children
     } = this.props
-
-    if (initialApplicationsLoaded && offlineDataLoaded) {
+    if (offlineDataLoaded && initialApplicationsLoaded) {
       return (
         <div id="readyApplication">
           <StyledPage {...this.props}>{children}</StyledPage>

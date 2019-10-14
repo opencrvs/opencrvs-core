@@ -33,11 +33,11 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
-    dsn: 'https://8f6ba426b20045f1b91528d5fdc214b5@sentry.io/1401900'
+    dsn: window.config.SENTRY
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init('hxf1hb/opencrvs')
+  LogRocket.init(window.config.LOGROCKET)
 
   // Integrate the two
   Sentry.configureScope(scope => {
@@ -64,12 +64,14 @@ function onNewContentAvailable(waitingSW: ServiceWorker | null) {
 }
 
 function onBackGroundSync() {
+  if (typeof BroadcastChannel === 'undefined') {
+    return
+  }
   const channel = new BroadcastChannel(
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
   channel.onmessage = e => {
-    const syncCount = typeof e.data === 'number' ? e.data : 0
-    const action = actions.showBackgroundSyncedNotification(syncCount)
+    const action = actions.showBackgroundSyncedNotification()
     store.dispatch(action)
   }
 }

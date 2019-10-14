@@ -39,12 +39,26 @@ const declareToken = jwt.sign(
   }
 )
 
+const certifyToken = jwt.sign(
+  { scope: ['certify'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
 
 const authHeaderValidate = {
   Authorization: `Bearer ${validateToken}`
+}
+
+const authHeaderCertify = {
+  Authorization: `Bearer ${certifyToken}`
 }
 
 const authHeaderNotRegCert = {
@@ -2186,14 +2200,14 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it("throws an error when the user doesn't have register or validate scope", async () => {
-      await expect(
+    it("throws an error when the user doesn't have required scope", async () => {
+      expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
-          authHeaderNotRegCert
+          authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 })

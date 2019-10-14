@@ -553,7 +553,7 @@
 "imageUploadOption.upload.error","File format not supported. Please attach a png, jpg or pdf (max 5mb)","Show error messages while uploading"
 "imageUploadOption.upload.documentType","Please select the type of document first","Show error message if the document type is not selected"
 "imageUploadOption.upload.overSized","File is too large. Please attach file less than 5mb","Error message for Attachment size greater than 5MD."
-"notification.declarationsSynced","As you have connectivity, we have synced {syncCount} new birth applications.","The message that appears in notification when background sync takes place"
+"notification.declarationsSynced","As you have connectivity, we can synchronize your applications.","The message that appears in notification when background sync takes place"
 "notification.draftsSaved","Your draft has been saved","The message that appears in notification when save drafts button is clicked"
 "notification.outboxText","Outbox({num})","Application outbox text"
 "notification.processingText","{num} application processing...","Application processing text"

@@ -10,9 +10,11 @@ import {
   IFormData,
   IFormField,
   IFormSectionData,
-  TransformedData
+  TransformedData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
 import { set } from 'lodash'
+import { callingCountries } from 'country-data'
 
 export function transformCertificateData(
   transformedData: TransformedData,
@@ -94,8 +96,35 @@ export function setBirthRegistrationSectionTransformer(
   }
 }
 
+const convertToMSISDN = (phoneWithoutCountryCode: string) => {
+  const countryCode =
+    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
+
+  return phoneWithoutCountryCode.startsWith('0')
+    ? `${countryCode}${phoneWithoutCountryCode.substring(1)}`
+    : `${countryCode}${phoneWithoutCountryCode}`
+}
+
+export const msisdnTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedFieldName ? transformedFieldName : field.name
+
+  set(
+    transformedData,
+    fieldName,
+    convertToMSISDN(draftData[sectionId][field.name] as string)
+  )
+
+  return transformedData
+}
+
 export const changeHirerchyMutationTransformer = (
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  transformerMethod?: IFormFieldMutationMapFunction
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -103,15 +132,25 @@ export const changeHirerchyMutationTransformer = (
   field: IFormField,
   nestedField: IFormField
 ) => {
-  const nestedFieldValueObj: IFormSectionData = (draftData[sectionId][
+  let nestedFieldValueObj: IFormSectionData = (draftData[sectionId][
     field.name
   ] as IFormSectionData).nestedFields as IFormSectionData
+
   if (transformedFieldName) {
     set(
       transformedData,
       transformedFieldName,
       nestedFieldValueObj[nestedField.name]
     )
+
+    if (transformerMethod) {
+      transformerMethod(
+        transformedData,
+        draftData[sectionId][field.name] as IFormData,
+        'nestedFields',
+        nestedField
+      )
+    }
   } else {
     transformedData[nestedField.name] = nestedFieldValueObj[nestedField.name]
   }

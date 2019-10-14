@@ -130,17 +130,15 @@ function reducer(
           failActionCreator: actions.assetsFailed
         })
       ])
-
-      if (isOfflineDataLoaded(offlineData)) {
+      const offlineDataLoaded = isOfflineDataLoaded(offlineData)
+      if (offlineDataLoaded) {
         return loop(
           {
             ...state,
-            offlineData
+            offlineData,
+            offlineDataLoaded
           },
-          Cmd.list([
-            // Try loading data regardless as it might have been updated.
-            !state.offlineDataLoaded ? dataLoadingCmds : Cmd.none
-          ])
+          Cmd.list([Cmd.none])
         )
       }
       return loop(state, dataLoadingCmds)
@@ -246,9 +244,11 @@ function reducer(
     }
 
     case actions.READY: {
+      const offlineDataLoaded = isOfflineDataLoaded(action.payload)
       return {
         ...state,
-        offlineData: action.payload
+        offlineData: action.payload,
+        offlineDataLoaded
       }
     }
 

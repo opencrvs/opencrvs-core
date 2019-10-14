@@ -44,7 +44,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
         title: messages.reviewTitle,
         groups: [
           {
-            id: 'review-group',
+            id: 'review-view-group',
             fields: []
           }
         ]
