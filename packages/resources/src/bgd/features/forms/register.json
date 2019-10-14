@@ -11813,75 +11813,16 @@
               ],
               "fields": [
                 {
-                  "name": "methodOfCauseOfDeath",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "initialValue": "",
-                  "label": {
-                    "defaultMessage": "Method of Cause of Death",
-                    "description": "Label for form field: Method of Cause of Death",
-                    "id": "form.field.label.methodOfCauseOfDeath"
-                  },
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "required": false,
-                  "options": [
-                    {
-                      "value": "VERBAL_AUTOPSY",
-                      "label": {
-                        "defaultMessage": "Verbal autopsy",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.verbalAutopsy"
-                      }
-                    },
-                    {
-                      "value": "MEDICALLY_CERTIFIED",
-                      "label": {
-                        "defaultMessage": "Medically Certified Cause of Death",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.medicallyCertified"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "causeOfDeathCode",
+                  "name": "causeOfDeath",
                   "type": "TEXT",
                   "initialValue": "",
                   "label": {
-                    "defaultMessage": "Cause of Death Code",
-                    "description": "Label for form field: Cause of Death Code",
-                    "id": "form.field.label.causeOfDeathCode"
+                    "defaultMessage": "Cause of Death",
+                    "description": "Label for form field: Cause of Death",
+                    "id": "form.field.label.causeOfDeath"
                   },
                   "required": false,
-                  "validate": [
-                    {
-                      "operation": "blockAlphaNumericDot"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        17
-                      ]
-                    }
-                  ],
+                  "validate": [],
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
