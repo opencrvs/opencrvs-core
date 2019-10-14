@@ -99,7 +99,7 @@ export const userSection: ISerializedFormSection = {
           mapping: {
             mutation: {
               operation: 'msisdnTransformer',
-              parameters: ['mobile']
+              parameters: ['user.mobile']
             }
           }
         },

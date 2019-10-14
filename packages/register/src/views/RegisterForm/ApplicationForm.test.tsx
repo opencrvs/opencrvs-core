@@ -88,8 +88,12 @@ describe('when user has starts a new application', () => {
         history.replace(
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
-
         await waitForElement(app, '#register_form')
+        app
+          .find('#next_section')
+          .hostNodes()
+          .simulate('click')
+        await waitForElement(app, '#form_section_id_child-view-group')
       })
 
       describe('when user types in something and press continue', () => {
@@ -242,8 +246,30 @@ describe('when user has starts a new application', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
-      })
 
+        it('should go to input field when user press change button to edit information', async () => {
+          const backToReviewButton = await waitForElement(
+            app,
+            '#back-to-review-button'
+          )
+
+          backToReviewButton.hostNodes().simulate('click')
+
+          const changeNameButton = await waitForElement(
+            app,
+            '#btn_change_child_firstNames'
+          )
+
+          changeNameButton.hostNodes().simulate('click')
+
+          const firstNamesEngInputField = await waitForElement(
+            app,
+            '#firstNamesEng'
+          )
+
+          expect(firstNamesEngInputField.hostNodes()).toHaveLength(1)
+        })
+      })
       describe('when user clicks the "mother" page', () => {
         beforeEach(() => goToMotherSection(app))
         it('changes to the mother details section', () => {

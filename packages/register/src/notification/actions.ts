@@ -56,13 +56,8 @@ export const toggleDraftSavedNotification = (): toggleDraftSavedNotificationActi
   type: TOGGLE_DRAFT_SAVED_NOTIFICATION
 })
 
-type backgroundSyncPayload = {
-  syncCount: number
-}
-
 export type ShowBackgroundSyncedAction = {
   type: typeof SHOW_BACKGROUND_SYNC_TRIGGERED
-  payload: backgroundSyncPayload
 }
 
 export type HideBackgroundSyncedAction = {
@@ -73,11 +68,8 @@ export type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
 
-export const showBackgroundSyncedNotification = (
-  syncCount: number
-): ShowBackgroundSyncedAction => ({
-  type: SHOW_BACKGROUND_SYNC_TRIGGERED,
-  payload: { syncCount }
+export const showBackgroundSyncedNotification = (): ShowBackgroundSyncedAction => ({
+  type: SHOW_BACKGROUND_SYNC_TRIGGERED
 })
 
 export const hideBackgroundSyncedNotification = (): HideBackgroundSyncedAction => ({

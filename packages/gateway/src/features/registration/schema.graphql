@@ -19,6 +19,8 @@ enum RegistrationContactType {
   BOTH
   MOTHER
   FATHER
+  OTHER
+  APPLICANT
 }
 
 enum BirthRegPresence {
@@ -77,6 +79,8 @@ enum AttachmentType {
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
   SIGNED_AFFIDAVIT
+  ORIGINAL_BIRTH_RECORD
+  UNDER_FIVE_CARD
 }
 
 enum AttachmentSubject {
@@ -285,6 +289,7 @@ input RegistrationInput {
   page: String
   book: String
   contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
@@ -305,6 +310,7 @@ type Registration { # -> Task
   page: String # -> .identifier
   book: String # -> .identifier
   contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code

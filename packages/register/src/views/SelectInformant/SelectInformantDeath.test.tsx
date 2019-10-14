@@ -46,9 +46,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toContain(
-        '/events/death/registration/contact'
-      )
+      const expectation = `/drafts/${draft.id}/events/death`
+      expect(window.location.pathname).toContain(expectation)
     })
   })
   describe('when click continue without select anything', () => {
@@ -97,9 +96,8 @@ describe('when user is selecting the informant', () => {
         .hostNodes()
         .simulate('click')
 
-      expect(window.location.pathname).toContain(
-        '/events/death/registration/contact'
-      )
+      const expectation = `/drafts/${draft.id}/events/death`
+      expect(window.location.pathname).toContain(expectation)
     })
   })
 
