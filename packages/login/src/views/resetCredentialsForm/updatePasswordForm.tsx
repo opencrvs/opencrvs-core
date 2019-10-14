@@ -278,7 +278,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
               )}
             </PasswordContents>
             <Action>
-              <PrimaryButton id="confirm-button">
+              <PrimaryButton id="continue-button">
                 {intl.formatMessage(messages.confirmButtonLabel)}
               </PrimaryButton>
             </Action>
