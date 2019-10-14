@@ -5,6 +5,10 @@ import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
+import { storage } from '@login/storage'
+import { createStore } from './store'
+
+storage.configStorage('OpenCRVS')
 
 // Injecting global styles for the body tag - used only once
 // @ts-ignore
@@ -43,6 +47,9 @@ if (
     })
   })
 }
-
-ReactDOM.render(<App />, document.getElementById('root'))
+const { store, history } = createStore()
+ReactDOM.render(
+  <App store={store} history={history} />,
+  document.getElementById('root')
+)
 registerServiceWorker()

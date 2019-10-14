@@ -2,7 +2,7 @@ import * as Hapi from 'hapi'
 import * as Joi from 'joi'
 import { unauthorized } from 'boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/hash'
+import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 
 interface IChangePasswordPayload {
@@ -25,9 +25,7 @@ export default async function changePasswordHandler(
     throw unauthorized()
   }
 
-  const { hash, salt } = generateSaltedHash(userUpdateData.password)
-  user.salt = salt
-  user.passwordHash = hash
+  user.passwordHash = generateHash(userUpdateData.password, user.salt)
 
   try {
     await User.update({ _id: user._id }, user)

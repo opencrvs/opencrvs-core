@@ -26,8 +26,6 @@ import { intlReducer, IntlState } from '@login/i18n/reducer'
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 
-export const history = createBrowserHistory()
-
 export interface IStoreState {
   login: LoginState
   router: RouterState
@@ -50,22 +48,26 @@ const reducers = combineReducers<IStoreState>({
 
 const enhancedCreateStore = createReduxStore as StoreCreator
 
-const enhancer = compose(
-  install(),
-  applyMiddleware(routerMiddleware(history)),
-  // @ts-ignore types are not correct for this module yet
-  applyMiddleware(createSentryMiddleware(Sentry)),
-
-  typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
-    ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-    : (f: any) => f
-) as StoreEnhancer<IStoreState>
-
 export type AppStore = Store<IStoreState, AnyAction>
 
-export const createStore = (): AppStore =>
-  enhancedCreateStore<IStoreState, AnyAction>(
+export const createStore = () => {
+  const history = createBrowserHistory()
+
+  const enhancer = compose(
+    install(),
+    applyMiddleware(routerMiddleware(history)),
+    // @ts-ignore types are not correct for this module yet
+    applyMiddleware(createSentryMiddleware(Sentry)),
+
+    typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
+      ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+      : (f: any) => f
+  ) as StoreEnhancer<IStoreState>
+
+  const store = enhancedCreateStore<IStoreState, AnyAction>(
     reducers,
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
+  return { store, history }
+}
