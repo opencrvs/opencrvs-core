@@ -560,6 +560,13 @@ export const typeResolvers: GQLResolver = {
 
   PrimaryCaregiver: {
     primaryCaregiver: async (primaryCaregiver, _, authHeader) => {
+      if (
+        !primaryCaregiver.patientSection ||
+        !primaryCaregiver.patientSection.entry ||
+        primaryCaregiver.patientSection.entry.length === 0
+      ) {
+        return null
+      }
       return (await fetchFHIR(
         `/${primaryCaregiver.patientSection.entry[0].reference}`,
         authHeader
@@ -572,7 +579,11 @@ export const typeResolvers: GQLResolver = {
         }`,
         authHeader
       )) as fhir.Bundle
-      const reasons: any[] = []
+      const reasons: {
+        primaryCaregiverType?: string
+        reasonNotApplying?: string
+        isDeceased?: boolean
+      }[] = []
       let primaryCaregiverType
       let reasonCaregiverNotApplying
 
@@ -895,9 +906,6 @@ export const typeResolvers: GQLResolver = {
         PRIMARY_CAREGIVER_CODE,
         composition
       )
-      if (!patientSection || !patientSection.entry) {
-        return null
-      }
 
       const encounterSection = findCompositionSection(
         BIRTH_ENCOUNTER_CODE,
