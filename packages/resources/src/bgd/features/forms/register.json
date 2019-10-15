@@ -10572,7 +10572,7 @@
                     {
                       "value": "OTHER",
                       "label": {
-                        "defaultMessage": "Other Institution",
+                        "defaultMessage": "Other address",
                         "description": "Select item for Other Institution",
                         "id": "form.field.label.otherInstitution"
                       }
