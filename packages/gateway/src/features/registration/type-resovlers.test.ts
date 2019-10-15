@@ -1232,6 +1232,16 @@ describe('Registration type resolvers', () => {
       expect(parentDetailsType).toBe('MOTHER_AND_FATHER')
     })
 
+    it('returns null as parentDetailsType if there is no parent details type section', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      const parentDetailsType = await typeResolvers.PrimaryCaregiver.parentDetailsType(
+        primaryCaregiverObj
+      )
+
+      expect(parentDetailsType).toBe(null)
+    })
+
     it('returns primaryCaregiver', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockPatient))
 

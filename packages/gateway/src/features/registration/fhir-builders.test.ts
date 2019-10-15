@@ -869,6 +869,7 @@ test('build bundle for primaryCaregive', async () => {
       primaryCaregiver: {
         parentDetailsType: 'MOTHER_AND_FATHER',
         primaryCaregiver: {
+          _fhirID: '8f18a6ea-89d1-4b03-xxxx-xxxxxxxxx',
           name: [
             {
               use: 'en',
