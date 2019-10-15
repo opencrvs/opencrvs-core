@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
+import { connect } from 'react-redux'
 import {
   SuccessButton,
   DangerButton,
@@ -18,6 +19,16 @@ import {
   LabelValuePair
 } from '@opencrvs/components/lib/interface'
 import { formatLongDate } from '@register/utils/date-formatting'
+import { IStoreState } from '@register/store'
+import { getOfflineData } from '@register/offline/selectors'
+import { IOfflineData } from '@register/offline/reducer'
+
+export interface ICollectorField {
+  firstNames: string
+  familyName: string
+  applicantFirstNames: string
+  applicantFamilyName: string
+}
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -35,6 +46,7 @@ interface IIDVerifierProps {
   title: string
   collectorInformation: IFormSectionData
   actionProps: IVerifierActionProps
+  offlineResources: IOfflineData
 }
 
 const Title = styled.div`
@@ -91,14 +103,15 @@ class IDVerifierComponent extends React.Component<
     const { locale } = this.props.intl
     const iD = info.iD || info.applicantID
     const iDType = info.iDType || info.iDTypeOther
+    const fields = this.props.offlineResources.collectorFields
+
     const firstNames =
-      locale === 'en'
-        ? info.firstNamesEng || info.applicantFirstNamesEng
-        : info.firstNames || info.applicantFirstNames
+      info[fields[locale].firstNames] ||
+      info[fields[locale].applicantFirstNames]
     const familyName =
-      locale === 'en'
-        ? info.familyNameEng || info.applicantFamilyNameEng
-        : info.familyName || info.applicantFamilyName
+      info[fields[locale].familyName] ||
+      info[fields[locale].applicantFamilyName]
+
     const birthDate =
       info.motherBirthDate || info.fatherBirthDate || info.applicantBirthDate
     const nationality = info.nationality
@@ -226,4 +239,12 @@ class IDVerifierComponent extends React.Component<
   }
 }
 
-export const IDVerifier = injectIntl(IDVerifierComponent)
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    offlineResources: getOfflineData(store)
+  }
+}
+
+export const IDVerifier = connect(mapStateToProps)(
+  injectIntl(IDVerifierComponent)
+)

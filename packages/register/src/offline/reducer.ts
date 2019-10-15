@@ -2,7 +2,10 @@ import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
 import * as actions from '@register/offline/actions'
 import * as profileActions from '@register/profile/profileActions'
 import { storage } from '@register/storage'
-import { referenceApi } from '@register/utils/referenceApi'
+import {
+  referenceApi,
+  ICollectorFieldsResponse
+} from '@register/utils/referenceApi'
 import { ILanguage } from '@register/i18n/reducer'
 import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
@@ -45,6 +48,7 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
+  collectorFields: ICollectorFieldsResponse
 }
 
 export type IOfflineDataState = {
@@ -128,6 +132,10 @@ function reducer(
         Cmd.run(referenceApi.loadAssets, {
           successActionCreator: actions.assetsLoaded,
           failActionCreator: actions.assetsFailed
+        }),
+        Cmd.run(referenceApi.loadCollectorFields, {
+          successActionCreator: actions.collectorFieldsLoaded,
+          failActionCreator: actions.collectorFieldsFailed
         })
       ])
       const offlineDataLoaded = isOfflineDataLoaded(offlineData)
@@ -237,6 +245,27 @@ function reducer(
       }
     }
     case actions.ASSETS_FAILED: {
+      return {
+        ...state,
+        loadingError: true
+      }
+    }
+
+    /*
+     * Collector fields
+     */
+
+    case actions.COLLECTOR_FIELDS_LOADED: {
+      return {
+        ...state,
+        loadingError: false,
+        offlineData: {
+          ...state.offlineData,
+          collectorFields: action.payload
+        }
+      }
+    }
+    case actions.COLLECTOR_FIELDS_FAILED: {
       return {
         ...state,
         loadingError: true

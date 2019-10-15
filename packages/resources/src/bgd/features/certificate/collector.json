@@ -1,0 +1,14 @@
+{
+  "bn": {
+    "firstNames": "firstNames",
+    "familyName": "familyName",
+    "applicantFirstNames": "applicantFirstNames",
+    "applicantFamilyName": "applicantFamilyName"
+  },
+  "en": {
+    "firstNames": "firstNamesEng",
+    "familyName": "familyNameEng",
+    "applicantFirstNames": "applicantFirstNamesEng",
+    "applicantFamilyName": "applicantFamilyNameEng"
+  }
+}

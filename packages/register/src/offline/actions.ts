@@ -4,7 +4,8 @@ import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
   IDefinitionsResponse,
-  IAssetResponse
+  IAssetResponse,
+  ICollectorFieldsResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
 
@@ -58,6 +59,17 @@ export type AssetsLoadedAction = {
 export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
+  payload: Error
+}
+export const COLLECTOR_FIELDS_LOADED = 'OFFLINE/COLLECTOR_FIELDS_LOADED'
+export type CollectorFieldsLoadedAction = {
+  type: typeof COLLECTOR_FIELDS_LOADED
+  payload: ICollectorFieldsResponse
+}
+
+export const COLLECTOR_FIELDS_FAILED = 'OFFLINE/COLLECTOR_FIELDS_FAILED'
+export type CollectorFieldsFailedAction = {
+  type: typeof COLLECTOR_FIELDS_FAILED
   payload: Error
 }
 
@@ -147,6 +159,20 @@ export const assetsFailed = (error: Error): AssetsFailedAction => ({
   payload: error
 })
 
+export const collectorFieldsLoaded = (
+  payload: ICollectorFieldsResponse
+): CollectorFieldsLoadedAction => ({
+  type: COLLECTOR_FIELDS_LOADED,
+  payload: payload
+})
+
+export const collectorFieldsFailed = (
+  error: Error
+): CollectorFieldsFailedAction => ({
+  type: COLLECTOR_FIELDS_FAILED,
+  payload: error
+})
+
 export const offlineDataReady = (state: IOfflineData) => ({
   type: READY,
   payload: state
@@ -167,3 +193,5 @@ export type Action =
   | AssetsFailedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
+  | CollectorFieldsLoadedAction
+  | CollectorFieldsFailedAction

@@ -2654,7 +2654,8 @@ export async function createTestStore() {
       templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      collectorFields: {}
     })
   )
   return { store, history }
@@ -2679,7 +2680,8 @@ export async function createTestComponent(
       templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
-      assets: mockOfflineData.assets
+      assets: mockOfflineData.assets,
+      collectorFields: {}
     })
   )
 

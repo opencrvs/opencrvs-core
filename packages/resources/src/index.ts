@@ -22,6 +22,7 @@ import {
   requestSchema as bgdGeneratorRequestSchema,
   responseSchema as bgdGeneratorResponseSchema
 } from '@resources/bgd/features/generate/handler'
+import { collectorFieldsHandler as bgdCollectorFieldsHandler } from '@resources/bgd/features/certificate/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
 import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
@@ -31,6 +32,7 @@ import {
   requestSchema as zmbGeneratorRequestSchema,
   responseSchema as zmbGeneratorResponseSchema
 } from '@resources/zmb/features/generate/handler'
+import { collectorFieldsHandler as zmbCollectorFieldsHandler } from '@resources/zmb/features/certificate/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -118,6 +120,17 @@ export async function createServer() {
     }
   })
 
+  server.route({
+    method: 'GET',
+    path: '/bgd/collector',
+    handler: bgdCollectorFieldsHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Serves definitional metadata like form definitions, language files and pdf templates'
+    }
+  })
+
   // Zambia
 
   server.route({
@@ -175,6 +188,17 @@ export async function createServer() {
       },
       description:
         'Generates registration numbers based on country specific implementation logic'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/zmb/collector',
+    handler: zmbCollectorFieldsHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Serves definitional metadata like form definitions, language files and pdf templates'
     }
   })
 
