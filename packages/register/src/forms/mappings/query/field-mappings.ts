@@ -419,7 +419,6 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   if (fieldValue) {
     transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
   }
-  // console.log(transformedData[sectionId][field.name])
 }
 
 export const valueToNestedRadioFieldTransformer = (
@@ -439,13 +438,11 @@ export const valueToNestedRadioFieldTransformer = (
 
   if (transformMethod) {
     transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
-  }
-  if (transformMethod) {
-    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
     fieldValue = tempDraftData[sectionId][fieldName]
   } else {
     fieldValue = queryData[sectionId][transformFieldName || fieldName]
   }
+
   if (!fieldValue) {
     return
   }
