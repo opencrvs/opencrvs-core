@@ -13,9 +13,9 @@ describe('collector fields handler receives a request', () => {
   describe('service returns collector fields json to client', () => {
     const mockReturn: collectorService.IFields = {
       en: {
-        firstNamesEng: 'firstNamesEng',
+        firstNames: 'firstNamesEng',
         familyName: 'familyNameEng',
-        applicantFirstNamesEng: 'applicantFirstNamesEng',
+        applicantFirstNames: 'applicantFirstNamesEng',
         applicantFamilyName: 'applicantFamilyNameEng'
       }
     }
@@ -38,9 +38,9 @@ describe('collector fields handler receives a request', () => {
         }
       })
       expect(JSON.parse(res.payload).data.en).toEqual({
-        firstNamesEng: 'firstNamesEng',
+        firstNames: 'firstNamesEng',
         familyName: 'familyNameEng',
-        applicantFirstNamesEng: 'applicantFirstNamesEng',
+        applicantFirstNames: 'applicantFirstNamesEng',
         applicantFamilyName: 'applicantFamilyNameEng'
       })
     })
