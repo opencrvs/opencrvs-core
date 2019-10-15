@@ -216,10 +216,34 @@ export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   return new Date(date) >= new Date(JSON.stringify(drafts.deceased.birthDate))
 }
 
+export const isDateNotBeforeDate = (first: string, second: string) => {
+  return new Date(first) >= new Date(second)
+}
+
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? undefined
+    : {
+        message: messages.isValidBirthDate
+      }
+}
+
+export const isValidChildBirthDate: Validation = (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const cast = value as string
+  const motherBirthDate = (drafts && drafts.mother.motherBirthDate) as string
+
+  return cast && isAValidDateFormat(cast) && isDateNotInFuture(cast)
+    ? motherBirthDate
+      ? isDateNotBeforeDate(cast, motherBirthDate)
+        ? undefined
+        : {
+            message: messages.isValidBirthDate
+          }
+      : undefined
     : {
         message: messages.isValidBirthDate
       }

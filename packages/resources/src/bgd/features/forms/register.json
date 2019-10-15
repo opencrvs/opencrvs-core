@@ -867,7 +867,7 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
+                      "operation": "isValidChildBirthDate"
                     }
                   ],
                   "mapping": {
@@ -4422,7 +4422,8 @@
                           "parameters": []
                         },
                         "dependencies": [
-                          "dateOfMarriage"
+                          "dateOfMarriage",
+                          "draftData.child.childBirthDate"
                         ]
                       }
                     ]
