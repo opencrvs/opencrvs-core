@@ -419,6 +419,7 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   if (fieldValue) {
     transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
   }
+  // console.log(transformedData[sectionId][field.name])
 }
 
 export const valueToNestedRadioFieldTransformer = (
@@ -444,6 +445,9 @@ export const valueToNestedRadioFieldTransformer = (
     fieldValue = tempDraftData[sectionId][fieldName]
   } else {
     fieldValue = queryData[sectionId][transformFieldName || fieldName]
+  }
+  if (!fieldValue) {
+    return
   }
 
   let transformedFieldData = transformedData[sectionId][field.name] as IFormData
