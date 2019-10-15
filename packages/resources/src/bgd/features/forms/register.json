@@ -4013,7 +4013,8 @@
                     "description": "Question to ask the user if they have the parents details",
                     "id": "form.field.label.parentDetailsType"
                   },
-                  "initialValue": true,
+                  "initialValue": "",
+                  "required": true,
                   "validate": [],
                   "options": [
                     {
@@ -4082,6 +4083,7 @@
                   },
                   "validate": [],
                   "initialValue": "",
+                  "required": true,
                   "extraValue": "MOTHER",
                   "previewGroup": "reasonMotherNotApplying",
                   "mapping": {
@@ -4166,6 +4168,7 @@
                   },
                   "validate": [],
                   "initialValue": "",
+                  "required": true,
                   "previewGroup": "reasonFatherNotApplying",
                   "extraValue": "FATHER",
                   "mapping": {
@@ -4275,6 +4278,7 @@
                     "id": "form.field.label.primaryCaregiverType"
                   },
                   "initialValue": "",
+                  "required": true,
                   "validate": [],
                   "options": [
                     {
@@ -4283,7 +4287,13 @@
                         "defaultMessage": "Mother and father",
                         "description": "label for parents radio button",
                         "id": "form.field.label.caregiver.parents"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.primaryCaregiver && ((draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString()) || (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString())))"
+                        }
+                      ]
                     },
                     {
                       "value": "MOTHER",
@@ -4291,7 +4301,13 @@
                         "defaultMessage": "Mother",
                         "description": "label for mother radio button",
                         "id": "form.field.label.caregiver.mother"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.primaryCaregiver && (draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString()))"
+                        }
+                      ]
                     },
                     {
                       "value": "FATHER",
@@ -4299,7 +4315,13 @@
                         "defaultMessage": "Father",
                         "description": "label for father radio button",
                         "id": "form.field.label.caregiver.father"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.primaryCaregiver &&  (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString()))"
+                        }
+                      ]
                     },
                     {
                       "value": "LEGAL_GUARDIAN",
@@ -4341,6 +4363,7 @@
                         },
                         "initialValue": "",
                         "validate": [],
+                        "required": true,
                         "mapping": {
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
@@ -4392,6 +4415,7 @@
                           "description": "field label for phone"
                         },
                         "initialValue": "",
+                        "required": true,
                         "validate": [
                           {
                             "operation": "phoneNumberFormat"
@@ -4489,6 +4513,7 @@
                           "description": "field label for name"
                         },
                         "initialValue": "",
+                        "required": true,
                         "validate": [],
                         "mapping": {
                           "mutation": {
@@ -4541,6 +4566,7 @@
                           "description": "field label for phone"
                         },
                         "initialValue": "",
+                        "required": true,
                         "validate": [
                           {
                             "operation": "phoneNumberFormat"
