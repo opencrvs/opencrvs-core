@@ -17,12 +17,6 @@ const unionsNumbers = JSON.parse(
   fs.readFileSync(`${SEQUENCE_NUMBER_SOURCE}/generated/unions.json`).toString()
 )
 
-const municipalitiesNumbers = JSON.parse(
-  fs
-    .readFileSync(`${SEQUENCE_NUMBER_SOURCE}/generated/municipalities.json`)
-    .toString()
-)
-
 async function prepareAndSaveLocationSequenceNumber(
   locations: fhir.Location[],
   locWiseSeqNumbers: ILocationSequenceNumber[]
@@ -65,23 +59,11 @@ export default async function saveSequenceNumberData() {
     fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`).toString()
   )
   // Preparing union wise sequence numbers
-  let sequenceNumberModels = await prepareAndSaveLocationSequenceNumber(
+  const sequenceNumberModels = await prepareAndSaveLocationSequenceNumber(
     unions.unions,
     unionsNumbers
   )
 
-  const municipalities = JSON.parse(
-    fs
-      .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`)
-      .toString()
-  )
-  // Preparing municipality wise sequence numbers
-  sequenceNumberModels = sequenceNumberModels.concat(
-    await prepareAndSaveLocationSequenceNumber(
-      municipalities.municipalities,
-      municipalitiesNumbers
-    )
-  )
   if (sequenceNumberModels.length === 0) {
     return false
   }

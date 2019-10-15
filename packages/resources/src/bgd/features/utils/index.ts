@@ -16,10 +16,18 @@ type ISupportedType =
   | IOISFLocation
 
 export interface IOISFLocation {
-  bbsCode: string
-  name: string
-  nameBn: string
-  id: number
+  geo_id: string
+  name_bng: string
+  name_eng: string
+  bbs_code: string
+  a2i_reference: string
+}
+
+export interface IOISFLocationResponse {
+  divisions: IOISFLocation[]
+  districts: IOISFLocation[]
+  upazilas: IOISFLocation[]
+  unions: IOISFLocation[]
 }
 
 export interface IStatistic {
