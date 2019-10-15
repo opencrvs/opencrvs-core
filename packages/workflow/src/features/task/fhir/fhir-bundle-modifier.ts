@@ -2,7 +2,8 @@ import { getLoggedInPractitionerResource } from '@workflow/features/user/utils'
 import {
   setupLastRegUser,
   setupLastRegLocation,
-  setupAuthorOnNotes
+  setupAuthorOnNotes,
+  checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
@@ -18,6 +19,9 @@ export async function modifyTaskBundle(
   ) {
     throw new Error('Invalid FHIR bundle found for task')
   }
+  // Checking for duplicate status update
+  await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as fhir.Task)
+
   const taskResource = getTaskResource(fhirBundle) as fhir.Task
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */

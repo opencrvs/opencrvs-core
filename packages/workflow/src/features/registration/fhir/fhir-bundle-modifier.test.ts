@@ -157,7 +157,7 @@ describe('Verify fhir bundle modifier functions', () => {
     })
   })
   describe('SetupRegistrationWorkflow', () => {
-    it('Will push the registration status on fhirDoc', () => {
+    it('Will push the registration status on fhirDoc', async () => {
       const tokenPayload = {
         iss: '',
         iat: 1541576965,
@@ -168,7 +168,7 @@ describe('Verify fhir bundle modifier functions', () => {
         subject: '1',
         scope: ['declare']
       }
-      const taskResource = setupRegistrationWorkflow(
+      const taskResource = await setupRegistrationWorkflow(
         testFhirBundle.entry[1].resource as fhir.Task,
         tokenPayload
       )
@@ -184,7 +184,7 @@ describe('Verify fhir bundle modifier functions', () => {
         expect(taskResource.businessStatus.coding[0].code).toEqual('DECLARED')
       }
     })
-    it('Will update existing registration status on fhirDoc', () => {
+    it('Will update existing registration status on fhirDoc', async () => {
       const tokenPayload = {
         iss: '',
         iat: 1541576965,
@@ -212,7 +212,7 @@ describe('Verify fhir bundle modifier functions', () => {
           ]
         }
         /* tslint:enable:no-string-literal */
-        const taskResource = setupRegistrationWorkflow(
+        const taskResource = await setupRegistrationWorkflow(
           fhirBundle.entry[1].resource as fhir.Task,
           tokenPayload
         )

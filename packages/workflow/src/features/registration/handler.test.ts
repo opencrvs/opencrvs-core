@@ -17,7 +17,8 @@ import {
   compositionMock,
   deathCompositionMock,
   testInProgressFhirBundle,
-  testInProgressDeathFhirBundle
+  testInProgressDeathFhirBundle,
+  taskResouceMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -603,6 +604,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -753,6 +755,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -848,6 +851,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -930,6 +934,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1076,6 +1081,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1167,6 +1173,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
