@@ -501,6 +501,7 @@
         "form.field.label.birthTypeTwin": "Twin",
         "form.field.label.causeOfDeathCode": "Cause of Death Code",
         "form.field.label.causeOfDeathEstablished": "Has a Cause of Death been established ?",
+        "form.field.label.causeOfDeath": "What is the medically certified cause of death?",
         "form.field.label.childDateOfBirth": "Date of birth",
         "form.field.label.childFamilyName": "Last name",
         "form.field.label.childFirstNames": "First name(s)",
