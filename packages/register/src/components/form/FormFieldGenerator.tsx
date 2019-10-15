@@ -48,6 +48,7 @@ import {
   ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
   ITextFormField,
+  Ii18nTextFormField,
   LINK,
   LIST,
   NUMBER,
@@ -424,6 +425,7 @@ function GeneratedInputField({
         type="text"
         {...inputProps}
         value={inputProps.value as string}
+        maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
       />
     </InputField>
   )
