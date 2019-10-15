@@ -3,11 +3,14 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   mockApplicationData,
-  mockDeathApplicationData
+  mockDeathApplicationData,
+  mockOfflineData
 } from '@register/tests/util'
 import { VerifyCollector } from './VerifyCollector'
+import { offlineDataReady } from '@register/offline/actions'
 import { storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
+import { createIntl } from 'react-intl'
 import { ReactWrapper } from 'enzyme'
 
 describe('verify collector tests', () => {

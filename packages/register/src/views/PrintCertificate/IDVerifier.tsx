@@ -106,11 +106,15 @@ class IDVerifierComponent extends React.Component<
     const fields = this.props.offlineResources.collectorFields
 
     const firstNames =
-      info[fields[locale].firstNames] ||
-      info[fields[locale].applicantFirstNames]
+      fields &&
+      fields[locale] &&
+      (info[fields[locale].firstNames] ||
+        info[fields[locale].applicantFirstNames])
     const familyName =
-      info[fields[locale].familyName] ||
-      info[fields[locale].applicantFamilyName]
+      fields &&
+      fields[locale] &&
+      (info[fields[locale].familyName] ||
+        info[fields[locale].applicantFamilyName])
 
     const birthDate =
       info.motherBirthDate || info.fatherBirthDate || info.applicantBirthDate
