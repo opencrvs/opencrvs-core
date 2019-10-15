@@ -23,7 +23,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/notification/birth',
+      path: '/dhis2-notification/birth',
       handler: birthNotificationHandler,
       config: {
         tags: ['api'],
@@ -36,7 +36,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/notification/death',
+      path: '/dhis2-notification/death',
       handler: deathNotificationHandler,
       config: {
         tags: ['api'],

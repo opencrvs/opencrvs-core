@@ -80,7 +80,7 @@ if (!module.parent) {
     // tslint:disable-next-line:no-console
     console.log(authResBody)
 
-    const res = await fetch(`${OPENHIM_URL}/notification/death`, {
+    const res = await fetch(`${OPENHIM_URL}/dhis2-notification/death`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {

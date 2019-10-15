@@ -15,4 +15,5 @@ RUN yarn build
 
 EXPOSE 8040
 
+# TODO wait for openhim api
 CMD yarn start:prod

@@ -77,7 +77,12 @@ export function createUsers(users: IUserModel[]) {
     active: true
   })
 
-  // Add API USER ROLE?
+  const apiUserRole = new Role({
+    title: 'API User',
+    value: 'API_USER',
+    types: ['API_USER'],
+    active: true
+  })
 
   const roles = [
     fieldAgentRole,
@@ -86,7 +91,8 @@ export function createUsers(users: IUserModel[]) {
     sysAdminLocalRole,
     sysAdminNationalRole,
     performanceOversightRole,
-    performanceMgntRole
+    performanceMgntRole,
+    apiUserRole
   ]
   function onInsert(err: any, values: any) {
     if (!err) {
