@@ -133,6 +133,20 @@ describe('Registration type resolvers', () => {
     expect(primaryCaregiver.encounterSection.title).toBe('Birth Encounter')
   })
 
+  it('returns null as primaryCaregiver if no encounter section', async () => {
+    const primaryCaregiver = await typeResolvers.BirthRegistration.primaryCaregiver(
+      {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '{{urn_uuid}}'
+        },
+        resourceType: 'Composition',
+        section: []
+      }
+    )
+    expect(primaryCaregiver).toBe(null)
+  })
+
   it('returns id from identifier', () => {
     const id = typeResolvers.IdentityType.id({
       value: '123456789',
@@ -1228,6 +1242,16 @@ describe('Registration type resolvers', () => {
       expect(primaryCaregiver.name.length).toBeGreaterThan(0)
     })
 
+    it('returns null if no patientSection', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockPatient))
+
+      const primaryCaregiver = await typeResolvers.PrimaryCaregiver.primaryCaregiver(
+        {}
+      )
+
+      expect(primaryCaregiver).toBe(null)
+    })
+
     it('returns reasonsNotApplying', async () => {
       fetch.mockResponseOnce(JSON.stringify(mockObservationBundle))
 
@@ -1236,6 +1260,21 @@ describe('Registration type resolvers', () => {
       )
 
       expect(reasonsNotApplying).toEqual(reasonsNotApplyingMock)
+    })
+
+    it('returns empty reasons array if  no observations', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          type: 'searchset'
+        })
+      )
+
+      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+        primaryCaregiverObj
+      )
+
+      expect(reasonsNotApplying).toEqual([])
     })
   })
 
