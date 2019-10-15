@@ -66,7 +66,7 @@ if (!module.parent) {
     const authRes = await fetch(`${AUTH_URL}/authenticate`, {
       method: 'POST',
       body: JSON.stringify({
-        username: 'mohammad.ashraful',
+        username: 'api.user',
         password: 'test'
       })
     })

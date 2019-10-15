@@ -68,13 +68,13 @@ rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
 
 # Prepare docker-compose.deploy.yml and docker-compose.<COUNTRY>.yml file - rotate secrets etc
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
-ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.'$COUNTRY'.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.'$COUNTRY'.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 
 # Setup configuration files and compose file for the deployment domain
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
-ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.yml --with-registry-auth opencrvs'
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
 
 if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
     echo
