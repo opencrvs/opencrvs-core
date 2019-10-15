@@ -22,7 +22,6 @@ type NotificationProps = {
   language?: string
   configurationErrorVisible: boolean
   backgroundSyncMessageVisible: boolean
-  syncCount: number
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
@@ -64,7 +63,6 @@ class Component extends React.Component<
       children,
       backgroundSyncMessageVisible,
       configurationErrorVisible,
-      syncCount,
       intl,
       saveDraftClicked,
       submitFormSuccessToast,
@@ -80,9 +78,7 @@ class Component extends React.Component<
             show={backgroundSyncMessageVisible}
             callback={this.hideBackgroundSyncedNotification}
           >
-            {intl.formatMessage(messages.declarationsSynced, {
-              syncCount
-            })}
+            {intl.formatMessage(messages.declarationsSynced)}
           </Notification>
         )}
         {configurationErrorVisible && (
@@ -140,7 +136,6 @@ const mapStateToProps = (store: IStoreState) => {
     backgroundSyncMessageVisible:
       store.notification.backgroundSyncMessageVisible,
     configurationErrorVisible: store.notification.configurationErrorVisible,
-    syncCount: store.notification.syncCount,
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast

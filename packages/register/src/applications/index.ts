@@ -186,11 +186,13 @@ export interface IUserData {
 export interface IApplicationsState {
   userID: string
   applications: IApplication[]
+  initialApplicationsLoaded: boolean
 }
 
 const initialState = {
   userID: '',
-  applications: []
+  applications: [],
+  initialApplicationsLoaded: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {
@@ -441,11 +443,13 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         return {
           ...state,
           userID: userData.userID,
-          applications: userData.applications
+          applications: userData.applications,
+          initialApplicationsLoaded: true
         }
       }
       return {
-        ...state
+        ...state,
+        initialApplicationsLoaded: true
       }
     default:
       return state

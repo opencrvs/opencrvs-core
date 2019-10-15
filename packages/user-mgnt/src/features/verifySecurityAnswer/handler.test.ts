@@ -86,7 +86,7 @@ describe('verifying a security question answer', () => {
       }
     })
 
-    expect(res.statusCode).toBe(401)
+    expect(res.statusCode).toBe(409)
   })
   it('responds with matched as true when answer is correct', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')

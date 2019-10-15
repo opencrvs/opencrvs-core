@@ -24,6 +24,7 @@ import {
   IDynamicOptions,
   IFileValue,
   IForm,
+  IFormData,
   IFormField,
   IFormFieldValue,
   IFormSection,
@@ -35,6 +36,7 @@ import {
   LIST,
   PARAGRAPH,
   RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
   SEARCH_FIELD,
   Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
@@ -42,9 +44,7 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
-  FETCH_BUTTON,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  IFormData
+  FETCH_BUTTON
 } from '@register/forms'
 import {
   getBirthSection,
@@ -64,8 +64,8 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
 import {
-  getValidationErrorsForForm,
   Errors,
+  getValidationErrorsForForm,
   IFieldErrors
 } from '@register/forms/validation'
 import { buttonMessages } from '@register/i18n/messages'
@@ -785,6 +785,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 field =>
                   this.isVisibleField(field, section) && !this.isViewOnly(field)
               )
+              .filter(field => !Boolean(field.hideInPreview))
               .map(field => {
                 return field.previewGroup
                   ? this.getPreviewGroupsField(

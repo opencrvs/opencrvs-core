@@ -116,7 +116,6 @@ class ReviewTabComponent extends React.Component<
             )
         })
       }
-
       return {
         ...reg,
         eventTimeElapsed:

@@ -27,11 +27,10 @@ export const influx = new Influx.InfluxDB({
 })
 
 export const writePoints = (points: any[]) => {
-  influx
-    .writePoints(points)
-    .catch((err: Error) =>
-      logger.error(`Error saving data to InfluxDB! ${err.stack}`)
-    )
+  return influx.writePoints(points).catch((err: Error) => {
+    logger.error(`Error saving data to InfluxDB! ${err.stack}`)
+    throw err
+  })
 }
 
 export const readPoints = (query: string) => {
@@ -39,6 +38,6 @@ export const readPoints = (query: string) => {
     return influx.query(query)
   } catch (err) {
     logger.error(`Error reading data from InfluxDB! ${err.stack}`)
-    throw new Error(err)
+    throw err
   }
 }

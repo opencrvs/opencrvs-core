@@ -31,7 +31,7 @@
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
     "deploy:staging:bgd": "bash deploy.sh bgd --clear-data=yes --restore-metadata=yes opencrvs-staging.jembi.org latest",
-    "deploy:staging:zmb": "bash deploy.sh zmb --clear-data=yes --restore-metadata=yes opencrvs.zmb-qa1.jembi.org latest",
+    "deploy:staging:zmb": "bash deploy.sh zmb --clear-data=yes --restore-metadata=yes opencrvs.zmb-qa1.jembi.org",
     "deploy:qa:bgd": "bash deploy.sh bgd --clear-data=yes --restore-metadata=yes opencrvs.qa1.jembi.org",
     "deploy": "bash deploy.sh",
     "deploy:bn-prod": "SSH_USER=mishealth SSH_HOST=172.16.17.54 LOG_LOCATION=/home/mishealth bash deploy.sh bgd --clear-data=no --restore-metadata=yes opencrvsbd.org",

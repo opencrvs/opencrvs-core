@@ -41,7 +41,7 @@ test('verifyUserHandler should return 200 and the user scope when the user exist
   expect([...res.result.scope]).toMatchObject(['test'])
 })
 
-test('verifyUserHandler should throw when no security question answer found', async () => {
+test('verifyUserHandler should respond with conflict when there are now security answers', async () => {
   const entry = {
     mobile: '+8801711111111',
     scope: ['test'],
@@ -56,7 +56,7 @@ test('verifyUserHandler should throw when no security question answer found', as
     url: '/verifyUser',
     payload: { mobile: '+8801711111111' }
   })
-  expect(res.result.statusCode).toBe(500)
+  expect(res.result.statusCode).toBe(409)
 })
 
 test('verifyUserHandler should throw when User.findOne throws', async () => {

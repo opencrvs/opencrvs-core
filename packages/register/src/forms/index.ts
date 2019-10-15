@@ -70,6 +70,7 @@ export interface ISelectOption {
 export interface IRadioOption {
   value: RadioComponentOption['value']
   label: MessageDescriptor
+  conditionals?: RadioComponentOption['conditionals']
 }
 export interface ICheckboxOption {
   value: CheckboxComponentOption['value']
@@ -176,14 +177,16 @@ export type IFormFieldMutationMapFunction = (
   transFormedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
-  fieldDefinition: IFormField
+  fieldDefinition: IFormField,
+  nestedFieldDefinition?: IFormField
 ) => void
 
 export type IFormFieldQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
   sectionId: string,
-  fieldDefinition: IFormField
+  fieldDefinition: IFormField,
+  nestedFieldDefinition?: IFormField
 ) => void
 
 /*
@@ -322,6 +325,7 @@ export interface IFormFieldBase {
   // This flag will only remove the change link from preview/review screen
   // Default false
   readonly?: boolean
+  hideInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -364,6 +368,7 @@ export interface IInformativeRadioGroupFormField extends IFormFieldBase {
 
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
+  maxLength?: number
 }
 
 export interface ITelFormField extends IFormFieldBase {
@@ -830,6 +835,7 @@ export interface Ii18nInformativeRadioGroupFormField
 
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
+  maxLength?: number
 }
 export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL

@@ -5,6 +5,10 @@ import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
+import { storage } from '@login/storage'
+import { createStore } from './store'
+
+storage.configStorage('OpenCRVS')
 
 // Injecting global styles for the body tag - used only once
 // @ts-ignore
@@ -21,11 +25,11 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
-    dsn: 'https://8f6ba426b20045f1b91528d5fdc214b5@sentry.io/1401900'
+    dsn: window.config.SENTRY
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init('hxf1hb/opencrvs')
+  LogRocket.init(window.config.LOGROCKET)
 
   // Integrate the two
   Sentry.configureScope(scope => {
@@ -43,6 +47,9 @@ if (
     })
   })
 }
-
-ReactDOM.render(<App />, document.getElementById('root'))
+const { store, history } = createStore()
+ReactDOM.render(
+  <App store={store} history={history} />,
+  document.getElementById('root')
+)
 registerServiceWorker()

@@ -1,65 +1,65 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import {
+  InputField,
+  IRadioOption as RadioComponentOption,
+  TextInput
+} from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
+  deleteApplication,
   IApplication,
-  modifyApplication,
-  deleteApplication
+  modifyApplication
 } from '@register/applications'
 import {
-  goToBirthRegistrationAsParent,
-  goBack,
-  goToHome,
-  goToBirthContactPoint,
-  goToDeathContactPoint,
-  goToPrimaryApplicant,
-  goToDeathRegistration
-} from '@register/navigation'
-import { IStoreState } from '@register/store'
-
-import {
-  InputField,
-  TextInput,
-  IRadioOption as RadioComponentOption
-} from '@opencrvs/components/lib/forms'
-import {
-  Event,
   BirthSection,
   DeathSection,
-  IFormSection
+  Event,
+  IFormSection,
+  IFormSectionData
 } from '@register/forms'
-import { phoneNumberFormat } from '@register/utils/validate'
-import {
-  PHONE_NO_FIELD_STRING,
-  RADIO_BUTTON_LARGE_STRING,
-  INFORMANT_FIELD_STRING
-} from '@register/utils/constants'
-import { messages } from '@register/i18n/messages/views/selectInformant'
-import { constantsMessages } from '@register/i18n/messages/constants'
-import {
-  validationMessages,
-  formMessages,
-  buttonMessages
-} from '@register/i18n/messages'
 import {
   getBirthSection,
   getDeathSection
 } from '@register/forms/register/application-selectors'
+import {
+  buttonMessages,
+  formMessages,
+  validationMessages
+} from '@register/i18n/messages'
+import { constantsMessages } from '@register/i18n/messages/constants'
+import { messages } from '@register/i18n/messages/views/selectInformant'
+import {
+  goBack,
+  goToBirthContactPoint,
+  goToBirthRegistrationAsParent,
+  goToDeathContactPoint,
+  goToDeathRegistration,
+  goToHome,
+  goToPrimaryApplicant
+} from '@register/navigation'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import {
+  INFORMANT_FIELD_STRING,
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING
+} from '@register/utils/constants'
+import { phoneNumberFormat } from '@register/utils/validate'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -141,18 +141,18 @@ const setInformantFields = (
         disabled: false
       },
       {
-        id: `select_informant_${INFORMANT.SELF}`,
-        option: {
-          label: intl.formatMessage(formMessages.self),
-          value: INFORMANT.SELF
-        },
-        disabled: true
-      },
-      {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
           label: intl.formatMessage(formMessages.someoneElse),
           value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SELF}`,
+        option: {
+          label: intl.formatMessage(formMessages.self),
+          value: INFORMANT.SELF
         },
         disabled: true
       }
@@ -302,7 +302,8 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToPrimaryApplicant,
-        registrationSection
+        registrationSection,
+        goToBirthRegistrationAsParent
       } = this.props
       this.props.modifyApplication({
         ...application,
@@ -311,12 +312,18 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           registration: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant
+              presentAtBirthRegistration: this.state.informant,
+              applicant: {
+                value: this.state.informant,
+                nestedFields: {}
+              }
             }
           }
         }
       })
-      goToPrimaryApplicant(this.props.match.params.applicationId)
+      event === Event.BIRTH
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
+        : goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -324,7 +331,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     ) {
       const {
         application,
-        goToBirthContactPoint,
+        goToBirthRegistrationAsParent,
         goToDeathContactPoint,
         registrationSection,
         applicantsSection
@@ -340,7 +347,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           ...application.data[registrationSection.id],
           ...{
             presentAtBirthRegistration: this.state.informant,
-            applicant: this.state.informant
+            applicant: {
+              value: this.state.informant,
+              nestedFields: {}
+            }
           }
         }
       } else {
@@ -359,7 +369,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.props.modifyApplication(newApplication)
 
       this.props.location.pathname.includes(Event.BIRTH)
-        ? goToBirthContactPoint(this.props.match.params.applicationId)
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
         : goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
       event === Event.DEATH &&
@@ -391,6 +401,52 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       })
 
       goToDeathRegistration(this.props.match.params.applicationId)
+    } else if (
+      event === Event.BIRTH &&
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant === INFORMANT.SOMEONE_ELSE
+    ) {
+      const {
+        application,
+        registrationSection,
+        goToBirthRegistrationAsParent
+      } = this.props
+
+      const modifiedApplicationData = {
+        ...application,
+        data: {
+          ...application.data,
+          [registrationSection.id]: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: {
+                value:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).value) ||
+                  '',
+                nestedFields:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).nestedFields) ||
+                  {}
+              }
+            }
+          }
+        }
+      }
+      this.props.modifyApplication(modifiedApplicationData)
+      goToBirthRegistrationAsParent(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
