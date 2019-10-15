@@ -8,17 +8,18 @@ import {
   upazilaMock,
   unionMock,
   officeMock,
-  testFhirTaskBundle
+  testFhirTaskBundle,
+  taskResouceMock
 } from '@workflow/test/utils'
 import { modifyTaskBundle } from '@workflow/features/task/fhir/fhir-bundle-modifier'
-
+import { cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
-
+let token: string
 describe('Verify handler', () => {
-  it('modifyTaskBundle returns correct bundle', async () => {
-    const token = jwt.sign(
+  beforeEach(() => {
+    token = jwt.sign(
       { scope: ['declare'] },
       readFileSync('../auth/test/cert.key'),
       {
@@ -27,7 +28,11 @@ describe('Verify handler', () => {
         audience: 'opencrvs:workflow-user'
       }
     )
+  })
+
+  it('modifyTaskBundle returns correct bundle', async () => {
     fetch.mockResponses(
+      [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -41,7 +46,10 @@ describe('Verify handler', () => {
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }]
     )
-    const payload = await modifyTaskBundle(testFhirTaskBundle, token)
+    const clonedTestFhirTaskBundle = cloneDeep(testFhirTaskBundle)
+    clonedTestFhirTaskBundle.entry[0].resource.businessStatus.coding[0].code =
+      'REJECTED'
+    const payload = await modifyTaskBundle(clonedTestFhirTaskBundle, token)
     if (
       payload &&
       payload.entry &&
@@ -62,5 +70,37 @@ describe('Verify handler', () => {
     } else {
       throw new Error('Failed')
     }
+  })
+
+  it('Throws error if application is already rejected', () => {
+    fetch.mockResponses(
+      [
+        JSON.stringify({
+          id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+          businessStatus: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/reg-status',
+                code: 'REJECTED'
+              }
+            ]
+          }
+        }),
+        { status: 200 }
+      ],
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }]
+    )
+    expect(modifyTaskBundle(testFhirTaskBundle, token)).rejects.toThrowError()
   })
 })
