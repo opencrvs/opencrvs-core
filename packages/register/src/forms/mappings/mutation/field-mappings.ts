@@ -409,6 +409,7 @@ export const fieldToIdentifierWithTypeTransformer = (
 }
 
 export const nestedRadioFieldTransformer = (
+  transformedFieldName?: string,
   nestedTransformer?: IFormFieldMutationMapFunction
 ) => (
   transformedData: TransformedData,
@@ -425,13 +426,13 @@ export const nestedRadioFieldTransformer = (
     parentData[field.name] = fieldValueObj.value as IFormSectionData
     partialDraftData[sectionId] = parentData
   } else if (nestedField) {
-    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
     if (
       nestedField.extraValue &&
       nestedField.extraValue !== fieldValueObj.value
     ) {
-      return transformedData
+      return
     }
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
   }
 
   if (nestedTransformer) {
@@ -441,6 +442,17 @@ export const nestedRadioFieldTransformer = (
       sectionId,
       nestedField || field
     )
+  } else {
+    const transFieldName = transformedFieldName
+      ? transformedFieldName
+      : nestedField
+      ? nestedField.name
+      : field.name
+    const fieldValue = !nestedField
+      ? fieldValueObj.value
+      : (fieldValueObj.nestedFields as IFormSectionData)[nestedField.name]
+
+    transformedData[sectionId][transFieldName] = fieldValue
   }
 }
 

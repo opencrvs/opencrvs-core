@@ -389,7 +389,7 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   transformedFieldValue?: string[]
 ) => (
   transformedData: IFormData,
-  queryData: any,
+  queryData: TransformedData,
   sectionId: string,
   field: IFormField
 ) => {
@@ -422,28 +422,31 @@ export const reasonsNotApplyingToFieldValueTransformer = (
 }
 
 export const valueToNestedRadioFieldTransformer = (
+  transformFieldName?: string,
   transformMethod?: IFormFieldQueryMapFunction
 ) => (
   transformedData: IFormData,
-  queryData: any,
+  queryData: TransformedData,
   sectionId: string,
   field: IFormField,
   nestedField: IFormField
 ) => {
   const tempDraftData = {} as IFormData
-  tempDraftData[sectionId] = {}
+  const fieldName = nestedField ? nestedField.name : field.name
   let fieldValue
+  tempDraftData[sectionId] = {}
 
   if (transformMethod) {
     transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
   }
-  if (nestedField) {
-    fieldValue = tempDraftData[sectionId][nestedField.name]
+  if (transformMethod) {
+    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
+    fieldValue = tempDraftData[sectionId][fieldName]
   } else {
-    fieldValue = tempDraftData[sectionId][field.name]
+    fieldValue = queryData[sectionId][transformFieldName || fieldName]
   }
 
-  let transformedFieldData = transformedData[sectionId][field.name]
+  let transformedFieldData = transformedData[sectionId][field.name] as IFormData
 
   if (!transformedFieldData) {
     transformedData[sectionId][field.name] = {
@@ -451,7 +454,6 @@ export const valueToNestedRadioFieldTransformer = (
       nestedFields: {}
     }
   } else if (nestedField) {
-    // @ts-ignore
     transformedFieldData.nestedFields[nestedField.name] = fieldValue
   }
 }

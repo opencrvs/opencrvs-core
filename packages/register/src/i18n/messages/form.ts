@@ -305,6 +305,8 @@ interface IFormMessages {
   otherCaregiverTypeLabel: MessageDescriptor
   nameFieldLabel: MessageDescriptor
   reasonNotApplyingFieldLabel: MessageDescriptor
+  reasonMotherNotApplyingPreview: MessageDescriptor
+  reasonFatherNotApplyingPreview: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1794,6 +1796,16 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Reason for father',
     description: 'Label for form field: reasonFatherNotApplying',
     id: 'form.field.label.reasonFatherNotApplying'
+  },
+  reasonMotherNotApplyingPreview: {
+    defaultMessage: 'Reason for mother not applying',
+    description: 'Label for form field: reasonMotherNotApplyingPreview',
+    id: 'form.field.label.reasonMotherNotApplyingPreview'
+  },
+  reasonFatherNotApplyingPreview: {
+    defaultMessage: 'Reason for father not applying',
+    description: 'Label for form field: reasonFatherNotApplyingPreview',
+    id: 'form.field.label.reasonFatherNotApplyingPreview'
   },
   reasonParentsNotApplying: {
     defaultMessage: 'Why are the mother and father not applying?',

@@ -270,6 +270,26 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           }
         }
       }
+      primaryCaregiver {
+        parentDetailsType
+        primaryCaregiver {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          telecom {
+            system
+            value
+            use
+          }
+        }
+        reasonsNotApplying {
+          primaryCaregiverType
+          reasonNotApplying
+          isDeceased
+        }
+      }
       registration {
         id
         contact
