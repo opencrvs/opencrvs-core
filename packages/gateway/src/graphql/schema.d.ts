@@ -465,9 +465,15 @@ export enum GQLBirthRegPresence {
 }
 
 export interface GQLPrimaryCaregiver {
+  primaryCaregiver?: GQLPerson
+  reasonsNotApplying?: Array<GQLReasonsNotApplying | null>
+  parentDetailsType?: GQLParentDetailsType
+}
+
+export interface GQLReasonsNotApplying {
   primaryCaregiverType?: GQLPrimaryCaregiverType
-  primaryCaregiver?: GQLRelatedPerson
   reasonNotApplying?: string
+  isDeceased?: boolean
 }
 
 export enum GQLPrimaryCaregiverType {
@@ -477,6 +483,13 @@ export enum GQLPrimaryCaregiverType {
   INFORMANT = 'INFORMANT',
   LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
   OTHER = 'OTHER'
+}
+
+export enum GQLParentDetailsType {
+  MOTHER_AND_FATHER = 'MOTHER_AND_FATHER',
+  MOTHER_ONLY = 'MOTHER_ONLY',
+  FATHER_ONLY = 'FATHER_ONLY',
+  NONE = 'NONE'
 }
 
 export interface GQLBirthRegResultSet {
@@ -813,9 +826,15 @@ export interface GQLPaymentInput {
 }
 
 export interface GQLPrimaryCaregiverInput {
+  primaryCaregiver?: GQLPersonInput
+  reasonsNotApplying?: Array<GQLReasonsNotApplyingInput | null>
+  parentDetailsType?: GQLParentDetailsType
+}
+
+export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
-  primaryCaregiver?: GQLRelatedPersonInput
   reasonNotApplying?: string
+  isDeceased?: boolean
 }
 
 export interface GQLCreatedIds {
@@ -901,6 +920,7 @@ export interface GQLResolver {
   Payment?: GQLPaymentTypeResolver
   Map?: GraphQLScalarType
   PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
+  ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -2164,16 +2184,9 @@ export interface PaymentToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLPrimaryCaregiverTypeResolver<TParent = any> {
-  primaryCaregiverType?: PrimaryCaregiverToPrimaryCaregiverTypeResolver<TParent>
   primaryCaregiver?: PrimaryCaregiverToPrimaryCaregiverResolver<TParent>
-  reasonNotApplying?: PrimaryCaregiverToReasonNotApplyingResolver<TParent>
-}
-
-export interface PrimaryCaregiverToPrimaryCaregiverTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  reasonsNotApplying?: PrimaryCaregiverToReasonsNotApplyingResolver<TParent>
+  parentDetailsType?: PrimaryCaregiverToParentDetailsTypeResolver<TParent>
 }
 
 export interface PrimaryCaregiverToPrimaryCaregiverResolver<
@@ -2183,7 +2196,43 @@ export interface PrimaryCaregiverToPrimaryCaregiverResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface PrimaryCaregiverToReasonNotApplyingResolver<
+export interface PrimaryCaregiverToReasonsNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PrimaryCaregiverToParentDetailsTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLReasonsNotApplyingTypeResolver<TParent = any> {
+  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
+    TParent
+  >
+  reasonNotApplying?: ReasonsNotApplyingToReasonNotApplyingResolver<TParent>
+  isDeceased?: ReasonsNotApplyingToIsDeceasedResolver<TParent>
+}
+
+export interface ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ReasonsNotApplyingToReasonNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ReasonsNotApplyingToIsDeceasedResolver<
   TParent = any,
   TResult = any
 > {
