@@ -25,5 +25,3 @@ export const SEQUENCE_NUMBER_SOURCE = path.join(
   'src/bgd/features/generate/sequenceNumbers/'
 )
 export const ADMINISTRATIVE_STRUCTURE_URL = 'http://esb.beta.doptor.gov.bd:8280'
-
-export const A2I_ENDPOINT_SECRET = process.env.A2I_ENDPOINT_SECRET || ''

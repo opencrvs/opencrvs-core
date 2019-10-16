@@ -1,8 +1,5 @@
 import fetch, { Response } from 'node-fetch'
-import {
-  ADMINISTRATIVE_STRUCTURE_URL,
-  A2I_ENDPOINT_SECRET
-} from '@resources/bgd/constants'
+import { ADMINISTRATIVE_STRUCTURE_URL } from '@resources/bgd/constants'
 import { ORG_URL } from '@resources/constants'
 import {
   sendToFhir,
@@ -88,10 +85,16 @@ export const appendLocations = (
 }
 
 export async function getTokenForOISF() {
+  const secret = process.argv[2]
+  if (!secret) {
+    // tslint:disable-next-line:no-console
+    console.log('No secret found for OISF token generation')
+    process.exit(1)
+  }
   const tokenResponse = await fetchFromOISF(
     'token/create',
     {
-      Authorization: `Secret ${A2I_ENDPOINT_SECRET}`
+      Authorization: `Secret ${secret}`
     },
     'POST'
   )

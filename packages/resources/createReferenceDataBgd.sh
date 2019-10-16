@@ -1,6 +1,14 @@
 #! /bin/sh
 
-ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/assign-admin-structure-to-locations.ts
+if [ -z "$1" ] 
+  then
+    echo 'Error: Argument for a2i secret is required in position 1.'
+    echo 'Usage: db:populate:bgd {secret}'
+    echo "Script must receive a parameter of a2i secret"
+    exit 1
+fi
+
+ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/assign-admin-structure-to-locations.ts -- $1
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/assign-geodata-to-locations.ts
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/update-location-data.ts
 ts-node -r tsconfig-paths/register src/bgd/features/facilities/scripts/prepare-source-facilities.ts
