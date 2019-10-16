@@ -21,14 +21,15 @@ services:
     image: jembi/ocrvs-bgd-dhis2-mediator
     secrets:
       - jwt-public-key.{{ts}}
+      - openhim-user
+      - openhim-password
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
       - FHIR_URL=http://openhim-core:5001/fhir
-      # TODO need to secure some of these for production
-      - OPENHIM_USER=root@openhim.org
-      - OPENHIM_PASSWORD=password
+      - OPENHIM_USER=/run/secrets/openhim-user
+      - OPENHIM_PASSWORD=/run/secrets/openhim-password
       - OPENHIM_URL=https://openhim-core:8080
       - TRUST_SELF_SIGNED=true
     deploy:
@@ -44,4 +45,8 @@ secrets:
   infobip-sender-id:
     external: true
   jwt-public-key.{{ts}}:
+    external: true
+  openhim-user:
+    external: true
+  openhim-password:
     external: true

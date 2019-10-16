@@ -18,11 +18,17 @@ Before the deployment can be done a few secrets need to be manually added to the
 
 ssh into the leader manager and run the following, replacing the values with the actual secrets:
 
-```
+```sh
+# For BGD
 printf "<clickatell-user>" | docker secret create clickatell-user -
 printf "<clickatell-password>" | docker secret create clickatell-password -
 printf "<clickatell-api-id>" | docker secret create clickatell-api-id -
 
+# For BGD DHIS2 medaitor, for API access to the OpenHIM
+printf "<openhim-user>" | docker secret create openhim-user -
+printf "<openhim-password>" | docker secret create openhim-password -
+
+# For ZMB
 printf "<infobip-gateway-endpoint>" | docker secret create infobip-gateway-endpoint -
 printf "<infobip-api-key>" | docker secret create infobip-api-key -
 printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
