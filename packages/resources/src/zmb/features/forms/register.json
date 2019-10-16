@@ -5358,7 +5358,7 @@
             {
               "id": "causeOfDeath-methodOfCauseOfDeathSection",
               "title": {
-                "defaultMessage": "What is the official cause of death?",
+                "defaultMessage": "What is the medically certified cause of death?",
                 "description": "Form section title for Cause of Death",
                 "id": "form.section.causeOfDeath.title"
               },
@@ -5370,24 +5370,36 @@
               ],
               "fields": [
                 {
+                  "name": "paragraph",
+                  "type": "PARAGRAPH",
+                  "hidden": true,
+                  "label": {
+                    "defaultMessage": " ",
+                    "description": "No Label",
+                    "id": "print.certificate.noLabel"
+                  },
+                  "initialValue": "",
+                  "validate": []
+                },
+                {
                   "name": "causeOfDeathCode",
                   "type": "TEXT",
                   "initialValue": "",
                   "label": {
-                    "defaultMessage": "What is the medically certified cause of death?",
-                    "description": "Label for form field: Cause of Death",
-                    "id": "form.field.label.causeOfDeath"
+                    "defaultMessage": "Underlying cause of death",
+                    "description": "Label for form field: Underlying cause of death",
+                    "id": "form.field.label.causeOfDeathCode"
                   },
                   "required": false,
                   "validate": [],
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": "causeOfDeath"
+                      "parameters": ["causeOfDeath"]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": "causeOfDeath"
+                      "parameters": ["causeOfDeath"]
                     }
                   }
                 }
