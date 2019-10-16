@@ -4465,6 +4465,7 @@
                           "description": "field label for reasonNotApplying"
                         },
                         "initialValue": "",
+                        "required": false,
                         "validate": [],
                         "extraValue": "LEGAL_GUARDIAN",
                         "mapping": {
@@ -4617,6 +4618,7 @@
                         },
                         "initialValue": "",
                         "validate": [],
+                        "required": false,
                         "extraValue": "OTHER",
                         "mapping": {
                           "mutation": {
