@@ -57,7 +57,7 @@ Once all data sources have been readied, then a single command should be able to
 **Populate OpenCRVS with reference data relevant to your country configuration**
 
 <!-- prettier-ignore -->
-```yarn populate:<<insert country code>>```
+```yarn db:populate:<<insert country code>>```
 
 ---
 
