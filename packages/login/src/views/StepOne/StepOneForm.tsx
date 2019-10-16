@@ -261,7 +261,11 @@ export class StepOneForm extends React.Component<FullProps> {
             <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>
-            <StyledButton id="login-forgot-password" type="button">
+            <StyledButton
+              id="login-forgot-password"
+              type="button"
+              onClick={() => (window.location.href = '/forgotten-item')}
+            >
               {intl.formatMessage(messages.forgotPassword)}
             </StyledButton>
           </ActionWrapper>

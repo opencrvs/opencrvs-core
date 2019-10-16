@@ -38,8 +38,8 @@ In these cases we will write migrations that fetch already stored data from hear
 
 We've decided to go with [InfluxDB](https://www.influxdata.com/) which is a time series database, designed to store information about metrics and events.
 
-* [InfluxDB Docker image](https://hub.docker.com/_/influxdb/)
-* [InfluxDB documentation](https://docs.influxdata.com/influxdb)
+- [InfluxDB Docker image](https://hub.docker.com/_/influxdb/)
+- [InfluxDB documentation](https://docs.influxdata.com/influxdb)
 
 ### Try it
 
@@ -126,3 +126,9 @@ time count_age_in_days
 ---- -----------------
 0    1
 ```
+
+### Browse the data with [Chronograf](https://www.influxdata.com/time-series-platform/chronograf/)
+
+- Run `docker run -p 5656:8888 quay.io/influxdb/chronograf`
+- Open up http://localhost:5656
+- The UI will now ask you for connection details. Using `localhost:8086` does NOT work here, and will not connect. Instead you have to use `<your local ip>:8086`

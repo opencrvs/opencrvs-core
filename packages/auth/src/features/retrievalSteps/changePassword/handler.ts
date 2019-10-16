@@ -20,16 +20,16 @@ export default async function changePasswordHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IPayload
-  const retrivalStepInformation = await getRetrievalStepInformation(
+  const retrievalStepInformation = await getRetrievalStepInformation(
     payload.nonce
   ).catch(() => {
     throw unauthorized()
   })
 
-  if (retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
     return h.response().code(401)
   }
-  await changePassword(retrivalStepInformation.userId, payload.newPassword)
+  await changePassword(retrievalStepInformation.userId, payload.newPassword)
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

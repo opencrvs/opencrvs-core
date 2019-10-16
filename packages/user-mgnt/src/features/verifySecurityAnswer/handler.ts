@@ -1,19 +1,16 @@
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { unauthorized } from 'boom'
+import { unauthorized, conflict } from 'boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
 import { getRandomQuestionKey } from '@user-mgnt/features/verifyUser/handler'
+import { isNonEmptyArray } from '@user-mgnt/utils/non-empty-array'
 
 interface IVerifySecurityAnswer {
   userId: string
   questionKey: string
   answer: string
-}
-interface IVerifySecurityAnswerResponse {
-  matched: boolean
-  questionKey: string
 }
 
 export default async function verifySecurityAnswer(
@@ -37,23 +34,21 @@ export default async function verifySecurityAnswer(
       generateHash(payload.answer.toLowerCase(), user.salt) ===
         securityQNA.answerHash
   )
-  let response: IVerifySecurityAnswerResponse
-  try {
-    response = {
-      matched: isCorrect,
-      questionKey: isCorrect
-        ? payload.questionKey
-        : // will throw exception if securityQnA is empty
-          getRandomQuestionKey(
-            user.securityQuestionAnswers,
-            payload.questionKey
-          )
-    }
-  } catch (error) {
+
+  if (
+    !user.securityQuestionAnswers ||
+    !isNonEmptyArray(user.securityQuestionAnswers)
+  ) {
     logger.error(`Unable to get security questions for user: ${payload.userId}`)
-    throw unauthorized()
+    throw conflict("User doesn't have security questions")
   }
-  return response
+
+  return {
+    matched: isCorrect,
+    questionKey: isCorrect
+      ? payload.questionKey
+      : getRandomQuestionKey(user.securityQuestionAnswers, payload.questionKey)
+  }
 }
 
 export const verifySecurityRequestSchema = Joi.object({

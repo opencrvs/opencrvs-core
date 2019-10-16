@@ -10,7 +10,6 @@ const Wrapper = styled.form`
   ${({ theme }) => theme.fonts.bodyStyle};
   padding: 0px 10px;
   margin-bottom: 1px;
-  min-width: 400px;
   position: relative;
 `
 const SearchTextInput = styled.input`
@@ -24,6 +23,10 @@ const SearchTextInput = styled.input`
   &:-webkit-autofill {
     -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
       inset;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0px 4px;
+    width: 40%;
   }
 `
 const DropDownWrapper = styled.ul`
@@ -86,6 +89,9 @@ const DropDown = styled.div`
   align-items: center;
   cursor: pointer;
   display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: auto;
+  }
 `
 const ClearTextIcon = styled(ClearText)`
   margin: 0 5px;

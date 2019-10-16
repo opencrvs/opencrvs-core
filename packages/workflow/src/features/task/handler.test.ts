@@ -10,7 +10,8 @@ import {
   unionMock,
   officeMock,
   testFhirTaskBundle,
-  testFhirBundleWithIdsForDeath
+  taskResouceMock,
+  testDeathFhirTaskBundle
 } from '@workflow/test/utils'
 
 import * as fetchAny from 'jest-fetch-mock'
@@ -24,6 +25,7 @@ describe('Verify handler', () => {
     fetch.resetMocks()
     server = await createServer()
     fetch.mockResponses(
+      [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
@@ -98,7 +100,7 @@ describe('Verify handler', () => {
     const res = await server.server.inject({
       method: 'PUT',
       url: '/fhir/Task/123',
-      payload: testFhirBundleWithIdsForDeath,
+      payload: testDeathFhirTaskBundle,
       headers: {
         Authorization: `Bearer ${token}`
       }

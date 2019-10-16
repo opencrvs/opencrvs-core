@@ -368,6 +368,7 @@ export interface IInformativeRadioGroupFormField extends IFormFieldBase {
 
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
+  maxLength?: number
 }
 
 export interface ITelFormField extends IFormFieldBase {
@@ -834,6 +835,7 @@ export interface Ii18nInformativeRadioGroupFormField
 
 export interface Ii18nTextFormField extends Ii18nFormFieldBase {
   type: typeof TEXT
+  maxLength?: number
 }
 export interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL

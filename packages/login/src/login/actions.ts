@@ -1,10 +1,20 @@
 import { AxiosError } from 'axios'
-import { RouterAction } from 'react-router-redux'
+import { RouterAction, push, goBack as back } from 'react-router-redux'
 import {
   IAuthenticateResponse,
   IAuthenticationData,
   ITokenResponse
 } from '@login/utils/authApi'
+import {
+  PHONE_NUMBER_VERIFICATION,
+  FORGOTTEN_ITEM,
+  RECOVERY_CODE_ENTRY,
+  SECURITY_QUESTION,
+  UPDATE_PASSWORD,
+  STEP_ONE,
+  SUCCESS
+} from '@login/navigation/routes'
+
 export const AUTHENTICATE = 'login/AUTHENTICATE'
 export const AUTHENTICATION_COMPLETED = 'login/AUTHENTICATION_COMPLETED'
 export const AUTHENTICATION_FAILED = 'login/AUTHENTICATION_FAILED'
@@ -18,6 +28,11 @@ export const RESEND_SMS_COMPLETED = 'login/RESEND_SMS_COMPLETED'
 export const RESEND_SMS_FAILED = 'login/RESEND_SMS_FAILED'
 export const AUTHENTICATE_VALIDATE = 'login/AUTHENTICATE_VALIDATE'
 export const GOTO_APP = 'login/GOTO_APP'
+
+export enum FORGOTTEN_ITEMS {
+  USERNAME = 'username',
+  PASSWORD = 'password'
+}
 
 export type AuthenticationDataAction = {
   type: typeof AUTHENTICATE
@@ -159,7 +174,47 @@ export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
 })
+export function goBack() {
+  return back()
+}
 export const gotoApp = (appId: string): GoToAppAction => ({
   type: GOTO_APP,
   payload: appId
 })
+export function goToForgottenItemForm() {
+  return push(FORGOTTEN_ITEM)
+}
+export function goToPhoneNumberVerificationForm(forgottenItem: string) {
+  return push(PHONE_NUMBER_VERIFICATION, { forgottenItem })
+}
+export function goToRecoveryCodeEntryForm(
+  nonce: string,
+  mobile: string,
+  forgottenItem: string
+) {
+  return push(RECOVERY_CODE_ENTRY, {
+    nonce,
+    mobile,
+    forgottenItem
+  })
+}
+export function goToSecurityQuestionForm(
+  nonce: string,
+  securityQuestionKey: string,
+  forgottenItem: string
+) {
+  return push(SECURITY_QUESTION, {
+    nonce,
+    securityQuestionKey,
+    forgottenItem
+  })
+}
+export function goToUpdatePasswordForm(nonce: string) {
+  return push(UPDATE_PASSWORD, { nonce })
+}
+export function goToSuccessPage(forgottenItem: string) {
+  return push(SUCCESS, { forgottenItem })
+}
+export function goToHome() {
+  return push(STEP_ONE)
+}
