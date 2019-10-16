@@ -25,12 +25,13 @@ describe('Birth handler', () => {
     ]
   })
 
-  it('throws an error when location of notification cannot be determines', async () => {
+  it('return a mediator response', async () => {
     const request = {
       payload: JSON.stringify(body),
       headers: { authorization: 'bearer xyz' }
     }
-    const code = jest.fn()
+    const header = jest.fn()
+    const code = jest.fn().mockReturnValue({ header })
     const h = { response: () => ({ code }) }
 
     // 3 x create patient location fetches
@@ -55,6 +56,7 @@ describe('Birth handler', () => {
     await birthNotificationHandler(request, h)
 
     expect(code).toBeCalledWith(201)
+    expect(header).toBeCalledWith('Content-Type', 'application/json+openhim')
 
     fetch.resetMocks()
   })
