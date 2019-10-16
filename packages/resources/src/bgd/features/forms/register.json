@@ -10573,8 +10573,8 @@
                       "value": "OTHER",
                       "label": {
                         "defaultMessage": "Other address",
-                        "description": "Select item for Other Institution",
-                        "id": "form.field.label.otherInstitution"
+                        "description": "Select item for Other Address",
+                        "id": "form.field.label.otherAddress"
                       }
                     }
                   ],
