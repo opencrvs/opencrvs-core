@@ -44,6 +44,8 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
+  CHECKBOX_GROUP,
+  ICheckboxGroupFormField,
   FETCH_BUTTON
 } from '@register/forms'
 import {
@@ -259,6 +261,20 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckBoxGroupFieldValue = (
+  field: ICheckboxGroupFormField,
+  value: string[],
+  intl: IntlShape
+) => {
+  const option = field.options.find(option => {
+    return value.length > 0 && option.value === value[0]
+  })
+  if (option) {
+    return intl.formatMessage(option.label)
+  }
+  return ''
+}
+
 const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -303,10 +319,14 @@ const renderValue = (
 
   if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
     return renderSelectOrRadioLabel(
-      (value && (value as IFormSectionData).value) || value,
+      (value && (value as IFormSectionData).value) || '',
       field.options,
       intl
     )
+  }
+
+  if (value && field.type === CHECKBOX_GROUP) {
+    return getCheckBoxGroupFieldValue(field, value as string[], intl)
   }
 
   if (typeof value === 'string') {
@@ -319,6 +339,7 @@ const renderValue = (
   }
   return value
 }
+
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication

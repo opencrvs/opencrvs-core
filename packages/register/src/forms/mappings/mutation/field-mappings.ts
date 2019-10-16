@@ -4,7 +4,8 @@ import {
   IFormFieldValue,
   IAttachment,
   TransformedData,
-  IFormSectionData
+  IFormSectionData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
 import { set } from 'lodash'
 
@@ -405,4 +406,109 @@ export const fieldToIdentifierWithTypeTransformer = (
   sectionData.identifier[0].system = identifierType
   sectionData.identifier[0].value = draftData[sectionId][field.name]
   return transformedData
+}
+
+export const nestedRadioFieldTransformer = (
+  transformedFieldName?: string,
+  nestedTransformer?: IFormFieldMutationMapFunction
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField?: IFormField
+) => {
+  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+  let partialDraftData: IFormData = {}
+
+  if (!nestedField) {
+    const parentData: IFormSectionData = {}
+    parentData[field.name] = fieldValueObj.value as IFormSectionData
+    partialDraftData[sectionId] = parentData
+  } else if (nestedField) {
+    if (
+      nestedField.extraValue &&
+      nestedField.extraValue !== fieldValueObj.value
+    ) {
+      return
+    }
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+  }
+
+  if (nestedTransformer) {
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
+  } else {
+    const transFieldName = transformedFieldName
+      ? transformedFieldName
+      : nestedField
+      ? nestedField.name
+      : field.name
+    const fieldValue = !nestedField
+      ? fieldValueObj.value
+      : (fieldValueObj.nestedFields as IFormSectionData)[nestedField.name]
+
+    transformedData[sectionId][transFieldName] = fieldValue
+  }
+}
+
+export const fieldToReasonsNotApplyingTransformer = (
+  transformedArrayName: string,
+  transformedFieldName?: string,
+  extraField?: string,
+  transformeValueArrayToBoolean?: boolean
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  let fieldValue = draftData[sectionId][field.name]
+  const transFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
+
+  if (!fieldValue) {
+    return
+  } else {
+    if (transformeValueArrayToBoolean) {
+      const valueArray = fieldValue as IFormFieldValue[]
+      fieldValue = valueArray.length > 0
+    }
+
+    if (!transformedData[sectionId][transformedArrayName]) {
+      transformedData[sectionId][transformedArrayName] = []
+    }
+
+    const transformedArray: TransformedData[] =
+      transformedData[sectionId][transformedArrayName]
+
+    let transformedField = transformedArray.find(transField => {
+      if (extraField) {
+        return (
+          transField[extraField] && transField[extraField] === field.extraValue
+        )
+      }
+      return (
+        transField[transFieldName] && transField[transFieldName] === fieldValue
+      )
+    })
+
+    if (!transformedField) {
+      transformedField = {}
+      transformedField[transFieldName] = fieldValue
+
+      if (extraField) {
+        transformedField[extraField] = field.extraValue
+      }
+
+      transformedArray.push(transformedField)
+    } else {
+      transformedField[transFieldName] = fieldValue
+    }
+  }
 }
