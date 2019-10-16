@@ -24,7 +24,7 @@ const composeFhirLocation = (
     resourceType: 'Location',
     identifier: [
       {
-        system: `${ORG_URL}/specs/id/a2i-internal-id`,
+        system: `${ORG_URL}/specs/id/geo-id`,
         value: String(location.geo_id)
       },
       {
