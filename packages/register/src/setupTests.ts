@@ -144,7 +144,8 @@ jest.mock('@register/utils/referenceApi', (): {
         templates: mockOfflineData.templates
       }),
     loadAssets: () => Promise.resolve(mockOfflineData.assets),
-    loadCollectorFields: () => Promise.resolve(mockOfflineData.collectorFields)
+    loadCertificateCollectorFields: () =>
+      Promise.resolve(mockOfflineData.certificateCollectorFields)
   }
 }))
 

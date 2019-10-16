@@ -23,7 +23,7 @@ import { IStoreState } from '@register/store'
 import { getOfflineData } from '@register/offline/selectors'
 import { IOfflineData } from '@register/offline/reducer'
 
-export interface ICollectorField {
+export interface ICertificateCollectorField {
   firstNames: string
   familyName: string
   applicantFirstNames: string
@@ -103,7 +103,7 @@ class IDVerifierComponent extends React.Component<
     const { locale } = this.props.intl
     const iD = info.iD || info.applicantID
     const iDType = info.iDType || info.iDTypeOther
-    const fields = this.props.offlineResources.collectorFields
+    const fields = this.props.offlineResources.certificateCollectorFields
 
     const firstNames =
       fields &&

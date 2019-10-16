@@ -59,7 +59,7 @@ describe('ReviewForm tests', () => {
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
         assets: mockOfflineData.assets,
-        collectorFields: mockOfflineData.collectorFields
+        certificateCollectorFields: mockOfflineData.certificateCollectorFields
       })
     )
 

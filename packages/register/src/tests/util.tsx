@@ -2643,7 +2643,7 @@ export const mockOfflineData = {
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },
-  collectorFields: {
+  certificateCollectorFields: {
     en: {
       firstNames: 'firstNamesEng',
       familyName: 'familyNameEng',
@@ -2663,7 +2663,7 @@ export async function createTestStore() {
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
       assets: mockOfflineData.assets,
-      collectorFields: mockOfflineData.collectorFields
+      certificateCollectorFields: mockOfflineData.certificateCollectorFields
     })
   )
   return { store, history }
@@ -2689,7 +2689,7 @@ export async function createTestComponent(
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
       assets: mockOfflineData.assets,
-      collectorFields: {}
+      certificateCollectorFields: {}
     })
   )
 

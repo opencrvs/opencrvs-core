@@ -4,7 +4,7 @@ import { ILanguage } from '@register/i18n/reducer'
 import { ISerializedForm } from '@register/forms'
 import * as ImageDownloader from 'image-to-base64'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
-import { ICollectorField } from '@register/views/PrintCertificate/IDVerifier'
+import { ICertificateCollectorField } from '@register/views/PrintCertificate/IDVerifier'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -27,8 +27,8 @@ export interface IAssetResponse {
   logo: string
 }
 
-export interface ICollectorFieldsResponse {
-  [key: string]: ICollectorField
+export interface ICertificateCollectorFieldsResponse {
+  [language: string]: ICertificateCollectorField
 }
 
 async function loadDefinitions(): Promise<IDefinitionsResponse> {
@@ -97,7 +97,9 @@ async function loadAssets(): Promise<IAssetResponse> {
   }
 }
 
-async function loadCollectorFields(): Promise<ICollectorFieldsResponse> {
+async function loadCertificateCollectorFields(): Promise<
+  ICertificateCollectorFieldsResponse
+> {
   const url = `${window.config.RESOURCES_URL}/collector`
   const res = await fetch(url, {
     method: 'GET',
@@ -120,5 +122,5 @@ export const referenceApi = {
   loadFacilities,
   loadDefinitions,
   loadAssets,
-  loadCollectorFields
+  loadCertificateCollectorFields
 }
