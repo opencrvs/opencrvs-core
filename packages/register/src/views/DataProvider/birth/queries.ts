@@ -43,6 +43,26 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
+      primaryCaregiver {
+        parentDetailsType
+        primaryCaregiver {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          telecom {
+            system
+            value
+            use
+          }
+        }
+        reasonsNotApplying {
+          primaryCaregiverType
+          reasonNotApplying
+          isDeceased
+        }
+      }
       mother {
         id
         name {
@@ -255,6 +275,26 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             postalCode
             country
           }
+        }
+      }
+      primaryCaregiver {
+        parentDetailsType
+        primaryCaregiver {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          telecom {
+            system
+            value
+            use
+          }
+        }
+        reasonsNotApplying {
+          primaryCaregiverType
+          reasonNotApplying
+          isDeceased
         }
       }
       registration {

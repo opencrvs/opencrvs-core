@@ -19,8 +19,12 @@ import {
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import {
   BirthSection,
+  CHECKBOX_GROUP,
   DATE,
   Event,
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  ICheckboxGroupFormField,
   IDynamicOptions,
   IFileValue,
   IForm,
@@ -43,8 +47,7 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING,
-  FETCH_BUTTON
+  WARNING
 } from '@register/forms'
 import {
   getBirthSection,
@@ -259,6 +262,20 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckBoxGroupFieldValue = (
+  field: ICheckboxGroupFormField,
+  value: string[],
+  intl: IntlShape
+) => {
+  const option = field.options.find(option => {
+    return value.length > 0 && option.value === value[0]
+  })
+  if (option) {
+    return intl.formatMessage(option.label)
+  }
+  return ''
+}
+
 const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -289,7 +306,15 @@ const renderValue = (
     )
   }
 
-  if (field.type === DATE && value && typeof value === 'string') {
+  if (
+    (field.type === DATE ||
+      (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+        (field.dynamicDefinitions.type &&
+          field.dynamicDefinitions.type.kind === 'static' &&
+          field.dynamicDefinitions.type.staticType === DATE))) &&
+    value &&
+    typeof value === 'string'
+  ) {
     return formatLongDate(value)
   }
 
@@ -303,10 +328,14 @@ const renderValue = (
 
   if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
     return renderSelectOrRadioLabel(
-      (value && (value as IFormSectionData).value) || value,
+      (value && (value as IFormSectionData).value) || '',
       field.options,
       intl
     )
+  }
+
+  if (value && field.type === CHECKBOX_GROUP) {
+    return getCheckBoxGroupFieldValue(field, value as string[], intl)
   }
 
   if (typeof value === 'string') {
@@ -319,6 +348,7 @@ const renderValue = (
   }
   return value
 }
+
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication

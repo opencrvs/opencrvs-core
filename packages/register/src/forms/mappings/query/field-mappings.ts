@@ -10,7 +10,8 @@ import {
   IFormData,
   IFormField,
   IFormFieldQueryMapFunction,
-  TransformedData
+  TransformedData,
+  IFormSectionData
 } from '@register/forms'
 import { EMPTY_STRING } from '@register/utils/constants'
 import { cloneDeep, get } from 'lodash'
@@ -392,6 +393,84 @@ export const nestedValueToFieldTransformer = (
   return transformedData
 }
 
+export const reasonsNotApplyingToFieldValueTransformer = (
+  transformedArrayName: string,
+  transformedFieldName: string,
+  extraField?: string,
+  extraValues?: string[],
+  transformedFieldValue?: string[]
+) => (
+  transformedData: IFormData,
+  queryData: TransformedData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = queryData[sectionId]
+  let fieldValue
+  if (!sectionData) {
+    return transformedData
+  }
+
+  const transformedArray = sectionData[
+    transformedArrayName
+  ] as IFormSectionData[]
+
+  transformedArray.forEach(arrayField => {
+    const value = arrayField[transformedFieldName]
+    if (
+      (extraField &&
+        (arrayField[extraField] === field.extraValue ||
+          (extraValues &&
+            extraValues.includes(arrayField[extraField] as string)))) ||
+      (extraValues && extraValues.includes(value as string))
+    ) {
+      fieldValue = value
+    }
+  })
+
+  if (fieldValue) {
+    transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
+  }
+}
+
+export const valueToNestedRadioFieldTransformer = (
+  transformFieldName?: string,
+  transformMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: IFormData,
+  queryData: TransformedData,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  const tempDraftData = {} as IFormData
+  const fieldName = nestedField ? nestedField.name : field.name
+  let fieldValue
+  tempDraftData[sectionId] = {}
+
+  if (transformMethod) {
+    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
+    fieldValue = tempDraftData[sectionId][fieldName]
+  } else {
+    fieldValue = queryData[sectionId][transformFieldName || fieldName]
+  }
+
+  if (!fieldValue) {
+    return
+  }
+
+  let transformedFieldData = transformedData[sectionId][field.name] as IFormData
+
+  if (!transformedFieldData) {
+    transformedData[sectionId][field.name] = {
+      value: fieldValue,
+      nestedFields: {}
+    }
+  } else if (nestedField) {
+    transformedFieldData.nestedFields[nestedField.name] = fieldValue
+  }
+}
+
 export const bundleFieldToNestedRadioFieldTransformer = (
   transformedFieldName: string
 ) => (
@@ -404,5 +483,4 @@ export const bundleFieldToNestedRadioFieldTransformer = (
     value: get(queryData, transformedFieldName),
     nestedFields: {}
   }
-  return transformedData
 }

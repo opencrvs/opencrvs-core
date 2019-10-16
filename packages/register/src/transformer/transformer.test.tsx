@@ -16,7 +16,10 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { v4 as uuid } from 'uuid'
-import { draftToGqlTransformer } from '@register/transformer'
+import {
+  draftToGqlTransformer,
+  gqlToDraftTransformer
+} from '@register/transformer'
 import { getRegisterForm } from '@opencrvs/register/src/forms/register/application-selectors'
 import { getOfflineDataSuccess } from '@register/offline/actions'
 import { Event, IForm } from '@opencrvs/register/src/forms'
@@ -246,6 +249,157 @@ describe('when draft data is transformed to graphql', () => {
       }
       expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
         true
+      )
+    })
+
+    it('transform primary caregiver data to gql data', () => {
+      const data = {
+        child: {},
+        father: {},
+        mother: {},
+        registration: {
+          presentAtBirthRegistration: 'LEGAL_GUARDIAN',
+          registrationPhone: '01736478884',
+          whoseContactDetails: 'MOTHER'
+        },
+        primaryCaregiver: {
+          parentDetailsType: 'MOTHER_AND_FATHER',
+          primaryCaregiverType: {
+            value: 'LEGAL_GUARDIAN',
+            nestedFields: {
+              name: 'Alex',
+              phone: '01686942106',
+              reasonNotApplying: 'sick'
+            }
+          },
+          reasonFatherNotApplying: '',
+          reasonMotherNotApplying: 'sick',
+          fatherIsDeceased: ['deceased']
+        },
+        documents: {}
+      }
+      const transformedData = {
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        primaryCaregiver: {
+          name: [
+            {
+              use: 'en',
+              familyName: 'Alex'
+            }
+          ],
+          telecom: [
+            {
+              system: 'phone',
+              value: '01686942106'
+            }
+          ]
+        },
+        reasonsNotApplying: [
+          {
+            primaryCaregiverType: 'MOTHER',
+            reasonNotApplying: 'sick'
+          },
+          {
+            primaryCaregiverType: 'FATHER',
+            isDeceased: true
+          },
+          {
+            primaryCaregiverType: 'LEGAL_GUARDIAN',
+            reasonNotApplying: 'sick'
+          }
+        ]
+      }
+
+      expect(draftToGqlTransformer(form, data).primaryCaregiver).toEqual(
+        transformedData
+      )
+    })
+
+    it('transform gql data to primary caregiver form data', () => {
+      const data = {
+        id: '70773af0-68e3-4b08-aace-e28f4809d9c1',
+        child: null,
+        informant: {
+          individual: null,
+          relationship: null,
+          otherRelationship: null
+        },
+        primaryCaregiver: {
+          parentDetailsType: 'MOTHER_AND_FATHER',
+          primaryCaregiver: {
+            name: [
+              {
+                use: 'en',
+                firstNames: '',
+                familyName: 'Alex'
+              }
+            ],
+            telecom: [
+              {
+                system: 'phone',
+                value: '01686942106',
+                use: null
+              }
+            ]
+          },
+          reasonsNotApplying: [
+            {
+              primaryCaregiverType: 'MOTHER',
+              reasonNotApplying: '',
+              isDeceased: true
+            },
+            {
+              primaryCaregiverType: 'FATHER',
+              reasonNotApplying: 'sick',
+              isDeceased: false
+            },
+            {
+              primaryCaregiverType: 'OTHER',
+              reasonNotApplying: 'sick',
+              isDeceased: null
+            }
+          ]
+        },
+        mother: null,
+        father: null,
+        registration: {
+          contact: 'MOTHER',
+          contactRelationship: null,
+          contactPhoneNumber: '01555555555',
+          attachments: null,
+          status: [
+            {
+              comments: null,
+              type: 'DECLARED'
+            }
+          ],
+          type: 'BIRTH',
+          trackingId: 'BWH1TVW',
+          registrationNumber: null
+        },
+        attendantAtBirth: null,
+        weightAtBirth: null,
+        birthType: null,
+        eventLocation: null,
+        presentAtBirthRegistration: 'OTHER'
+      }
+
+      const primaryCaregiverData = {
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        motherIsDeceased: ['deceased'],
+        reasonFatherNotApplying: 'sick',
+        primaryCaregiverType: {
+          value: 'OTHER',
+          nestedFields: {
+            name: 'Alex',
+            phone: '01686942106',
+            reasonNotApplying: 'sick'
+          }
+        }
+      }
+
+      expect(gqlToDraftTransformer(form, data).primaryCaregiver).toEqual(
+        primaryCaregiverData
       )
     })
   })
