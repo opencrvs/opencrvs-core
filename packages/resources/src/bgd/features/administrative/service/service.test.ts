@@ -30,7 +30,7 @@ const locationBundle = JSON.stringify({
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '1'
           },
           {
@@ -94,7 +94,7 @@ const locationBundle = JSON.stringify({
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '2'
           },
           {
@@ -158,7 +158,7 @@ const locationBundle = JSON.stringify({
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '3'
           },
           {
@@ -222,7 +222,7 @@ const locationBundle = JSON.stringify({
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '4'
           },
           {
@@ -286,7 +286,7 @@ const locationBundle = JSON.stringify({
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '5'
           },
           {

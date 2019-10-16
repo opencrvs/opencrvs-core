@@ -204,7 +204,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
   groups: [
     {
       id: 'certCollector',
-      title: certificateMessages.certificateCollectionTitle,
+      title: certificateMessages.whoToCollect,
       error: certificateMessages.certificateCollectorError,
       fields: [
         {
