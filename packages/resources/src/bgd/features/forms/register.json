@@ -4422,9 +4422,15 @@
                           "parameters": []
                         },
                         "dependencies": [
-                          "dateOfMarriage",
-                          "draftData.child.childBirthDate"
+                          "dateOfMarriage"
                         ]
+                      },
+                      {
+                        "validator": {
+                          "operation": "isValidMotherBirthDate",
+                          "parameters": []
+                        },
+                        "dependencies": []
                       }
                     ]
                   },
