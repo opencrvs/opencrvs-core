@@ -867,7 +867,7 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
+                      "operation": "isValidChildBirthDate"
                     }
                   ],
                   "mapping": {
@@ -5135,6 +5135,13 @@
                         "dependencies": [
                           "dateOfMarriage"
                         ]
+                      },
+                      {
+                        "validator": {
+                          "operation": "isValidMotherBirthDate",
+                          "parameters": []
+                        },
+                        "dependencies": []
                       }
                     ]
                   },
