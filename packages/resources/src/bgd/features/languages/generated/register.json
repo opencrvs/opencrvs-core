@@ -1645,7 +1645,7 @@
         "form.field.label.imageUpload.uploadedList": "আপলোড করা:",
         "form.field.label.lastNameBN": "বাংলা নামের শেষাংশ",
         "form.field.label.lastNameEN": "ইংরেজি নামের শেষাংশ",
-        "form.field.label.mannerOfDeath": "মৃত্যু কীভাবে হয়েছিল",
+        "form.field.label.mannerOfDeath": "মৃত্যু কীভাবে হয়েছিল?",
         "form.field.label.mannerOfDeathAccident": "দুর্ঘটনা",
         "form.field.label.mannerOfDeathHomicide": "নরহত্যা",
         "form.field.label.mannerOfDeathNatural": "প্রাকৃতিক কারণ",
