@@ -87,7 +87,7 @@ function buildLocationStats(
       Bengali_name: alias[0] as string,
       Bureau_of_Statistics_ID: identifier[0].value,
       Map_data_exists: false,
-      OISF_A2I_Reference: location.description as string,
+      OISF_A2I_Reference: identifier[3].value,
       Rural_or_Urban: '',
       Estimated_Male_Population: 0,
       Estimated_Female_Population: 0,
