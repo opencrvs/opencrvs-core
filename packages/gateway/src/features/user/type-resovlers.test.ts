@@ -84,7 +84,7 @@ describe('User type resolvers', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '3'
           },
           {
@@ -125,7 +125,7 @@ describe('User type resolvers', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '20'
           },
           {
@@ -166,7 +166,7 @@ describe('User type resolvers', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           {
@@ -207,7 +207,7 @@ describe('User type resolvers', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '3476'
           },
           {

@@ -57,7 +57,7 @@ Once all data sources have been readied, then a single command should be able to
 **Populate OpenCRVS with reference data relevant to your country configuration**
 
 <!-- prettier-ignore -->
-```yarn populate:<<insert country code>>```
+```yarn db:populate:<<insert country code>>```
 
 ---
 
@@ -71,7 +71,7 @@ This will have to be done for each country we are supporting:
 4. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
 5. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
 6. Click Channels and check all have loaded successfully.
-7. Populate reference data for your country requirements from the resources package. `yarn createReferenceData:<<insert alpha3 country code>>`
+7. Populate reference data for your country requirements from the resources package. `yarn db:populate:<<insert alpha3 country code>> <<a2i_secret>>`
 8. `yarn db:backup:create <<insert country code>>`
 9. Commit and push the new db dump archive files that have been created in your country folder.
 
