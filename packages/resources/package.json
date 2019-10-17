@@ -7,7 +7,7 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test": "jest  --silent --noStackTrace --coverage && yarn test:compilation && yarn test:dhis2-mediator",
-    "test:dhis2-mediator": "cd src/bgd/packages/bgd-dhis2-mediator/ && yarn test",
+    "test:dhis2-mediator": "cd src/bgd/packages/bgd-dhis2-mediator/ && yarn install && yarn test",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
