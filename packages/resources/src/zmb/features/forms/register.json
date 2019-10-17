@@ -3174,7 +3174,10 @@
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
                             "reasonsNotApplying",
-                            "primaryCaregiverType"
+                            "primaryCaregiverType",
+                            "",
+                            false,
+                            true
                           ]
                         }
                       ]
