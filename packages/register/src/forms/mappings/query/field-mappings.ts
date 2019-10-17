@@ -403,7 +403,7 @@ export const reasonsNotApplyingToFieldValueTransformer = (
     transformedArrayName
   ] as IFormSectionData[]
 
-  transformedArray.forEach(arrayField => {
+  transformedArray.forEach((arrayField, index) => {
     const value = arrayField[transformedFieldName]
     if (
       (value &&
@@ -414,6 +414,7 @@ export const reasonsNotApplyingToFieldValueTransformer = (
       (extraValues && extraValues.includes(value as string))
     ) {
       fieldValue = value
+      transformedArray.splice(index, 1)
     }
   })
 
