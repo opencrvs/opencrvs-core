@@ -4,7 +4,7 @@ import * as profileActions from '@register/profile/profileActions'
 import { storage } from '@register/storage'
 import {
   referenceApi,
-  ICertificateCollectorFieldsResponse
+  ICertificateCollection
 } from '@register/utils/referenceApi'
 import { ILanguage } from '@register/i18n/reducer'
 import { filterLocations, getLocation } from '@register/utils/locationUtils'
@@ -37,6 +37,7 @@ export interface IOfflineData {
       birth: ISerializedForm
       death: ISerializedForm
     }
+    certificateCollection: ICertificateCollection
   }
   templates: {
     receipt?: IPDFTemplate
@@ -48,7 +49,6 @@ export interface IOfflineData {
   assets: {
     logo: string
   }
-  certificateCollectorFields: ICertificateCollectorFieldsResponse
 }
 
 export type IOfflineDataState = {
@@ -132,10 +132,6 @@ function reducer(
         Cmd.run(referenceApi.loadAssets, {
           successActionCreator: actions.assetsLoaded,
           failActionCreator: actions.assetsFailed
-        }),
-        Cmd.run(referenceApi.loadCertificateCollectorFields, {
-          successActionCreator: actions.certificateCollectorFieldsLoaded,
-          failActionCreator: actions.certificateCollectorFieldsFailed
         })
       ])
       const offlineDataLoaded = isOfflineDataLoaded(offlineData)
@@ -245,27 +241,6 @@ function reducer(
       }
     }
     case actions.ASSETS_FAILED: {
-      return {
-        ...state,
-        loadingError: true
-      }
-    }
-
-    /*
-     * Collector fields
-     */
-
-    case actions.CERTIFICATE_COLLECTOR_FIELDS_LOADED: {
-      return {
-        ...state,
-        loadingError: false,
-        offlineData: {
-          ...state.offlineData,
-          certificateCollectorFields: action.payload
-        }
-      }
-    }
-    case actions.CERTIFICATE_COLLECTOR_FIELDS_FAILED: {
       return {
         ...state,
         loadingError: true

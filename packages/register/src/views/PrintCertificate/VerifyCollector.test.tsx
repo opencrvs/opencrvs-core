@@ -3,11 +3,9 @@ import { createStore } from '@register/store'
 import {
   createTestComponent,
   mockApplicationData,
-  mockDeathApplicationData,
-  mockOfflineData
+  mockDeathApplicationData
 } from '@register/tests/util'
 import { VerifyCollector } from './VerifyCollector'
-import { getOfflineDataSuccess } from '@register/offline/actions'
 import { storeApplication } from '@register/applications'
 import { Event } from '@register/forms'
 import { ReactWrapper } from 'enzyme'
@@ -30,7 +28,6 @@ describe('verify collector tests', () => {
   describe('in case of birth application', () => {
     beforeAll(async () => {
       store.dispatch(storeApplication(birthApplication))
-      store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
     })
 
     it('when mother is collector renders idVerifier component', async () => {
@@ -58,7 +55,6 @@ describe('verify collector tests', () => {
     describe('when father is collector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
-        store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
         testComponent = (await createTestComponent(
           // @ts-ignore
           <VerifyCollector
@@ -153,11 +149,12 @@ describe('verify collector tests', () => {
   })
 
   describe('in case of death application renders idVerifier component', () => {
-    let testComponent: ReactWrapper
-    beforeAll(async () => {
+    beforeAll(() => {
       store.dispatch(storeApplication(deathApplication))
-      store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-      testComponent = (await createTestComponent(
+    })
+
+    it('when informant is collector', async () => {
+      const testComponent = (await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -174,9 +171,7 @@ describe('verify collector tests', () => {
         />,
         store
       )).component
-    })
 
-    it('when informant is collector', () => {
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
   })

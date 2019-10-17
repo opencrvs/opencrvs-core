@@ -103,8 +103,7 @@ class IDVerifierComponent extends React.Component<
     const { locale } = this.props.intl
     const iD = info.iD || info.applicantID
     const iDType = info.iDType || info.iDTypeOther
-    const fields = this.props.offlineResources.certificateCollectorFields
-
+    const fields = this.props.offlineResources.forms.certificateCollection
     const firstNames =
       fields &&
       fields[locale] &&

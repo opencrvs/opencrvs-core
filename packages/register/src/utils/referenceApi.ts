@@ -14,7 +14,10 @@ export interface IFacilitiesDataResponse {
 }
 export interface IDefinitionsResponse {
   languages: ILanguage[]
-  forms: { registerForm: { birth: ISerializedForm; death: ISerializedForm } }
+  forms: {
+    registerForm: { birth: ISerializedForm; death: ISerializedForm }
+    certificateCollection: ICertificateCollection
+  }
   templates: {
     receipt?: IPDFTemplate
     certificates: {
@@ -27,7 +30,7 @@ export interface IAssetResponse {
   logo: string
 }
 
-export interface ICertificateCollectorFieldsResponse {
+export interface ICertificateCollection {
   [language: string]: ICertificateCollectorField
 }
 
@@ -97,30 +100,9 @@ async function loadAssets(): Promise<IAssetResponse> {
   }
 }
 
-async function loadCertificateCollectorFields(): Promise<
-  ICertificateCollectorFieldsResponse
-> {
-  const url = `${window.config.RESOURCES_URL}/collector`
-  const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
-  })
-
-  if (res && res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  const response = await res.json()
-
-  return response.data
-}
-
 export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadDefinitions,
-  loadAssets,
-  loadCertificateCollectorFields
+  loadAssets
 }

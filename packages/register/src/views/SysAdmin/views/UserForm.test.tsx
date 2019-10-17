@@ -21,8 +21,7 @@ describe('Create new user page tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
-        assets: mockOfflineData.assets,
-        certificateCollectorFields: mockOfflineData.certificateCollectorFields
+        assets: mockOfflineData.assets
       })
     )
     const testComponent = await createTestComponent(

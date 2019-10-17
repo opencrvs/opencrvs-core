@@ -4,8 +4,7 @@ import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
   IDefinitionsResponse,
-  IAssetResponse,
-  ICertificateCollectorFieldsResponse
+  IAssetResponse
 } from '@register/utils/referenceApi'
 import { IUserDetails } from '@register/utils/userUtils'
 
@@ -59,19 +58,6 @@ export type AssetsLoadedAction = {
 export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
-  payload: Error
-}
-export const CERTIFICATE_COLLECTOR_FIELDS_LOADED =
-  'OFFLINE/CERTIFICATE_COLLECTOR_FIELDS_LOADED'
-export type CollectorFieldsLoadedAction = {
-  type: typeof CERTIFICATE_COLLECTOR_FIELDS_LOADED
-  payload: ICertificateCollectorFieldsResponse
-}
-
-export const CERTIFICATE_COLLECTOR_FIELDS_FAILED =
-  'OFFLINE/CERTIFICATE_COLLECTOR_FIELDS_FAILED'
-export type CollectorFieldsFailedAction = {
-  type: typeof CERTIFICATE_COLLECTOR_FIELDS_FAILED
   payload: Error
 }
 
@@ -161,20 +147,6 @@ export const assetsFailed = (error: Error): AssetsFailedAction => ({
   payload: error
 })
 
-export const certificateCollectorFieldsLoaded = (
-  payload: ICertificateCollectorFieldsResponse
-): CollectorFieldsLoadedAction => ({
-  type: CERTIFICATE_COLLECTOR_FIELDS_LOADED,
-  payload: payload
-})
-
-export const certificateCollectorFieldsFailed = (
-  error: Error
-): CollectorFieldsFailedAction => ({
-  type: CERTIFICATE_COLLECTOR_FIELDS_FAILED,
-  payload: error
-})
-
 export const offlineDataReady = (state: IOfflineData) => ({
   type: READY,
   payload: state
@@ -195,5 +167,3 @@ export type Action =
   | AssetsFailedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
-  | CollectorFieldsLoadedAction
-  | CollectorFieldsFailedAction
