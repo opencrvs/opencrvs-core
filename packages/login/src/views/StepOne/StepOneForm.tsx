@@ -116,6 +116,7 @@ export const Title = styled.div`
   margin-top: 30px;
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -132,7 +133,7 @@ export const StyledButton = styled(Button)`
   flex-direction: row;
   justify-content: center;
   padding: 10px ${({ theme }) => theme.grid.margin}px;
-
+  ${({ theme }) => theme.fonts.bodyStyle};
   :hover {
     text-decoration: underline;
     text-decoration-color: ${({ theme }) => theme.colors.secondary};
