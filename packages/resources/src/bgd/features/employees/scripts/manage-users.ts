@@ -19,6 +19,8 @@ export function getScope(role: string): string[] {
       return ['register', 'performance', 'certify', 'config', 'teams', 'demo']
     case 'LOCAL_SYSTEM_ADMIN':
       return ['sysadmin', 'demo']
+    case 'API_USER':
+      return ['declare', 'api']
     default:
       return ['declare', 'demo']
   }
@@ -75,6 +77,13 @@ export function createUsers(users: IUserModel[]) {
     active: true
   })
 
+  const apiUserRole = new Role({
+    title: 'API User',
+    value: 'API_USER',
+    types: ['API_USER'],
+    active: true
+  })
+
   const roles = [
     fieldAgentRole,
     regitstrationAgentRole,
@@ -82,7 +91,8 @@ export function createUsers(users: IUserModel[]) {
     sysAdminLocalRole,
     sysAdminNationalRole,
     performanceOversightRole,
-    performanceMgntRole
+    performanceMgntRole,
+    apiUserRole
   ]
   function onInsert(err: any, values: any) {
     if (!err) {

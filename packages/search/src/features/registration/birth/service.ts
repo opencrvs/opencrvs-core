@@ -163,7 +163,8 @@ function createMotherIndex(
   body.motherFamilyNameLocal =
     motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
   body.motherDoB = mother.birthDate
-  body.motherIdentifier = mother.identifier && mother.identifier[0].value
+  body.motherIdentifier =
+    mother.identifier && mother.identifier[0] && mother.identifier[0].value
 }
 
 function createFatherIndex(
@@ -180,6 +181,7 @@ function createFatherIndex(
   if (!father) {
     return
   }
+
   const fatherName = father && findName(NAME_EN, father)
   const fatherNameLocal = father && findName(NAME_BN, father)
 
@@ -192,7 +194,8 @@ function createFatherIndex(
   body.fatherFamilyNameLocal =
     fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
   body.fatherDoB = father.birthDate
-  body.fatherIdentifier = father.identifier && father.identifier[0].value
+  body.fatherIdentifier =
+    father.identifier && father.identifier[0] && father.identifier[0].value
 }
 
 async function createApplicationIndex(

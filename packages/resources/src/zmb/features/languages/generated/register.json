@@ -74,6 +74,7 @@
         "certificate.receipt.birthService.between": "Birth registration between 45 days and 5 years of date of birth",
         "certificate.receipt.deathService.after": "Death registration after 5 years of date of death",
         "certificate.receipt.deathService.between": "Death registration between 45 days and 5 years of date of death",
+        "constants.apiUser": "API User",
         "constants.applicantContactNumber": "Applicant contact number",
         "constants.application": "application",
         "constants.applicationCollectedOn": "Certificate collected on",

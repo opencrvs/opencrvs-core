@@ -52,6 +52,11 @@ export default async function createUser(
     user.status = statuses.PENDING
     user.scope = roleScopeMapping[user.role]
 
+    if (user.role === 'API_USER') {
+      // Immediately active API users
+      user.status = statuses.ACTIVE
+    }
+
     autoGenPassword = generateRandomPassword(hasDemoScope(request))
 
     const { hash, salt } = generateSaltedHash(autoGenPassword)
