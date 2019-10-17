@@ -234,7 +234,9 @@ export const isValidChildBirthDate: Validation = (
   drafts
 ) => {
   const childBirthDate = value as string
-  const motherBirthDate = (drafts && drafts.mother.motherBirthDate) as string
+  const motherBirthDate = (drafts &&
+    drafts.mother &&
+    drafts.mother.motherBirthDate) as string
 
   return childBirthDate &&
     isAValidDateFormat(childBirthDate) &&
