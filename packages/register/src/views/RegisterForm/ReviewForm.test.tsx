@@ -1287,8 +1287,7 @@ describe('ReviewForm tests', () => {
                   }
                 },
                 mannerOfDeath: 'ACCIDENT',
-                causeOfDeathMethod: 'Natural',
-                causeOfDeath: '123'
+                causeOfDeath: 'Internal injury in head'
               }
             }
           }
@@ -1331,8 +1330,7 @@ describe('ReviewForm tests', () => {
 
       expect(data.data.causeOfDeath).toEqual({
         causeOfDeathEstablished: true,
-        causeOfDeathCode: '123',
-        methodOfCauseOfDeath: 'Natural'
+        causeOfDeathCode: 'Internal injury in head'
       })
     })
   })
