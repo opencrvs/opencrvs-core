@@ -1,6 +1,9 @@
-import { internal } from 'boom'
 import chalk from 'chalk'
-import { getFromFhir, IStatistic } from '@resources/bgd/features/utils'
+import {
+  IStatistic,
+  matchLocationWithA2IRef,
+  getLocationsByIdentifier
+} from '@resources/bgd/features/utils'
 import * as fs from 'fs'
 import { ADMIN_STRUCTURE_SOURCE } from '@resources/bgd/constants'
 
@@ -81,15 +84,14 @@ function generateStatisticalExtensions(sourceStatistic: IStatistic) {
 }
 
 async function matchAndAssignStatisticalData(
-  fhirLocations: fhir.BundleEntry[],
+  fhirLocations: fhir.Location[],
   statistics: IStatistic[]
 ) {
   const locationsWithStatistics: fhir.Location[] = []
 
-  for (const locationEntry of fhirLocations) {
-    const location = locationEntry.resource as fhir.Location
-    const matchingStatistics = statistics.find((obj: IStatistic) => {
-      return obj.reference === location.description
+  for (const location of fhirLocations) {
+    const matchingStatistics = statistics.find((stat: IStatistic) => {
+      return matchLocationWithA2IRef(location, stat.reference)
     })
     if (!matchingStatistics) {
       // tslint:disable-next-line:no-console
@@ -120,27 +122,13 @@ export default async function addStatisticalData() {
     )}`
   )
 
-  let divisions
-  try {
-    divisions = await getFromFhir(`/Location/?identifier=DIVISION&_count=0`)
-  } catch (err) {
-    return internal(err)
-  }
-
-  let districts
-  try {
-    districts = await getFromFhir(`/Location/?identifier=DISTRICT&_count=0`)
-  } catch (err) {
-    return internal(err)
-  }
-
   const statistics = {
     divisions: await matchAndAssignStatisticalData(
-      divisions.entry,
+      await getLocationsByIdentifier('DIVISION'),
       divisionsStatistics
     ),
     districts: await matchAndAssignStatisticalData(
-      districts.entry,
+      await getLocationsByIdentifier('DISTRICT'),
       districtsStatistics
     )
   }

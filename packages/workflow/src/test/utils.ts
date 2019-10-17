@@ -734,7 +734,7 @@ export const districtMock = JSON.stringify({
   id: 'd33e4cb2-670e-4564-a8ed-c72baacd9173',
   identifier: [
     {
-      system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+      system: 'http://opencrvs.org/specs/id/geo-id',
       value: '165'
     },
     { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
@@ -758,7 +758,7 @@ export const upazilaMock = JSON.stringify({
   id: 'd33e4cb2-670e-4564-a8ed-c72baacdxxx',
   identifier: [
     {
-      system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+      system: 'http://opencrvs.org/specs/id/geo-id',
       value: '165'
     },
     { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -782,7 +782,7 @@ export const unionMock = JSON.stringify({
   id: 'd33e4cb2-670e-4564-a8ed-c72baacdy48y',
   identifier: [
     {
-      system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+      system: 'http://opencrvs.org/specs/id/geo-id',
       value: '165'
     },
     { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -806,7 +806,7 @@ export const officeMock = JSON.stringify({
   id: 'd33e4cb2-670e-4564-a8ed-c72baacd12yy',
   identifier: [
     {
-      system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+      system: 'http://opencrvs.org/specs/id/geo-id',
       value: '165'
     },
     { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
