@@ -406,15 +406,16 @@ export const reasonsNotApplyingToFieldValueTransformer = (
   transformedArray.forEach((arrayField, index) => {
     const value = arrayField[transformedFieldName]
     if (
-      (value &&
-        (extraField &&
-          (arrayField[extraField] === field.extraValue ||
-            (extraValues &&
-              extraValues.includes(arrayField[extraField] as string))))) ||
-      (extraValues && extraValues.includes(value as string))
+      value &&
+      (extraField &&
+        (arrayField[extraField] === field.extraValue ||
+          (extraValues &&
+            extraValues.includes(arrayField[extraField] as string))))
     ) {
       fieldValue = value
       transformedArray.splice(index, 1)
+    } else if (value && extraValues && extraValues.includes(value as string)) {
+      fieldValue = value
     }
   })
 
