@@ -19,8 +19,12 @@ import {
 import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import {
   BirthSection,
+  CHECKBOX_GROUP,
   DATE,
   Event,
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  ICheckboxGroupFormField,
   IDynamicOptions,
   IFileValue,
   IForm,
@@ -43,10 +47,7 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING,
-  CHECKBOX_GROUP,
-  ICheckboxGroupFormField,
-  FETCH_BUTTON
+  WARNING
 } from '@register/forms'
 import {
   getBirthSection,
@@ -305,7 +306,15 @@ const renderValue = (
     )
   }
 
-  if (field.type === DATE && value && typeof value === 'string') {
+  if (
+    (field.type === DATE ||
+      (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+        (field.dynamicDefinitions.type &&
+          field.dynamicDefinitions.type.kind === 'static' &&
+          field.dynamicDefinitions.type.staticType === DATE))) &&
+    value &&
+    typeof value === 'string'
+  ) {
     return formatLongDate(value)
   }
 
