@@ -174,7 +174,7 @@ describe('SetupReviewPage page tests', () => {
               status: 'active',
               identifier: [
                 {
-                  system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+                  system: 'http://opencrvs.org/specs/id/geo-id',
                   value: '3'
                 },
                 {

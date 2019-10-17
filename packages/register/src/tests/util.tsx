@@ -1845,7 +1845,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
@@ -1861,7 +1861,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '20'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
@@ -1877,7 +1877,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -1893,7 +1893,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3473'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
@@ -1938,7 +1938,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
@@ -1955,7 +1955,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '20'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
@@ -1972,7 +1972,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -1989,7 +1989,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3473'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
@@ -2042,7 +2042,7 @@ export const mockRegistrarUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3'
             }
           ],
@@ -2054,7 +2054,7 @@ export const mockRegistrarUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '20'
             }
           ],
@@ -2066,7 +2066,7 @@ export const mockRegistrarUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             }
           ],
@@ -2078,7 +2078,7 @@ export const mockRegistrarUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3473'
             }
           ],
