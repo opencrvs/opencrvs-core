@@ -724,7 +724,7 @@ describe('ReviewForm tests', () => {
       uuid(),
       {},
       Event.BIRTH,
-      SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+      'IN_PROGRESS'
     )
     application.data = {
       child: {
@@ -785,7 +785,7 @@ describe('ReviewForm tests', () => {
     )
     exitButton.hostNodes().simulate('click')
     testComponent.component.update()
-    expect(window.location.href).toContain('/review')
+    expect(window.location.href).toContain('/progress')
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
