@@ -19,3 +19,21 @@ export function createLocationWiseSeqNumbers(
   }
   LocationSequenceNumber.collection.insertMany(seqNumbers, onInsert)
 }
+
+export async function getNextLocationWiseSeqNumber(locationId: string) {
+  // tslint:disable-next-line
+  const sequenceNumber: ILocationSequenceNumberModel | null = await LocationSequenceNumber.findOneAndUpdate(
+    {
+      locationId,
+      year: new Date().getFullYear()
+    },
+    { $inc: { lastUsedSequenceNumber: 1 } },
+    { new: true }
+  )
+  if (!sequenceNumber) {
+    throw new Error(
+      `No starting sequece number found for generating registration number in location: ${locationId}`
+    )
+  }
+  return sequenceNumber
+}
