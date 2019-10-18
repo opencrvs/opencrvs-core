@@ -107,7 +107,7 @@ export const user = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3',
           __typename: 'Identifier'
         },
@@ -130,7 +130,7 @@ export const user = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '20',
           __typename: 'Identifier'
         },
@@ -153,7 +153,7 @@ export const user = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -170,7 +170,7 @@ export const user = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3473'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
@@ -204,7 +204,7 @@ export const userDetails = {
       name: 'Dhaka',
       status: 'active',
       identifier: [
-        { system: 'http://opencrvs.org/specs/id/a2i-internal-id', value: '3' },
+        { system: 'http://opencrvs.org/specs/id/geo-id', value: '3' },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
@@ -217,7 +217,7 @@ export const userDetails = {
       name: 'GAZIPUR',
       status: 'active',
       identifier: [
-        { system: 'http://opencrvs.org/specs/id/a2i-internal-id', value: '20' },
+        { system: 'http://opencrvs.org/specs/id/geo-id', value: '20' },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
         {
           system: 'http://opencrvs.org/specs/id/jurisdiction-type',
@@ -231,7 +231,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -247,7 +247,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3473'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },

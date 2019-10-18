@@ -22,7 +22,8 @@ import {
   dateNotInFuture,
   dateFormatIsCorrect,
   dateInPast,
-  validLength
+  validLength,
+  isDateAfter
 } from '@register/utils/validate'
 import { validationMessages as messages } from '@register/i18n/messages'
 
@@ -726,6 +727,19 @@ describe('validate', () => {
       expect(dateNotInFuture()(futureDate)).toEqual({
         message: messages.dateFormat
       })
+    })
+  })
+
+  describe('isDateAfter. Checks if a given date is after a given date', () => {
+    it('should be okay with first after second', () => {
+      const first = '1995-10-10'
+      const second = '1971-02-23'
+      expect(isDateAfter(first, second)).toEqual(true)
+    })
+    it('should not be okay with first after second', () => {
+      const second = '1995-10-10'
+      const first = '1994-10-10'
+      expect(isDateAfter(first, second)).toEqual(false)
     })
   })
 
