@@ -26,7 +26,6 @@ services:
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
       - FHIR_URL=http://openhim-core:5001/fhir
       - OPENHIM_USER_PATH=/run/secrets/openhim-user
       - OPENHIM_PASSWORD_PATH=/run/secrets/openhim-password
