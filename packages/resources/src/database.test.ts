@@ -9,15 +9,15 @@ jest.mock('mongoose', () => ({
 }))
 
 import * as mongoose from 'mongoose'
-import { start, stop } from '@user-mgnt/database'
-import { logger } from '@user-mgnt/logger'
+import { connect, disconnect } from '@resources/database'
+import { logger } from '@resources/logger'
 
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
 describe('Database connector', () => {
   it('keeps on retrying a connection on startup', async () => {
     const spy = jest.spyOn(logger, 'error')
-    const promise = start()
+    const promise = connect()
     await wait(1)
     expect(spy).toHaveBeenCalled()
     jest.spyOn(mongoose, 'connect').mockResolvedValueOnce(mongoose)
@@ -33,7 +33,7 @@ describe('Database connector', () => {
   })
   it('calls mongoose disconnect when stop method is called', async () => {
     const spy = jest.spyOn(mongoose, 'disconnect')
-    await stop()
+    await disconnect()
     expect(spy).toHaveBeenCalled()
   })
 })
