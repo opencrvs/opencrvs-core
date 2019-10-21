@@ -787,6 +787,213 @@ describe('ReviewForm tests', () => {
     testComponent.component.update()
     expect(window.location.href).toContain('/progress')
   })
+
+  it('redirect to review tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'DECLARED'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/review')
+  })
+
+  it('redirect to review tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'VALIDATED'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/review')
+  })
+
+  it('redirect to update tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'REJECTED'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/updates')
+  })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     application.data = {
