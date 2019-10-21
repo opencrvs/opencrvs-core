@@ -417,15 +417,18 @@ export const reasonsNotApplyingToFieldValueTransformer = (
     transformedArrayName
   ] as IFormSectionData[]
 
-  transformedArray.forEach(arrayField => {
+  transformedArray.forEach((arrayField, index) => {
     const value = arrayField[transformedFieldName]
     if (
+      value &&
       (extraField &&
         (arrayField[extraField] === field.extraValue ||
           (extraValues &&
-            extraValues.includes(arrayField[extraField] as string)))) ||
-      (extraValues && extraValues.includes(value as string))
+            extraValues.includes(arrayField[extraField] as string))))
     ) {
+      fieldValue = value
+      transformedArray.splice(index, 1)
+    } else if (value && extraValues && extraValues.includes(value as string)) {
       fieldValue = value
     }
   })

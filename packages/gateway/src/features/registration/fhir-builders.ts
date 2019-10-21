@@ -59,7 +59,8 @@ import {
   fetchFHIR,
   setPrimaryCaregiverReference,
   selectObservationResource,
-  getReasonCodeAndDesc
+  getReasonCodeAndDesc,
+  removeObservationResource
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -2606,6 +2607,8 @@ const builders: IFieldBuilders = {
             fhirBundle
           )
         }
+
+        removeObservationResource(PRIMARY_CAREGIVER, fhirBundle)
       }
     },
     parentDetailsType: (

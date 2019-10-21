@@ -234,7 +234,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           resourceType: 'Location',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -251,7 +251,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           resourceType: 'Location',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -276,7 +276,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           resourceType: 'Location',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
@@ -296,7 +296,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
       resourceType: 'Location',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -457,7 +457,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -471,7 +471,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -493,7 +493,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },
@@ -512,7 +512,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       resourceType: 'Location',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -537,7 +537,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -551,7 +551,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '21' },
@@ -565,7 +565,7 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
         resourceType: 'Location',
         identifier: [
           {
-            system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+            system: 'http://opencrvs.org/specs/id/geo-id',
             value: '165'
           },
           { system: 'http://opencrvs.org/specs/id/bbs-code', value: '10' },

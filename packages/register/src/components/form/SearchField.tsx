@@ -222,7 +222,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {!this.state.showModal && !this.state.showSearch && (
           <InputSection>
             <TextInput
-              id={this.props.fieldName + '-id'}
+              id={this.props.fieldName}
               value={fieldLocationName}
               disabled
               className="item"

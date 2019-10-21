@@ -20,4 +20,8 @@ export const LANGUAGES_SOURCE = path.join(
   process.cwd(),
   'src/bgd/features/languages/generated/'
 )
-export const ADMINISTRATIVE_STRUCTURE_URL = 'http://174.136.37.245:8090/gen'
+export const SEQUENCE_NUMBER_SOURCE = path.join(
+  process.cwd(),
+  'src/bgd/features/generate/sequenceNumbers/'
+)
+export const ADMINISTRATIVE_STRUCTURE_URL = 'http://esb.beta.doptor.gov.bd:8280'
