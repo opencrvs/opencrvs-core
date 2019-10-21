@@ -224,7 +224,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{child.district}, {child.state}"
+                "formattedKeys": "{child.district}, {child.state}, {child.internationalDistrict}, {child.internationalState}, {child.country}"
               }
             ]
           }
@@ -465,7 +465,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.districtPermanent}, {deceased.statePermanent}"
+                "formattedKeys": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}"
               },
               {
                 "condition": {
@@ -474,7 +474,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.district}, {deathEvent.state}"
+                "formattedKeys": "{deathEvent.district}, {deathEvent.state}, {deathEvent.country}"
               },
               {
                 "condition": {

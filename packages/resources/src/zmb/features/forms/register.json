@@ -793,6 +793,10 @@
                     {
                       "action": "hide",
                       "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
                     }
                   ],
                   "mapping": {
@@ -1843,6 +1847,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPlaceOfHeritage)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPlaceOfHeritage"
                     },
                     {
@@ -2336,6 +2344,10 @@
                     "dependency": "statePermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.countryPermanent"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"
@@ -3111,6 +3123,10 @@
                     "dependency": "state"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -4463,6 +4479,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.fathersDetailsExist"
                     },
                     {
@@ -5652,6 +5672,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPermanent"
                     },
                     {
@@ -6561,6 +6585,10 @@
                     "dependency": "state"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -7718,6 +7746,10 @@
                     "dependency": "statePermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"

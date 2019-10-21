@@ -312,13 +312,15 @@ export const eventLocationQueryTransformer = (
     transformedData[sectionId][field.name] = line[lineNumber - 1]
   } else if (
     address[transformedFieldName ? transformedFieldName : field.name] &&
-    country === window.config.COUNTRY
+    country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
+    field.name !== 'internationalState' &&
+    field.name !== 'internationalDistrict'
   ) {
     transformedData[sectionId][field.name] =
       address[transformedFieldName ? transformedFieldName : field.name]
   } else if (
     address[transformedFieldName ? transformedFieldName : field.name] &&
-    country !== window.config.COUNTRY &&
+    country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
     field.name !== 'state' &&
     field.name !== 'district'
   ) {

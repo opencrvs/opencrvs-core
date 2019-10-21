@@ -278,7 +278,6 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
@@ -288,6 +287,8 @@ describe('ReviewForm tests', () => {
       gender: 'male',
       placeOfBirth: 'PRIVATE_HOME',
       country: 'BGD',
+      district: 'district2',
+      state: 'state4',
       addressLine1: 'Rd #10',
       addressLine1CityOption: '',
       addressLine2: 'Akua',
@@ -297,8 +298,6 @@ describe('ReviewForm tests', () => {
       internationalAddressLine1: undefined,
       internationalAddressLine2: undefined,
       internationalAddressLine3: undefined,
-      internationalDistrict: 'district2',
-      internationalState: 'state4',
       multipleBirth: 1,
       birthType: 'SINGLE',
       weightAtBirth: 2

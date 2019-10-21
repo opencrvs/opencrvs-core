@@ -1295,6 +1295,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -2611,6 +2615,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPermanent"
                     },
                     {
@@ -2664,6 +2672,10 @@
                     "dependency": "districtPermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"
@@ -3643,6 +3655,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -3695,6 +3711,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -5981,6 +6001,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPermanent"
                     },
                     {
@@ -6021,6 +6045,10 @@
                     "dependency": "districtPermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"
@@ -6749,6 +6777,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -6793,6 +6825,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -8329,6 +8365,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -8373,6 +8413,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -9193,6 +9237,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "values.permanentAddressSameAsMother"
                     },
                     {
@@ -9237,6 +9285,10 @@
                     "dependency": "districtPermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "values.permanentAddressSameAsMother"
@@ -10994,6 +11046,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPermanent"
                     },
                     {
@@ -11034,6 +11090,10 @@
                     "dependency": "districtPermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"
@@ -11759,6 +11819,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -11803,6 +11867,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -12804,6 +12872,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -12844,6 +12916,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -13518,6 +13594,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -13558,6 +13638,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -15126,6 +15210,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.country"
                     },
                     {
@@ -15174,6 +15262,10 @@
                     "dependency": "district"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.country)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.country"
@@ -16147,6 +16239,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "!values.countryPermanent"
                     },
                     {
@@ -16204,6 +16300,10 @@
                     "dependency": "districtPermanent"
                   },
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!isDefaultCountry(values.countryPermanent)"
+                    },
                     {
                       "action": "hide",
                       "expression": "!values.countryPermanent"

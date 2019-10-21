@@ -34,7 +34,9 @@ import {
 } from '@register/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 import { IOfflineData } from '@register/offline/reducer'
+import { getCountryTranslations, ICertificateCountry } from './utils'
 import { getOfflineData } from '@register/offline/selectors'
+import { countries } from '@register/forms/countries'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -97,6 +99,7 @@ type IProps = {
   registrationId: string
   draft: IPrintableApplication
   userDetails: IUserDetails | null
+  countries: ICertificateCountry[]
   registerForm: IForm
   resources: IOfflineData
   modifyApplication: typeof modifyApplication
@@ -130,7 +133,8 @@ class ReviewCertificateActionComponent extends React.Component<
           this.setState({
             certificatePdf: base64PDF
           })
-        }
+        },
+        this.props.countries
       )
     }
   }
@@ -164,7 +168,8 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.intl,
       draft,
       this.props.userDetails,
-      this.props.resources
+      this.props.resources,
+      this.props.countries
     )
   }
 
@@ -302,6 +307,7 @@ function mapStatetoProps(
     event,
     registrationId,
     draft,
+    countries: getCountryTranslations(state.i18n.languages, countries),
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
     resources: getOfflineData(state),

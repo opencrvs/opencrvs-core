@@ -771,6 +771,7 @@
           "field": "placeOfBirth",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "en",
             "conditionalKeys": [
               {
                 "condition": {
@@ -788,7 +789,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}, {child.internationalDistrict}, {child.internationalState}, {child.country}"
               }
             ]
           }
@@ -797,6 +798,7 @@
           "field": "bnPlaceOfBirth",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "bn",
             "conditionalKeys": [
               {
                 "condition": {
@@ -814,7 +816,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}, {child.internationalDistrict}, {child.internationalState}, {child.country}"
               }
             ]
           }
@@ -1302,6 +1304,7 @@
           "field": "placeOfDeath",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "en",
             "conditionalKeys": [
               {
                 "condition": {
@@ -1310,7 +1313,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
               },
               {
                 "condition": {
@@ -1319,7 +1322,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
               },
               {
                 "condition": {
@@ -1328,7 +1331,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deceased.country}"
               },
               {
                 "condition": {
@@ -1346,6 +1349,7 @@
           "field": "bnPlaceOfDeath",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "bn",
             "conditionalKeys": [
               {
                 "condition": {
@@ -1354,7 +1358,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
               },
               {
                 "condition": {
@@ -1363,7 +1367,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
               },
               {
                 "condition": {
@@ -1372,7 +1376,7 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deceased.country}"
               },
               {
                 "condition": {

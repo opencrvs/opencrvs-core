@@ -6,6 +6,10 @@ import {
   IOfflineAddressPayload
 } from '@register/pdfRenderer/transformer/types'
 import { getValueFromApplicationDataByKey } from '@register/pdfRenderer/transformer/utils'
+import {
+  ICertificateCountry,
+  ICountry
+} from '@register/views/PrintCertificate/utils'
 
 export const offlineTransformers: IFunctionTransformer = {
   /*
@@ -32,7 +36,8 @@ export const offlineTransformers: IFunctionTransformer = {
   OfflineAddress: (
     templateData: TemplateTransformerData,
     intl: IntlShape,
-    payload?: TransformerPayload
+    payload?: TransformerPayload,
+    optionalData?: ICertificateCountry[]
   ) => {
     const params = payload && (payload as IOfflineAddressPayload)
     if (!params) {
@@ -70,15 +75,36 @@ export const offlineTransformers: IFunctionTransformer = {
       return matchedCondition.formattedKeys
     }
     const value = Object.keys(keyValues).reduce((value, key) => {
-      const addresses =
-        templateData.resource[
-          matchedCondition.addressType as keyof typeof templateData.resource
-        ]
-      const address = addresses[keyValues[key] as keyof typeof addresses]
-      return value.replace(
-        new RegExp(`${key}`, 'g'),
-        address[matchedCondition.addressKey] || ''
-      )
+      if (keyValues[key] === undefined || keyValues[key] === '') {
+        return value.replace(new RegExp(`${key}, `, 'g'), '')
+      } else if (key.includes('country') && optionalData) {
+        const countries: ICountry[] = optionalData.filter(
+          (country: ICertificateCountry) => {
+            return country.language === params.language
+          }
+        )[0].countries as ICountry[]
+        const countryMessage = countries.filter((country: ICountry) => {
+          return country.value === keyValues[key]
+        })[0].name
+
+        return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
+      } else if (key.includes('international')) {
+        if (params.language === 'en') {
+          return value.replace(new RegExp(`${key}`, 'g'), keyValues[key])
+        } else {
+          return value.replace(new RegExp(`${key}, `, 'g'), '')
+        }
+      } else {
+        const addresses =
+          templateData.resource[
+            matchedCondition.addressType as keyof typeof templateData.resource
+          ]
+        const address = addresses[keyValues[key] as keyof typeof addresses]
+        return value.replace(
+          new RegExp(`${key}`, 'g'),
+          address[matchedCondition.addressKey] || ''
+        )
+      }
     }, matchedCondition.formattedKeys)
     return value
   }
