@@ -624,6 +624,10 @@ export const typeResolvers: GQLResolver = {
           primaryCaregiverType,
           reasonNotApplying: reasonCaregiverNotApplying
         })
+      } else if (primaryCaregiver && !reasonCaregiverNotApplying) {
+        reasons.push({
+          primaryCaregiverType
+        })
       }
 
       return reasons

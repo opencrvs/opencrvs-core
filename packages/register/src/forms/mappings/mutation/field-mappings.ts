@@ -461,7 +461,8 @@ export const fieldToReasonsNotApplyingTransformer = (
   transformedArrayName: string,
   transformedFieldName?: string,
   extraField?: string,
-  transformeValueArrayToBoolean?: boolean
+  transformeValueArrayToBoolean?: boolean,
+  isCaregiver?: boolean
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -495,7 +496,9 @@ export const fieldToReasonsNotApplyingTransformer = (
         )
       }
       return (
-        transField[transFieldName] && transField[transFieldName] === fieldValue
+        !isCaregiver &&
+        transField[transFieldName] &&
+        transField[transFieldName] === fieldValue
       )
     })
 
