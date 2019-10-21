@@ -242,6 +242,30 @@ export function selectObservationResource(
   return observation
 }
 
+export async function removeObservationResource(
+  observationCode: string,
+  fhirBundle: ITemplatedBundle
+) {
+  fhirBundle.entry.forEach((entry, index) => {
+    if (
+      !entry ||
+      !entry.resource ||
+      entry.resource.resourceType === 'Observation'
+    ) {
+      const observationEntry = entry.resource as fhir.Observation
+      const obCoding =
+        observationEntry.code &&
+        observationEntry.code.coding &&
+        observationEntry.code.coding.find(
+          obCode => obCode.code === observationCode
+        )
+      if (obCoding) {
+        fhirBundle.entry.splice(index, 1)
+      }
+    }
+  })
+}
+
 export function getReasonCodeAndDesc(type: string) {
   switch (type) {
     case 'MOTHER':
