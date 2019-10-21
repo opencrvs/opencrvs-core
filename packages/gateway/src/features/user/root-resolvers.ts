@@ -114,6 +114,30 @@ export const resolvers: GQLResolver = {
         )
       }
       return response
+    },
+    async changePassword(
+      _,
+      { userId, existingPassword, password },
+      authHeader
+    ) {
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, existingPassword, password }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      const response = await res.json()
+      if (res.status !== 201) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user password"
+          )
+        )
+      }
+      return response
     }
   }
 }

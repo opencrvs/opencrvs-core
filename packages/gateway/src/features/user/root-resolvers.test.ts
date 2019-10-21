@@ -218,6 +218,53 @@ describe('User root resolvers', () => {
     })
   })
 
+  describe('changePassword mutation', () => {
+    it('changes password for loggedin user', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      const response = await resolvers.Mutation.changePassword(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          existingPassword: 'test',
+          password: 'NewPassword'
+        }
+      )
+
+      expect(response).toEqual({
+        userId: 'ba7022f0ff4822'
+      })
+    })
+    it('throws error if @user-mgnt/changeUserPassword sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      expect(
+        resolvers.Mutation.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            existingPassword: 'test',
+            password: 'NewPassword'
+          }
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user password"
+      )
+    })
+  })
+
   describe('createUser mutation', () => {
     const user = {
       name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
