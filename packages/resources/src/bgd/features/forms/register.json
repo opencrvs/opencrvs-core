@@ -823,7 +823,7 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
+                      "operation": "isValidChildBirthDate"
                     }
                   ],
                   "mapping": {
@@ -4172,6 +4172,7 @@
                           "description": "field label for reasonNotApplying"
                         },
                         "initialValue": "",
+                        "required": false,
                         "validate": [],
                         "extraValue": "LEGAL_GUARDIAN",
                         "mapping": {
@@ -4316,6 +4317,7 @@
                         },
                         "initialValue": "",
                         "validate": [],
+                        "required": false,
                         "extraValue": "OTHER",
                         "mapping": {
                           "mutation": {
@@ -4360,7 +4362,10 @@
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
                             "reasonsNotApplying",
-                            "primaryCaregiverType"
+                            "primaryCaregiverType",
+                            "",
+                            false,
+                            true
                           ]
                         }
                       ]
@@ -4375,7 +4380,14 @@
                             "reasonsNotApplying",
                             "primaryCaregiverType",
                             "",
-                            ["OTHER", "LEGAL_GUARDIAN"]
+                            [
+                              "MOTHER_AND_FATHER",
+                              "MOTHER",
+                              "FATHER",
+                              "INFORMANT",
+                              "OTHER",
+                              "LEGAL_GUARDIAN"
+                            ]
                           ]
                         }
                       ]
@@ -4793,6 +4805,13 @@
                           "parameters": []
                         },
                         "dependencies": ["dateOfMarriage"]
+                      },
+                      {
+                        "validator": {
+                          "operation": "isValidMotherBirthDate",
+                          "parameters": []
+                        },
+                        "dependencies": []
                       }
                     ]
                   },
@@ -10387,9 +10406,9 @@
                     {
                       "value": "OTHER",
                       "label": {
-                        "defaultMessage": "Other Institution",
-                        "description": "Select item for Other Institution",
-                        "id": "form.field.label.otherInstitution"
+                        "defaultMessage": "Other address",
+                        "description": "Select item for Other Address",
+                        "id": "form.field.label.otherAddress"
                       }
                     }
                   ],

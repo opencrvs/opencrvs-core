@@ -47,6 +47,7 @@ interface IUserMessages {
   securityTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   STATE_REGISTRAR: MessageDescriptor
+  API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
 }
@@ -240,6 +241,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'State Registrar',
     description: 'The description for STATE_REGISTRAR role',
     id: 'constants.stateRegistrar'
+  },
+  API_USER: {
+    defaultMessage: 'API User',
+    description: 'The description for API_USER role',
+    id: 'constants.apiUser'
   },
   systemTitle: {
     defaultMessage: 'System',
