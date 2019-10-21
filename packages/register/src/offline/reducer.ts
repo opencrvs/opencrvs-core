@@ -2,10 +2,7 @@ import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
 import * as actions from '@register/offline/actions'
 import * as profileActions from '@register/profile/profileActions'
 import { storage } from '@register/storage'
-import {
-  referenceApi,
-  ICertificateCollection
-} from '@register/utils/referenceApi'
+import { referenceApi } from '@register/utils/referenceApi'
 import { ILanguage } from '@register/i18n/reducer'
 import { filterLocations, getLocation } from '@register/utils/locationUtils'
 import { tempData } from '@register/offline/temp/tempLocations'
@@ -13,6 +10,7 @@ import { ISerializedForm } from '@register/forms'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@register/utils/userUtils'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import { ICertificateCollectorDefinition } from '@register/views/PrintCertificate/VerifyCollector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -37,7 +35,10 @@ export interface IOfflineData {
       birth: ISerializedForm
       death: ISerializedForm
     }
-    certificateCollection: ICertificateCollection
+    certificateCollectorDefinition: {
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
+    }
   }
   templates: {
     receipt?: IPDFTemplate

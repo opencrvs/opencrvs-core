@@ -5,21 +5,35 @@ interface IForm {
   sections: Array<any> // no point defining full types here as we don't use them
 }
 
-interface ICollectorField {
-  firstNames: string
-  familyName: string
-  applicantFirstNames: string
-  applicantFamilyName: string
+interface INameField {
+  firstNamesField: string
+  familyNameField: string
 }
-export interface ICollectorFields {
-  [key: string]: ICollectorField
+interface INameFields {
+  [language: string]: INameField
+}
+
+interface ICollectorField {
+  identifierTypeField: string
+  identifierOtherTypeField: string
+  identifierField: string
+  nameFields: INameFields
+  birthDateField: string
+  nationalityField: string
+}
+
+interface ICertificateCollectorDefinition {
+  [collector: string]: ICollectorField
 }
 export interface IForms {
   registerForm: {
     birth: IForm
     death: IForm
   }
-  certificateCollection: ICollectorFields
+  certificateCollectorDefinition: {
+    birth: ICertificateCollectorDefinition
+    death: ICertificateCollectorDefinition
+  }
 }
 
 export async function getForms(): Promise<IForms> {

@@ -4,7 +4,7 @@ import { ILanguage } from '@register/i18n/reducer'
 import { ISerializedForm } from '@register/forms'
 import * as ImageDownloader from 'image-to-base64'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
-import { ICertificateCollectorField } from '@register/views/PrintCertificate/IDVerifier'
+import { ICertificateCollectorDefinition } from '@register/views/PrintCertificate/VerifyCollector'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -16,7 +16,10 @@ export interface IDefinitionsResponse {
   languages: ILanguage[]
   forms: {
     registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    certificateCollection: ICertificateCollection
+    certificateCollectorDefinition: {
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
+    }
   }
   templates: {
     receipt?: IPDFTemplate
@@ -28,10 +31,6 @@ export interface IDefinitionsResponse {
 }
 export interface IAssetResponse {
   logo: string
-}
-
-export interface ICertificateCollection {
-  [language: string]: ICertificateCollectorField
 }
 
 async function loadDefinitions(): Promise<IDefinitionsResponse> {

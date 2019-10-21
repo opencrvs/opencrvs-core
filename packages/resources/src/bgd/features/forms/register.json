@@ -14078,18 +14078,61 @@
       ]
     }
   },
-  "certificateCollection": {
-    "bn": {
-      "firstNames": "firstNames",
-      "familyName": "familyName",
-      "applicantFirstNames": "applicantFirstNames",
-      "applicantFamilyName": "applicantFamilyName"
+  "certificateCollectorDefinition": {
+    "birth": {
+      "mother": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "firstNames",
+            "familyNameField": "familyName"
+          }
+        },
+        "birthDateField": "motherBirthDate",
+        "nationalityField": "nationality"
+      },
+      "father": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "firstNames",
+            "familyNameField": "familyName"
+          }
+        },
+        "birthDateField": "fatherBirthDate",
+        "nationalityField": "nationality"
+      }
     },
-    "en": {
-      "firstNames": "firstNamesEng",
-      "familyName": "familyNameEng",
-      "applicantFirstNames": "applicantFirstNamesEng",
-      "applicantFamilyName": "applicantFamilyNameEng"
+    "death": {
+      "informant": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "applicantID",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "applicantFirstNamesEng",
+            "familyNameField": "applicantFamilyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "applicantFirstNames",
+            "familyNameField": "applicantFamilyName"
+          }
+        },
+        "birthDateField": "applicantBirthDate",
+        "nationalityField": "nationality"
+      }
     }
   }
 }

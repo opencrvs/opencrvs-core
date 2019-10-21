@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from '@register/styledComponents'
-import { connect } from 'react-redux'
 import {
   SuccessButton,
   DangerButton,
@@ -9,7 +8,6 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { IFormSectionData } from '@register/forms'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
@@ -21,14 +19,6 @@ import {
 import { formatLongDate } from '@register/utils/date-formatting'
 import { IStoreState } from '@register/store'
 import { getOfflineData } from '@register/offline/selectors'
-import { IOfflineData } from '@register/offline/reducer'
-
-export interface ICertificateCollectorField {
-  firstNames: string
-  familyName: string
-  applicantFirstNames: string
-  applicantFamilyName: string
-}
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -41,12 +31,20 @@ interface IVerifierActionProps {
   }
 }
 
+export interface ICollectorInfo {
+  iD: string
+  iDType: string
+  firstNames: string
+  familyName: string
+  birthDate: string
+  nationality: string
+}
+
 interface IIDVerifierProps {
   id?: string
   title: string
-  collectorInformation: IFormSectionData
+  collectorInformation: ICollectorInfo
   actionProps: IVerifierActionProps
-  offlineResources: IOfflineData
 }
 
 const Title = styled.div`
@@ -97,82 +95,50 @@ class IDVerifierComponent extends React.Component<
     this.setState(prevState => ({ showPrompt: !prevState.showPrompt }))
   }
 
-  getGenericCollectorInfo = (
-    info: IIDVerifierProps['collectorInformation']
-  ) => {
-    const { locale } = this.props.intl
-    const iD = info.iD || info.applicantID
-    const iDType = info.iDType || info.iDTypeOther
-    const fields = this.props.offlineResources.forms.certificateCollection
-    const firstNames =
-      fields &&
-      fields[locale] &&
-      (info[fields[locale].firstNames] ||
-        info[fields[locale].applicantFirstNames])
-    const familyName =
-      fields &&
-      fields[locale] &&
-      (info[fields[locale].familyName] ||
-        info[fields[locale].applicantFamilyName])
-
-    const birthDate =
-      info.motherBirthDate || info.fatherBirthDate || info.applicantBirthDate
-    const nationality = info.nationality
-
-    return {
-      iD,
-      iDType,
-      firstNames,
-      familyName,
-      birthDate,
-      nationality
-    }
-  }
-
   renderLabelValue = () => {
     const { collectorInformation, intl } = this.props
-    const {
-      iD,
-      iDType,
-      firstNames,
-      familyName,
-      birthDate,
-      nationality
-    } = this.getGenericCollectorInfo(collectorInformation)
 
     return (
       <>
         <LabelValuePair
           label={intl.formatMessage(constantsMessages.id)}
           value={
-            intl.formatMessage(identityNameMapper(iDType as string)) +
+            intl.formatMessage(
+              identityNameMapper(collectorInformation.iDType as string)
+            ) +
             ' | ' +
-            iD
+            collectorInformation.iD
           }
         />
-        {firstNames && (
+        {collectorInformation.firstNames && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.firstName)}
-            value={String(firstNames)}
+            value={String(collectorInformation.firstNames)}
           />
         )}
 
         <LabelValuePair
           label={intl.formatMessage(certificateMessages.familyName)}
-          value={String(familyName)}
+          value={String(collectorInformation.familyName)}
         />
 
-        {birthDate && (
+        {collectorInformation.birthDate && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(birthDate as string, intl.locale, 'LL')}
+            value={formatLongDate(
+              collectorInformation.birthDate as string,
+              intl.locale,
+              'LL'
+            )}
           />
         )}
 
-        {nationality && (
+        {collectorInformation.nationality && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.nationality)}
-            value={intl.formatMessage(countryMessages[nationality as string])}
+            value={intl.formatMessage(
+              countryMessages[collectorInformation.nationality as string]
+            )}
           />
         )}
       </>
@@ -242,12 +208,4 @@ class IDVerifierComponent extends React.Component<
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
-  return {
-    offlineResources: getOfflineData(store)
-  }
-}
-
-export const IDVerifier = connect(mapStateToProps)(
-  injectIntl(IDVerifierComponent)
-)
+export const IDVerifier = injectIntl(IDVerifierComponent)

@@ -6478,12 +6478,48 @@
       ]
     }
   },
-  "certificateCollection": {
-    "en": {
-      "firstNames": "firstNamesEng",
-      "familyName": "familyNameEng",
-      "applicantFirstNames": "applicantFirstNamesEng",
-      "applicantFamilyName": "applicantFamilyNameEng"
+  "certificateCollectorDefinition": {
+    "birth": {
+      "mother": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "birthDateField": "motherBirthDate",
+        "nationalityField": "nationality"
+      },
+      "father": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "birthDateField": "fatherBirthDate",
+        "nationalityField": "nationality"
+      }
+    },
+    "death": {
+      "informant": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "applicantID",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "nationalityField": "nationality"
+      }
     }
   }
 }
