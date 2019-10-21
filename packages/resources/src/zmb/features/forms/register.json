@@ -359,7 +359,7 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": ["birthDate"]
                     },
                     "query": {
@@ -1347,7 +1347,7 @@
                   "validate": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": ["birthDate"]
                     },
                     "query": {
@@ -2939,7 +2939,7 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": ["birthDate"]
                     },
                     "query": {
@@ -4034,7 +4034,13 @@
                     {
                       "operation": "isValidBirthDate"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "gender",
@@ -4660,7 +4666,13 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
-                      "parameters": ["deceased"]
+                      "parameters": [
+                        "deceased",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": []
+                        }
+                      ]
                     },
                     "query": {
                       "operation": "deceasedDateToFieldTransformation",
