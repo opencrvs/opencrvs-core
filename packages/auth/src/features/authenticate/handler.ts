@@ -8,7 +8,11 @@ import {
 } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import {
+  WEB_USER_JWT_AUDIENCES,
+  JWT_ISSUER,
+  API_USER_AUDIENCE
+} from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -54,7 +58,9 @@ export default async function authenticateHandler(
     response.token = await createToken(
       result.userId,
       result.scope,
-      WEB_USER_JWT_AUDIENCES,
+      isAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([API_USER_AUDIENCE])
+        : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
   }
