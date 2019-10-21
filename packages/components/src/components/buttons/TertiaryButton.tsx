@@ -25,7 +25,6 @@ export const TertiaryButton = styled(Button)`
   &:active {
     background: ${({ theme }) => theme.colors.focus};
   }
-  -webkit-tap-highlight-color: transparent;
 `
 
 enum ICON_ALIGNMENT {
@@ -45,6 +44,7 @@ const ButtonBase = styled.button`
       stroke: ${({ theme }) => theme.colors.disabled};
     }
   }
+  -webkit-tap-highlight-color: transparent;
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode

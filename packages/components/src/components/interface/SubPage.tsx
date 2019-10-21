@@ -30,7 +30,6 @@ const BackButton = styled(Button)`
   justify-content: center;
   cursor: pointer;
   margin-left: ${({ theme }) => theme.grid.margin}px;
-  -webkit-tap-highlight-color: transparent;
 `
 const MenuTitle = styled.span`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
