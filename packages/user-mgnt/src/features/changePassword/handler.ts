@@ -7,6 +7,7 @@ import { logger } from '@user-mgnt/logger'
 
 interface IChangePasswordPayload {
   userId: string
+  existingPassword?: string
   password: string
 }
 
@@ -24,7 +25,17 @@ export default async function changePasswordHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-
+  if (
+    userUpdateData.existingPassword &&
+    generateHash(userUpdateData.existingPassword, user.salt) !==
+      user.passwordHash
+  ) {
+    logger.error(
+      `Password didn't match for given userid: ${userUpdateData.userId}`
+    )
+    // Don't return a 404 as this gives away that this user account exists
+    throw unauthorized()
+  }
   user.passwordHash = generateHash(userUpdateData.password, user.salt)
 
   try {
@@ -39,5 +50,6 @@ export default async function changePasswordHandler(
 
 export const changePasswordRequestSchema = Joi.object({
   userId: Joi.string().required(),
+  existingPassword: Joi.string().optional(),
   password: Joi.string().required()
 })
