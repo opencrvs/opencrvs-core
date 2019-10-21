@@ -25,6 +25,7 @@ export const TertiaryButton = styled(Button)`
   &:active {
     background: ${({ theme }) => theme.colors.focus};
   }
+  -webkit-tap-highlight-color: transparent;
 `
 
 enum ICON_ALIGNMENT {
