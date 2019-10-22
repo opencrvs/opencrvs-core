@@ -169,7 +169,9 @@ export enum GQLAttachmentType {
   TAX_RECEIPT = 'TAX_RECEIPT',
   BROUGHT_IN_DEAD_CERTIFICATE = 'BROUGHT_IN_DEAD_CERTIFICATE',
   CORONERS_REPORT = 'CORONERS_REPORT',
-  SIGNED_AFFIDAVIT = 'SIGNED_AFFIDAVIT'
+  SIGNED_AFFIDAVIT = 'SIGNED_AFFIDAVIT',
+  ORIGINAL_BIRTH_RECORD = 'ORIGINAL_BIRTH_RECORD',
+  UNDER_FIVE_CARD = 'UNDER_FIVE_CARD'
 }
 
 export enum GQLAttachmentSubject {
@@ -291,6 +293,7 @@ export interface GQLRegistration {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
@@ -303,7 +306,9 @@ export interface GQLRegistration {
 export enum GQLRegistrationContactType {
   BOTH = 'BOTH',
   MOTHER = 'MOTHER',
-  FATHER = 'FATHER'
+  FATHER = 'FATHER',
+  OTHER = 'OTHER',
+  APPLICANT = 'APPLICANT'
 }
 
 export interface GQLRegWorkflow {
@@ -388,7 +393,18 @@ export enum GQLRelationshipType {
   DAUGHTER = 'DAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY',
   OTHER = 'OTHER',
-  INFORMANT = 'INFORMANT'
+  INFORMANT = 'INFORMANT',
+  GRANDFATHER = 'GRANDFATHER',
+  GRANDMOTHER = 'GRANDMOTHER',
+  BROTHER = 'BROTHER',
+  SISTER = 'SISTER',
+  OTHER_FAMILY_MEMBER = 'OTHER_FAMILY_MEMBER',
+  INSTITUTION_HEAD_PLACE_OF_BIRTH = 'INSTITUTION_HEAD_PLACE_OF_BIRTH',
+  HOUSE_OWNER = 'HOUSE_OWNER',
+  OPERATOR = 'OPERATOR',
+  OFFICE_IN_CHARGE = 'OFFICE_IN_CHARGE',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
+  BOTH_PARENTS = 'BOTH_PARENTS'
 }
 
 export interface GQLPayment {
@@ -449,9 +465,15 @@ export enum GQLBirthRegPresence {
 }
 
 export interface GQLPrimaryCaregiver {
+  primaryCaregiver?: GQLPerson
+  reasonsNotApplying?: Array<GQLReasonsNotApplying | null>
+  parentDetailsType?: GQLParentDetailsType
+}
+
+export interface GQLReasonsNotApplying {
   primaryCaregiverType?: GQLPrimaryCaregiverType
-  primaryCaregiver?: GQLRelatedPerson
   reasonNotApplying?: string
+  isDeceased?: boolean
 }
 
 export enum GQLPrimaryCaregiverType {
@@ -461,6 +483,13 @@ export enum GQLPrimaryCaregiverType {
   INFORMANT = 'INFORMANT',
   LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
   OTHER = 'OTHER'
+}
+
+export enum GQLParentDetailsType {
+  MOTHER_AND_FATHER = 'MOTHER_AND_FATHER',
+  MOTHER_ONLY = 'MOTHER_ONLY',
+  FATHER_ONLY = 'FATHER_ONLY',
+  NONE = 'NONE'
 }
 
 export interface GQLBirthRegResultSet {
@@ -722,6 +751,7 @@ export interface GQLRegistrationInput {
   page?: string
   book?: string
   contact?: GQLRegistrationContactType
+  contactRelationship?: string
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
@@ -796,9 +826,15 @@ export interface GQLPaymentInput {
 }
 
 export interface GQLPrimaryCaregiverInput {
+  primaryCaregiver?: GQLPersonInput
+  reasonsNotApplying?: Array<GQLReasonsNotApplyingInput | null>
+  parentDetailsType?: GQLParentDetailsType
+}
+
+export interface GQLReasonsNotApplyingInput {
   primaryCaregiverType?: GQLPrimaryCaregiverType
-  primaryCaregiver?: GQLRelatedPersonInput
   reasonNotApplying?: string
+  isDeceased?: boolean
 }
 
 export interface GQLCreatedIds {
@@ -884,6 +920,7 @@ export interface GQLResolver {
   Payment?: GQLPaymentTypeResolver
   Map?: GraphQLScalarType
   PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
+  ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
@@ -1776,6 +1813,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   page?: RegistrationToPageResolver<TParent>
   book?: RegistrationToBookResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
+  contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
@@ -1823,6 +1861,13 @@ export interface RegistrationToBookResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationToContactResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToContactRelationshipResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2139,16 +2184,9 @@ export interface PaymentToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLPrimaryCaregiverTypeResolver<TParent = any> {
-  primaryCaregiverType?: PrimaryCaregiverToPrimaryCaregiverTypeResolver<TParent>
   primaryCaregiver?: PrimaryCaregiverToPrimaryCaregiverResolver<TParent>
-  reasonNotApplying?: PrimaryCaregiverToReasonNotApplyingResolver<TParent>
-}
-
-export interface PrimaryCaregiverToPrimaryCaregiverTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+  reasonsNotApplying?: PrimaryCaregiverToReasonsNotApplyingResolver<TParent>
+  parentDetailsType?: PrimaryCaregiverToParentDetailsTypeResolver<TParent>
 }
 
 export interface PrimaryCaregiverToPrimaryCaregiverResolver<
@@ -2158,7 +2196,43 @@ export interface PrimaryCaregiverToPrimaryCaregiverResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface PrimaryCaregiverToReasonNotApplyingResolver<
+export interface PrimaryCaregiverToReasonsNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PrimaryCaregiverToParentDetailsTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLReasonsNotApplyingTypeResolver<TParent = any> {
+  primaryCaregiverType?: ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
+    TParent
+  >
+  reasonNotApplying?: ReasonsNotApplyingToReasonNotApplyingResolver<TParent>
+  isDeceased?: ReasonsNotApplyingToIsDeceasedResolver<TParent>
+}
+
+export interface ReasonsNotApplyingToPrimaryCaregiverTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ReasonsNotApplyingToReasonNotApplyingResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ReasonsNotApplyingToIsDeceasedResolver<
   TParent = any,
   TResult = any
 > {

@@ -73,6 +73,22 @@ function createTaskRefTemplate(event: EVENT_TYPE) {
     }
   }
 }
+export async function findInformantEntry(
+  fhirBundle: fhir.Bundle
+): Promise<fhir.Patient | undefined> {
+  const informantEntry = selectInformantResource(fhirBundle)
+  if (informantEntry) {
+    return informantEntry
+  }
+  const informantRelatedPersonEntry = (await findPersonEntry(
+    INFORMANT_CODE,
+    fhirBundle
+  )) as fhir.RelatedPerson
+  if (!informantRelatedPersonEntry) {
+    return undefined
+  }
+  return await getFromFhir(`/${informantRelatedPersonEntry.patient.reference}`)
+}
 
 export async function findPersonEntry(
   sectionCode: string,

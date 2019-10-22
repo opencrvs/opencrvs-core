@@ -185,14 +185,14 @@ export interface IUserData {
 
 export interface IApplicationsState {
   userID: string
-  initialApplicationsLoaded: boolean
   applications: IApplication[]
+  initialApplicationsLoaded: boolean
 }
 
 const initialState = {
   userID: '',
-  initialApplicationsLoaded: false,
-  applications: []
+  applications: [],
+  initialApplicationsLoaded: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {

@@ -16,7 +16,7 @@ describe('when app notifies the user', () => {
 
   describe('When background Sync is triggered', () => {
     beforeEach(() => {
-      const action = actions.showBackgroundSyncedNotification(7)
+      const action = actions.showBackgroundSyncedNotification()
       store.dispatch(action)
       app.update()
     })
@@ -37,7 +37,7 @@ describe('when app notifies the user', () => {
         .hostNodes()
         .text()
       expect(label).toBe(
-        'ইন্টারনেট সংযোগ ফিরে আসায় আমরা 7 টি নতুন জন্ম ঘোষণা সিঙ্ক করেছি'
+        'ইন্টারনেট সংযোগ ফিরে আসায় আমরা এখন আপনার দরখাস্তগুলো সিঙ্ক করতে পারবো'
       )
     })
 

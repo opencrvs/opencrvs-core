@@ -116,6 +116,7 @@ export const Title = styled.div`
   margin-top: 30px;
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -132,7 +133,7 @@ export const StyledButton = styled(Button)`
   flex-direction: row;
   justify-content: center;
   padding: 10px ${({ theme }) => theme.grid.margin}px;
-
+  ${({ theme }) => theme.fonts.bodyStyle};
   :hover {
     text-decoration: underline;
     text-decoration-color: ${({ theme }) => theme.colors.secondary};
@@ -261,7 +262,11 @@ export class StepOneForm extends React.Component<FullProps> {
             <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>
-            <StyledButton id="login-forgot-password" type="button">
+            <StyledButton
+              id="login-forgot-password"
+              type="button"
+              onClick={() => (window.location.href = '/forgotten-item')}
+            >
               {intl.formatMessage(messages.forgotPassword)}
             </StyledButton>
           </ActionWrapper>

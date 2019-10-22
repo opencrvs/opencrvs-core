@@ -9,6 +9,8 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
+import { logger } from '@auth/logger'
+import { PRODUCTION } from '@auth/constants'
 
 interface IPayload {
   nonce: string
@@ -19,19 +21,28 @@ export default async function sendUserNameHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IPayload
-  const retrivalStepInformation = await getRetrievalStepInformation(
+  const retrievalStepInformation = await getRetrievalStepInformation(
     payload.nonce
   ).catch(() => {
     throw unauthorized()
   })
 
-  if (retrivalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
+  if (retrievalStepInformation.status !== RetrievalSteps.SECURITY_Q_VERIFIED) {
     return h.response().code(401)
   }
-  await sendUserName(
-    retrivalStepInformation.mobile,
-    retrivalStepInformation.username
-  )
+
+  const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
+  if (!PRODUCTION || isDemoUser) {
+    logger.info('Sending a verification SMS', {
+      mobile: retrievalStepInformation.mobile,
+      username: retrievalStepInformation.username
+    })
+  } else {
+    await sendUserName(
+      retrievalStepInformation.mobile,
+      retrievalStepInformation.username
+    )
+  }
   await deleteRetrievalStepInformation(payload.nonce)
   return h.response().code(200)
 }

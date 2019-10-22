@@ -27,12 +27,16 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     // SELECT APPLICANT
-    cy.get('#select_mother_event').click()
-    cy.get('#continue').click()
+    cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_MOTHER').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_MOTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('স্পিভক')
@@ -126,12 +130,16 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
-    cy.get('#select_mother_event').click()
-    cy.get('#continue').click()
+    cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_FATHER').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_FATHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')
@@ -176,8 +184,8 @@ context('Birth Integration Test', () => {
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
-    cy.selectOption('#addressLine4Permanent', 'Matlab Uttar', 'Matlab Uttar')
-    cy.selectOption('#addressLine3Permanent', 'Satnal', 'Satnal')
+    cy.selectOption('#addressLine4Permanent', 'Kachua', 'Kachua')
+    cy.selectOption('#addressLine3Permanent', 'Bitara', 'Bitara')
     cy.get('#addressLine2Permanent').type('Ruhitarpar')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
@@ -290,12 +298,16 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     // SELECT APPLICANT
-    cy.get('#select_mother_event').click()
-    cy.get('#continue').click()
+    cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_MOTHER').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_MOTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('চৌধুরী')
@@ -392,12 +404,16 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
-    cy.get('#select_mother_event').click()
-    cy.get('#continue').click()
+    cy.get('#applicant_MOTHER').click()
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_MOTHER').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_MOTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.wait(1000)
+    cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('তাহ্মিদ')
@@ -442,8 +458,8 @@ context('Birth Integration Test', () => {
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
-    cy.selectOption('#addressLine4Permanent', 'Matlab Uttar', 'Matlab Uttar')
-    cy.selectOption('#addressLine3Permanent', 'Satnal', 'Satnal')
+    cy.selectOption('#addressLine4Permanent', 'Kachua', 'Kachua')
+    cy.selectOption('#addressLine3Permanent', 'Bitara', 'Bitara')
     cy.get('#addressLine2Permanent').type('Ruhitarpar')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
@@ -557,12 +573,14 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
-    cy.get('#select_mother_event').click()
-    cy.get('#continue').click()
+    cy.get('#applicant_MOTHER').click()
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_FATHER').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_FATHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')
@@ -607,8 +625,8 @@ context('Birth Integration Test', () => {
     cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#statePermanent', 'Chittagong', 'Chittagong')
     cy.selectOption('#districtPermanent', 'Chandpur', 'Chandpur')
-    cy.selectOption('#addressLine4Permanent', 'Matlab Uttar', 'Matlab Uttar')
-    cy.selectOption('#addressLine3Permanent', 'Satnal', 'Satnal')
+    cy.selectOption('#addressLine4Permanent', 'Kachua', 'Kachua')
+    cy.selectOption('#addressLine3Permanent', 'Bitara', 'Bitara')
     cy.get('#addressLine2Permanent').type('Ruhitarpar')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')

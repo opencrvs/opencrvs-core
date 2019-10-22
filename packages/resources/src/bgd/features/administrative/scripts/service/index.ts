@@ -4,36 +4,42 @@ import { ORG_URL } from '@resources/constants'
 import {
   sendToFhir,
   IOISFLocation,
+  IOISFLocationResponse,
   ILocation,
-  titleCase
+  titleCase,
+  getA2iInternalRefIndentifierOfLocation
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
+export const A2I_LOCATION_REFERENCE_IDENTIFIER = `${ORG_URL}/specs/id/a2i-internal-reference`
 const composeFhirLocation = (
   location: IOISFLocation,
   jurisdictionType: string,
-  partOfReference: string,
-  oisfA2IParams?: string
+  partOfReference: string
 ): fhir.Location => {
   return {
     resourceType: 'Location',
     identifier: [
       {
-        system: `${ORG_URL}/specs/id/a2i-internal-id`,
-        value: String(location.id)
+        system: `${ORG_URL}/specs/id/geo-id`,
+        value: String(location.geo_id)
       },
       {
         system: `${ORG_URL}/specs/id/bbs-code`,
-        value: location.bbsCode
+        value: location.bbs_code
       },
       {
         system: `${ORG_URL}/specs/id/jurisdiction-type`,
         value: jurisdictionType
+      },
+      {
+        // Reference to the route params used internally in OISF/A2I to find this location
+        system: A2I_LOCATION_REFERENCE_IDENTIFIER,
+        value: location.a2i_reference
       }
     ],
-    name: titleCase(location.name), // English name
-    alias: [location.nameBn], // Bangla name in element 0
-    description: oisfA2IParams as string, // Reference to the route params used internally in OISF/A2I to find this location
+    name: titleCase(location.name_eng), // English name
+    alias: [location.name_bng], // Bangla name in element 0
     status: 'active',
     mode: 'instance',
     partOf: {
@@ -78,34 +84,107 @@ export const appendLocations = (
   }, locations)
 }
 
-const makeOISFParams = (route: string, id: number): string => {
-  const splitRoute = route.split('?')
-  return `${splitRoute[1]}&${splitRoute[0]}=${id}`
+export async function getTokenForOISF() {
+  const secret = process.argv[2]
+  if (!secret) {
+    // tslint:disable-next-line:no-console
+    console.log('No secret found for OISF token generation')
+    process.exit(1)
+  }
+  const tokenResponse = await fetchFromOISF(
+    'token/create',
+    {
+      Authorization: `Secret ${secret}`
+    },
+    'POST'
+  )
+  return tokenResponse.token
 }
 
-export async function fetchAndComposeLocations(
-  route: string,
-  partOfReference: string,
-  jurisdictionType: string
-): Promise<fhir.Location[]> {
-  const body = await getLocationsFromOISF(route).catch(err => {
-    throw Error('Cannot retrieve locations from OISF')
+export async function fetchAndProcessLocationsFromOISF(): Promise<
+  IOISFLocationResponse
+> {
+  const locationResponse = await fetchFromOISF(
+    'nothi/api/v1/geo/divisions',
+    { Authorization: `Bearer ${await getTokenForOISF()}` },
+    'POST'
+  )
+  const divisions: IOISFLocation[] = []
+  const districts: IOISFLocation[] = []
+  const upazilas: IOISFLocation[] = []
+  const unions: IOISFLocation[] = []
+  Object.keys(locationResponse.data).forEach(divisionId => {
+    // gathering division data
+    const rawDivisionData = locationResponse.data[divisionId]
+    divisions.push({
+      geo_id: rawDivisionData.geo_division_id,
+      name_bng: rawDivisionData.division_name_bng,
+      name_eng: rawDivisionData.division_name_eng,
+      bbs_code: rawDivisionData.bbs_code,
+      a2i_reference: `division=${rawDivisionData.geo_division_id}`
+    })
+    // gathering district data
+    Object.keys(rawDivisionData.districts).forEach(districtId => {
+      const rawDistrictData = rawDivisionData.districts[districtId]
+      districts.push({
+        geo_id: rawDistrictData.geo_district_id,
+        name_bng: rawDistrictData.district_name_bng,
+        name_eng: rawDistrictData.district_name_eng,
+        bbs_code: rawDistrictData.bbs_code,
+        a2i_reference:
+          `division=${rawDivisionData.geo_division_id}` +
+          `&district=${rawDistrictData.geo_district_id}`
+      })
+      // gathering upazila data
+      Object.keys(rawDistrictData.upazilas).forEach(upazilaId => {
+        const rawUpazilaData = rawDistrictData.upazilas[upazilaId]
+        upazilas.push({
+          geo_id: rawUpazilaData.geo_upazila_id,
+          name_bng: rawUpazilaData.upazila_name_bng,
+          name_eng: rawUpazilaData.upazila_name_eng,
+          bbs_code: rawUpazilaData.bbs_code,
+          a2i_reference:
+            `division=${rawDivisionData.geo_division_id}` +
+            `&district=${rawDistrictData.geo_district_id}` +
+            `&upazila=${rawUpazilaData.geo_upazila_id}`
+        })
+        // gathering union data
+        Object.keys(rawUpazilaData.unions).forEach(unionId => {
+          const rawUnionData = rawUpazilaData.unions[unionId]
+          unions.push({
+            geo_id: rawUnionData.geo_union_id,
+            name_bng: rawUnionData.union_name_bng,
+            name_eng: rawUnionData.union_name_eng,
+            bbs_code: rawUnionData.bbs_code,
+            a2i_reference:
+              `division=${rawDivisionData.geo_division_id}` +
+              `&district=${rawDistrictData.geo_district_id}` +
+              `&upazila=${rawUpazilaData.geo_upazila_id}` +
+              `&union=${rawUnionData.geo_union_id}`
+          })
+        })
+      })
+    })
   })
+  return {
+    divisions,
+    districts,
+    upazilas,
+    unions
+  }
+}
 
+export async function composeAndSaveLocations(
+  oisfLocations: IOISFLocation[],
+  jurisdictionType: string,
+  partOfReference: string
+): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
-  for (const oisfLocation of body) {
-    let oisfA2IParams: string
-    if (partOfReference === '0') {
-      oisfA2IParams = `${route}=${oisfLocation.id}`
-    } else {
-      oisfA2IParams = makeOISFParams(route, oisfLocation.id)
-    }
-
+  for (const oisfLocation of oisfLocations) {
     const newLocation: fhir.Location = composeFhirLocation(
       oisfLocation,
       jurisdictionType,
-      partOfReference,
-      oisfA2IParams
+      partOfReference
     )
 
     const savedLocationResponse = (await sendToFhir(
@@ -120,6 +199,38 @@ export async function fetchAndComposeLocations(
     ) as string
     newLocation.id = locationHeader.split('/')[3]
     locations.push(newLocation)
+  }
+  return locations
+}
+
+export async function composeAndSaveLocationsByParent(
+  oisfLocations: IOISFLocation[],
+  jurisdictionType: string,
+  parentLocations: fhir.Location[]
+): Promise<fhir.Location[]> {
+  let locations: fhir.Location[] = []
+  let queryResult: fhir.Location[] = []
+  for (const parentLocation of parentLocations) {
+    const parentIdentifier = getA2iInternalRefIndentifierOfLocation(
+      parentLocation
+    )
+    if (!parentIdentifier) {
+      // tslint:disable-next-line:no-console
+      console.log(
+        `${chalk.yellow('No a2i internal reference found for location :')}${
+          parentLocation.id
+        }`
+      )
+      continue
+    }
+    queryResult = await composeAndSaveLocations(
+      oisfLocations.filter(loc =>
+        loc.a2i_reference.startsWith(`${parentIdentifier.value}&`)
+      ),
+      jurisdictionType.toUpperCase(),
+      parentLocation.id as string
+    )
+    locations = appendLocations(locations, queryResult)
   }
   return locations
 }
@@ -152,25 +263,6 @@ export function generateLocationResource(
   return loc
 }
 
-export async function getLocationsByParentDivisions(
-  jurisdictionType: string,
-  parentDivisions: fhir.Location[]
-): Promise<fhir.Location[]> {
-  let locations: fhir.Location[] = []
-  let queryRoute: string
-  let queryResult: fhir.Location[] = []
-  for (const parentDivision of parentDivisions) {
-    queryRoute = `${jurisdictionType}?${parentDivision.description}`
-    queryResult = await fetchAndComposeLocations(
-      queryRoute,
-      parentDivision.id as string,
-      jurisdictionType.toUpperCase()
-    )
-    locations = appendLocations(locations, queryResult)
-  }
-  return locations
-}
-
 const chalkColors = [
   'green',
   'yellow',
@@ -190,7 +282,15 @@ function getRandomColor(): string {
   return chalkColors[Math.floor(Math.random() * chalkColors.length)]
 }
 
-export async function getLocationsFromOISF(route: string): Promise<any> {
+export interface IOISFAuthHeader {
+  Authorization: string
+}
+
+export async function fetchFromOISF(
+  route: string,
+  header: IOISFAuthHeader,
+  method: string = 'GET'
+): Promise<any> {
   const url = `${ADMINISTRATIVE_STRUCTURE_URL}/${route}`
   // tslint:disable-next-line:no-console
   console.log(`Fetching: ${url}.`)
@@ -200,7 +300,10 @@ export async function getLocationsFromOISF(route: string): Promise<any> {
     `${chalk[getRandomColor()]('Please wait, will take 10 minutes ....')}`
   )
   const res = await fetch(url, {
-    method: 'GET'
+    method,
+    headers: {
+      ...header
+    }
   })
 
   if (res.status !== 200) {

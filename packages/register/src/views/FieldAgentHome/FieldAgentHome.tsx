@@ -334,13 +334,6 @@ class FieldAgentHomeView extends React.Component<
                     />
                   )
                 }
-                if (error) {
-                  return (
-                    <ErrorText id="field-agent-home_error">
-                      {intl.formatMessage(errorMessages.fieldAgentQueryError)}
-                    </ErrorText>
-                  )
-                }
                 return (
                   <>
                     <Header />
@@ -386,7 +379,10 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.requireUpdates, {
-                          total: data.searchEvents.totalItems
+                          total:
+                            navigator.onLine && data
+                              ? data.searchEvents.totalItems
+                              : '?'
                         })}
                       </IconTab>
                     </TopBar>

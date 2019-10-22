@@ -33,7 +33,7 @@
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/geo-id",
           "value": "3476"
         },
         { "system": "http://opencrvs.org/specs/id/bbs-code", "value": "94" },
@@ -75,7 +75,7 @@
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/geo-id",
           "value": "165"
         },
         { "system": "http://opencrvs.org/specs/id/bbs-code", "value": "34" },
@@ -117,7 +117,7 @@
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/geo-id",
           "value": "20"
         },
         { "system": "http://opencrvs.org/specs/id/bbs-code", "value": "33" },
@@ -159,7 +159,7 @@
       "resourceType": "Location",
       "identifier": [
         {
-          "system": "http://opencrvs.org/specs/id/a2i-internal-id",
+          "system": "http://opencrvs.org/specs/id/geo-id",
           "value": "3"
         },
         { "system": "http://opencrvs.org/specs/id/bbs-code", "value": "30" },

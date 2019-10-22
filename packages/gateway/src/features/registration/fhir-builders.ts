@@ -32,7 +32,11 @@ import {
   INFORMANT_CODE,
   INFORMANT_TITLE,
   MANNER_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_METHOD_CODE
+  CAUSE_OF_DEATH_METHOD_CODE,
+  PRIMARY_CAREGIVER,
+  PRIMARY_CAREGIVER_CODE,
+  PRIMARY_CAREGIVER_TITLE,
+  PARENT_DETAILS
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -52,7 +56,11 @@ import {
   selectOrCreateInformantSection,
   selectOrCreateInformantResource,
   setInformantReference,
-  fetchFHIR
+  fetchFHIR,
+  setPrimaryCaregiverReference,
+  selectObservationResource,
+  getReasonCodeAndDesc,
+  removeObservationResource
 } from '@gateway/features/fhir/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -642,6 +650,16 @@ function createInformantShareContact(resource: fhir.Task, fieldValue: string) {
   }
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+    valueString: fieldValue
+  })
+}
+
+function createInformantRelationship(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
     valueString: fieldValue
   })
 }
@@ -1665,6 +1683,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContact(taskResource, fieldValue)
     },
+    contactRelationship: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return createInformantRelationship(taskResource, fieldValue)
+    },
     contactPhoneNumber: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -2476,6 +2502,132 @@ const builders: IFieldBuilders = {
       context
     )
     observation.valueString = fieldValue
+  },
+  primaryCaregiver: {
+    primaryCaregiver: {
+      _fhirID: (fhirBundle, fieldValue) => {
+        const primaryCaregiver = selectOrCreatePersonResource(
+          PRIMARY_CAREGIVER_CODE,
+          PRIMARY_CAREGIVER_TITLE,
+          fhirBundle
+        )
+        primaryCaregiver.id = fieldValue as string
+      },
+      name: createNameBuilder(PRIMARY_CAREGIVER_CODE, PRIMARY_CAREGIVER_TITLE),
+      telecom: createTelecomBuilder(
+        PRIMARY_CAREGIVER_CODE,
+        PRIMARY_CAREGIVER_TITLE
+      )
+    },
+    reasonsNotApplying: {
+      primaryCaregiverType: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const observation = selectOrCreateObservationResource(
+          BIRTH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          PRIMARY_CAREGIVER,
+          'Primary caregiver',
+          fhirBundle,
+          context
+        )
+
+        observation.valueString = fieldValue
+        setPrimaryCaregiverReference(
+          PRIMARY_CAREGIVER_CODE,
+          observation,
+          fhirBundle
+        )
+      },
+      reasonNotApplying: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        if (fieldValue) {
+          const primaryCaregiverObservation = selectObservationResource(
+            PRIMARY_CAREGIVER,
+            fhirBundle
+          )
+          const type =
+            (primaryCaregiverObservation &&
+              primaryCaregiverObservation.valueString) ||
+            PRIMARY_CAREGIVER
+          const codeAndDesc = getReasonCodeAndDesc(type)
+          const observation = selectOrCreateObservationResource(
+            BIRTH_ENCOUNTER_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_DESC,
+            codeAndDesc.code,
+            codeAndDesc.desc,
+            fhirBundle,
+            context
+          )
+
+          observation.valueString = fieldValue
+          setPrimaryCaregiverReference(
+            PRIMARY_CAREGIVER_CODE,
+            observation,
+            fhirBundle
+          )
+        }
+      },
+      isDeceased: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: boolean,
+        context: any
+      ) => {
+        if (fieldValue) {
+          const primaryCaregiverObservation = selectObservationResource(
+            PRIMARY_CAREGIVER,
+            fhirBundle
+          )
+          const type =
+            (primaryCaregiverObservation &&
+              primaryCaregiverObservation.valueString) ||
+            PRIMARY_CAREGIVER
+          const codeAndDesc = getReasonCodeAndDesc(type)
+          const observation = selectOrCreateObservationResource(
+            BIRTH_ENCOUNTER_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_CODE,
+            OBSERVATION_CATEGORY_PROCEDURE_DESC,
+            codeAndDesc.code,
+            codeAndDesc.desc,
+            fhirBundle,
+            context
+          )
+
+          observation.valueString = 'DECEASED'
+          setPrimaryCaregiverReference(
+            PRIMARY_CAREGIVER_CODE,
+            observation,
+            fhirBundle
+          )
+        }
+
+        removeObservationResource(PRIMARY_CAREGIVER, fhirBundle)
+      }
+    },
+    parentDetailsType: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const observation = selectOrCreateObservationResource(
+        BIRTH_ENCOUNTER_CODE,
+        OBSERVATION_CATEGORY_PROCEDURE_CODE,
+        OBSERVATION_CATEGORY_PROCEDURE_DESC,
+        PARENT_DETAILS,
+        'Parent details',
+        fhirBundle,
+        context
+      )
+
+      observation.valueString = fieldValue
+    }
   },
   childrenBornAliveToMother: (
     fhirBundle: ITemplatedBundle,

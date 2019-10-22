@@ -193,7 +193,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendForReview'
   },
   sendIncomplete: {
-    defaultMessage: 'Send incomplete application',
+    defaultMessage: 'Send incomplete',
     description: 'Title for Incomplete submit button',
     id: 'buttons.sendIncomplete'
   },

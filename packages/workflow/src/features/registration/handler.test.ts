@@ -11,13 +11,14 @@ import {
   upazilaMock,
   unionMock,
   officeMock,
-  testFhirBundleForDeath,
+  testDeathFhirBundle,
   testFhirBundleWithIdsForDeath,
   motherMock,
   compositionMock,
-  testDeathFhirBundle,
+  deathCompositionMock,
   testInProgressFhirBundle,
-  testInProgressDeathFhirBundle
+  testInProgressDeathFhirBundle,
+  taskResouceMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -362,7 +363,7 @@ describe('Verify handler', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/fhir',
-        payload: testFhirBundleForDeath,
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -493,7 +494,7 @@ describe('Verify handler', () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/fhir',
-        payload: testFhirBundleForDeath,
+        payload: testDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -603,6 +604,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -753,6 +755,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -848,6 +851,7 @@ describe('markEventAsValidatedHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -930,6 +934,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1076,6 +1081,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1167,6 +1173,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
       [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
+      [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
       [upazilaMock, { status: 200 }],
@@ -1187,7 +1194,24 @@ describe('markEventAsRegisteredHandler handler', () => {
           ]
         })
       ],
-      [compositionMock, { status: 200 }],
+      [deathCompositionMock, { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'RelatedPerson',
+          relationship: {
+            coding: [
+              {
+                system:
+                  'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+                code: 'MOTHER'
+              }
+            ]
+          },
+          patient: {
+            reference: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7'
+          }
+        })
+      ],
       [motherMock, { status: 200 }]
     )
     const taskBundle = {

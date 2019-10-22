@@ -19,6 +19,8 @@ enum RegistrationContactType {
   BOTH
   MOTHER
   FATHER
+  OTHER
+  APPLICANT
 }
 
 enum BirthRegPresence {
@@ -77,6 +79,8 @@ enum AttachmentType {
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
   SIGNED_AFFIDAVIT
+  ORIGINAL_BIRTH_RECORD
+  UNDER_FIVE_CARD
 }
 
 enum AttachmentSubject {
@@ -149,16 +153,35 @@ enum PrimaryCaregiverType {
   OTHER
 }
 
-input PrimaryCaregiverInput {
-  primaryCaregiverType: PrimaryCaregiverType
-  primaryCaregiver: RelatedPersonInput # -> Use for Observation.subject.reference
+enum ParentDetailsType {
+  MOTHER_AND_FATHER
+  MOTHER_ONLY
+  FATHER_ONLY
+  NONE
+}
+
+input ReasonsNotApplyingInput {
+  primaryCaregiverType: PrimaryCaregiverType # -> Observation.valueString
   reasonNotApplying: String # -> Observation.valueString
+  isDeceased: Boolean
+}
+
+input PrimaryCaregiverInput {
+  primaryCaregiver: PersonInput # -> Use for Observation.subject.reference
+  reasonsNotApplying: [ReasonsNotApplyingInput]
+  parentDetailsType: ParentDetailsType # -> Observation.valueString
+}
+
+type ReasonsNotApplying {
+  primaryCaregiverType: PrimaryCaregiverType
+  reasonNotApplying: String
+  isDeceased: Boolean
 }
 
 type PrimaryCaregiver {
-  primaryCaregiverType: PrimaryCaregiverType
-  primaryCaregiver: RelatedPerson
-  reasonNotApplying: String
+  primaryCaregiver: Person
+  reasonsNotApplying: [ReasonsNotApplying]
+  parentDetailsType: ParentDetailsType
 }
 
 input CommentInput {
@@ -285,6 +308,7 @@ input RegistrationInput {
   page: String
   book: String
   contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
@@ -305,6 +329,7 @@ type Registration { # -> Task
   page: String # -> .identifier
   book: String # -> .identifier
   contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code

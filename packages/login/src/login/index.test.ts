@@ -32,7 +32,8 @@ describe('actions', () => {
 describe('reducer', () => {
   let store: AppStore
   beforeEach(() => {
-    store = createStore()
+    const storebundle = createStore()
+    store = storebundle.store
 
     moxios.install(client)
     moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {

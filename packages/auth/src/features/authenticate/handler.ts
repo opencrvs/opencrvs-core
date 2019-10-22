@@ -8,7 +8,11 @@ import {
 } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import {
+  WEB_USER_JWT_AUDIENCES,
+  JWT_ISSUER,
+  API_USER_AUDIENCE
+} from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -40,21 +44,27 @@ export default async function authenticateHandler(
 
   await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
 
-  const respose: IAuthResponse = {
+  const response: IAuthResponse = {
     mobile: result.mobile,
     status: result.status,
     nonce
   }
 
-  if (respose.status && respose.status === 'pending') {
-    respose.token = await createToken(
+  const isPendingUser = response.status && response.status === 'pending'
+  const isAPIUser = result.scope.indexOf('api') > -1
+
+  // directly send the token if the user is pending or an API user
+  if (isPendingUser || isAPIUser) {
+    response.token = await createToken(
       result.userId,
       result.scope,
-      WEB_USER_JWT_AUDIENCES,
+      isAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([API_USER_AUDIENCE])
+        : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
   }
-  return respose
+  return response
 }
 
 export const requestSchema = Joi.object({

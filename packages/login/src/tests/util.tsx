@@ -2,30 +2,39 @@ import * as React from 'react'
 import { mount, configure, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
 import Adapter from 'enzyme-adapter-react-16'
-
+import { Router } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-import { App, store } from '@login/App'
+import { App } from '@login/App'
 import { IStoreState, createStore } from '@login/store'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import { getDefaultLanguage } from '@login/i18n/utils'
 
 configure({ adapter: new Adapter() })
 
-export const mockState: IStoreState = createStore().getState()
+export const mockState: IStoreState = createStore().store.getState()
 
-export function createTestApp(): ReactWrapper<{}, {}> {
-  return mount<App>(<App />)
+export async function createTestApp() {
+  const { store, history } = createStore()
+  const app = mount(<App store={store} history={history} />)
+
+  return { history, app, store }
 }
 
-export function createTestComponent(node: React.ReactElement<object>) {
+export function createTestComponent(
+  node: React.ReactElement<object>,
+  storeAndHistory?: ReturnType<typeof createStore>
+) {
+  storeAndHistory = storeAndHistory || createStore()
+  const { store, history } = storeAndHistory
+
   return mount(
     <Provider store={store}>
       <IntlContainer>
         <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-          {node}
+          <Router history={history}>{node}</Router>
         </ThemeProvider>
       </IntlContainer>
     </Provider>

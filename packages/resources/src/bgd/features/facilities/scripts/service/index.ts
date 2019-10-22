@@ -1,7 +1,7 @@
 import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
 import {
-  getLocationIDByDescription,
+  getLocationIDByA2IRef,
   sendToFhir,
   ILocation
 } from '@resources/bgd/features/utils'
@@ -93,7 +93,7 @@ export async function composeAndSaveFacilities(
 ): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
   for (const facility of facilities) {
-    const parentLocationID = getLocationIDByDescription(
+    const parentLocationID = getLocationIDByA2IRef(
       parentLocations,
       facility.A2IReference
     )

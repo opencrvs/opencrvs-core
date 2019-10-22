@@ -3,8 +3,12 @@ import {
   IFormData,
   IFormFieldValue,
   IAttachment,
-  TransformedData
+  TransformedData,
+  IFormSectionData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
+import moment from 'moment'
+import { set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -184,6 +188,28 @@ export const sectionFieldToBundleFieldTransformer = (
     transformedData[transformedFieldName] = draftData[sectionId][field.name]
   } else {
     transformedData[field.name] = draftData[sectionId][field.name]
+  }
+  return transformedData
+}
+
+export const nestedRadioFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformedFieldName) {
+    set(
+      transformedData,
+      transformedFieldName,
+      (draftData[sectionId][field.name] as IFormSectionData).value
+    )
+  } else {
+    transformedData[field.name] = (draftData[sectionId][
+      field.name
+    ] as IFormSectionData).value
   }
   return transformedData
 }
@@ -380,5 +406,138 @@ export const fieldToIdentifierWithTypeTransformer = (
   }
   sectionData.identifier[0].system = identifierType
   sectionData.identifier[0].value = draftData[sectionId][field.name]
+  return transformedData
+}
+
+export const nestedRadioFieldTransformer = (
+  transformedFieldName?: string,
+  nestedTransformer?: IFormFieldMutationMapFunction
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField?: IFormField
+) => {
+  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+  let partialDraftData: IFormData = {}
+
+  if (!nestedField) {
+    const parentData: IFormSectionData = {}
+    parentData[field.name] = fieldValueObj.value as IFormSectionData
+    partialDraftData[sectionId] = parentData
+  } else if (nestedField) {
+    if (
+      nestedField.extraValue &&
+      nestedField.extraValue !== fieldValueObj.value
+    ) {
+      return
+    }
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+  }
+
+  if (nestedTransformer) {
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
+  } else {
+    const transFieldName = transformedFieldName
+      ? transformedFieldName
+      : nestedField
+      ? nestedField.name
+      : field.name
+    const fieldValue = !nestedField
+      ? fieldValueObj.value
+      : (fieldValueObj.nestedFields as IFormSectionData)[nestedField.name]
+
+    transformedData[sectionId][transFieldName] = fieldValue
+  }
+}
+
+export const fieldToReasonsNotApplyingTransformer = (
+  transformedArrayName: string,
+  transformedFieldName?: string,
+  extraField?: string,
+  transformeValueArrayToBoolean?: boolean,
+  isCaregiver?: boolean
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  let fieldValue = draftData[sectionId][field.name]
+  const transFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
+
+  if (!fieldValue) {
+    return
+  } else {
+    if (transformeValueArrayToBoolean) {
+      const valueArray = fieldValue as IFormFieldValue[]
+      fieldValue = valueArray.length > 0
+    }
+
+    if (!transformedData[sectionId][transformedArrayName]) {
+      transformedData[sectionId][transformedArrayName] = []
+    }
+
+    const transformedArray: TransformedData[] =
+      transformedData[sectionId][transformedArrayName]
+
+    let transformedField = transformedArray.find(transField => {
+      if (extraField) {
+        return (
+          transField[extraField] && transField[extraField] === field.extraValue
+        )
+      }
+      return (
+        !isCaregiver &&
+        transField[transFieldName] &&
+        transField[transFieldName] === fieldValue
+      )
+    })
+
+    if (!transformedField) {
+      transformedField = {}
+      transformedField[transFieldName] = fieldValue
+
+      if (extraField) {
+        transformedField[extraField] = field.extraValue
+      }
+
+      transformedArray.push(transformedField)
+    } else {
+      transformedField[transFieldName] = fieldValue
+    }
+  }
+}
+
+function formatDate(dateString: string) {
+  const [year, month, day] = dateString.split('-')
+  const date = moment(dateString, 'YYYY-M-D')
+
+  if (date.isValid() && year && month && day) {
+    return date.format('YYYY-MM-DD')
+  } else return null
+}
+
+export const longDateTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedFieldName || field.name
+  const sectionData = draftData[sectionId][field.name] as string
+
+  if (sectionData) {
+    transformedData[sectionId][fieldName] = formatDate(sectionData)
+  }
+
   return transformedData
 }

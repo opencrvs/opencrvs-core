@@ -5,7 +5,7 @@ import {
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/register/src/applications'
-import { Event, IForm } from '@opencrvs/register/src/forms'
+import { Event, IForm, IFormSectionData } from '@opencrvs/register/src/forms'
 
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/register/src/navigation/routes'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
@@ -157,6 +157,7 @@ describe('ReviewForm tests', () => {
                 gender: 'male'
               },
               informant: null,
+              primaryCaregiver: null,
               mother: {
                 name: [
                   {
@@ -212,6 +213,7 @@ describe('ReviewForm tests', () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
@@ -323,6 +325,7 @@ describe('ReviewForm tests', () => {
               child: null,
               mother: null,
               informant: null,
+              primaryCaregiver: null,
               father: {
                 name: [
                   {
@@ -372,6 +375,7 @@ describe('ReviewForm tests', () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'FATHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: null,
@@ -433,8 +437,10 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
-    expect(data.data.registration.registrationPhone).toBe('01733333333')
+    expect(
+      ((data.data.registration.contactPoint as IFormSectionData)
+        .nestedFields as IFormSectionData).registrationPhone
+    ).toBe('01733333333')
   })
   it('when registration has attachment', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -463,9 +469,11 @@ describe('ReviewForm tests', () => {
               mother: null,
               father: null,
               informant: null,
+              primaryCaregiver: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: [
                   {
@@ -571,6 +579,7 @@ describe('ReviewForm tests', () => {
               },
               child: null,
               informant: null,
+              primaryCaregiver: null,
               mother: {
                 name: [
                   {
@@ -622,6 +631,7 @@ describe('ReviewForm tests', () => {
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
                 contactPhoneNumber: '01733333333',
                 attachments: null,
                 status: [
@@ -693,13 +703,18 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
     expect(data.data.registration).toEqual({
-      _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
-      whoseContactDetails: 'MOTHER',
+      applicant: {
+        nestedFields: {}
+      },
       presentAtBirthRegistration: 'MOTHER_ONLY',
-      registrationPhone: '01733333333',
-      commentsOrNotes: 'This is a note',
+      contactPoint: {
+        value: 'MOTHER',
+        nestedFields: {
+          registrationPhone: '01733333333'
+        }
+      },
+      _fhirID: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
       trackingId: 'B123456',
       type: 'birth'
     })
@@ -709,7 +724,76 @@ describe('ReviewForm tests', () => {
       uuid(),
       {},
       Event.BIRTH,
-      SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]
+      'IN_PROGRESS'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/progress')
+  })
+
+  it('redirect to review tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'DECLARED'
     )
     application.data = {
       child: {
@@ -771,6 +855,208 @@ describe('ReviewForm tests', () => {
     exitButton.hostNodes().simulate('click')
     testComponent.component.update()
     expect(window.location.href).toContain('/review')
+  })
+
+  it('redirect to review tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'VALIDATED'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/review')
+  })
+
+  it('redirect to update tab when exit button is clicked', async () => {
+    const application = createReviewApplication(
+      uuid(),
+      {},
+      Event.BIRTH,
+      'REJECTED'
+    )
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/updates')
+  })
+
+  it('redirect to progress tab when exit button is clicked', async () => {
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    application.data = {
+      child: {
+        attendantAtBirth: 'NURSE',
+        childBirthDate: '2001-01-01',
+        familyName: 'আকাশ',
+        familyNameEng: 'Akash',
+        firstNames: '',
+        firstNamesEng: '',
+        gender: 'male',
+        birthType: 'SINGLE',
+        weightAtBirth: '2'
+      },
+      registration: {
+        presentAtBirthRegistration: 'MOTHER_ONLY',
+        registrationPhone: '01741234567',
+        whoseContactDetails: 'MOTHER',
+        type: 'BIRTH'
+      }
+    }
+    store.dispatch(
+      getStorageApplicationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [application],
+          applications: []
+        })
+      )
+    )
+    store.dispatch(storeApplication(application))
+
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        staticContext={mock}
+        scope={scope}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'review',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    const exitButton = await waitForElement(
+      testComponent.component,
+      '#save_draft'
+    )
+    exitButton.hostNodes().simulate('click')
+    testComponent.component.update()
+    expect(window.location.href).toContain('/progress')
   })
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
@@ -1341,8 +1627,13 @@ describe('ReviewForm tests', () => {
                 child: null,
                 mother: null,
                 father: null,
+                informant: {
+                  relationship: 'Informant Relation',
+                  otherRelationship: 'Other Relation'
+                },
                 registration: {
                   contact: 'MOTHER',
+                  contactRelationship: 'Contact Relation',
                   attachments: null,
                   status: null,
                   type: 'BIRTH'

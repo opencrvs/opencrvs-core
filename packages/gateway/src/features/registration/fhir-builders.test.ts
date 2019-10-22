@@ -19,6 +19,7 @@ import {
   LAST_LIVE_BIRTH_CODE
 } from '@gateway/features/fhir/templates'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import * as _ from 'lodash'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -756,4 +757,149 @@ test('should update a task document as rejected', async () => {
   expect(fhir.entry[0].resource.businessStatus.coding[0].code).toEqual(
     'REJECTED'
   )
+})
+
+test('creates task with contact other relationship', async () => {
+  const simpleFhir: fhir.Bundle = await buildFHIRBundle(
+    {
+      registration: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        contact: 'OTHER',
+        contactRelationship: 'Friend',
+        contactPhoneNumber: '01733333333',
+        paperFormID: '12345678',
+        trackingId: 'B123456',
+        registrationNumber: '201923324512345671',
+        inProgress: true,
+        status: [
+          {
+            comments: [
+              {
+                comment: 'This is just a test data',
+                createdAt: '2018-10-31T09:45:05+10:00'
+              }
+            ],
+            timestamp: '2018-10-31T09:45:05+10:00'
+          }
+        ],
+        attachments: [
+          {
+            _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce11',
+            contentType: 'image/jpeg',
+            data: 'SampleData',
+            status: 'final',
+            originalFileName: 'original.jpg',
+            systemFileName: 'system.jpg',
+            type: 'NATIONAL_ID_FRONT',
+            createdAt: '2018-10-21'
+          },
+          {
+            _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce22',
+            contentType: 'image/png',
+            data: 'ExampleData',
+            status: 'deleted',
+            originalFileName: 'original.png',
+            systemFileName: 'system.png',
+            type: 'PASSPORT',
+            createdAt: '2018-10-22',
+            subject: 'MOTHER'
+          }
+        ],
+        certificates: [
+          {
+            collector: {
+              relationship: 'OTHER',
+              affidavit: {
+                contentType: 'image/jpg',
+                data: 'ExampleData'
+              },
+              individual: {
+                name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+                identifier: [{ id: '123456', type: 'PASSPORT' }]
+              }
+            },
+            hasShowedVerifiedDocument: true,
+            payments: [
+              {
+                paymentId: '1234',
+                type: 'MANUAL',
+                total: 50,
+                amount: 50,
+                outcome: 'COMPLETED',
+                date: '2018-10-22'
+              }
+            ],
+            data: 'DUMMY-DATA'
+          }
+        ]
+      }
+    },
+    'BIRTH' as EVENT_TYPE
+  )
+
+  expect(simpleFhir).toBeDefined()
+
+  const taskResource = (simpleFhir.entry.find(
+    ({ resource }) => resource.resourceType === 'Task'
+  ) as fhir.BundleEntry).resource as fhir.Task
+
+  expect(taskResource).toBeDefined()
+  expect(
+    taskResource.extension.some(taskExtension =>
+      _.isEqual(taskExtension, {
+        url: 'http://opencrvs.org/specs/extension/contact-person',
+        valueString: 'OTHER'
+      })
+    )
+  ).toBe(true)
+
+  expect(
+    taskResource.extension.some(taskExtension =>
+      _.isEqual(taskExtension, {
+        url: 'http://opencrvs.org/specs/extension/contact-relationship',
+        valueString: 'Friend'
+      })
+    )
+  ).toBe(true)
+})
+
+test('build bundle for primaryCaregive', async () => {
+  const fhir: fhir.Bundle = await buildFHIRBundle(
+    {
+      primaryCaregiver: {
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        primaryCaregiver: {
+          _fhirID: '8f18a6ea-89d1-4b03-xxxx-xxxxxxxxx',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Sahriar',
+              familyName: 'Toufiq'
+            }
+          ]
+        },
+        reasonsNotApplying: [
+          {
+            primaryCaregiverType: 'MOTHER',
+            isDeceased: true
+          },
+          {
+            reasonNotApplying: 'Sick',
+            primaryCaregiverType: 'FATHER'
+          },
+          {
+            primaryCaregiverType: 'LEGAL_GUARDIAN',
+            reasonNotApplying: 'Not present'
+          }
+        ]
+      }
+    },
+    'BIRTH' as EVENT_TYPE
+  )
+
+  expect(fhir).toBeDefined()
+  expect(fhir.entry.length).toBe(7)
+  expect(fhir.entry[2].resource.resourceType).toBe('Observation')
+  const observation = fhir.entry[2].resource as fhir.Observation
+  expect(observation.valueString).toBe('MOTHER_AND_FATHER')
 })

@@ -50,7 +50,9 @@ export const birthDocumentTypeFhirMapping = {
   'Discharge Certificate': 'DISCHARGE_CERTIFICATE',
   'Proof of birth from medical institution': 'MEDICAL_INSTITUTION',
   'Proof of birth from birth attendant': 'BIRTH_ATTENDANT',
-  'Tax Payment Receipt': 'TAX_RECEIPT'
+  'Tax Payment Receipt': 'TAX_RECEIPT',
+  'Original Birth Record': 'ORIGINAL_BIRTH_RECORD',
+  'Under Five Card': 'UNDER_FIVE_CARD'
 }
 
 export function birthFieldToAttachmentTransformer(

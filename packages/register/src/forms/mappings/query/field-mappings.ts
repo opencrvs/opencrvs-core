@@ -1,18 +1,20 @@
 import {
-  IFormField,
-  IFormData,
-  IAttachment,
-  IFormFieldQueryMapFunction
-} from '@register/forms'
-import {
-  GQLHumanName,
   GQLAddress,
-  GQLRegWorkflow,
+  GQLAttachment,
   GQLComment,
-  GQLAttachment
+  GQLHumanName,
+  GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
-import { cloneDeep } from 'lodash'
+import {
+  IAttachment,
+  IFormData,
+  IFormField,
+  IFormFieldQueryMapFunction,
+  TransformedData,
+  IFormSectionData
+} from '@register/forms'
 import { EMPTY_STRING } from '@register/utils/constants'
+import { cloneDeep, get } from 'lodash'
 
 interface IName {
   [key: string]: any
@@ -377,4 +379,99 @@ export const nestedValueToFieldTransformer = (
       clonedData[nestedFieldName][field.name]
   }
   return transformedData
+}
+
+export const reasonsNotApplyingToFieldValueTransformer = (
+  transformedArrayName: string,
+  transformedFieldName: string,
+  extraField?: string,
+  extraValues?: string[],
+  transformedFieldValue?: string[]
+) => (
+  transformedData: IFormData,
+  queryData: TransformedData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = queryData[sectionId]
+  let fieldValue
+  if (!sectionData) {
+    return transformedData
+  }
+
+  const transformedArray = sectionData[
+    transformedArrayName
+  ] as IFormSectionData[]
+
+  transformedArray.forEach((arrayField, index) => {
+    const value = arrayField[transformedFieldName]
+    if (
+      value &&
+      (extraField &&
+        (arrayField[extraField] === field.extraValue ||
+          (extraValues &&
+            extraValues.includes(arrayField[extraField] as string))))
+    ) {
+      fieldValue = value
+      transformedArray.splice(index, 1)
+    } else if (value && extraValues && extraValues.includes(value as string)) {
+      fieldValue = value
+    }
+  })
+
+  if (fieldValue) {
+    transformedData[sectionId][field.name] = transformedFieldValue || fieldValue
+  }
+}
+
+export const valueToNestedRadioFieldTransformer = (
+  transformFieldName?: string,
+  transformMethod?: IFormFieldQueryMapFunction
+) => (
+  transformedData: IFormData,
+  queryData: TransformedData,
+  sectionId: string,
+  field: IFormField,
+  nestedField: IFormField
+) => {
+  const tempDraftData = {} as IFormData
+  const fieldName = nestedField ? nestedField.name : field.name
+  let fieldValue
+  tempDraftData[sectionId] = {}
+
+  if (transformMethod) {
+    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
+    fieldValue = tempDraftData[sectionId][fieldName]
+  } else {
+    fieldValue = queryData[sectionId][transformFieldName || fieldName]
+  }
+
+  if (!fieldValue) {
+    return
+  }
+
+  let transformedFieldData = transformedData[sectionId][field.name] as IFormData
+
+  if (!transformedFieldData) {
+    transformedData[sectionId][field.name] = {
+      value: fieldValue,
+      nestedFields: {}
+    }
+  } else if (nestedField) {
+    transformedFieldData.nestedFields[nestedField.name] = fieldValue
+  }
+}
+
+export const bundleFieldToNestedRadioFieldTransformer = (
+  transformedFieldName: string
+) => (
+  transformedData: TransformedData,
+  queryData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  transformedData[sectionId][field.name] = {
+    value: get(queryData, transformedFieldName),
+    nestedFields: {}
+  }
 }

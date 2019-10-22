@@ -16,7 +16,9 @@ import {
   mockTaskForError,
   mockCertificateComposition,
   mockCertificate,
-  mockErrorComposition
+  mockErrorComposition,
+  mockObservationBundle,
+  reasonsNotApplyingMock
 } from '@gateway/utils/testUtils'
 import { clone, cloneDeep } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
@@ -119,6 +121,32 @@ describe('Registration type resolvers', () => {
     expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
     expect(informant.resource.relationship.text).toEqual('Nephew')
   })
+
+  it('returns primaryCaregiver', async () => {
+    const primaryCaregiver = await typeResolvers.BirthRegistration.primaryCaregiver(
+      mockComposition
+    )
+    expect(primaryCaregiver).toBeDefined()
+    expect(primaryCaregiver.patientSection.title).toBe(
+      "Primary caregiver's details"
+    )
+    expect(primaryCaregiver.encounterSection.title).toBe('Birth Encounter')
+  })
+
+  it('returns null as primaryCaregiver if no encounter section', async () => {
+    const primaryCaregiver = await typeResolvers.BirthRegistration.primaryCaregiver(
+      {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: '{{urn_uuid}}'
+        },
+        resourceType: 'Composition',
+        section: []
+      }
+    )
+    expect(primaryCaregiver).toBe(null)
+  })
+
   it('returns id from identifier', () => {
     const id = typeResolvers.IdentityType.id({
       value: '123456789',
@@ -884,6 +912,38 @@ describe('Registration type resolvers', () => {
 
       expect(contact).toEqual('MOTHER')
     })
+
+    it('returns contact relationship from the task if other contact person', async () => {
+      const extensionOtherContactPerson = [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'OTHER'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-relationship',
+          valueString: 'Friend'
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '01733333333'
+        }
+      ]
+
+      const mockTaskWithOtherContact = {
+        ...mockTask,
+        extension: extensionOtherContactPerson
+      }
+      const contact = await typeResolvers.Registration.contact(
+        mockTaskWithOtherContact
+      )
+      const contactRelationship = await typeResolvers.Registration.contactRelationship(
+        mockTaskWithOtherContact
+      )
+      expect(contact).toBe('OTHER')
+      expect(contactRelationship).toBe('Friend')
+    })
+
     it('returns contact person phone number from the task', async () => {
       // @ts-ignore
       const contactNumber = await typeResolvers.Registration.contactPhoneNumber(
@@ -1120,6 +1180,173 @@ describe('Registration type resolvers', () => {
       )
       expect(relatedPerson).toBeDefined()
       expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
+    })
+  })
+
+  describe('Primary Caregiver type', () => {
+    const primaryCaregiverObj = {
+      patientSection: {
+        title: "Primary caregiver's details",
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-sections',
+              code: 'primary-caregiver-details'
+            }
+          ],
+          text: "Primary caregiver's details"
+        },
+        entry: [
+          {
+            reference: 'Patient/123' // reference to a Patient resource contained below, by fullUrl
+          }
+        ]
+      },
+      encounterSection: {
+        title: 'Birth Encounter',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/sections',
+              code: 'birth-encounter'
+            }
+          ],
+          text: 'Birth encounter'
+        },
+        text: '',
+        entry: [
+          {
+            reference: 'Encounter/123' // reference to Encounter resource contained below
+          }
+        ]
+      }
+    }
+
+    it('returns parentDetailsType', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservations.parentDetailsType))
+
+      const parentDetailsType = await typeResolvers.PrimaryCaregiver.parentDetailsType(
+        primaryCaregiverObj
+      )
+
+      expect(parentDetailsType).toBe('MOTHER_AND_FATHER')
+    })
+
+    it('returns null as parentDetailsType if there is no parent details type section', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      const parentDetailsType = await typeResolvers.PrimaryCaregiver.parentDetailsType(
+        primaryCaregiverObj
+      )
+
+      expect(parentDetailsType).toBe(null)
+    })
+
+    it('returns primaryCaregiver', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockPatient))
+
+      const primaryCaregiver = await typeResolvers.PrimaryCaregiver.primaryCaregiver(
+        primaryCaregiverObj
+      )
+
+      expect(primaryCaregiver.name.length).toBeGreaterThan(0)
+    })
+
+    it('returns null if no patientSection', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockPatient))
+
+      const primaryCaregiver = await typeResolvers.PrimaryCaregiver.primaryCaregiver(
+        {}
+      )
+
+      expect(primaryCaregiver).toBe(null)
+    })
+
+    it('returns reasonsNotApplying', async () => {
+      fetch.mockResponseOnce(JSON.stringify(mockObservationBundle))
+
+      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+        primaryCaregiverObj
+      )
+
+      expect(reasonsNotApplying).toEqual(reasonsNotApplyingMock)
+    })
+
+    it('returns reasonsNotApplying', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              fullUrl: 'urn:uuid:<uuid>',
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/123'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/obs-type',
+                      code: 'primary-caregiver'
+                    }
+                  ]
+                },
+                valueString: 'INFORMANT'
+              }
+            }
+          ]
+        })
+      )
+
+      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+        primaryCaregiverObj
+      )
+
+      expect(reasonsNotApplying).toEqual([
+        { primaryCaregiverType: 'INFORMANT' }
+      ])
+    })
+
+    it('returns empty reasons array if  no observations', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          type: 'searchset'
+        })
+      )
+
+      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+        primaryCaregiverObj
+      )
+
+      expect(reasonsNotApplying).toEqual([])
+    })
+  })
+
+  describe('Reason not applying type', () => {
+    it('returns primaryCaregiverType', () => {
+      const primaryCaregiverType = typeResolvers.ReasonsNotApplying.primaryCaregiverType(
+        reasonsNotApplyingMock[2]
+      )
+
+      expect(primaryCaregiverType).toBe('OTHER')
+    })
+
+    it('returns reasonNotApplying', () => {
+      const reason = typeResolvers.ReasonsNotApplying.reasonNotApplying(
+        reasonsNotApplyingMock[0]
+      )
+
+      expect(reason).toBe('Sick')
+    })
+
+    it('returns isDeceased', () => {
+      const isDeceased = typeResolvers.ReasonsNotApplying.isDeceased(
+        reasonsNotApplyingMock[1]
+      )
+
+      expect(isDeceased).toBe(true)
     })
   })
 })

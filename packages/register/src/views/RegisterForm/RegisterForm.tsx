@@ -116,7 +116,7 @@ function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   application: IApplication
-) {
+): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
     application.data[fromSection.id] || {},
@@ -295,7 +295,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHomeTab('progress')
+    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
   onDeleteApplication = (application: IApplication) => {
@@ -334,6 +334,27 @@ class RegisterFormView extends React.Component<FullProps, State> {
       })
     }
     this.props.application.visitedGroupIds = visitedGroups
+  }
+
+  getRedirectionTabOnSaveOrExit = () => {
+    const status =
+      this.props.application.submissionStatus ||
+      this.props.application.registrationStatus ||
+      ''
+    switch (status) {
+      case 'DECLARED':
+        return 'review'
+      case 'DRAFT':
+        return 'progress'
+      case 'IN_PROGRESS':
+        return 'progress/field-agents'
+      case 'REJECTED':
+        return 'updates'
+      case 'VALIDATED':
+        return 'review'
+      default:
+        return 'progress'
+    }
   }
 
   render() {
@@ -418,7 +439,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'orange'
                   }
                   saveAction={{
-                    handler: () => this.props.goToHomeTab('review'),
+                    handler: () =>
+                      this.props.goToHomeTab(
+                        this.getRedirectionTabOnSaveOrExit()
+                      ),
                     label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
@@ -628,7 +652,6 @@ function mapStateToProps(
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
-
   const groupId =
     match.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(
@@ -636,7 +659,6 @@ function mapStateToProps(
       application.data[activeSection.id] || {},
       application.data
     )[0].id
-
   const activeSectionGroup = activeSection.groups.find(
     group => group.id === groupId
   )
