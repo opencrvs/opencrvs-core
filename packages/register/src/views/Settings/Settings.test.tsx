@@ -97,4 +97,18 @@ describe('Settings page tests', () => {
       .hostNodes()
       .simulate('click')
   })
+  it('Should display password change modal', () => {
+    component
+      .find('#BtnChangePassword')
+      .hostNodes()
+      .simulate('click')
+
+    const modal = component.find('#ChangePasswordModal').hostNodes()
+    expect(modal.length).toEqual(1)
+
+    modal
+      .find('#confirm-button')
+      .hostNodes()
+      .simulate('click')
+  })
 })

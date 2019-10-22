@@ -9,7 +9,11 @@ import {
   buttonMessages,
   constantsMessages
 } from '@register/i18n/messages'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import {
+  InputField,
+  TextInput,
+  WarningMessage
+} from '@opencrvs/components/lib/forms'
 import { TickOn, TickOff } from '@opencrvs/components/lib/icons'
 
 const CancelButton = styled(TertiaryButton)`
@@ -86,6 +90,9 @@ const Field = styled.div`
     margin-bottom: 0px;
   }
 `
+const GlobalError = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+`
 type State = {
   currentPassword: string
   newPassword: string
@@ -95,7 +102,7 @@ type State = {
   hasCases: boolean
   passwordMismatched: boolean
   passwordMatched: boolean
-  continuePressed: boolean
+  confirmPressed: boolean
 }
 
 interface IProps {
@@ -117,7 +124,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       hasCases: false,
       passwordMismatched: false,
       passwordMatched: false,
-      continuePressed: false
+      confirmPressed: false
     }
   }
   validateLength = (value: string) => {
@@ -146,7 +153,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       confirmPassword: '',
       passwordMatched: false,
       passwordMismatched: false,
-      continuePressed: false
+      confirmPressed: false
     }))
     this.validateLength(value)
     this.validateNumber(value)
@@ -159,16 +166,26 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       confirmPassword: value,
       passwordMismatched: value.length > 0 && newPassword !== value,
       passwordMatched: value.length > 0 && newPassword === value,
-      continuePressed: false
+      confirmPressed: false
     }))
   }
+  changePassword = () => {
+    this.setState(() => ({
+      confirmPressed: true
+    }))
+
+    if (
+      this.state.passwordMatched &&
+      this.state.currentPassword &&
+      this.state.hasCases &&
+      this.state.hasNumber &&
+      this.state.validLength
+    ) {
+      this.props.changePassword()
+    }
+  }
   render() {
-    const {
-      intl,
-      showPasswordChange,
-      togglePassworkChangeModal,
-      changePassword
-    } = this.props
+    const { intl, showPasswordChange, togglePassworkChangeModal } = this.props
     return (
       <ResponsiveModal
         id="ChangePasswordModal"
@@ -179,7 +196,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
           <PrimaryButton
             id="confirm-button"
             key="confirm"
-            onClick={changePassword}
+            onClick={this.changePassword}
           >
             {intl.formatMessage(messages.confirmButtonLabel)}
           </PrimaryButton>
@@ -211,8 +228,18 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     touched={true}
                     value={this.state.currentPassword}
                     onChange={this.setCurrentPassword}
+                    error={
+                      this.state.confirmPressed &&
+                      this.state.currentPassword.length === 0
+                    }
                   />
                 </InputField>
+                {this.state.confirmPressed &&
+                  this.state.currentPassword.length === 0 && (
+                    <GlobalError>
+                      {intl.formatMessage(messages.requiredfield)}
+                    </GlobalError>
+                  )}
               </Field>
             </PasswordContents>
           </Row>
@@ -231,10 +258,6 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     touched={true}
                     value={this.state.newPassword}
                     onChange={this.checkPasswordStrength}
-                    error={
-                      this.state.continuePressed &&
-                      this.state.newPassword.length === 0
-                    }
                   />
                 </InputField>
                 <ValidationRulesSection>
@@ -286,8 +309,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     type="password"
                     touched={true}
                     error={
-                      this.state.continuePressed &&
-                      this.state.passwordMismatched
+                      this.state.confirmPressed && this.state.passwordMismatched
                     }
                     value={this.state.confirmPassword}
                     onChange={this.matchPassword}

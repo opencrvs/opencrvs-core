@@ -182,7 +182,7 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   changePassword = () => {
-    alert('Call mutation')
+    this.togglePassworkChangeModal()
   }
 
   render() {
@@ -260,6 +260,7 @@ class SettingsView extends React.Component<IProps, IState> {
             label: intl.formatMessage(constantsMessages.labelPassword),
             placeHolder: 'Last change 4 days ago',
             action: {
+              id: 'BtnChangePassword',
               label: intl.formatMessage(buttonMessages.change),
               handler: this.togglePassworkChangeModal
             }

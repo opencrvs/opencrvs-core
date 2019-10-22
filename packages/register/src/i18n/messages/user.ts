@@ -73,6 +73,7 @@ interface IUserMessages {
   matchedPasswordMsg: MessageDescriptor
   mismatchedPasswordMsg: MessageDescriptor
   confirmButtonLabel: MessageDescriptor
+  requiredfield: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -334,6 +335,11 @@ const messagesToDefine: IUserMessages = {
     id: 'buttons.confirm',
     defaultMessage: 'Confirm',
     description: 'Label used for confirm button'
+  },
+  requiredfield: {
+    id: 'register.form.required',
+    defaultMessage: 'This field is required',
+    description: 'Required field error message'
   }
 }
 
