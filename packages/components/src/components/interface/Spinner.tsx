@@ -8,11 +8,9 @@ export interface ISpinner {
   size?: number
 }
 
-const styledSpinner = styled.div.attrs<ISpinner>({})
-
-const StyledSpinner = styledSpinner`
+const StyledSpinner = styled.div<ISpinner>`
   width: ${({ size }) => (size ? `${size}px` : 'auto')};
-  display:flex;
+  display: flex;
   justify-content: center;
   & svg {
     animation: rotate 2s linear infinite;
@@ -47,7 +45,7 @@ const StyledSpinner = styledSpinner`
       stroke-dashoffset: -124;
     }
   }
-}`
+`
 
 export class Spinner extends React.Component<ISpinner> {
   render() {

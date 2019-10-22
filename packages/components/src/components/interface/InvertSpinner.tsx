@@ -8,23 +8,35 @@ export interface IInvertSpinner {
   size?: string
 }
 
-const styledSpinner = styled.div.attrs<IInvertSpinner>({})
-
-const StyledSpinner = styledSpinner`
+/* stylelint-disable opencrvs/no-font-styles */
+const StyledSpinner = styled.div<IInvertSpinner>`
   font-size: 10px;
   text-indent: -9999em;
   width: ${({ size }) => (size ? size : '6em')};
   height: ${({ size }) => (size ? size : '6em')};
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.white};
-  background: -moz-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
-  background: -webkit-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
-  background: -o-linear-gradient(left, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
-  background: linear-gradient(to right, ${({ theme }) =>
-    theme.colors.gradientLight} 10%, ${({ theme }) => theme.colors.white} 42%);
+  /* stylelint-disable value-no-vendor-prefix */
+  background: -moz-linear-gradient(
+    left,
+    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.white} 42%
+  );
+  background: -webkit-linear-gradient(
+    left,
+    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.white} 42%
+  );
+  background: -o-linear-gradient(
+    left,
+    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.white} 42%
+  );
+  background: linear-gradient(
+    to right,
+    ${({ theme }) => theme.colors.gradientLight} 10%,
+    ${({ theme }) => theme.colors.white} 42%
+  );
   position: relative;
   -webkit-animation: load3 0.4s infinite linear;
   animation: load3 0.4s infinite linear;
@@ -54,28 +66,28 @@ const StyledSpinner = styledSpinner`
     bottom: 0;
     right: 0;
   }
-}
 
-@-webkit-keyframes load3 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
+  @-webkit-keyframes load3 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
   }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
+  @keyframes load3 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
   }
-}
-@keyframes load3 {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}`
+`
 
 export class InvertSpinner extends React.Component<IInvertSpinner> {
   render() {

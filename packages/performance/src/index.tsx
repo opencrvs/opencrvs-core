@@ -4,15 +4,7 @@ import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { App } from '@performance/App'
 import { createStore } from '@performance/store'
-import { injectGlobal } from '@performance/styledComponents'
 
-// @ts-ignore
-injectGlobal`
-  body {
-    margin: 0;
-    padding: 0;
-  }
-`
 const { store, history } = createStore()
 
 if (

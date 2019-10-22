@@ -10,7 +10,7 @@ export interface IPage {
 
 const languageFromProps = ({ language }: IPage) => language
 
-const StyledPage = styled.div.attrs<IPage>({})`
+const StyledPage = styled.div<IPage>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;

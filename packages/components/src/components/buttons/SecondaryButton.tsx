@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
 export const SecondaryButton = styled(Button)`

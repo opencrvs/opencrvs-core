@@ -33,7 +33,7 @@ const LegendItemBase = styled.div`
     content: ':';
   }
 `
-const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
+const LegendItem = styled(LegendItemBase)<{ colour: string }>`
   &::before {
     background: ${({ colour }) => colour};
   }
@@ -53,7 +53,7 @@ const DataLabel = styled.label`
   margin-top: 1em;
   margin-bottom: auto;
 `
-const DataTitle = styled.h3.attrs<{ description?: string }>({})`
+const DataTitle = styled.h3<{ description?: string }>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};

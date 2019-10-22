@@ -13,7 +13,7 @@ const Container = css`
     width: 100%;
   }
 `
-const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
+const ControlsContainer = styled.div<{ centerController?: boolean }>`
   position: absolute;
   z-index: 2;
   ${({ centerController }) =>

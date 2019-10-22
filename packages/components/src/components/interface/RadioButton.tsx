@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Label = styled.label.attrs<{ size?: string; disabled?: boolean }>({})`
+const Label = styled.label<{ size?: string; disabled?: boolean }>`
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
@@ -27,7 +27,7 @@ const CheckOuter = styled.div`
   border-radius: 50%;
   position: relative;
 `
-const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
+const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: flex;
   justify-content: center;
   border: 2px solid
@@ -59,7 +59,7 @@ const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
   }
 `
 
-const Input = styled.input.attrs<{ disabled?: boolean }>({})`
+const Input = styled.input<{ disabled?: boolean }>`
   position: absolute;
   opacity: 0;
   z-index: 2;

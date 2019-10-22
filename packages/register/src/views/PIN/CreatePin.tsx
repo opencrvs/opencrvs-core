@@ -210,10 +210,9 @@ class CreatePinComponent extends React.Component<IProps> {
 
   componentDidUpdate = () => this.focusKeypad()
 
-  componentDidMount = () => this.focusKeypad()
-
-  componentWillMount() {
+  componentDidMount = () => {
     document.addEventListener('mouseup', this.handleClick, false)
+    this.focusKeypad()
   }
 
   componentWillUnmount() {
