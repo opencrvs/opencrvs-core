@@ -2033,6 +2033,8 @@
         "settings.changeLanguage": "ভাষা পরিবর্তন",
         "settings.changeLanguage.success": "ভাষা পরিবর্তিত হয়ে {language} হয়েছে",
         "settings.message.changeLanguage": "OpenCRVS-এ যে ভাষা আপনি ব্যাবহার করতে চান",
+        "settings.changePassword": "পাসওয়ার্ড পরিবর্তন করুন",
+        "settings.message.changePassword": "আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরি করার পরামর্শ দিচ্ছি - এটি যা আপনি অন্য ওয়েবসাইট বা অ্যাপের জন্য ব্যবহার করেন না। বিঃদ্রঃ. একবার আপনি নিজের পুরানো পাসওয়ার্ড পরিবর্তন করলে আপনি এটি পুনরায় ব্যবহার করতে পারবেন না।",
         "settings.profile.tile": "প্রোফাইল",
         "settings.security.tile": "নিরাপত্তা",
         "settings.system.tile": "সিস্টেম",

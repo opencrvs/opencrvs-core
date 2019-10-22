@@ -39,6 +39,7 @@ import {
 import { modifyUserDetails as modifyUserDetailsAction } from '@register/profile/profileActions'
 import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
 import { IntlState } from '@register/i18n/reducer'
+import { PasswordChangeModal } from '@register/views/Settings/PasswordChangeModal'
 
 const Container = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -127,6 +128,7 @@ interface IState {
   showLanguageSettings: boolean
   selectedLanguage: string
   showSuccessNotification: boolean
+  showPasswordChange: boolean
 }
 
 interface ILanguageOptions {
@@ -139,7 +141,8 @@ class SettingsView extends React.Component<IProps, IState> {
     this.state = {
       showLanguageSettings: false,
       showSuccessNotification: false,
-      selectedLanguage: this.props.language
+      selectedLanguage: this.props.language,
+      showPasswordChange: false
     }
   }
 
@@ -162,6 +165,12 @@ class SettingsView extends React.Component<IProps, IState> {
     }))
   }
 
+  togglePassworkChangeModal = () => {
+    this.setState(state => ({
+      showPasswordChange: !state.showPasswordChange
+    }))
+  }
+
   changeLanguage = () => {
     if (this.props.userDetails) {
       this.props.userDetails.language = this.state.selectedLanguage
@@ -170,6 +179,10 @@ class SettingsView extends React.Component<IProps, IState> {
       this.toggleLanguageSettingsModal()
       this.toggleSuccessNotification()
     }
+  }
+
+  changePassword = () => {
+    alert('Call mutation')
   }
 
   render() {
@@ -248,7 +261,7 @@ class SettingsView extends React.Component<IProps, IState> {
             placeHolder: 'Last change 4 days ago',
             action: {
               label: intl.formatMessage(buttonMessages.change),
-              disabled: true
+              handler: this.togglePassworkChangeModal
             }
           },
           {
@@ -333,6 +346,11 @@ class SettingsView extends React.Component<IProps, IState> {
             placeholder=""
           />
         </ResponsiveModal>
+        <PasswordChangeModal
+          togglePassworkChangeModal={this.togglePassworkChangeModal}
+          showPasswordChange={this.state.showPasswordChange}
+          changePassword={this.changePassword}
+        />
         <Notification
           type={NOTIFICATION_TYPE.SUCCESS}
           show={this.state.showSuccessNotification}
