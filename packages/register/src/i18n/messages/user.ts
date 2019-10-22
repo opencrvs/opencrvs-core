@@ -61,6 +61,18 @@ interface IUserMessages {
   API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
+  currentPassword: MessageDescriptor
+  changePassword: MessageDescriptor
+  changePasswordMessage: MessageDescriptor
+  newPasswordLabel: MessageDescriptor
+  passwordUpdateFormValidationMsg: MessageDescriptor
+  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  confirmPasswordLabel: MessageDescriptor
+  matchedPasswordMsg: MessageDescriptor
+  mismatchedPasswordMsg: MessageDescriptor
+  confirmButtonLabel: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -262,6 +274,66 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'System',
     description: 'System header',
     id: 'settings.system.tile'
+  },
+  currentPassword: {
+    id: 'password.label.current',
+    defaultMessage: 'Current password:',
+    description: 'Current password label'
+  },
+  changePassword: {
+    defaultMessage: 'Change password',
+    description: 'Password change modal header',
+    id: 'settings.changePassword'
+  },
+  changePasswordMessage: {
+    defaultMessage: 'Change password message',
+    description: 'Password change message',
+    id: 'settings.message.changePassword'
+  },
+  newPasswordLabel: {
+    id: 'password.label.new',
+    defaultMessage: 'New password:',
+    description: 'New password label'
+  },
+  passwordUpdateFormValidationMsg: {
+    id: 'password.validation.msg',
+    defaultMessage: 'Password must have:',
+    description: 'Password validation message'
+  },
+  passwordLengthCharacteristicsForPasswordUpdateForm: {
+    id: 'password.minLength',
+    defaultMessage: '{min} characters minimum',
+    description: 'Password validation'
+  },
+  passwordCaseCharacteristicsForPasswordUpdateForm: {
+    id: 'password.cases',
+    defaultMessage: 'Contain upper and lower cases',
+    description: 'Password validation'
+  },
+  passwordNumberCharacteristicsForPasswordUpdateForm: {
+    id: 'password.number',
+    defaultMessage: 'At least one number',
+    description: 'Password validation'
+  },
+  confirmPasswordLabel: {
+    id: 'password.label.confirm',
+    defaultMessage: 'Confirm new password',
+    description: 'Confirm password label'
+  },
+  matchedPasswordMsg: {
+    id: 'password.match',
+    defaultMessage: 'Passwords match',
+    description: 'Password validation'
+  },
+  mismatchedPasswordMsg: {
+    id: 'password.mismatch',
+    defaultMessage: 'Passwords do not match',
+    description: 'Password validation'
+  },
+  confirmButtonLabel: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Label used for confirm button'
   }
 }
 

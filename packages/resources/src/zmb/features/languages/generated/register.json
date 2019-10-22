@@ -788,6 +788,7 @@
         "notification.userFormSuccess": "New user created",
         "password.cases": "Contain upper and lower cases",
         "password.label.confirm": "Confirm password",
+        "password.label.current": "Current password",
         "password.label.new": "New password",
         "password.match": "Passwords match",
         "password.minLength": "{min} characters minimum",
