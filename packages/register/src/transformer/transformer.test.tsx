@@ -402,5 +402,87 @@ describe('when draft data is transformed to graphql', () => {
         primaryCaregiverData
       )
     })
+
+    it('transform gql data to primary caregiver form data', () => {
+      const data = {
+        id: '70773af0-68e3-4b08-aace-e28f4809d9c1',
+        child: null,
+        informant: {
+          individual: null,
+          relationship: null,
+          otherRelationship: null
+        },
+        primaryCaregiver: {
+          parentDetailsType: 'MOTHER_AND_FATHER',
+          primaryCaregiver: {
+            name: [
+              {
+                use: 'en',
+                firstNames: '',
+                familyName: 'Alex'
+              }
+            ],
+            telecom: [
+              {
+                system: 'phone',
+                value: '01686942106',
+                use: null
+              }
+            ]
+          },
+          reasonsNotApplying: [
+            {
+              primaryCaregiverType: 'MOTHER',
+              reasonNotApplying: '',
+              isDeceased: true
+            },
+            {
+              primaryCaregiverType: 'OTHER',
+              reasonNotApplying: 'sick',
+              isDeceased: null
+            }
+          ]
+        },
+        mother: null,
+        father: null,
+        registration: {
+          contact: 'MOTHER',
+          contactRelationship: null,
+          contactPhoneNumber: '01555555555',
+          attachments: null,
+          status: [
+            {
+              comments: null,
+              type: 'DECLARED'
+            }
+          ],
+          type: 'BIRTH',
+          trackingId: 'BWH1TVW',
+          registrationNumber: null
+        },
+        attendantAtBirth: null,
+        weightAtBirth: null,
+        birthType: null,
+        eventLocation: null,
+        presentAtBirthRegistration: 'OTHER'
+      }
+
+      const primaryCaregiverData = {
+        motherIsDeceased: ['deceased'],
+        parentDetailsType: 'MOTHER_AND_FATHER',
+        primaryCaregiverType: {
+          value: 'OTHER',
+          nestedFields: {
+            name: 'Alex',
+            phone: '01686942106',
+            reasonNotApplying: 'sick'
+          }
+        }
+      }
+
+      expect(gqlToDraftTransformer(form, data).primaryCaregiver).toEqual(
+        primaryCaregiverData
+      )
+    })
   })
 })
