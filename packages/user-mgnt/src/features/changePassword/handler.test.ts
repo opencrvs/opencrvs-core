@@ -3,7 +3,6 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-
 import mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -109,8 +108,8 @@ describe('changePassword handler', () => {
 
 describe('changeUserPassword handler', () => {
   let server: any
-
   beforeEach(async () => {
+    mockUser.status = 'active'
     mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
@@ -145,6 +144,26 @@ describe('changeUserPassword handler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         existingPassword: 'wrong_password',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+  })
+  it('Returns 401 for non-active user', async () => {
+    mockUser.status = 'pending'
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        existingPassword: 'test',
         password: 'new_password'
       },
       headers: {
