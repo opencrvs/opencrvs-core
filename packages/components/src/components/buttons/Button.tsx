@@ -21,6 +21,7 @@ const ButtonBase = styled.button`
       stroke: ${({ theme }) => theme.colors.disabled};
     }
   }
+  -webkit-tap-highlight-color: transparent;
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
