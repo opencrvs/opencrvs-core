@@ -198,7 +198,8 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER)
+        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER),
+        state.userDetails!
       )
 
       return {
