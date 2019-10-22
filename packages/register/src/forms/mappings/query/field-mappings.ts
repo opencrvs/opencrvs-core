@@ -20,6 +20,11 @@ interface IName {
   [key: string]: any
 }
 
+interface IIgnoreAddressFields {
+  fieldsToIgnoreForLocalAddress: string[]
+  fieldsToIgnoreForInternationalAddress: string[]
+}
+
 export const nameToFieldTransformer = (
   language: string,
   transformedFieldName?: string
@@ -294,7 +299,8 @@ export function attachmentToFieldTransformer(
 
 export const eventLocationQueryTransformer = (
   lineNumber: number = 0,
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  ignoreAddressFields?: IIgnoreAddressFields
 ) => (
   transformedData: IFormData,
   queryData: any,
@@ -308,27 +314,25 @@ export const eventLocationQueryTransformer = (
   const address = eventLocation.address as IAddress
   const line = address.line as string[]
   const country = address.country
+  const fieldValue =
+    address[transformedFieldName ? transformedFieldName : field.name]
   if (lineNumber > 0) {
     transformedData[sectionId][field.name] = line[lineNumber - 1]
-  } else if (
-    address[transformedFieldName ? transformedFieldName : field.name] &&
-    country &&
-    country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
-    field.name !== 'internationalState' &&
-    field.name !== 'internationalDistrict'
-  ) {
-    transformedData[sectionId][field.name] =
-      address[transformedFieldName ? transformedFieldName : field.name]
-  } else if (
-    address[transformedFieldName ? transformedFieldName : field.name] &&
-    country &&
-    country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
-    field.name !== 'state' &&
-    field.name !== 'district'
-  ) {
-    // do not set selects for state and district if country is not the default country
-    transformedData[sectionId][field.name] =
-      address[transformedFieldName ? transformedFieldName : field.name]
+  } else if (fieldValue && ignoreAddressFields) {
+    if (
+      (country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
+        !ignoreAddressFields.fieldsToIgnoreForLocalAddress.includes(
+          field.name
+        )) ||
+      (country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
+        !ignoreAddressFields.fieldsToIgnoreForInternationalAddress.includes(
+          field.name
+        ))
+    ) {
+      transformedData[sectionId][field.name] = fieldValue
+    }
+  } else if (fieldValue) {
+    transformedData[sectionId][field.name] = fieldValue
   }
 
   return transformedData
