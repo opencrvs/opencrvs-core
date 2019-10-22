@@ -1222,7 +1222,18 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": []
+                      "parameters": [0,
+                        "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -1272,7 +1283,18 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": []
+                      "parameters": [0,
+                        "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -3243,7 +3265,17 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "state"]
+                      "parameters": [0, "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -3276,7 +3308,17 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "district"]
+                      "parameters": [0, "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -8821,7 +8863,18 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": []
+                      "parameters": [0,
+                        "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -8867,7 +8920,18 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": []
+                      "parameters": [0,
+                        "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -9222,7 +9286,17 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "state"]
+                      "parameters": [0, "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
@@ -9251,7 +9325,17 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "district"]
+                      "parameters": [0, "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }]
                     }
                   }
                 },
