@@ -10,6 +10,7 @@ import {
   IUserSearchPayload,
   IUserPayload
 } from '@gateway/features/user/type-resovlers'
+import { hasScope, isTokenOwner } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -120,6 +121,17 @@ export const resolvers: GQLResolver = {
       { userId, existingPassword, password },
       authHeader
     ) {
+      // Only token owner except sysadmin should be able to change their password
+      if (
+        !hasScope(authHeader, 'sysadmin') &&
+        !isTokenOwner(authHeader, userId)
+      ) {
+        return await Promise.reject(
+          new Error(
+            `Change password is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
         method: 'POST',
         body: JSON.stringify({ userId, existingPassword, password }),
