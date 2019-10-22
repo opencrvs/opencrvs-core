@@ -828,8 +828,15 @@
                   ],
                   "mapping": {
                     "mutation": {
+<<<<<<< HEAD
                       "operation": "fieldNameTransformer",
                       "parameters": ["birthDate"]
+=======
+                      "operation": "longDateTransformer",
+                      "parameters": [
+                        "birthDate"
+                      ]
+>>>>>>> origin/master
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -2220,8 +2227,15 @@
                       "parameters": [
                         "individual",
                         {
+<<<<<<< HEAD
                           "operation": "fieldNameTransformer",
                           "parameters": ["birthDate"]
+=======
+                          "operation": "longDateTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
+>>>>>>> origin/master
                         }
                       ]
                     },
@@ -4825,8 +4839,15 @@
                   "validate": [],
                   "mapping": {
                     "mutation": {
+<<<<<<< HEAD
                       "operation": "fieldNameTransformer",
                       "parameters": ["birthDate"]
+=======
+                      "operation": "longDateTransformer",
+                      "parameters": [
+                        "birthDate"
+                      ]
+>>>>>>> origin/master
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -4947,6 +4968,12 @@
                   "required": false,
                   "initialValue": "",
                   "validate": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -6649,8 +6676,15 @@
                   ],
                   "mapping": {
                     "mutation": {
+<<<<<<< HEAD
                       "operation": "fieldNameTransformer",
                       "parameters": ["birthDate"]
+=======
+                      "operation": "longDateTransformer",
+                      "parameters": [
+                        "birthDate"
+                      ]
+>>>>>>> origin/master
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -6786,7 +6820,13 @@
                       "action": "hide",
                       "expression": "(!values.maritalStatus || values.maritalStatus !== \"MARRIED\")"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "educationalAttainment",
@@ -9038,7 +9078,13 @@
                     {
                       "operation": "isValidBirthDate"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "maritalStatus",
@@ -10270,7 +10316,13 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
-                      "parameters": ["deceased"]
+                      "parameters": [
+                        "deceased",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": []
+                        }
+                      ]
                     },
                     "query": {
                       "operation": "deceasedDateToFieldTransformation",
@@ -12182,8 +12234,15 @@
                       "parameters": [
                         "individual",
                         {
+<<<<<<< HEAD
                           "operation": "fieldNameTransformer",
                           "parameters": ["birthDate"]
+=======
+                          "operation": "longDateTransformer",
+                          "parameters": [
+                            "birthDate"
+                          ]
+>>>>>>> origin/master
                         }
                       ]
                     },

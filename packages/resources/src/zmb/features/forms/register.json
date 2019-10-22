@@ -812,10 +812,8 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "operation": "longDateTransformer",
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -3438,10 +3436,8 @@
                   "validate": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "operation": "longDateTransformer",
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -5232,10 +5228,8 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "operation": "longDateTransformer",
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -6423,7 +6417,13 @@
                     {
                       "operation": "isValidBirthDate"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "gender",
@@ -7116,7 +7116,11 @@
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
                       "parameters": [
-                        "deceased"
+                        "deceased",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": []
+                        }
                       ]
                     },
                     "query": {
