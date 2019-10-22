@@ -35,9 +35,13 @@ export async function birthRegistrationHandler(
 ) {
   try {
     const points = await Promise.all([
-      generateEventDurationPoint(request.payload as fhir.Bundle, 'DECLARED', {
-        Authorization: request.headers.authorization
-      }),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
       generateBirthRegPoint(
         request.payload as fhir.Bundle,
         'mark-existing-application-registered',
@@ -61,9 +65,13 @@ export async function birthCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generateEventDurationPoint(request.payload as fhir.Bundle, 'REGISTERED', {
-        Authorization: request.headers.authorization
-      })
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['REGISTERED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     ])
 
     await writePoints(points)

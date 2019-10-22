@@ -75,7 +75,7 @@ const generatePointLocations = async (
 
 export async function generateEventDurationPoint(
   payload: fhir.Bundle,
-  previousState: APPLICATION_STATUS,
+  allowedPreviousStates: APPLICATION_STATUS[],
   authHeader: IAuthHeader
 ) {
   const composition = getComposition(payload)
@@ -90,7 +90,7 @@ export async function generateEventDurationPoint(
   }
   const previousTask = await getPreviousTask(
     currentTask,
-    previousState,
+    allowedPreviousStates,
     authHeader
   )
 

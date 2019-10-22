@@ -39,11 +39,11 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
 
-export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED'
+export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED' | 'VALIDATED'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
-  previousState: APPLICATION_STATUS
+  allowedPreviousStates: APPLICATION_STATUS[]
 ) {
   const task =
     historyResponseBundle.entry &&
@@ -57,8 +57,8 @@ function findPreviousTask(
           return false
         }
 
-        return resource.businessStatus.coding.some(
-          coding => coding.code === previousState
+        return resource.businessStatus.coding.some(coding =>
+          allowedPreviousStates.includes(coding.code as APPLICATION_STATUS)
         )
       })
 
@@ -81,11 +81,11 @@ export function getComposition(bundle: fhir.Bundle) {
 
 export async function getPreviousTask(
   task: Task,
-  previousState: APPLICATION_STATUS,
+  allowedPreviousStates: APPLICATION_STATUS[],
   authHeader: IAuthHeader
 ) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
-  return findPreviousTask(taskHistory, previousState)
+  return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
 export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
