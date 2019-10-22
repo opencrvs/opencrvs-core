@@ -9088,10 +9088,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "values.addressSameAsMother"
                     }
                   ],
                   "mapping": {
