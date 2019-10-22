@@ -2,13 +2,15 @@ import {
   IFormField,
   IFormData,
   ICertificate,
-  TransformedData
+  TransformedData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
-
+import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@register/forms/register/fieldMappings/birth/mutation/registration-mappings'
 
 export const fieldToDeceasedDateTransformation = (
-  alternativeSectionId?: string
+  alternativeSectionId?: string,
+  nestedTransformer?: IFormFieldMutationMapFunction
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -18,11 +20,20 @@ export const fieldToDeceasedDateTransformation = (
   if (!draftData[sectionId] || !draftData[sectionId][field.name]) {
     return transformedData
   }
+
+  let fieldValue = draftData[sectionId][field.name]
+
+  if (nestedTransformer) {
+    const clonedTransformedData = cloneDeep(transformedData)
+    nestedTransformer(clonedTransformedData, draftData, sectionId, field)
+    fieldValue = clonedTransformedData[sectionId][field.name]
+  }
+
   transformedData[
     alternativeSectionId ? alternativeSectionId : sectionId
   ].deceased = {
     deceased: true,
-    deathDate: draftData[sectionId][field.name]
+    deathDate: fieldValue
   }
   return transformedData
 }
