@@ -90,16 +90,6 @@ export async function getLocationsByIdentifier(identifier: string) {
   }
 }
 
-export function getLocationIDByA2IRef(
-  locations: fhir.Location[],
-  a2IReference: string
-) {
-  const location = locations.find(loc =>
-    matchLocationWithA2IRef(loc, a2IReference)
-  ) as fhir.Location
-  return location.id as string
-}
-
 export function matchLocationWithA2IRef(
   location: fhir.Location,
   a2IReference: string

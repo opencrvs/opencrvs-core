@@ -1,9 +1,7 @@
 import * as fs from 'fs'
 import {
   FACILITIES_SOURCE,
-  HRIS_FACILITIES_URL,
-  HRIS_CLIENT_ID,
-  HRIS_TOKEN
+  HRIS_FACILITIES_URL
 } from '@resources/bgd/constants'
 import * as csv2json from 'csv2json'
 const crvsOfficeSourceJSON = `${FACILITIES_SOURCE}crvs-facilities.json`
@@ -19,8 +17,8 @@ async function fetchHealthFacilitiesFromHRIS(offset: number, limit: number) {
     `${HRIS_FACILITIES_URL}?offset=${offset}&limit=${limit}`,
     {
       headers: {
-        'client-id': HRIS_CLIENT_ID,
-        'X-Auth-Token': HRIS_TOKEN
+        'client-id': process.argv[3],
+        'X-Auth-Token': process.argv[4]
       }
     }
   )

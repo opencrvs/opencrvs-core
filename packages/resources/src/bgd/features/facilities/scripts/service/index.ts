@@ -1,25 +1,22 @@
 import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
-import {
-  getLocationIDByA2IRef,
-  sendToFhir,
-  ILocation
-} from '@resources/bgd/features/utils'
+import { sendToFhir, ILocation } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
-export interface IDGHSFacility {
+export interface IORGFacility {
   facilityId: string
   division: string
   district: string
+  districtBn: string
   upazila: string
+  upazilaBn: string
   union: string
+  unionBn: string
   A2IReference: string
   facilityNameBengali: string
   facilityNameEnglish: string
   facilityTypeBengali: string
   facilityTypeEnglish: string
-  email: string
-  phone: string
 }
 
 export interface IHRISFacility {
@@ -65,8 +62,8 @@ export interface IHRISFacility {
   facilitytype_name: string
 }
 
-const createFhirLocationFromA2IJson = (
-  location: IDGHSFacility,
+const createFhirLocationFromORGJson = (
+  location: IORGFacility,
   partOfReference: string
 ): fhir.Location => {
   return {
@@ -100,10 +97,6 @@ const createFhirLocationFromA2IJson = (
         }
       ]
     },
-    telecom: [
-      { system: 'phone', value: location.phone },
-      { system: 'email', value: location.email }
-    ],
     address: {
       line: [location.union, location.upazila],
       district: location.district,
@@ -157,36 +150,6 @@ const createFhirLocationFromHRISJson = (
     }
   }
 
-  if (location.landphone1) {
-    resource.telecom.push({ system: 'phone', value: location.landphone1 })
-  }
-  if (location.landphone2) {
-    resource.telecom.push({ system: 'phone', value: location.landphone2 })
-  }
-  if (location.landphone3) {
-    resource.telecom.push({ system: 'phone', value: location.landphone3 })
-  }
-
-  if (location.mobile1) {
-    resource.telecom.push({ system: 'phone', value: location.mobile1 })
-  }
-  if (location.mobile2) {
-    resource.telecom.push({ system: 'phone', value: location.mobile2 })
-  }
-  if (location.mobile3) {
-    resource.telecom.push({ system: 'phone', value: location.mobile3 })
-  }
-
-  if (location.email1) {
-    resource.telecom.push({ system: 'email', value: location.email1 })
-  }
-  if (location.email2) {
-    resource.telecom.push({ system: 'email', value: location.email2 })
-  }
-  if (location.email3) {
-    resource.telecom.push({ system: 'email', value: location.email3 })
-  }
-
   return resource
 }
 
@@ -210,18 +173,87 @@ export function generateSimpleLocationResource(
 }
 
 export async function mapAndSaveCRVSFacilities(
-  facilities: IDGHSFacility[],
-  parentLocations: fhir.Location[]
+  facilities: IORGFacility[],
+  divisions: fhir.Location[],
+  districts: fhir.Location[],
+  upazilas: fhir.Location[],
+  unions: fhir.Location[]
 ): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
   for (const facility of facilities) {
-    const parentLocationID = getLocationIDByA2IRef(
-      parentLocations,
-      facility.A2IReference
+    const division = findLocationByNameAndParent(
+      'division',
+      divisions,
+      facility.division,
+      'Location/0' // this is used for top level locations
     )
-    const newLocation: fhir.Location = createFhirLocationFromA2IJson(
+
+    if (!division) {
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.yellow(
+          `WARNING: Division not found for facility ${facility.facilityNameEnglish}`
+        )
+      )
+      continue
+    }
+
+    const district = findLocationByNameAndParent(
+      'district',
+      districts,
+      facility.district,
+      `Location/${division.id}`
+    )
+
+    if (!district) {
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.yellow(
+          // tslint:disable-next-line:max-line-length
+          `WARNING: District not found for facility ${facility.facilityNameEnglish} with parent=${division.id}`
+        )
+      )
+      continue
+    }
+
+    const upazila = findLocationByNameAndParent(
+      'upazila',
+      upazilas,
+      facility.upazila,
+      `Location/${district.id}`
+    )
+
+    if (!upazila) {
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.yellow(
+          // tslint:disable-next-line:max-line-length
+          `WARNING: Upazila not found for facility ${facility.facilityNameEnglish} with parent=${district.id}`
+        )
+      )
+      continue
+    }
+
+    const union = findLocationByNameAndParent(
+      'union',
+      unions,
+      facility.union,
+      `Location/${upazila.id}`
+    )
+
+    if (!union) {
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.yellow(
+          // tslint:disable-next-line:max-line-length
+          `WARNING: Union not found for facility ${facility.facilityNameEnglish} with parent=${upazila.id}`
+        )
+      )
+      continue
+    }
+    const newLocation: fhir.Location = createFhirLocationFromORGJson(
       facility,
-      `Location/${parentLocationID}`
+      `Location/${union.id}`
     )
     // tslint:disable-next-line:no-console
     console.log(
@@ -267,6 +299,30 @@ function findLocationByIdentifierAndParent(
       return false
     }
   })
+}
+
+function findLocationByNameAndParent(
+  type: string,
+  resources: fhir.Location[],
+  name: string,
+  parentRef: string
+) {
+  const resourcesArray = resources.filter(resource => {
+    if (resource.name && resource.partOf && resource.partOf.reference) {
+      return resource.name === name && resource.partOf.reference === parentRef
+    } else {
+      return false
+    }
+  })
+  if (resourcesArray.length > 1) {
+    // tslint:disable-next-line:no-console
+    console.log(chalk.yellow(`WARNING: ${type} duplicates found for ${name}`))
+  }
+  if (!resourcesArray || resourcesArray.length === 0) {
+    // tslint:disable-next-line:no-console
+    console.log(chalk.yellow(`WARNING: No ${type} found for ${name}`))
+  }
+  return resourcesArray[0]
 }
 
 export async function mapAndSaveHealthFacilities(
