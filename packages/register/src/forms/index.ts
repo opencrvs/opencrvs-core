@@ -427,7 +427,7 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
 }
 export interface ISearchFormField extends IFormFieldBase {
   type: typeof SEARCH_FIELD
-  searchableResource: Extract<keyof IOfflineData, 'locations'>
+  searchableResource: Extract<keyof IOfflineData, 'facilities'>
   searchableType: string
   dynamicOptions?: IDynamicOptions
   onCompleted?: (response: string) => void

@@ -77,6 +77,7 @@ const Input = styled.input.attrs<{ disabled?: boolean }>({})`
 
     background: ${({ theme }) => theme.colors.copy};
   }
+  -webkit-tap-highlight-color: transparent;
 `
 
 type Value = string | number | boolean
