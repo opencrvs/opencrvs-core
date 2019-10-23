@@ -37,7 +37,7 @@
     "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.0.15",
     "styled-components": "^4.4.0",
-    "@types/styled-components": "^4.1.19"
+    "@types/styled-components": "4.1.8"
   },
   "scripts": {
     "postinstall": "patch-package",

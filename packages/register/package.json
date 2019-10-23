@@ -14,7 +14,7 @@
     "@types/react-redux": "^7.1.5",
     "@types/react-tooltip": "^3.9.3",
     "@types/redux-sentry-middleware": "^0.0.1",
-    "@types/styled-components": "^4.1.19",
+    "@types/styled-components": "4.1.8",
     "@types/xregexp": "^3.0.29",
     "apollo-boost": "^0.1.6",
     "apollo-client": "^2.4.5",
