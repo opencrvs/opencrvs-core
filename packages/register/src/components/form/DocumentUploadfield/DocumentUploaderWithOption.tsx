@@ -10,13 +10,17 @@ import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { getBase64Strings as resizeAndRotate } from 'exif-rotate-js/lib'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/imageUpload'
+import imageCompression from 'browser-image-compression'
 
-const MAX_IMAGE_WIDTH_OR_HEIGHT = 2500
+const options = {
+  maxSizeMB: 0.4,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true
+}
 
 const UploaderWrapper = styled.div`
   margin-bottom: 20px;
@@ -153,15 +157,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
       throw new Error(this.props.intl.formatMessage(messages.overSized))
     }
 
-    if (uploadedImage.size > 2097152) {
-      const [resized] = await resizeAndRotate([uploadedImage], {
-        maxSize: MAX_IMAGE_WIDTH_OR_HEIGHT
-      })
-      return resized
-    }
+    const resized =
+      uploadedImage.size > 512000 &&
+      (await imageCompression(uploadedImage, options))
 
-    const fileAsBase64 = await getBase64String(uploadedImage)
-    return fileAsBase64.toString()
+    return (await getBase64String(resized || uploadedImage)) as string
   }
 
   handleFileChange = async (uploadedImage: File) => {
