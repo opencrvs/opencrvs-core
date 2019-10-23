@@ -4851,6 +4851,11 @@ brotli@^1.2.0:
   dependencies:
     base64-js "^1.1.2"
 
+browser-image-compression@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/browser-image-compression/-/browser-image-compression-1.0.6.tgz#3d710aea5a6bb1cb6804737418fceb8a527e79f2"
+  integrity sha512-gb++v1g26BgV/I9qrdXNzirFLDGcOiPmobVxuTJymNTFHbbxJnZ74o1GRoYHjDTgOt1Iypqh4Wk1K03C8tjXHQ==
+
 browser-process-hrtime@^0.1.2:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/browser-process-hrtime/-/browser-process-hrtime-0.1.3.tgz#616f00faef1df7ec1b5bf9cfe2bdc3170f26c7b4"

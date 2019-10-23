@@ -20,6 +20,7 @@
     "apollo-client": "^2.4.5",
     "apollo-link-context": "^1.0.9",
     "bcryptjs": "^2.4.3",
+    "browser-image-compression": "^1.0.6",
     "core-js": "^3.2.1",
     "country-data": "^0.0.31",
     "email-validator": "^2.0.4",
