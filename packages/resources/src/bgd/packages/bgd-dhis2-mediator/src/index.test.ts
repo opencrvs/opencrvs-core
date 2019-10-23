@@ -32,7 +32,7 @@ describe('Route authorization', () => {
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:bgd-dhis2-integration-user'
+        audience: 'opencrvs:api-user'
       }
     )
     const res = await server.server.inject({
@@ -53,7 +53,7 @@ describe('Route authorization', () => {
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:bgd-dhis2-integration-user'
+        audience: 'opencrvs:api-user'
       }
     )
     const res = await server.server.inject({
@@ -74,7 +74,7 @@ describe('Route authorization', () => {
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:bgd-dhis2-integration-user',
+        audience: 'opencrvs:api-user',
         expiresIn: '1ms'
       }
     )
@@ -101,7 +101,7 @@ describe('Route authorization', () => {
       {
         algorithm: 'HS512',
         issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:bgd-dhis2-integration-user'
+        audience: 'opencrvs:api-user'
       }
     )
     const res = await server.server.inject({
@@ -115,28 +115,27 @@ describe('Route authorization', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  // TODO: Disabled until we set the have an audience set for API users
-  // it('blocks requests signed with wrong audience', async () => {
-  //   const server = await createServer()
-  //   const token = jwt.sign(
-  //     {},
-  //     readFileSync('../../../../../auth/test/cert.key'),
-  //     {
-  //       algorithm: 'RS256',
-  //       issuer: 'opencrvs:auth-service',
-  //       audience: 'opencrvs:NOT_VALID'
-  //     }
-  //   )
-  //   const res = await server.server.inject({
-  //     method: 'GET',
-  //     url: '/ping',
-  //     headers: {
-  //       Authorization: `Bearer ${token}`
-  //     }
-  //   })
+  it('blocks requests signed with wrong audience', async () => {
+    const server = await createServer()
+    const token = jwt.sign(
+      {},
+      readFileSync('../../../../../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:NOT_VALID'
+      }
+    )
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
-  //   expect(res.statusCode).toBe(401)
-  // })
+    expect(res.statusCode).toBe(401)
+  })
 
   it('blocks requests signed with wrong issuer', async () => {
     const server = await createServer()
@@ -146,7 +145,7 @@ describe('Route authorization', () => {
       {
         algorithm: 'RS256',
         issuer: 'opencrvs:NOT_VALID',
-        audience: 'opencrvs:bgd-dhis2-integration-user'
+        audience: 'opencrvs:api-user'
       }
     )
     const res = await server.server.inject({

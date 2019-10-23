@@ -7,6 +7,7 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@register/forms'
+import moment from 'moment'
 import { set } from 'lodash'
 
 interface IPersonName {
@@ -460,7 +461,8 @@ export const fieldToReasonsNotApplyingTransformer = (
   transformedArrayName: string,
   transformedFieldName?: string,
   extraField?: string,
-  transformeValueArrayToBoolean?: boolean
+  transformeValueArrayToBoolean?: boolean,
+  isCaregiver?: boolean
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -494,7 +496,9 @@ export const fieldToReasonsNotApplyingTransformer = (
         )
       }
       return (
-        transField[transFieldName] && transField[transFieldName] === fieldValue
+        !isCaregiver &&
+        transField[transFieldName] &&
+        transField[transFieldName] === fieldValue
       )
     })
 
@@ -511,4 +515,29 @@ export const fieldToReasonsNotApplyingTransformer = (
       transformedField[transFieldName] = fieldValue
     }
   }
+}
+
+function formatDate(dateString: string) {
+  const [year, month, day] = dateString.split('-')
+  const date = moment(dateString, 'YYYY-M-D')
+
+  if (date.isValid() && year && month && day) {
+    return date.format('YYYY-MM-DD')
+  } else return null
+}
+
+export const longDateTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedFieldName || field.name
+  const sectionData = draftData[sectionId][field.name] as string
+
+  if (sectionData) {
+    transformedData[sectionId][fieldName] = formatDate(sectionData)
+  }
+
+  return transformedData
 }

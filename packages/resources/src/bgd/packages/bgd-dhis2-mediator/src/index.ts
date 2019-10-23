@@ -39,8 +39,8 @@ export async function createServer() {
     key: publicCert,
     verifyOptions: {
       algorithms: ['RS256'],
-      issuer: 'opencrvs:auth-service'
-      // audience: 'opencrvs:bgd-dhis2-integration-user' TODO enable this once we have API user that support it
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:api-user'
     },
     validate: (payload: any, request: Hapi.Request) =>
       validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)

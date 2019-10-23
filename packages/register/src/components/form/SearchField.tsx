@@ -15,7 +15,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/forms'
 import {
   buttonMessages,
   formMessages,
@@ -222,7 +222,7 @@ class SearchFieldClass extends React.Component<IFullProps, IState> {
         {!this.state.showModal && !this.state.showSearch && (
           <InputSection>
             <TextInput
-              id={this.props.fieldName + '-id'}
+              id={this.props.fieldName}
               value={fieldLocationName}
               disabled
               className="item"
