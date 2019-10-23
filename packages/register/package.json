@@ -25,7 +25,6 @@
     "country-data": "^0.0.31",
     "email-validator": "^2.0.4",
     "eslint-plugin-import": "^2.17.3",
-    "exif-rotate-js": "^1.0.3",
     "formik": "^1.5.1",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.4.2",

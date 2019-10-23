@@ -8703,22 +8703,10 @@ executable@4.1.1:
   dependencies:
     pify "^2.2.0"
 
-exif-js@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/exif-js/-/exif-js-2.3.0.tgz#9d10819bf571f873813e7640241255ab9ce1a814"
-  integrity sha1-nRCBm/Vx+HOBPnZAJBJVq5zhqBQ=
-
 exif-parser@^0.1.12:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/exif-parser/-/exif-parser-0.1.12.tgz#58a9d2d72c02c1f6f02a0ef4a9166272b7760922"
   integrity sha1-WKnS1ywCwfbwKg70qRZicrd2CSI=
-
-exif-rotate-js@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/exif-rotate-js/-/exif-rotate-js-1.0.3.tgz#5a4265dd28a903cd8953f9d2f46679d8a48c9756"
-  integrity sha512-6ZdPnwtdYiJNj8rNS44LXVmPBilurU/z+9nm0uFklTNDBxK+CL40/POK7SsWNXv55j1uCAQfaRw+ycOOeHuV+g==
-  dependencies:
-    exif-js "^2.3.0"
 
 exit-hook@^1.0.0:
   version "1.1.1"
