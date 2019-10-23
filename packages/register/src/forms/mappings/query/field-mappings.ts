@@ -320,11 +320,13 @@ export const eventLocationQueryTransformer = (
     transformedData[sectionId][field.name] = line[lineNumber - 1]
   } else if (fieldValue && ignoreAddressFields) {
     if (
-      (country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
+      (country &&
+        country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
         !ignoreAddressFields.fieldsToIgnoreForLocalAddress.includes(
           field.name
         )) ||
-      (country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
+      (country &&
+        country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
         !ignoreAddressFields.fieldsToIgnoreForInternationalAddress.includes(
           field.name
         ))

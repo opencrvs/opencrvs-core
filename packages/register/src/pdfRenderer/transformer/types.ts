@@ -7,9 +7,9 @@ import {
   TFontFamilyTypes
 } from 'pdfmake/build/pdfmake'
 import { IOfflineData } from '@register/offline/reducer'
-import { ICertificateCountry } from '@register/views/PrintCertificate/utils'
+import { IAvailableCountries } from '@register/views/PrintCertificate/utils'
 
-export type OptionalData = ICertificateCountry[]
+export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
@@ -96,7 +96,11 @@ export interface IOfflineAddressPayload {
     }
     addressType: string
     addressKey: string
-    formattedKeys: string
+    addresses: {
+      countryCode: string
+      localAddress: string
+      internationalAddress?: string
+    }
   }[]
 }
 

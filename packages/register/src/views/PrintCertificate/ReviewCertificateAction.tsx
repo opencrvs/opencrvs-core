@@ -34,7 +34,7 @@ import {
 } from '@register/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 import { IOfflineData } from '@register/offline/reducer'
-import { getCountryTranslations, ICertificateCountry } from './utils'
+import { getCountryTranslations, IAvailableCountries } from './utils'
 import { getOfflineData } from '@register/offline/selectors'
 import { countries } from '@register/forms/countries'
 
@@ -99,7 +99,7 @@ type IProps = {
   registrationId: string
   draft: IPrintableApplication
   userDetails: IUserDetails | null
-  countries: ICertificateCountry[]
+  countries: IAvailableCountries[]
   registerForm: IForm
   resources: IOfflineData
   modifyApplication: typeof modifyApplication

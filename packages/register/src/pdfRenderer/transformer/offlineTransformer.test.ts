@@ -37,7 +37,10 @@ describe('PDF template offline data related field transformer tests', () => {
               },
               addressType: 'facilities',
               addressKey: 'name',
-              formattedKeys: '{child.birthLocation}'
+              addresses: {
+                countryCode: 'BGD',
+                localAddress: '{child.birthLocation}'
+              }
             },
             {
               condition: {
@@ -46,8 +49,11 @@ describe('PDF template offline data related field transformer tests', () => {
               },
               addressType: 'locations',
               addressKey: 'name',
-              formattedKeys:
-                '{child.addressLine4}, {child.district}, {child.state}'
+              addresses: {
+                countryCode: 'child.country',
+                localAddress:
+                  '{child.addressLine4}, {child.district}, {child.state}, {child.country}'
+              }
             }
           ]
         },
@@ -83,30 +89,51 @@ describe('PDF template offline data related field transformer tests', () => {
       })
 
       expect(() =>
-        offlineTransformers.OfflineAddress(data, intl, {
-          language: 'en',
-          conditionalKeys: [
-            {
-              condition: {
-                key: 'child.placeOfBirth',
-                matchValues: ['INVALID']
+        offlineTransformers.OfflineAddress(
+          data,
+          intl,
+          {
+            language: 'en',
+            conditionalKeys: [
+              {
+                condition: {
+                  key: 'child.placeOfBirth',
+                  matchValues: ['INVALID']
+                },
+                addressType: 'locations',
+                addressKey: 'name',
+                addresses: {
+                  countryCode: 'child.country',
+                  localAddress:
+                    '{child.addressLine4}, {child.district}, {child.state}, {child.country}'
+                }
               },
-              addressType: 'locations',
-              addressKey: 'name',
-              formattedKeys:
-                '{child.addressLine4}, {child.district}, {child.state}'
-            },
+              {
+                condition: {
+                  key: 'child.invalid',
+                  matchValues: ['INVALID']
+                },
+                addressType: 'facilities',
+                addressKey: 'name',
+                addresses: {
+                  countryCode: 'BGD',
+                  localAddress: '{child.birthLocation}'
+                }
+              }
+            ]
+          },
+          [
             {
-              condition: {
-                key: 'child.invalid',
-                matchValues: ['INVALID']
-              },
-              addressType: 'facilities',
-              addressKey: 'name',
-              formattedKeys: '{child.birthLocation}'
+              language: 'en',
+              countries: [
+                {
+                  value: 'BGD',
+                  name: 'Bangladesh'
+                }
+              ]
             }
           ]
-        })
+        )
       ).toThrowError('No condition has matched for this transformer')
     })
     it('Returns the expected output when no key is defined to replace as param', () => {
@@ -114,20 +141,38 @@ describe('PDF template offline data related field transformer tests', () => {
         locale: 'en'
       })
 
-      const transformedValue = offlineTransformers.OfflineAddress(data, intl, {
-        language: 'en',
-        conditionalKeys: [
+      const transformedValue = offlineTransformers.OfflineAddress(
+        data,
+        intl,
+        {
+          language: 'en',
+          conditionalKeys: [
+            {
+              condition: {
+                key: 'child.placeOfBirth',
+                matchValues: ['HEALTH_FACILITY']
+              },
+              addressType: 'facilities',
+              addressKey: 'name',
+              addresses: {
+                countryCode: 'BGD',
+                localAddress: 'Dummy output'
+              }
+            }
+          ]
+        },
+        [
           {
-            condition: {
-              key: 'child.placeOfBirth',
-              matchValues: ['HEALTH_FACILITY']
-            },
-            addressType: 'facilities',
-            addressKey: 'name',
-            formattedKeys: 'Dummy output'
+            language: 'en',
+            countries: [
+              {
+                value: 'BGD',
+                name: 'Bangladesh'
+              }
+            ]
           }
         ]
-      })
+      )
       expect(transformedValue).toEqual('Dummy output')
     })
   })
@@ -156,7 +201,10 @@ describe('PDF template offline data related field transformer tests', () => {
             },
             addressType: 'facilities',
             addressKey: 'name',
-            formattedKeys: '{child.birthLocation}'
+            addresses: {
+              countryCode: 'BGD',
+              localAddress: '{child.birthLocation}'
+            }
           },
           {
             condition: {
@@ -165,8 +213,13 @@ describe('PDF template offline data related field transformer tests', () => {
             },
             addressType: 'locations',
             addressKey: 'name',
-            formattedKeys:
-              '{child.addressLine4}, {child.district}, {child.state}, {child.internationalDistrict}, {child.internationalState}, {child.country}'
+            addresses: {
+              countryCode: 'child.country',
+              localAddress:
+                '{child.addressLine4}, {child.district}, {child.state}, {child.country}',
+              internationalAddress:
+                '{child.internationalDistrict}, {child.internationalState}, {child.country}'
+            }
           }
         ]
       },
@@ -213,7 +266,10 @@ describe('PDF template offline data related field transformer tests', () => {
             },
             addressType: 'facilities',
             addressKey: 'name',
-            formattedKeys: '{child.birthLocation}'
+            addresses: {
+              countryCode: 'BGD',
+              localAddress: '{child.birthLocation}'
+            }
           },
           {
             condition: {
@@ -222,8 +278,13 @@ describe('PDF template offline data related field transformer tests', () => {
             },
             addressType: 'locations',
             addressKey: 'name',
-            formattedKeys:
-              '{child.addressLine4}, {child.district}, {child.state}, {child.internationalDistrict}, {child.internationalState}, {child.country}'
+            addresses: {
+              countryCode: 'child.country',
+              localAddress:
+                '{child.addressLine4}, {child.district}, {child.state}, {child.country}',
+              internationalAddress:
+                '{child.internationalDistrict}, {child.internationalState}, {child.country}'
+            }
           }
         ]
       },

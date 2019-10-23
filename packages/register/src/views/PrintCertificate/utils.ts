@@ -24,7 +24,7 @@ export interface ICountry {
   name: string
 }
 
-export interface ICertificateCountry {
+export interface IAvailableCountries {
   language?: string
   countries?: ICountry[]
 }
@@ -32,10 +32,10 @@ export interface ICertificateCountry {
 export function getCountryTranslations(
   languageState: ILanguageState,
   countries: ISelectOption[]
-): ICertificateCountry[] {
-  const certificateCountries: ICertificateCountry[] = []
+): IAvailableCountries[] {
+  const certificateCountries: IAvailableCountries[] = []
   getAvailableLanguages().forEach((language: string) => {
-    const certificateCountry: ICertificateCountry = { language }
+    const certificateCountry: IAvailableCountries = { language }
     const availableCountries: ICountry[] = []
     countries.forEach(country => {
       availableCountries.push({
