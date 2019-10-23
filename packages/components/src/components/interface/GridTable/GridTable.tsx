@@ -206,6 +206,7 @@ export class GridTable extends React.Component<
     // perform internal pagination
     const offset = (currentPage - 1) * pageSize
     const displayItems = allItems.slice(offset, offset + pageSize)
+
     return displayItems
   }
 
@@ -253,11 +254,17 @@ export class GridTable extends React.Component<
                 <RowWrapper
                   id={'row_' + index}
                   expandable={this.props.expandable}
-                  clickable={this.props.clickable}
+                  clickable={
+                    (item.rowClickable !== undefined
+                      ? item.rowClickable
+                      : this.props.clickable) as boolean
+                  }
                   onClick={() =>
                     (this.props.expandable &&
                       this.toggleExpanded(item.id as string)) ||
-                    (this.props.clickable &&
+                    ((item.rowClickable !== undefined
+                      ? item.rowClickable
+                      : this.props.clickable) &&
                       this.getRowClickHandler(
                         item.rowClickHandler as IAction[]
                       )())

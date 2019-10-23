@@ -180,6 +180,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           name: name || '',
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
+          rowClickable: !!draft.compositionId,
           rowClickHandler: [
             {
               label: 'rowClickHandler',
