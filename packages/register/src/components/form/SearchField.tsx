@@ -15,7 +15,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { TextInput, InputLabel } from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/forms'
 import {
   buttonMessages,
   formMessages,

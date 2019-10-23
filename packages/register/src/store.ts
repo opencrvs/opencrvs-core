@@ -11,8 +11,7 @@ import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
   connectRouter,
   routerMiddleware,
-  RouterState,
-  LocationChangeAction
+  RouterState
 } from 'connected-react-router'
 
 import { profileReducer, ProfileState } from '@register/profile/profileReducer'

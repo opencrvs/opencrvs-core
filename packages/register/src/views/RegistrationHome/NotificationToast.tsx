@@ -54,7 +54,7 @@ class NotificationToast extends React.Component<IFullProps> {
 
     return outboxData.length > 0 ? (
       <ExpandableNotificationContainer>
-        {/* <ExpandableNotification
+        <ExpandableNotification
           outboxText={this.props.intl.formatMessage(messages.outboxText, {
             num: outboxData.length
           })}
@@ -65,8 +65,8 @@ class NotificationToast extends React.Component<IFullProps> {
             }
           )}
         >
-         <Outbox application={outboxData} />
-        </ExpandableNotification> */}
+          <Outbox application={outboxData} />
+        </ExpandableNotification>
       </ExpandableNotificationContainer>
     ) : null
   }

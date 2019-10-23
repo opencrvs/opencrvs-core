@@ -1,10 +1,4 @@
-import {
-  IFormField,
-  IFormData,
-  TransformedData,
-  SEARCH_FIELD
-} from '@register/forms'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 
 export const birthEventLocationMutationTransformer = (
   lineNumber: number = 0,

@@ -3,9 +3,7 @@ import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from '@register/store'
 import { errorMessages, buttonMessages } from '@register/i18n/messages'
 
 const ErrorContainer = styled.div`
