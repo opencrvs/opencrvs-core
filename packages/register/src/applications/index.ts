@@ -57,6 +57,13 @@ export interface IVisitedGroupId {
   sectionId: string
   groupId: string
 }
+
+export interface ITimeLog {
+  role: string
+  userId: string
+  duration: number // in milliseconds
+}
+
 export interface IApplication {
   id: string
   data: IFormData
@@ -73,6 +80,7 @@ export interface IApplication {
   registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
+  timeLogged?: ITimeLog[]
 }
 
 type Relation =

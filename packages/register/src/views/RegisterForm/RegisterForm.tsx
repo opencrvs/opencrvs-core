@@ -179,6 +179,8 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
+  userId: string
+  role: string
 }
 
 export type FullProps = IFormProps &
@@ -246,6 +248,31 @@ class RegisterFormView extends React.Component<FullProps, State> {
         }
       }
     })
+  }
+
+  logTime(timeMs: number, userId: string, role: string) {
+    const application = this.props.application
+
+    if (!application.timeLogged) {
+      application.timeLogged = []
+    }
+
+    let log = application.timeLogged.find(
+      log => log.role === role && log.userId === userId
+    )
+
+    if (!log) {
+      log = {
+        role,
+        userId,
+        duration: 0
+      }
+      application.timeLogged.push(log)
+    }
+
+    log.duration += timeMs
+
+    this.props.modifyApplication(application)
   }
 
   confirmSubmission = (
@@ -367,7 +394,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
       handleSubmit,
       duplicate,
       activeSection,
-      activeSectionGroup
+      activeSectionGroup,
+      userId,
+      role
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -383,7 +412,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return (
       <TimeMounted
         onUnmount={(duration: number) => {
-          console.log(`Mounted for ${duration}ms`)
+          this.logTime(duration, userId, role)
         }}
       >
         <StyledContainer
@@ -653,6 +682,15 @@ function mapStateToProps(
 ) {
   const { match, registerForm, application } = props
 
+  if (
+    !state.profile.userDetails ||
+    !state.profile.userDetails.userMgntUserID ||
+    !state.profile.userDetails.role
+  ) {
+    throw new Error('User details not properly loaded into redux')
+  }
+  const { userMgntUserID, role } = state.profile.userDetails
+
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(
@@ -704,7 +742,9 @@ function mapStateToProps(
       ...activeSectionGroup,
       fields
     },
-    application
+    application,
+    userId: userMgntUserID,
+    role
   }
 }
 
