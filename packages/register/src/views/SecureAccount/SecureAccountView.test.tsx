@@ -7,9 +7,9 @@ import { ReactWrapper } from 'enzyme'
 describe('Login app > Secure Account Page', () => {
   let component: ReactWrapper
 
-  beforeEach(() => {
+  beforeEach(async () => {
     const { store } = createStore()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <SecureAccount onComplete={() => null} />,
       store
     )

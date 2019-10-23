@@ -1,19 +1,37 @@
 import * as React from 'react'
-import { createTestComponent } from '@register/tests/util'
+import { createTestComponent, mockOfflineData } from '@register/tests/util'
 import { createStore } from '@register/store'
 import { UserForm } from '@register/views/SysAdmin/views/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
+import { offlineDataReady } from '@register/offline/actions'
+
 const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
-  beforeEach(() => {
-    const testComponent = createTestComponent(
+  beforeEach(async () => {
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities,
+        assets: mockOfflineData.assets
+      })
+    )
+    const testComponent = await createTestComponent(
       // @ts-ignore
-      <UserForm section={userSection} />,
+      <UserForm
+        section={deserializeFormSection(userSection)}
+        activeGroup={deserializeFormSection(userSection).groups[0]}
+        nextGroupId="preview-user-view-group"
+        nextSectionId="preview"
+      />,
       store
     )
     component = testComponent.component
@@ -32,7 +50,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -51,7 +69,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -63,10 +81,10 @@ describe('Create new user page tests', () => {
     component.update()
 
     component
-      .find('#location-1')
+      .find('#location-0')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'location-1', value: 'checked' }
+        target: { id: 'location-0', value: 'checked' }
       })
     component.update()
 
@@ -79,10 +97,10 @@ describe('Create new user page tests', () => {
 
     expect(
       component
-        .find('#registrationOffice-id')
+        .find('#registrationOffice')
         .hostNodes()
         .props().value
-    ).toEqual('Amdia Union Parishad')
+    ).toEqual('Moktarpur Union Parishad')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
@@ -90,7 +108,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Barisal' }
       })
     component.update()
 
@@ -111,12 +129,12 @@ describe('Create new user page tests', () => {
     expect(component.find('#office-search-modal').hostNodes().length).toBe(0)
   })
 
-  it('it sets value to registerOffice  while modal select clicked', () => {
+  it('it sets value to registerOffice while modal select clicked', () => {
     component
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -134,7 +152,7 @@ describe('Create new user page tests', () => {
 
     component.update()
 
-    expect(component.find('#registrationOffice-id').hostNodes().length).toBe(1)
+    expect(component.find('#registrationOffice').hostNodes().length).toBe(1)
   })
 
   it('it opens modal  while edit registration office link clicked', () => {
@@ -142,7 +160,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur Union Parishad' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -168,7 +186,5 @@ describe('Create new user page tests', () => {
     component.update()
 
     expect(component.find('#office-search-modal').hostNodes().length).toBe(1)
-
-    component.unmount()
   })
 })

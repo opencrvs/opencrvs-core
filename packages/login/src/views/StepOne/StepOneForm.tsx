@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { InjectedIntlProps, defineMessages, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  defineMessages,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
@@ -23,7 +28,7 @@ import {
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   stepOneTitle: {
     id: 'buttons.login',
@@ -111,6 +116,7 @@ export const Title = styled.div`
   margin-top: 30px;
   color: ${({ theme }) => theme.colors.white};
   text-align: center;
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 export const StyledPrimaryButton = styled(PrimaryButton)`
   justify-content: center;
@@ -127,7 +133,7 @@ export const StyledButton = styled(Button)`
   flex-direction: row;
   justify-content: center;
   padding: 10px ${({ theme }) => theme.grid.margin}px;
-
+  ${({ theme }) => theme.fonts.bodyStyle};
   :hover {
     text-decoration: underline;
     text-decoration-color: ${({ theme }) => theme.colors.secondary};
@@ -149,14 +155,14 @@ export interface IDispatchProps {
 
 type IStepOneForm = IProps & IDispatchProps
 
-export type FullProps = InjectedIntlProps &
+export type FullProps = IntlShapeProps &
   InjectedFormProps<IAuthenticationData, IStepOneForm> &
   IStepOneForm
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
 
-type Props = WrappedFieldProps & InjectedIntlProps
+type Props = WrappedFieldProps & IntlShapeProps
 
 const UserNameInput = injectIntl((props: Props) => {
   const { intl, meta, input, ...otherProps } = props
@@ -242,21 +248,25 @@ export class StepOneForm extends React.Component<FullProps> {
             <Field
               name={userNameField.name}
               validate={userNameField.validate}
-              component={UserNameInput as React.ComponentClass<any>}
+              component={UserNameInput}
             />
           </FieldWrapper>
           <FieldWrapper>
             <Field
               name={passwordField.name}
               validate={passwordField.validate}
-              component={Password as React.ComponentClass<any>}
+              component={Password}
             />
           </FieldWrapper>
           <ActionWrapper>
             <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>
-            <StyledButton id="login-forgot-password" type="button">
+            <StyledButton
+              id="login-forgot-password"
+              type="button"
+              onClick={() => (window.location.href = '/forgotten-item')}
+            >
               {intl.formatMessage(messages.forgotPassword)}
             </StyledButton>
           </ActionWrapper>

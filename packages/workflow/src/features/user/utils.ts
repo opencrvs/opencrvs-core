@@ -1,7 +1,6 @@
 import { USER_MANAGEMENT_URL, COUNTRY } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
-import { logger } from '@workflow/logger'
 import { getTokenPayload } from '@workflow/utils/authUtils.ts'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 const JURISDICTION_TYPE_DISTRICT = 'district'
@@ -12,21 +11,24 @@ export async function getUserMobile(
   userId: string,
   authHeader: { Authorization: string }
 ) {
-  try {
-    const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
-      method: 'POST',
-      body: JSON.stringify({ userId }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-    const body = await res.json()
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
 
-    return body
-  } catch (err) {
-    logger.error(`Unable to retrieve mobile for error : ${err}`)
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve user mobile number. Error: ${res.status} status received`
+    )
   }
+
+  const body = await res.json()
+
+  return body
 }
 
 export const convertToLocal = (
@@ -90,7 +92,7 @@ export function getPrimaryLocationFromLocationList(
 }
 
 function getOfficeLocationFromLocationList(
-  locations: [fhir.Location]
+  locations: fhir.Location[]
 ): fhir.Location {
   let office: fhir.Location | undefined
   locations.forEach((location: fhir.Location) => {

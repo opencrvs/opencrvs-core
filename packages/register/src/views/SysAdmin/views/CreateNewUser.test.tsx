@@ -9,21 +9,24 @@ import {
   mockIncompleteFormData,
   mockCompleteFormData,
   mockUserGraphqlOperation,
-  mockFetchRoleGraphqlOperation
+  mockFetchRoleGraphqlOperation,
+  mockDataWithRegistarRoleSelected
 } from '@register/views/SysAdmin/user/utils'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 describe('create new user tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
   describe('when user is in create new user form', () => {
-    beforeEach(() => {
-      testComponent = createTestComponent(
+    beforeEach(async () => {
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user'
+              sectionId: 'user',
+              groupId: userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -32,7 +35,7 @@ describe('create new user tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
@@ -57,7 +60,7 @@ describe('create new user tests', () => {
           .find('#phoneNumber_error')
           .hostNodes()
           .text()
-      ).toBe('Required for registration')
+      ).toBe('Required to register a new user')
     })
 
     it('clicking on confirm button with complete data takes user to preview page', async () => {
@@ -76,17 +79,37 @@ describe('create new user tests', () => {
 
       expect(history.location.pathname).toContain('preview')
     })
+
+    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+
+      testComponent
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+
+      expect(history.location.pathname).toContain(
+        '/createUser/user/signature-attachment'
+      )
+    })
   })
 
   describe('when user in review page', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = createTestComponent(
+      testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'preview'
+              sectionId: 'preview',
+              groupId: 'preview-' + userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -95,7 +118,7 @@ describe('create new user tests', () => {
         />,
         store,
         [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
-      ).component
+      )).component
     })
 
     it('renders review header', () => {
@@ -113,7 +136,7 @@ describe('create new user tests', () => {
         .hostNodes()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user')
+      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
       expect(history.location.hash).toBe('#familyNameEng')
     })
 

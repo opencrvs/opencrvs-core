@@ -21,6 +21,8 @@ export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:applicationId/events/${Even
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:applicationId/events/:event/parent/:pageId'
+export const REVIEW_EVENT_PARENT_FORM_PAGE_GROUP =
+  '/reviews/:applicationId/events/:event/parent/:pageId/group/:groupId'
 
 export const SAVED_REGISTRATION = '/saved'
 export const REJECTED_REGISTRATION = '/rejected'
@@ -30,7 +32,13 @@ export const MY_RECORDS = '/my-records'
 export const MY_DRAFTS = '/my-drafts'
 export const REVIEW_DUPLICATES = '/duplicates/:applicationId'
 export const CONFIRMATION_SCREEN = '/confirm'
-export const PRINT_CERTIFICATE = '/print/:registrationId/:eventType'
+export const CERTIFICATE_COLLECTOR =
+  '/cert/collector/:registrationId/:eventType/:groupId'
+export const VERIFY_COLLECTOR =
+  '/print/check/:registrationId/:eventType/:collector'
+export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
+
+export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
@@ -43,4 +51,4 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const CREATE_USER = '/createUser'
-export const CREATE_USER_SECTION = '/createUser/:sectionId'
+export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'

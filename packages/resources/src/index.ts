@@ -13,9 +13,24 @@ import {
   AUTH_URL
 } from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
-
 import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
+import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
+import { assetHandler as bgdAssetHandler } from '@resources/bgd/features/assets/handler'
+import {
+  generatorHandler as bgdGeneratorHandler,
+  requestSchema as bgdGeneratorRequestSchema,
+  responseSchema as bgdGeneratorResponseSchema
+} from '@resources/bgd/features/generate/handler'
+import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
+import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
+import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
+import { assetHandler as zmbAssetHandler } from '@resources/zmb/features/assets/handler'
+import {
+  generatorHandler as zmbGeneratorHandler,
+  requestSchema as zmbGeneratorRequestSchema,
+  responseSchema as zmbGeneratorResponseSchema
+} from '@resources/zmb/features/generate/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -43,6 +58,8 @@ export async function createServer() {
 
   server.auth.default('jwt')
 
+  // Bangladesh
+
   server.route({
     method: 'GET',
     path: '/bgd/locations',
@@ -60,6 +77,104 @@ export async function createServer() {
     options: {
       tags: ['api'],
       description: 'Returns Bangladesh facilities.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/assets/{file}',
+    handler: bgdAssetHandler,
+    options: {
+      tags: ['api'],
+      description: 'Serves country specific assets, unprotected'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/definitions/{application}',
+    handler: bgdDefinitionsHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Serves definitional metadata like form definitions, language files and pdf templates'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/bgd/generate/{type}',
+    handler: bgdGeneratorHandler,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: bgdGeneratorRequestSchema
+      },
+      response: {
+        schema: bgdGeneratorResponseSchema
+      },
+      description:
+        'Generates registration numbers based on country specific implementation logic'
+    }
+  })
+
+  // Zambia
+
+  server.route({
+    method: 'GET',
+    path: '/zmb/locations',
+    handler: zmbLocationsHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns Bangladesh locations.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/zmb/facilities',
+    handler: zmbFacilitiesHandler,
+    options: {
+      tags: ['api'],
+      description: 'Returns Bangladesh facilities.json'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/zmb/assets/{file}',
+    handler: zmbAssetHandler,
+    options: {
+      tags: ['api'],
+      description: 'Serves country specific assets, unprotected'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/zmb/definitions/{application}',
+    handler: zmbDefinitionsHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Serves definitional metadata like form definitions, language files and pdf templates'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/zmb/generate/{type}',
+    handler: zmbGeneratorHandler,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: zmbGeneratorRequestSchema
+      },
+      response: {
+        schema: zmbGeneratorResponseSchema
+      },
+      description:
+        'Generates registration numbers based on country specific implementation logic'
     }
   })
 

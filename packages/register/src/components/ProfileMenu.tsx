@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import styled from '@register/styledComponents'
-import { injectIntl, InjectedIntlProps, InjectedIntl } from 'react-intl'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  IntlShape
+} from 'react-intl'
 import { IToggleMenuItem, ToggleMenu } from '@opencrvs/components/lib/interface'
 import {
   SettingsBlack,
@@ -9,10 +13,9 @@ import {
   AvatarSmall
 } from '@opencrvs/components/lib/icons'
 import { IStoreState } from '@register/store'
-import { IUserDetails } from '@register/utils/userUtils'
+import { IUserDetails, getIndividualNameObj } from '@register/utils/userUtils'
 import { getLanguage } from '@register/i18n/selectors'
 import { getUserDetails } from '@register/profile/profileSelectors'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { goToSettings } from '@register/navigation'
 import { buttonMessages, userMessages } from '@register/i18n/messages'
@@ -40,10 +43,10 @@ interface IState {
   showLogoutModal: boolean
 }
 
-type FullProps = IProps & InjectedIntlProps
+type FullProps = IProps & IntlShapeProps
 
 class ProfileMenuComponent extends React.Component<FullProps, IState> {
-  getMenuItems = (intl: InjectedIntl): IToggleMenuItem[] => {
+  getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
       icon: <SettingsBlack />,
@@ -59,7 +62,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
   }
 
   getMenuHeader = (
-    intl: InjectedIntl,
+    intl: IntlShape,
     language: string,
     userDetails: IUserDetails | null
   ): JSX.Element => {
@@ -67,12 +70,7 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
     let userRole
 
     if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === language
-        }
-      ) as GQLHumanName
+      const nameObj = getIndividualNameObj(userDetails.name, language)
 
       if (nameObj) {
         userName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`

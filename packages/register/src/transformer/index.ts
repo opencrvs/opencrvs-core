@@ -1,8 +1,43 @@
-import { IForm, IFormData } from '@register/forms'
+import {
+  IForm,
+  IFormData,
+  TransformedData,
+  IFormField,
+  IFormFieldMapping,
+  IFormFieldMutationMapFunction,
+  IFormFieldQueryMapFunction
+} from '@register/forms'
 import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
 } from '@register/forms/utils'
+
+const nestedFieldsMapping = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  fieldDef: IFormField,
+  mappingKey: keyof IFormFieldMapping
+) => {
+  let tempFormField: IFormField
+  for (let index in fieldDef.nestedFields) {
+    for (let nestedIndex in fieldDef.nestedFields[index]) {
+      tempFormField = fieldDef.nestedFields[index][nestedIndex]
+      tempFormField &&
+        tempFormField.mapping &&
+        tempFormField.mapping[mappingKey] &&
+        (tempFormField.mapping[mappingKey] as
+          | IFormFieldMutationMapFunction
+          | IFormFieldQueryMapFunction)(
+          transformedData,
+          draftData,
+          sectionId,
+          fieldDef,
+          tempFormField
+        )
+    }
+  }
+}
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
@@ -11,7 +46,7 @@ export const draftToGqlTransformer = (
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
   }
-  const transformedData: any = { createdAt: new Date() }
+  const transformedData: TransformedData = { createdAt: new Date() }
   let inCompleteData = false
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
@@ -22,7 +57,8 @@ export const draftToGqlTransformer = (
     }
     getVisibleSectionGroupsBasedOnConditions(
       section,
-      draftData[section.id]
+      draftData[section.id],
+      draftData
     ).forEach(groupDef => {
       groupDef.fields.forEach(fieldDef => {
         const conditionalActions: string[] = getConditionalActionsForField(
@@ -56,6 +92,13 @@ export const draftToGqlTransformer = (
               section.id,
               fieldDef
             )
+            nestedFieldsMapping(
+              transformedData,
+              draftData,
+              section.id,
+              fieldDef,
+              'mutation'
+            )
           } else {
             transformedData[section.id][fieldDef.name] =
               draftData[section.id][fieldDef.name]
@@ -86,6 +129,7 @@ export const draftToGqlTransformer = (
       transformedData.registration = { inProgress: true }
     }
   }
+
   return transformedData
 }
 
@@ -100,7 +144,17 @@ export const gqlToDraftTransformer = (
     throw new Error('Provided query data is not valid')
   }
   const transformedData: IFormData = {}
-  formDefinition.sections.forEach(section => {
+
+  const visibleSections = formDefinition.sections.filter(
+    section =>
+      getVisibleSectionGroupsBasedOnConditions(
+        section,
+        queryData[section.id] || {},
+        queryData
+      ).length > 0
+  )
+
+  visibleSections.forEach(section => {
     transformedData[section.id] = {}
     section.groups.forEach(groupDef => {
       groupDef.fields.forEach(fieldDef => {
@@ -110,6 +164,13 @@ export const gqlToDraftTransformer = (
             queryData,
             section.id,
             fieldDef
+          )
+          nestedFieldsMapping(
+            transformedData,
+            queryData,
+            section.id,
+            fieldDef,
+            'query'
           )
         } else if (
           queryData[section.id] &&

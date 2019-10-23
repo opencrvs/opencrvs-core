@@ -1,47 +1,51 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IReviewMessages {
-  additionalComments: ReactIntl.FormattedMessage.MessageDescriptor
-  backToPreview: ReactIntl.FormattedMessage.MessageDescriptor
-  editApplicationConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
-  editDocuments: ReactIntl.FormattedMessage.MessageDescriptor
-  formDataHeader: ReactIntl.FormattedMessage.MessageDescriptor
-  headerSubjectWithName: ReactIntl.FormattedMessage.MessageDescriptor
-  headerSubjectWithoutName: ReactIntl.FormattedMessage.MessageDescriptor
-  previewName: ReactIntl.FormattedMessage.MessageDescriptor
-  previewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescriptionComplete: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionDescriptionIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
-  registerActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  registerConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionDescriptionComplete: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionDescriptionIncomplete: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewName: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  submitConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  submitConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateConfirmationDesc: ReactIntl.FormattedMessage.MessageDescriptor
-  validateConfirmationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  valueApprove: ReactIntl.FormattedMessage.MessageDescriptor
-  zeroDocumentsText: ReactIntl.FormattedMessage.MessageDescriptor
-  createAndValidateApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  validateCompleteApplicationActionTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateCompleteApplicationActionDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  validateApplicationActionModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  validateApplicationActionModalDescription: ReactIntl.FormattedMessage.MessageDescriptor
+  additionalComments: MessageDescriptor
+  backToPreview: MessageDescriptor
+  editApplicationConfirmation: MessageDescriptor
+  editDocuments: MessageDescriptor
+  formDataHeader: MessageDescriptor
+  headerSubjectWithName: MessageDescriptor
+  headerSubjectWithoutName: MessageDescriptor
+  previewName: MessageDescriptor
+  previewTitle: MessageDescriptor
+  registerActionDescription: MessageDescriptor
+  registerActionDescriptionComplete: MessageDescriptor
+  registerActionDescriptionIncomplete: MessageDescriptor
+  registerActionTitle: MessageDescriptor
+  registerConfirmationTitle: MessageDescriptor
+  approvalActionDescriptionComplete: MessageDescriptor
+  approvalActionDescriptionIncomplete: MessageDescriptor
+  approvalActionTitle: MessageDescriptor
+  reviewActionDescriptionComplete: MessageDescriptor
+  reviewActionDescriptionIncomplete: MessageDescriptor
+  reviewActionTitle: MessageDescriptor
+  reviewName: MessageDescriptor
+  reviewTitle: MessageDescriptor
+  submitConfirmationDesc: MessageDescriptor
+  submitConfirmationTitle: MessageDescriptor
+  validateConfirmationDesc: MessageDescriptor
+  validateConfirmationTitle: MessageDescriptor
+  valueApprove: MessageDescriptor
+  zeroDocumentsText: MessageDescriptor
+  createAndValidateApplicationActionDescription: MessageDescriptor
+  validateCompleteApplicationActionTitle: MessageDescriptor
+  validateCompleteApplicationActionDescription: MessageDescriptor
+  validateApplicationActionModalTitle: MessageDescriptor
+  validateApplicationActionModalDescription: MessageDescriptor
+  govtName: MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
   validateCompleteApplicationActionTitle: {
     id: 'validate.complete.application.action.title',
-    defaultMessage: 'Ready to approve?'
+    defaultMessage: 'Send for approval or reject?'
   },
   validateCompleteApplicationActionDescription: {
     id: 'validate.complete.application.action.description',
     defaultMessage:
-      'By approving you confirm that the applicatiohn is ready to register'
+      'By sending for approval you confirm that the application is ready for approval'
   },
   validateApplicationActionModalTitle: {
     id: 'validate.application.action.modal.title',
@@ -108,7 +112,7 @@ const messagesToDefine: IReviewMessages = {
   },
   registerActionDescription: {
     defaultMessage:
-      'By registering this birth, a birth certificate will be generated with your signature for issuance.',
+      'By registering you confirm that you have reviewed this application and satisfied it fulfils requirements required for registration. ',
     id: 'review.actions.description'
   },
   registerActionDescriptionComplete: {
@@ -122,17 +126,35 @@ const messagesToDefine: IReviewMessages = {
     id: 'review.actions.description.registerConfirmInComplete'
   },
   registerActionTitle: {
-    defaultMessage: 'Register or reject?',
+    defaultMessage: 'Ready to register?',
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
-    defaultMessage: 'Register this application?',
+    defaultMessage: 'Register this {event}?',
     description: 'Title for register confirmation modal',
     id: 'review.modal.title.registerConfirmation'
   },
+  approvalActionDescriptionComplete: {
+    defaultMessage:
+      'By sending for approval you confirm that the application is ready for approval.',
+    description:
+      'Description for review action component when complete application',
+    id: 'approval.actions.description.Complete'
+  },
+  approvalActionDescriptionIncomplete: {
+    defaultMessage:
+      'Mandatory information is missing. Please add this information so that you can send for approval.',
+    id: 'approval.actions.description.inComplete'
+  },
+  approvalActionTitle: {
+    defaultMessage:
+      'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
+    description: 'Title for review action component',
+    id: 'approval.actions.title.applicationStatus'
+  },
   reviewActionDescriptionComplete: {
     defaultMessage:
-      'By sending this application for review, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.',
+      'By sending this application for review you confirm that the information has been reviewed by the applicant and that they are aware that they will receive an SMS with a tracking ID and details of how to collect the birth certificate',
     description:
       'Description for review action component when complete application',
     id: 'review.actions.description.confirmComplete'
@@ -146,7 +168,7 @@ const messagesToDefine: IReviewMessages = {
   },
   reviewActionTitle: {
     defaultMessage:
-      'Application is {completeApplication, select, true {complete} false {incomplete}}',
+      'Application {completeApplication, select, true {complete} false {incomplete}}',
     description: 'Title for review action component',
     id: 'review.actions.title.applicationStatus'
   },
@@ -174,7 +196,7 @@ const messagesToDefine: IReviewMessages = {
   },
   validateConfirmationDesc: {
     defaultMessage:
-      'This application will be sent to the registrar from them to approve.',
+      'This application will be sent to the registrar for them to approve.',
     description: 'Description for validate confirmation modal',
     id: 'register.form.modal.desc.validateConfirmation'
   },
@@ -193,23 +215,12 @@ const messagesToDefine: IReviewMessages = {
       'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
     description: 'Zero documents text',
     id: 'review.documents.zeroDocumentsText'
-  }
-}
-
-export const messages: IReviewMessages = defineMessages(messagesToDefine)
-
-interface IDynamicReviewMessages {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
-}
-
-const dynamicMessagesToDefine = {
-  bgdGovtName: {
-    id: 'review.header.title.govtName.bgd',
+  },
+  govtName: {
+    id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
   }
 }
 
-export const dynamicMessages: IDynamicReviewMessages = defineMessages(
-  dynamicMessagesToDefine
-)
+export const messages: IReviewMessages = defineMessages(messagesToDefine)

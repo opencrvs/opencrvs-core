@@ -1,23 +1,34 @@
-import fetch from 'node-fetch'
-import { resolve } from 'url'
 import { ILocation } from '@register/offline/reducer'
 import { getToken } from '@register/utils/authUtils'
+import { ILanguage } from '@register/i18n/reducer'
+import { ISerializedForm } from '@register/forms'
+import * as ImageDownloader from 'image-to-base64'
+import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
 
 export interface ILocationDataResponse {
-  data: { [key: string]: ILocation }
+  [locationId: string]: ILocation
 }
-
 export interface IFacilitiesDataResponse {
-  data: { [key: string]: ILocation }
+  [facilityId: string]: ILocation
+}
+export interface IDefinitionsResponse {
+  languages: ILanguage[]
+  forms: { registerForm: { birth: ISerializedForm; death: ISerializedForm } }
+  templates: {
+    receipt?: IPDFTemplate
+    certificates: {
+      birth: IPDFTemplate
+      death: IPDFTemplate
+    }
+  }
+}
+export interface IAssetResponse {
+  logo: string
 }
 
-async function loadLocations(): Promise<any> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/locations`
-  )
+async function loadDefinitions(): Promise<IDefinitionsResponse> {
+  const url = `${window.config.RESOURCES_URL}/definitions/register`
 
-  // @ts-ignore
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -29,18 +40,13 @@ async function loadLocations(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
-  return {
-    data: body.data
-  }
+  const response = await res.json()
+  return response
 }
 
-async function loadFacilities(): Promise<any> {
-  const url = resolve(
-    window.config.RESOURCES_URL,
-    `${window.config.COUNTRY}/facilities`
-  )
-  // @ts-ignore
+async function loadLocations(): Promise<ILocationDataResponse> {
+  const url = `${window.config.RESOURCES_URL}/locations`
+
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -52,13 +58,43 @@ async function loadFacilities(): Promise<any> {
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
+  const response = await res.json()
+  return response.data
+}
+
+async function loadFacilities(): Promise<IFacilitiesDataResponse> {
+  const url = `${window.config.RESOURCES_URL}/facilities`
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+  return response.data
+}
+
+async function loadAssets(): Promise<IAssetResponse> {
+  const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const base64Logo = await ImageDownloader(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
   return {
-    data: body.data
+    logo: `data:image;base64,${base64Logo}`
   }
 }
 
 export const referenceApi = {
   loadLocations,
-  loadFacilities
+  loadFacilities,
+  loadDefinitions,
+  loadAssets
 }

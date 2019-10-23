@@ -1,17 +1,18 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Event, Action } from '@register/forms'
 import { getBirthQueryMappings } from '@register/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@register/views/DataProvider/death/queries'
-import { Query } from 'react-apollo'
-import * as Sentry from '@sentry/browser'
+import { Query } from '@register/components/Query'
+import { WatchQueryFetchPolicy } from 'apollo-client'
 
 interface IQueryProviderProps {
   event: Event
   action: Action
   payload?: any
+  fetchPolicy?: WatchQueryFetchPolicy
 }
-type IProps = IQueryProviderProps & InjectedIntlProps
+type IProps = IQueryProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const QueryMapper = {
   [Event.BIRTH]: getBirthQueryMappings,
@@ -39,6 +40,7 @@ class QueryProviderComponent extends React.Component<IProps> {
       <Query
         query={eventQueryMapping.query}
         variables={this.props.payload || {}}
+        fetchPolicy={this.props.fetchPolicy || 'cache-first'} // By default, Apollo Client's fetch policy is cache-first
       >
         {({
           loading,
@@ -49,10 +51,6 @@ class QueryProviderComponent extends React.Component<IProps> {
           error?: any
           data: any
         }) => {
-          if (error) {
-            Sentry.captureException(error)
-          }
-
           return (
             <QueryContext.Provider
               value={{

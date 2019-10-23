@@ -6,9 +6,12 @@ import registerServiceWorker from '@register/registerServiceWorker'
 import { createStore } from '@register/store'
 import * as actions from '@register/notification/actions'
 import { storage } from '@register/storage'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@register/SubmissionController'
+import * as pdfjsLib from 'pdfjs-dist'
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
 storage.configStorage('OpenCRVS')
 
@@ -30,11 +33,11 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
-    dsn: 'https://8f6ba426b20045f1b91528d5fdc214b5@sentry.io/1401900'
+    dsn: window.config.SENTRY
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init('hxf1hb/opencrvs')
+  LogRocket.init(window.config.LOGROCKET)
 
   // Integrate the two
   Sentry.configureScope(scope => {
@@ -53,20 +56,22 @@ if (
   })
 }
 
-function onNewConentAvailable(waitingSW: ServiceWorker | null) {
+function onNewContentAvailable(waitingSW: ServiceWorker | null) {
   if (waitingSW) {
-    const action = actions.showNewContentAvailableNotification(waitingSW)
-    store.dispatch(action)
+    waitingSW.postMessage('skipWaiting')
+    window.location.reload()
   }
 }
 
 function onBackGroundSync() {
+  if (typeof BroadcastChannel === 'undefined') {
+    return
+  }
   const channel = new BroadcastChannel(
     window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
   )
   channel.onmessage = e => {
-    const syncCount = typeof e.data === 'number' ? e.data : 0
-    const action = actions.showBackgroundSyncedNotification(syncCount)
+    const action = actions.showBackgroundSyncedNotification()
     store.dispatch(action)
   }
 }
@@ -78,5 +83,5 @@ ReactDOM.render(
   document.getElementById('root')
 )
 
-registerServiceWorker(onNewConentAvailable)
+registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()

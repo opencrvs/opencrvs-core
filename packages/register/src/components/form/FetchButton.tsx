@@ -2,9 +2,14 @@ import * as React from 'react'
 import styled from '@register/styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { buttonMessages } from '@register/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -30,7 +35,7 @@ interface IFetchButtonState {
   show?: boolean
 }
 
-type IFullProps = IFetchButtonProps & InjectedIntlProps
+type IFullProps = IFetchButtonProps & IntlShapeProps
 
 const Container = styled.div`
   display: flex;
@@ -50,6 +55,7 @@ const Backdrop = styled.div`
 
 const ModalContent = styled.div`
   width: 30vw;
+  min-width: 305px;
   border-radius: 2px;
   background-color: ${({ theme }) => theme.colors.white};
   padding: 30px 30px 60px 30px;
@@ -131,7 +137,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     }
   }
 
-  getModalInfo = (intl: ReactIntl.InjectedIntl) => {
+  getModalInfo = (intl: IntlShape) => {
     const { variables, modalInfoText } = this.props.queryData as IQuery
     return (
       <>
@@ -218,4 +224,4 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
   }
 }
 
-export const FetchButtonField = injectIntl<IFullProps>(FetchButton)
+export const FetchButtonField = injectIntl<'intl', IFullProps>(FetchButton)

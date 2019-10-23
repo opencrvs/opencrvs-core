@@ -1,26 +1,25 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface INotificationsMessages {
-  declarationsSynced: ReactIntl.FormattedMessage.MessageDescriptor
-  draftsSaved: ReactIntl.FormattedMessage.MessageDescriptor
-  newContentAvailable: ReactIntl.FormattedMessage.MessageDescriptor
-  outboxText: ReactIntl.FormattedMessage.MessageDescriptor
-  processingText: ReactIntl.FormattedMessage.MessageDescriptor
-  statusRegistering: ReactIntl.FormattedMessage.MessageDescriptor
-  statusRejecting: ReactIntl.FormattedMessage.MessageDescriptor
-  statusSubmitting: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToRegister: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToReject: ReactIntl.FormattedMessage.MessageDescriptor
-  statusWaitingToSubmit: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormFail: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSuccess: ReactIntl.FormattedMessage.MessageDescriptor
-  waitingToRetry: ReactIntl.FormattedMessage.MessageDescriptor
+  declarationsSynced: MessageDescriptor
+  draftsSaved: MessageDescriptor
+  outboxText: MessageDescriptor
+  processingText: MessageDescriptor
+  statusRegistering: MessageDescriptor
+  statusRejecting: MessageDescriptor
+  statusSubmitting: MessageDescriptor
+  statusWaitingToRegister: MessageDescriptor
+  statusWaitingToReject: MessageDescriptor
+  statusWaitingToSubmit: MessageDescriptor
+  userFormFail: MessageDescriptor
+  userFormSuccess: MessageDescriptor
+  waitingToRetry: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
   declarationsSynced: {
     defaultMessage:
-      'As you have connectivity, we have synced {syncCount} new birth declarations.',
+      'As you have connectivity, we can synchronize your applications.',
     description:
       'The message that appears in notification when background sync takes place',
     id: 'notification.declarationsSynced'
@@ -30,12 +29,6 @@ const messagesToDefine: INotificationsMessages = {
     description:
       'The message that appears in notification when save drafts button is clicked',
     id: 'notification.draftsSaved'
-  },
-  newContentAvailable: {
-    defaultMessage: "We've made some updates, click here to refresh.",
-    description:
-      'The message that appears in notification when new content available.',
-    id: 'notification.newContentAvailable'
   },
   outboxText: {
     defaultMessage: 'Outbox({num})',

@@ -30,8 +30,7 @@ describe('when user is in the confirmation screen page for birth declaration', (
     fullNameInEng
   })
   beforeEach(async () => {
-    window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -125,7 +124,7 @@ describe('when user is in the confirmation screen page for birth declaration in 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -213,7 +212,7 @@ describe('when user is in the confirmation screen page for birth registration', 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -301,7 +300,7 @@ describe('when user is in the confirmation screen page for birth rejection', () 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -389,7 +388,7 @@ describe('when user is in the confirmation screen page for birth certification',
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -476,7 +475,7 @@ describe('when user is in the confirmation screen page for birth duplication', (
   })
   beforeEach(async () => {
     // window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -584,7 +583,7 @@ describe('when user is in the confirmation screen page for death declaration', (
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -680,7 +679,7 @@ describe('when user is in the confirmation screen page for death declaration in 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -768,7 +767,7 @@ describe('when user is in the confirmation screen page for death registration', 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -856,7 +855,7 @@ describe('when user is in the confirmation screen page for death rejection', () 
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -944,7 +943,7 @@ describe('when user is in the confirmation screen page for death certification',
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}
@@ -1030,7 +1029,7 @@ describe('when user is in the confirmation screen page for death duplication', (
   })
   beforeEach(async () => {
     window.location.assign = jest.fn()
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <ConfirmationScreen
         location={mock}
         history={history}

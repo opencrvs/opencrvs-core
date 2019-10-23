@@ -4,6 +4,8 @@ import { storage } from '@register/storage'
 import { IUserDetails } from '@register/utils/userUtils'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
+import { IQueryData } from '@register/views/RegistrationHome/RegistrationHome'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -27,9 +29,25 @@ export enum SUBMISSION_STATUS {
   READY_TO_REJECT = 'READY_TO_REJECT',
   REJECTING = 'REJECTING',
   REJECTED = 'REJECTED',
+  READY_TO_CERTIFY = 'READY_TO_CERTIFY',
+  CERTIFYING = 'CERTIFYING',
+  CERTIFIED = 'CERTIFIED',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
+
+export const processingStates = [
+  SUBMISSION_STATUS.READY_TO_SUBMIT,
+  SUBMISSION_STATUS.SUBMITTING,
+  SUBMISSION_STATUS.READY_TO_APPROVE,
+  SUBMISSION_STATUS.APPROVING,
+  SUBMISSION_STATUS.READY_TO_REGISTER,
+  SUBMISSION_STATUS.REGISTERING,
+  SUBMISSION_STATUS.READY_TO_REJECT,
+  SUBMISSION_STATUS.REJECTING,
+  SUBMISSION_STATUS.READY_TO_CERTIFY,
+  SUBMISSION_STATUS.CERTIFYING
+]
 
 export interface IPayload {
   [key: string]: IFormFieldValue
@@ -57,6 +75,59 @@ export interface IApplication {
   visitedGroupIds?: IVisitedGroupId[]
 }
 
+type Relation =
+  | 'FATHER'
+  | 'MOTHER'
+  | 'SPOUSE'
+  | 'SON'
+  | 'DAUGHTER'
+  | 'EXTENDED_FAMILY'
+  | 'OTHER'
+  | 'INFORMANT'
+
+export type ICertificate = {
+  collector?: Partial<{ type: Relation }>
+  hasShowedVerifiedDocument?: boolean
+  payments?: Payment
+  data?: string
+}
+
+/*
+ * This type represents a submitted application that we've received from the API
+ * It provides a more strict alternative to IApplication with fields we know should always exist
+ */
+export interface IPrintableApplication extends Omit<IApplication, 'data'> {
+  data: {
+    father: {
+      fathersDetailsExist: boolean
+      [key: string]: IFormFieldValue
+    }
+    registration: {
+      _fhirID: string
+      presentAtBirthRegistration: Relation
+      whoseContactDetails: string
+      registrationPhone: string
+      trackingId: string
+      registrationNumber: string
+      certificates: ICertificate[]
+      [key: string]: IFormFieldValue
+    }
+  } & Exclude<IApplication['data'], 'father' | 'registration'>
+}
+
+type PaymentType = 'MANUAL'
+
+type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
+
+type Payment = {
+  paymentId?: string
+  type: PaymentType
+  total: string
+  amount: string
+  outcome: PaymentOutcomeType
+  date: number
+}
+
 interface IStoreApplicationAction {
   type: typeof STORE_APPLICATION
   payload: { application: IApplication }
@@ -65,14 +136,14 @@ interface IStoreApplicationAction {
 interface IModifyApplicationAction {
   type: typeof MODIFY_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
 export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
@@ -83,7 +154,7 @@ interface ISetInitialApplicationsAction {
 interface IDeleteApplicationAction {
   type: typeof DELETE_APPLICATION
   payload: {
-    application: IApplication
+    application: IApplication | IPrintableApplication
   }
 }
 
@@ -114,14 +185,14 @@ export interface IUserData {
 
 export interface IApplicationsState {
   userID: string
-  initialApplicationsLoaded: boolean
   applications: IApplication[]
+  initialApplicationsLoaded: boolean
 }
 
 const initialState = {
   userID: '',
-  initialApplicationsLoaded: false,
-  applications: []
+  applications: [],
+  initialApplicationsLoaded: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {
@@ -155,7 +226,7 @@ export function storeApplication(
 }
 
 export function modifyApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IModifyApplicationAction {
   application.modifiedOn = Date.now()
   return { type: MODIFY_APPLICATION, payload: { application } }
@@ -176,13 +247,13 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
 })
 
 export function deleteApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IDeleteApplicationAction {
   return { type: DELETE_APPLICATION, payload: { application } }
 }
 
 export function writeApplication(
-  application: IApplication
+  application: IApplication | IPrintableApplication
 ): IWriteApplicationAction {
   return { type: WRITE_APPLICATION, payload: { application } }
 }
@@ -382,5 +453,67 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       }
     default:
       return state
+  }
+}
+
+export function filterProcessingApplications(
+  data: GQLEventSearchResultSet,
+  processingApplicationIds: string[]
+): GQLEventSearchResultSet {
+  if (!data.results) {
+    return data
+  }
+
+  const filteredResults = data.results.filter(result => {
+    if (result === null) {
+      return false
+    }
+
+    return !processingApplicationIds.includes(result.id)
+  })
+  const filteredTotal =
+    (data.totalItems || 0) - (data.results.length - filteredResults.length)
+
+  return {
+    results: filteredResults,
+    totalItems: filteredTotal
+  }
+}
+
+export function filterProcessingApplicationsFromQuery(
+  queryData: IQueryData,
+  storedApplications: IApplication[]
+): IQueryData {
+  const processingApplicationIds = storedApplications
+    .filter(
+      application =>
+        application.submissionStatus &&
+        processingStates.includes(
+          application.submissionStatus as SUBMISSION_STATUS
+        )
+    )
+    .map(application => application.id)
+
+  return {
+    inProgressTab: filterProcessingApplications(
+      queryData.inProgressTab,
+      processingApplicationIds
+    ),
+    reviewTab: filterProcessingApplications(
+      queryData.reviewTab,
+      processingApplicationIds
+    ),
+    rejectTab: filterProcessingApplications(
+      queryData.rejectTab,
+      processingApplicationIds
+    ),
+    approvalTab: filterProcessingApplications(
+      queryData.approvalTab,
+      processingApplicationIds
+    ),
+    printTab: filterProcessingApplications(
+      queryData.printTab,
+      processingApplicationIds
+    )
   }
 }

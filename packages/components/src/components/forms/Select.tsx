@@ -75,6 +75,10 @@ const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
       }`
       : ''
   }}
+
+  .react-select__value-container {
+    padding: 0;
+  }
 `
 
 function getSelectedOption(
@@ -94,6 +98,7 @@ export interface ISelectProps
   onChange: (value: string) => void
   value: string
   color?: string
+  searchableLength?: number
 }
 
 export class Select extends React.Component<ISelectProps> {
@@ -103,12 +108,15 @@ export class Select extends React.Component<ISelectProps> {
     }
   }
   render() {
+    const length = this.props.searchableLength || 10
+
     return (
       <StyledSelect
         classNamePrefix="react-select"
         components={{ DropdownIndicator }}
         {...this.props}
         onChange={this.change}
+        isSearchable={this.props.options.length > length}
         value={getSelectedOption(this.props.value, this.props.options)}
       />
     )

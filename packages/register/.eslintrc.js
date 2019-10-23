@@ -16,6 +16,7 @@ module.exports = {
     jest: true
   },
   rules: {
+    'import/namespace': 'off',
     'prettier/prettier': [
       'error',
       {
@@ -29,6 +30,23 @@ module.exports = {
     ],
     'no-console': 'off',
     'no-return-assign': 'off',
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@sentry/browser',
+            message: `Errors should be sent to Sentry from few centralised places of our codebase.
+Query component now sends errors automatically to Sentry.`
+          },
+          {
+            name: 'react-apollo',
+            importNames: ['Query'],
+            message: `Please use our own <Query /> component instead from components/Query.tsx`
+          }
+        ]
+      }
+    ],
     'no-unreachable': 2,
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',

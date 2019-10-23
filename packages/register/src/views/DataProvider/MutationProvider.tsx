@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Event, Action, IForm } from '@register/forms'
 import { getBirthMutationMappings } from '@register/views/DataProvider/birth/mutations'
 import { getDeathMutationMappings } from '@register/views/DataProvider/death/mutations'
@@ -15,7 +15,7 @@ interface IMutationProviderProps {
   onCompleted: (data: any) => void
   onError?: (error: any) => void
 }
-type IProps = IMutationProviderProps & InjectedIntlProps
+type IProps = IMutationProviderProps & IntlShapeProps
 /* Need to add mappings for events here */
 const MutationMapper = {
   [Event.BIRTH]: getBirthMutationMappings,

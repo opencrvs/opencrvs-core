@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
@@ -25,8 +25,8 @@ import {
   QueryProvider,
   QueryContext
 } from '@register/views/DataProvider/QueryProvider'
-import * as Sentry from '@sentry/browser'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@register/navigation/routes'
+
+import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@register/navigation/routes'
 import { errorMessages } from '@register/i18n/messages'
 
 interface IReviewProps {
@@ -43,7 +43,7 @@ interface IApplicationProp {
 type IProps = IReviewProps &
   IApplicationProp &
   FullProps &
-  InjectedIntlProps &
+  IntlShapeProps &
   RouteComponentProps<{}>
 
 export interface IReviewSectionDetails {
@@ -97,8 +97,6 @@ export class ReviewFormView extends React.Component<IProps> {
                 )
               }
               if (error) {
-                Sentry.captureException(error)
-
                 return (
                   <ErrorText id="review-error-text">
                     {intl.formatMessage(errorMessages.registrationQueryError)}
@@ -155,6 +153,7 @@ function mapStatetoProps(
   props: RouteComponentProps<{
     pageRoute: string
     pageId: string
+    groupId: string
     applicationId: string
     event: string
   }>
@@ -177,7 +176,7 @@ function mapStatetoProps(
     applicationId: match.params.applicationId,
     event: getEvent(match.params.event),
     registerForm: form,
-    pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+    pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
     duplicate: history.location.state && history.location.state.duplicate
   }
 }

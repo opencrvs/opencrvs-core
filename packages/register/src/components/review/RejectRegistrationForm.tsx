@@ -7,7 +7,7 @@ import { hasFormError } from '@register/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/register/src/review/reject-registration'
 import { getRejectForm } from '@opencrvs/register/src/review/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import {
   IApplication,
@@ -55,7 +55,7 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = InjectedIntlProps & IProps & { form: IRejectRegistrationForm }
+type IFullProps = IntlShapeProps & IProps & { form: IRejectRegistrationForm }
 
 class RejectRegistrationView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {

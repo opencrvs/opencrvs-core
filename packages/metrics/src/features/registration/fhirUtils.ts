@@ -1,6 +1,5 @@
-import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl } from '@metrics/constants'
+import { fetchTaskHistory } from '@metrics/api'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -36,6 +35,73 @@ export function getSectionBySectionCode(
   return personEntry.resource as fhir.Patient
 }
 
+function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
+  return resource.resourceType === 'Task'
+}
+
+export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED' | 'VALIDATED'
+
+function findPreviousTask(
+  historyResponseBundle: fhir.Bundle,
+  allowedPreviousStates: APPLICATION_STATUS[]
+) {
+  const task =
+    historyResponseBundle.entry &&
+    historyResponseBundle.entry
+      .map(entry => entry.resource)
+      .filter((resource): resource is fhir.Task =>
+        Boolean(resource && isTaskResource(resource))
+      )
+      .find(resource => {
+        if (!resource.businessStatus || !resource.businessStatus.coding) {
+          return false
+        }
+
+        return resource.businessStatus.coding.some(coding =>
+          allowedPreviousStates.includes(coding.code as APPLICATION_STATUS)
+        )
+      })
+
+  if (!task) {
+    return null
+  }
+  return task as Task
+}
+
+export type Task = fhir.Task & { id: string }
+export type Composition = fhir.Composition & { id: string }
+
+export function getTask(bundle: fhir.Bundle) {
+  return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
+}
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export async function getPreviousTask(
+  task: Task,
+  allowedPreviousStates: APPLICATION_STATUS[],
+  authHeader: IAuthHeader
+) {
+  const taskHistory = await fetchTaskHistory(task.id, authHeader)
+  return findPreviousTask(taskHistory, allowedPreviousStates)
+}
+
+export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
+  if (!task.businessStatus || !task.businessStatus.coding) {
+    return null
+  }
+
+  const coding = task.businessStatus.coding.find(
+    ({ system }) => system === 'http://opencrvs.org/specs/reg-status'
+  )
+  if (!coding) {
+    return null
+  }
+  return coding.code as APPLICATION_STATUS
+}
+
 export function getRegLastLocation(bundle: fhir.Bundle) {
   const task: fhir.Task = getResourceByType(
     bundle,
@@ -58,18 +124,10 @@ export function getRegLastLocation(bundle: fhir.Bundle) {
   )
 }
 
-export async function fetchParentLocationByLocationID(
-  locationID: string,
-  authHeader: IAuthHeader
-) {
-  const location = await fetchFHIR(locationID, authHeader)
-  return location && location.partOf && location.partOf.reference
-}
-
-export function getResourceByType(
+export function getResourceByType<T = fhir.Resource>(
   bundle: fhir.Bundle,
   type: string
-): fhir.Resource | undefined {
+): T | undefined {
   const bundleEntry =
     bundle &&
     bundle.entry &&
@@ -80,32 +138,10 @@ export function getResourceByType(
         return entry.resource.resourceType === type
       }
     })
-  return bundleEntry && (bundleEntry.resource as fhir.Resource)
+  return bundleEntry && (bundleEntry.resource as T)
 }
 
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task'
-}
-
-export const fetchFHIR = (
-  suffix: string,
-  authHeader: IAuthHeader,
-  method: string = 'GET',
-  body: string | undefined = undefined
-) => {
-  return fetch(`${fhirUrl}${suffix}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/fhir+json',
-      ...authHeader
-    },
-    body
-  })
-    .then(response => {
-      return response.json()
-    })
-    .catch(error => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
 }

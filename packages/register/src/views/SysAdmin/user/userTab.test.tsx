@@ -4,10 +4,10 @@ import { createTestComponent, flushPromises } from '@register/tests/util'
 import * as React from 'react'
 import { UserTab } from './userTab'
 
-describe('User tab tests', async () => {
+describe('User tab tests', () => {
   const { store } = createStore()
 
-  describe('Header test', async () => {
+  describe('Header test', () => {
     it('renders header with user count', async () => {
       const userListMock = [
         {
@@ -28,7 +28,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -69,7 +69,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -95,7 +95,7 @@ describe('User tab tests', async () => {
     })
   })
 
-  describe('Table test', async () => {
+  describe('Table test', () => {
     it('renders no result text for empty user list in response', async () => {
       const userListMock = [
         {
@@ -116,7 +116,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -224,7 +224,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -242,7 +242,7 @@ describe('User tab tests', async () => {
     })
   })
 
-  describe('Pagination test', async () => {
+  describe('Pagination test', () => {
     it('renders no pagination block when the total amount of data is not applicable for pagination', async () => {
       const userListMock = [
         {
@@ -334,7 +334,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -511,7 +511,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,
@@ -693,7 +693,7 @@ describe('User tab tests', async () => {
           }
         }
       ]
-      const testComponent = createTestComponent(
+      const testComponent = await createTestComponent(
         // @ts-ignore
         <UserTab />,
         store,

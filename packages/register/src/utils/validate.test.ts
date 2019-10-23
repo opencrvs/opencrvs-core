@@ -21,7 +21,9 @@ import {
   dateLessThan,
   dateNotInFuture,
   dateFormatIsCorrect,
-  dateInPast
+  dateInPast,
+  validLength,
+  isDateAfter
 } from '@register/utils/validate'
 import { validationMessages as messages } from '@register/i18n/messages'
 
@@ -83,17 +85,29 @@ describe('validate', () => {
           description: 'The error message that appears on required fields'
         }
       }
-      expect(required(badValue)).toEqual(response)
+      expect(required()(badValue)).toEqual(response)
+    })
+    it('Should return custom error message when supplied a bad value and custom error message', () => {
+      const badValue = ''
+      const customErrorMessageDescriptor = {
+        id: 'validations.userform.required',
+        defaultMessage: 'Required for new user',
+        description: 'The error message that appears on required fields'
+      }
+      const response = {
+        message: customErrorMessageDescriptor
+      }
+      expect(required(customErrorMessageDescriptor)(badValue)).toEqual(response)
     })
     it('should pass when supplied a good value.', () => {
       const goodValue = 'jkgjgjgkgjkj'
       const response = undefined
-      expect(required(goodValue)).toEqual(response)
+      expect(required()(goodValue)).toEqual(response)
     })
     it('should pass when supplied a good boolean value', () => {
       const goodValue = true
       const response = undefined
-      expect(required(goodValue)).toEqual(response)
+      expect(required()(goodValue)).toEqual(response)
     })
   })
 
@@ -332,7 +346,7 @@ describe('validate', () => {
         message: {
           id: 'validations.phoneNumberFormat',
           defaultMessage:
-            'Must be {num} digit valid mobile phone number that stars with {start}',
+            'Must be a valid {num} digit number that starts with {start}',
           description:
             'The error message that appears on phone numbers where the first two characters must be a 01 and length must be 11'
         },
@@ -716,6 +730,19 @@ describe('validate', () => {
     })
   })
 
+  describe('isDateAfter. Checks if a given date is after a given date', () => {
+    it('should be okay with first after second', () => {
+      const first = '1995-10-10'
+      const second = '1971-02-23'
+      expect(isDateAfter(first, second)).toEqual(true)
+    })
+    it('should not be okay with first after second', () => {
+      const second = '1995-10-10'
+      const first = '1994-10-10'
+      expect(isDateAfter(first, second)).toEqual(false)
+    })
+  })
+
   describe('dateFormatIsCorrect. Checks if a given date is in correct format', () => {
     it('should error when input invalid chararcters', () => {
       const invalidDate = '1901-+2-2e'
@@ -752,23 +779,29 @@ describe('validate', () => {
   })
 
   describe('isValidDeathOccrenceDate. Checks a given date of death is valid', () => {
+    const drafts = {
+      deceased: {
+        birthDate: '1991-10-22'
+      }
+    }
+
     it('should error when input invalid chararcters', () => {
       const invalidDate = '1901-+2-2e'
-      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+      expect(isValidDeathOccurrenceDate(invalidDate, drafts)).toEqual({
         message: messages.isValidDateOfDeath
       })
     })
 
     it('should error when input invalid format', () => {
       const invalidDate = '190-2-21'
-      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+      expect(isValidDeathOccurrenceDate(invalidDate, drafts)).toEqual({
         message: messages.isValidDateOfDeath
       })
     })
 
     it('should error when input invalid date', () => {
       const invalidDate = '2017-2-29'
-      expect(isValidDeathOccurrenceDate(invalidDate)).toEqual({
+      expect(isValidDeathOccurrenceDate(invalidDate, drafts)).toEqual({
         message: messages.isValidDateOfDeath
       })
     })
@@ -776,7 +809,15 @@ describe('validate', () => {
     it('should error when input a future date', () => {
       const futureDate = '2099-08-12'
 
-      expect(isValidDeathOccurrenceDate(futureDate)).toEqual({
+      expect(isValidDeathOccurrenceDate(futureDate, drafts)).toEqual({
+        message: messages.isValidDateOfDeath
+      })
+    })
+
+    it('should error when input a date before DOB of deceased', () => {
+      const futureDate = '1991-10-21'
+
+      expect(isValidDeathOccurrenceDate(futureDate, drafts)).toEqual({
         message: messages.isValidDateOfDeath
       })
     })
@@ -784,13 +825,13 @@ describe('validate', () => {
     it('should pass when supplied a valid date with single digit', () => {
       const validDate = '2011-8-12'
       const response = undefined
-      expect(isValidDeathOccurrenceDate(validDate)).toEqual(response)
+      expect(isValidDeathOccurrenceDate(validDate, drafts)).toEqual(response)
     })
 
     it('should pass when supplied a valid date', () => {
       const validDate = '2011-08-12'
       const response = undefined
-      expect(isValidDeathOccurrenceDate(validDate)).toEqual(response)
+      expect(isValidDeathOccurrenceDate(validDate, drafts)).toEqual(response)
     })
   })
 
@@ -811,6 +852,20 @@ describe('validate', () => {
       const goodValue = '1'
       const response = undefined
       expect(greaterThanZero(goodValue)).toEqual(response)
+    })
+  })
+
+  describe('Checking validLength function', () => {
+    it('Should return error message', () => {
+      const factory = validLength(5)
+      const result = factory(999999)
+      expect(!!result).toBe(true)
+    })
+
+    it('Should return no error', () => {
+      const factory = validLength(5)
+      const result = factory(99999)
+      expect(!!result).toBe(false)
     })
   })
 })

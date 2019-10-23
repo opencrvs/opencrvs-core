@@ -11,7 +11,7 @@ const mockHandleClose = jest.fn()
 describe('when user opens the log out modal', () => {
   let logoutComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       <NotDuplicateConfirmation
         show={true}
         handleYes={mockHandleYes}

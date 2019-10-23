@@ -2,8 +2,13 @@ import {
   IFormField,
   IFormData,
   IFormFieldValue,
-  IAttachment
+  IAttachment,
+  TransformedData,
+  IFormSectionData,
+  IFormFieldMutationMapFunction
 } from '@register/forms'
+import moment from 'moment'
+import { set } from 'lodash'
 
 interface IPersonName {
   [key: string]: string
@@ -13,7 +18,7 @@ export const fieldToNameTransformer = (
   language: string,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -41,7 +46,7 @@ export const fieldToNameTransformer = (
 }
 
 export function ignoreFieldTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -51,7 +56,7 @@ export function ignoreFieldTransformer(
 }
 
 export function fieldToArrayTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -61,7 +66,7 @@ export function fieldToArrayTransformer(
 }
 
 export const fieldToIdentifierTransformer = (identifierField: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -74,6 +79,36 @@ export const fieldToIdentifierTransformer = (identifierField: string) => (
   return transformedData
 }
 
+export const fieldToIdentityTransformer = (
+  identifierField: string,
+  identityType: string
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const sectionData = transformedData[sectionId]
+  if (!sectionData.identifier) {
+    sectionData.identifier = []
+  }
+
+  const existingIdentity = sectionData.identifier.find(
+    (identifier: fhir.Identifier) =>
+      identifier.type && identifier.type === identityType
+  )
+  if (!existingIdentity) {
+    sectionData.identifier.push({
+      [identifierField]: draftData[sectionId][field.name],
+      type: identityType
+    })
+  } else {
+    existingIdentity[identifierField] = draftData[sectionId][field.name]
+    existingIdentity.type = identityType
+  }
+  return transformedData
+}
+
 interface IAddress {
   [key: string]: any
 }
@@ -83,12 +118,13 @@ export const fieldToAddressTransformer = (
   lineNumber: number = 0,
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
   const sectionData = transformedData[sectionId]
+
   if (!sectionData.address) {
     sectionData.address = []
   }
@@ -108,11 +144,12 @@ export const fieldToAddressTransformer = (
     address[!transformedFieldName ? field.name : transformedFieldName] =
       draftData[sectionId][field.name]
   }
+
   return transformedData
 }
 
 export const fieldNameTransformer = (transformedFieldName: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -126,7 +163,7 @@ export const fieldValueSectionExchangeTransformer = (
   toSectionId: string,
   toSectionField?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -142,7 +179,7 @@ export const fieldValueSectionExchangeTransformer = (
 export const sectionFieldToBundleFieldTransformer = (
   transformedFieldName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -155,8 +192,30 @@ export const sectionFieldToBundleFieldTransformer = (
   return transformedData
 }
 
+export const nestedRadioFieldToBundleFieldTransformer = (
+  transformedFieldName?: string
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  if (transformedFieldName) {
+    set(
+      transformedData,
+      transformedFieldName,
+      (draftData[sectionId][field.name] as IFormSectionData).value
+    )
+  } else {
+    transformedData[field.name] = (draftData[sectionId][
+      field.name
+    ] as IFormSectionData).value
+  }
+  return transformedData
+}
+
 export const copyEventAddressTransformer = (fromSection: string) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -164,7 +223,7 @@ export const copyEventAddressTransformer = (fromSection: string) => (
   if (
     draftData[sectionId][field.name] === 'OTHER' ||
     draftData[sectionId][field.name] === 'PRIVATE_HOME' ||
-    draftData[sectionId][field.name] === 'HEALTH_INSTITUTION'
+    draftData[sectionId][field.name] === 'HEALTH_FACILITY'
   ) {
     transformedData.eventLocation = { type: draftData[sectionId][field.name] }
     return transformedData
@@ -202,7 +261,7 @@ export const copyAddressTransformer = (
   triggerValue: boolean = true,
   nodeName?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -247,7 +306,7 @@ export const copyAddressTransformer = (
 }
 
 export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -260,7 +319,7 @@ export const sectionRemoveTransformer = (triggerValue: boolean = false) => (
 }
 
 export function fieldToCommentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -280,7 +339,7 @@ export function fieldToCommentTransformer(
 }
 
 export function fieldToAttachmentTransformer(
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField,
@@ -322,7 +381,7 @@ export function fieldToAttachmentTransformer(
 export const fieldToPhoneNumberTransformer = (
   transformedSectionId?: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -336,7 +395,7 @@ export const fieldToPhoneNumberTransformer = (
 export const fieldToIdentifierWithTypeTransformer = (
   identifierType: string
 ) => (
-  transformedData: any,
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
@@ -350,14 +409,135 @@ export const fieldToIdentifierWithTypeTransformer = (
   return transformedData
 }
 
-export const fieldNameValueTransformer = (transformedFieldName: string) => (
-  transformedData: any,
+export const nestedRadioFieldTransformer = (
+  transformedFieldName?: string,
+  nestedTransformer?: IFormFieldMutationMapFunction
+) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField,
+  nestedField?: IFormField
+) => {
+  const fieldValueObj = draftData[sectionId][field.name] as IFormSectionData
+  let partialDraftData: IFormData = {}
+
+  if (!nestedField) {
+    const parentData: IFormSectionData = {}
+    parentData[field.name] = fieldValueObj.value as IFormSectionData
+    partialDraftData[sectionId] = parentData
+  } else if (nestedField) {
+    if (
+      nestedField.extraValue &&
+      nestedField.extraValue !== fieldValueObj.value
+    ) {
+      return
+    }
+    partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
+  }
+
+  if (nestedTransformer) {
+    nestedTransformer(
+      transformedData,
+      partialDraftData,
+      sectionId,
+      nestedField || field
+    )
+  } else {
+    const transFieldName = transformedFieldName
+      ? transformedFieldName
+      : nestedField
+      ? nestedField.name
+      : field.name
+    const fieldValue = !nestedField
+      ? fieldValueObj.value
+      : (fieldValueObj.nestedFields as IFormSectionData)[nestedField.name]
+
+    transformedData[sectionId][transFieldName] = fieldValue
+  }
+}
+
+export const fieldToReasonsNotApplyingTransformer = (
+  transformedArrayName: string,
+  transformedFieldName?: string,
+  extraField?: string,
+  transformeValueArrayToBoolean?: boolean,
+  isCaregiver?: boolean
+) => (
+  transformedData: TransformedData,
   draftData: IFormData,
   sectionId: string,
   field: IFormField
 ) => {
-  transformedData[sectionId][transformedFieldName] = (draftData[sectionId][
-    field.name
-  ] as { [key: string]: string }).value
+  let fieldValue = draftData[sectionId][field.name]
+  const transFieldName = transformedFieldName
+    ? transformedFieldName
+    : field.name
+
+  if (!fieldValue) {
+    return
+  } else {
+    if (transformeValueArrayToBoolean) {
+      const valueArray = fieldValue as IFormFieldValue[]
+      fieldValue = valueArray.length > 0
+    }
+
+    if (!transformedData[sectionId][transformedArrayName]) {
+      transformedData[sectionId][transformedArrayName] = []
+    }
+
+    const transformedArray: TransformedData[] =
+      transformedData[sectionId][transformedArrayName]
+
+    let transformedField = transformedArray.find(transField => {
+      if (extraField) {
+        return (
+          transField[extraField] && transField[extraField] === field.extraValue
+        )
+      }
+      return (
+        !isCaregiver &&
+        transField[transFieldName] &&
+        transField[transFieldName] === fieldValue
+      )
+    })
+
+    if (!transformedField) {
+      transformedField = {}
+      transformedField[transFieldName] = fieldValue
+
+      if (extraField) {
+        transformedField[extraField] = field.extraValue
+      }
+
+      transformedArray.push(transformedField)
+    } else {
+      transformedField[transFieldName] = fieldValue
+    }
+  }
+}
+
+function formatDate(dateString: string) {
+  const [year, month, day] = dateString.split('-')
+  const date = moment(dateString, 'YYYY-M-D')
+
+  if (date.isValid() && year && month && day) {
+    return date.format('YYYY-MM-DD')
+  } else return null
+}
+
+export const longDateTransformer = (transformedFieldName?: string) => (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedFieldName || field.name
+  const sectionData = draftData[sectionId][field.name] as string
+
+  if (sectionData) {
+    transformedData[sectionId][fieldName] = formatDate(sectionData)
+  }
+
   return transformedData
 }

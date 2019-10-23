@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/interface'
 import styled from '@register/styledComponents'
 import {
@@ -30,7 +30,7 @@ const Container = styled.div`
   width: 80%;
   margin: 0 auto;
   margin-top: -55px;
-  max-width: 940px;
+  max-width: 300px;
 `
 const StyledP = styled.p`
   color: ${({ theme }) => theme.colors.copy};
@@ -123,7 +123,7 @@ type Props = {
 }
 
 class ConfirmationScreenView extends React.Component<
-  Props & InjectedIntlProps & RouteComponentProps<{}>
+  Props & IntlShapeProps & RouteComponentProps<{}>
 > {
   render() {
     const { intl, history } = this.props

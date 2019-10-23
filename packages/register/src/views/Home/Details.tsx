@@ -19,7 +19,7 @@ import {
   StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getDraftApplicantFullName } from '@register/utils/draftUtils'
 import styled, { withTheme, ITheme } from '@register/styledComponents'
 import {
@@ -41,9 +41,9 @@ import {
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@register/navigation/routes'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/Home/queries'
-import * as Sentry from '@sentry/browser'
+
 import {
   userMessages,
   constantsMessages as messages,
@@ -56,18 +56,20 @@ import {
   DECLARED,
   REJECT_REASON,
   REJECT_COMMENTS,
-  REGISTERED
+  REGISTERED,
+  VALIDATED
 } from '@register/utils/constants'
 import { Scope } from '@register/utils/authUtils'
 
 const HistoryWrapper = styled.div`
-  padding: 10px 0px;
+  padding: 10px 0px 10px 10px;
+  margin-bottom: 8px;
   flex: 1;
   display: flex;
   flex-direction: row;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
-  &:last-child {
+  &:last-of-type {
     margin-bottom: 0;
   }
 `
@@ -89,10 +91,10 @@ const ValueContainer = styled.div`
 `
 const StatusContainer = styled.div`
   flex: 1;
-  margin-left: 10px;
+  margin-left: 16px;
 `
 const ActionButton = styled(PrimaryButton)`
-  margin: 20px 25px 30px;
+  margin: 6px 50px 30px;
 `
 const QuerySpinner = styled(Spinner)`
   width: 70px;
@@ -199,7 +201,7 @@ function generateHistoryEntry(
   }
 }
 
-class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
+class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
       case 'DRAFT_STARTED':
@@ -286,7 +288,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           generateHistoryEntry(
             DraftStatus.DRAFT_MODIFIED,
             userDetails.name as GQLHumanName[],
-            new Date(draft.modifiedOn).toString(),
+            new Date(draft.modifiedOn).toISOString(),
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
                   userMessages[userDetails.role as string]
@@ -305,7 +307,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
           generateHistoryEntry(
             DraftStatus.DRAFT_STARTED,
             userDetails.name as GQLHumanName[],
-            (draft.savedOn && new Date(draft.savedOn).toString()) || '',
+            (draft.savedOn && new Date(draft.savedOn).toISOString()) || '',
             userDetails && userDetails.role
               ? this.props.intl.formatMessage(
                   userMessages[userDetails.role as string]
@@ -391,6 +393,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
     } else if (
       (applicationState === IN_PROGRESS ||
         applicationState === DECLARED ||
+        applicationState === VALIDATED ||
         applicationState === REJECTED) &&
       this.userHasRegisterOrValidateScope()
     ) {
@@ -406,7 +409,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
             )
           }
         >
-          {this.props.intl.formatMessage(buttonMessages.print)}
+          {this.props.intl.formatMessage(buttonMessages.review)}
         </ActionButton>
       )
     } else {
@@ -597,10 +600,7 @@ class DetailView extends React.Component<IDetailProps & InjectedIntlProps> {
               error?: any
               data: any
             }) => {
-              if (error) {
-                Sentry.captureException(error)
-                throw error
-              } else if (loading) {
+              if (loading) {
                 return (
                   <SpinnerContainer>
                     <QuerySpinner

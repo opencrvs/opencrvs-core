@@ -1,5 +1,8 @@
 import * as ShortUIDGen from 'short-uid'
-import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import {
+  NOTIFICATION_SERVICE_URL,
+  RESOURCE_SERVICE_URL
+} from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
@@ -12,6 +15,12 @@ import {
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
+
+interface INotificationPayload {
+  msisdn: string
+  name: string
+  trackingid?: string
+}
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -37,89 +46,88 @@ export async function sendEventNotification(
   msisdn: string,
   authHeader: { Authorization: string }
 ) {
+  logger.info(`sendEventNotification method for event: ${event}`)
   // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_NEW_DEC:
-      await sendDeclarationNotification(
-        fhirBundle,
-        msisdn,
-        CHILD_SECTION_CODE,
+      await sendNotification(
         'birthDeclarationSMS',
-        authHeader
+        msisdn,
+        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+        authHeader,
+        getTrackingId(fhirBundle)
       )
       break
     case Events.BIRTH_NEW_REG:
     case Events.BIRTH_MARK_REG:
-      await sendRegistrationNotification(
-        fhirBundle,
-        msisdn,
-        CHILD_SECTION_CODE,
+      await sendNotification(
         'birthRegistrationSMS',
+        msisdn,
+        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
         authHeader
       )
       break
-    case Events.DEATH_NEW_DEC:
-      await sendDeclarationNotification(
-        fhirBundle,
+    case Events.BIRTH_MARK_VOID:
+      await sendNotification(
+        'birthRejectionSMS',
         msisdn,
-        DECEASED_SECTION_CODE,
+        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+        authHeader,
+        getTrackingId(fhirBundle)
+      )
+      break
+    case Events.DEATH_NEW_DEC:
+      await sendNotification(
         'deathDeclarationSMS',
-        authHeader
+        msisdn,
+        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+        authHeader,
+        getTrackingId(fhirBundle)
       )
       break
     case Events.DEATH_NEW_REG:
     case Events.DEATH_MARK_REG:
-      await sendRegistrationNotification(
-        fhirBundle,
-        msisdn,
-        DECEASED_SECTION_CODE,
+      await sendNotification(
         'deathRegistrationSMS',
+        msisdn,
+        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
         authHeader
       )
-      // tslint:disable-next-line
       break
+    case Events.DEATH_MARK_VOID:
+      await sendNotification(
+        'deathRejectionSMS',
+        msisdn,
+        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+        authHeader,
+        getTrackingId(fhirBundle)
+      )
   }
 }
 
-async function sendDeclarationNotification(
-  fhirBundle: fhir.Bundle,
-  msisdn: string,
-  recipientSectionCode: string,
+async function sendNotification(
   smsType: string,
-  authHeader: { Authorization: string }
+  msisdn: string,
+  name: string,
+  authHeader: { Authorization: string },
+  trackingId?: string
 ) {
-  try {
-    await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        trackingid: getTrackingId(fhirBundle),
-        msisdn,
-        name: await getInformantName(fhirBundle, recipientSectionCode)
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-  } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
+  const payload: INotificationPayload = {
+    msisdn,
+    name
   }
-}
-
-async function sendRegistrationNotification(
-  fhirBundle: fhir.Bundle,
-  msisdn: string,
-  recipientSectionCode: string,
-  smsType: string,
-  authHeader: { Authorization: string }
-) {
+  if (trackingId) {
+    payload.trackingid = trackingId
+  }
+  logger.info(
+    `Sending sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
+      payload
+    )}`
+  )
   try {
     await fetch(`${NOTIFICATION_SERVICE_URL}${smsType}`, {
       method: 'POST',
-      body: JSON.stringify({
-        msisdn,
-        name: await getInformantName(fhirBundle, recipientSectionCode)
-      }),
+      body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
         ...authHeader
@@ -181,4 +189,30 @@ export function isInProgressApplication(fhirBundle: fhir.Bundle) {
       (taskEntry.resource as fhir.Task).status === 'draft') ||
     false
   )
+}
+
+export async function getRegistrationNumber(
+  trackingId: string,
+  practitionerId: string,
+  authHeader: { Authorization: string }
+): Promise<{ registrationNumber: string }> {
+  try {
+    const response = await fetch(
+      `${RESOURCE_SERVICE_URL}generate/registrationNumber`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          trackingId,
+          practitionerId
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      }
+    )
+    return response.json()
+  } catch (err) {
+    throw new Error(`Unable to get registration number for error : ${err}`)
+  }
 }

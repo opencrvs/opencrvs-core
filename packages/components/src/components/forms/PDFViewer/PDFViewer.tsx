@@ -5,16 +5,18 @@ import { Pagination, Spinner } from '../../interface'
 
 const Container = styled.div`
   margin: 10px 0;
-  padding: 5px 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  @media (max-height: 900px) {
+    margin-top: 30%;
+    margin-bottom: 5%;
+  }
   background: ${({ theme }) => theme.colors.white};
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {
-  pdfSource: string
+  pdfSource: string | null
 }
 
 interface IPDFViewerState {

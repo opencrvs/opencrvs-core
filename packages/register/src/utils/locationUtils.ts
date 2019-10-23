@@ -1,14 +1,23 @@
 import { ILocation } from '@register/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
+import { SYS_ADMIN_ROLES } from './constants'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  filterValue: string
+  filterValue: string,
+  userDetails: IUserDetails
 ): { [key: string]: ILocation } {
   const locationsCopy = Object.assign({}, locations)
 
   Object.values(locationsCopy).forEach((location: ILocation) => {
-    if (location.partOf !== `Location/${filterValue}`) {
+    if (
+      location.partOf !== `Location/${filterValue}` &&
+      !(
+        userDetails.role &&
+        SYS_ADMIN_ROLES.includes(userDetails.role) &&
+        location.type === 'CRVS_OFFICE'
+      )
+    ) {
       delete locationsCopy[location.id]
     }
   })

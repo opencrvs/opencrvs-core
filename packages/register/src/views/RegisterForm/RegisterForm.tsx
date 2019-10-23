@@ -33,19 +33,18 @@ import {
   goToPageGroup as goToPageGroupAction
 } from '@register/navigation'
 import { toggleDraftSavedNotification } from '@register/notification/actions'
-import { IOfflineDataState } from '@register/offline/reducer'
+
 import { HOME } from '@register/navigation/routes'
-import { getOfflineState } from '@register/offline/selectors'
+
 import { getScope } from '@register/profile/profileSelectors'
 import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
 import { isNull, isUndefined, merge } from 'lodash'
-// @ts-ignore - Required for mocking
 import debounce from 'lodash/debounce'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -57,7 +56,8 @@ import { buttonMessages, formMessages } from '@register/i18n/messages'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
-  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE
+  PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
+  PAGE_TRANSITIONS_EXIT_TIME
 } from '@register/utils/constants'
 
 const FormSectionTitle = styled.h4`
@@ -116,10 +116,11 @@ function getNextSectionIds(
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   application: IApplication
-) {
+): { [key: string]: string } | null {
   const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
     fromSection,
-    application.data[fromSection.id] || {}
+    application.data[fromSection.id] || {},
+    application.data
   )
   const currentGroupIndex = visibleGroups.findIndex(
     (group: IFormSectionGroup) => group.id === fromSectionGroup.id
@@ -127,14 +128,22 @@ function getNextSectionIds(
 
   if (currentGroupIndex === visibleGroups.length - 1) {
     const visibleSections = sections.filter(
-      section => section.viewType !== VIEW_TYPE.HIDDEN
+      section =>
+        section.viewType !== VIEW_TYPE.HIDDEN &&
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          application.data[fromSection.id] || {},
+          application.data
+        ).length > 0
     )
+
     const currentIndex = visibleSections.findIndex(
       (section: IFormSection) => section.id === fromSection.id
     )
     if (currentIndex === visibleSections.length - 1) {
       return null
     }
+
     return {
       sectionId: visibleSections[currentIndex + 1].id,
       groupId: visibleSections[currentIndex + 1].groups[0].id
@@ -169,13 +178,12 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
-  offlineResources: IOfflineDataState
 }
 
 export type FullProps = IFormProps &
   Props &
   DispatchProps &
-  InjectedIntlProps & { scope: Scope } & RouteComponentProps<{
+  IntlShapeProps & { scope: Scope } & RouteComponentProps<{
     pageId: string
     groupId?: string
     applicationId: string
@@ -188,21 +196,20 @@ type State = {
 }
 
 const fadeFromTop = keyframes`
-from {
-   -webkit-transform: translateY(-100%);
-   transform: translateY(-100%); 
+  to {
+    -webkit-transform: translateY(100vh);
+    transform: translateY(100vh);
   }
 `
 const StyledContainer = styled(Container)`
   &.${PAGE_TRANSITIONS_CLASSNAME}-exit {
-    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_ENTER_TIME}ms
-      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
-    position: fixed;
+    top: 0;
     z-index: 999;
+    animation: ${fadeFromTop} ${PAGE_TRANSITIONS_EXIT_TIME}ms
+      ${PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE};
   }
 
   &.${PAGE_TRANSITIONS_CLASSNAME}-exit-active {
-    position: fixed;
     z-index: 999;
   }
 `
@@ -257,17 +264,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     disabled: boolean,
     sections: IFormSection[]
   ) => {
-    const result: IFormSection[] = []
-    sections.map((section: IFormSection) => {
-      result.push(
-        merge(
-          {
-            disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
-          },
-          section
-        )
+    const result: IFormSection[] = sections.map((section: IFormSection) => {
+      return merge(
+        {
+          disabled: section.viewType !== VIEW_TYPE.REVIEW && disabled
+        },
+        section
       )
-      return
     })
     return result
   }
@@ -292,7 +295,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = () => {
     this.props.writeApplication(this.props.application)
-    this.props.goToHomeTab('progress')
+    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
   onDeleteApplication = (application: IApplication) => {
@@ -333,13 +336,33 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.application.visitedGroupIds = visitedGroups
   }
 
+  getRedirectionTabOnSaveOrExit = () => {
+    const status =
+      this.props.application.submissionStatus ||
+      this.props.application.registrationStatus ||
+      ''
+    switch (status) {
+      case 'DECLARED':
+        return 'review'
+      case 'DRAFT':
+        return 'progress'
+      case 'IN_PROGRESS':
+        return 'progress/field-agents'
+      case 'REJECTED':
+        return 'updates'
+      case 'VALIDATED':
+        return 'review'
+      default:
+        return 'progress'
+    }
+  }
+
   render() {
     const {
       intl,
       setAllFieldsDirty,
       application,
       registerForm,
-      offlineResources,
       handleSubmit,
       duplicate,
       activeSection,
@@ -416,7 +439,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       : 'orange'
                   }
                   saveAction={{
-                    handler: () => this.props.goToHomeTab('progress'),
+                    handler: () =>
+                      this.props.goToHomeTab(
+                        this.getRedirectionTabOnSaveOrExit()
+                      ),
                     label: intl.formatMessage(buttonMessages.exitButton)
                   }}
                 />
@@ -455,7 +481,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }
                   ]}
                 />
-                <BodyContent>
+                <BodyContent id="register_form">
                   <TertiaryButton
                     align={ICON_ALIGNMENT.LEFT}
                     icon={() => <BackArrow />}
@@ -525,7 +551,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       }}
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
-                      offlineResources={offlineResources}
                       draftData={application.data}
                     />
                   </form>
@@ -603,6 +628,10 @@ export function replaceInitialValues(fields: IFormField[], sectionValues: any) {
   }))
 }
 
+function firstVisibleSection(form: IForm) {
+  return form.sections.filter(({ viewType }) => viewType !== 'hidden')[0]
+}
+
 function mapStateToProps(
   state: IStoreState,
   props: IFormProps &
@@ -615,14 +644,21 @@ function mapStateToProps(
 ) {
   const { match, registerForm, application } = props
 
-  const sectionId = match.params.pageId || registerForm.sections[0].id
+  const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
+
   const activeSection = registerForm.sections.find(
     section => section.id === sectionId
   )
   if (!activeSection) {
     throw new Error(`Configuration for tab "${match.params.pageId}" missing!`)
   }
-  const groupId = match.params.groupId || activeSection.groups[0].id
+  const groupId =
+    match.params.groupId ||
+    getVisibleSectionGroupsBasedOnConditions(
+      activeSection,
+      application.data[activeSection.id] || {},
+      application.data
+    )[0].id
   const activeSectionGroup = activeSection.groups.find(
     group => group.id === groupId
   )
@@ -650,13 +686,10 @@ function mapStateToProps(
     application.data[activeSection.id] || {}
   )
 
-  const offlineResources = getOfflineState(state)
-
   return {
     registerForm,
     scope: getScope(state),
     setAllFieldsDirty,
-    offlineResources,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,
@@ -686,4 +719,4 @@ export const RegisterForm = connect<
       console.log(values)
     }
   }
-)(injectIntl<FullProps>(RegisterFormView))
+)(injectIntl<'intl', FullProps>(RegisterFormView))

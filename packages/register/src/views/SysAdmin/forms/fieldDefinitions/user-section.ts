@@ -1,31 +1,23 @@
 import {
-  IFormSection,
   TEXT,
   FIELD_GROUP_TITLE,
   SEARCH_FIELD,
   SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  ISerializedFormSection,
+  SIMPLE_DOCUMENT_UPLOADER,
+  UserSection
 } from '@register/forms'
-import {
-  bengaliOnlyNameFormat,
-  englishOnlyNameFormat,
-  phoneNumberFormat,
-  validIDNumber
-} from '@register/utils/validate'
-import {
-  fieldToNameTransformer,
-  fieldNameTransformer,
-  fieldToIdentifierWithTypeTransformer,
-  fieldNameValueTransformer
-} from '@register/forms/mappings/mutation/field-mappings'
+
 import { NATIONAL_ID } from '@register/forms/identity'
 import {
   constantsMessages,
   formMessages as messages
 } from '@register/i18n/messages'
+import { conditionals } from '@register/forms/utils'
 
-export const userSection: IFormSection = {
-  id: 'user',
+export const userSection: ISerializedFormSection = {
+  id: UserSection.User,
   viewType: 'form',
   name: constantsMessages.user,
   title: messages.userFormTitle,
@@ -47,9 +39,12 @@ export const userSection: IFormSection = {
           label: messages.firstNameBn,
           required: false,
           initialValue: '',
-          validate: [bengaliOnlyNameFormat],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
-            mutation: fieldToNameTransformer('bn')
+            mutation: {
+              operation: 'fieldToNameTransformer',
+              parameters: ['bn']
+            }
           }
         },
         {
@@ -58,9 +53,12 @@ export const userSection: IFormSection = {
           label: messages.lastNameBn,
           required: true,
           initialValue: '',
-          validate: [bengaliOnlyNameFormat],
+          validate: [{ operation: 'bengaliOnlyNameFormat' }],
           mapping: {
-            mutation: fieldToNameTransformer('bn')
+            mutation: {
+              operation: 'fieldToNameTransformer',
+              parameters: ['bn']
+            }
           }
         },
         {
@@ -69,9 +67,12 @@ export const userSection: IFormSection = {
           label: messages.firstNameEn,
           required: false,
           initialValue: '',
-          validate: [englishOnlyNameFormat],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
-            mutation: fieldToNameTransformer('en', 'firstNames')
+            mutation: {
+              operation: 'fieldToNameTransformer',
+              parameters: ['en', 'firstNames']
+            }
           }
         },
         {
@@ -80,9 +81,12 @@ export const userSection: IFormSection = {
           label: messages.lastNameEn,
           required: true,
           initialValue: '',
-          validate: [englishOnlyNameFormat],
+          validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
-            mutation: fieldToNameTransformer('en', 'familyName')
+            mutation: {
+              operation: 'fieldToNameTransformer',
+              parameters: ['en', 'familyName']
+            }
           }
         },
         {
@@ -91,9 +95,12 @@ export const userSection: IFormSection = {
           label: messages.phoneNumber,
           required: true,
           initialValue: '',
-          validate: [phoneNumberFormat],
+          validate: [{ operation: 'phoneNumberFormat' }],
           mapping: {
-            mutation: fieldNameTransformer('mobile')
+            mutation: {
+              operation: 'msisdnTransformer',
+              parameters: ['user.mobile']
+            }
           }
         },
         {
@@ -102,9 +109,12 @@ export const userSection: IFormSection = {
           label: messages.NID,
           required: true,
           initialValue: '',
-          validate: [validIDNumber(NATIONAL_ID)],
+          validate: [{ operation: 'validIDNumber', parameters: [NATIONAL_ID] }],
           mapping: {
-            mutation: fieldToIdentifierWithTypeTransformer('NATIONAL_ID')
+            mutation: {
+              operation: 'fieldToIdentifierWithTypeTransformer',
+              parameters: ['NATIONAL_ID']
+            }
           }
         },
         {
@@ -158,10 +168,42 @@ export const userSection: IFormSection = {
           label: messages.registrationOffice,
           required: true,
           initialValue: '',
+          searchableResource: 'facilities',
+          searchableType: 'CRVS_OFFICE',
           validate: [],
           mapping: {
-            mutation: fieldNameValueTransformer('primaryOffice')
+            mutation: {
+              operation: 'fieldNameTransformer',
+              parameters: ['primaryOffice']
+            }
           }
+        }
+      ]
+    },
+    {
+      id: 'signature-attachment',
+      title: messages.userSignatureAttachmentTitle,
+      conditionals: [conditionals.isRegistrarRoleSelected],
+      fields: [
+        {
+          name: 'attachmentTitle',
+          type: FIELD_GROUP_TITLE,
+          hidden: true,
+          label: messages.userAttachmentSection,
+          required: false,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'signature',
+          type: SIMPLE_DOCUMENT_UPLOADER,
+          label: messages.userSignatureAttachment,
+          description: messages.userSignatureAttachmentDesc,
+          allowedDocType: ['image/png'],
+          initialValue: '',
+          required: true,
+          hideAsterisk: true,
+          validate: []
         }
       ]
     }

@@ -23,7 +23,13 @@ import {
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  CERTIFICATE_DOCS_CODE
+  CERTIFICATE_DOCS_CODE,
+  PRIMARY_CAREGIVER_CODE,
+  REASON_MOTHER_NOT_APPLYING,
+  REASON_FATHER_NOT_APPLYING,
+  REASON_CAREGIVER_NOT_APPLYING,
+  PRIMARY_CAREGIVER,
+  PARENT_DETAILS
 } from '@gateway/features/fhir/templates'
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
@@ -80,6 +86,13 @@ export const typeResolvers: GQLResolver = {
     },
     maritalStatus: person => {
       return person.maritalStatus.text
+    },
+    occupation: person => {
+      const occupationExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/patient-occupation`,
+        person.extension
+      )
+      return (occupationExtension && occupationExtension.valueString) || null
     },
     multipleBirth: person => {
       return person.multipleBirthInteger
@@ -244,6 +257,13 @@ export const typeResolvers: GQLResolver = {
     contact: task => {
       const contact = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/contact-person`,
+        task.extension
+      )
+      return (contact && contact.valueString) || null
+    },
+    contactRelationship: task => {
+      const contact = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/contact-relationship`,
         task.extension
       )
       return (contact && contact.valueString) || null
@@ -530,6 +550,105 @@ export const typeResolvers: GQLResolver = {
     },
     address: location => location.address
   },
+
+  ReasonsNotApplying: {
+    primaryCaregiverType: reasonNotApplying =>
+      reasonNotApplying.primaryCaregiverType,
+    reasonNotApplying: reasonNotApplying => reasonNotApplying.reasonNotApplying,
+    isDeceased: reasonNotApplying => reasonNotApplying.isDeceased
+  },
+
+  PrimaryCaregiver: {
+    primaryCaregiver: async (primaryCaregiver, _, authHeader) => {
+      if (
+        !primaryCaregiver.patientSection ||
+        !primaryCaregiver.patientSection.entry ||
+        primaryCaregiver.patientSection.entry.length === 0
+      ) {
+        return null
+      }
+      return (await fetchFHIR(
+        `/${primaryCaregiver.patientSection.entry[0].reference}`,
+        authHeader
+      )) as fhir.Person
+    },
+    reasonsNotApplying: async (primaryCaregiver, _, authHeader) => {
+      const observations = (await fetchFHIR(
+        `/Observation?encounter=${
+          primaryCaregiver.encounterSection.entry[0].reference
+        }`,
+        authHeader
+      )) as fhir.Bundle
+      const reasons: {
+        primaryCaregiverType?: string
+        reasonNotApplying?: string
+        isDeceased?: boolean
+      }[] = []
+      let primaryCaregiverType
+      let reasonCaregiverNotApplying
+
+      if (!observations.entry) {
+        return reasons
+      }
+
+      observations.entry.forEach(observationResource => {
+        const observation = observationResource.resource as fhir.Observation
+        const observationCode =
+          observation.code &&
+          observation.code.coding &&
+          observation.code.coding[0].code
+        const reasonNotApplying =
+          observation.valueString !== 'DECEASED' ? observation.valueString : ''
+        const isDeceased = observation.valueString === 'DECEASED' ? true : false
+        const careGiverType =
+          observationCode === REASON_MOTHER_NOT_APPLYING
+            ? 'MOTHER'
+            : observationCode === REASON_FATHER_NOT_APPLYING
+            ? 'FATHER'
+            : ''
+        if (careGiverType) {
+          reasons.push({
+            primaryCaregiverType: careGiverType,
+            reasonNotApplying,
+            isDeceased
+          })
+        } else if (observationCode === REASON_CAREGIVER_NOT_APPLYING) {
+          reasonCaregiverNotApplying = observation.valueString
+        } else if (observationCode === PRIMARY_CAREGIVER) {
+          primaryCaregiverType = observation.valueString
+        }
+      })
+
+      if (primaryCaregiver && reasonCaregiverNotApplying) {
+        reasons.push({
+          primaryCaregiverType,
+          reasonNotApplying: reasonCaregiverNotApplying
+        })
+      } else if (primaryCaregiver && !reasonCaregiverNotApplying) {
+        reasons.push({
+          primaryCaregiverType
+        })
+      }
+
+      return reasons
+    },
+    parentDetailsType: async (primaryCaregiver, _, authHeader) => {
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${
+          primaryCaregiver.encounterSection.entry[0].reference
+        }&code=${PARENT_DETAILS}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    }
+  },
+
   DeathRegistration: {
     // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
@@ -785,6 +904,25 @@ export const typeResolvers: GQLResolver = {
         `/${patientSection.entry[0].reference}`,
         authHeader
       )) as fhir.RelatedPerson
+    },
+    async primaryCaregiver(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(
+        PRIMARY_CAREGIVER_CODE,
+        composition
+      )
+
+      const encounterSection = findCompositionSection(
+        BIRTH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+
+      return {
+        patientSection,
+        encounterSection
+      }
     },
     async registration(composition: ITemplatedComposition, _, authHeader) {
       const taskBundle = await fetchFHIR(

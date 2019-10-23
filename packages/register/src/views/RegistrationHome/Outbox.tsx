@@ -5,7 +5,7 @@ import {
   ColumnContentAlignment,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages } from '@register/i18n/messages'
 import { StatusWaiting } from '@opencrvs/components/lib/icons'
 import { messages } from '@register/i18n/messages/views/notifications'
@@ -25,7 +25,7 @@ interface IState {
 interface IProps {
   application: IApplication[]
 }
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 class Outbox extends React.Component<IFullProps, IState> {
   submissionStatusMap = (status: string, index: number) => {
     const { formatMessage } = this.props.intl
@@ -174,8 +174,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               ),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(window.config.COUNTRY, getDefaultLanguage())
-                .colors.secondaryLabel
+              color: getTheme(getDefaultLanguage()).colors.secondaryLabel
             },
             {
               label: '',

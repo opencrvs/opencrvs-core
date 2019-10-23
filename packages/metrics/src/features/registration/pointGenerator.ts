@@ -7,9 +7,17 @@ import {
 import {
   getSectionBySectionCode,
   getRegLastLocation,
-  fetchParentLocationByLocationID
+  getTask,
+  getPreviousTask,
+  getComposition,
+  APPLICATION_STATUS,
+  getApplicationStatus
 } from '@metrics/features/registration/fhirUtils'
-import { getAgeInDays } from '@metrics/features/registration/utils'
+import {
+  getAgeInDays,
+  getDurationInSeconds
+} from '@metrics/features/registration/utils'
+import { fetchParentLocationByLocationID } from '@metrics/api'
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,
@@ -52,7 +60,8 @@ const generatePointLocations = async (
   }
   locations.locationLevel5 = locationLevel5
   let locationID: string = locations.locationLevel5
-  // tslint:disable-next-line
+
+  // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
     if (!locationID) {
@@ -62,4 +71,51 @@ const generatePointLocations = async (
   }
 
   return locations
+}
+
+export async function generateEventDurationPoint(
+  payload: fhir.Bundle,
+  allowedPreviousStates: APPLICATION_STATUS[],
+  authHeader: IAuthHeader
+) {
+  const composition = getComposition(payload)
+  const currentTask = getTask(payload)
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  if (!currentTask || !currentTask.lastModified) {
+    throw new Error('Current task not found')
+  }
+  const previousTask = await getPreviousTask(
+    currentTask,
+    allowedPreviousStates,
+    authHeader
+  )
+
+  if (!previousTask || !previousTask.lastModified) {
+    throw new Error('Previous task not found')
+  }
+
+  const fields = {
+    duration_in_seconds: getDurationInSeconds(
+      previousTask.lastModified,
+      currentTask.lastModified
+    ),
+    application_id: composition.id,
+    current_task_id: currentTask.id,
+    previous_task_id: previousTask.id
+  }
+
+  const tags = {
+    current_status: getApplicationStatus(currentTask),
+    previous_status: getApplicationStatus(previousTask)
+  }
+
+  return {
+    measurement: 'application_event_duration',
+    tags,
+    fields
+  }
 }

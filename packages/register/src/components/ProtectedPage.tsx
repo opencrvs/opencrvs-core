@@ -6,21 +6,25 @@ import { storage } from '@register/storage'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { isMobileDevice } from '@register/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
-import { USER_DETAILS } from '@register/utils/userUtils'
+import { USER_DETAILS, IUserDetails } from '@register/utils/userUtils'
 import { ProtectedAccount } from '@register/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@register/applications'
+import * as LogRocket from 'logrocket'
 export const SCREEN_LOCK = 'screenLock'
 
+interface IProtectedPageProps {
+  unprotectedRouteElements: string[]
+}
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
 }
 class ProtectedPageComponent extends React.Component<
-  RouteComponentProps<{}>,
+  IProtectedPageProps & RouteComponentProps<{}>,
   IProtectPageState
 > {
-  constructor(props: RouteComponentProps<{}>) {
+  constructor(props: IProtectedPageProps & RouteComponentProps<{}>) {
     super(props)
     this.state = {
       secured: true,
@@ -34,6 +38,7 @@ class ProtectedPageComponent extends React.Component<
 
   async componentDidMount() {
     const newState = { ...this.state }
+
     if (await storage.getItem(SCREEN_LOCK)) {
       newState.secured = false
     } else {
@@ -44,18 +49,25 @@ class ProtectedPageComponent extends React.Component<
     } else {
       newState.pinExists = false
     }
-    const userDetails = JSON.parse(
+    const userDetails: IUserDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
     if (userDetails && userDetails.status && userDetails.status === 'pending') {
       newState.pendingUser = true
     }
+    if (userDetails && userDetails.practitionerId) {
+      LogRocket.identify(userDetails.practitionerId)
+    }
     this.setState(newState)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
+    const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
+    const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
+      this.props.location.pathname.includes(route)
+    )
     const newState = { ...this.state }
-    if (!isVisible && !(await storage.getItem(SCREEN_LOCK))) {
+    if (!alreadyLocked && !onUnprotectedPage) {
       newState.secured = false
       if (await this.getPIN()) {
         newState.pinExists = true
@@ -75,6 +87,7 @@ class ProtectedPageComponent extends React.Component<
   async getPIN(): Promise<string> {
     const currentUserID = await getCurrentUserID()
     const userData = await storage.getItem('USER_DATA')
+
     if (!userData) {
       return ''
     }
@@ -93,23 +106,31 @@ class ProtectedPageComponent extends React.Component<
   }
   render() {
     const { pendingUser, secured, pinExists } = this.state
-    return (
-      (pendingUser && <ProtectedAccount />) ||
-      (!pinExists && <SecureAccount onComplete={this.markAsSecured} />) ||
-      (isMobileDevice() && (
+
+    if (pendingUser) {
+      return <ProtectedAccount />
+    }
+
+    if (!pinExists) {
+      return <SecureAccount onComplete={this.markAsSecured} />
+    }
+
+    if (isMobileDevice()) {
+      return (
         <PageVisibility onChange={this.handleVisibilityChange}>
           {(secured && this.props.children) ||
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
         </PageVisibility>
-      )) || (
-        <IdleTimer
-          onIdle={this.onIdle}
-          timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
-        >
-          {(secured && this.props.children) ||
-            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
-        </IdleTimer>
       )
+    }
+    return (
+      <IdleTimer
+        onIdle={this.onIdle}
+        timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
+      >
+        {(secured && this.props.children) ||
+          (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+      </IdleTimer>
     )
   }
 }

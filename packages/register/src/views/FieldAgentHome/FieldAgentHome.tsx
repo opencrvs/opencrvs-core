@@ -1,7 +1,7 @@
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import {
@@ -47,13 +47,13 @@ import {
   PlusTransparentWhite,
   ApplicationsOrangeAmber
 } from '@opencrvs/components/lib/icons'
-import { Query } from 'react-apollo'
+import { Query } from '@register/components/Query'
 import {
   SEARCH_APPLICATIONS_USER_WISE,
   COUNT_USER_WISE_APPLICATIONS
 } from '@register/search/queries'
 import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
-import * as Sentry from '@sentry/browser'
+
 import { HomeContent } from '@opencrvs/components/lib/layout'
 
 import {
@@ -80,7 +80,10 @@ const IconTab = styled(Button).attrs<{ active: boolean }>({})`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 8px;
   }
-  ${({ active }) => (active ? 'border-bottom: 3px solid #5E93ED' : '')};
+  ${({ active }) =>
+    active
+      ? 'border-bottom: 3px solid #5E93ED'
+      : 'border-bottom: 3px solid transparent'};
   & > div {
     padding: 0 8px;
   }
@@ -154,7 +157,7 @@ interface IMatchParams {
 }
 
 type FieldAgentHomeProps = IBaseFieldAgentHomeProps &
-  InjectedIntlProps &
+  IntlShapeProps &
   ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
@@ -331,14 +334,6 @@ class FieldAgentHomeView extends React.Component<
                     />
                   )
                 }
-                if (error) {
-                  Sentry.captureException(error)
-                  return (
-                    <ErrorText id="field-agent-home_error">
-                      {intl.formatMessage(errorMessages.fieldAgentQueryError)}
-                    </ErrorText>
-                  )
-                }
                 return (
                   <>
                     <Header />
@@ -384,7 +379,10 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.requireUpdates, {
-                          total: data.searchEvents.totalItems
+                          total:
+                            navigator.onLine && data
+                              ? data.searchEvents.totalItems
+                              : '?'
                         })}
                       </IconTab>
                     </TopBar>
@@ -405,7 +403,7 @@ class FieldAgentHomeView extends React.Component<
 
             {tabId === TAB_ID.requireUpdates && (
               <Query
-                query={SEARCH_APPLICATIONS_USER_WISE}
+                query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                 variables={{
                   userId: userDetails ? userDetails.practitionerId : '',
                   status: [EVENT_STATUS.REJECTED],
@@ -441,7 +439,6 @@ class FieldAgentHomeView extends React.Component<
                     )
                   }
                   if (error) {
-                    Sentry.captureException(error)
                     return (
                       <ErrorText id="require_updates_loading_error">
                         {intl.formatMessage(errorMessages.fieldAgentQueryError)}

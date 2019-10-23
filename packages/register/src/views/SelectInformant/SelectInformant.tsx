@@ -1,48 +1,65 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import {
+  InputField,
+  IRadioOption as RadioComponentOption,
+  TextInput
+} from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
-import { IApplication, modifyApplication } from '@register/applications'
 import {
-  goToBirthRegistrationAsParent,
-  goBack,
-  goToHome,
-  goToBirthContactPoint,
-  goToDeathContactPoint,
-  goToPrimaryApplicant,
-  goToDeathRegistration
-} from '@register/navigation'
-import { IStoreState } from '@register/store'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
+  deleteApplication,
+  IApplication,
+  modifyApplication
+} from '@register/applications'
 import {
-  InputField,
-  TextInput,
-  IRadioOption as RadioComponentOption
-} from '@opencrvs/components/lib/forms'
-import { Event } from '@register/forms'
-import { phoneNumberFormat } from '@register/utils/validate'
+  BirthSection,
+  DeathSection,
+  Event,
+  IFormSection,
+  IFormSectionData
+} from '@register/forms'
 import {
-  PHONE_NO_FIELD_STRING,
-  RADIO_BUTTON_LARGE_STRING,
-  INFORMANT_FIELD_STRING
-} from '@register/utils/constants'
+  getBirthSection,
+  getDeathSection
+} from '@register/forms/register/application-selectors'
+import {
+  buttonMessages,
+  formMessages,
+  validationMessages
+} from '@register/i18n/messages'
+import { constantsMessages } from '@register/i18n/messages/constants'
 import { messages } from '@register/i18n/messages/views/selectInformant'
 import {
-  validationMessages,
-  formMessages,
-  buttonMessages
-} from '@register/i18n/messages'
+  goBack,
+  goToBirthContactPoint,
+  goToBirthRegistrationAsParent,
+  goToDeathContactPoint,
+  goToDeathRegistration,
+  goToHome,
+  goToPrimaryApplicant
+} from '@register/navigation'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import {
+  INFORMANT_FIELD_STRING,
+  PHONE_NO_FIELD_STRING,
+  RADIO_BUTTON_LARGE_STRING
+} from '@register/utils/constants'
+import { phoneNumberFormat } from '@register/utils/validate'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps, withRouter } from 'react-router'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -50,7 +67,7 @@ const Title = styled.h4`
 `
 const Actions = styled.div`
   padding: 32px 0;
-  & div:not(:last-child) {
+  & > div {
     margin-bottom: 16px;
   }
 `
@@ -70,6 +87,7 @@ enum INFORMANT {
   FATHER = 'FATHER',
   MOTHER = 'MOTHER',
   BOTH_PARENTS = 'BOTH_PARENTS',
+  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
   SELF = 'SELF',
   SOMEONE_ELSE = 'OTHER',
   SPOUSE = 'SPOUSE',
@@ -85,7 +103,7 @@ export interface IInformantField {
 }
 
 const setInformantFields = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   event: string
 ): IInformantField[] => {
   if (event === Event.BIRTH) {
@@ -115,18 +133,26 @@ const setInformantFields = (
         disabled: false
       },
       {
-        id: `select_informant_${INFORMANT.SELF}`,
+        id: `select_informant_${INFORMANT.LEGAL_GUARDIAN}`,
         option: {
-          label: intl.formatMessage(formMessages.self),
-          value: INFORMANT.SELF
+          label: intl.formatMessage(messages.legalGuardian),
+          value: INFORMANT.LEGAL_GUARDIAN
         },
-        disabled: true
+        disabled: false
       },
       {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
           label: intl.formatMessage(formMessages.someoneElse),
           value: INFORMANT.SOMEONE_ELSE
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.SELF}`,
+        option: {
+          label: intl.formatMessage(formMessages.self),
+          value: INFORMANT.SELF
         },
         disabled: true
       }
@@ -200,6 +226,7 @@ interface IMatchProps {
 type IFullProps = {
   application: IApplication
   modifyApplication: typeof modifyApplication
+  deleteApplication: typeof deleteApplication
   goBack: typeof goBack
   goToHome: typeof goToHome
   goToBirthContactPoint: typeof goToBirthContactPoint
@@ -207,7 +234,9 @@ type IFullProps = {
   goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
   goToDeathRegistration: typeof goToDeathRegistration
   goToPrimaryApplicant: typeof goToPrimaryApplicant
-} & InjectedIntlProps &
+  registrationSection: IFormSection
+  applicantsSection: IFormSection
+} & IntlShapeProps &
   RouteComponentProps<IMatchProps>
 
 interface IState {
@@ -222,6 +251,7 @@ interface IState {
 export class SelectInformantView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
+    const { applicantsSection, registrationSection } = props
     this.state = {
       informant:
         (this.props.application &&
@@ -269,7 +299,12 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.BOTH_PARENTS
     ) {
-      const { application, goToPrimaryApplicant } = this.props
+      const {
+        application,
+        goToPrimaryApplicant,
+        registrationSection,
+        goToBirthRegistrationAsParent
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -277,12 +312,18 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           registration: {
             ...application.data[registrationSection.id],
             ...{
-              presentAtBirthRegistration: this.state.informant
+              presentAtBirthRegistration: this.state.informant,
+              applicant: {
+                value: this.state.informant,
+                nestedFields: {}
+              }
             }
           }
         }
       })
-      goToPrimaryApplicant(this.props.match.params.applicationId)
+      event === Event.BIRTH
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
+        : goToPrimaryApplicant(this.props.match.params.applicationId)
     } else if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -290,8 +331,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     ) {
       const {
         application,
-        goToBirthContactPoint,
-        goToDeathContactPoint
+        goToBirthRegistrationAsParent,
+        goToDeathContactPoint,
+        registrationSection,
+        applicantsSection
       } = this.props
       const newApplication = {
         ...application,
@@ -304,7 +347,10 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           ...application.data[registrationSection.id],
           ...{
             presentAtBirthRegistration: this.state.informant,
-            applicant: this.state.informant
+            applicant: {
+              value: this.state.informant,
+              nestedFields: {}
+            }
           }
         }
       } else {
@@ -323,7 +369,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.props.modifyApplication(newApplication)
 
       this.props.location.pathname.includes(Event.BIRTH)
-        ? goToBirthContactPoint(this.props.match.params.applicationId)
+        ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
         : goToDeathContactPoint(this.props.match.params.applicationId)
     } else if (
       event === Event.DEATH &&
@@ -334,7 +380,11 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       !this.state.isPhoneNoError &&
       this.state.relationship !== ''
     ) {
-      const { application, goToDeathRegistration } = this.props
+      const {
+        application,
+        goToDeathRegistration,
+        applicantsSection
+      } = this.props
       this.props.modifyApplication({
         ...application,
         data: {
@@ -351,6 +401,52 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       })
 
       goToDeathRegistration(this.props.match.params.applicationId)
+    } else if (
+      event === Event.BIRTH &&
+      this.state.informant &&
+      this.state.informant !== 'error' &&
+      this.state.informant === INFORMANT.SOMEONE_ELSE
+    ) {
+      const {
+        application,
+        registrationSection,
+        goToBirthRegistrationAsParent
+      } = this.props
+
+      const modifiedApplicationData = {
+        ...application,
+        data: {
+          ...application.data,
+          [registrationSection.id]: {
+            ...application.data[registrationSection.id],
+            ...{
+              presentAtBirthRegistration: this.state.informant,
+              applicant: {
+                value:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).value) ||
+                  '',
+                nestedFields:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).nestedFields) ||
+                  {}
+              }
+            }
+          }
+        }
+      }
+      this.props.modifyApplication(modifiedApplicationData)
+      goToBirthRegistrationAsParent(this.props.match.params.applicationId)
     } else {
       this.setState({ informant: 'error' })
     }
@@ -408,11 +504,27 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       ? Event.BIRTH
       : Event.DEATH
     const infornantFields = setInformantFields(intl, event)
+
+    let titleMessage
+    switch (event) {
+      case Event.BIRTH:
+        titleMessage = constantsMessages.newBirthRegistration
+        break
+      case Event.DEATH:
+        titleMessage = constantsMessages.newDeathRegistration
+        break
+      default:
+        titleMessage = constantsMessages.newBirthRegistration
+    }
+
     return (
       <Container>
         <EventTopBar
-          title={intl.formatMessage(messages.newBirthRegistration)}
-          goHome={this.props.goToHome}
+          title={intl.formatMessage(titleMessage)}
+          goHome={() => {
+            this.props.deleteApplication(this.props.application)
+            this.props.goToHome()
+          }}
         />
 
         <BodyContent id="select_informant_view">
@@ -501,9 +613,11 @@ const mapStateToProps = (
 ) => {
   const { match } = props
   return {
+    registrationSection: getBirthSection(store, BirthSection.Registration),
+    applicantsSection: getDeathSection(store, DeathSection.Applicants),
     application: store.applicationsState.applications.find(
       ({ id }) => id === match.params.applicationId
-    ) as IApplication
+    )!
   }
 }
 
@@ -518,7 +632,8 @@ export const SelectInformant = withRouter(
       goToBirthRegistrationAsParent,
       goToPrimaryApplicant,
       goToDeathRegistration,
-      modifyApplication
+      modifyApplication,
+      deleteApplication
     }
   )(injectIntl(SelectInformantView))
-) as any
+)

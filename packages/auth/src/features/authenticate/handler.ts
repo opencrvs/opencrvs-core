@@ -3,17 +3,16 @@ import * as Joi from 'joi'
 import {
   authenticate,
   storeUserInformation,
-  createToken
+  createToken,
+  generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
-import {
-  generateVerificationCode,
-  sendVerificationCode,
-  generateNonce,
-  storeVerificationCode
-} from '@auth/features/verifyCode/service'
-import { logger } from '@auth/logger'
+import { generateNonce } from '@auth/features/verifyCode/service'
 import { unauthorized } from 'boom'
-import { PRODUCTION, WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
+import {
+  WEB_USER_JWT_AUDIENCES,
+  JWT_ISSUER,
+  API_USER_AUDIENCE
+} from '@auth/constants'
 
 interface IAuthPayload {
   username: string
@@ -43,40 +42,29 @@ export default async function authenticateHandler(
   const nonce = generateNonce()
   await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
 
-  const isDemoUser = result.scope.indexOf('demo') > -1
+  await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
 
-  let verificationCode
-  if (isDemoUser) {
-    verificationCode = '000000'
-    await storeVerificationCode(nonce, verificationCode)
-  } else {
-    verificationCode = await generateVerificationCode(nonce, result.mobile)
-  }
-
-  if (!PRODUCTION || isDemoUser) {
-    logger.info('Sending a verification SMS', {
-      mobile: result.mobile,
-      verificationCode
-    })
-  } else {
-    await sendVerificationCode(result.mobile, verificationCode)
-  }
-
-  const respose: IAuthResponse = {
+  const response: IAuthResponse = {
     mobile: result.mobile,
     status: result.status,
     nonce
   }
 
-  if (respose.status && respose.status === 'pending') {
-    respose.token = await createToken(
+  const isPendingUser = response.status && response.status === 'pending'
+  const isAPIUser = result.scope.indexOf('api') > -1
+
+  // directly send the token if the user is pending or an API user
+  if (isPendingUser || isAPIUser) {
+    response.token = await createToken(
       result.userId,
       result.scope,
-      WEB_USER_JWT_AUDIENCES,
+      isAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([API_USER_AUDIENCE])
+        : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
   }
-  return respose
+  return response
 }
 
 export const requestSchema = Joi.object({

@@ -1,12 +1,12 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IRegisterMessages {
-  newVitalEventRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  previewEventRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  reviewEventRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  submitDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  registerFormQueryError: ReactIntl.FormattedMessage.MessageDescriptor
-  backToReviewButton: ReactIntl.FormattedMessage.MessageDescriptor
+  newVitalEventRegistration: MessageDescriptor
+  previewEventRegistration: MessageDescriptor
+  reviewEventRegistration: MessageDescriptor
+  submitDescription: MessageDescriptor
+  registerFormQueryError: MessageDescriptor
+  backToReviewButton: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {

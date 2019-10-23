@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "path": "packages/register/build/static/js/*.chunk.js",
+      "maxSize": "2MB"
+    },
+    {
+      "path": "packages/login/build/static/js/*.chunk.js",
+      "maxSize": "600KB"
+    },
+    {
+      "path": "packages/performance/build/static/js/*.chunk.js",
+      "maxSize": "1MB"
+    }
+  ]
+}

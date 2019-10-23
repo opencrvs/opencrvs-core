@@ -22,15 +22,26 @@ const DataContainer = styled.div`
     width: 100%;
   }
 `
+const ValueContainer = styled.div`
+  ${({ theme }) => theme.fonts.bigBody};
+  width: 100%;
+`
 const Label = styled.label`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   flex: 1;
   margin-right: 16px;
   max-width: 40%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    max-width: 100%;
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
+  }
 `
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   flex: 1;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyStyle};
+  }
 `
 
 const PlaceHolder = styled.div`
@@ -62,22 +73,27 @@ export class DataRow extends React.Component<IDataProps> {
 
     return (
       <Container id={id}>
-        <DataContainer>
-          <Label>{label}</Label>
-          {value && <Value>{value}</Value>}
-          {placeHolder && <PlaceHolder>{placeHolder}</PlaceHolder>}
-        </DataContainer>
-        {action && (
-          <Action>
-            <LinkButton
-              id={action.id}
-              disabled={action.disabled}
-              onClick={action.handler}
-            >
-              {action.label}
-            </LinkButton>
-          </Action>
+        {label && (
+          <>
+            <DataContainer>
+              <Label>{label}</Label>
+              {value && <Value>{value}</Value>}
+              {placeHolder && <PlaceHolder>{placeHolder}</PlaceHolder>}
+            </DataContainer>
+            {action && (
+              <Action>
+                <LinkButton
+                  id={action.id}
+                  disabled={action.disabled}
+                  onClick={action.handler}
+                >
+                  {action.label}
+                </LinkButton>
+              </Action>
+            )}
+          </>
         )}
+        {!label && <ValueContainer>{value}</ValueContainer>}
       </Container>
     )
   }

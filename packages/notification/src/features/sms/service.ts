@@ -8,10 +8,10 @@ import {
   CLICKATELL_PASSWORD,
   CLICKATELL_USER,
   INFOBIP_API_KEY,
+  INFOBIP_SENDER_ID,
   INFOBIP_GATEWAY_ENDPOINT
 } from '@notification/constants'
 import { logger } from '@notification/logger'
-import { convertToMSISDN } from '@notification/features/sms/utils'
 
 async function sendSMSClickatell(
   msisdn: string,
@@ -22,7 +22,7 @@ async function sendSMSClickatell(
     user: CLICKATELL_USER,
     password: CLICKATELL_PASSWORD,
     api_id: CLICKATELL_API_ID,
-    to: convertToMSISDN(msisdn),
+    to: msisdn,
     text: message,
     unicode: 0
   }
@@ -34,7 +34,7 @@ async function sendSMSClickatell(
       unicode: 1
     }
   }
-  logger.info('Sending a verification token', params)
+  logger.info('Sending an sms', params)
 
   const url = `https://api.clickatell.com/http/sendmsg?${stringify(params)}`
 
@@ -56,7 +56,8 @@ async function sendSMSClickatell(
 
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
-    to: convertToMSISDN(to),
+    from: INFOBIP_SENDER_ID,
+    to,
     text
   })
   const headers = {
@@ -89,6 +90,7 @@ export async function sendSMS(
   message: string,
   convertUnicode?: boolean
 ) {
+  logger.info('Using the following provider', SMS_PROVIDER)
   switch (SMS_PROVIDER) {
     case 'clickatell':
       return sendSMSClickatell(msisdn, message, convertUnicode)

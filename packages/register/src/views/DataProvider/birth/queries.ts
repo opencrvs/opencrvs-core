@@ -16,6 +16,52 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         gender
       }
+      informant {
+        id
+        individual {
+          id
+          identifier {
+            id
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          birthDate
+          address {
+            type
+            line
+            district
+            state
+            postalCode
+            country
+          }
+        }
+      }
+      primaryCaregiver {
+        parentDetailsType
+        primaryCaregiver {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          telecom {
+            system
+            value
+            use
+          }
+        }
+        reasonsNotApplying {
+          primaryCaregiverType
+          reasonNotApplying
+          isDeceased
+        }
+      }
       mother {
         id
         name {
@@ -25,6 +71,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         maritalStatus
+        occupation
         dateOfMarriage
         educationalAttainment
         nationality
@@ -56,6 +103,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         birthDate
         maritalStatus
+        occupation
         dateOfMarriage
         educationalAttainment
         nationality
@@ -77,9 +125,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           value
         }
       }
+      informant {
+        relationship
+        otherRelationship
+      }
       registration {
         id
         contact
+        contactRelationship
         contactPhoneNumber
         attachments {
           data
@@ -191,6 +244,52 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           value
         }
       }
+      informant {
+        id
+        individual {
+          id
+          identifier {
+            id
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          birthDate
+          address {
+            type
+            line
+            district
+            state
+            postalCode
+            country
+          }
+        }
+      }
+      primaryCaregiver {
+        parentDetailsType
+        primaryCaregiver {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          telecom {
+            system
+            value
+            use
+          }
+        }
+        reasonsNotApplying {
+          primaryCaregiverType
+          reasonNotApplying
+          isDeceased
+        }
+      }
       registration {
         id
         contact
@@ -205,7 +304,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           comments {
             comment
           }
-
+          type
           location {
             name
             alias
@@ -219,7 +318,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
         }
-
         trackingId
         registrationNumber
       }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -19,12 +19,14 @@ import { buttonMessages } from '@register/i18n/messages'
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.black};
+  margin: 0px;
 `
 const Instruction = styled.p`
   color: ${({ theme }) => theme.colors.copy};
+  margin: 13px 64px 27px 0px;
 `
 const Action = styled.div`
-  margin-top: 32px;
+  margin-top: 58px;
 `
 
 const GlobalError = styled.div`
@@ -47,7 +49,7 @@ const PasswordContents = styled.div`
 `
 const ValidationRulesSection = styled.div`
   background: ${({ theme }) => theme.colors.background};
-  margin: 16px 0 16px;
+  margin: 16px 0 24px;
   padding: 8px 24px;
   & div {
     padding: 8px 0;
@@ -78,7 +80,7 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IProps & InjectedIntlProps
+type IFullProps = IProps & IntlShapeProps
 
 class CreatePasswordComponent extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {

@@ -31,11 +31,10 @@ import { storage } from '@register/storage'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { connect } from 'react-redux'
 import { getUserDetails } from '@register/profile/profileSelectors'
-import { IUserDetails } from '@register/utils/userUtils'
+import { IUserDetails, getIndividualNameObj } from '@register/utils/userUtils'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { IStoreState } from '@register/store'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   goToHome,
   goToPerformance,
@@ -58,8 +57,9 @@ import {
   buttonMessages,
   userMessages
 } from '@register/i18n/messages'
+import { grid } from '@opencrvs/components/lib/grid'
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
@@ -103,12 +103,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
     let name = ''
     if (userDetails && userDetails.name) {
-      const nameObj = userDetails.name.find(
-        (storedName: GQLHumanName | null) => {
-          const name = storedName as GQLHumanName
-          return name.use === language
-        }
-      ) as GQLHumanName
+      const nameObj = getIndividualNameObj(userDetails.name, language)
       name = nameObj
         ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
         : ''
@@ -223,6 +218,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <TrackingID />,
+        invertIcon: <TrackingID color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
         isDefault: true
       },
@@ -230,12 +226,14 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(messages.typeBrnDrn),
         value: BRN_DRN_TEXT,
         icon: <BRN />,
+        invertIcon: <BRN color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Phone />,
+        invertIcon: <Phone color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       }
     ]
@@ -279,22 +277,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (
-      userDetails &&
-      userDetails.role &&
-      SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      menuItems = [
-        {
-          key: 'sysadmin',
-          title: intl.formatMessage(messages.systemTitle),
-          onClick: goToHome,
-          selected: true
-        }
-      ]
-    }
-
-    const rightMenu = [
+    let rightMenu = [
       {
         element: (
           <StyledPrimaryButton
@@ -312,6 +295,27 @@ class HeaderComp extends React.Component<IProps, IState> {
         element: <ProfileMenu key="profileMenu" />
       }
     ]
+
+    if (
+      userDetails &&
+      userDetails.role &&
+      SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      menuItems = [
+        {
+          key: 'sysadmin',
+          title: intl.formatMessage(messages.systemTitle),
+          onClick: goToHome,
+          selected: true
+        }
+      ]
+
+      rightMenu = [
+        {
+          element: <ProfileMenu key="profileMenu" />
+        }
+      ]
+    }
 
     const mobileHeaderActionProps = this.props.mobileSearchBar
       ? {
@@ -360,4 +364,4 @@ export const Header = connect(
     goToHomeAction: goToHome,
     goToPerformanceAction: goToPerformance
   }
-)(injectIntl<IProps>(HeaderComp))
+)(injectIntl<'intl', IProps>(HeaderComp))

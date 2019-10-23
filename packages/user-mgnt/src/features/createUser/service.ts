@@ -12,7 +12,24 @@ export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
       { system: 'phone', value: user.mobile },
       { system: 'email', value: user.email }
     ],
-    name: user.name
+    name: user.name,
+    extension: user.signature && [
+      {
+        url: 'http://opencrvs.org/specs/extension/employee-signature',
+        valueSignature: {
+          type: [
+            {
+              system: 'urn:iso-astm:E1762-95:2013',
+              code: '1.2.840.10065.1.12.1.13',
+              display: 'Review Signature'
+            }
+          ],
+          when: new Date().toISOString(),
+          contentType: user.signature.type,
+          blob: user.signature.data
+        }
+      }
+    ]
   }
 }
 

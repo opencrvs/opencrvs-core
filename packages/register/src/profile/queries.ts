@@ -29,9 +29,22 @@ export const FETCH_USER = gql`
         name
         status
       }
+      localRegistrar {
+        name {
+          use
+          firstNames
+          familyName
+        }
+        role
+        signature {
+          data
+          type
+        }
+      }
     }
   }
 `
+
 async function fetchUserDetails(userId: string) {
   return (
     client &&

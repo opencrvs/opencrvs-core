@@ -39,12 +39,26 @@ const declareToken = jwt.sign(
   }
 )
 
+const certifyToken = jwt.sign(
+  { scope: ['certify'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
 
 const authHeaderValidate = {
   Authorization: `Bearer ${validateToken}`
+}
+
+const authHeaderCertify = {
+  Authorization: `Bearer ${certifyToken}`
 }
 
 const authHeaderNotRegCert = {
@@ -118,112 +132,6 @@ describe('Registration root resolvers', () => {
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
-    })
-  })
-  describe('listEventRegistrations()', () => {
-    it('returns an array of composition results', async () => {
-      fetch.mockResponse(
-        JSON.stringify({ entry: [{ resource: { focus: {} } }], total: 1 })
-      )
-      const result = await resolvers.Query.listEventRegistrations(
-        {},
-        { status: 'DECLARED' },
-        authHeaderRegCert
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(1)
-    })
-
-    it('returns an array of composition results when location ids provided', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }],
-          total: 2
-        })
-      )
-
-      const result = await resolvers.Query.listEventRegistrations(
-        {},
-        {
-          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
-          status: 'DECLARED'
-        },
-        authHeaderRegCert
-      )
-
-      expect(result).toBeDefined()
-      expect(result.results).toBeInstanceOf(Array)
-      expect(result.totalItems).toBe(2)
-    })
-
-    it('throws error if user does not have register or validate scope', async () => {
-      await expect(
-        resolvers.Query.listEventRegistrations(
-          {},
-          {
-            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff'],
-            status: 'DECLARED'
-          },
-          authHeaderNotRegCert
-        )
-      ).rejects.toThrowError('User does not have a register or validate scope')
-    })
-  })
-  describe('countEventRegistrationsByStatus()', () => {
-    it('returns total number of compositions by status', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
-        })
-      )
-
-      // @ts-ignore
-      const result = await resolvers.Query.countEventRegistrationsByStatus(
-        {},
-        {
-          status: 'IN_PROGRESS',
-          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
-        },
-        authHeaderRegCert
-      )
-
-      expect(result).toBeDefined()
-      expect(result.count).toBe(2)
-    })
-    it('throws error if user does not have register or validate scope', async () => {
-      await expect(
-        resolvers.Query.countEventRegistrationsByStatus(
-          {},
-          {
-            status: 'IN_PROGRES',
-            locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
-          },
-          authHeaderNotRegCert
-        )
-      ).rejects.toThrowError('User does not have a register or validate scope')
-    })
-  })
-  describe('countEventRegistrations()', () => {
-    it('returns total number of declared and rejected compositions', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          entry: [{ resource: { focus: {} } }, { resource: { focus: {} } }]
-        })
-      )
-
-      // @ts-ignore
-      const result = await resolvers.Query.countEventRegistrations(
-        {},
-        {
-          locationIds: ['9483afb0-dcda-4756-bae3-ee5dc09361ff']
-        }
-      )
-
-      expect(result).toBeDefined()
-      expect(result.declared).toBe(2)
-      expect(result.rejected).toBe(2)
     })
   })
   describe('createDeathRegistration()', () => {
@@ -2154,7 +2062,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register scope')
     })
   })
-  describe('queryRegistrationByIdentifier()', async () => {
+  describe('queryRegistrationByIdentifier()', () => {
     it('returns registration', async () => {
       fetch.mockResponses(
         [
@@ -2235,7 +2143,7 @@ describe('Registration root resolvers', () => {
     })
   })
 
-  describe('queryPersonByIdentifier()', async () => {
+  describe('queryPersonByIdentifier()', () => {
     it('returns person', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -2292,14 +2200,14 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it("throws an error when the user doesn't have register or validate scope", async () => {
-      await expect(
+    it("throws an error when the user doesn't have required scope", async () => {
+      expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
-          authHeaderNotRegCert
+          authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 })

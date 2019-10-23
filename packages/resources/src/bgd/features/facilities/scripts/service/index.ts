@@ -1,13 +1,14 @@
 import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
 import {
-  getLocationIDByDescription,
+  getLocationIDByA2IRef,
   sendToFhir,
   ILocation
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
 export interface IDGHSFacility {
+  facilityId: string
   division: string
   district: string
   upazila: string
@@ -70,7 +71,12 @@ const createFhirLocationFromA2IJson = (
 ): fhir.Location => {
   return {
     resourceType: 'Location',
-    identifier: [],
+    identifier: [
+      {
+        system: `${ORG_URL}/specs/id/internal-id`,
+        value: String(location.facilityId)
+      }
+    ],
     name: location.facilityNameEnglish, // English name
     alias: [location.facilityNameBengali], // Bangla name in element 0
     status: 'active',
@@ -190,7 +196,7 @@ export function generateSimpleLocationResource(
   const loc = {} as ILocation
   loc.id = fhirLocation.id
   loc.name = fhirLocation.name
-  loc.nameBn = fhirLocation.alias && fhirLocation.alias[0]
+  loc.alias = fhirLocation.alias && fhirLocation.alias[0]
   loc.physicalType =
     fhirLocation.physicalType &&
     fhirLocation.physicalType.coding &&
@@ -209,7 +215,7 @@ export async function mapAndSaveCRVSFacilities(
 ): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
   for (const facility of facilities) {
-    const parentLocationID = getLocationIDByDescription(
+    const parentLocationID = getLocationIDByA2IRef(
       parentLocations,
       facility.A2IReference
     )

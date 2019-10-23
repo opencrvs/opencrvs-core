@@ -1,12 +1,16 @@
 language: node_js
 node_js:
   - 'lts/*'
+env:
+  - CI=true
 jobs:
   include:
     - stage: tests (unit and integration)
+      script: yarn test && yarn lint && yarn build
       after_success:
         - npm install codecov -g
         - codecov
+        - ./node_modules/.bin/bundlesize
     - if: type = pull_request
       before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       addons:
@@ -21,8 +25,8 @@ jobs:
         - sudo chown -R 1000:1000 data/elasticsearch
         - yarn compose:all &
         - wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 tcp:8086 tcp:3447 tcp:5001
-        - yarn db:backup:restore
-        - cd packages/resources && yarn save:testData && cd ../..
+        - cd packages/resources && yarn db:backup:restore bgd
+        - yarn save:testData && cd ../..
         - cd packages/e2e && yarn start --record false
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
@@ -46,7 +50,7 @@ jobs:
     - stage: deploy to staging
       if: branch = master AND type = push
       install: skip
-      script: yarn deploy:staging
+      script: yarn deploy:staging:bgd
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 

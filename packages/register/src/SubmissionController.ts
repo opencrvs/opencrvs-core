@@ -1,4 +1,5 @@
 import ApolloClient, { ApolloError } from 'apollo-client'
+// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import {
   IApplication,
@@ -6,12 +7,14 @@ import {
   writeApplication,
   SUBMISSION_STATUS
 } from '@register/applications'
-import { Action, IForm } from '@register/forms'
+import { Action } from '@register/forms'
 import { getRegisterForm } from '@register/forms/register/application-selectors'
 import { AppStore } from '@register/store'
-import { createClient } from '@register/utils/apolloClient'
 import { getMutationMapping } from '@register/views/DataProvider/MutationProvider'
 import { FetchResult } from 'react-apollo'
+import { REGISTRATION_HOME_QUERY } from './views/RegistrationHome/queries'
+import { getOperationName } from 'apollo-utilities'
+import { client } from '@register/utils/apolloClient'
 
 const INTERVAL_TIME = 5000
 const ALLOWED_STATUS_FOR_RETRY = [
@@ -19,6 +22,7 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
   SUBMISSION_STATUS.READY_TO_REGISTER.toString(),
   SUBMISSION_STATUS.READY_TO_REJECT.toString(),
+  SUBMISSION_STATUS.READY_TO_CERTIFY.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
 
@@ -30,32 +34,33 @@ const ACTION_LIST: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: Action.SUBMIT_FOR_REVIEW,
   [Action.APPROVE_APPLICATION]: Action.APPROVE_APPLICATION,
   [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
-  [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION
+  [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION,
+  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE
 }
 const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
   [Action.APPROVE_APPLICATION]: SUBMISSION_STATUS.APPROVING,
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
-  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING,
+  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING
 }
 const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
   [Action.APPROVE_APPLICATION]: SUBMISSION_STATUS.APPROVED,
   [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
-  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED
+  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED,
+  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFIED
 }
 
 export class SubmissionController {
   private store: AppStore
   private client: ApolloClient<{}>
-  private registerForms: { [key: string]: IForm }
   private syncRunning: boolean = false
   private syncCount: number = 0
 
   constructor(store: AppStore) {
     this.store = store
-    this.client = createClient(store)
-    this.registerForms = getRegisterForm(this.store.getState())
+    this.client = client
   }
 
   public start = () => {
@@ -105,12 +110,15 @@ export class SubmissionController {
     }
 
     const applicationAction = ACTION_LIST[application.action || ''] || null
+
+    const forms = getRegisterForm(this.store.getState())
+
     const result = getMutationMapping(
       application.event,
       // @ts-ignore
       applicationAction,
       application.payload,
-      this.registerForms[application.event],
+      forms[application.event],
       application
     )
     const { mutation, variables } = result || {
@@ -126,7 +134,12 @@ export class SubmissionController {
     this.store.dispatch(writeApplication(application))
 
     try {
-      const mutationResult = await this.client.mutate({ mutation, variables })
+      const mutationResult = await this.client.mutate({
+        mutation,
+        variables,
+        refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
+        awaitRefetchQueries: true
+      })
       this.onSuccess(application, mutationResult)
     } catch (exception) {
       this.onError(application, exception)

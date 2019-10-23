@@ -9,7 +9,7 @@ import { client } from '@search/elasticsearch/client'
 import { logger } from '@search/logger'
 import { IBirthCompositionBody } from '@search/elasticsearch/utils'
 
-describe('elasticsearch db helper', async () => {
+describe('elasticsearch db helper', () => {
   let indexSpy: jest.SpyInstance<any, any[]>
   let updateSpy: jest.SpyInstance<any, any[]>
   let searchSpy: jest.SpyInstance<any, any[]>
@@ -28,7 +28,8 @@ describe('elasticsearch db helper', async () => {
         body: mockCompositionBody,
         id: 'testId',
         index: 'ocrvs',
-        type: 'compositions'
+        type: 'compositions',
+        refresh: 'wait_for'
       })
     })
 
@@ -45,7 +46,8 @@ describe('elasticsearch db helper', async () => {
         id: 'testId',
         body: {
           doc: body
-        }
+        },
+        refresh: 'wait_for'
       })
     })
 

@@ -2,7 +2,8 @@ import * as React from 'react'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
-  PAGE_TRANSITIONS_CLASSNAME
+  PAGE_TRANSITIONS_CLASSNAME,
+  PAGE_TRANSITIONS_EXIT_TIME
 } from '@register/utils/constants'
 import * as routes from '@register/navigation/routes'
 import { matchPath } from 'react-router'
@@ -38,7 +39,8 @@ function isFormPage(pathname: string): boolean {
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM) ||
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE) ||
     isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE_GROUP) ||
-    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE)
+    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE) ||
+    isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP)
   ) {
     return true
   }
@@ -98,7 +100,7 @@ export default class TransitionWrapper extends React.Component<IProps, IState> {
           unmountOnExit
           timeout={{
             enter: PAGE_TRANSITIONS_ENTER_TIME,
-            exit: PAGE_TRANSITIONS_ENTER_TIME - 20
+            exit: PAGE_TRANSITIONS_EXIT_TIME
           }}
           classNames={PAGE_TRANSITIONS_CLASSNAME}
           key={locationKey}

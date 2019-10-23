@@ -112,13 +112,15 @@ export class TextInput extends React.Component<ITextInputProps> {
   }
 
   render() {
-    const { focusInput, ...props } = this.props
+    const { focusInput, maxLength = 250, ...props } = this.props
 
     return (
       <StyledInput
         innerRef={this.$element}
+        name={props.id}
         {...this.props}
         autocomplete={false}
+        maxLength={maxLength}
       />
     )
   }

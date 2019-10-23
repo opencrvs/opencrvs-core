@@ -17,6 +17,8 @@ services:
       - '9200:9200'
     volumes:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
+    environment:
+      - 'cluster.routing.allocation.disk.threshold_enabled=false'
 
   influxdb:
     ports:
@@ -54,3 +56,4 @@ services:
       - 'notification:${LOCAL_IP-172.17.0.1}'
       - 'resources:${LOCAL_IP-172.17.0.1}'
       - 'metrics:${LOCAL_IP-172.17.0.1}'
+      - 'bgd-dhis2-mediator:${LOCAL_IP-172.17.0.1}'

@@ -1,5 +1,13 @@
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
+import { A2I_LOCATION_REFERENCE_IDENTIFIER } from '@resources/bgd/features/administrative/scripts/service'
+import { internal } from 'boom'
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const JURISDICTION_TYPE_DISTRICT = 'district'
+export const JURISDICTION_TYPE_UPAZILA = 'upazila'
+export const JURISDICTION_TYPE_UNION = 'union'
+export const GENERATE_TYPE_RN = 'registrationNumber'
 
 type ISupportedType =
   | fhir.Practitioner
@@ -8,10 +16,18 @@ type ISupportedType =
   | IOISFLocation
 
 export interface IOISFLocation {
-  bbsCode: string
-  name: string
-  nameBn: string
-  id: number
+  geo_id: string
+  name_bng: string
+  name_eng: string
+  bbs_code: string
+  a2i_reference: string
+}
+
+export interface IOISFLocationResponse {
+  divisions: IOISFLocation[]
+  districts: IOISFLocation[]
+  upazilas: IOISFLocation[]
+  unions: IOISFLocation[]
 }
 
 export interface IStatistic {
@@ -21,11 +37,16 @@ export interface IStatistic {
 export interface ILocation {
   id?: string
   name?: string
-  nameBn?: string
+  alias?: string
   physicalType?: string
   jurisdictionType?: string
   type?: string
   partOf?: string
+}
+
+export interface ILocationSequenceNumber {
+  reference: string
+  sequence_number: string
 }
 
 export const sendToFhir = (
@@ -50,6 +71,54 @@ export const sendToFhir = (
     })
 }
 
+export async function getLocationsByIdentifier(identifier: string) {
+  try {
+    const locationSearchResult = await getFromFhir(
+      `/Location/?identifier=${identifier}&_count=0`
+    )
+    return (
+      (locationSearchResult &&
+        locationSearchResult.entry &&
+        locationSearchResult.entry.map(
+          (locationEntry: fhir.BundleEntry) =>
+            locationEntry.resource as fhir.Location
+        )) ||
+      []
+    )
+  } catch (err) {
+    return internal(err)
+  }
+}
+
+export function getLocationIDByA2IRef(
+  locations: fhir.Location[],
+  a2IReference: string
+) {
+  const location = locations.find(loc =>
+    matchLocationWithA2IRef(loc, a2IReference)
+  ) as fhir.Location
+  return location.id as string
+}
+
+export function matchLocationWithA2IRef(
+  location: fhir.Location,
+  a2IReference: string
+) {
+  const refIdentifier = getA2iInternalRefIndentifierOfLocation(location)
+
+  return refIdentifier ? refIdentifier.value === a2IReference : false
+}
+
+export function getA2iInternalRefIndentifierOfLocation(
+  location: fhir.Location
+) {
+  return (
+    location.identifier &&
+    location.identifier.find(
+      identifier => identifier.system === A2I_LOCATION_REFERENCE_IDENTIFIER
+    )
+  )
+}
 export const getFromFhir = (suffix: string) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     headers: {
@@ -62,45 +131,6 @@ export const getFromFhir = (suffix: string) => {
     .catch(error => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
     })
-}
-
-// This is a temporary solution, used to map facilities and employees to a location
-// Currently we are requesting facility and employee information manually from a csv file
-// Until the A2I system is complete and has ORG and Health staff and facilities fully populated and internally mapped,
-// or until we scale out an OpenCRVS team management system, to allow all OpenCRVS employees, facilities, and administrative structures
-// to be configurable, we have a temporary solution here, to connect the reference data only in the areas of our test in March 2019
-
-export function getLocationIDByDescription(
-  locations: fhir.Location[],
-  description: string
-) {
-  const location = locations.find(obj => {
-    return obj.description === description
-  }) as fhir.Location
-  return location.id as string
-}
-
-const kaliganjA2IIdescription = 'division=3&district=20&upazila=165'
-const narsingdiA2IIdescription = 'division=3&district=29&upazila=229'
-const kurigramA2IIdescription = 'division=6&district=55&upazila=417'
-const bhurungamariA2IIdescription = 'division=6&district=55&upazila=413'
-
-export async function getUpazilaID(
-  upazilas: fhir.Location[],
-  name: string
-): Promise<string> {
-  let description: string
-  if (name === 'Kaliganj') {
-    description = kaliganjA2IIdescription
-  } else if (name === 'Narsingdi Sadar') {
-    description = narsingdiA2IIdescription
-  } else if (name === 'Bhurungamari') {
-    description = bhurungamariA2IIdescription
-  } else {
-    description = kurigramA2IIdescription
-  }
-
-  return getLocationIDByDescription(upazilas, description)
 }
 
 export function checkDuplicate(
@@ -125,4 +155,51 @@ export const titleCase = (str: string) => {
       stringArray[i].charAt(0).toUpperCase() + stringArray[i].slice(1)
   }
   return stringArray.join(' ')
+}
+
+export async function getPractitionerLocations(
+  practitionerId: string
+): Promise<fhir.Location[]> {
+  const roleResponse = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
+  )
+  const roleEntry = roleResponse.entry[0].resource
+  if (!roleEntry || !roleEntry.location) {
+    throw new Error('PractitionerRole has no locations associated')
+  }
+  const locList = []
+  for (const location of roleEntry.location) {
+    const splitRef = location.reference.split('/')
+    const locationResponse: fhir.Location = await getFromFhir(
+      `/Location/${splitRef[1]}`
+    )
+    if (!locationResponse) {
+      throw new Error(`Location not found for ${location}`)
+    }
+    locList.push(locationResponse)
+  }
+  return locList as fhir.Location[]
+}
+
+export function getJurisDictionalLocations() {
+  return [
+    {
+      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_UNION,
+      bbsCode: ''
+    }
+  ]
+}
+
+export function convertStringToASCII(str: string): string {
+  return [...str]
+    .map(char => char.charCodeAt(0).toString())
+    .reduce((acc, v) => acc.concat(v))
 }

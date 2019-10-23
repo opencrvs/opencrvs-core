@@ -10,7 +10,7 @@ import { logger } from '@user-mgnt/logger'
 import User, { IUser } from '@user-mgnt/model/user'
 import {
   generateSaltedHash,
-  generateRandomPassowrd
+  generateRandomPassword
 } from '@user-mgnt/utils/hash'
 import {
   statuses,
@@ -31,6 +31,7 @@ export default async function createUser(
   let practitionerId = null
   let roleId = null
   let autoGenPassword = null
+
   try {
     const practitioner = createFhirPractitioner(user)
     practitionerId = await postFhir(token, practitioner)
@@ -50,7 +51,13 @@ export default async function createUser(
 
     user.status = statuses.PENDING
     user.scope = roleScopeMapping[user.role]
-    autoGenPassword = generateRandomPassowrd(hasDemoScope(request))
+
+    if (user.role === 'API_USER') {
+      // Immediately active API users
+      user.status = statuses.ACTIVE
+    }
+
+    autoGenPassword = generateRandomPassword(hasDemoScope(request))
 
     const { hash, salt } = generateSaltedHash(autoGenPassword)
     user.salt = salt

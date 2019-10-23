@@ -1,10 +1,10 @@
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { Query } from 'react-apollo'
-import * as Sentry from '@sentry/browser'
+import { Query } from '@register/components/Query'
+
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLDeathRegistration,
@@ -147,7 +147,7 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   theme: ITheme
   eventId: string
 }
@@ -309,7 +309,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             data?: any
           }) => {
             if (error) {
-              Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
                   {intl.formatMessage(errorMessages.queryError)}

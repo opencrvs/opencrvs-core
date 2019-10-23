@@ -1,20 +1,15 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISelectInformantMessages {
-  newBirthRegistration: ReactIntl.FormattedMessage.MessageDescriptor
-  birthInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deathInformantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  parents: ReactIntl.FormattedMessage.MessageDescriptor
-  birthErrorMessage: ReactIntl.FormattedMessage.MessageDescriptor
-  deathErrorMessage: ReactIntl.FormattedMessage.MessageDescriptor
+  birthInformantTitle: MessageDescriptor
+  deathInformantTitle: MessageDescriptor
+  parents: MessageDescriptor
+  legalGuardian: MessageDescriptor
+  birthErrorMessage: MessageDescriptor
+  deathErrorMessage: MessageDescriptor
 }
 
 const messagesToDefine: ISelectInformantMessages = {
-  newBirthRegistration: {
-    id: 'register.selectInformant.newBirthRegistration',
-    defaultMessage: 'New birth application',
-    description: 'The message that appears for new birth registrations'
-  },
   birthInformantTitle: {
     id: 'register.selectInformant.birthInformantTitle',
     defaultMessage: 'Who is applying for birth registration?',
@@ -31,6 +26,11 @@ const messagesToDefine: ISelectInformantMessages = {
     defaultMessage: 'Mother & Father',
     description:
       'The description that appears when selecting the parent as informant'
+  },
+  legalGuardian: {
+    id: 'register.selectinformant.legalGuardian',
+    defaultMessage: 'Legal guardian',
+    description: 'Informant option'
   },
   birthErrorMessage: {
     id: 'register.selectInformant.birthErrorMessage',

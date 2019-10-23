@@ -8,6 +8,7 @@ import {
 } from '@register/forms'
 import { userMessages } from '@register/i18n/messages'
 import { getRolesQuery } from './queries'
+import { deserializeFormSection } from '@register/forms/mappings/deserializer'
 
 export enum UserStatus {
   ACTIVE,
@@ -48,11 +49,33 @@ export const mockCompleteFormData = {
   username: ''
 }
 
+export const mockDataWithRegistarRoleSelected = {
+  accountDetails: '',
+  assignedRegisterOffice: '',
+  device: '',
+  familyName: 'হোসেন',
+  familyNameEng: 'Hossain',
+  firstNames: '',
+  firstNamesEng: '',
+  nid: '1014881922121',
+  phoneNumber: '01662132132',
+  registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
+  role: 'LOCAL_REGISTRAR',
+  type: 'SECRETARY',
+  userDetails: '',
+  username: '',
+  signature: {
+    type: 'image/png',
+    data:
+      'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUt'
+  }
+}
+
 export const mockUserGraphqlOperation = {
   request: {
     query: createUserMutation,
     variables: draftToGqlTransformer(
-      { sections: [userSection] },
+      { sections: [deserializeFormSection(userSection)] },
       { user: mockCompleteFormData }
     )
   },

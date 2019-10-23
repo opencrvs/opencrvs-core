@@ -12,14 +12,14 @@ import {
   RegistrationHome,
   EVENT_STATUS
 } from '@register/views/RegistrationHome/RegistrationHome'
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { GridTable } from '@opencrvs/components/lib/interface'
 import {
-  COUNT_REGISTRATION_QUERY,
   FETCH_REGISTRATION_BY_COMPOSITION,
-  SEARCH_EVENTS
+  REGISTRATION_HOME_QUERY
 } from '@register/views/RegistrationHome/queries'
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
+import { waitForElement } from '@register/tests/wait-for-element'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -73,6 +73,7 @@ const mockUserData = {
   // TODO: When fragmentMatching work is completed, remove unnecessary result objects
   // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
   child: {
+    id: 'FAKE_ID',
     name: [
       {
         firstNames: 'Iliyas',
@@ -133,96 +134,35 @@ describe('RegistrationHome sent for update tab related tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store
-    )
-
-    // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
-  })
-  it('renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: COUNT_REGISTRATION_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
-          }
-        },
-        error: new Error('boom')
-      }
-    ]
-
-    const testComponent = createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    expect(
-      testComponent.component
-        .find('#search-result-error-text-reject')
-        .children()
-        .text()
-    ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
-  })
-
   it('check sent for update applications count', async () => {
     const graphqlMock = [
       {
         request: {
-          query: COUNT_REGISTRATION_QUERY,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f']
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            count: 10,
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            countEvents: {
-              declared: 10,
-              validated: 4,
-              registered: 7,
-              rejected: 5
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 5, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -240,18 +180,9 @@ describe('RegistrationHome sent for update tab related tests', () => {
     )
 
     // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
+    const tab = await waitForElement(testComponent.component, '#tab_updates')
 
-    testComponent.component.update()
-    const app = testComponent.component
-    expect(
-      app
-        .find('#tab_updates')
-        .hostNodes()
-        .text()
-    ).toContain('Sent for updates (5)')
+    expect(tab.hostNodes().text()).toContain('Sent for updates (5)')
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
@@ -259,17 +190,23 @@ describe('RegistrationHome sent for update tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
               totalItems: 2,
               results: [
                 {
@@ -333,13 +270,15 @@ describe('RegistrationHome sent for update tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -349,12 +288,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+    const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = moment(
       moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
       'YYYY-MM-DD HH:mm:ss'
@@ -366,8 +301,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
-
-    testComponent.component.unmount()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {
@@ -375,21 +308,31 @@ describe('RegistrationHome sent for update tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
-          data: {}
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 2, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
+          }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -409,40 +352,41 @@ describe('RegistrationHome sent for update tab related tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    const table = await waitForElement(testComponent.component, GridTable)
+
+    const data = table.prop('content')
     expect(data.length).toBe(0)
-    testComponent.component.unmount()
   })
 
   it('should show pagination bar in sent for update tab if items more than 11', async () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
-              totalItems: 14,
-              results: userData
-            }
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 14, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -451,23 +395,13 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-
-    expect(
-      testComponent.component.find('#pagination').hostNodes()
-    ).toHaveLength(1)
+    await waitForElement(testComponent.component, '#pagination')
 
     testComponent.component
       .find('#pagination button')
       .last()
       .hostNodes()
       .simulate('click')
-
-    testComponent.component.unmount()
   })
 
   it('renders expanded area for required updates', async () => {
@@ -475,17 +409,23 @@ describe('RegistrationHome sent for update tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
               totalItems: 2,
               results: [
                 {
@@ -525,7 +465,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
                     status: 'REJECTED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
-                    contactNumber: null,
+                    contactNumber: '01622688231',
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -549,7 +489,9 @@ describe('RegistrationHome sent for update tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       },
@@ -615,6 +557,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
                 contactPhoneNumber: '01622688231'
               },
               child: {
+                id: 'FAKE_ID',
                 name: [
                   {
                     use: 'en',
@@ -632,7 +575,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
       store,
@@ -659,7 +602,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(testComponent.component.find('#REJECTED-0').hostNodes().length).toBe(
       1
     )
-    testComponent.component.unmount()
   })
 
   it('redirects user to review page on update action click', async () => {
@@ -668,17 +610,23 @@ describe('RegistrationHome sent for update tab related tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
               totalItems: 2,
               results: [
                 {
@@ -692,8 +640,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
                   },
                   dateOfBirth: '2010-10-10',
                   childName: [
@@ -718,7 +666,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
                     status: 'REJECTED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
-                    contactNumber: null,
+                    contactNumber: '01622688231',
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -742,13 +690,15 @@ describe('RegistrationHome sent for update tab related tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -789,7 +739,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(window.location.href).toContain(
       '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })
 
@@ -812,17 +761,23 @@ describe('Tablet tests', () => {
     const graphqlMock = [
       {
         request: {
-          query: SEARCH_EVENTS,
+          query: REGISTRATION_HOME_QUERY,
           variables: {
-            status: [EVENT_STATUS.REJECTED],
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             count: 10,
-            skip: 0
+            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+            inProgressSkip: 0,
+            reviewSkip: 0,
+            rejectSkip: 0,
+            approvalSkip: 0,
+            printSkip: 0
           }
         },
         result: {
           data: {
-            searchEvents: {
+            inProgressTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
               totalItems: 2,
               results: [
                 {
@@ -836,8 +791,8 @@ describe('Tablet tests', () => {
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
                   },
                   dateOfBirth: '2010-10-10',
                   childName: [
@@ -862,7 +817,7 @@ describe('Tablet tests', () => {
                     status: 'REJECTED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
-                    contactNumber: null,
+                    contactNumber: '01622688231',
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -886,13 +841,15 @@ describe('Tablet tests', () => {
                   ]
                 }
               ]
-            }
+            },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
           }
         }
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <RegistrationHome
         match={{
@@ -912,15 +869,8 @@ describe('Tablet tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
-    testComponent.component
-      .find('#row_0')
-      .hostNodes()
-      .simulate('click')
+    const element = await waitForElement(testComponent.component, '#row_0')
+    element.hostNodes().simulate('click')
 
     await new Promise(resolve => {
       setTimeout(resolve, 100)
@@ -930,6 +880,5 @@ describe('Tablet tests', () => {
     expect(window.location.href).toContain(
       '/details/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
-    testComponent.component.unmount()
   })
 })

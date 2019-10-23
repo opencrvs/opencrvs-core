@@ -1,4 +1,4 @@
-import { FormattedMessage } from 'react-intl'
+import { MessageDescriptor } from 'react-intl'
 import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
 import { formMessages as messages } from '@register/i18n/messages'
 
@@ -11,6 +11,7 @@ export const REFUGEE_NUMBER = 'REFUGEE_NUMBER'
 export const ALIEN_NUMBER = 'ALIEN_NUMBER'
 export const OTHER = 'OTHER'
 export const NO_ID = 'NO_ID'
+export const SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 
 export const birthIdentityOptions = [
   { value: NATIONAL_ID, label: messages.iDTypeNationalID },
@@ -51,9 +52,7 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
-export function identityNameMapper(
-  code: string
-): FormattedMessage.MessageDescriptor {
+export function identityNameMapper(code: string): MessageDescriptor {
   switch (code) {
     case 'NATIONAL_ID':
       return messages.iDTypeNationalID

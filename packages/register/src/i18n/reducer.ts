@@ -1,8 +1,8 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@register/i18n/actions'
-import { ENGLISH_STATE } from '@register/i18n/locales/en'
-import { BENGALI_STATE } from '@register/i18n/locales/bn'
-import { getDefaultLanguage } from '@register/i18n/utils'
+import { getDefaultLanguage, getAvailableLanguages } from '@register/i18n/utils'
+import * as offlineActions from '@register/offline/actions'
+import { ILocation } from '@register/offline/reducer'
 
 export interface IntlMessages {
   [key: string]: string
@@ -18,50 +18,119 @@ export interface ILanguageState {
   [key: string]: ILanguage
 }
 
-export const languages: ILanguageState = {
-  en: ENGLISH_STATE,
-  bn: BENGALI_STATE
-}
-
 export type IntlState = {
   language: string
   messages: IntlMessages
   languages: ILanguageState
 }
 
-export const initialState: IntlState = {
-  language: getDefaultLanguage(),
-  messages: languages[getDefaultLanguage()].messages,
-  languages
+interface ISupportedLanguages {
+  code: string
+  language: string
 }
 
-const getNextMessages = (language: string): IntlMessages => {
+const supportedLanguages: ISupportedLanguages[] = [
+  { code: 'en', language: 'English' },
+  { code: 'bn', language: 'বাংলা' }
+]
+
+export const initLanguages = () => {
+  const initLanguages: ILanguageState = {}
+  getAvailableLanguages().forEach(lang => {
+    const languageDescription = supportedLanguages.find(
+      obj => obj.code === lang
+    ) as ISupportedLanguages
+    initLanguages[lang] = {
+      lang,
+      displayName: languageDescription.language,
+      messages: {}
+    }
+  })
+  return initLanguages
+}
+
+const DEFAULT_MESSAGES = { default: 'default' }
+
+export const initialState: IntlState = {
+  language: getDefaultLanguage(),
+  messages: DEFAULT_MESSAGES,
+  languages: initLanguages()
+}
+
+export const formatLocationLanguageState = (
+  locations: ILocation[],
+  languages: ILanguageState
+): ILanguageState => {
+  const primaryLocationMessages: IntlMessages = {}
+  const secondaryLocationMessages: IntlMessages = {}
+
+  locations.forEach((location: ILocation) => {
+    primaryLocationMessages[`location.${location.id}`] = location.name
+    if (Object.keys(languages).length === 2) {
+      secondaryLocationMessages[`location.${location.id}`] = location.alias
+    }
+  })
+  Object.keys(languages).forEach((key, index) => {
+    const language = languages[key]
+    language.messages = {
+      ...language.messages,
+      ...(index === 1 ? secondaryLocationMessages : primaryLocationMessages)
+    }
+  })
+  return languages
+}
+
+const getNextMessages = (
+  language: string,
+  languages: ILanguageState
+): IntlMessages => {
   return languages[language].messages
 }
 
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: any
-): IntlState | Loop<IntlState, actions.Action> => {
+  action: actions.Action | offlineActions.Action
+): IntlState | Loop<IntlState, actions.Action | offlineActions.Action> => {
   switch (action.type) {
     case actions.CHANGE_LANGUAGE:
-      const messages = getNextMessages(action.payload.language)
+      const messages = getNextMessages(action.payload.language, state.languages)
 
       return {
         ...state,
         language: action.payload.language,
         messages
       }
-    case actions.ADD_OFFLINE_KEYS:
-      let updatedMessages = getNextMessages(state.language)
-      updatedMessages = {
-        ...updatedMessages,
-        ...action.payload[state.language].messages
+
+    case offlineActions.READY:
+      const languages = action.payload.languages
+
+      const loadedLanguagesState: ILanguageState = languages.reduce(
+        (indexedByLang, language) => ({
+          ...indexedByLang,
+          [language.lang]: language
+        }),
+        {}
+      )
+
+      const languagesWithLocations = formatLocationLanguageState(
+        Object.values(action.payload.locations),
+        loadedLanguagesState
+      )
+
+      const languagesWithFacilities = formatLocationLanguageState(
+        Object.values(action.payload.facilities),
+        languagesWithLocations
+      )
+
+      const updatedMessages = {
+        ...getNextMessages(state.language, state.languages),
+        ...languagesWithFacilities[state.language].messages
       }
+
       return {
         ...state,
         messages: updatedMessages,
-        languages: action.payload
+        languages: languagesWithFacilities
       }
     default:
       return state

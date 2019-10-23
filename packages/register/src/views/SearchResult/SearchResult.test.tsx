@@ -43,8 +43,8 @@ describe('SearchResult tests', () => {
     store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('sets loading state while waiting for data', () => {
-    const testComponent = createTestComponent(
+  it('sets loading state while waiting for data', async () => {
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -62,8 +62,6 @@ describe('SearchResult tests', () => {
 
     // @ts-ignore
     expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
-
-    testComponent.component.unmount()
   })
 
   it('renders all items returned from graphql query', async () => {
@@ -221,7 +219,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -249,7 +247,7 @@ describe('SearchResult tests', () => {
         id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         name: 'ইলিয়াস খান',
         dob: '',
-        dod: '01-01-2007',
+        dod: '01 January 2007',
         registrationNumber: '',
         trackingId: 'DW0UTHR',
         event: 'Death',
@@ -266,7 +264,7 @@ describe('SearchResult tests', () => {
         id: 'c7e83060-4db9-4057-8b14-71841243b05f',
         name: 'জহির রায়হান',
         dob: '',
-        dod: '01-01-2010',
+        dod: '01 January 2010',
         registrationNumber: '',
         trackingId: 'DXMJPYA',
         event: 'Death',
@@ -282,7 +280,7 @@ describe('SearchResult tests', () => {
       {
         id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
         name: 'ফকরুল ইসলাম',
-        dob: '01-01-2010',
+        dob: '01 January 2010',
         dod: '',
         registrationNumber: '2019333494BQRZWDR2',
         duplicates: [],
@@ -299,7 +297,7 @@ describe('SearchResult tests', () => {
       {
         id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
         name: 'রফিক ইসলাম',
-        dob: '01-01-2008',
+        dob: '01 January 2008',
         dod: '',
         registrationNumber: '2019333494B3DBJMP5',
         duplicates: [],
@@ -314,8 +312,6 @@ describe('SearchResult tests', () => {
         modifiedAt: undefined
       }
     ])
-
-    testComponent.component.unmount()
   })
 
   it('renders error text when an error occurs', async () => {
@@ -335,7 +331,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
         match={{
@@ -364,15 +360,13 @@ describe('SearchResult tests', () => {
         .children()
         .text()
     ).toBe('An error occurred while searching')
-
-    testComponent.component.unmount()
   })
-  it('renders empty search page with a header in small devices', () => {
-    const testSearchResultComponent = createTestComponent(
+  it('renders empty search page with a header in small devices', async () => {
+    const testSearchResultComponent = (await createTestComponent(
       // @ts-ignore
       <SearchResult match={{ params: {} }} />,
       store
-    ).component
+    )).component
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,

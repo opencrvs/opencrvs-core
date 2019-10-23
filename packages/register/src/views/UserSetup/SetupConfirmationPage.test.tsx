@@ -13,7 +13,7 @@ describe('Setup confirmation page tests', () => {
     store.dispatch(checkAuth({ '?token': validToken }))
   })
   it('renders page successfully', async () => {
-    const testComponent = createTestComponent(
+    const testComponent = await createTestComponent(
       // @ts-ignore
       <SetupConfirmationPage />,
       store

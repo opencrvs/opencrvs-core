@@ -1,284 +1,312 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IFormMessages {
-  accountDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  addressLine1: ReactIntl.FormattedMessage.MessageDescriptor
-  addressLine2: ReactIntl.FormattedMessage.MessageDescriptor
-  addressLine3: ReactIntl.FormattedMessage.MessageDescriptor
-  addressLine3CityOption: ReactIntl.FormattedMessage.MessageDescriptor
-  addressLine4: ReactIntl.FormattedMessage.MessageDescriptor
-  addressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  answer: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantIDProof: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantName: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantOtherRelationship: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsIdType: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsNationality: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantsRelationWithDeceased: ReactIntl.FormattedMessage.MessageDescriptor
-  applicantTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  assignedRegisterOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthLayperson: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthMidwife: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthNone: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthNurse: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthOther: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthOtherParamedicalPersonnel: ReactIntl.FormattedMessage.MessageDescriptor
-  attendantAtBirthPhysician: ReactIntl.FormattedMessage.MessageDescriptor
-  attestedBirthRecord: ReactIntl.FormattedMessage.MessageDescriptor
-  attestedVaccination: ReactIntl.FormattedMessage.MessageDescriptor
-  birthAttendant: ReactIntl.FormattedMessage.MessageDescriptor
-  birthLocation: ReactIntl.FormattedMessage.MessageDescriptor
-  birthMedicalInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  birthType: ReactIntl.FormattedMessage.MessageDescriptor
-  birthTypeHigherMultipleDelivery: ReactIntl.FormattedMessage.MessageDescriptor
-  birthTypeQuadruplet: ReactIntl.FormattedMessage.MessageDescriptor
-  birthTypeSingle: ReactIntl.FormattedMessage.MessageDescriptor
-  birthTypeTriplet: ReactIntl.FormattedMessage.MessageDescriptor
-  birthTypeTwin: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathCode: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathEstablished: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathName: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathNotice: ReactIntl.FormattedMessage.MessageDescriptor
-  causeOfDeathTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  certification: ReactIntl.FormattedMessage.MessageDescriptor
-  changeAssignedOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  childDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  childFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  childFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  childFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
-  childFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  childSex: ReactIntl.FormattedMessage.MessageDescriptor
-  childSexFemale: ReactIntl.FormattedMessage.MessageDescriptor
-  childSexMale: ReactIntl.FormattedMessage.MessageDescriptor
-  childSexOther: ReactIntl.FormattedMessage.MessageDescriptor
-  childSexUnknown: ReactIntl.FormattedMessage.MessageDescriptor
-  childTab: ReactIntl.FormattedMessage.MessageDescriptor
-  childTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  commentsOrNotesDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  commentsOrNotesLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  confirm: ReactIntl.FormattedMessage.MessageDescriptor
-  confirmMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  contactDetailsBoth: ReactIntl.FormattedMessage.MessageDescriptor
-  contactDetailsFather: ReactIntl.FormattedMessage.MessageDescriptor
-  contactDetailsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  country: ReactIntl.FormattedMessage.MessageDescriptor
-  currentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  currentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  dateOfMarriage: ReactIntl.FormattedMessage.MessageDescriptor
-  daughter: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtFacility: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtOtherLocation: ReactIntl.FormattedMessage.MessageDescriptor
-  deathAtPrivateHome: ReactIntl.FormattedMessage.MessageDescriptor
-  deathDate: ReactIntl.FormattedMessage.MessageDescriptor
-  deathEventName: ReactIntl.FormattedMessage.MessageDescriptor
-  deathEventTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlace: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressOther: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  deathPlaceAddressType: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedCurrentAddressSameAsPermanent: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDeathProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedDoBProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedGivenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedGivenNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedIDProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedIdType: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedName: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedParagraph: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedPermanentAddressProof: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSex: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexFemale: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexMale: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexOther: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedSexUnknown: ReactIntl.FormattedMessage.MessageDescriptor
-  deceasedTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  defaultLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  deliveryAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  deliveryInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  deny: ReactIntl.FormattedMessage.MessageDescriptor
-  dischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  district: ReactIntl.FormattedMessage.MessageDescriptor
-  docTaxReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeBR: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeChildAgeProof: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeChildBirthProof: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeCopyOfBurialReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeDeathCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeDoctorCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeEPICard: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeEPIStaffCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeFuneralReceipt: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeHospitalDischargeCertificate: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeLetterOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeNIDBack: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeNIDFront: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypePostMortemReport: ReactIntl.FormattedMessage.MessageDescriptor
-  docTypeSC: ReactIntl.FormattedMessage.MessageDescriptor
-  documentNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsName: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsUploadName: ReactIntl.FormattedMessage.MessageDescriptor
-  documentsUploadTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED1: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED2: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED3: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED4: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED5: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentISCED6: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentNone: ReactIntl.FormattedMessage.MessageDescriptor
-  educationAttainmentNotStated: ReactIntl.FormattedMessage.MessageDescriptor
-  enterResponse: ReactIntl.FormattedMessage.MessageDescriptor
-  familyName: ReactIntl.FormattedMessage.MessageDescriptor
-  father: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherName: ReactIntl.FormattedMessage.MessageDescriptor
-  fathersDetailsExist: ReactIntl.FormattedMessage.MessageDescriptor
-  fatherTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchDeceasedDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchFatherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalErrorTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalSuccessTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchIdentifierModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchInformantDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchMotherDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchPersonByNIDModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchPersonByNIDModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchRegistrationModalErrorText: ReactIntl.FormattedMessage.MessageDescriptor
-  fetchRegistrationModalInfo: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameBn: ReactIntl.FormattedMessage.MessageDescriptor
-  firstNameEn: ReactIntl.FormattedMessage.MessageDescriptor
-  givenNames: ReactIntl.FormattedMessage.MessageDescriptor
-  healthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  hospital: ReactIntl.FormattedMessage.MessageDescriptor
-  iD: ReactIntl.FormattedMessage.MessageDescriptor
-  iDType: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeAlienNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeBRN: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeDrivingLicense: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeDRN: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeNationalID: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeNoId: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeOther: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeOtherLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypePassport: ReactIntl.FormattedMessage.MessageDescriptor
-  iDTypeRefugeeNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  informantAttestation: ReactIntl.FormattedMessage.MessageDescriptor
-  lastNameBn: ReactIntl.FormattedMessage.MessageDescriptor
-  lastNameEn: ReactIntl.FormattedMessage.MessageDescriptor
-  manner: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerAccident: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerHomicide: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerNatural: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerSuicide: ReactIntl.FormattedMessage.MessageDescriptor
-  mannerUndetermined: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatus: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusDivorced: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusMarried: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusNotStated: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusSeparated: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusSingle: ReactIntl.FormattedMessage.MessageDescriptor
-  maritalStatusWidowed: ReactIntl.FormattedMessage.MessageDescriptor
-  medicallyCertified: ReactIntl.FormattedMessage.MessageDescriptor
-  methodOfCauseOfDeath: ReactIntl.FormattedMessage.MessageDescriptor
-  mother: ReactIntl.FormattedMessage.MessageDescriptor
-  motherDateOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  motherEducationAttainment: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFamilyName: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFamilyNameEng: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFirstNames: ReactIntl.FormattedMessage.MessageDescriptor
-  motherFirstNamesEng: ReactIntl.FormattedMessage.MessageDescriptor
-  motherName: ReactIntl.FormattedMessage.MessageDescriptor
-  motherTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  multipleBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  nationality: ReactIntl.FormattedMessage.MessageDescriptor
-  nationalityBangladesh: ReactIntl.FormattedMessage.MessageDescriptor
-  NID: ReactIntl.FormattedMessage.MessageDescriptor
-  officeLocationId: ReactIntl.FormattedMessage.MessageDescriptor
-  optionalLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  otherDocuments: ReactIntl.FormattedMessage.MessageDescriptor
-  otherHealthInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  otherInstitution: ReactIntl.FormattedMessage.MessageDescriptor
-  otherOption: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraph45daysTo5Years: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraph: ReactIntl.FormattedMessage.MessageDescriptor
-  paragraphAbove5Years: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddressSameAsCurrent: ReactIntl.FormattedMessage.MessageDescriptor
-  permanentAddressSameAsMother: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneNumber: ReactIntl.FormattedMessage.MessageDescriptor
-  phoneVerificationWarning: ReactIntl.FormattedMessage.MessageDescriptor
-  placeOfBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  postCode: ReactIntl.FormattedMessage.MessageDescriptor
-  presentBoth: ReactIntl.FormattedMessage.MessageDescriptor
-  presentFather: ReactIntl.FormattedMessage.MessageDescriptor
-  presentMother: ReactIntl.FormattedMessage.MessageDescriptor
-  presentOther: ReactIntl.FormattedMessage.MessageDescriptor
-  privateHome: ReactIntl.FormattedMessage.MessageDescriptor
-  prompt: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfBirthPlaceAndDate: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfDocCertificateOfChild: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfEPICardOfChild: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfFathersID: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfMothersID: ReactIntl.FormattedMessage.MessageDescriptor
-  proofOfParentPermanentAddress: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationName: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationOffice: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationPhoneLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  registrationTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  relationExtendedFamily: ReactIntl.FormattedMessage.MessageDescriptor
-  relationOther: ReactIntl.FormattedMessage.MessageDescriptor
-  relationshipPlaceHolder: ReactIntl.FormattedMessage.MessageDescriptor
-  searchFieldModalTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  searchFieldPlaceHolderText: ReactIntl.FormattedMessage.MessageDescriptor
-  securityQuestionLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  select: ReactIntl.FormattedMessage.MessageDescriptor
-  selectOne: ReactIntl.FormattedMessage.MessageDescriptor
-  selectSecurityQuestion: ReactIntl.FormattedMessage.MessageDescriptor
-  self: ReactIntl.FormattedMessage.MessageDescriptor
-  signedAffidavitConfirmation: ReactIntl.FormattedMessage.MessageDescriptor
-  someoneElse: ReactIntl.FormattedMessage.MessageDescriptor
-  son: ReactIntl.FormattedMessage.MessageDescriptor
-  spouse: ReactIntl.FormattedMessage.MessageDescriptor
-  state: ReactIntl.FormattedMessage.MessageDescriptor
-  typeOfDocument: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForChild: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForFather: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForMother: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForOther: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadDocForWhom: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadImage: ReactIntl.FormattedMessage.MessageDescriptor
-  userDetails: ReactIntl.FormattedMessage.MessageDescriptor
-  userDevice: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormReviewTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsDescription: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsHeading: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormSecurityQuestionsTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  userFormTitle: ReactIntl.FormattedMessage.MessageDescriptor
-  verbalAutopsy: ReactIntl.FormattedMessage.MessageDescriptor
-  warningNotVerified: ReactIntl.FormattedMessage.MessageDescriptor
-  weightAtBirth: ReactIntl.FormattedMessage.MessageDescriptor
-  whatDocToUpload: ReactIntl.FormattedMessage.MessageDescriptor
-  whoIsPresentLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  whoseContactDetailsLabel: ReactIntl.FormattedMessage.MessageDescriptor
-  uploadedList: ReactIntl.FormattedMessage.MessageDescriptor
+  accountDetails: MessageDescriptor
+  addressLine1: MessageDescriptor
+  addressLine2: MessageDescriptor
+  addressLine3: MessageDescriptor
+  addressLine3CityOption: MessageDescriptor
+  addressLine4: MessageDescriptor
+  addressSameAsMother: MessageDescriptor
+  answer: MessageDescriptor
+  applicantIDProof: MessageDescriptor
+  applicantName: MessageDescriptor
+  applicantOtherRelationship: MessageDescriptor
+  applicantsDateOfBirth: MessageDescriptor
+  applicantsFamilyName: MessageDescriptor
+  applicantsFamilyNameEng: MessageDescriptor
+  applicantsGivenNames: MessageDescriptor
+  applicantsGivenNamesEng: MessageDescriptor
+  applicantsIdType: MessageDescriptor
+  applicantsNationality: MessageDescriptor
+  applicantsRelationWithChild: MessageDescriptor
+  applicantsRelationWithDeceased: MessageDescriptor
+  applicantTitle: MessageDescriptor
+  assignedRegisterOffice: MessageDescriptor
+  attendantAtBirth: MessageDescriptor
+  attendantAtBirthLayperson: MessageDescriptor
+  attendantAtBirthMidwife: MessageDescriptor
+  attendantAtBirthNone: MessageDescriptor
+  attendantAtBirthNurse: MessageDescriptor
+  attendantAtBirthOther: MessageDescriptor
+  attendantAtBirthOtherParamedicalPersonnel: MessageDescriptor
+  attendantAtBirthPhysician: MessageDescriptor
+  attestedBirthRecord: MessageDescriptor
+  attestedVaccination: MessageDescriptor
+  birthAttendant: MessageDescriptor
+  birthLocation: MessageDescriptor
+  birthMedicalInstitution: MessageDescriptor
+  birthType: MessageDescriptor
+  birthTypeHigherMultipleDelivery: MessageDescriptor
+  birthTypeQuadruplet: MessageDescriptor
+  birthTypeSingle: MessageDescriptor
+  birthTypeTriplet: MessageDescriptor
+  birthTypeTwin: MessageDescriptor
+  causeOfDeathCode: MessageDescriptor
+  causeOfDeathEstablished: MessageDescriptor
+  causeOfDeathName: MessageDescriptor
+  causeOfDeathNotice: MessageDescriptor
+  causeOfDeathTitle: MessageDescriptor
+  certification: MessageDescriptor
+  changeButtonLabel: MessageDescriptor
+  childDateOfBirth: MessageDescriptor
+  childFamilyName: MessageDescriptor
+  childFamilyNameEng: MessageDescriptor
+  childFirstNames: MessageDescriptor
+  childFirstNamesEng: MessageDescriptor
+  childSex: MessageDescriptor
+  childSexFemale: MessageDescriptor
+  childSexMale: MessageDescriptor
+  childSexOther: MessageDescriptor
+  childSexUnknown: MessageDescriptor
+  childTab: MessageDescriptor
+  childTitle: MessageDescriptor
+  commentsOrNotesDescription: MessageDescriptor
+  commentsOrNotesLabel: MessageDescriptor
+  confirm: MessageDescriptor
+  confirmMotherDetails: MessageDescriptor
+  contactDetailsBoth: MessageDescriptor
+  contactDetailsFather: MessageDescriptor
+  contactDetailsMother: MessageDescriptor
+  country: MessageDescriptor
+  currentAddress: MessageDescriptor
+  currentAddressSameAsPermanent: MessageDescriptor
+  dateOfMarriage: MessageDescriptor
+  daughter: MessageDescriptor
+  deathAtFacility: MessageDescriptor
+  deathAtOtherLocation: MessageDescriptor
+  deathAtPrivateHome: MessageDescriptor
+  deathDate: MessageDescriptor
+  deathEventName: MessageDescriptor
+  deathEventTitle: MessageDescriptor
+  deathPlace: MessageDescriptor
+  deathPlaceAddress: MessageDescriptor
+  deathPlaceAddressOther: MessageDescriptor
+  deathPlaceAddressSameAsCurrent: MessageDescriptor
+  deathPlaceAddressSameAsPermanent: MessageDescriptor
+  deathPlaceAddressType: MessageDescriptor
+  deceasedCurrentAddressSameAsPermanent: MessageDescriptor
+  deceasedDateOfBirth: MessageDescriptor
+  deceasedDeathProof: MessageDescriptor
+  deceasedDoBProof: MessageDescriptor
+  deceasedFamilyName: MessageDescriptor
+  deceasedFamilyNameEng: MessageDescriptor
+  deceasedGivenNames: MessageDescriptor
+  deceasedGivenNamesEng: MessageDescriptor
+  deceasedIDProof: MessageDescriptor
+  deceasedIdType: MessageDescriptor
+  deceasedName: MessageDescriptor
+  deceasedParagraph: MessageDescriptor
+  deceasedPermanentAddressProof: MessageDescriptor
+  deceasedSex: MessageDescriptor
+  deceasedSexFemale: MessageDescriptor
+  deceasedSexMale: MessageDescriptor
+  deceasedSexOther: MessageDescriptor
+  deceasedSexUnknown: MessageDescriptor
+  deceasedTitle: MessageDescriptor
+  defaultLabel: MessageDescriptor
+  deliveryAddress: MessageDescriptor
+  deliveryInstitution: MessageDescriptor
+  deny: MessageDescriptor
+  dischargeCertificate: MessageDescriptor
+  district: MessageDescriptor
+  docTaxReceipt: MessageDescriptor
+  docTypeBR: MessageDescriptor
+  docTypeChildAgeProof: MessageDescriptor
+  docTypeChildBirthProof: MessageDescriptor
+  docTypeChildUnderFiveCard: MessageDescriptor
+  docTypeCopyOfBurialReceipt: MessageDescriptor
+  docTypeDeathCertificate: MessageDescriptor
+  docTypeDoctorCertificate: MessageDescriptor
+  docTypeEPICard: MessageDescriptor
+  docTypeEPIStaffCertificate: MessageDescriptor
+  docTypeFuneralReceipt: MessageDescriptor
+  docTypeHospitalDischargeCertificate: MessageDescriptor
+  docTypeLetterOfDeath: MessageDescriptor
+  docTypeNIDBack: MessageDescriptor
+  docTypeNIDFront: MessageDescriptor
+  docTypeOther: MessageDescriptor
+  docTypePassport: MessageDescriptor
+  docTypePostMortemReport: MessageDescriptor
+  docTypeSC: MessageDescriptor
+  documentNumber: MessageDescriptor
+  documentsName: MessageDescriptor
+  documentsTitle: MessageDescriptor
+  documentsUploadName: MessageDescriptor
+  educationAttainmentISCED1: MessageDescriptor
+  educationAttainmentISCED4: MessageDescriptor
+  educationAttainmentISCED5: MessageDescriptor
+  educationAttainmentNone: MessageDescriptor
+  enterResponse: MessageDescriptor
+  familyName: MessageDescriptor
+  father: MessageDescriptor
+  fatherDateOfBirth: MessageDescriptor
+  fatherEducationAttainment: MessageDescriptor
+  fatherFamilyName: MessageDescriptor
+  fatherFamilyNameEng: MessageDescriptor
+  fatherFirstNames: MessageDescriptor
+  fatherFirstNamesEng: MessageDescriptor
+  fatherName: MessageDescriptor
+  fathersDetailsExist: MessageDescriptor
+  fatherTitle: MessageDescriptor
+  fetchDeceasedDetails: MessageDescriptor
+  fetchFatherDetails: MessageDescriptor
+  fetchIdentifierModalErrorTitle: MessageDescriptor
+  fetchIdentifierModalSuccessTitle: MessageDescriptor
+  fetchIdentifierModalTitle: MessageDescriptor
+  fetchInformantDetails: MessageDescriptor
+  fetchMotherDetails: MessageDescriptor
+  fetchPersonByNIDModalErrorText: MessageDescriptor
+  fetchPersonByNIDModalInfo: MessageDescriptor
+  fetchRegistrationModalErrorText: MessageDescriptor
+  fetchRegistrationModalInfo: MessageDescriptor
+  firstNameBn: MessageDescriptor
+  firstNameEn: MessageDescriptor
+  givenNames: MessageDescriptor
+  healthInstitution: MessageDescriptor
+  hospital: MessageDescriptor
+  iD: MessageDescriptor
+  iDType: MessageDescriptor
+  iDTypeAlienNumber: MessageDescriptor
+  iDTypeBRN: MessageDescriptor
+  iDTypeDrivingLicense: MessageDescriptor
+  iDTypeDRN: MessageDescriptor
+  iDTypeNationalID: MessageDescriptor
+  iDTypeNoId: MessageDescriptor
+  iDTypeOther: MessageDescriptor
+  iDTypeOtherLabel: MessageDescriptor
+  iDTypePassport: MessageDescriptor
+  iDTypeRefugeeNumber: MessageDescriptor
+  informantAttestation: MessageDescriptor
+  lastNameBn: MessageDescriptor
+  lastNameEn: MessageDescriptor
+  manner: MessageDescriptor
+  mannerAccident: MessageDescriptor
+  mannerHomicide: MessageDescriptor
+  mannerNatural: MessageDescriptor
+  mannerSuicide: MessageDescriptor
+  mannerUndetermined: MessageDescriptor
+  maritalStatus: MessageDescriptor
+  maritalStatusDivorced: MessageDescriptor
+  maritalStatusMarried: MessageDescriptor
+  maritalStatusNotStated: MessageDescriptor
+  maritalStatusSeparated: MessageDescriptor
+  maritalStatusSingle: MessageDescriptor
+  maritalStatusWidowed: MessageDescriptor
+  medicallyCertified: MessageDescriptor
+  methodOfCauseOfDeath: MessageDescriptor
+  mother: MessageDescriptor
+  motherDateOfBirth: MessageDescriptor
+  motherEducationAttainment: MessageDescriptor
+  motherFamilyName: MessageDescriptor
+  motherFamilyNameEng: MessageDescriptor
+  motherFirstNames: MessageDescriptor
+  motherFirstNamesEng: MessageDescriptor
+  motherName: MessageDescriptor
+  motherTitle: MessageDescriptor
+  multipleBirth: MessageDescriptor
+  nationality: MessageDescriptor
+  nationalityBangladesh: MessageDescriptor
+  NID: MessageDescriptor
+  officeLocationId: MessageDescriptor
+  optionalLabel: MessageDescriptor
+  otherDocuments: MessageDescriptor
+  otherHealthInstitution: MessageDescriptor
+  otherInstitution: MessageDescriptor
+  otherOption: MessageDescriptor
+  paragraph45daysTo5Years: MessageDescriptor
+  paragraph: MessageDescriptor
+  paragraphAbove5Years: MessageDescriptor
+  permanentAddress: MessageDescriptor
+  permanentAddressSameAsCurrent: MessageDescriptor
+  permanentAddressSameAsMother: MessageDescriptor
+  phoneNumber: MessageDescriptor
+  phoneVerificationWarning: MessageDescriptor
+  placeOfBirth: MessageDescriptor
+  postCode: MessageDescriptor
+  presentBoth: MessageDescriptor
+  presentFather: MessageDescriptor
+  presentMother: MessageDescriptor
+  presentOther: MessageDescriptor
+  privateHome: MessageDescriptor
+  prompt: MessageDescriptor
+  proofOfBirthPlaceAndDate: MessageDescriptor
+  proofOfDocCertificateOfChild: MessageDescriptor
+  proofOfEPICardOfChild: MessageDescriptor
+  proofOfFathersID: MessageDescriptor
+  proofOfMothersID: MessageDescriptor
+  proofOfParentPermanentAddress: MessageDescriptor
+  registrationName: MessageDescriptor
+  registrationOffice: MessageDescriptor
+  registrationPhoneLabel: MessageDescriptor
+  registrationTitle: MessageDescriptor
+  relationExtendedFamily: MessageDescriptor
+  relationOther: MessageDescriptor
+  relationshipPlaceHolder: MessageDescriptor
+  searchFieldModalTitle: MessageDescriptor
+  searchFieldPlaceHolderText: MessageDescriptor
+  securityQuestionLabel: MessageDescriptor
+  select: MessageDescriptor
+  selectOne: MessageDescriptor
+  selectSecurityQuestion: MessageDescriptor
+  self: MessageDescriptor
+  signedAffidavitConfirmation: MessageDescriptor
+  someoneElse: MessageDescriptor
+  son: MessageDescriptor
+  spouse: MessageDescriptor
+  state: MessageDescriptor
+  typeOfDocument: MessageDescriptor
+  uploadDocForChild: MessageDescriptor
+  uploadDocForFather: MessageDescriptor
+  uploadDocForMother: MessageDescriptor
+  uploadDocForOther: MessageDescriptor
+  uploadDocForWhom: MessageDescriptor
+  uploadImage: MessageDescriptor
+  userDetails: MessageDescriptor
+  userDevice: MessageDescriptor
+  userFormReviewTitle: MessageDescriptor
+  userFormSecurityQuestionsDescription: MessageDescriptor
+  userFormSecurityQuestionsHeading: MessageDescriptor
+  userFormSecurityQuestionsTitle: MessageDescriptor
+  userFormTitle: MessageDescriptor
+  verbalAutopsy: MessageDescriptor
+  warningNotVerified: MessageDescriptor
+  weightAtBirth: MessageDescriptor
+  whatDocToUpload: MessageDescriptor
+  whoIsPresentLabel: MessageDescriptor
+  whoseContactDetailsLabel: MessageDescriptor
+  uploadedList: MessageDescriptor
+  userSignatureAttachmentTitle: MessageDescriptor
+  userSignatureAttachment: MessageDescriptor
+  userAttachmentSection: MessageDescriptor
+  userSignatureAttachmentDesc: MessageDescriptor
+  addFile: MessageDescriptor
+  fileUploadError: MessageDescriptor
+  typeOfId: MessageDescriptor
+  firstName: MessageDescriptor
+  lastName: MessageDescriptor
+  relationship: MessageDescriptor
+  informantPermanentAdress: MessageDescriptor
+  primaryCaregiverNameOrTitle: MessageDescriptor
+  parentDetailsType: MessageDescriptor
+  motherRadioButton: MessageDescriptor
+  fatherRadioButton: MessageDescriptor
+  reasonMotherNotApplying: MessageDescriptor
+  reasonFatherNotApplying: MessageDescriptor
+  reasonParentsNotApplying: MessageDescriptor
+  motherDeceasedLabel: MessageDescriptor
+  fatherDeceasedLabel: MessageDescriptor
+  primaryCaregiverTypeLabel: MessageDescriptor
+  motherCaregiverTypeLabel: MessageDescriptor
+  fatherCaregiverTypeLabel: MessageDescriptor
+  legalGuardianCaregiverTypeLabel: MessageDescriptor
+  parentsCaregiverTypeLabel: MessageDescriptor
+  informantCaregiverTypeLabel: MessageDescriptor
+  otherCaregiverTypeLabel: MessageDescriptor
+  nameFieldLabel: MessageDescriptor
+  reasonNotApplyingFieldLabel: MessageDescriptor
+  reasonMotherNotApplyingPreview: MessageDescriptor
+  reasonFatherNotApplyingPreview: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -324,7 +352,7 @@ const messagesToDefine: IFormMessages = {
     id: 'user.form.securityquestion.answer'
   },
   applicantIDProof: {
-    defaultMessage: "Proof of Applicant's ID",
+    defaultMessage: 'Proof of applicant ID',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.applicantIDProof'
   },
@@ -372,6 +400,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality',
     id: 'form.field.label.applicants.nationality'
+  },
+  applicantsRelationWithChild: {
+    defaultMessage: 'Relationship to child',
+    description: 'Label for Relationship to child',
+    id: 'form.field.label.applicantsRelationWithChild'
   },
   applicantsRelationWithDeceased: {
     defaultMessage: 'Relationship to Deceased',
@@ -516,11 +549,6 @@ const messagesToDefine: IFormMessages = {
     description: 'Certification regarding NGO worker',
     id: 'form.section.documents.list.certification'
   },
-  changeAssignedOffice: {
-    defaultMessage: 'Change assigned office',
-    description: 'Edit button text',
-    id: 'form.field.SearchField.changeAssignedOffice'
-  },
   childDateOfBirth: {
     defaultMessage: 'Date of birth',
     description: 'Label for form field: Date of birth',
@@ -634,6 +662,11 @@ const messagesToDefine: IFormMessages = {
       'Title for the radio button to select that the mothers current address is the same as her permanent address',
     id: 'form.field.label.currentAddressSameAsPermanent'
   },
+  informantPermanentAdress: {
+    defaultMessage: 'What is their permanent address?',
+    description: 'Title of informant permanent adress ',
+    id: 'form.field.label.informantPermanentAddress'
+  },
   dateOfMarriage: {
     defaultMessage: 'Date of marriage',
     description: 'Option for form field: Date of marriage',
@@ -718,12 +751,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDateOfBirth'
   },
   deceasedDeathProof: {
-    defaultMessage: 'Proof of Death of Deceased',
+    defaultMessage: 'Proof of death of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedDeathProof'
   },
   deceasedDoBProof: {
-    defaultMessage: 'Proof of Date of Birth of Deceased',
+    defaultMessage: 'Proof of date of birth of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedDoBProof'
   },
@@ -748,7 +781,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedGivenNamesEng'
   },
   deceasedIDProof: {
-    defaultMessage: "Proof of Deceased's ID",
+    defaultMessage: "Proof of deceased's ID",
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedIDProof'
   },
@@ -769,7 +802,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDocumentParagraph'
   },
   deceasedPermanentAddressProof: {
-    defaultMessage: 'Proof of Permanent Address of Deceased',
+    defaultMessage: 'Proof of permanent address of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.deceasedPermanentAddressProof'
   },
@@ -839,57 +872,62 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeTaxReceipt'
   },
   docTypeBR: {
-    defaultMessage: 'Birth Registration',
+    defaultMessage: 'Birth registration certificate',
     description: 'Label for select option Birth Registration',
     id: 'form.field.label.docTypeBR'
   },
   docTypeChildAgeProof: {
-    defaultMessage: 'Proof of Child Age',
+    defaultMessage: 'Proof of child age',
     description: 'Label for select option Child Age Proof',
     id: 'form.field.label.docTypeChildAgeProof'
   },
   docTypeChildBirthProof: {
-    defaultMessage: 'Proof of Place and Date of Birth',
+    defaultMessage: 'Proof of place and date of birth',
     description: 'Label for select option Child Birth Proof',
     id: 'form.field.label.docTypeChildBirthProof'
   },
+  docTypeChildUnderFiveCard: {
+    defaultMessage: 'Under five card',
+    description: 'Label for select option Under five card',
+    id: 'form.field.label.docTypeChildUnderFiveCard'
+  },
   docTypeCopyOfBurialReceipt: {
-    defaultMessage: 'Certified Copy of Burial Receipt',
+    defaultMessage: 'Certified copy of burial receipt',
     description: 'Label for select option Certified Copy of Burial Receipt',
     id: 'form.field.label.docTypeCopyOfBurialReceipt'
   },
   docTypeDeathCertificate: {
-    defaultMessage: 'Attested Certificate of Death',
+    defaultMessage: 'Attested certificate of death',
     description: 'Label for select option Attested Certificate of Death',
     id: 'form.field.label.docTypeDeathCertificate'
   },
   docTypeDoctorCertificate: {
-    defaultMessage: 'Doctor Certificate',
+    defaultMessage: 'Doctor certificate',
     description: 'Label for select option Doctor Certificate',
     id: 'form.field.label.docTypeDoctorCertificate'
   },
   docTypeEPICard: {
-    defaultMessage: 'EPI Card',
+    defaultMessage: 'EPI card',
     description: 'Label for select option EPI Card',
     id: 'form.field.label.docTypeEPICard'
   },
   docTypeEPIStaffCertificate: {
-    defaultMessage: 'EPI Staff Certificate',
+    defaultMessage: 'EPI staff certificate',
     description: 'Label for select option EPI Card',
     id: 'form.field.label.docTypeEPIStaffCertificate'
   },
   docTypeFuneralReceipt: {
-    defaultMessage: 'Certified Copy of Funeral Receipt',
+    defaultMessage: 'Certified copy of funeral receipt',
     description: 'Label for select option Certified Copy of Funeral Receipt',
     id: 'form.field.label.docTypeFuneralReceipt'
   },
   docTypeHospitalDischargeCertificate: {
-    defaultMessage: 'Hospital Discharge Certificate',
+    defaultMessage: 'Hospital discharge certificate',
     description: 'Label for select option Hospital Discharge Certificate',
     id: 'form.field.label.docTypeHospitalDischargeCertificate'
   },
   docTypeLetterOfDeath: {
-    defaultMessage: 'Attested Letter of Death',
+    defaultMessage: 'Attested letter of death',
     description: 'Label for select option Attested Letter of Death',
     id: 'form.field.label.docTypeLetterOfDeath'
   },
@@ -914,12 +952,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypePassport'
   },
   docTypePostMortemReport: {
-    defaultMessage: 'Certified Post Mortem Report',
+    defaultMessage: 'Certified post mortem report',
     description: 'Label for select option Post Mortem Report',
     id: 'form.field.label.docTypePostMortemReport'
   },
   docTypeSC: {
-    defaultMessage: 'School Certificate',
+    defaultMessage: 'School certificate',
     description: 'Label for radio option School Certificate',
     id: 'form.field.label.docTypeSC'
   },
@@ -934,7 +972,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.documents.name'
   },
   documentsTitle: {
-    defaultMessage: 'Supporting documents',
+    defaultMessage: 'Attach supporting documents',
     description: 'Form section title for Documents',
     id: 'form.section.documents.title'
   },
@@ -943,50 +981,25 @@ const messagesToDefine: IFormMessages = {
     description: 'Form section name for Documents Upload',
     id: 'form.section.upload.documentsName'
   },
-  documentsUploadTitle: {
-    defaultMessage: 'Supporting documents',
-    description: 'Form section title for Documents',
-    id: 'form.section.upload.documentsTitle'
-  },
   educationAttainmentISCED1: {
     defaultMessage: 'Primary',
     description: 'Option for form field: ISCED1 education',
     id: 'form.field.label.educationAttainmentISCED1'
   },
-  educationAttainmentISCED2: {
-    defaultMessage: 'Lower secondary',
-    description: 'Option for form field: ISCED2 education',
-    id: 'form.field.label.educationAttainmentISCED2'
-  },
-  educationAttainmentISCED3: {
-    defaultMessage: 'Upper secondary',
-    description: 'Option for form field: ISCED3 education',
-    id: 'form.field.label.educationAttainmentISCED3'
-  },
   educationAttainmentISCED4: {
-    defaultMessage: 'Post secondary',
+    defaultMessage: 'Secondary',
     description: 'Option for form field: ISCED4 education',
     id: 'form.field.label.educationAttainmentISCED4'
   },
   educationAttainmentISCED5: {
-    defaultMessage: 'First stage tertiary',
+    defaultMessage: 'Tertiary',
     description: 'Option for form field: ISCED5 education',
     id: 'form.field.label.educationAttainmentISCED5'
-  },
-  educationAttainmentISCED6: {
-    defaultMessage: 'Second stage tertiary',
-    description: 'Option for form field: ISCED6 education',
-    id: 'form.field.label.educationAttainmentISCED6'
   },
   educationAttainmentNone: {
     defaultMessage: 'No schooling',
     description: 'Option for form field: no education',
     id: 'form.field.label.educationAttainmentNone'
-  },
-  educationAttainmentNotStated: {
-    defaultMessage: 'Not stated',
-    description: 'Option for form field: not stated education',
-    id: 'form.field.label.educationAttainmentNotStated'
   },
   enterResponse: {
     defaultMessage: 'Enter a response to your chosen security question',
@@ -1464,7 +1477,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.print.otherPersonPrompt'
   },
   proofOfBirthPlaceAndDate: {
-    defaultMessage: 'Proof of Place and Date of Birth of Child',
+    defaultMessage: 'Proof of place and date of birth of child',
     description: 'Label for list item Child Birth Proof',
     id: 'form.field.label.proofOfBirthPlaceAndDate'
   },
@@ -1529,9 +1542,14 @@ const messagesToDefine: IFormMessages = {
     description: 'Relationship place holder',
     id: 'form.field.label.relationshipPlaceHolder'
   },
+  changeButtonLabel: {
+    id: 'form.field.SearchField.changeButtonLabel',
+    defaultMessage: `{fieldName, select, registrationOffice {Change assigned office} other {Change health institute}}`,
+    description: 'Edit button text'
+  },
   searchFieldModalTitle: {
     id: 'form.field.SearchField.modalTitle',
-    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office}}`,
+    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office} other {Health institutions}}`,
     description: 'Modal title'
   },
   searchFieldPlaceHolderText: {
@@ -1696,6 +1714,158 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Who is the contact person for this application?',
     description: 'Input label for contact details person',
     id: 'form.field.label.application.whoseContactDetails'
+  },
+  userSignatureAttachmentTitle: {
+    defaultMessage: 'Attach the registrar’s signature',
+    description: 'Title for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentTitle'
+  },
+  userSignatureAttachment: {
+    defaultMessage: 'Registrar’s signature',
+    description: 'Input label for user signature attachment',
+    id: 'form.field.label.userSignatureAttachment'
+  },
+  userSignatureAttachmentDesc: {
+    defaultMessage:
+      'Ask the registrar to sign a piece of paper and then scan or take a photo.',
+    description: 'Description for user signature attachment',
+    id: 'form.field.label.userSignatureAttachmentDesc'
+  },
+  userAttachmentSection: {
+    defaultMessage: 'Attachments',
+    description: 'label for user signature attachment',
+    id: 'form.field.label.userAttachmentSection'
+  },
+  addFile: {
+    defaultMessage: 'Add file',
+    description: 'text for add file button',
+    id: 'form.field.label.addFile'
+  },
+  fileUploadError: {
+    defaultMessage: '{type} supported only',
+    description: 'text for error on file upload',
+    id: 'form.field.label.fileUploadError'
+  },
+  typeOfId: {
+    defaultMessage: 'Type of ID',
+    description: "Input label for certificate collector's id type options",
+    id: 'form.field.label.typeOfId'
+  },
+  firstName: {
+    defaultMessage: 'First name',
+    description: "Input label for certificate collector's first name",
+    id: 'form.field.label.firstName'
+  },
+  lastName: {
+    defaultMessage: 'Last name',
+    description: "Input label for certificate collector's last name",
+    id: 'form.field.label.lastName'
+  },
+  relationship: {
+    defaultMessage: 'Relationship',
+    description:
+      "Input label for certificate collector's relationship to the subject",
+    id: 'form.field.label.relationship'
+  },
+  primaryCaregiverNameOrTitle: {
+    defaultMessage: 'Parents details',
+    description: 'Form section name or title for primary caregiver',
+    id: 'form.section.primaryCaregiver.nameOrTitle'
+  },
+  parentDetailsType: {
+    defaultMessage: "Do you have the mother and father's details?",
+    description: 'Question to ask the user if they have the parents details',
+    id: 'form.field.label.parentDetailsType'
+  },
+  motherRadioButton: {
+    defaultMessage: "Only the mother's",
+    description: 'confirmation label for mother radio button',
+    id: 'form.field.label.radio.mother'
+  },
+  fatherRadioButton: {
+    defaultMessage: "Only the father's",
+    description: 'confirmation label for father radio button',
+    id: 'form.field.label.radio.father'
+  },
+  reasonMotherNotApplying: {
+    defaultMessage: 'Reason for mother',
+    description: 'Label for form field: reasonMotherNotApplying',
+    id: 'form.field.label.reasonMotherNotApplying'
+  },
+  reasonFatherNotApplying: {
+    defaultMessage: 'Reason for father',
+    description: 'Label for form field: reasonFatherNotApplying',
+    id: 'form.field.label.reasonFatherNotApplying'
+  },
+  reasonMotherNotApplyingPreview: {
+    defaultMessage: 'Reason for mother not applying',
+    description: 'Label for form field: reasonMotherNotApplyingPreview',
+    id: 'form.field.label.reasonMotherNotApplyingPreview'
+  },
+  reasonFatherNotApplyingPreview: {
+    defaultMessage: 'Reason for father not applying',
+    description: 'Label for form field: reasonFatherNotApplyingPreview',
+    id: 'form.field.label.reasonFatherNotApplyingPreview'
+  },
+  reasonParentsNotApplying: {
+    defaultMessage: 'Why are the mother and father not applying?',
+    description: 'Form group name for reason parents are not applying',
+    id: 'form.group.reasonNotApplying.parents'
+  },
+  motherDeceasedLabel: {
+    defaultMessage: 'Mother has died',
+    description: 'Label for form field: motherIsDeceased',
+    id: 'form.field.label.motherIsDeceased'
+  },
+  fatherDeceasedLabel: {
+    defaultMessage: 'Father has died',
+    description: 'Label for form field: fatherIsDeceased',
+    id: 'form.field.label.fatherIsDeceased'
+  },
+  primaryCaregiverTypeLabel: {
+    defaultMessage: 'Who is looking after the child?',
+    description: 'Question to ask the user about caregiver',
+    id: 'form.field.label.primaryCaregiverType'
+  },
+  motherCaregiverTypeLabel: {
+    defaultMessage: 'Mother',
+    description: 'label for mother radio button',
+    id: 'form.field.label.caregiver.mother'
+  },
+  fatherCaregiverTypeLabel: {
+    defaultMessage: 'Father',
+    description: 'label for father radio button',
+    id: 'form.field.label.caregiver.father'
+  },
+  parentsCaregiverTypeLabel: {
+    defaultMessage: 'Mother and father',
+    description: 'label for parents radio button',
+    id: 'form.field.label.caregiver.parents'
+  },
+  legalGuardianCaregiverTypeLabel: {
+    defaultMessage: 'Legal Guardian',
+    description: 'label for legal guardian radio button',
+    id: 'form.field.label.caregiver.legalGuardian'
+  },
+  informantCaregiverTypeLabel: {
+    defaultMessage: 'Applicant is the primary caregiver',
+    description: 'label for informant radio button',
+    id: 'form.field.label.caregiver.informant'
+  },
+  otherCaregiverTypeLabel: {
+    defaultMessage: 'Other caregiver',
+    description: 'label for other caregiver radio button',
+    id: 'form.field.label.caregiver.other'
+  },
+  nameFieldLabel: {
+    defaultMessage: 'Name',
+    description: 'Label for form field: name',
+    id: 'form.field.label.name'
+  },
+  reasonNotApplyingFieldLabel: {
+    defaultMessage: 'Reason not applying',
+    description: 'Label for form field: ReasonNotApplying',
+    id: 'form.field.label.ReasonNotApplying'
   }
 }
 

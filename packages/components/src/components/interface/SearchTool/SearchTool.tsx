@@ -10,7 +10,6 @@ const Wrapper = styled.form`
   ${({ theme }) => theme.fonts.bodyStyle};
   padding: 0px 10px;
   margin-bottom: 1px;
-  min-width: 400px;
   position: relative;
 `
 const SearchTextInput = styled.input`
@@ -25,6 +24,10 @@ const SearchTextInput = styled.input`
     -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
       inset;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0px 4px;
+    width: 40%;
+  }
 `
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
@@ -38,6 +41,7 @@ const DropDownWrapper = styled.ul`
   top: 100%;
   left: 0px;
   margin: 3px 0px;
+  cursor: pointer;
 `
 const DropDownItem = styled.li`
   display: flex;
@@ -67,11 +71,27 @@ const SelectedSearchCriteria = styled.span`
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.captionStyle};
   margin-right: 10px;
+  display: flex;
+  & .selected-icon {
+    display: none;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 2px;
+    & .selected-icon {
+      display: flex;
+    }
+    & .selected-label {
+      display: none;
+    }
+  }
 `
 const DropDown = styled.div`
   align-items: center;
   cursor: pointer;
   display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: auto;
+  }
 `
 const ClearTextIcon = styled(ClearText)`
   margin: 0 5px;
@@ -80,6 +100,7 @@ export interface ISearchType {
   label: string
   value: string
   icon: React.ReactNode
+  invertIcon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
 }
@@ -198,7 +219,12 @@ export class SearchTool extends React.Component<IProps, IState> {
         )}
         <DropDown onClick={this.toggleDropdownDisplay}>
           <SelectedSearchCriteria>
-            {this.state.selectedSearchType.label}
+            <span className="selected-icon">
+              {this.state.selectedSearchType.invertIcon}
+            </span>
+            <span className="selected-label">
+              {this.state.selectedSearchType.label}
+            </span>
           </SelectedSearchCriteria>
           <ArrowDownBlue />
         </DropDown>

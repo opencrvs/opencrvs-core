@@ -1,16 +1,14 @@
 import { Button } from '@opencrvs/components/lib/buttons'
-import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   ColumnContentAlignment,
   GridTable
 } from '@opencrvs/components/lib/interface/GridTable'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
-  GQLBirthRegistration,
-  GQLDeathRegistration,
-  GQLEventRegistration,
   GQLHumanName,
-  GQLQuery
+  GQLEventSearchResultSet,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IApplication } from '@register/applications'
 import {
@@ -26,36 +24,23 @@ import {
 import styled, { ITheme, withTheme } from '@register/styledComponents'
 import { LANG_EN } from '@register/utils/constants'
 import { createNamesMap, sentenceCase } from '@register/utils/data-formatting'
-import {
-  COUNT_EVENT_REGISTRATION_BY_STATUS,
-  LIST_EVENT_REGISTRATIONS_BY_STATUS
-} from '@register/views/RegistrationHome/queries'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  IntlShape
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
 import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
-import { EVENT_STATUS } from '@register/views/RegistrationHome/RegistrationHome'
 import {
   buttonMessages,
-  errorMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 
-const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-align: center;
-  margin-top: 100px;
-`
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
   height: 32px;
@@ -89,6 +74,11 @@ const TabGroup = styled.div`
     padding-top: 5px;
   }
 `
+
+interface IQueryData {
+  data: GQLEventSearchResultSet
+}
+
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
@@ -97,15 +87,16 @@ interface IBaseRegistrarHomeProps {
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
-  parentQueryLoading?: boolean
+  queryData: IQueryData
+  page: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IRegistrarHomeState {
   width: number
-  progressCurrentPage: number
 }
 
-type IRegistrarHomeProps = InjectedIntlProps & IBaseRegistrarHomeProps
+type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps
 
 export const TAB_ID = {
   inProgress: 'progress',
@@ -126,87 +117,78 @@ export class InProgressTabComponent extends React.Component<
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      progressCurrentPage: 1
+      width: window.innerWidth
     }
   }
 
-  transformRemoteDraftsContent = (data: GQLQuery) => {
-    if (!data.listEventRegistrations || !data.listEventRegistrations.results) {
+  transformRemoteDraftsContent = (data: GQLEventSearchResultSet) => {
+    if (!data || !data.results) {
       return []
     }
 
     const { intl } = this.props
     const { locale } = intl
 
-    return data.listEventRegistrations.results.map(
-      (reg: GQLEventRegistration | null) => {
-        let birthReg
-        let deathReg
-        let name
+    return data.results.map(reg => {
+      if (!reg) {
+        throw new Error('Registration is null')
+      }
 
-        const regId = (reg as GQLEventRegistration).id
-        const event =
-          reg && reg.registration && (reg.registration.type as string)
-        const lastModificationDate = reg && reg.createdAt
-        const trackingId =
-          reg && reg.registration && reg.registration.trackingId
-        const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
+      const regId = reg.id
+      const event = reg.type
+      const lastModificationDate =
+        (reg && reg.registration && reg.registration.modifiedAt) || ''
+      const trackingId = reg && reg.registration && reg.registration.trackingId
+      const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
 
-        if (event && event.toLowerCase() === 'birth') {
-          birthReg = reg as GQLBirthRegistration
-          const childName =
-            (birthReg.child && (birthReg.child.name as GQLHumanName[])) || []
-          name =
-            (createNamesMap(childName)[locale] as string) ||
-            (createNamesMap(childName)[LANG_EN] as string) ||
-            ''
-        } else if (event && event.toLowerCase() === 'death') {
-          deathReg = reg as GQLDeathRegistration
-          const deceasedName =
-            (deathReg.deceased && (deathReg.deceased.name as GQLHumanName[])) ||
-            []
-          name =
-            (createNamesMap(deceasedName)[locale] as string) ||
-            (createNamesMap(deceasedName)['default'] as string) ||
-            ''
+      let name
+      if (reg.registration && reg.type === 'Birth') {
+        const birthReg = reg as GQLBirthEventSearchSet
+        const names = birthReg && (birthReg.childName as GQLHumanName[])
+        const namesMap = createNamesMap(names)
+        name = namesMap[locale] || namesMap[LANG_EN]
+      } else {
+        const deathReg = reg as GQLDeathEventSearchSet
+        const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
+        const namesMap = createNamesMap(names)
+        name = namesMap[locale] || namesMap[LANG_EN]
+      }
+
+      const actions = [
+        {
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () =>
+            this.props.goToPage(
+              pageRoute,
+              regId,
+              'review',
+              (event && event.toLowerCase()) || ''
+            )
         }
-        const actions = [
+      ]
+      moment.locale(locale)
+      return {
+        id: regId,
+        event:
+          (event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[event.toLowerCase()]
+            )) ||
+          '',
+        name,
+        trackingId,
+        dateOfModification:
+          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          '',
+        actions,
+        rowClickHandler: [
           {
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () =>
-              this.props.goToPage(
-                pageRoute,
-                regId,
-                'review',
-                (event && event.toLowerCase()) || ''
-              )
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(regId)
           }
         ]
-        moment.locale(locale)
-        return {
-          id: regId,
-          event:
-            (event &&
-              intl.formatMessage(
-                dynamicConstantsMessages[event.toLowerCase()]
-              )) ||
-            '',
-          name,
-          trackingId,
-          dateOfModification:
-            (lastModificationDate && moment(lastModificationDate).fromNow()) ||
-            '',
-          actions,
-          rowClickHandler: [
-            {
-              label: 'rowClickHandler',
-              handler: () => this.props.goToApplicationDetails(regId)
-            }
-          ]
-        }
       }
-    )
+    })
   }
 
   transformDraftContent = () => {
@@ -287,113 +269,71 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressSelectorsWithCounts = (
     selectorId: string,
     drafts: IApplication[],
-    registrarLocationId: string
+    count: number
   ) => {
     const { intl } = this.props
 
     return (
-      <Query
-        query={COUNT_EVENT_REGISTRATION_BY_STATUS}
-        variables={{
-          locationIds: [registrarLocationId],
-          status: EVENT_STATUS.IN_PROGRESS
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-count">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-          return (
-            <TabGroup>
-              {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-                <BlueButton
-                  id={`selector_${SELECTOR_ID.ownDrafts}`}
-                  key={SELECTOR_ID.ownDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.ownDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                  {drafts && drafts.length})
-                </BlueButton>
-              )) || (
-                <WhiteButton
-                  id={`selector_${SELECTOR_ID.ownDrafts}`}
-                  key={SELECTOR_ID.ownDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.ownDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressOwnDrafts)} (
-                  {drafts && drafts.length})
-                </WhiteButton>
-              )}
+      <TabGroup>
+        {((!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+          <BlueButton
+            id={`selector_${SELECTOR_ID.ownDrafts}`}
+            key={SELECTOR_ID.ownDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.ownDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressOwnDrafts)} (
+            {drafts && drafts.length})
+          </BlueButton>
+        )) || (
+          <WhiteButton
+            id={`selector_${SELECTOR_ID.ownDrafts}`}
+            key={SELECTOR_ID.ownDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.ownDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressOwnDrafts)} (
+            {drafts && drafts.length})
+          </WhiteButton>
+        )}
 
-              {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
-                <BlueButton
-                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                  key={SELECTOR_ID.fieldAgentDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.fieldAgentDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
-                    0}
-                  )
-                </BlueButton>
-              )) || (
-                <WhiteButton
-                  id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
-                  key={SELECTOR_ID.fieldAgentDrafts}
-                  onClick={() =>
-                    this.props.goToRegistrarHomeTab(
-                      TAB_ID.inProgress,
-                      SELECTOR_ID.fieldAgentDrafts
-                    )
-                  }
-                >
-                  {intl.formatMessage(messages.inProgressFieldAgents)} (
-                  {(data &&
-                    data.countEventRegistrationsByStatus &&
-                    data.countEventRegistrationsByStatus.count) ||
-                    0}
-                  )
-                </WhiteButton>
-              )}
-            </TabGroup>
-          )
-        }}
-      </Query>
+        {(selectorId === SELECTOR_ID.fieldAgentDrafts && (
+          <BlueButton
+            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+            key={SELECTOR_ID.fieldAgentDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.fieldAgentDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressFieldAgents)} ({count})
+          </BlueButton>
+        )) || (
+          <WhiteButton
+            id={`selector_${SELECTOR_ID.fieldAgentDrafts}`}
+            key={SELECTOR_ID.fieldAgentDrafts}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(
+                TAB_ID.inProgress,
+                SELECTOR_ID.fieldAgentDrafts
+              )
+            }
+          >
+            {intl.formatMessage(messages.inProgressFieldAgents)} ({count})
+          </WhiteButton>
+        )}
+      </TabGroup>
     )
-  }
-
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ progressCurrentPage: newPageNumber })
   }
 
   renderDraftDataExpandedComponent = (itemId: string) => {
@@ -403,6 +343,29 @@ export class InProgressTabComponent extends React.Component<
   renderInProgressDataExpandedComponent = (itemId: string) => {
     return <RemoteInProgressDataDetails eventId={itemId} />
   }
+
+  renderFieldAgentTable = (
+    data: GQLEventSearchResultSet,
+    intl: IntlShape,
+    page: number,
+    onPageChange: (newPageNumber: number) => void
+  ) => {
+    return (
+      <GridTable
+        content={this.transformRemoteDraftsContent(data)}
+        columns={this.getRemoteDraftColumns()}
+        renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+        noResultText={intl.formatMessage(constantsMessages.noResults)}
+        onPageChange={onPageChange}
+        pageSize={this.pageSize}
+        totalItems={(data && data.totalItems) || 0}
+        currentPage={page}
+        expandable={this.getExpandable()}
+        clickable={!this.getExpandable()}
+      />
+    )
+  }
+
   componentDidMount() {
     window.addEventListener('resize', this.recordWindowWidth)
   }
@@ -523,20 +486,21 @@ export class InProgressTabComponent extends React.Component<
 
   render() {
     const {
-      theme,
       intl,
-      registrarLocationId,
       selectorId,
       drafts,
-      parentQueryLoading
+      queryData,
+      page,
+      onPageChange
     } = this.props
+    const { data } = queryData
 
     return (
       <HomeContent>
         {this.renderInProgressSelectorsWithCounts(
           selectorId,
           drafts,
-          registrarLocationId as string
+          data.totalItems || 0
         )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
@@ -544,78 +508,16 @@ export class InProgressTabComponent extends React.Component<
             columns={this.getDraftColumns()}
             renderExpandedComponent={this.renderDraftDataExpandedComponent}
             noResultText={intl.formatMessage(constantsMessages.noResults)}
-            onPageChange={(currentPage: number) => {
-              this.onPageChange(currentPage)
-            }}
+            onPageChange={onPageChange}
             pageSize={this.pageSize}
             totalItems={drafts && drafts.length}
-            currentPage={this.state.progressCurrentPage}
+            currentPage={page}
             expandable={this.getExpandable()}
             clickable={!this.getExpandable()}
           />
         )}
-        {selectorId === SELECTOR_ID.fieldAgentDrafts && (
-          <Query
-            query={LIST_EVENT_REGISTRATIONS_BY_STATUS}
-            variables={{
-              status: EVENT_STATUS.IN_PROGRESS,
-              locationIds: [registrarLocationId],
-              count: this.pageSize,
-              skip: (this.state.progressCurrentPage - 1) * this.pageSize
-            }}
-          >
-            {({
-              loading,
-              error,
-              data
-            }: {
-              loading: any
-              error?: any
-              data: any
-            }) => {
-              if (loading) {
-                return (
-                  (!parentQueryLoading && (
-                    <StyledSpinner
-                      id="remote-drafts-spinner"
-                      baseColor={theme.colors.background}
-                    />
-                  )) ||
-                  null
-                )
-              }
-              if (error) {
-                Sentry.captureException(error)
-                return (
-                  <ErrorText id="remote-drafts-error-text">
-                    {intl.formatMessage(errorMessages.queryError)}
-                  </ErrorText>
-                )
-              }
-              return (
-                <GridTable
-                  content={this.transformRemoteDraftsContent(data)}
-                  columns={this.getRemoteDraftColumns()}
-                  renderExpandedComponent={
-                    this.renderInProgressDataExpandedComponent
-                  }
-                  noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  onPageChange={(currentPage: number) => {
-                    this.onPageChange(currentPage)
-                  }}
-                  pageSize={this.pageSize}
-                  totalItems={
-                    data.listEventRegistrations &&
-                    data.listEventRegistrations.totalItems
-                  }
-                  currentPage={this.state.progressCurrentPage}
-                  expandable={this.getExpandable()}
-                  clickable={!this.getExpandable()}
-                />
-              )
-            }}
-          </Query>
-        )}
+        {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+          this.renderFieldAgentTable(data, intl, page, onPageChange)}
       </HomeContent>
     )
   }

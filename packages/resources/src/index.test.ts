@@ -4,9 +4,11 @@ import { createServer } from '@resources/index'
 import * as locationsService from '@resources/bgd/features/administrative/service/service'
 
 describe('Route authorization', () => {
-  jest
-    .spyOn(locationsService, 'getLocations')
-    .mockReturnValue(Promise.resolve({ data: [] }))
+  beforeAll(() => {
+    jest
+      .spyOn(locationsService, 'getLocations')
+      .mockReturnValue(Promise.resolve({ data: [] }))
+  })
 
   it('blocks requests without a token', async () => {
     const server = await createServer()

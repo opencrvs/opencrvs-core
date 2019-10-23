@@ -9,7 +9,7 @@ it('renders without crashing', async () => {
 })
 
 it('renders a phone number and a password field on startup', async () => {
-  const app = createTestApp()
+  const { app } = await createTestApp()
   expect(app.find('input')).toHaveLength(2)
 })
 
@@ -23,8 +23,9 @@ describe('Login app step one', () => {
 
   describe('when credential form is filled', () => {
     let app: ReactWrapper<{}, {}>
-    beforeEach(() => {
-      app = createTestApp()
+    beforeEach(async () => {
+      const appBundle = await createTestApp()
+      app = appBundle.app
       app
         .find('input#username')
         .simulate('change', { target: { value: '01711111111' } })

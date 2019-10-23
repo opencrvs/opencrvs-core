@@ -5,7 +5,7 @@ import {
   SuccessButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import { injectIntl, InjectedIntlProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import {
   IApplication,
@@ -73,10 +73,16 @@ const UnderLayBackground = styled.div.attrs<{ background: string }>({})`
 const Title = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle}
   margin-bottom: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyBoldStyle}
+  }
 `
 const Description = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   margin-bottom: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyStyle}
+  }
 `
 
 const ActionContainer = styled.div`
@@ -152,19 +158,19 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.reviewActionTitle,
-              payload: { completeApplication: true }
+              message: messages.approvalActionTitle,
+              payload: { draftStatus: true }
             },
             description: {
-              message: messages.reviewActionDescriptionComplete
+              message: messages.approvalActionDescriptionComplete
             },
             modal: {
               title: {
-                message: messages.submitConfirmationTitle,
+                message: messages.validateConfirmationTitle,
                 payload: { completeApplication: true }
               },
               description: {
-                message: messages.submitConfirmationDesc,
+                message: messages.validateConfirmationDesc,
                 payload: { completeApplication: true }
               }
             }
@@ -175,7 +181,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeApplication: false }
             },
             description: {
-              message: messages.reviewActionDescriptionIncomplete
+              message: messages.approvalActionDescriptionIncomplete
             }
           }
         }
@@ -184,18 +190,19 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
         completionStatus: {
           true: {
             title: {
-              message: messages.validateCompleteApplicationActionTitle
+              message: messages.approvalActionTitle,
+              payload: { draftStatus: false }
             },
             description: {
-              message: messages.validateCompleteApplicationActionDescription
+              message: messages.approvalActionDescriptionComplete
             },
             modal: {
               title: {
-                message: messages.submitConfirmationTitle,
+                message: messages.validateConfirmationTitle,
                 payload: { completeApplication: true }
               },
               description: {
-                message: messages.submitConfirmationDesc,
+                message: messages.validateConfirmationDesc,
                 payload: { completeApplication: true }
               }
             }
@@ -206,7 +213,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
               payload: { completeApplication: false }
             },
             description: {
-              message: messages.registerActionDescriptionIncomplete
+              message: messages.approvalActionDescriptionIncomplete
             }
           }
         }
@@ -282,7 +289,7 @@ interface IReviewActionState {
   showSubmitModal: boolean
 }
 class ReviewActionComponent extends React.Component<
-  IReviewActionProps & InjectedIntlProps,
+  IReviewActionProps & IntlShapeProps,
   IReviewActionState
 > {
   state = { showSubmitModal: false }
@@ -349,19 +356,15 @@ class ReviewActionComponent extends React.Component<
                 {intl.formatMessage(buttonMessages.register)}
               </SuccessButton>
             ) : applicationToBeValidated ? (
-              <PrimaryButton
+              <SuccessButton
                 id="validateApplicationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
                 disabled={!completeApplication}
                 align={ICON_ALIGNMENT.LEFT}
               >
-                {intl.formatMessage(
-                  draftApplication
-                    ? buttonMessages.sendForReview
-                    : buttonMessages.approve
-                )}
-              </PrimaryButton>
+                {intl.formatMessage(buttonMessages.sendForApproval)}
+              </SuccessButton>
             ) : (
               <PrimaryButton
                 id="submit_form"
@@ -392,10 +395,10 @@ class ReviewActionComponent extends React.Component<
         </Content>
         {actionContent.modal && (
           <ResponsiveModal
-            title={intl.formatMessage(
-              actionContent.modal.title.message,
-              actionContent.modal.title.payload
-            )}
+            title={intl.formatMessage(actionContent.modal.title.message, {
+              ...actionContent.modal.title.payload,
+              event: application.event
+            })}
             contentHeight={96}
             actions={[
               <TertiaryButton
@@ -436,17 +439,17 @@ class ReviewActionComponent extends React.Component<
                 {applicationToBeRegistered
                   ? intl.formatMessage(buttonMessages.register)
                   : applicationToBeValidated
-                  ? intl.formatMessage(buttonMessages.approve)
+                  ? intl.formatMessage(buttonMessages.send)
                   : intl.formatMessage(buttonMessages.send)}
               </PrimaryButton>
             ]}
             show={this.state.showSubmitModal}
             handleClose={this.toggleSubmitModalOpen}
           >
-            {intl.formatMessage(
-              actionContent.modal.description.message,
-              actionContent.modal.description.payload
-            )}
+            {intl.formatMessage(actionContent.modal.description.message, {
+              ...actionContent.modal.description.payload,
+              event: application.event
+            })}
           </ResponsiveModal>
         )}
       </Container>

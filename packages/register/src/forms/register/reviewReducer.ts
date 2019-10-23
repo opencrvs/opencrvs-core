@@ -1,69 +1,25 @@
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm } from '@register/forms'
-import { childSection } from '@register/forms/register/fieldDefinitions/birth/child-section'
-import { motherSection } from '@register/forms/register/fieldDefinitions/birth/mother-section'
-import { fatherSection } from '@register/forms/register/fieldDefinitions/birth/father-section'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
-import { deceasedSection } from '@register/forms/register/fieldDefinitions/death/deceased-section'
-import { applicantsSection } from '@register/forms/register/fieldDefinitions/death/application-section'
-import { eventSection } from '@register/forms/register/fieldDefinitions/death/event-section'
-import { causeOfDeathSection } from '@register/forms/register/fieldDefinitions/death/cause-of-death-section'
-import { documentsSection as deathDocumentsSection } from '@register/forms/register/fieldDefinitions/death/documents-section'
+import { IForm, ReviewSection } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/review'
+import * as offlineActions from '@register/offline/actions'
+import { deserializeForm } from '@register/forms/mappings/deserializer'
 
-export interface IReviewFormState {
-  reviewForm: {
-    birth: IForm
-    death: IForm
-  }
-}
+export type IReviewFormState =
+  | {
+      state: 'LOADING'
+      reviewForm: null
+    }
+  | {
+      state: 'READY'
+      reviewForm: {
+        birth: IForm
+        death: IForm
+      }
+    }
 
 export const initialState: IReviewFormState = {
-  reviewForm: {
-    birth: {
-      sections: [
-        childSection,
-        motherSection,
-        fatherSection,
-        registrationSection,
-        documentsSection,
-        {
-          id: 'review',
-          viewType: 'review',
-          name: messages.reviewName,
-          title: messages.reviewTitle,
-          groups: [
-            {
-              id: 'review-group',
-              fields: []
-            }
-          ]
-        }
-      ]
-    },
-    death: {
-      sections: [
-        deceasedSection,
-        eventSection,
-        causeOfDeathSection,
-        applicantsSection,
-        deathDocumentsSection,
-        {
-          id: 'review',
-          viewType: 'review',
-          name: messages.reviewName,
-          title: messages.reviewTitle,
-          groups: [
-            {
-              id: 'review-group',
-              fields: []
-            }
-          ]
-        }
-      ]
-    }
-  }
+  state: 'LOADING',
+  reviewForm: null
 }
 
 const GET_REVIEW_FORM = 'REVIEW_FORM/GET_REVIEW_FORM'
@@ -74,9 +30,40 @@ type Action = GetReviewFormAction
 
 export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
   state: IReviewFormState = initialState,
-  action: Action
+  action: Action | offlineActions.Action
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
+    case offlineActions.READY:
+      const birth = deserializeForm(action.payload.forms.registerForm.birth)
+      const death = deserializeForm(action.payload.forms.registerForm.death)
+
+      const review = {
+        id: ReviewSection.Review,
+        viewType: 'review' as const,
+        name: messages.reviewName,
+        title: messages.reviewTitle,
+        groups: [
+          {
+            id: 'review-view-group',
+            fields: []
+          }
+        ]
+      }
+
+      return {
+        ...state,
+        state: 'READY',
+        reviewForm: {
+          birth: {
+            ...birth,
+            sections: [...birth.sections, review]
+          },
+          death: {
+            ...death,
+            sections: [...death.sections, review]
+          }
+        }
+      }
     default:
       return state
   }

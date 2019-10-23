@@ -11,11 +11,14 @@ export const CircleButton = styled.button.attrs<{ dark?: boolean }>({})`
   transition: background-color 0.3s ease;
   border-radius: 100%;
   &:hover {
-    background-color: ${({ theme, dark }) =>
-      dark ? theme.colors.primary : theme.colors.background};
+    ${({ theme, dark }) =>
+      dark
+        ? theme.gradients.gradientSkyDark
+        : 'background-color: ' + theme.colors.dropdownHover};
   }
   &:active {
     background-color: transparent;
   }
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 `

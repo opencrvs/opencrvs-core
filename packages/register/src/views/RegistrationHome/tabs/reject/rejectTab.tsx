@@ -4,7 +4,7 @@ import {
   IAction
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import {
   goToPage,
   goToReviewDuplicate,
@@ -16,26 +16,15 @@ import { transformData } from '@register/search/transformer'
 import { IStoreState } from '@register/store'
 import { ITheme } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { SEARCH_EVENTS } from '@register/views/RegistrationHome/queries'
-import {
-  ErrorText,
-  EVENT_STATUS,
-  StyledSpinner
-} from '@register/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
-import {
-  buttonMessages,
-  errorMessages,
-  constantsMessages
-} from '@register/i18n/messages'
+import { buttonMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { IApplication } from '@register/applications'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -44,15 +33,19 @@ interface IBaseRejectTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  parentQueryLoading?: boolean
+  outboxApplications: IApplication[]
+  queryData: {
+    data: GQLEventSearchResultSet
+  }
+  page: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IRejectTabState {
-  updatesCurrentPage: number
   width: number
 }
 
-type IRejectTabProps = InjectedIntlProps & IBaseRejectTabProps
+type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
 class RejectTabComponent extends React.Component<
   IRejectTabProps,
@@ -62,8 +55,7 @@ class RejectTabComponent extends React.Component<
   constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      updatesCurrentPage: 1
+      width: window.innerWidth
     }
   }
 
@@ -138,8 +130,8 @@ class RejectTabComponent extends React.Component<
     }
   }
 
-  transformRejectedContent = (data: GQLQuery) => {
-    if (!data.searchEvents || !data.searchEvents.results) {
+  transformRejectedContent = (data: GQLEventSearchResultSet) => {
+    if (!data || !data.results) {
       return []
     }
     const transformedData = transformData(data, this.props.intl)
@@ -184,82 +176,37 @@ class RejectTabComponent extends React.Component<
     })
   }
 
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ updatesCurrentPage: newPageNumber })
-  }
-
   renderExpandedComponent = (itemId: string) => {
     return <RowHistoryView eventId={itemId} />
   }
 
   render() {
-    const { theme, intl, registrarLocationId, parentQueryLoading } = this.props
+    const { intl, queryData, page, onPageChange } = this.props
+    const { data } = queryData
 
     return (
-      <Query
-        query={SEARCH_EVENTS}
-        variables={{
-          status: [EVENT_STATUS.REJECTED],
-          locationIds: [registrarLocationId],
-          count: this.pageSize,
-          skip: (this.state.updatesCurrentPage - 1) * this.pageSize
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          error?: any
-          data: any
-        }) => {
-          if (loading) {
-            return (
-              (!parentQueryLoading && (
-                <StyledSpinner
-                  id="search-result-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )) ||
-              null
-            )
-          }
-          if (error) {
-            Sentry.captureException(error)
-            return (
-              <ErrorText id="search-result-error-text-reject">
-                {intl.formatMessage(errorMessages.queryError)}
-              </ErrorText>
-            )
-          }
-          return (
-            <HomeContent>
-              <GridTable
-                content={this.transformRejectedContent(data)}
-                columns={this.getColumns()}
-                renderExpandedComponent={this.renderExpandedComponent}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
-                }}
-                pageSize={this.pageSize}
-                totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={this.state.updatesCurrentPage}
-                expandable={this.getExpandable()}
-                clickable={!this.getExpandable()}
-              />
-            </HomeContent>
-          )
-        }}
-      </Query>
+      <HomeContent>
+        <GridTable
+          content={this.transformRejectedContent(data)}
+          columns={this.getColumns()}
+          renderExpandedComponent={this.renderExpandedComponent}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          expandable={this.getExpandable()}
+          clickable={!this.getExpandable()}
+        />
+      </HomeContent>
     )
   }
 }
 
 function mapStateToProps(state: IStoreState) {
   return {
-    scope: getScope(state)
+    scope: getScope(state),
+    outboxApplications: state.applicationsState.applications
   }
 }
 

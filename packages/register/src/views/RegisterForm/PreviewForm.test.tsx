@@ -1,12 +1,10 @@
 import {
   createTestApp,
-  mockOfflineData,
-  assign,
-  validToken,
   getItem,
-  flushPromises,
-  setItem,
-  mockApplicationData
+  mockApplicationData,
+  goToEndOfForm,
+  waitForReady,
+  validateScopeToken
 } from '@register/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -22,42 +20,18 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { getOfflineDataSuccess } from '@register/offline/actions'
-import { storage } from '@register/storage'
+
 import { Event } from '@register/forms'
 import { v4 as uuid } from 'uuid'
+// eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/register/src/profile/profileActions'
-import * as CommonUtils from '@register/utils/commonUtils'
 
-import * as fetchAny from 'jest-fetch-mock'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-
-const fetch = fetchAny as any
-
-const validateToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
+import { waitForElement } from '@register/tests/wait-for-element'
 
 interface IPersonDetails {
   [key: string]: any
 }
-
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
-jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
-
-beforeEach(() => {
-  window.history.replaceState({}, '', '/')
-  assign.mockClear()
-})
 
 describe('when user is previewing the form data', () => {
   let app: ReactWrapper
@@ -65,20 +39,11 @@ describe('when user is previewing the form data', () => {
   let store: Store
 
   beforeEach(async () => {
-    getItem.mockReturnValue(validToken)
-    setItem.mockClear()
-    fetch.resetMocks()
-    fetch.mockResponses(
-      [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
-      [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
-    )
-    const testApp = createTestApp()
+    const testApp = await createTestApp()
     app = testApp.app
-    await flushPromises()
-    app.update()
     history = testApp.history
     store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+    await waitForReady(app)
   })
 
   describe('when user is in the preview section', () => {
@@ -157,8 +122,21 @@ describe('when user is previewing the form data', () => {
       commentsOrNotes: 'comments',
       presentAtBirthRegistration: 'MOTHER_ONLY',
       registrationCertificateLanguage: ['en'],
-      registrationPhone: '01736478884',
-      whoseContactDetails: 'MOTHER'
+      whoseContactDetails: 'MOTHER',
+      applicant: {
+        value: 'OTHER',
+        nestedFields: {
+          otherRelationShip: 'Friend'
+        }
+      },
+      contactPoint: {
+        value: 'OTHER',
+        nestedFields: {
+          registrationPhone: '',
+          contactRelationship: 'grandma',
+          contactPhoneNumber: '01717000000'
+        }
+      }
     }
 
     beforeEach(async () => {
@@ -184,53 +162,13 @@ describe('when user is previewing the form data', () => {
         )
       )
 
-      await flushPromises()
-      app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      for (let i = 1; i <= 8; i++) {
-        app
-          .find(`#keypad-${i % 2}`)
-          .hostNodes()
-          .simulate('click')
-      }
-      await flushPromises()
-      app.update()
+      await waitForElement(app, '#readyApplication')
     })
 
     describe('when user clicks the "submit" button', () => {
-      beforeEach(async () => {
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-        app
-          .find('#next_section')
-          .hostNodes()
-          .simulate('click')
-        await flushPromises()
-        app.update()
-      })
+      beforeEach(async () => goToEndOfForm(app))
 
-      it('check whether submit button is enabled or not', () => {
+      it('check whether submit button is enabled or not', async () => {
         expect(
           app
             .find('#submit_form')
@@ -253,9 +191,6 @@ describe('when user is previewing the form data', () => {
               .find('#submit_form')
               .hostNodes()
               .simulate('click')
-
-            await flushPromises()
-            app.update()
           })
 
           it('confirmation screen should show up', () => {
@@ -266,7 +201,6 @@ describe('when user is previewing the form data', () => {
               .find('#submit_confirm')
               .hostNodes()
               .simulate('click')
-            app.update()
             expect(history.location.pathname).toBe(HOME)
           })
         })
@@ -394,29 +328,7 @@ describe('when user is previewing the form data', () => {
           .replace(':event', 'birth')
           .replace(':pageId', 'review')
       )
-      await flushPromises()
-      app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      for (let i = 1; i <= 8; i++) {
-        app
-          .find(`#keypad-${i % 2}`)
-          .hostNodes()
-          .simulate('click')
-      }
-      await flushPromises()
-      app.update()
-    })
-
-    it('successfully submits the review form', async () => {
-      jest.setMock('react-apollo', { default: ReactApollo })
-
-      await flushPromises()
-      app.update()
+      await waitForElement(app, '#readyApplication')
     })
 
     it('rejecting application redirects to home screen', async () => {
@@ -428,7 +340,7 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#rejectionReasonMisspelling')
+        .find('#rejectionReasonmisspelling')
         .hostNodes()
         .simulate('change')
 
@@ -447,9 +359,6 @@ describe('when user is previewing the form data', () => {
         .find('#submit_reject_form')
         .hostNodes()
         .simulate('click')
-
-      await flushPromises()
-      app.update()
 
       expect(store.dispatch).toBeCalled()
       expect(history.location.pathname).toEqual('/')
@@ -597,22 +506,7 @@ describe('when user is previewing the form data', () => {
           .replace(':event', 'death')
           .replace(':pageId', 'review')
       )
-      await flushPromises()
-      app.update()
-      app
-        .find('#createPinBtn')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      app.update()
-      for (let i = 1; i <= 8; i++) {
-        app
-          .find(`#keypad-${i % 2}`)
-          .hostNodes()
-          .simulate('click')
-      }
-      await flushPromises()
-      app.update()
+      await waitForElement(app, '#readyApplication')
     })
 
     it('successfully submits the review form', async () => {
@@ -627,9 +521,6 @@ describe('when user is previewing the form data', () => {
         .find('#submit_confirm')
         .hostNodes()
         .simulate('click')
-
-      await flushPromises()
-      app.update()
     })
     it('rejecting application redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
@@ -640,7 +531,7 @@ describe('when user is previewing the form data', () => {
         .simulate('click')
 
       app
-        .find('#rejectionReasonMisspelling')
+        .find('#rejectionReasonmisspelling')
         .hostNodes()
         .simulate('change')
 
@@ -660,19 +551,14 @@ describe('when user is previewing the form data', () => {
         .hostNodes()
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 500)
-      })
-      await flushPromises()
-      app.update()
       expect(store.dispatch).toBeCalled()
     })
   })
 
   describe('when user has validate scope', () => {
     beforeEach(async () => {
-      getItem.mockReturnValue(validateToken)
-      store.dispatch(checkAuth({ '?token': validateToken }))
+      getItem.mockReturnValue(validateScopeToken)
+      store.dispatch(checkAuth({ '?token': validateScopeToken }))
       const data = {
         _fhirIDMap: {
           composition: '16'
@@ -695,13 +581,16 @@ describe('when user is previewing the form data', () => {
       app.update()
     })
 
-    it('shows send for review button', () => {
+    it('shows send for review button', async () => {
+      await waitForElement(app, '#readyApplication')
+
       expect(
         app
+          .update()
           .find('#validateApplicationBtn')
           .hostNodes()
           .text()
-      ).toBe('SEND FOR REVIEW')
+      ).toBe('SEND FOR APPROVAL')
     })
   })
 })

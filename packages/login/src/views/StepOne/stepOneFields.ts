@@ -1,11 +1,11 @@
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
 export const messages: {
-  [key: string]: ReactIntl.FormattedMessage.MessageDescriptor
+  [key: string]: MessageDescriptor
 } = defineMessages({
   username: {
     id: 'login.username',
-    defaultMessage: 'User Name',
+    defaultMessage: 'Username',
     description: 'The label that appears on the mobile number input'
   },
   passwordLabel: {

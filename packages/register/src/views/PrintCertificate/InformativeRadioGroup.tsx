@@ -7,7 +7,7 @@ import {
   Ii18nRadioGroupFormField,
   Ii18nInformativeRadioGroupFormField
 } from '@register/forms'
-import { injectIntl } from 'react-intl'
+
 import { ParentDetails } from '@register/views/PrintCertificate/ParentDetails'
 import styled from '@register/styledComponents'
 
@@ -74,4 +74,4 @@ function InformativeRadioGroupComponent({
   )
 }
 
-export const InformativeRadioGroup = injectIntl(InformativeRadioGroupComponent)
+export const InformativeRadioGroup = InformativeRadioGroupComponent

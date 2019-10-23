@@ -26,19 +26,26 @@ import {
   DATE,
   IDateFormField,
   IFormSectionGroup,
+  IRadioGroupFormField,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@register/forms'
-import { InjectedIntl, FormattedMessage } from 'react-intl'
-import { getValidationErrorsForForm } from '@register/forms/validation'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
-  IOfflineDataState,
+  getValidationErrorsForForm,
+  IFieldErrors,
+  Errors
+} from '@register/forms/validation'
+import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
-  ILocation
+  ILocation,
+  IOfflineData
 } from '@register/offline/reducer'
-import { Validation } from '@register/utils/validate'
+import { Validation, IValidationResult } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 
 interface IRange {
   start: number
@@ -47,7 +54,7 @@ interface IRange {
 }
 
 export const internationaliseOptions = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
   return options.map(opt => {
@@ -59,7 +66,7 @@ export const internationaliseOptions = (
 }
 
 export const internationaliseFieldObject = (
-  intl: InjectedIntl,
+  intl: IntlShape,
   field: IFormField
 ): Ii18nFormField => {
   const base = {
@@ -79,7 +86,10 @@ export const internationaliseFieldObject = (
     ;(base as any).options = internationaliseOptions(intl, base.options)
   }
 
-  if (base.type === RADIO_GROUP) {
+  if (
+    base.type === RADIO_GROUP ||
+    base.type === RADIO_GROUP_WITH_NESTED_FIELDS
+  ) {
     ;(base as any).options = internationaliseOptions(intl, base.options)
     if ((field as IDateFormField).notice) {
       ;(base as any).notice = intl.formatMessage(
@@ -151,7 +161,7 @@ export const getFieldType = (
 export const getFieldLabel = (
   field: IDynamicFormField,
   values: IFormSectionData
-): FormattedMessage.MessageDescriptor | undefined => {
+): MessageDescriptor | undefined => {
   if (!field.dynamicDefinitions.label) {
     return undefined
   }
@@ -192,7 +202,7 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  resources?: IOfflineDataState
+  resources: IOfflineData
 ) => {
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (!dependencyVal) {
@@ -333,8 +343,11 @@ export function getQueryData(
 
 export const getConditionalActionsForField = (
   field: IFormField,
+  /*
+   * These are used in the eval expression
+   */
   values: IFormSectionData,
-  resources?: IOfflineDataState,
+  resources?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
   if (!field.conditionals) {
@@ -350,7 +363,8 @@ export const getConditionalActionsForField = (
 
 export const getVisibleSectionGroupsBasedOnConditions = (
   section: IFormSection,
-  values: IFormSectionData
+  values: IFormSectionData,
+  draftData?: IFormData
 ): IFormSectionGroup[] => {
   return section.groups.filter(group => {
     if (!group.conditionals) {
@@ -366,14 +380,35 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   })
 }
 
+export const getVisibleOptions = (
+  radioOptions: CRadioOption[],
+  draftData: IFormData
+): CRadioOption[] => {
+  return radioOptions.filter(option => {
+    if (!option.conditionals) {
+      return true
+    }
+    return (
+      option.conditionals
+        // eslint-disable-next-line no-eval
+        .filter(conditional => eval(conditional.expression))
+        .map((conditional: IConditional) => conditional.action)
+        .includes('hide') !== true
+    )
+  })
+}
+
 export const getSectionFields = (
   section: IFormSection,
-  values?: IFormSectionData
+  values?: IFormSectionData,
+  draftData?: IFormData
 ) => {
   let fields: IFormField[] = []
-  getVisibleSectionGroupsBasedOnConditions(section, values || {}).forEach(
-    group => (fields = fields.concat(group.fields))
-  )
+  getVisibleSectionGroupsBasedOnConditions(
+    section,
+    values || {},
+    draftData
+  ).forEach(group => (fields = fields.concat(group.fields)))
   return fields
 }
 
@@ -381,11 +416,16 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData
 ): boolean => {
-  const errors = getValidationErrorsForForm(fields, values)
+  const errors: Errors = getValidationErrorsForForm(fields, values)
 
-  const fieldListWithErrors = Object.keys(errors).filter(key => {
-    return errors[key] && errors[key].length > 0
-  })
+  const fieldListWithErrors = Object.values(errors).filter(
+    error =>
+      (error as IFieldErrors).errors.length > 0 ||
+      Object.values(error.nestedFields).some(
+        nestedFieldErrors => nestedFieldErrors.length > 0
+      )
+  )
+
   return fieldListWithErrors && fieldListWithErrors.length > 0
 }
 
@@ -487,7 +527,7 @@ export const conditionals: IConditionals = {
   },
   deathPlaceAddressTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_INSTITUTION"'
+    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',
@@ -575,5 +615,13 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
+  },
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
+  },
+  certCollectorOther: {
+    action: 'hide',
+    expression: 'values.type !== "OTHER"'
   }
 }

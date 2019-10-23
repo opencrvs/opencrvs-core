@@ -1,9 +1,17 @@
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@register/components/form'
-import { IFormSection, IFormSectionData } from '@register/forms'
-import { getSectionFields, hasFormError } from '@register/forms/utils'
-import { goToCreateUserSection, goToHome } from '@register/navigation'
+import {
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup
+} from '@register/forms'
+import {
+  getSectionFields,
+  hasFormError,
+  getVisibleGroupFields
+} from '@register/forms/utils'
+import { goToCreateUserSection, goBack } from '@register/navigation'
 import styled from '@register/styledComponents'
 import {
   modifyUserFormData,
@@ -11,9 +19,13 @@ import {
 } from '@register/views/SysAdmin/forms/userReducer'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { buttonMessages } from '@register/i18n/messages'
+import {
+  buttonMessages,
+  validationMessages as messages
+} from '@register/i18n/messages'
+import { userSection } from '@register/views/SysAdmin/forms/fieldDefinitions/user-section'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -25,26 +37,35 @@ export const FormTitle = styled.div`
 export const Action = styled.div`
   margin-top: 32px;
 `
+
 type IProps = {
   section: IFormSection
-  goToHome: typeof goToHome
+  formData: IFormSectionData
+  activeGroup: IFormSectionGroup
+  nextSectionId: string
+  nextGroupId: string
+}
+
+type IDispatchProps = {
+  goBack: typeof goBack
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   clearUserFormData: typeof clearUserFormData
-  formData: IFormSectionData
 }
-
-type IFullProps = InjectedIntlProps & IProps
+type IFullProps = IntlShapeProps & IProps & IDispatchProps
 
 class UserFormComponent extends React.Component<IFullProps> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   handleFormAction = () => {
-    const { section, formData } = this.props
-    if (hasFormError(getSectionFields(section), formData)) {
+    const { formData, activeGroup } = this.props
+    if (hasFormError(activeGroup.fields, formData)) {
       this.showAllValidationErrors()
     } else {
-      this.props.goToCreateUserSection('preview')
+      this.props.goToCreateUserSection(
+        this.props.nextSectionId,
+        this.props.nextGroupId
+      )
     }
   }
 
@@ -57,12 +78,19 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   handleBackAction = () => {
-    this.props.goToHome()
-    this.props.clearUserFormData()
+    this.props.goBack()
+    if (this.props.activeGroup.id === userSection.groups[0].id) {
+      this.props.clearUserFormData()
+    }
+  }
+
+  modifyData = (values: any) => {
+    const { formData } = this.props
+    this.props.modifyUserFormData({ ...formData, ...values })
   }
 
   render = () => {
-    const { section, intl } = this.props
+    const { section, intl, activeGroup } = this.props
 
     return (
       <>
@@ -70,15 +98,19 @@ class UserFormComponent extends React.Component<IFullProps> {
           title={intl.formatMessage(section.title)}
           goBack={this.handleBackAction}
         >
-          <FormTitle>{intl.formatMessage(section.title)}</FormTitle>
+          <FormTitle id="form-title">
+            {intl.formatMessage(activeGroup.title || section.title)}
+          </FormTitle>
           <FormFieldGenerator
+            key={activeGroup.id}
             id={section.id}
-            onChange={this.props.modifyUserFormData}
+            onChange={values => this.modifyData(values)}
             setAllFieldsDirty={false}
-            fields={getSectionFields(section)}
+            fields={getVisibleGroupFields(activeGroup)}
             onSetTouched={setTouchedFunc => {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
+            requiredErrorMessage={messages.requiredForNewUser}
           />
           <Action>
             <PrimaryButton id="confirm_form" onClick={this.handleFormAction}>
@@ -92,6 +124,6 @@ class UserFormComponent extends React.Component<IFullProps> {
 }
 
 export const UserForm = connect(
-  null,
-  { modifyUserFormData, goToCreateUserSection, goToHome, clearUserFormData }
-)(injectIntl<IFullProps>(UserFormComponent))
+  undefined,
+  { modifyUserFormData, goToCreateUserSection, goBack, clearUserFormData }
+)(injectIntl(UserFormComponent))

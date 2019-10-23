@@ -11,7 +11,6 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
-    "populate": "ts-node -r tsconfig-paths/register resources/populate.ts",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "postbuild": "ef-tspm",
@@ -33,7 +32,8 @@
     "mongoose": "^5.1.5",
     "node-fetch": "^2.6.0",
     "uuid": "^3.3.2",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "crypto": "^1.0.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",

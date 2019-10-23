@@ -19,8 +19,18 @@ const LargeList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-  & div {
+  & > div {
     margin-bottom: 16px;
+  }
+`
+const NestedChildren = styled.div`
+  margin: 15px 0px 0px 18px;
+  padding-left: 33px;
+  border-left: 4px solid ${({ theme }) => theme.colors.copy};
+  padding-top: 0px !important;
+
+  > div {
+    padding: 16px 0;
   }
 `
 
@@ -28,9 +38,15 @@ export enum RadioSize {
   LARGE = 'large',
   NORMAL = 'normal'
 }
+
+interface IConditionals {
+  action: string
+  expression: string
+}
 export interface IRadioOption {
   label: string
   value: string | boolean
+  conditionals?: IConditionals[]
 }
 
 export interface IRadioGroupProps {
@@ -39,18 +55,21 @@ export interface IRadioGroupProps {
   value: string
   size?: RadioSize
   notice?: string
+  nestedFields?: { [key: string]: JSX.Element[] }
   onChange: (value: string) => void
 }
 
 export class RadioGroup extends React.Component<IRadioGroupProps> {
-  change = (value: string) => {
-    if (this.props.onChange) {
-      this.props.onChange(value)
-    }
-  }
-
   render() {
-    const { options, value, name, size, notice, ...props } = this.props
+    const {
+      options,
+      value,
+      name,
+      size,
+      notice,
+      nestedFields,
+      ...props
+    } = this.props
 
     return (
       <Wrapper>
@@ -63,17 +82,23 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
           <LargeList>
             {options.map(option => {
               return (
-                <RadioButton
-                  {...props}
-                  size={'large'}
-                  key={option.label}
-                  name={name}
-                  label={option.label}
-                  value={option.value}
-                  id={`${name}_${option.value}`}
-                  selected={value}
-                  onChange={this.change}
-                />
+                <div key={option.label}>
+                  <RadioButton
+                    {...props}
+                    size={'large'}
+                    name={name}
+                    label={option.label}
+                    value={option.value}
+                    id={`${name}_${option.value}`}
+                    selected={value}
+                    onChange={this.props.onChange}
+                  />
+                  {nestedFields &&
+                    value === option.value &&
+                    nestedFields[value] && (
+                      <NestedChildren>{nestedFields[value]}</NestedChildren>
+                    )}
+                </div>
               )
             })}
           </LargeList>
@@ -89,7 +114,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                   value={option.value}
                   id={`${name}_${option.value}`}
                   selected={value}
-                  onChange={this.change}
+                  onChange={this.props.onChange}
                 />
               )
             })}

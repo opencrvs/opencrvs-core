@@ -5,7 +5,7 @@ services:
   # Note: these published port will override UFW rules as Docker manages it's own iptables
   # Only publish the exact ports that are required for OpenCRVS to work
   traefik:
-    image: traefik
+    image: traefik:1.7.16
     ports:
       - '80:80'
       - '443:443'
@@ -193,21 +193,9 @@ services:
 
   notification:
     secrets:
-      - clickatell-user
-      - clickatell-password
-      - clickatell-api-id
-      - infobip-gateway-endpoint
-      - infobip-api-key
       - jwt-public-key.{{ts}}
     environment:
-      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
-      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
-      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
-      - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
-      - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - LANGUAGES=bn,en
-      - COUNTRY_ALPHA3=BGD
     deploy:
       replicas: 2
     networks:
@@ -253,6 +241,8 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - MONGO_URL=mongodb://mongo1,mongo2,mogno3/user-mgnt?replicaSet=rs0
+      - TEST_USER_PASSWORD=test
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -332,16 +322,6 @@ secrets:
   jwt-public-key.{{ts}}:
     external: true
   jwt-private-key.{{ts}}:
-    external: true
-  clickatell-user:
-    external: true
-  clickatell-password:
-    external: true
-  clickatell-api-id:
-    external: true
-  infobip-gateway-endpoint:
-    external: true
-  infobip-api-key:
     external: true
 
 configs:

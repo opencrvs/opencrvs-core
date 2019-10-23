@@ -1,8 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue } from '../icons'
-import { Button } from '../buttons'
-import { colors } from '../colors'
+import { Button, CircleButton } from '../buttons'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -16,36 +15,21 @@ const HeaderContainer = styled.div`
   position: relative;
 `
 const BodyContent = styled.div`
-  max-width: 940px;
   width: 100%;
   height: 64px;
-  margin: auto;
+  margin: 0 24px;
   padding: 24px 0px;
   display: flex;
   flex-direction: row;
   align-items: center;
 `
 const BackButtonContainer = styled.div`
+  margin-right: 8px;
   cursor: pointer;
 `
 const BackButton = styled(Button)`
-  height: 42px;
-  background: ${({ theme }) => theme.colors.white};
   justify-content: center;
-  margin: 0;
-  margin-right: 16px;
-  padding: 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 24px;
-  }
-`
-
-const BackButtonIcon = styled(BackArrowDeepBlue)`
-  &:hover {
-    g {
-      stroke: ${colors.tertiary};
-    }
-  }
+  height: auto;
 `
 
 const BackButtonText = styled.span`
@@ -63,23 +47,27 @@ const Container = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
-  padding: 24px 32px;
+  padding: 24px 32px 32px;
   margin: 32px auto 0;
   max-width: 940px;
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px;
-    width: 100%;
+    margin: 40px 54px;
+    padding: 24px 32px;
     min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+    margin: 0;
+    padding: 24px 32px;
+    min-height: 100vh;
   }
 `
 interface IProps {
   title?: string
   backLabel?: string
   icon?: () => React.ReactNode
+  id?: string
 }
 
 export class ActionPageLight extends React.Component<
@@ -88,14 +76,16 @@ export class ActionPageLight extends React.Component<
   }
 > {
   render() {
-    const { title, icon, goBack, backLabel } = this.props
+    const { id, title, icon, goBack, backLabel } = this.props
 
     return (
-      <ActionContainer>
+      <ActionContainer id={id}>
         <HeaderContainer>
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <BackButton icon={icon || (() => <BackButtonIcon />)} />
+              <CircleButton>
+                <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+              </CircleButton>
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>
             {title && <MenuTitle>{title}</MenuTitle>}

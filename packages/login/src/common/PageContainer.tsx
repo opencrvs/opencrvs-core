@@ -3,7 +3,7 @@ import { getLanguage } from '@login/i18n/selectors'
 import { Page, IPage } from '@login/common/Page'
 import { IStoreState } from '@login/store'
 import { withRouter, RouteComponentProps } from 'react-router'
-import { DarkPage } from '@login/common/DarkPage'
+import { DarkPage } from '@login/common/DarkPage/DarkPage'
 
 const mapStateToProps = (store: IStoreState): IPage => {
   return {

@@ -1,6 +1,6 @@
 import { FHIR_URL } from '@resources/constants'
 import fetch from 'node-fetch'
-import { generateSimpleLocationResource } from '@resources/bgd/features/facilities/scripts/service'
+import { generateLocationResource } from '@resources/bgd/features/administrative/scripts/service'
 import { ILocation } from '@resources/bgd/features/utils'
 
 export interface ILocationDataResponse {
@@ -17,7 +17,7 @@ export async function getLocations(): Promise<ILocationDataResponse> {
           throw new Error('Resource in entry not valid')
         }
 
-        accumulator[entry.resource.id] = generateSimpleLocationResource(
+        accumulator[entry.resource.id] = generateLocationResource(
           entry.resource as fhir.Location
         )
 

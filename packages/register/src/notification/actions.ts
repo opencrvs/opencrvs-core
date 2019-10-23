@@ -1,6 +1,3 @@
-export const SHOW_NEW_CONTENT_AVAILABLE = 'SHOW_NEW_CONTENT_AVAILABLE'
-export const HIDE_NEW_CONTENT_AVAILABLE = 'HIDE_NEW_CONTENT_AVAILABLE'
-
 export const SHOW_BACKGROUND_SYNC_TRIGGERED = 'SHOW_BACKGROUND_SYNC_TRIGGERED'
 export const HIDE_BACKGROUND_SYNC_TRIGGERED = 'HIDE_BACKGROUND_SYNC_TRIGGERED'
 export const SHOW_CONFIG_ERROR = 'SHOW_CONFIG_ERROR'
@@ -12,26 +9,6 @@ export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
 export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
-
-export type ShowNewContentAvailableAction = {
-  type: typeof SHOW_NEW_CONTENT_AVAILABLE
-  payload: { waitingSW: ServiceWorker }
-}
-
-export type HideNewContentAvailableAction = {
-  type: typeof HIDE_NEW_CONTENT_AVAILABLE
-}
-
-export const showNewContentAvailableNotification = (
-  waitingSW: ServiceWorker
-): ShowNewContentAvailableAction => ({
-  type: SHOW_NEW_CONTENT_AVAILABLE,
-  payload: { waitingSW }
-})
-
-export const hideNewContentAvailableNotification = (): HideNewContentAvailableAction => ({
-  type: HIDE_NEW_CONTENT_AVAILABLE
-})
 
 export type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
@@ -79,13 +56,8 @@ export const toggleDraftSavedNotification = (): toggleDraftSavedNotificationActi
   type: TOGGLE_DRAFT_SAVED_NOTIFICATION
 })
 
-type backgroundSyncPayload = {
-  syncCount: number
-}
-
 export type ShowBackgroundSyncedAction = {
   type: typeof SHOW_BACKGROUND_SYNC_TRIGGERED
-  payload: backgroundSyncPayload
 }
 
 export type HideBackgroundSyncedAction = {
@@ -96,11 +68,8 @@ export type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
 
-export const showBackgroundSyncedNotification = (
-  syncCount: number
-): ShowBackgroundSyncedAction => ({
-  type: SHOW_BACKGROUND_SYNC_TRIGGERED,
-  payload: { syncCount }
+export const showBackgroundSyncedNotification = (): ShowBackgroundSyncedAction => ({
+  type: SHOW_BACKGROUND_SYNC_TRIGGERED
 })
 
 export const hideBackgroundSyncedNotification = (): HideBackgroundSyncedAction => ({
@@ -134,8 +103,6 @@ export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
 })
 
 export type Action =
-  | ShowNewContentAvailableAction
-  | HideNewContentAvailableAction
   | ShowBackgroundSyncedAction
   | HideBackgroundSyncedAction
   | SessionExpiredAction

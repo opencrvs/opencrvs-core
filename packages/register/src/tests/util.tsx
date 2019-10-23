@@ -1,3 +1,4 @@
+import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { graphql, print } from 'graphql'
@@ -6,17 +7,23 @@ import { MockedProvider } from 'react-apollo/test-utils'
 import { ApolloLink, Observable } from 'apollo-link'
 import { IStoreState, createStore, AppStore } from '@register/store'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import en from 'react-intl/locale-data/en'
 import { mount, configure, shallow, ReactWrapper } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import { addLocaleData, IntlProvider, intlShape } from 'react-intl'
 import { App } from '@register/App'
 import { getSchema } from '@register/tests/graphql-schema-mock'
 import { ThemeProvider } from '@register/styledComponents'
-import { ENGLISH_STATE } from '@register/i18n/locales/en'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { I18nContainer } from '@opencrvs/register/src/i18n/components/I18nContainer'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { waitForElement } from './wait-for-element'
+import { readFileSync } from 'fs'
+
+import { offlineDataReady, setOfflineData } from '@register/offline/actions'
+import { ISerializedForm, Event } from '@register/forms'
+import { Store, AnyAction } from 'redux'
+import { getRegisterForm } from '@register/forms/register/application-selectors'
+import { getReviewForm } from '@register/forms/register/review-selectors'
+import { IntlShape } from 'react-intl'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -24,6 +31,23 @@ export const fieldAgentScopeToken =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NjQ5OTgyNzUsImV4cCI6MTU5NjUzNDI3NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydkZWNsYXJlJ10ifQ.uriNBNUYD9xColqKq7FraHf8X8b1erMXqRkyzRDJzQk'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
+export const sysadminToken =
+  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNTU5MTk5MTE3LCJleHAiOjE1NTk4MDM5MTcsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1Y2VlNmM1MzU0NWRjMTYwYTIyODQyYjQifQ.Typ3XPwbfofrvWrYuWWHBEIuhzUypsSlTpPZUionO1SxTcAGbm0msn0chpdMw6AJtV0JbC0u-7lpmzpbpHjeQ98emt29pez1EteP8ZapQQmivT55DnwB0_YRg4BdlBGC561aOf6btnFtQsMULhJ8DkPNWUaa-a5_8gPEZmpUVExUw1yslGNCsGwPoNkEEcpXZ8dc-QWXWOFz7eEvKUAXTiLzOQFt4ea7BjU0fVBgMpLr5JmK42OAU3k6xvJHLNM3b8OlPm3fsmsfqZY7_n7L7y7ia5lKFAuFf33pii1_VtG-NZKhu8OecioOpb8ShIqHseU0sDFl58tIf7o1uMS9DQ'
+export const validImageB64String =
+  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+export const inValidImageB64String =
+  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+
+export const validateScopeToken = jwt.sign(
+  { scope: ['validate'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 export function flushPromises() {
   return new Promise(resolve => setImmediate(resolve))
 }
@@ -53,8 +77,6 @@ function createGraphQLClient() {
   })
 }
 
-addLocaleData([...en])
-
 export function getInitialState(): IStoreState {
   const { store: mockStore } = createStore()
 
@@ -63,53 +85,26 @@ export function getInitialState(): IStoreState {
   return mockStore.getState()
 }
 
-export function createTestApp() {
+export function waitForReady(app: ReactWrapper) {
+  return waitForElement(app, '#readyApplication')
+}
+
+export async function createTestApp(
+  config = { waitUntilResourcesLoaded: true }
+) {
   const { store, history } = createStore()
   const app = mount(
     <App store={store} history={history} client={createGraphQLClient()} />
   )
 
+  if (config.waitUntilResourcesLoaded) {
+    await waitForReady(app)
+  }
   return { history, app, store }
 }
 
 interface ITestView {
-  intl: ReactIntl.InjectedIntl
-}
-
-const intlProvider = new IntlProvider(
-  { locale: 'en', messages: ENGLISH_STATE.messages },
-  {}
-)
-export const { intl } = intlProvider.getChildContext()
-
-function nodeWithIntlProp(node: React.ReactElement<ITestView>) {
-  return React.cloneElement(node, { intl })
-}
-
-export function createTestComponent(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null
-) {
-  const component = mount(
-    <MockedProvider mocks={graphqlMocks} addTypename={false}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider
-            theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-          >
-            {nodeWithIntlProp(node)}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </MockedProvider>,
-    {
-      context: { intl },
-      childContextTypes: { intl: intlShape }
-    }
-  )
-
-  return { component, store }
+  intl: IntlShape
 }
 
 export function createShallowRenderedComponent(
@@ -140,18 +135,26 @@ export const selectOption = (
   wrapper: ReactWrapper<{}, {}, React.Component<{}, {}, any>>,
   selector: string,
   option: string
-): string => {
-  const input = wrapper
-    .find(`${selector} input`)
-    .instance() as React.InputHTMLAttributes<HTMLInputElement>
-  input.value = option.charAt(0)
-  wrapper.find(`${selector} input`).simulate('change', {
-    target: { value: option.charAt(0) }
-  })
-  wrapper
-    .find(`${selector} .react-select__menu div[children="${option}"]`)
+): ReactWrapper => {
+  const input = wrapper.find(selector).hostNodes()
+
+  input
+    .find('input')
+    .simulate('focus')
+    .update()
+  input
+    .find('.react-select__control')
+    .simulate('mousedown')
+    .update()
+  input
+    .update()
+    .find('.react-select__option')
+    .findWhere((el: ReactWrapper) => el.text() === option)
+    .hostNodes()
     .simulate('click')
-  return `${selector} .react-select__single-value`
+    .update()
+
+  return input.find('.react-select__control')
 }
 
 const currentUserId = '123'
@@ -1824,10 +1827,9 @@ export const userDetails = {
     {
       use: 'en',
       firstNames: 'Shakib',
-      familyName: 'Al Hasan',
-      __typename: 'HumanName'
+      familyName: 'Al Hasan'
     },
-    { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
+    { use: 'bn', firstNames: '', familyName: '' }
   ],
   role: 'FIELD_AGENT',
   mobile: '01677701431',
@@ -1843,7 +1845,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
@@ -1859,7 +1861,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '20'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
@@ -1875,7 +1877,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -1891,7 +1893,7 @@ export const userDetails = {
       status: 'active',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3473'
         },
         { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
@@ -1901,7 +1903,22 @@ export const userDetails = {
         }
       ]
     }
-  ]
+  ],
+  localRegistrar: {
+    role: 'LOCAL_REGISTRAR',
+    signature: {
+      data: `data:image/png;base64,${validImageB64String}`,
+      type: 'image/png'
+    },
+    name: [
+      {
+        use: 'en',
+        firstNames: 'Mohammad',
+        familyName: 'Ashraful',
+        __typename: 'HumanName'
+      }
+    ]
+  }
 }
 
 export const mockUserResponseWithName = {
@@ -1921,7 +1938,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '30' },
@@ -1938,7 +1955,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '20'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '33' },
@@ -1955,7 +1972,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '165'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '34' },
@@ -1972,7 +1989,7 @@ export const mockUserResponse = {
           status: 'active',
           identifier: [
             {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+              system: 'http://opencrvs.org/specs/id/geo-id',
               value: '3473'
             },
             { system: 'http://opencrvs.org/specs/id/bbs-code', value: '17' },
@@ -1990,6 +2007,109 @@ export const mockUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
+      __typename: 'User',
+      signature: {
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            firstNames: 'Mohammad',
+            familyName: 'Ashraful',
+            __typename: 'HumanName'
+          }
+        ]
+      }
+    }
+  }
+}
+
+export const mockRegistrarUserResponse = {
+  data: {
+    getUser: {
+      userMgntUserID: '123',
+      catchmentArea: [
+        {
+          id: 'ddab090d-040e-4bef-9475-314a448a576a',
+          name: 'Dhaka',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: 'f9ec1fdb-086c-4b3d-ba9f-5257f3638286',
+          name: 'GAZIPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '20'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '825b17fb-4308-48cb-b77c-2f2cee4f14b9',
+          name: 'KALIGANJ',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '165'
+            }
+          ],
+          __typename: 'Location'
+        },
+        {
+          id: '123456789',
+          name: 'BAKTARPUR',
+          status: 'active',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '3473'
+            }
+          ],
+          __typename: 'Location'
+        }
+      ],
+      primaryOffice: {
+        id: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+        name: 'Kaliganj Union Sub Center',
+        status: 'active',
+        __typename: 'Location'
+      },
+      role: 'LOCAL_REGISTRAR',
+      signature: {
+        data: `data:image/png;base64,${validImageB64String}`,
+        type: 'image/png'
+      },
+      localRegistrar: {
+        role: 'LOCAL_REGISTRAR',
+        signature: {
+          data: `data:image/png;base64,${validImageB64String}`,
+          type: 'image/png'
+        },
+        name: [
+          {
+            use: 'en',
+            given: ['Mohammad'],
+            family: 'Ashraful'
+          }
+        ]
+      },
       __typename: 'User'
     }
   }
@@ -2006,7 +2126,9 @@ export const mockApplicationData = {
     weightAtBirth: '3.5',
     attendantAtBirth: 'MIDWIFE',
     birthType: 'SINGLE',
-    multipleBirth: 1
+    multipleBirth: 1,
+    placeOfBirth: 'HEALTH_FACILITY',
+    birthLocation: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee'
   },
   mother: {
     firstNames: 'স্পিভক',
@@ -2071,9 +2193,27 @@ export const mockApplicationData = {
     addressSameAsMother: true
   },
   registration: {
-    whoseContactDetails: 'MOTHER',
+    whoseContactDetails: {
+      value: 'MOTHER',
+      nestedFields: { registrationPhone: '01557394986' }
+    },
     presentAtBirthRegistration: 'BOTH_PARENTS',
-    registrationPhone: '01557394986'
+    registrationNumber: '201908122365BDSS0SE1',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'MOTHER'
+        },
+        hasShowedVerifiedDocument: true
+      }
+    ]
   }
 }
 
@@ -2148,13 +2288,13 @@ export const mockDeathApplicationData = {
     deathLocation: '',
     addressType: '',
     country: 'BGD',
-    state: 'state',
-    district: 'district',
-    addressLine4: 'upazila',
-    addressLine3: 'union',
+    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2: '',
-    addressLine1: '',
-    postCode: ''
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200'
   },
   causeOfDeath: {
     causeOfDeathEstablished: false,
@@ -2171,15 +2311,96 @@ export const mockDeathApplicationData = {
         description: 'National ID (front)'
       }
     ]
+  },
+  registration: {
+    registrationPhone: '01557394986',
+    registrationNumber: '201908122365DDSS0SE1',
+    regStatus: {
+      type: 'REGISTERED',
+      officeName: 'MokhtarPur',
+      officeAlias: 'মখতারপুর',
+      officeAddressLevel3: 'Gazipur',
+      officeAddressLevel4: 'Dhaka'
+    },
+    certificates: [
+      {
+        collector: {
+          type: 'MOTHER'
+        },
+        hasShowedVerifiedDocument: true
+      }
+    ]
   }
 }
 
+export const mockBirthRegistrationSectionData = {
+  whoseContactDetails: {
+    value: 'MOTHER',
+    nestedFields: { registrationPhone: '01557394986' }
+  },
+  presentAtBirthRegistration: 'BOTH_PARENTS',
+  registrationPhone: '01557394986',
+  trackingId: 'BDSS0SE',
+  registrationNumber: '201908122365BDSS0SE1',
+  regStatus: {
+    type: 'REGISTERED',
+    officeName: 'MokhtarPur',
+    officeAlias: 'মখতারপুর',
+    officeAddressLevel3: 'Gazipur',
+    officeAddressLevel4: 'Dhaka'
+  },
+  certificates: [
+    {
+      collector: {
+        type: 'OTHER',
+        relationship: 'Uncle',
+        firstName: 'Mushraful',
+        lastName: 'Hoque',
+        iDType: 'PASSPORT',
+        iD: '123456789'
+      },
+      hasShowedVerifiedDocument: true
+    }
+  ]
+}
+
+export const mockDeathRegistrationSectionData = {
+  whoseContactDetails: 'MOTHER',
+  presentAtBirthRegistration: 'BOTH_PARENTS',
+  registrationPhone: '01557394986',
+  trackingId: 'DDSS0SE',
+  registrationNumber: '201908122365DDSS0SE1',
+  regStatus: {
+    type: 'REGISTERED',
+    officeName: 'MokhtarPur',
+    officeAlias: 'মখতারপুর',
+    officeAddressLevel3: 'Gazipur',
+    officeAddressLevel4: 'Dhaka'
+  },
+  certificates: [
+    {
+      collector: {
+        type: 'OTHER',
+        relationship: 'Uncle',
+        firstName: 'Mushraful',
+        lastName: 'Hoque',
+        iDType: 'PASSPORT',
+        iD: '123456789'
+      },
+      hasShowedVerifiedDocument: true
+    }
+  ]
+}
+
 export const mockOfflineData = {
+  forms: JSON.parse(
+    readFileSync('../resources/src/bgd/features/forms/register.json').toString()
+  ) as { registerForm: { birth: ISerializedForm; death: ISerializedForm } },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
       name: 'Shaheed Taj Uddin Ahmad Medical College',
-      nameBn: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
+      alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
@@ -2187,7 +2408,7 @@ export const mockOfflineData = {
     'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
       id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
       name: 'Kaliganj Union Sub Center',
-      nameBn: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
+      alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -2195,7 +2416,7 @@ export const mockOfflineData = {
     '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
       id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
       name: 'Kaliganj Upazila Health Complex',
-      nameBn: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
+      alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
@@ -2203,18 +2424,26 @@ export const mockOfflineData = {
     '0d8474da-0361-4d32-979e-af91f020309e': {
       id: '0d8474da-0361-4d32-979e-af91f020309e',
       name: 'Dholashadhukhan Cc',
-      nameBn: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
+      alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+    },
+    '0d8474da-0361-4d32-979e-af91f012340a': {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Moktarpur Union Parishad',
+      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
   },
-  healthFacilityFilterLocation: '50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987',
+
   locations: {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
       name: 'Barisal',
-      nameBn: 'বরিশাল',
+      alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2223,7 +2452,7 @@ export const mockOfflineData = {
     '8cbc862a-b817-4c29-a490-4a8767ff023c': {
       id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
       name: 'Chittagong',
-      nameBn: 'চট্টগ্রাম',
+      alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2232,7 +2461,7 @@ export const mockOfflineData = {
     '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b': {
       id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
       name: 'Dhaka',
-      nameBn: 'ঢাকা',
+      alias: 'ঢাকা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2241,7 +2470,7 @@ export const mockOfflineData = {
     '7304b306-1b0d-4640-b668-5bf39bc78f48': {
       id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
       name: 'Khulna',
-      nameBn: 'খুলনা',
+      alias: 'খুলনা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2250,7 +2479,7 @@ export const mockOfflineData = {
     '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a': {
       id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
       name: 'Rajshahi',
-      nameBn: 'রাজশাহী',
+      alias: 'রাজশাহী',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2259,7 +2488,7 @@ export const mockOfflineData = {
     '2b55d13f-f700-4373-8255-c0febd4733b6': {
       id: '2b55d13f-f700-4373-8255-c0febd4733b6',
       name: 'Rangpur',
-      nameBn: 'রংপুর',
+      alias: 'রংপুর',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2268,7 +2497,7 @@ export const mockOfflineData = {
     '59f7f044-84b8-4a6c-955d-271aa3e5af46': {
       id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
       name: 'Sylhet',
-      nameBn: 'সিলেট',
+      alias: 'সিলেট',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2277,7 +2506,7 @@ export const mockOfflineData = {
     '237f3404-d417-41fe-9130-3d049800a1e5': {
       id: '237f3404-d417-41fe-9130-3d049800a1e5',
       name: 'Mymensingh',
-      nameBn: 'ময়মনসিংহ',
+      alias: 'ময়মনসিংহ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DIVISION',
       type: 'ADMIN_STRUCTURE',
@@ -2286,7 +2515,7 @@ export const mockOfflineData = {
     'bc4b9f99-0db3-4815-926d-89fd56889407': {
       id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
       name: 'BARGUNA',
-      nameBn: 'বরগুনা',
+      alias: 'বরগুনা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2295,7 +2524,7 @@ export const mockOfflineData = {
     'dabffdf7-c174-4450-b306-5a3c2c0e2c0e': {
       id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
       name: 'BARISAL',
-      nameBn: 'বরিশাল',
+      alias: 'বরিশাল',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2304,7 +2533,7 @@ export const mockOfflineData = {
     'a5b61fc5-f0c9-4f54-a934-eba18f9110c2': {
       id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
       name: 'BHOLA',
-      nameBn: 'ভোলা',
+      alias: 'ভোলা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2313,7 +2542,7 @@ export const mockOfflineData = {
     '5ffa5780-5ddf-4549-a391-7ad3ba2334d4': {
       id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
       name: 'JHALOKATI',
-      nameBn: 'ঝালকাঠি',
+      alias: 'ঝালকাঠি',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2322,7 +2551,7 @@ export const mockOfflineData = {
     'c8dcf1fe-bf92-404b-81c0-31d6802a1a68': {
       id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
       name: 'PATUAKHALI',
-      nameBn: 'পটুয়াখালী ',
+      alias: 'পটুয়াখালী ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2331,7 +2560,7 @@ export const mockOfflineData = {
     '9c86160a-f704-464a-8b7d-9eae2b4cf1f9': {
       id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
       name: 'PIROJPUR',
-      nameBn: 'পিরোজপুর ',
+      alias: 'পিরোজপুর ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2340,7 +2569,7 @@ export const mockOfflineData = {
     '1846f07e-6f5c-4507-b5d6-126716b0856b': {
       id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
       name: 'BANDARBAN',
-      nameBn: 'বান্দরবান',
+      alias: 'বান্দরবান',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2349,7 +2578,7 @@ export const mockOfflineData = {
     'cf141982-36a1-4308-9090-0445c311f5ae': {
       id: 'cf141982-36a1-4308-9090-0445c311f5ae',
       name: 'BRAHMANBARIA',
-      nameBn: 'ব্রাহ্মণবাড়িয়া',
+      alias: 'ব্রাহ্মণবাড়িয়া',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2358,7 +2587,7 @@ export const mockOfflineData = {
     '478f518e-8d86-439d-8618-5cfa8d3bf5dd': {
       id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
       name: 'CHANDPUR',
-      nameBn: 'চাঁদপুর',
+      alias: 'চাঁদপুর',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2367,7 +2596,7 @@ export const mockOfflineData = {
     'db5faba3-8143-4924-a44a-8562ed5e0437': {
       id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
       name: 'CHITTAGONG',
-      nameBn: 'চট্টগ্রাম',
+      alias: 'চট্টগ্রাম',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2376,7 +2605,7 @@ export const mockOfflineData = {
     '5926982b-845c-4463-80aa-cbfb86762e0a': {
       id: '5926982b-845c-4463-80aa-cbfb86762e0a',
       name: 'COMILLA',
-      nameBn: 'কুমিল্লা',
+      alias: 'কুমিল্লা',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2385,7 +2614,7 @@ export const mockOfflineData = {
     'a3455e64-164c-4bf4-b834-16640a85efd8': {
       id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
       name: "COX'S BAZAR",
-      nameBn: 'কক্সবাজার ',
+      alias: 'কক্সবাজার ',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
@@ -2394,13 +2623,79 @@ export const mockOfflineData = {
     '1dfc716a-c5f7-4d39-ad71-71d2a359210c': {
       id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
       name: 'FENI',
-      nameBn: 'ফেনী',
+      alias: 'ফেনী',
       physicalType: 'Jurisdiction',
       jurisdictionType: 'DISTRICT',
       type: 'ADMIN_STRUCTURE',
       partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
     }
+  },
+  languages: JSON.parse(
+    readFileSync(
+      '../resources/src/bgd/features/languages/generated/register.json'
+    ).toString()
+  ).data,
+  templates: JSON.parse(
+    readFileSync(
+      '../resources/src/bgd/features/templates/register.json'
+    ).toString()
+  ),
+  assets: {
+    logo: `data:image;base64,${validImageB64String}`
   }
+}
+
+export async function createTestStore() {
+  const { store, history } = createStore()
+  await store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      templates: mockOfflineData.templates,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities,
+      assets: mockOfflineData.assets
+    })
+  )
+  return { store, history }
+}
+
+export async function createTestComponent(
+  node: React.ReactElement<ITestView>,
+  store: AppStore,
+  graphqlMocks: any = null
+) {
+  /*
+   * Would it work to replace this fn with createTestApp()
+   * call send return only the component that requires testing..
+   *
+   * Feels odd the whole boilerplate has to be recreated
+   */
+
+  await store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      templates: mockOfflineData.templates,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities,
+      assets: mockOfflineData.assets
+    })
+  )
+
+  const component = mount(
+    <MockedProvider mocks={graphqlMocks} addTypename={false}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+            {node}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </MockedProvider>
+  )
+
+  return { component: component.update(), store }
 }
 
 export const mockDeathApplicationDataWithoutFirstNames = {
@@ -2502,12 +2797,6 @@ export const mockDeathApplicationDataWithoutFirstNames = {
   }
 }
 
-export const validImageB64String =
-  'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-
-export const inValidImageB64String =
-  'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-
 export const getFileFromBase64String = (
   base64String: string,
   name: string,
@@ -2533,5 +2822,75 @@ export const getFileFromBase64String = (
   })
 }
 
-export const sysadminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNTU5MTk5MTE3LCJleHAiOjE1NTk4MDM5MTcsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1Y2VlNmM1MzU0NWRjMTYwYTIyODQyYjQifQ.Typ3XPwbfofrvWrYuWWHBEIuhzUypsSlTpPZUionO1SxTcAGbm0msn0chpdMw6AJtV0JbC0u-7lpmzpbpHjeQ98emt29pez1EteP8ZapQQmivT55DnwB0_YRg4BdlBGC561aOf6btnFtQsMULhJ8DkPNWUaa-a5_8gPEZmpUVExUw1yslGNCsGwPoNkEEcpXZ8dc-QWXWOFz7eEvKUAXTiLzOQFt4ea7BjU0fVBgMpLr5JmK42OAU3k6xvJHLNM3b8OlPm3fsmsfqZY7_n7L7y7ia5lKFAuFf33pii1_VtG-NZKhu8OecioOpb8ShIqHseU0sDFl58tIf7o1uMS9DQ'
+export async function goToSection(component: ReactWrapper, nth: number) {
+  for (let i = 0; i < nth; i++) {
+    component
+      .find('#next_section')
+      .hostNodes()
+      .simulate('click')
+
+    await flushPromises()
+  }
+}
+
+export async function goToEndOfForm(component: ReactWrapper) {
+  await goToSection(component, 5)
+  await waitForElement(component, '#review_header')
+}
+
+export async function goToDocumentsSection(component: ReactWrapper) {
+  await goToSection(component, 3)
+  await waitForElement(component, '#form_section_id_documents-view-group')
+}
+
+export async function goToFatherSection(component: ReactWrapper) {
+  await goToSection(component, 2)
+  await waitForElement(component, '#form_section_id_father-view-group')
+}
+
+export async function goToMotherSection(component: ReactWrapper) {
+  await goToSection(component, 1)
+  await waitForElement(component, '#form_section_id_mother-view-group')
+}
+
+export async function getRegisterFormFromStore(
+  store: Store<IStoreState, AnyAction>,
+  event: Event
+) {
+  await store.dispatch(setOfflineData(userDetails))
+  const state = store.getState()
+  return getRegisterForm(state)[event]
+}
+
+export async function getReviewFormFromStore(
+  store: Store<IStoreState, AnyAction>,
+  event: Event
+) {
+  await store.dispatch(setOfflineData(userDetails))
+  const state = store.getState()
+  return getReviewForm(state)![event]
+}
+
+export async function setPinCode(component: ReactWrapper) {
+  component
+    .find('#createPinBtn')
+    .hostNodes()
+    .simulate('click')
+
+  for (let i = 1; i <= 8; i++) {
+    component
+      .find(`#keypad-${i % 2}`)
+      .hostNodes()
+      .simulate('click')
+  }
+  await flushPromises()
+  component.update()
+}
+
+export function setPageVisibility(isVisible: boolean) {
+  // @ts-ignore
+  document.hidden = !isVisible
+  const evt = document.createEvent('HTMLEvents')
+  evt.initEvent('visibilitychange', false, true)
+  document.dispatchEvent(evt)
+}

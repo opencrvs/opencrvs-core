@@ -1,10 +1,12 @@
 import * as React from 'react'
-import * as Sticky from 'react-stickynode'
 import styled from 'styled-components'
 import { Select, ISelectOption as SelectComponentOptions } from './../forms'
 import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`
+  width: calc(50vw - 50px);
+  position: fixed;
+  top: 94px;
   background-color: ${({ theme }) => theme.colors.background};
   outline: 2px solid ${({ theme }) => theme.colors.chartAreaGradientStart};
   box-sizing: border-box;
@@ -69,38 +71,36 @@ export class DocumentViewer extends React.Component<IProps, IState> {
     const { options, children, id } = this.props
 
     return (
-      <Sticky enabled={true} top="#eventtopbar">
-        <Container id={id}>
-          {options.documentOptions.length > 0 && (
-            <>
-              <Select
-                id="select_document"
-                options={options.selectOptions}
-                color="inherit"
-                value={this.state.selectedOption as string}
-                onChange={(val: string) => {
-                  const imgArray = options.documentOptions.filter(doc => {
-                    return doc.label === val
+      <Container id={id}>
+        {options.documentOptions.length > 0 && (
+          <>
+            <Select
+              id="select_document"
+              options={options.selectOptions}
+              color="inherit"
+              value={this.state.selectedOption as string}
+              onChange={(val: string) => {
+                const imgArray = options.documentOptions.filter(doc => {
+                  return doc.label === val
+                })
+                if (imgArray[0]) {
+                  this.setState({
+                    selectedOption: val,
+                    selectedDocument: imgArray[0].value
                   })
-                  if (imgArray[0]) {
-                    this.setState({
-                      selectedOption: val,
-                      selectedDocument: imgArray[0].value
-                    })
-                  }
-                }}
+                }
+              }}
+            />
+            {this.state.selectedDocument && (
+              <DocumentImage
+                id="document_image"
+                image={this.state.selectedDocument}
               />
-              {this.state.selectedDocument && (
-                <DocumentImage
-                  id="document_image"
-                  image={this.state.selectedDocument}
-                />
-              )}
-            </>
-          )}
-          {options.documentOptions.length === 0 && children}
-        </Container>
-      </Sticky>
+            )}
+          </>
+        )}
+        {options.documentOptions.length === 0 && children}
+      </Container>
     )
   }
 }

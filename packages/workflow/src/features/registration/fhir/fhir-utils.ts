@@ -6,11 +6,11 @@ import {
   EVENT_TYPE,
   REG_STATUS_VALIDATED
 } from '@workflow/features/registration/fhir/constants'
-import { HEARTH_URL } from '@workflow/constants'
+import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
-  selectInformantResource
+  findInformantEntry
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
@@ -35,7 +35,7 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
       })
     phoneNumber = phoneExtension && phoneExtension.valueString
   } else if (eventType === EVENT_TYPE.DEATH) {
-    const contact = selectInformantResource(fhirBundle)
+    const contact = await findInformantEntry(fhirBundle)
     if (!contact || !contact.telecom) {
       return false
     }
@@ -54,15 +54,14 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
 
 export async function getInformantName(
   fhirBundle: fhir.Bundle,
-  sectionCode: string = CHILD_SECTION_CODE,
-  language: string = 'bn'
+  sectionCode: string = CHILD_SECTION_CODE
 ) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error(
       'getInformantName: Invalid FHIR bundle found for declaration'
     )
   }
-
+  const language = getDefaultLanguage()
   const informant = await findPersonEntry(sectionCode, fhirBundle)
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")
@@ -81,15 +80,25 @@ export async function getInformantName(
 }
 
 export function getTrackingId(fhirBundle: fhir.Bundle) {
-  const composition =
-    fhirBundle &&
-    fhirBundle.entry &&
-    (fhirBundle.entry[0].resource as fhir.Composition)
-
-  if (!composition || !composition.identifier) {
+  const resource =
+    fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
+  if (!resource) {
     throw new Error('getTrackingId: Invalid FHIR bundle found for declaration')
   }
-  return composition.identifier.value
+  switch (resource.resourceType) {
+    case 'Composition':
+      const composition = resource as fhir.Composition
+      if (!composition.identifier) {
+        throw new Error(
+          'getTrackingId: Invalid FHIR bundle found for declaration'
+        )
+      }
+      return composition.identifier.value
+    case 'Task':
+      return getTrackingIdFromTaskResource(resource as fhir.Task)
+    default:
+      return undefined
+  }
 }
 
 export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {

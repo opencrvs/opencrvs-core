@@ -16,11 +16,10 @@ import {
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@register/views/RegistrationHome/queries'
-import * as Sentry from '@sentry/browser'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from 'react-apollo'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { Query } from '@register/components/Query'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 
 const ExpansionContent = styled.div`
@@ -117,7 +116,7 @@ function formatRoleCode(str: string) {
   return formattedString.join(' ')
 }
 
-type IProps = InjectedIntlProps & {
+type IProps = IntlShapeProps & {
   theme: ITheme
   eventId: string
 }
@@ -127,9 +126,7 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
     const { locale } = this.props.intl
     const registration =
       data && data.fetchRegistration && data.fetchRegistration.registration
-    if (registration && registration.contact) {
-      console.log(registration.contact)
-    }
+
     return {
       informantRelation:
         registration &&
@@ -191,7 +188,6 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
             data?: any
           }) => {
             if (error) {
-              Sentry.captureException(error)
               return (
                 <ErrorText id="search-result-error-text-expanded">
                   {intl.formatMessage(errorMessages.queryError)}

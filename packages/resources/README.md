@@ -36,7 +36,7 @@ This feature, imports and converts the administrative divisions for a country in
 
 ## Facilities
 
-This feature, imports and converts civil registration offices and health facilities into [FHIR Location](https://www.hl7.org/fhir/location.html) objects.
+This feature, imports and converts civil registration offices and health facilities into [FHIR Location](https://www.hl7.org/fhir/location.html) objects. Each facility must have a unique id.
 
 [This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/offices/offices-resource.jsonc)
 
@@ -44,7 +44,7 @@ This feature, imports and converts civil registration offices and health facilit
 
 ## Employees
 
-This feature, imports and converts an employee list into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The list is a test list based on the users and permissions in the [user-mgnt package.](https://github.com/jembi/OpenCRVS/blob/master/packages/user-mgnt/resources/populate.ts)
+This feature, imports and converts a test user and employee list from a csv file into [FHIR Practitioner](https://www.hl7.org/fhir/practitioner.html) and [FHIR PractitionerRole](https://www.hl7.org/fhir/practitionerrole.html) objects to manage permissions and map registrations to staff members, so that their performance can be tracked. The facility id for the users working location must match a facility unique id
 
 [This FHIR standard is followed.](https://github.com/jembi/opencrvs-fhir-templates/blob/master/employee/employee-resource.jsonc)
 
@@ -54,14 +54,30 @@ This feature, imports and converts an employee list into [FHIR Practitioner](htt
 
 Once all data sources have been readied, then a single command should be able to be run by a developer, in order to populate a local or production OpenCRVS environment with the necessary reference data.
 
-**Populate OpenCRVS with reference data**
+**Populate OpenCRVS with reference data relevant to your country configuration**
 
 <!-- prettier-ignore -->
-```yarn populate```
+```yarn db:populate:<<insert country code>>```
 
 ---
 
-**Ensuring readiness of data sources**
+### Create a new metadata db dump
+
+This will have to be done for each country we are supporting:
+
+1. Start the dev environment
+2. Clear any existing data `yarn db:clear:all` (On a Mac you may need to manually delete the config and hearth-dev databases in Mongo)
+3. Quit and restart the dev environment
+4. Log into the OpenHIM at [here](http://localhost:8888) to load one initial config - default password is root@openhim.org:openhim-password (login will fail a security check as we are using self signed certs by default, follow the instructions in the error message)
+5. Once logged in click Export/Import then drop the file `infrastructure/openhim-base-config.json` into the import box and click 'Import'
+6. Click Channels and check all have loaded successfully.
+7. Populate reference data for your country requirements from the resources package. `yarn db:populate:<<insert alpha3 country code>> <<a2i_secret>>`
+8. `yarn db:backup:create <<insert country code>>`
+9. Commit and push the new db dump archive files that have been created in your country folder.
+
+---
+
+**Example sequence of scripts that run when populating for Bangladesh**
 
 Running the populate command runs the following commands sequentially. Each should be individually confirmed to be working as expected during code review, before publishing a countries resources package to master:
 

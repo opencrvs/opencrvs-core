@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { keyframes } from '@register/styledComponents'
-import { InjectedIntlProps, injectIntl } from 'react-intl'
+import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
@@ -32,7 +32,7 @@ const Title = styled.h4`
 `
 const Actions = styled.div`
   padding: 32px 0;
-  & div:first-child {
+  & > div {
     margin-bottom: 16px;
   }
 `
@@ -62,7 +62,7 @@ const StyledContainer = styled.div`
   }
 `
 class SelectVitalEventView extends React.Component<
-  InjectedIntlProps & {
+  IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeApplication: typeof storeApplication
@@ -95,7 +95,10 @@ class SelectVitalEventView extends React.Component<
   render() {
     const { intl } = this.props
     return (
-      <StyledContainer className={PAGE_TRANSITIONS_CLASSNAME}>
+      <StyledContainer
+        id="select-vital-event-view"
+        className={PAGE_TRANSITIONS_CLASSNAME}
+      >
         <Container>
           <EventTopBar
             title={intl.formatMessage(messages.registerNewEventTitle)}

@@ -1,88 +1,112 @@
-import * as React from 'react'
-import {
-  DocumentViewer,
-  IDocumentViewerOptions,
-  DataSection
-} from '@opencrvs/components/lib/interface'
-import styled from '@register/styledComponents'
-import {
-  IApplication,
-  writeApplication,
-  SUBMISSION_STATUS,
-  IPayload
-} from '@register/applications'
-import { connect } from 'react-redux'
-import { IStoreState } from '@register/store'
-import { getRegisterForm } from '@register/forms/register/application-selectors'
-import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
-import {
-  getConditionalActionsForField,
-  getVisibleSectionGroupsBasedOnConditions,
-  getSectionFields
-} from '@register/forms/utils'
-import { flatten, isArray } from 'lodash'
-import { getValidationErrorsForForm } from '@register/forms/validation'
-import { goToPageGroup } from '@register/navigation'
-
-import {
-  ISelectOption as SelectComponentOptions,
-  TextArea,
-  InputField
-} from '@opencrvs/components/lib/forms'
-import { documentsSection } from '@register/forms/register/fieldDefinitions/birth/documents-section'
-import { getScope } from '@register/profile/profileSelectors'
-import { Scope } from '@register/utils/authUtils'
-import { getOfflineState } from '@register/offline/selectors'
-import {
-  IOfflineDataState,
-  OFFLINE_LOCATIONS_KEY,
-  OFFLINE_FACILITIES_KEY,
-  ILocation
-} from '@register/offline/reducer'
-import { getLanguage } from '@register/i18n/selectors'
-import { InjectedIntlProps, injectIntl, InjectedIntl } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
-  IForm,
-  IFormSection,
-  IFormField,
-  IFileValue,
-  IFormFieldValue,
-  LIST,
-  PARAGRAPH,
-  SELECT_WITH_OPTIONS,
-  SELECT_WITH_DYNAMIC_OPTIONS,
-  ISelectOption,
-  IDynamicOptions,
-  IFormSectionData,
-  WARNING,
-  DATE,
-  TEXTAREA,
-  Event
-} from '@register/forms'
-import { formatLongDate } from '@register/utils/date-formatting'
-import { messages, dynamicMessages } from '@register/i18n/messages/views/review'
-import { buttonMessages } from '@register/i18n/messages'
-import { REJECTED, BIRTH } from '@register/utils/constants'
-import { ReviewHeader } from './ReviewHeader'
-import { SEAL_BD_GOVT } from '@register/views/PrintCertificate/generatePDF'
-import { registrationSection } from '@register/forms/register/fieldDefinitions/birth/registration-section'
-import { getDraftApplicantFullName } from '@register/utils/draftUtils'
-import { ReviewAction } from '@register/components/form/ReviewActionComponent'
-import { findDOMNode } from 'react-dom'
-import { isMobileDevice } from '@register/utils/commonUtils'
+  InputField,
+  ISelectOption as SelectComponentOptions,
+  TextArea
+} from '@opencrvs/components/lib/forms'
+import {
+  DataSection,
+  DocumentViewer,
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
-  sectionMapping as birthSectionMapping,
-  sectionTitle as birthSectionTitle
-} from '@register/forms/register/fieldDefinitions/birth/mappings/mutation/documents-mappings'
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS,
+  writeApplication
+} from '@register/applications'
+import { ReviewAction } from '@register/components/form/ReviewActionComponent'
 import {
-  sectionMapping as deathSectionMapping,
-  sectionTitle as deathSectionTitle
-} from '@register/forms/register/fieldDefinitions/death/mappings/mutation/documents-mappings'
+  BirthSection,
+  CHECKBOX_GROUP,
+  DATE,
+  Event,
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  ICheckboxGroupFormField,
+  IDynamicOptions,
+  IFileValue,
+  IForm,
+  IFormData,
+  IFormField,
+  IFormFieldValue,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IFormTag,
+  IRadioOption,
+  ISelectOption,
+  LIST,
+  PARAGRAPH,
+  RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  SEARCH_FIELD,
+  Section,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS,
+  SUBSECTION,
+  TEXTAREA,
+  WARNING
+} from '@register/forms'
+import {
+  getBirthSection,
+  getRegisterForm
+} from '@register/forms/register/application-selectors'
+import {
+  birthSectionMapping,
+  birthSectionTitle
+} from '@register/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import {
+  deathSectionMapping,
+  deathSectionTitle
+} from '@register/forms/register/fieldMappings/death/mutation/documents-mappings'
+import {
+  getConditionalActionsForField,
+  getSectionFields,
+  getVisibleSectionGroupsBasedOnConditions
+} from '@register/forms/utils'
+import {
+  Errors,
+  getValidationErrorsForForm,
+  IFieldErrors
+} from '@register/forms/validation'
+import { buttonMessages } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/review'
+import { getLanguage } from '@register/i18n/selectors'
+import { getDefaultLanguage } from '@register/i18n/utils'
+import { goToPageGroup } from '@register/navigation'
+import {
+  ILocation,
+  IOfflineData,
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from '@register/offline/reducer'
+import { getOfflineData } from '@register/offline/selectors'
+import { getScope } from '@register/profile/profileSelectors'
+import { IStoreState } from '@register/store'
+import styled from '@register/styledComponents'
+import { Scope } from '@register/utils/authUtils'
+import { isMobileDevice } from '@register/utils/commonUtils'
+import { BIRTH, REJECTED } from '@register/utils/constants'
+import { formatLongDate } from '@register/utils/date-formatting'
+import { getDraftApplicantFullName } from '@register/utils/draftUtils'
+import { EditConfirmation } from '@register/views/RegisterForm/review/EditConfirmation'
+import { flatten, isArray } from 'lodash'
+import * as React from 'react'
+import { findDOMNode } from 'react-dom'
+import {
+  injectIntl,
+  IntlShape,
+  MessageDescriptor,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
+import { ReviewHeader } from './ReviewHeader'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
+  text-transform: lowercase;
 `
 const Row = styled.div`
   display: flex;
@@ -133,16 +157,22 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 24px;
+  }
 `
 const FormDataHeader = styled.div`
   ${({ theme }) => theme.fonts.h2Style}
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.h3Style}
+  }
 `
 const InputWrapper = styled.div`
-  margin-top: 48px;
+  margin-top: 56px;
 `
 type onChangeReviewForm = (
   sectionData: IFormSectionData,
-  activeSection: any,
+  activeSection: IFormSection,
   application: IApplication
 ) => void
 interface IProps {
@@ -158,48 +188,42 @@ interface IProps {
     payload?: IPayload
   ) => void
   scope: Scope | null
-  offlineResources: IOfflineDataState
+  offlineResources: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm
   writeApplication: typeof writeApplication
+  registrationSection: IFormSection
+  documentsSection: IFormSection
 }
 type State = {
   displayEditDialog: boolean
-  editClickedSectionId: string
+  editClickedSectionId: Section | null
   editClickedSectionGroupId: string
-  editClickFieldName: string
-  activeSection: string
-}
-type FullProps = IProps & InjectedIntlProps
-
-const getViewableSection = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ id, viewType }) =>
-      id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
-  )
+  editClickFieldName?: string
+  activeSection: Section | null
 }
 
-const getDocumentSections = (registerForm: IForm): IFormSection[] => {
-  return registerForm.sections.filter(
-    ({ hasDocumentSection }) => hasDocumentSection
-  )
+interface IErrorsBySection {
+  [sectionId: string]: Errors
 }
 
-function renderSelectLabel(
+type FullProps = IProps & IntlShapeProps
+
+function renderSelectOrRadioLabel(
   value: IFormFieldValue,
-  options: ISelectOption[],
-  intl: InjectedIntl
+  options: Array<ISelectOption | IRadioOption>,
+  intl: IntlShape
 ) {
-  const selectedOption = options.find(option => option.value === value)
-  return selectedOption ? intl.formatMessage(selectedOption.label) : value
+  const option = options.find(option => option.value === value)
+  return option ? intl.formatMessage(option.label) : value
 }
 
 export function renderSelectDynamicLabel(
   value: IFormFieldValue,
   options: IDynamicOptions,
   draftData: IFormSectionData,
-  intl: InjectedIntl,
-  resources: IOfflineDataState,
+  intl: IntlShape,
+  resources: IOfflineData,
   language: string
 ) {
   if (!options.resource) {
@@ -224,10 +248,10 @@ export function renderSelectDynamicLabel(
       }
 
       if (selectedLocation) {
-        if (language === 'en') {
-          return selectedLocation.name
+        if (language !== getDefaultLanguage()) {
+          return selectedLocation.alias
         } else {
-          return selectedLocation.nameBn
+          return selectedLocation.name
         }
       } else {
         return false
@@ -238,34 +262,80 @@ export function renderSelectDynamicLabel(
   }
 }
 
+const getCheckBoxGroupFieldValue = (
+  field: ICheckboxGroupFormField,
+  value: string[],
+  intl: IntlShape
+) => {
+  const option = field.options.find(option => {
+    return value.length > 0 && option.value === value[0]
+  })
+  if (option) {
+    return intl.formatMessage(option.label)
+  }
+  return ''
+}
+
 const renderValue = (
-  draft: IApplication,
-  section: IFormSection,
+  draftData: IFormData,
+  sectionId: string,
   field: IFormField,
-  intl: InjectedIntl,
-  offlineResources: IOfflineDataState,
+  intl: IntlShape,
+  offlineResources: IOfflineData,
   language: string
 ) => {
-  const value: IFormFieldValue = draft.data[section.id]
-    ? draft.data[section.id][field.name]
+  const value: IFormFieldValue = draftData[sectionId]
+    ? draftData[sectionId][field.name]
     : ''
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
-    return renderSelectLabel(value, field.options, intl)
+    return renderSelectOrRadioLabel(value, field.options, intl)
   }
-  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
-    const draftData = draft.data[section.id]
+  if (
+    (field.type === SEARCH_FIELD ||
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS) &&
+    field.dynamicOptions
+  ) {
+    const sectionData = draftData[sectionId]
     return renderSelectDynamicLabel(
       value,
       field.dynamicOptions,
-      draftData,
+      sectionData,
       intl,
       offlineResources,
       language
     )
   }
 
-  if (field.type === DATE && value && typeof value === 'string') {
+  if (
+    (field.type === DATE ||
+      (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+        (field.dynamicDefinitions.type &&
+          field.dynamicDefinitions.type.kind === 'static' &&
+          field.dynamicDefinitions.type.staticType === DATE))) &&
+    value &&
+    typeof value === 'string'
+  ) {
     return formatLongDate(value)
+  }
+
+  if (field.hideValueInPreview) {
+    return ''
+  }
+
+  if (field.type === RADIO_GROUP) {
+    return renderSelectOrRadioLabel(value, field.options, intl)
+  }
+
+  if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+    return renderSelectOrRadioLabel(
+      (value && (value as IFormSectionData).value) || '',
+      field.options,
+      intl
+    )
+  }
+
+  if (value && field.type === CHECKBOX_GROUP) {
+    return getCheckBoxGroupFieldValue(field, value as string[], intl)
   }
 
   if (typeof value === 'string') {
@@ -278,33 +348,45 @@ const renderValue = (
   }
   return value
 }
+
 const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   draft: IApplication
-) => {
+): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
     const fields: IFormField[] = getSectionFields(
       section,
-      draft.data[section.id]
+      draft.data[section.id],
+      draft.data
     )
 
     const errors = getValidationErrorsForForm(
       fields,
-      draft.data[section.id] || {}
+      draft.data[section.id] || {},
+      undefined,
+      draft.data
     )
 
     return {
       ...sections,
       [section.id]: fields.reduce((fields, field) => {
         // REFACTOR
-        const validationErrors = errors[field.name]
+        const validationErrors: IFieldErrors = errors[
+          field.name as keyof typeof errors
+        ] as IFieldErrors
 
         const value = draft.data[section.id]
           ? draft.data[section.id][field.name]
           : null
 
         const informationMissing =
-          validationErrors.length > 0 || value === null ? validationErrors : []
+          validationErrors.errors.length > 0 ||
+          value === null ||
+          Object.values(validationErrors.nestedFields).some(
+            nestedErrors => nestedErrors.length > 0
+          )
+            ? validationErrors
+            : { errors: [], nestedFields: {} }
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -327,10 +409,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     this.state = {
       displayEditDialog: false,
-      editClickedSectionId: '',
       editClickedSectionGroupId: '',
       editClickFieldName: '',
-      activeSection: ''
+      editClickedSectionId: null,
+      activeSection: null
     }
   }
 
@@ -342,7 +424,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     window.removeEventListener('scroll', this.onScroll)
   }
 
-  docSections = getDocumentSections(
+  getVisibleSections = (formSections: IFormSection[]) => {
+    const { draft } = this.props
+    return formSections.filter(
+      section =>
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          draft.data[section.id] || {},
+          draft.data
+        ).length > 0
+    )
+  }
+
+  getViewableSection = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ id, viewType }) =>
+        id !== 'documents' && (viewType === 'form' || viewType === 'hidden')
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  getDocumentSections = (registerForm: IForm): IFormSection[] => {
+    const sections = registerForm.sections.filter(
+      ({ hasDocumentSection }) => hasDocumentSection
+    )
+
+    return this.getVisibleSections(sections)
+  }
+
+  docSections = this.getDocumentSections(
     this.props.registerForm[this.props.draft.event]
   )
 
@@ -383,8 +494,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   prepSectionDocuments = (
     draft: IApplication,
-    activeSection: string
+    activeSection: Section
   ): IDocumentViewerOptions => {
+    const { documentsSection } = this.props
+
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
     const selectOptions: SelectComponentOptions[] = []
@@ -392,22 +505,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     let uploadedDocuments: IFileValue[] = []
 
     for (let index in draft.data[draftItemName]) {
-      if (isArray(draft.data[draftItemName][index]))
-        uploadedDocuments = uploadedDocuments.concat(draft.data[draftItemName][
+      if (isArray(draft.data[draftItemName][index])) {
+        const newDocuments = (draft.data[draftItemName][
           index
-        ] as IFileValue[])
+        ] as unknown) as IFileValue[]
+        uploadedDocuments = uploadedDocuments.concat(newDocuments)
+      }
     }
 
     uploadedDocuments = uploadedDocuments.filter(document => {
       const sectionMapping = SECTION_MAPPING[draft.event]
       const sectionTitle = SECTION_TITLE[draft.event]
-      // @ts-ignore
-      const allowedDocumentType = sectionMapping[activeSection] || []
+
+      const allowedDocumentType: string[] =
+        sectionMapping[activeSection as keyof typeof sectionMapping] || []
 
       if (
-        allowedDocumentType.indexOf(document.optionValues[0].toString()) > -1
+        allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title = sectionTitle[activeSection]
+        const title = sectionTitle[activeSection as keyof typeof sectionMapping]
         const label = title + ' ' + document.optionValues[1]
 
         documentOptions.push({
@@ -436,9 +552,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   editLinkClickHandler = (
-    sectionId: string,
+    sectionId: Section | null,
     sectionGroupId: string,
-    fieldName: string
+    fieldName?: string
   ) => {
     this.setState(() => ({
       editClickedSectionId: sectionId,
@@ -446,6 +562,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       editClickFieldName: fieldName
     }))
     this.toggleDisplayDialog()
+  }
+
+  editLinkClickHandlerForDraft = (
+    sectionId: string,
+    groupId: string,
+    fieldName: string
+  ) => {
+    const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
+    const application = draft
+    application.review = true
+    writeApplication(application)
+    goToPageGroup(
+      pageRoute,
+      application.id,
+      sectionId,
+      groupId,
+      application.event.toLowerCase(),
+      fieldName
+    )
   }
 
   userHasRegisterScope() {
@@ -464,74 +599,241 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  isVisibleField(field: IFormField, section: IFormSection) {
+    const { draft, offlineResources } = this.props
+    const conditionalActions = getConditionalActionsForField(
+      field,
+      draft.data[section.id] || {},
+      offlineResources,
+      draft.data
+    )
+    return !conditionalActions.includes('hide')
+  }
+
+  isViewOnly(field: IFormField) {
+    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
+      type => type === field.type
+    )
+  }
+
+  isDraft() {
+    return this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+  }
+
+  getFieldValueWithErrorMessage(
+    section: IFormSection,
+    field: IFormField,
+    errorsOnField: any
+  ) {
+    return (
+      <RequiredField id={`required_label_${section.id}_${field.name}`}>
+        {field.previewGroup && this.props.intl.formatMessage(field.label) + ' '}
+        {this.props.intl.formatMessage(
+          errorsOnField.message,
+          errorsOnField.props
+        )}
+      </RequiredField>
+    )
+  }
+
+  getRenderableField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    fieldLabel: MessageDescriptor,
+    fieldName: string,
+    value: IFormFieldValue | JSX.Element | undefined,
+    ignoreAction: boolean = false
+  ) {
+    const { intl } = this.props
+
+    return {
+      label: intl.formatMessage(fieldLabel),
+      value,
+      action: !ignoreAction && {
+        id: `btn_change_${section.id}_${fieldName}`,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          if (this.isDraft()) {
+            this.editLinkClickHandlerForDraft(section.id, group.id, fieldName)
+          } else {
+            this.editLinkClickHandler(section.id, group.id, fieldName)
+          }
+        }
+      }
+    }
+  }
+
+  getValueOrError = (
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) => {
+    const { intl, draft, offlineResources, language } = this.props
+    const errorsOnField = sectionErrors[section.id][field.name].errors
+    return errorsOnField.length > 0
+      ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
+      : field.nestedFields
+      ? (
+          (draft.data[section.id] &&
+            draft.data[section.id][field.name] &&
+            (draft.data[section.id][field.name] as IFormSectionData).value &&
+            field.nestedFields[
+              (draft.data[section.id][field.name] as IFormSectionData)
+                .value as string
+            ]) ||
+          []
+        ).reduce((groupedValues, nestedField) => {
+          const errorsOnNestedField =
+            sectionErrors[section.id][field.name].nestedFields[
+              nestedField.name
+            ] || []
+          // Value of the parentField resembles with IFormData as a nested form
+          const nestedValue =
+            (draft.data[section.id] &&
+              draft.data[section.id][field.name] &&
+              renderValue(
+                draft.data[section.id][field.name] as IFormData,
+                'nestedFields',
+                nestedField,
+                intl,
+                offlineResources,
+                language
+              )) ||
+            ''
+          return (
+            <>
+              {groupedValues}
+              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+              {errorsOnNestedField.length > 0
+                ? this.getFieldValueWithErrorMessage(
+                    section,
+                    field,
+                    errorsOnNestedField[0]
+                  )
+                : nestedValue}
+            </>
+          )
+        }, <>{renderValue(draft.data, section.id, field, intl, offlineResources, language)}</>)
+      : renderValue(
+          draft.data,
+          section.id,
+          field,
+          intl,
+          offlineResources,
+          language
+        )
+  }
+
+  getPreviewGroupsField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    visitedTags: string[],
+    errorsOnFields: IErrorsBySection
+  ) {
+    if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
+      visitedTags.push(field.previewGroup)
+
+      const baseTag = field.previewGroup
+      const taggedFields = group.fields.filter(
+        field =>
+          this.isVisibleField(field, section) &&
+          !this.isViewOnly(field) &&
+          field.previewGroup === baseTag
+      )
+
+      const tagDef =
+        (group.previewGroups &&
+          (group.previewGroups.filter(
+            previewGroup => previewGroup.id === baseTag
+          ) as IFormTag[])) ||
+        []
+      const values = taggedFields
+        .map(field => this.getValueOrError(section, field, errorsOnFields))
+        .filter(value => value)
+
+      let completeValue = values[0]
+      values.shift()
+      values.forEach(
+        value =>
+          (completeValue = (
+            <>
+              {completeValue}
+              <br />
+              {value}
+            </>
+          ))
+      )
+
+      return this.getRenderableField(
+        section,
+        group,
+        (tagDef[0] && tagDef[0].label) || field.label,
+        (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
+        completeValue,
+        field.readonly
+      )
+    }
+  }
+
+  getSinglePreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) {
+    const value = this.getValueOrError(section, field, sectionErrors)
+
+    return this.getRenderableField(
+      section,
+      group,
+      field.label,
+      field.name,
+      value,
+      field.readonly
+    )
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
-    errorsOnFields: any
+    errorsOnFields: IErrorsBySection
   ) => {
-    const { intl, draft, offlineResources, language, pageRoute } = this.props
-    const isVisibleField = (field: IFormField, section: IFormSection) => {
-      const conditionalActions = getConditionalActionsForField(
-        field,
-        draft.data[section.id] || {},
-        offlineResources,
-        draft.data
-      )
-      return !conditionalActions.includes('hide')
-    }
+    const { intl, draft } = this.props
 
-    const isViewOnly = (field: IFormField) => {
-      return [LIST, PARAGRAPH, WARNING, TEXTAREA].find(
-        type => type === field.type
-      )
-    }
     return formSections.map(section => {
       let items: any[] = []
+      let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
         section,
-        draft.data[section.id] || {}
+        draft.data[section.id] || {},
+        draft.data
       ).forEach(group => {
-        items = items.concat(
-          group.fields
-            .filter(
-              field => isVisibleField(field, section) && !isViewOnly(field)
-            )
-            .map(field => {
-              const errorsOnField =
-                // @ts-ignore
-                errorsOnFields[section.id][field.name]
-
-              return {
-                label: intl.formatMessage(field.label),
-                value:
-                  errorsOnField.length > 0 ? (
-                    <RequiredField
-                      id={`required_label_${section.id}_${field.name}`}
-                    >
-                      {intl.formatMessage(
-                        errorsOnField[0].message,
-                        errorsOnField[0].props
-                      )}
-                    </RequiredField>
-                  ) : (
-                    renderValue(
-                      draft,
+        items = items
+          .concat(
+            group.fields
+              .filter(
+                field =>
+                  this.isVisibleField(field, section) && !this.isViewOnly(field)
+              )
+              .filter(field => !Boolean(field.hideInPreview))
+              .map(field => {
+                return field.previewGroup
+                  ? this.getPreviewGroupsField(
                       section,
+                      group,
                       field,
-                      intl,
-                      offlineResources,
-                      language
+                      visitedTags,
+                      errorsOnFields
                     )
-                  ),
-                action: {
-                  id: `btn_change_${section.id}_${field.name}`,
-                  label: intl.formatMessage(buttonMessages.change),
-                  handler: () => {
-                    this.editLinkClickHandler(section.id, group.id, field.name)
-                  }
-                }
-              }
-            })
-        )
+                  : this.getSinglePreviewField(
+                      section,
+                      group,
+                      field,
+                      errorsOnFields
+                    )
+              })
+          )
+          .filter(item => item)
       })
       return {
         id: section.id,
@@ -544,24 +846,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   render() {
     const {
       intl,
-      draft,
+      draft: application,
       registerForm,
       rejectApplicationClickEvent,
       submitClickEvent,
-      pageRoute,
+      registrationSection,
+      documentsSection,
+      offlineResources,
       draft: { event }
     } = this.props
+    const formSections = this.getViewableSection(registerForm[event])
 
-    const formSections = getViewableSection(registerForm[event])
-
-    const errorsOnFields = getErrorsOnFieldsBySection(formSections, draft)
+    const errorsOnFields = getErrorsOnFieldsBySection(formSections, application)
 
     const isComplete =
       flatten(
         // @ts-ignore
         Object.values(errorsOnFields).map(Object.values)
         // @ts-ignore
-      ).filter(errors => errors.length > 0).length === 0
+      ).filter(errors => errors.errors.length > 0).length === 0
 
     const textAreaProps = {
       id: 'additional_comments',
@@ -569,19 +872,19 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         ;(this.props.onChangeReviewForm as onChangeReviewForm)(
           { commentsOrNotes: e.target.value },
           registrationSection,
-          draft
+          application
         )
       },
       value:
-        (draft.data.registration && draft.data.registration.commentsOrNotes) ||
+        (application.data.registration &&
+          application.data.registration.commentsOrNotes) ||
         '',
       ignoreMediaQuery: true
     }
 
     const sectionName = this.state.activeSection || this.docSections[0].id
-    const applicantName = getDraftApplicantFullName(draft, intl.locale)
-    const isDraft =
-      this.props.draft.submissionStatus === SUBMISSION_STATUS.DRAFT
+    const applicantName = getDraftApplicantFullName(application, intl.locale)
+    const draft = this.isDraft()
 
     return (
       <FullBodyContent>
@@ -589,10 +892,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           <StyledColumn>
             <ReviewHeader
               id="review_header"
-              logoSource={SEAL_BD_GOVT}
-              title={intl.formatMessage(
-                dynamicMessages[`${window.config.COUNTRY}GovtName`]
-              )}
+              logoSource={offlineResources.assets.logo}
+              title={intl.formatMessage(messages.govtName)}
               subject={
                 applicantName
                   ? intl.formatMessage(messages.headerSubjectWithName, {
@@ -606,7 +907,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             />
             <FormData>
               <FormDataHeader>
-                {intl.formatMessage(messages.formDataHeader, { isDraft })}
+                {intl.formatMessage(messages.formDataHeader, {
+                  isDraft: draft
+                })}
               </FormDataHeader>
               {this.transformSectionData(formSections, errorsOnFields).map(
                 (sec, index) => (
@@ -632,8 +935,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 alreadyRejectedApplication={
                   this.props.draft.registrationStatus === REJECTED
                 }
-                draftApplication={isDraft}
-                application={draft}
+                draftApplication={draft}
+                application={application}
                 submitApplicationAction={submitClickEvent}
                 rejectApplicationAction={rejectApplicationClickEvent}
               />
@@ -647,8 +950,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
                 options={this.prepSectionDocuments(
-                  draft,
-                  this.state.activeSection || formSections[0].id
+                  application,
+                  this.state.activeSection || this.docSections[0].id
                 )}
               >
                 <ZeroDocument>
@@ -661,7 +964,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       this.editLinkClickHandler(
                         documentsSection.id,
                         documentsSection.groups[0].id,
-                        this.state.activeSection
+                        this.state.activeSection!
                       )
                     }
                   >
@@ -676,16 +979,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
           handleEdit={() => {
-            const application = this.props.draft
-            application.review = true
-            this.props.writeApplication(application)
-            this.props.goToPageGroup(
-              pageRoute,
-              draft.id,
-              this.state.editClickedSectionId,
+            this.editLinkClickHandlerForDraft(
+              this.state.editClickedSectionId!,
               this.state.editClickedSectionGroupId,
-              draft.event.toLowerCase(),
-              this.state.editClickFieldName
+              this.state.editClickFieldName!
             )
           }}
         />
@@ -697,8 +994,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 export const ReviewSection = connect(
   (state: IStoreState) => ({
     registerForm: getRegisterForm(state),
+    registrationSection: getBirthSection(state, BirthSection.Registration),
+    documentsSection: getBirthSection(state, BirthSection.Documents),
     scope: getScope(state),
-    offlineResources: getOfflineState(state),
+    offlineResources: getOfflineData(state),
     language: getLanguage(state)
   }),
   { goToPageGroup, writeApplication }

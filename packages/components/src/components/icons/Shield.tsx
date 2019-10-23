@@ -1,30 +1,37 @@
 import * as React from 'react'
 
 export const Shield = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={339} height={339} fill="none" {...props}>
+  <svg width={240} height={240} fill="none" {...props}>
     <path
       fillRule="evenodd"
       clipRule="evenodd"
-      d="M166.025 308.914c2.212 1.204 4.738 1.204 6.95 0C191.982 298.575 282.5 245.352 282.5 169.5V62.746a8 8 0 0 0-6.06-7.76l-105-26.25a7.997 7.997 0 0 0-3.88 0l-105 26.25a8 8 0 0 0-6.06 7.76V169.5c0 75.852 90.518 129.075 109.525 139.414z"
-      fill="#EDC55E"
-      stroke="#EDC55E"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M117.51 218.684c1.585.863 3.395.863 4.98 0C136.012 211.324 200 173.661 200 120V44.477a5.735 5.735 0 00-4.344-5.563l-74.265-18.566a5.736 5.736 0 00-2.782 0L44.344 38.914A5.735 5.735 0 0040 44.477V120c0 53.661 63.988 91.324 77.51 98.684z"
+      fill="url(#prefix__paint0_linear)"
     />
     <path
       fillRule="evenodd"
       clipRule="evenodd"
-      d="M151.388 113.303c0-10.162 8.24-18.401 18.407-18.401s18.406 8.239 18.406 18.401v13.531h-36.813v-13.531zm-11.902 13.531v-13.531c0-16.737 13.571-30.303 30.309-30.303 16.737 0 30.308 13.566 30.308 30.303v13.531h11.154a8.331 8.331 0 0 1 8.331 8.331v48.814a8.331 8.331 0 0 1-8.331 8.331h-82.926a8.331 8.331 0 0 1-8.331-8.331v-48.814a8.331 8.331 0 0 1 8.331-8.331h11.155zm54.666 11.901h-62.25v41.674h75.785v-41.674h-13.535z"
-      fill="url(#prefix__paint0_linear)"
+      d="M107.23 80.215c0-7.166 5.81-12.975 12.978-12.975 7.169 0 12.979 5.81 12.979 12.975v9.526H107.23v-9.526zm-8.531 9.526v-9.526c0-11.879 9.631-21.507 21.509-21.507 11.879 0 21.51 9.628 21.51 21.507v9.526h7.823a5.972 5.972 0 015.972 5.972v34.517a5.972 5.972 0 01-5.972 5.972H90.875a5.972 5.972 0 01-5.972-5.972V95.713a5.972 5.972 0 015.972-5.972h7.824zm38.754 8.531H93.434v29.398h53.548V98.272h-9.529z"
+      fill="url(#prefix__paint1_linear)"
     />
     <defs>
       <linearGradient
         id="prefix__paint0_linear"
-        x1={119.414}
-        y1={82.61}
-        x2={234.233}
-        y2={82.61}
+        x1={120}
+        y1={20}
+        x2={120}
+        y2={220}
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#6291CD" />
+        <stop offset={1} stopColor="#AACAF3" />
+      </linearGradient>
+      <linearGradient
+        id="prefix__paint1_linear"
+        x1={84.487}
+        y1={58.432}
+        x2={165.897}
+        y2={58.432}
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="#fff" />

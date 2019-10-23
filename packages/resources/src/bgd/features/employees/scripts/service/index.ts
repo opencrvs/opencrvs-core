@@ -1,30 +1,25 @@
-import { Response } from 'node-fetch'
-import { ORG_URL } from '@resources/constants'
-import {
-  getLocationIDByDescription,
-  getUpazilaID,
-  getFromFhir,
-  sendToFhir,
-  titleCase
-} from '@resources/bgd/features/utils'
+import { ORG_URL, TEST_USER_PASSWORD } from '@resources/constants'
+import { getFromFhir, sendToFhir } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
+import { logger } from '@resources/logger'
+import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'
+import { generateSaltedHash, convertToMSISDN } from '@resources/utils'
+import {
+  createUsers,
+  getScope
+} from '@resources/bgd/features/employees/scripts/manage-users'
 
 interface ITestPractitioner {
-  division: string
-  district: string
-  upazila: string
-  union: string
-  A2IReference: string
-  facilityEnglishName: string
-  facilityBengaliName: string
-  givenNamesBengali: string
-  givenNamesEnglish: string
-  familyNameBengali: string
-  familyNameEnglish: string
+  facilityId: string
+  username: string
+  givenNames: string
+  familyName: string
   gender: string
   role: string
+  type: string
   mobile: string
   email: string
+  signature?: string
 }
 
 const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
@@ -41,16 +36,30 @@ const composeFhirPractitioner = (practitioner: ITestPractitioner): any => {
     name: [
       {
         use: 'en',
-        family: [practitioner.familyNameEnglish],
-        given: practitioner.givenNamesEnglish.split(' ')
-      },
-      {
-        use: 'bn',
-        family: [practitioner.familyNameBengali],
-        given: practitioner.givenNamesBengali.split(' ')
+        family: [practitioner.familyName],
+        given: practitioner.givenNames.split(' ')
       }
     ],
-    gender: practitioner.gender
+    gender: practitioner.gender,
+    extension: practitioner.signature
+      ? [
+          {
+            url: 'http://opencrvs.org/specs/extension/employee-signature',
+            valueSignature: {
+              type: [
+                {
+                  system: 'urn:iso-astm:E1762-95:2013',
+                  code: '1.2.840.10065.1.12.1.13',
+                  display: 'Review Signature'
+                }
+              ],
+              when: new Date().toISOString(),
+              contentType: 'image/png',
+              blob: practitioner.signature
+            }
+          }
+        ]
+      : []
   }
 }
 
@@ -79,71 +88,60 @@ const composeFhirPractitionerRole = (
 }
 
 export async function composeAndSavePractitioners(
-  practitioners: ITestPractitioner[],
-  divisions: fhir.Location[],
-  districts: fhir.Location[],
-  upazilas: fhir.Location[],
-  unions: fhir.Location[]
+  practitioners: ITestPractitioner[]
 ): Promise<boolean> {
+  const users: IUserModel[] = []
   for (const practitioner of practitioners) {
-    // Get Locations
     const locations: fhir.Reference[] = []
-    if (practitioner.facilityEnglishName) {
-      const facility = await getFromFhir(
-        `/Location?name=${titleCase(
-          encodeURIComponent(practitioner.facilityEnglishName)
-        )}`
+    const catchmentAreaIds: string[] = []
+    let facilityResource: any
+    // get location FHIR references for catchment area and PractitionerRole locations prop
+    if (!practitioner.facilityId) {
+      throw Error(
+        'Cannot save practitioner as no facilityId exists to map practitioner to an office'
       )
-      const facilityResource = facility.entry[0].resource
-      locations.push({ reference: `Location/${facilityResource.id}` })
     }
-    if (practitioner.division) {
-      const practitionerDivision: fhir.Location = divisions.find(division => {
-        return division.name === titleCase(practitioner.division)
-      }) as fhir.Location
-      locations.push({ reference: `Location/${practitionerDivision.id}` })
-    }
-    if (practitioner.district) {
-      const practitionerDistrict: fhir.Location = districts.find(district => {
-        return district.name === titleCase(practitioner.district)
-      }) as fhir.Location
-      locations.push({ reference: `Location/${practitionerDistrict.id}` })
-    }
-    if (practitioner.upazila) {
-      const upazilaID = await getUpazilaID(upazilas, practitioner.upazila)
-      locations.push({ reference: `Location/${upazilaID as string}` })
-    }
-    if (practitioner.union) {
-      const unionID = getLocationIDByDescription(
-        unions,
-        practitioner.A2IReference
-      )
-      locations.push({ reference: `Location/${unionID as string}` })
-    }
-    // tslint:disable-next-line:no-console
-    console.log(
-      'Attaching the following locations: ' + JSON.stringify(locations)
+
+    const facility = await getFromFhir(
+      `/Location?identifier=${encodeURIComponent(practitioner.facilityId)}`
     )
+    facilityResource = facility.entry[0].resource
+    const primaryOfficeId = facilityResource.id
+    locations.push({ reference: `Location/${primaryOfficeId}` })
+    let partOf: fhir.Reference = facilityResource.partOf
+    let parentLocation: fhir.Location = {}
+    while (partOf.reference !== 'Location/0') {
+      parentLocation = await getFromFhir(`/${partOf.reference}`)
+      locations.push({ reference: `Location/${parentLocation.id}` })
+      if (parentLocation.id && parentLocation.partOf) {
+        catchmentAreaIds.push(parentLocation.id)
+        partOf = parentLocation.partOf
+      }
+    }
+    if (parentLocation.id) {
+      locations.push({ reference: `Location/${parentLocation.id}` })
+      catchmentAreaIds.push(parentLocation.id)
+    }
 
     // Create and save Practitioner
     const newPractitioner: fhir.Practitioner = composeFhirPractitioner(
       practitioner
     )
-    const savedPractitionerResponse = (await sendToFhir(
+    const savedPractitionerResponse = await sendToFhir(
       newPractitioner,
       '/Practitioner',
       'POST'
     ).catch(err => {
       throw Error('Cannot save practitioner to FHIR')
-    })) as Response
+    })
+
     const practitionerLocationHeader = savedPractitionerResponse.headers.get(
       'location'
     ) as string
-    const practitionerReference = `Practitioner/${
-      practitionerLocationHeader.split('/')[3]
-    }`
-    // tslint:disable-next-line:no-console
-    console.log(`Practitioner saved to fhir: ${practitionerReference}`)
+    const practitionerId = practitionerLocationHeader.split('/')[3]
+    const practitionerReference = `Practitioner/${practitionerId}`
+
+    logger.info(`Practitioner saved to fhir: ${practitionerReference}`)
 
     // Create and save PractitionerRole
     const newPractitionerRole: fhir.PractitionerRole = composeFhirPractitionerRole(
@@ -152,26 +150,56 @@ export async function composeAndSavePractitioners(
       locations
     )
 
-    const savedPractitionerRoleResponse = (await sendToFhir(
+    const savedPractitionerRoleResponse = await sendToFhir(
       newPractitionerRole,
       '/PractitionerRole',
       'POST'
     ).catch(err => {
       throw Error('Cannot save practitioner role to FHIR')
-    })) as Response
+    })
+
     const practitionerRoleLocationHeader = savedPractitionerRoleResponse.headers.get(
       'location'
     ) as string
     const practitionerRoleReference = `PractitionerRole/${
       practitionerRoleLocationHeader.split('/')[3]
     }`
-    // tslint:disable-next-line:no-console
-    console.log(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
+
+    logger.info(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
+
+    // create user account
+
+    const pass = generateSaltedHash(TEST_USER_PASSWORD)
+    const user = new User({
+      name: [
+        {
+          use: 'en',
+          given: [practitioner.givenNames],
+          family: practitioner.familyName
+        }
+      ],
+      username: practitioner.username,
+      email: practitioner.email,
+      mobile: convertToMSISDN(practitioner.mobile, 'bgd'),
+      passwordHash: pass.hash,
+      salt: pass.salt,
+      role: practitioner.role,
+      type: practitioner.type,
+      scope: getScope(practitioner.role),
+      status: 'active',
+      practitionerId,
+      primaryOfficeId,
+      catchmentAreaIds,
+      securityQuestionAnswers: []
+    })
+    users.push(user)
   }
-  // tslint:disable-next-line:no-console
-  console.log(
+  // Create users
+  createUsers(users)
+
+  logger.info(
     `${chalk.blueBright(
-      '/////////////////////////// FINISHED SAVING RESOURCES - THANK YOU FOR WAITING ///////////////////////////'
+      '/////////////////////////// FINISHED SAVING TEST USERS ///////////////////////////'
     )}`
   )
   return true

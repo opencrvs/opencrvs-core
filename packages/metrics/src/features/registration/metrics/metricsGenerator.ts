@@ -1,21 +1,21 @@
-import { readPoints } from '@metrics/influxdb/client'
+import {
+  FEMALE,
+  MALE,
+  WITHIN_1_YEAR,
+  WITHIN_45_DAYS,
+  WITHIN_45_DAYS_TO_1_YEAR
+} from '@metrics/features/registration/metrics/constants'
 import {
   ageIntervals,
   calculateInterval,
-  generateEmptyBirthKeyFigure,
   fetchEstimateByLocation,
+  generateEmptyBirthKeyFigure,
   IPoint,
-  LABEL_FOMRAT
+  LABEL_FOMRAT,
+  Location
 } from '@metrics/features/registration/metrics/utils'
+import { readPoints } from '@metrics/influxdb/client'
 import * as moment from 'moment'
-import { IAuthHeader } from '@metrics/features/registration'
-import {
-  MALE,
-  FEMALE,
-  WITHIN_45_DAYS,
-  WITHIN_45_DAYS_TO_1_YEAR,
-  WITHIN_1_YEAR
-} from '@metrics/features/registration/metrics/constants'
 
 interface IGroupedByGender {
   total: number
@@ -90,12 +90,10 @@ export const regWithin45d = async (timeStart: string, timeEnd: string) => {
 export async function fetchKeyFigures(
   timeStart: string,
   timeEnd: string,
-  locationId: string,
-  authHeader: IAuthHeader
+  location: Location
 ) {
   const estimatedFigure = await fetchEstimateByLocation(
-    locationId,
-    authHeader,
+    location,
     // TODO: need to adjust this when date range is properly introduced
     new Date().getFullYear()
   )

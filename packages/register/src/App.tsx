@@ -1,4 +1,3 @@
-import { Footer } from '@opencrvs/components/lib/interface/'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { History, Location } from 'history'
@@ -8,7 +7,7 @@ import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import styled, { ThemeProvider } from '@register/styledComponents'
 import { I18nContainer } from '@register/i18n/components/I18nContainer'
-import { createStore, AppStore } from '@register/store'
+import { AppStore } from '@register/store'
 import { ProtectedRoute } from '@register/components/ProtectedRoute'
 import * as routes from '@register/navigation/routes'
 import { NotificationComponent } from '@register/components/Notification'
@@ -24,7 +23,6 @@ import { createClient } from '@register/utils/apolloClient'
 import { ReviewDuplicates } from '@register/views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from '@register/components/SessionExpireConfirmation'
 import { ConfirmationScreen } from '@register/views/ConfirmationScreen/ConfirmationScreen'
-import { PrintCertificateAction } from '@register/views/PrintCertificate/PrintCertificateAction'
 import { ErrorBoundary } from '@register/components/ErrorBoundary'
 import { Details } from '@register/views/Home/Details'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
@@ -38,6 +36,10 @@ import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/S
 import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
 import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
+import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
+import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
+import { Payment } from './views/PrintCertificate/Payment'
+import { CollectorForm } from '@register/views/PrintCertificate/collectorForm/CollectorForm'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -48,7 +50,6 @@ const MainSection = styled.section`
   flex-grow: 8;
   background: ${({ theme }) => theme.colors.background};
 `
-export const store = createStore()
 
 export class App extends React.Component<IAppProps> {
   public render() {
@@ -59,9 +60,7 @@ export class App extends React.Component<IAppProps> {
         >
           <Provider store={this.props.store}>
             <I18nContainer>
-              <ThemeProvider
-                theme={getTheme(window.config.COUNTRY, getDefaultLanguage())}
-              >
+              <ThemeProvider theme={getTheme(getDefaultLanguage())}>
                 <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
                     <ScrollToTop>
@@ -69,7 +68,12 @@ export class App extends React.Component<IAppProps> {
                       <NotificationComponent>
                         <Page>
                           <MainSection>
-                            <ProtectedPage>
+                            <ProtectedPage
+                              unprotectedRouteElements={[
+                                'documents',
+                                'affidavit'
+                              ]}
+                            >
                               <ProtectedRoute
                                 render={({
                                   location
@@ -159,6 +163,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={
+                                              routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
+                                            }
+                                            component={ReviewForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.REGISTRAR_HOME}
                                             component={RegistrationHome}
                                           />
@@ -184,8 +195,24 @@ export class App extends React.Component<IAppProps> {
                                             component={ReviewDuplicates}
                                           />
                                           <ProtectedRoute
-                                            path={routes.PRINT_CERTIFICATE}
-                                            component={PrintCertificateAction}
+                                            exact
+                                            path={routes.CERTIFICATE_COLLECTOR}
+                                            component={CollectorForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_COLLECTOR}
+                                            component={VerifyCollector}
+                                          />
+                                          <ProtectedRoute
+                                            path={routes.REVIEW_CERTIFICATE}
+                                            component={ReviewCertificateAction}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.PRINT_CERTIFICATE_PAYMENT
+                                            }
+                                            component={Payment}
                                           />
                                           <ProtectedRoute
                                             path={routes.SETTINGS}
@@ -237,9 +264,6 @@ export class App extends React.Component<IAppProps> {
                               />
                             </ProtectedPage>
                           </MainSection>
-                          <Footer>
-                            <p>OpenCRVS {new Date().getFullYear()}</p>
-                          </Footer>
                         </Page>
                       </NotificationComponent>
                     </ScrollToTop>
