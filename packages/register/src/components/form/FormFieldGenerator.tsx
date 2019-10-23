@@ -100,6 +100,7 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@register/store'
 import { getOfflineData } from '@register/offline/selectors'
 import { connect } from 'react-redux'
+import { touch } from 'redux-form'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -171,6 +172,8 @@ function GeneratedInputField({
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder
   }
+
+  console.log(fieldDefinition.name, touched)
 
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
@@ -597,6 +600,7 @@ class FormSectionComponent extends React.Component<Props> {
       draftData,
       setValues
     } = this.props
+
     const language = this.props.intl.locale
 
     const errors = (this.props.errors as unknown) as Errors
@@ -640,6 +644,18 @@ class FormSectionComponent extends React.Component<Props> {
 
           if (conditionalActions.includes('hide')) {
             return null
+          }
+
+          if (
+            field.type === DATE &&
+            touched[`${field.name}-dd`] !== undefined &&
+            touched[`${field.name}-mm`] !== undefined &&
+            touched[`${field.name}-yyyy`] !== undefined
+          ) {
+            touched[field.name] =
+              touched[`${field.name}-dd`] &&
+              touched[`${field.name}-mm`] &&
+              touched[`${field.name}-yyyy`]
           }
 
           const withDynamicallyGeneratedFields =

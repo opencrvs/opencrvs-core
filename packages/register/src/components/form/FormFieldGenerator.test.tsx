@@ -9,7 +9,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
   Event,
-  RADIO_GROUP_WITH_NESTED_FIELDS
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  DATE
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'
@@ -302,5 +303,66 @@ describe('when field definition has nested fields', () => {
         .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
         .props().value
     ).toEqual('')
+  })
+})
+
+describe('when form has a date field', () => {
+  let component: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    const { store } = createStore()
+    const draft = createApplication(Event.BIRTH)
+    store.dispatch(storeApplication(draft))
+    const modifyDraft = jest.fn()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="child"
+        onChange={modifyDraft}
+        setAllFieldsDirty={false}
+        fields={[
+          {
+            name: 'childBirthDate',
+            type: DATE,
+            label: {
+              defaultMessage: 'Date of birth',
+              description: 'Label for form field: Date of birth',
+              id: 'form.field.label.childDateOfBirth'
+            },
+            required: true,
+            initialValue: '',
+            validate: []
+          }
+        ]}
+      />,
+      store
+    )
+    component = testComponent.component
+  })
+  it('should renders error after giving a wrong date', () => {
+    component.find('#childBirthDate-dd').simulate('change', {
+      target: {
+        value: '10'
+      }
+    })
+
+    component.find('#childBirthDate-mm').simulate('change', {
+      target: {
+        value: '10'
+      }
+    })
+
+    component.find('#childBirthDate-yyyy').simulate('change', {
+      target: {
+        value: '10'
+      }
+    })
+
+    component.find('#childBirthDate').simulate('blur')
+
+    expect(
+      component
+        .find('#childBirthDate_error')
+        .hostNodes()
+        .props().value
+    ).toEqual('Must be a valid birth date')
   })
 })
