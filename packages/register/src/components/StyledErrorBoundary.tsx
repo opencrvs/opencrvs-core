@@ -35,7 +35,7 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-type IFullProps = IntlShapeProps
+type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
 interface IErrorInfo extends React.ErrorInfo {
   [key: string]: string
@@ -97,9 +97,4 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   }
 }
 
-export const StyledErrorBoundary = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language
-  }),
-  {}
-)(injectIntl(StyledErrorBoundaryComponent))
+export const StyledErrorBoundary = injectIntl(StyledErrorBoundaryComponent)

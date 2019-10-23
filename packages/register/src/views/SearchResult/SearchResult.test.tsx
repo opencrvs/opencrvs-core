@@ -357,7 +357,7 @@ describe('SearchResult tests', () => {
     expect(
       testComponent.component
         .find('#search-result-error-text')
-        .children()
+        .hostNodes()
         .text()
     ).toBe('An error occurred while searching')
   })

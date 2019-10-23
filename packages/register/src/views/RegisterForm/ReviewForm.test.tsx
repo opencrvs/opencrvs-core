@@ -113,6 +113,7 @@ describe('ReviewForm tests', () => {
       testComponent.component
         .find('#review-error-text')
         .children()
+        .hostNodes()
         .text()
     ).toBe('An error occurred while fetching birth registration')
   })
@@ -1693,6 +1694,7 @@ describe('ReviewForm tests', () => {
         testComponent.component
           .find('#review-unauthorized-error-text')
           .children()
+          .hostNodes()
           .text()
       ).toBe('We are unable to display this page to you')
     })

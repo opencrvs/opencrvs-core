@@ -354,13 +354,11 @@ describe('when user is previewing the form data', () => {
           }
         })
 
-      store.dispatch = jest.fn()
       app
         .find('#submit_reject_form')
         .hostNodes()
         .simulate('click')
 
-      expect(store.dispatch).toBeCalled()
       expect(history.location.pathname).toEqual('/')
     })
   })
@@ -545,13 +543,12 @@ describe('when user is previewing the form data', () => {
           }
         })
 
-      store.dispatch = jest.fn()
       app
         .find('#submit_reject_form')
         .hostNodes()
         .simulate('click')
 
-      expect(store.dispatch).toBeCalled()
+      expect(history.location.pathname).toEqual('/')
     })
   })
 
