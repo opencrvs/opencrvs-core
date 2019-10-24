@@ -8267,7 +8267,7 @@
                   ],
                   "conditionals": [
                     {
-                      "description": "Hidden for Parent Details none or Father only",
+                      "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
                     }
