@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   CheckboxGroup,
   DateField,
@@ -95,12 +94,10 @@ import {
 } from 'formik'
 import { IOfflineData } from '@register/offline/reducer'
 import { isEqual, flatten } from 'lodash'
-import { IValidationResult } from '@register/utils/validate'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 import { IStoreState } from '@register/store'
 import { getOfflineData } from '@register/offline/selectors'
 import { connect } from 'react-redux'
-import { touch } from 'redux-form'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
