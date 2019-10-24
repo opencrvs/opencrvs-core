@@ -101,12 +101,16 @@ export default async function importFacilities() {
       )}`
     )
 
+    // setting some locations covered in the pilot implementation to use to highlight any warnings if we cannot map an office to A2I
+    const deploymentUpazilas = ['Kaliganj', 'Narsingdi Sadar', 'Bhurungamari']
+
     crvsOfficeLocations = await mapAndSaveCRVSFacilities(
       crvsOffices,
       divisions.divisions,
       districts.districts,
       upazilas.upazilas,
-      unions.unions
+      unions.unions,
+      deploymentUpazilas
     )
 
     healthFacilityLocations = await mapAndSaveHealthFacilities(

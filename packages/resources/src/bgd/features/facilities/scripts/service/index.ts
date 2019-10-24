@@ -2,6 +2,7 @@ import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
 import { sendToFhir, ILocation } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
+import { findBestMatch, BestMatch } from 'string-similarity'
 
 export interface IORGFacility {
   facilityId: string
@@ -177,7 +178,8 @@ export async function mapAndSaveCRVSFacilities(
   divisions: fhir.Location[],
   districts: fhir.Location[],
   upazilas: fhir.Location[],
-  unions: fhir.Location[]
+  unions: fhir.Location[],
+  pilotLocations: string[]
 ): Promise<fhir.Location[]> {
   const locations: fhir.Location[] = []
   for (const facility of facilities) {
@@ -192,7 +194,7 @@ export async function mapAndSaveCRVSFacilities(
       // tslint:disable-next-line:no-console
       console.log(
         chalk.yellow(
-          `WARNING: Division not found for facility ${facility.facilityNameEnglish}`
+          `WARNING: A2I Division not found for facility ${facility.facilityNameEnglish}`
         )
       )
       continue
@@ -206,13 +208,23 @@ export async function mapAndSaveCRVSFacilities(
     )
 
     if (!district) {
-      // tslint:disable-next-line:no-console
-      console.log(
-        chalk.yellow(
-          // tslint:disable-next-line:max-line-length
-          `WARNING: District not found for facility ${facility.facilityNameEnglish} with parent=${division.id}`
+      if (pilotLocations.includes(facility.upazila)) {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.red(
+            // tslint:disable-next-line:max-line-length
+            `PILOT WARNING: A2I District not found or matched for facility ,${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
+          )
         )
-      )
+      } else {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.yellow(
+            // tslint:disable-next-line:max-line-length
+            `WARNING: A2I District not found or matched for facility ,${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
+          )
+        )
+      }
       continue
     }
 
@@ -224,13 +236,25 @@ export async function mapAndSaveCRVSFacilities(
     )
 
     if (!upazila) {
-      // tslint:disable-next-line:no-console
-      console.log(
-        chalk.yellow(
-          // tslint:disable-next-line:max-line-length
-          `WARNING: Upazila not found for facility ${facility.facilityNameEnglish} with parent=${district.id}`
+      if (pilotLocations.includes(facility.upazila)) {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.red(
+            // tslint:disable-next-line:max-line-length
+            `PILOT WARNING: A2I Upazila not found or matched for facility ,${facility.facilityNameEnglish}` +
+              ` in district: ${facility.district} and division: ${facility.division} with parent district FHIR id: ${district.id}`
+          )
         )
-      )
+      } else {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.yellow(
+            // tslint:disable-next-line:max-line-length
+            `WARNING: A2I Upazila not found or matched for facility ,${facility.facilityNameEnglish}` +
+              ` in district: ${facility.district} and division: ${facility.division} with parent district FHIR id: ${district.id}`
+          )
+        )
+      }
       continue
     }
 
@@ -242,13 +266,27 @@ export async function mapAndSaveCRVSFacilities(
     )
 
     if (!union) {
-      // tslint:disable-next-line:no-console
-      console.log(
-        chalk.yellow(
-          // tslint:disable-next-line:max-line-length
-          `WARNING: Union not found for facility ${facility.facilityNameEnglish} with parent=${upazila.id}`
+      if (pilotLocations.includes(facility.upazila)) {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.red(
+            // tslint:disable-next-line:max-line-length
+            `PILOT WARNING: A2I Union not found or matched for facility ,${facility.facilityNameEnglish},` +
+              ` in upazila: ,${facility.upazila}, district: ,${facility.district}, and division:` +
+              ` ,${facility.division}, with parent upazila FHIR id: ${upazila.id}`
+          )
         )
-      )
+      } else {
+        // tslint:disable-next-line:no-console
+        console.log(
+          chalk.yellow(
+            // tslint:disable-next-line:max-line-length
+            `WARNING: A2I Union not found or matched for facility ,${facility.facilityNameEnglish}, in upazila: ,` +
+              `${facility.upazila}, district: ,${facility.district}, and division: ,${facility.division}, ` +
+              `with parent upazila FHIR id: ${upazila.id}`
+          )
+        )
+      }
       continue
     }
     const newLocation: fhir.Location = createFhirLocationFromORGJson(
@@ -256,9 +294,9 @@ export async function mapAndSaveCRVSFacilities(
       `Location/${union.id}`
     )
     // tslint:disable-next-line:no-console
-    console.log(
+    /*console.log(
       `Saving facility ... type: ${facility.facilityTypeEnglish}, name: ${facility.facilityNameEnglish}`
-    )
+    )*/
     const savedLocationResponse = (await sendToFhir(
       newLocation,
       '/Location',
@@ -307,9 +345,14 @@ function findLocationByNameAndParent(
   name: string,
   parentRef: string
 ) {
-  const resourcesArray = resources.filter(resource => {
+  const namesArray: string[] = []
+  let resourcesArray = resources.filter(resource => {
     if (resource.name && resource.partOf && resource.partOf.reference) {
-      return resource.name === name && resource.partOf.reference === parentRef
+      namesArray.push(resource.name)
+      return (
+        resource.name.toUpperCase() === name.toUpperCase() &&
+        resource.partOf.reference === parentRef
+      )
     } else {
       return false
     }
@@ -319,8 +362,45 @@ function findLocationByNameAndParent(
     console.log(chalk.yellow(`WARNING: ${type} duplicates found for ${name}`))
   }
   if (!resourcesArray || resourcesArray.length === 0) {
+    /*
+      The CRVS Facilities were supplied as an Excel sheet.  It has been manually created and there
+      are many differences in the spellings of both the English and Bengali names between the parent
+      union, upazila, district and the spelling of the same in the A2I api.  As we have no BBS codes
+      or reference to use to match, we have to find the best match using the name.  To see a list of
+      offices that the script is unable to exactly match, uncomment the logs below.
+    */
+
     // tslint:disable-next-line:no-console
-    console.log(chalk.yellow(`WARNING: No ${type} found for ${name}`))
+    /*console.log(
+      chalk.white(
+        `WARNING: No exact match ${type} found for ${name}. Attempting tp find best match ...`
+      )
+    )*/
+    const bestMatchResult: BestMatch = findBestMatch(name, namesArray)
+    // tslint:disable-next-line:no-console
+    /*console.log(
+      chalk.white(
+        `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+      )
+    )*/
+    resourcesArray = resources.filter(resource => {
+      if (
+        resource.name &&
+        resource.name === bestMatchResult.bestMatch.target &&
+        resource.partOf &&
+        resource.partOf.reference === parentRef
+      ) {
+        // tslint:disable-next-line:no-console
+        /*console.log(
+          chalk.white(
+            `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+          )
+        )*/
+        return true
+      } else {
+        return false
+      }
+    })
   }
   return resourcesArray[0]
 }
