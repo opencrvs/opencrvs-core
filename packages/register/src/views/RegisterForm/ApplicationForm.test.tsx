@@ -79,7 +79,12 @@ describe('when user has starts a new application', () => {
       let draft: IApplication
       beforeEach(async () => {
         draft = createApplication(Event.BIRTH)
-
+        draft.data = {
+          ...draft.data,
+          registration: {
+            presentAtBirthRegistration: 'MOTHER'
+          }
+        }
         /*
          * Needs to be done before storeApplication(draft)
          * so offline applications wouldn't override the dispatched ones
@@ -211,7 +216,7 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
@@ -221,7 +226,7 @@ describe('when user has starts a new application', () => {
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
         })
       })

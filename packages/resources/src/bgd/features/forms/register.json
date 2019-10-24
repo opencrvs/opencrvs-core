@@ -829,9 +829,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -2223,9 +2221,7 @@
                         "individual",
                         {
                           "operation": "longDateTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         }
                       ]
                     },
@@ -4831,9 +4827,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -6663,9 +6657,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -8277,7 +8269,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData.primaryCaregiver.parentDetailsType === \"NONE\" || draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -8355,7 +8347,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData.primaryCaregiver.parentDetailsType === \"NONE\" || draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -12367,9 +12359,7 @@
                         "individual",
                         {
                           "operation": "longDateTransformer",
-                          "parameters": [
-                            "birthDate"
-                          ]
+                          "parameters": ["birthDate"]
                         }
                       ]
                     },
