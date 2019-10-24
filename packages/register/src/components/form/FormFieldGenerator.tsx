@@ -173,8 +173,6 @@ function GeneratedInputField({
     placeholder: fieldDefinition.placeholder
   }
 
-  console.log(fieldDefinition.name, touched)
-
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
       <InputField {...inputFieldProps}>
