@@ -4,6 +4,7 @@ import { ILanguage } from '@register/i18n/reducer'
 import { ISerializedForm } from '@register/forms'
 import * as ImageDownloader from 'image-to-base64'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import { ICertificateCollectorDefinition } from '@register/views/PrintCertificate/VerifyCollector'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -13,7 +14,13 @@ export interface IFacilitiesDataResponse {
 }
 export interface IDefinitionsResponse {
   languages: ILanguage[]
-  forms: { registerForm: { birth: ISerializedForm; death: ISerializedForm } }
+  forms: {
+    registerForm: { birth: ISerializedForm; death: ISerializedForm }
+    certificateCollectorDefinition: {
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
+    }
+  }
   templates: {
     receipt?: IPDFTemplate
     certificates: {

@@ -813,7 +813,9 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -3718,7 +3720,9 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -6310,7 +6314,9 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -9566,7 +9572,7 @@
             {
               "id": "causeOfDeath-methodOfCauseOfDeathSection",
               "title": {
-                "defaultMessage": "What is the official cause of death?",
+                "defaultMessage": "What is the medically certified cause of death?",
                 "description": "Form section title for Cause of Death",
                 "id": "form.section.causeOfDeath.title"
               },
@@ -9578,75 +9584,28 @@
               ],
               "fields": [
                 {
-                  "name": "methodOfCauseOfDeath",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "initialValue": "",
+                  "name": "paragraph",
+                  "type": "PARAGRAPH",
+                  "hidden": true,
                   "label": {
-                    "defaultMessage": "Method of Cause of Death",
-                    "description": "Label for form field: Method of Cause of Death",
-                    "id": "form.field.label.methodOfCauseOfDeath"
+                    "defaultMessage": " ",
+                    "description": "No Label",
+                    "id": "print.certificate.noLabel"
                   },
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "required": false,
-                  "options": [
-                    {
-                      "value": "VERBAL_AUTOPSY",
-                      "label": {
-                        "defaultMessage": "Verbal autopsy",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.verbalAutopsy"
-                      }
-                    },
-                    {
-                      "value": "MEDICALLY_CERTIFIED",
-                      "label": {
-                        "defaultMessage": "Medically Certified Cause of Death",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.medicallyCertified"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    }
-                  }
+                  "initialValue": "",
+                  "validate": []
                 },
                 {
                   "name": "causeOfDeathCode",
                   "type": "TEXT",
                   "initialValue": "",
                   "label": {
-                    "defaultMessage": "Cause of Death Code",
-                    "description": "Label for form field: Cause of Death Code",
+                    "defaultMessage": "Underlying cause of death",
+                    "description": "Label for form field: Underlying cause of death",
                     "id": "form.field.label.causeOfDeathCode"
                   },
                   "required": false,
-                  "validate": [
-                    {
-                      "operation": "blockAlphaNumericDot"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        17
-                      ]
-                    }
-                  ],
+                  "validate": [],
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
@@ -11094,6 +11053,50 @@
           ]
         }
       ]
+    }
+  },
+  "certificateCollectorDefinition": {
+    "birth": {
+      "mother": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "birthDateField": "motherBirthDate",
+        "nationalityField": "nationality"
+      },
+      "father": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "birthDateField": "fatherBirthDate",
+        "nationalityField": "nationality"
+      }
+    },
+    "death": {
+      "informant": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "applicantID",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          }
+        },
+        "nationalityField": "nationality"
+      }
     }
   }
 }
