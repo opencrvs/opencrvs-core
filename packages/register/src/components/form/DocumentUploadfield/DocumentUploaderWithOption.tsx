@@ -271,11 +271,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, intl } = this.props
+    const { label, intl, name } = this.props
 
     return (
       <UploaderWrapper>
-        <ErrorMessage>
+        <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>{this.state.errorMessage}</ErrorText>
           )}
@@ -289,6 +289,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         />
         <Flex>
           <Select
+            id={name}
             options={this.state.dropDownOptions}
             value={this.state.fields.documentType}
             onChange={this.onChange}
