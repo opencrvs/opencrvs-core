@@ -161,7 +161,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
       uploadedImage.size > 512000 &&
       (await imageCompression(uploadedImage, options))
 
-    return (await getBase64String(resized || uploadedImage)) as string
+    const fileAsBase64 = await getBase64String(resized || uploadedImage)
+
+    return fileAsBase64.toString()
   }
 
   handleFileChange = async (uploadedImage: File) => {
