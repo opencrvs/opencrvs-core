@@ -17,8 +17,8 @@ async function fetchHealthFacilitiesFromHRIS(offset: number, limit: number) {
     `${HRIS_FACILITIES_URL}?offset=${offset}&limit=${limit}`,
     {
       headers: {
-        'client-id': process.argv[3],
-        'X-Auth-Token': process.argv[4]
+        'client-id': process.argv[2],
+        'X-Auth-Token': process.argv[3]
       }
     }
   )

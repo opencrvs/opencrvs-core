@@ -7,7 +7,7 @@ import chalk from 'chalk'
 import { internal } from 'boom'
 import {
   mapAndSaveCRVSFacilities,
-  generateSimpleLocationResource,
+  generateLocationResource,
   mapAndSaveHealthFacilities,
   IORGFacility,
   IHRISFacility
@@ -126,7 +126,7 @@ export default async function importFacilities() {
 
     const data: ILocation[] = []
     for (const location of fhirLocations) {
-      data.push(generateSimpleLocationResource(location))
+      data.push(generateLocationResource(location))
     }
     fs.writeFileSync(
       `${FACILITIES_SOURCE}locations.json`,

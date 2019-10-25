@@ -121,7 +121,7 @@ const createFhirLocationFromHRISJson = (
       { system: `${ORG_URL}/specs/id/hris-code`, value: location.code }
     ],
     name: location.name, // English name
-    alias: [location.name_BN], // Bangla name in element 0
+    alias: [location.name_BN ? location.name_BN : location.name], // Bangla name in element 0
     status: 'active',
     mode: 'instance',
     partOf: {
@@ -154,7 +154,7 @@ const createFhirLocationFromHRISJson = (
   return resource
 }
 
-export function generateSimpleLocationResource(
+export function generateLocationResource(
   fhirLocation: fhir.Location
 ): ILocation {
   const loc = {} as ILocation
