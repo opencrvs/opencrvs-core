@@ -10,6 +10,9 @@ import {
   IAvailableCountries,
   ICountry
 } from '@register/views/PrintCertificate/utils'
+import { isDefaultCountry } from '@register/forms/utils'
+
+type KeyValues = { [key: string]: string }
 
 const getKeyValues = (keys: any, templateData: TemplateTransformerData) =>
   keys.reduce((keyValues: { [key: string]: string }, key: string) => {
@@ -32,6 +35,51 @@ const getCountryValue = (
         // Getting rid of { }
         countryCode
       )
+}
+
+function getCountryMessage(
+  optionalData: IAvailableCountries[],
+  countryValue: string,
+  language: string
+) {
+  const countries: ICountry[] = optionalData.filter(
+    (country: IAvailableCountries) => {
+      return country.language === language
+    }
+  )[0].countries as ICountry[]
+  return countries.filter((country: ICountry) => {
+    return country.value === countryValue
+  })[0].name
+}
+
+function getTransformedAddress(
+  keyValues: KeyValues,
+  templateData: TemplateTransformerData,
+  addressToParse: string,
+  addressKey: string,
+  addressType: string,
+  countryMessage: string,
+  countryValue: string,
+  language: string
+) {
+  return Object.keys(keyValues).reduce((value, key) => {
+    if (key.includes('country')) {
+      // countries are all translated and can be returned for both languages
+      return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
+    } else if (!isDefaultCountry(countryValue)) {
+      if (language !== 'en') {
+        // An English address cannot be rendered in Bengali language
+        return countryMessage
+      } else {
+        return value.replace(new RegExp(`${key}`, 'g'), keyValues[key])
+      }
+    } else {
+      const addresses =
+        templateData.resource[addressType as keyof typeof templateData.resource]
+      const address = addresses[keyValues[key] as keyof typeof addresses]
+      return value.replace(new RegExp(`${key}`, 'g'), address[addressKey] || '')
+    }
+  }, addressToParse)
 }
 
 export const offlineTransformers: IFunctionTransformer = {
@@ -87,58 +135,45 @@ export const offlineTransformers: IFunctionTransformer = {
     if (!matchedCondition) {
       throw new Error('No condition has matched for this transformer')
     }
+
     const countryValue = getCountryValue(
       matchedCondition.addresses.countryCode,
       templateData
     )
-    const countries: ICountry[] = optionalData.filter(
-      (country: IAvailableCountries) => {
-        return country.language === params.language
-      }
-    )[0].countries as ICountry[]
-    const countryMessage = countries.filter((country: ICountry) => {
-      return country.value === countryValue
-    })[0].name
+
+    const countryMessage = getCountryMessage(
+      optionalData,
+      countryValue,
+      params.language
+    )
+
+    let addressToParse = ''
+    if (isDefaultCountry(countryValue)) {
+      addressToParse = matchedCondition.addresses.localAddress
+    } else {
+      addressToParse = matchedCondition.addresses.internationalAddress as string
+    }
+
+    const keyValues: KeyValues = getKeyValues(
+      addressToParse.match(/\{.*?\}/g),
+      templateData
+    )
 
     let value = ''
-    if (matchedCondition.addresses.localAddress.match(/\{.*?\}/g) === null) {
+    if (addressToParse.match(/\{.*?\}/g) === null) {
+      // return default localAddress without transformation if addressToParse is badly formatted
       value = matchedCondition.addresses.localAddress
-    } else if (countryValue === window.config.COUNTRY.toUpperCase()) {
-      const keyValues = getKeyValues(
-        matchedCondition.addresses.localAddress.match(/\{.*?\}/g),
-        templateData
+    } else {
+      value = getTransformedAddress(
+        keyValues,
+        templateData,
+        addressToParse,
+        matchedCondition.addressKey, // either name or alias depending on params.language
+        matchedCondition.addressType, // either facilities or locations
+        countryMessage,
+        countryValue,
+        params.language
       )
-      value = Object.keys(keyValues).reduce((value, key) => {
-        if (keyValues[key] === undefined || keyValues[key] === '') {
-          return value.replace(new RegExp(`${key}, `, 'g'), '')
-        } else if (key.includes('country')) {
-          return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
-        } else {
-          const addresses =
-            templateData.resource[
-              matchedCondition.addressType as keyof typeof templateData.resource
-            ]
-          const address = addresses[keyValues[key] as keyof typeof addresses]
-          return value.replace(
-            new RegExp(`${key}`, 'g'),
-            address[matchedCondition.addressKey] || ''
-          )
-        }
-      }, matchedCondition.addresses.localAddress)
-    } else if (params.language !== 'en') {
-      value = countryMessage
-    } else if (matchedCondition.addresses.internationalAddress) {
-      const keyValues = getKeyValues(
-        matchedCondition.addresses.internationalAddress.match(/\{.*?\}/g),
-        templateData
-      )
-      value = Object.keys(keyValues).reduce((value, key) => {
-        if (key.includes('country')) {
-          return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
-        } else {
-          return value.replace(new RegExp(`${key}`, 'g'), keyValues[key])
-        }
-      }, matchedCondition.addresses.internationalAddress)
     }
     return value
   }
