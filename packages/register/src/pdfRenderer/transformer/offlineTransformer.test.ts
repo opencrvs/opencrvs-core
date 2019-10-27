@@ -215,8 +215,7 @@ describe('PDF template offline data related field transformer tests', () => {
             addressKey: 'name',
             addresses: {
               countryCode: 'child.country',
-              localAddress:
-                '{child.addressLine4}, {child.district}, {child.state}, {child.country}',
+              localAddress: '{child.district}, {child.state}, {child.country}',
               internationalAddress:
                 '{child.internationalDistrict}, {child.internationalState}, {child.country}'
             }

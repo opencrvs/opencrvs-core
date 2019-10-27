@@ -15,6 +15,7 @@ import { isDefaultCountry } from '@register/forms/utils'
 type KeyValues = { [key: string]: string }
 
 const getKeyValues = (keys: any, templateData: TemplateTransformerData) =>
+  keys &&
   keys.reduce((keyValues: { [key: string]: string }, key: string) => {
     keyValues[key] = getValueFromApplicationDataByKey(
       templateData.application.data,
@@ -68,12 +69,13 @@ function getTransformedAddress(
       return value.replace(new RegExp(`${key}`, 'g'), countryMessage || '')
     } else if (!isDefaultCountry(countryValue)) {
       if (language !== 'en') {
-        // An English address cannot be rendered in Bengali language
+        // An English internationl address cannot be rendered in some fonts
         return countryMessage
       } else {
         return value.replace(new RegExp(`${key}`, 'g'), keyValues[key])
       }
     } else {
+      console.log(JSON.stringify(key))
       const addresses =
         templateData.resource[addressType as keyof typeof templateData.resource]
       const address = addresses[keyValues[key] as keyof typeof addresses]
@@ -153,7 +155,6 @@ export const offlineTransformers: IFunctionTransformer = {
     } else {
       addressToParse = matchedCondition.addresses.internationalAddress as string
     }
-
     const keyValues: KeyValues = getKeyValues(
       addressToParse.match(/\{.*?\}/g),
       templateData
