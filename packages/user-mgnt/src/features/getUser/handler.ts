@@ -13,7 +13,6 @@ export default async function getUser(
   h: Hapi.ResponseToolkit
 ) {
   const { userId, practitionerId } = request.payload as IVerifyPayload
-
   let criteria = {}
   if (userId) {
     criteria = { ...criteria, _id: userId }
