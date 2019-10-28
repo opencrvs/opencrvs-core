@@ -36,6 +36,14 @@ export enum SUBMISSION_STATUS {
   FAILED_NETWORK = 'FAILED_NETWORK'
 }
 
+export enum DOWNLOAD_STATUS {
+  PENDING = 'PENDING',
+  READY_TO_DOWNLOAD = 'READY_TO_DOWNLOAD',
+  DOWNLOADING = 'DOWNLOADING',
+  DOWNLOADED = 'DOWNLOADED',
+  FAILED = 'FAILED'
+}
+
 export const processingStates = [
   SUBMISSION_STATUS.READY_TO_SUBMIT,
   SUBMISSION_STATUS.SUBMITTING,
@@ -67,6 +75,7 @@ export interface IApplication {
   event: Event
   registrationStatus?: string
   submissionStatus?: string
+  downloadStatus?: string
   action?: string
   trackingId?: string
   compositionId?: string

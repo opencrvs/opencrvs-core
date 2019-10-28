@@ -14,9 +14,16 @@ export interface IStatus {
   label: string
 }
 
-export interface IAction {
+export type IAction = {
   label: string
   handler: () => void
+  icon?: () => React.ReactNode
+} & Partial<IStatusIndicatorPartial>
+
+interface IStatusIndicatorPartial {
+  loading: boolean
+  loadingLabel: string
+  error: boolean
 }
 
 export interface IListItemProps {
