@@ -78,7 +78,12 @@ describe('when user has starts a new application', () => {
     describe('when user is in birth registration by parent informant view', () => {
       let draft: IApplication
       beforeEach(async () => {
-        draft = createApplication(Event.BIRTH)
+        const data = {
+          registration: {
+            presentAtBirthRegistration: 'MOTHER'
+          }
+        }
+        draft = createApplication(Event.BIRTH, data)
 
         /*
          * Needs to be done before storeApplication(draft)
@@ -89,6 +94,22 @@ describe('when user has starts a new application', () => {
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
+        app
+          .find('#contactPoint_MOTHER')
+          .hostNodes()
+          .simulate('change', { target: { checked: true } })
+        await waitForElement(
+          app,
+          'input[name="contactPoint.nestedFields.registrationPhone"]'
+        )
+        app
+          .find('input[name="contactPoint.nestedFields.registrationPhone"]')
+          .simulate('change', {
+            target: {
+              name: 'contactPoint.nestedFields.registrationPhone',
+              value: '01999999999'
+            }
+          })
         app
           .find('#next_section')
           .hostNodes()

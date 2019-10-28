@@ -301,6 +301,7 @@
                 "id": "register.SelectContactPoint.heading"
               },
               "conditionals": [],
+              "preventContinueIfError": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
@@ -396,7 +397,7 @@
                   },
                   "conditionals": [],
                   "previewGroup": "contactPointGroup",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -455,7 +456,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
@@ -499,7 +500,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
@@ -543,7 +544,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
