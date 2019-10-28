@@ -1,7 +1,8 @@
 import { Button } from '@opencrvs/components/lib/buttons'
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface/GridTable'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
@@ -10,7 +11,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IApplication } from '@register/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
@@ -40,6 +41,7 @@ import {
   dynamicConstantsMessages
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
+import { Download } from '@opencrvs/components/lib/icons'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -154,8 +156,28 @@ export class InProgressTabComponent extends React.Component<
         name = namesMap[locale] || namesMap[LANG_EN]
       }
 
-      const actions = [
-        {
+      const actions: IAction[] = []
+      const foundApplication = this.props.drafts.find(
+        application => application.id === reg.id
+      )
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          label: '',
+          icon: () => <Download />,
+          handler: () => {
+            console.log('To dispatch download action')
+          },
+          loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
+          error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+          loadingLabel: this.props.intl.formatMessage(
+            constantsMessages.downloading
+          )
+        })
+      } else {
+        actions.push({
           label: intl.formatMessage(buttonMessages.update),
           handler: () =>
             this.props.goToPage(
@@ -164,8 +186,9 @@ export class InProgressTabComponent extends React.Component<
               'review',
               (event && event.toLowerCase()) || ''
             )
-        }
-      ]
+        })
+      }
+
       moment.locale(locale)
       return {
         id: regId,

@@ -24,7 +24,8 @@ import { withTheme } from 'styled-components'
 import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import { buttonMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import { IApplication } from '@register/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
+import { Download } from '@opencrvs/components/lib/icons'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -137,25 +138,47 @@ class RejectTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const actions = [] as IAction[]
-      if (this.userHasRegisterScope()) {
-        if (reg.duplicates && reg.duplicates.length > 0) {
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
-          })
-        } else {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.update),
-            handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
-              )
-          })
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          label: '',
+          icon: () => <Download />,
+          handler: () => {
+            console.log('To dispatch download action')
+          },
+          loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
+          error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+          loadingLabel: this.props.intl.formatMessage(
+            constantsMessages.downloading
+          )
+        })
+      } else {
+        if (this.userHasRegisterScope()) {
+          if (reg.duplicates && reg.duplicates.length > 0) {
+            actions.push({
+              label: this.props.intl.formatMessage(constantsMessages.review),
+              handler: () => this.props.goToReviewDuplicate(reg.id)
+            })
+          } else {
+            actions.push({
+              label: this.props.intl.formatMessage(buttonMessages.update),
+              handler: () =>
+                this.props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.id,
+                  'review',
+                  reg.event ? reg.event.toLowerCase() : ''
+                )
+            })
+          }
         }
       }
+
       return {
         ...reg,
         dateOfRejection:

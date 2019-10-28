@@ -1,6 +1,7 @@
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -19,7 +20,8 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import { buttonMessages, constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { IStoreState } from '@register/store'
-import { IApplication } from '@register/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
+import { Download } from '@opencrvs/components/lib/icons'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -85,7 +87,7 @@ class PrintTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(messages.listItemRegisteredDate),
-          width: 24,
+          width: 16,
           key: 'dateOfRegistration'
         },
         {
@@ -95,7 +97,7 @@ class PrintTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 12,
+          width: 20,
           key: 'actions',
           alignment: ColumnContentAlignment.CENTER,
           isActionColumn: true
@@ -124,16 +126,37 @@ class PrintTabComponent extends React.Component<
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
-      const actions = [
-        {
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const actions: IAction[] = []
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          label: '',
+          icon: () => <Download />,
+          handler: () => {
+            console.log('To dispatch download action')
+          },
+          loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
+          error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+          loadingLabel: this.props.intl.formatMessage(
+            constantsMessages.downloading
+          )
+        })
+      } else {
+        actions.push({
           label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () =>
             this.props.goToPrintCertificate(
               reg.id,
               reg.event.toLocaleLowerCase() || ''
             )
-        }
-      ]
+        })
+      }
+
       return {
         ...reg,
         dateOfRegistration:

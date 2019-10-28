@@ -1,4 +1,4 @@
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+import { Duplicate, Validate, Download } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -27,7 +27,7 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import { IApplication } from '@register/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -94,28 +94,66 @@ class ReviewTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const actions = [] as IAction[]
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
       let icon: JSX.Element = <div />
+
       if (reg.duplicates && reg.duplicates.length > 0) {
-        actions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () => this.props.goToReviewDuplicate(reg.id)
-        })
+        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+          actions.push({
+            label: '',
+            icon: () => <Download />,
+            handler: () => {
+              console.log('To dispatch download action')
+            },
+            loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
+            error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+            loadingLabel: this.props.intl.formatMessage(
+              constantsMessages.downloading
+            )
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        }
+
         icon = <Duplicate />
       } else {
         if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
           icon = <Validate data-tip data-for="validateTooltip" />
         }
-        actions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              reg.id,
-              'review',
-              reg.event ? reg.event.toLowerCase() : ''
+        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+          actions.push({
+            label: '',
+            icon: () => <Download />,
+            handler: () => {
+              console.log('To dispatch download action')
+            },
+            loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
+            error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+            loadingLabel: this.props.intl.formatMessage(
+              constantsMessages.downloading
             )
-        })
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
+          })
+        }
       }
+
       return {
         ...reg,
         eventTimeElapsed:
