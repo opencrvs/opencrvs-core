@@ -12,7 +12,10 @@
 import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { commonVFS } from '@register/pdfRenderer/common_vfs'
 import { transformers } from '@register/pdfRenderer/transformer'
-import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  OptionalData
+} from '@register/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -26,7 +29,8 @@ export function createPDF(
   application: IApplication,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  optionalData?: OptionalData
 ): TCreatedPdf {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
@@ -43,7 +47,8 @@ export function createPDF(
         transformFunction(
           { application, userDetails, resource: offlineResource },
           intl,
-          transformerDef.parameters
+          transformerDef.parameters,
+          optionalData
         ) || ''
       )
     })
@@ -60,7 +65,15 @@ export function printPDF(
   application: IApplication,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  optionalData?: OptionalData
 ) {
-  createPDF(template, application, userDetails, offlineResource, intl).print()
+  createPDF(
+    template,
+    application,
+    userDetails,
+    offlineResource,
+    intl,
+    optionalData
+  ).print()
 }

@@ -9,13 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  IFormField,
-  IFormData,
-  TransformedData,
-  SEARCH_FIELD
-} from '@register/forms'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { IFormField, IFormData, TransformedData } from '@register/forms'
 
 export const birthEventLocationMutationTransformer = (
   lineNumber: number = 0,
@@ -32,6 +26,7 @@ export const birthEventLocationMutationTransformer = (
         country: '',
         state: '',
         district: '',
+        city: '',
         postalCode: '',
         line: ['', '', '', '', '', '']
       }

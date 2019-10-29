@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event, IFormData } from '@register/forms'
+import { Event, IFormData, ISelectOption } from '@register/forms'
 import moment from 'moment'
 import { dynamicMessages } from '@register/i18n/messages/views/certificate'
+import { getAvailableLanguages } from '@register/i18n/utils'
+import { ILanguageState } from '@register/i18n/reducer'
 
 const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
 const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
@@ -26,6 +28,36 @@ interface IRange {
   start: number
   end?: number
   value: number
+}
+
+export interface ICountry {
+  value: string
+  name: string
+}
+
+export interface IAvailableCountries {
+  language?: string
+  countries?: ICountry[]
+}
+
+export function getCountryTranslations(
+  languageState: ILanguageState,
+  countries: ISelectOption[]
+): IAvailableCountries[] {
+  const certificateCountries: IAvailableCountries[] = []
+  getAvailableLanguages().forEach((language: string) => {
+    const certificateCountry: IAvailableCountries = { language }
+    const availableCountries: ICountry[] = []
+    countries.forEach(country => {
+      availableCountries.push({
+        value: country.value,
+        name: languageState[language].messages[`countries.${country.value}`]
+      })
+    })
+    certificateCountry.countries = availableCountries
+    certificateCountries.push(certificateCountry)
+  })
+  return certificateCountries
 }
 
 interface IDayRange {

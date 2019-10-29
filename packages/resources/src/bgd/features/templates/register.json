@@ -771,6 +771,7 @@
           "field": "placeOfBirth",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "en",
             "conditionalKeys": [
               {
                 "condition": {
@@ -779,7 +780,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
-                "formattedKeys": "{child.birthLocation}"
+                "addresses": {
+                  "countryCode": "BGD",
+                  "localAddress": "{child.birthLocation}"
+                }
               },
               {
                 "condition": {
@@ -788,7 +792,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+                "addresses": {
+                  "countryCode": "child.country",
+                  "localAddress": "{child.addressLine4}, {child.district}, {child.state}, {child.country}",
+                  "internationalAddress": "{child.internationalDistrict}, {child.internationalState}, {child.country}"
+                }
               }
             ]
           }
@@ -797,6 +805,7 @@
           "field": "bnPlaceOfBirth",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "bn",
             "conditionalKeys": [
               {
                 "condition": {
@@ -805,7 +814,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "alias",
-                "formattedKeys": "{child.birthLocation}"
+                "addresses": {
+                  "countryCode": "BGD",
+                  "localAddress": "{child.birthLocation}"
+                }
               },
               {
                 "condition": {
@@ -814,7 +826,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{child.addressLine4}, {child.district}, {child.state}"
+                "addresses": {
+                  "countryCode": "child.country",
+                  "localAddress": "{child.addressLine4}, {child.district}, {child.state}, {child.country}",
+                  "internationalAddress": "{child.internationalDistrict}, {child.internationalState}, {child.country}"
+                }
               }
             ]
           }
@@ -1302,6 +1318,7 @@
           "field": "placeOfDeath",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "en",
             "conditionalKeys": [
               {
                 "condition": {
@@ -1310,7 +1327,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+                "addresses": {
+                  "countryCode": "deceased.countryPermanent",
+                  "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
+                  "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
+                }
               },
               {
                 "condition": {
@@ -1319,7 +1340,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+                "addresses": {
+                  "countryCode": "deceased.country",
+                  "localAddress": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.country}",
+                  "internationalAddress": "{deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
+                }
               },
               {
                 "condition": {
@@ -1328,7 +1353,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+                "addresses": {
+                  "countryCode": "deathEvent.country",
+                  "localAddress": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.country}",
+                  "internationalAddress": "{deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deathEvent.country}"
+                }
               },
               {
                 "condition": {
@@ -1337,7 +1366,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.deathLocation}"
+                "addresses": {
+                  "countryCode": "BGD",
+                  "localAddress": "{deathEvent.deathLocation}"
+                }
               }
             ]
           }
@@ -1346,6 +1378,7 @@
           "field": "bnPlaceOfDeath",
           "operation": "OfflineAddress",
           "parameters": {
+            "language": "bn",
             "conditionalKeys": [
               {
                 "condition": {
@@ -1354,7 +1387,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}"
+                "addresses": {
+                  "countryCode": "deceased.countryPermanent",
+                  "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
+                  "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
+                }
               },
               {
                 "condition": {
@@ -1363,7 +1400,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deceased.addressLine4}, {deceased.district}, {deceased.state}"
+                "addresses": {
+                  "countryCode": "deceased.country",
+                  "localAddress": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.country}",
+                  "internationalAddress": "{deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
+                }
               },
               {
                 "condition": {
@@ -1372,7 +1413,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
-                "formattedKeys": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}"
+                "addresses": {
+                  "countryCode": "deathEvent.country",
+                  "localAddress": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.country}",
+                  "internationalAddress": "{deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deathEvent.country}"
+                }
               },
               {
                 "condition": {
@@ -1381,7 +1426,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "alias",
-                "formattedKeys": "{deathEvent.deathLocation}"
+                "addresses": {
+                  "countryCode": "BGD",
+                  "localAddress": "{deathEvent.deathLocation}"
+                }
               }
             ]
           }
