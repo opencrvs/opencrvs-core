@@ -179,8 +179,6 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
-  userId: string
-  role: string
 }
 
 export type FullProps = IFormProps &
@@ -250,28 +248,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  logTime(timeMs: number, userId: string, role: string) {
+  // TODO will this be called before a submission?
+  logTime(timeMs: number) {
     const application = this.props.application
-
-    if (!application.timeLogged) {
-      application.timeLogged = []
+    if (!application.timeLoggedMS) {
+      application.timeLoggedMS = 0
     }
-
-    let log = application.timeLogged.find(
-      log => log.role === role && log.userId === userId
-    )
-
-    if (!log) {
-      log = {
-        role,
-        userId,
-        duration: 0
-      }
-      application.timeLogged.push(log)
-    }
-
-    log.duration += timeMs
-
+    application.timeLoggedMS += timeMs
     this.props.modifyApplication(application)
   }
 
@@ -394,9 +377,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       handleSubmit,
       duplicate,
       activeSection,
-      activeSectionGroup,
-      userId,
-      role
+      activeSectionGroup
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -412,7 +393,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return (
       <TimeMounted
         onUnmount={(duration: number) => {
-          this.logTime(duration, userId, role)
+          this.logTime(duration)
         }}
       >
         <StyledContainer
@@ -689,7 +670,6 @@ function mapStateToProps(
   ) {
     throw new Error('User details not properly loaded into redux')
   }
-  const { userMgntUserID, role } = state.profile.userDetails
 
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
@@ -742,9 +722,7 @@ function mapStateToProps(
       ...activeSectionGroup,
       fields
     },
-    application,
-    userId: userMgntUserID,
-    role
+    application
   }
 }
 

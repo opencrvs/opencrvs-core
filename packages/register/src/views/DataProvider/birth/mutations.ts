@@ -1,7 +1,10 @@
 import gql from 'graphql-tag'
 import { IForm, Action } from '@register/forms'
 import { IApplication } from '@register/applications'
-import { draftToGqlTransformer } from '@register/transformer'
+import {
+  draftToGqlTransformer,
+  appendGqlMetadataFromDraft
+} from '@register/transformer'
 
 const SUBMIT_BIRTH_APPLICATION = gql`
   mutation submitMutation($details: BirthRegistrationInput!) {
@@ -38,40 +41,35 @@ export function getBirthMutationMappings(
   form?: IForm,
   draft?: IApplication
 ) {
+  let gqlDetails = {}
+  if (form && draft) {
+    gqlDetails = draftToGqlTransformer(form, draft.data)
+    appendGqlMetadataFromDraft(draft, gqlDetails)
+  }
+
   switch (action) {
     case Action.SUBMIT_FOR_REVIEW:
       return {
         mutation: SUBMIT_BIRTH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: { details: gqlDetails },
         dataKey: 'createBirthRegistration'
       }
     case Action.APPROVE_APPLICATION:
       return {
         mutation: APPROVE_BIRTH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markBirthAsValidated'
       }
     case Action.REGISTER_APPLICATION:
       return {
         mutation: REGISTER_BIRTH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markBirthAsRegistered'
       }
     case Action.REJECT_APPLICATION:
@@ -85,13 +83,10 @@ export function getBirthMutationMappings(
     case Action.COLLECT_CERTIFICATE:
       return {
         mutation: COLLECT_BIRTH_CERTIFICATE,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markBirthAsCertified'
       }
     default:
