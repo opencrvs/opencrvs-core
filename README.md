@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/jembi/OpenCRVS.svg?token=VAkt1HxiHGcBsXWJ7mWy&branch=master)](https://travis-ci.com/jembi/OpenCRVS) [![codecov](https://codecov.io/gh/jembi/OpenCRVS/branch/master/graph/badge.svg?token=ZDi55WmcbB)](https://codecov.io/gh/jembi/OpenCRVS)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 # OpenCRVS
 
