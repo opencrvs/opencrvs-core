@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@register/SubmissionController'
 import * as pdfjsLib from 'pdfjs-dist'
+import { InboxController } from './InboxController'
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
 storage.configStorage('OpenCRVS')
@@ -85,3 +86,4 @@ ReactDOM.render(
 
 registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()
+new InboxController(store).start()
