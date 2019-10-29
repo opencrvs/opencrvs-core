@@ -4,6 +4,7 @@ import { MIN_SEQ_NUMBER, MAX_SEQ_NUMBER } from '@resources/bgd/constants'
 import LocationSequenceNumber, {
   ILocationSequenceNumberModel
 } from '@resources/bgd/features/generate/sequenceNumbers/model/locationSequenceNumber'
+import { logger } from '@resources/logger'
 
 export function createLocationWiseSeqNumbers(
   seqNumbers: ILocationSequenceNumberModel[]
@@ -43,7 +44,12 @@ export async function getNextLocationWiseSeqNumber(locationId: string) {
         locationId
       },
       { lastUsedSequenceNumber: MIN_SEQ_NUMBER }
-    )
+    ).catch(error => {
+      logger.error(
+        `Unable to rotate the 6 digit sequence number to min value. Error: ${error}`
+      )
+      throw error
+    })
   }
   return sequenceNumber
 }
