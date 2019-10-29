@@ -238,13 +238,5 @@ export function convertStringToASCII(str: string): string {
 }
 
 export function convertNumberToString(value: number, size: number) {
-  const sizeDiff = size - value.toString().length
-  if (sizeDiff <= 0) {
-    return value.toString()
-  }
-  let convertedString = ''
-  for (let i = 0; i < sizeDiff; i += 1) {
-    convertedString += '0'
-  }
-  return convertedString + value.toString()
+  return value.toString().padStart(size, '0')
 }
