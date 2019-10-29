@@ -213,7 +213,10 @@ export const isDateNotInFuture = (date: string) => {
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
-  return new Date(date) >= new Date(JSON.stringify(drafts.deceased.birthDate))
+  const birthDate = drafts.deceased && drafts.deceased.birthDate
+  return birthDate
+    ? new Date(date) >= new Date(JSON.stringify(birthDate))
+    : true
 }
 
 export const isDateAfter = (first: string, second: string) => {
@@ -555,8 +558,9 @@ export const isValidDeathOccurrenceDate: Validation = (
   value: IFormFieldValue,
   drafts
 ) => {
-  const cast = value as string
-  return value &&
+  const cast = value.toString()
+
+  return cast &&
     isDateNotInFuture(cast) &&
     isAValidDateFormat(cast) &&
     isDateNotBeforeBirth(cast, drafts as IFormData)
