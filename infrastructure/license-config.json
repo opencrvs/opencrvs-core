@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info)",
+    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub)",
     ".git",
     "**/patches",
     ".secrets",
@@ -11,11 +11,15 @@
     ".vs",
     "**/.DS_Store",
     "AUTHORS",
-    "LICENSE"
+    "LICENSE",
+    "infrastructure/license-header.txt",
+    "**/*Dockerfile",
+    "**/packages/components/lib",
+    "packages/gateway/src/graphql/schema.d.ts"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
-    "Dockerfile|sh|yml|toml|conf|txt|dotfile|graphql": {
+    "sh|yml|toml|conf|txt|dotfile|graphql": {
       "eachLine": {
         "prepend": "# "
       }

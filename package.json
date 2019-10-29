@@ -7,12 +7,11 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit"
+      "pre-commit": "yarn check:license && lerna run --parallel precommit"
     }
   },
   "scripts": {
     "postinstall": "patch-package",
-    "precommit": "yarn check:license",
     "start": "lerna run build --scope @opencrvs/components && lerna run --parallel --ignore e2e --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
     "start:zmb": "cp packages/resources/src/zmb/config/register-config.js packages/register/public/config.js && cp packages/resources/src/zmb/config/login-config.js packages/login/public/config.js && COUNTRY=zmb BRN_GENERATOR_CODE=zm yarn start",
     "start:bgd": "cp packages/resources/src/bgd/config/register-config.js packages/register/public/config.js && cp packages/resources/src/bgd/config/login-config.js packages/login/public/config.js && COUNTRY=bgd BRN_GENERATOR_CODE=bd yarn start",
