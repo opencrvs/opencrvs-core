@@ -185,7 +185,8 @@ interface IProps {
     application: IApplication,
     submissionStatus: string,
     action: string,
-    payload?: IPayload
+    payload?: IPayload,
+    downloadStatus?: string
   ) => void
   scope: Scope | null
   offlineResources: IOfflineData

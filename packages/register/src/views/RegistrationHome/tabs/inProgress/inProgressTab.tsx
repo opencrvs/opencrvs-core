@@ -158,7 +158,7 @@ export class InProgressTabComponent extends React.Component<
 
       const actions: IAction[] = []
       const foundApplication = this.props.drafts.find(
-        application => application.id === reg.id
+        application => application.compositionId === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined

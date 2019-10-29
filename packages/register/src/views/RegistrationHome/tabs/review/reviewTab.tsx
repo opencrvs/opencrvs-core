@@ -95,7 +95,7 @@ class ReviewTabComponent extends React.Component<
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       const foundApplication = this.props.outboxApplications.find(
-        application => application.id === reg.id
+        application => application.compositionId === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
