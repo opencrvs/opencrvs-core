@@ -5,7 +5,37 @@
 # OpenCRVS
 
 <p align="center">
-<img width="200" height="200" src="https://go.globalinnovationexchange.org/s3_objs/new/uploads/1553806026-92c3f14033c80137126e0e6489633e00/OpenCRVS-logo.png">
+<svg width={120} height={120} viewBox="0 0 100 100" {...props}>
+    <defs>
+      <linearGradient
+        x1="3.135%"
+        y1="95.778%"
+        x2="60.677%"
+        y2="39.964%"
+        id="logo_a"
+      >
+        <stop stopColor="#7EACF5" offset="0%" />
+        <stop stopColor="#7C93EC" offset="100%" />
+      </linearGradient>
+      <linearGradient x1="100%" y1="0%" x2="36.586%" y2="66.853%" id="logo_b">
+        <stop stopColor="#7EACF5" offset="0%" />
+        <stop stopColor="#7C93EC" offset="100%" />
+      </linearGradient>
+    </defs>
+    <g fillRule="nonzero" fill="none">
+      <g strokeLinejoin="round" fill="#FFF" stroke="#FFF" strokeWidth={0.824}>
+        <path d="M26.196 32.116c.865-.45 1.818-.683 2.895-.683 2.136 0 3.92.844 4.996 2.84.547.988.83 2.192.83 3.594 0 2.805-1.218 4.854-2.93 5.77-.866.45-1.82.665-2.896.665-2.136 0-3.902-.844-5.014-2.84-.547-.988-.812-2.192-.812-3.595 0-2.804 1.218-4.87 2.93-5.751zm5.384 2.552c-.653-.719-1.483-1.079-2.49-1.079-1.005 0-1.835.36-2.506 1.079-.653.719-.989 1.78-.989 3.2 0 1.42.336 2.48.989 3.199.67.719 1.5 1.079 2.507 1.079 1.006 0 1.836-.36 2.49-1.079.67-.719 1.005-1.78 1.005-3.2 0-1.42-.335-2.48-1.006-3.199zm12.623 4.566h-2.366v4.925h-2.295V31.576h4.66c2.525 0 3.867 1.528 3.867 3.829 0 2.3-1.342 3.829-3.866 3.829zm-2.366-2.157h2.277c1.077 0 1.625-.558 1.625-1.672 0-1.114-.548-1.672-1.625-1.672h-2.277v3.344zm10.451 7.082V31.576h7.821v2.157h-5.526v3.092h4.29v2.157h-4.29v3.02h5.526v2.157h-7.82zm19.667-4.278v-8.305h2.295V44.16h-2.419l-4.537-8.305v8.305H65V31.576h2.419l4.537 8.305zM34.22 59.993l-2.063.54c-.547-1.457-1.553-2.194-3.052-2.194-1.006 0-1.853.36-2.523 1.097-.653.737-.988 1.797-.988 3.181 0 1.385.335 2.445.988 3.182.67.737 1.517 1.097 2.523 1.097 1.5 0 2.505-.737 3.052-2.193l2.064.539c-.583 2.426-2.435 3.81-5.116 3.81-1.641 0-3.017-.575-4.146-1.707-1.13-1.133-1.694-2.714-1.694-4.727 0-2.014.565-3.595 1.694-4.728 1.129-1.132 2.505-1.707 4.146-1.707 2.681 0 4.533 1.384 5.116 3.81zm13.709-.09c0 1.672-.83 2.93-2.312 3.38l3.423 5.626h-2.558l-3.317-5.429h-1.2v5.429h-2.293V56.326h4.499c2.4 0 3.758 1.42 3.758 3.577zm-5.963 1.42h2.222c.97 0 1.447-.467 1.447-1.42 0-.952-.476-1.42-1.447-1.42h-2.222v2.84zm21.205-4.997L59.025 68.91h-2.328L52.55 56.326h2.54l2.77 9.311 2.77-9.31h2.54zm10.797 2.14l-1.852 1.204c-.441-.881-1.024-1.33-1.712-1.33s-1.182.485-1.182 1.15c0 .79.847 1.384 1.853 1.87 1.482.664 3.44 1.599 3.422 3.774 0 2.445-1.552 3.918-3.951 3.918-1.077 0-2.012-.341-2.788-1.006-.776-.683-1.27-1.528-1.464-2.517l1.852-1.186c.477 1.708 1.288 2.553 2.452 2.553 1.077 0 1.606-.54 1.606-1.636 0-.737-.794-1.312-1.835-1.762-1.464-.629-3.37-1.582-3.334-3.9 0-.953.317-1.762.952-2.427.653-.665 1.447-.988 2.417-.988 1.676 0 2.858.754 3.564 2.282z" />
+      </g>
+      <path
+        fill="url(#logo_a)"
+        d="M3.712 95.287H99L95.287 99H0V7.425l3.712-3.712z"
+      />
+      <path
+        fill="url(#logo_b)"
+        d="M95.287 3.712H51.562L55.276 0H99v44.756l-3.713 3.713z"
+      />
+    </g>
+  </svg>
 </p>
 
 **A GLOBAL SOLUTION FOR CIVIL REGISTRATION**
@@ -123,20 +153,23 @@ OpenCRVS uses time-series databases to generate visualisations and perform calcu
 
 ## Meet the people we are building OpenCRVS for
 
-<img align="left" width="98" height="152" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
-
+<p align="center">
+<img width="98" height="152" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
+</p>
 **Samira and Anir**
 
 Registering their daughter’s birth is now affordable because they no longer have to skip days of work to make multiple visits to the registration office. The Health Worker comes to them to start the registration process and they can track progress through their mobile phone so they know when and where to collect the birth certificate. The streamlined complaints process means they can also easily report any delays or disruptions.
 
-<img align="left" width="110" height="147" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
-
+<p align="center">
+<img width="110" height="147" src="https://static.wixstatic.com/media/93440e_311346446ec94a47a047541a2982bf80~mv2.png/v1/crop/x_0,y_0,w_636,h_846/fill/w_110,h_147,al_c,q_80,usm_0.66_1.00_0.01/health-worker.webp">
+</p>
 **Sophia, Community Health Worker**
 
 Can now visit all pregnant and lactating mothers in her catchment and provide quality and continuous care to the mother and baby. This is now possible because she isn’t spending the majority of the consultation filling out the paperwork required to fulfil her duties of issuing a birth notification and administering vaccinations.
 
-<img align="left" width="82" height="169" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
-
+<p align="center">
+<img width="82" height="169" src="https://static.wixstatic.com/media/93440e_1ed34365b7b94424ac0c7c32ae5b5e3c~mv2.png/v1/crop/x_0,y_0,w_443,h_907/fill/w_82,h_169,al_c,q_80,usm_0.66_1.00_0.01/raman.webp">
+</p>
 **Raman, Union Councillor**
 
 Performance management reports can now be auto-generated presenting real-time disaggregated registration rates to the district head for planning. This increases efficiencies across budgeting and policy processes, leading to improved decision making, particularly for women and girls.
@@ -147,32 +180,38 @@ OpenCRVS is configurable, interoperable and scalable to any country’s needs an
 
 #### Database Layer
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_d04078ae922a4126b8e9dd3f96066505~mv2.png/v1/fill/w_136,h_39,al_c,q_80,usm_0.66_1.00_0.01/FHIR_Foundation.webp" width="136" height="39">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_d04078ae922a4126b8e9dd3f96066505~mv2.png/v1/fill/w_136,h_39,al_c,q_80,usm_0.66_1.00_0.01/FHIR_Foundation.webp" width="136" height="39">
+</p>
 **Hearth**
 
 Massively scalable and extensible, [Hearth](https://github.com/jembi/hearth) is an OpenSource NoSQL database server using interoperable Health Level 7 FHIR v4 (ANSI Accredited, Fast Healthcare Interoperability Resources) as JSON.
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_21c72b72ff3a405596448e33f80a719c~mv2_d_3422_1781_s_2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/Elasticsearch-Logo-Color-V.webp" width="136" height="70">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_21c72b72ff3a405596448e33f80a719c~mv2_d_3422_1781_s_2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/Elasticsearch-Logo-Color-V.webp" width="136" height="70">
+</p>
 **ElasticSearch**
 
 An industry standard, document orientated, real-time de-duplication / search engine. Lightning fast, intelligent civil registration record return, even with imprecise, “fuzzy” search parameters.
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_7ae07f5f77c6407080656fff4e0cdcd3~mv2.jpg/v1/fill/w_134,h_26,al_c,q_80,usm_0.66_1.00_0.01/influxdata-2.webp" width="134" height="26">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_7ae07f5f77c6407080656fff4e0cdcd3~mv2.jpg/v1/fill/w_134,h_26,al_c,q_80,usm_0.66_1.00_0.01/influxdata-2.webp" width="134" height="26">
+</p>
 **InfluxData**
 
 Hyper efficient and optimised, time series database for big data insights. Millisecond level query times over months of data, disaggregated by gender, location and configurable operational and statistical parameters.
 
 #### Business Layer
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_0e7fdde3dc404a8cbafdf70c18cedbc6~mv2.png/v1/fill/w_100,h_70,al_c,q_80,usm_0.66_1.00_0.01/hapi-logo.webp" width="100" height="70">
-
-<img align="left" src="https://static.wixstatic.com/media/93440e_65930e880f9e4efc822db3d5f3ddeb8a~mv2.png/v1/fill/w_90,h_51,al_c,q_80,usm_0.66_1.00_0.01/node.webp" width="90" height="51">
-
-<img align="left" src="https://static.wixstatic.com/media/93440e_168a1efc9a3d4a47bc9282c5b684df6e~mv2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/typescript.webp" width="70" height="70">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_0e7fdde3dc404a8cbafdf70c18cedbc6~mv2.png/v1/fill/w_100,h_70,al_c,q_80,usm_0.66_1.00_0.01/hapi-logo.webp" width="100" height="70">
+</p>
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_65930e880f9e4efc822db3d5f3ddeb8a~mv2.png/v1/fill/w_90,h_51,al_c,q_80,usm_0.66_1.00_0.01/node.webp" width="90" height="51">
+</p>
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_168a1efc9a3d4a47bc9282c5b684df6e~mv2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/typescript.webp" width="70" height="70">
+</p>
 **Microservices**
 
 OpenCRVS’ microservice architecture enables continuous delivery & deployment, facilitating endless scalability and evolution of its business requirements. The microservices are written in TypeScript (a strictly typed superset of JavaScript that compiles to JavaScript) and NodeJS using the fully documented HapiJS framework.
@@ -181,14 +220,16 @@ Each microservice in OpenCRVS has no knowledge of other services or business req
 
 #### Interoperability Layer
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_bdd011d5e3744e7b84684e6789c1f5c7~mv2.png/v1/fill/w_136,h_40,al_c,q_80,usm_0.66_1.00_0.01/openhim-logo-green.webp" width="136" height="40">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_bdd011d5e3744e7b84684e6789c1f5c7~mv2.png/v1/fill/w_136,h_40,al_c,q_80,usm_0.66_1.00_0.01/openhim-logo-green.webp" width="136" height="40">
+</p>
 **OpenHIM**
 
 The [OpenHIM (Health Information Mediator)](https://github.com/jembi/openhim-core-js) is an enterprise service bus designed to ease interoperability between OpenCRVS and external systems such as Health, National ID. It provides access to the system via secure APIs, and governs transactions, routing, orchestrating and translating requests into FHIR v4.
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_d1ec46ba4c2d4c1dbb6afe6b9b7143de~mv2.png/v1/fill/w_133,h_40,al_c,q_80,usm_0.66_1.00_0.01/graphql.webp" width="133" height="40">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_d1ec46ba4c2d4c1dbb6afe6b9b7143de~mv2.png/v1/fill/w_133,h_40,al_c,q_80,usm_0.66_1.00_0.01/graphql.webp" width="133" height="40">
+</p>
 **GraphQL Gateway**
 
 Using GraphQL allows OpenCRVS to perform much faster and more responsively in remote areas by drastically reducing the number of HTTP requests that are required to render a view in the presentation layer.
@@ -197,20 +238,23 @@ The OpenCRVS GraphQL Gateway is a JWT protected Apollo server that requests and 
 
 #### Presentation Layer
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_8452ed95c717459e86c95ed0e17378ad~mv2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/PWA-Progressive-Web-App-Logo.webp" width="136" height="70">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_8452ed95c717459e86c95ed0e17378ad~mv2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/PWA-Progressive-Web-App-Logo.webp" width="136" height="70">
+</p>
 **Progressive Web Application**
 
 Using an Android Progressive Web Application for our mobile registration app means that we can take advantage of offline functionality and native push notifications, without the overhead of maintaining native code and App Store deployments. In remote areas, registrars can save a configurable number of registrations offline on their mobile phone using a locally encrypted database.
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
+</p>
 **Secure 2-factor authentication**
 
 Our applications are protected by JWT 2-Factor Authentication. Our apps and microservices utilise OAuth best practices for JWT tokens. User permissions and roles are centrally managed, supporting IT organisations that conform to ISO27001 certification.
 
-<img align="left" src="https://static.wixstatic.com/media/93440e_50ed7c9e719e44daa7ca7d3e183f4071~mv2.png/v1/fill/w_121,h_55,al_c,q_80,usm_0.66_1.00_0.01/react.webp" width="122" height="55">
-
+<p align="center">
+<img src="https://static.wixstatic.com/media/93440e_50ed7c9e719e44daa7ca7d3e183f4071~mv2.png/v1/fill/w_121,h_55,al_c,q_80,usm_0.66_1.00_0.01/react.webp" width="122" height="55">
+</p>
 **React**
 
 Modularity extends to the user interface using the React framework. All multi-lingual, civil registration form field components are generated and configured for validation using JSON so that they can be easily configured to suit legal requirements. Our full-stack javascript application makes it easy to allocate local system administration resources.
