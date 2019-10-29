@@ -1,7 +1,7 @@
 import { model, Schema, Document } from 'mongoose'
+import { MIN_SEQ_NUMBER, MAX_SEQ_NUMBER } from '@resources/bgd/constants'
 
 interface ILocationSequenceNumber {
-  year: number
   locationId: string
   lastUsedSequenceNumber: number
 }
@@ -11,16 +11,16 @@ export interface ILocationSequenceNumberModel
 
 const locationSequenceNumberSchema = new Schema(
   {
-    year: { type: Number, required: true },
     locationId: {
       type: String,
+      unique: true,
       required: true
     },
     lastUsedSequenceNumber: {
       type: Number,
       required: true,
-      min: 0,
-      max: 999999
+      min: MIN_SEQ_NUMBER,
+      max: MAX_SEQ_NUMBER
     }
   },
   { strict: true }

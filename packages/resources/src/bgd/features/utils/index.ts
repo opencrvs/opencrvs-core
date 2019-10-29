@@ -165,20 +165,20 @@ export async function getPractitionerLocationId(
     practitionerId
   )
   const union = locations.find(location => {
-    const jurisDictionIdentifier =
+    const jurisdictionIdentifier =
       location.identifier &&
       location.identifier.find(
         identifier =>
           identifier.system ===
           `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`
       )
-    if (!jurisDictionIdentifier) {
+    if (!jurisdictionIdentifier) {
       return false
     }
     return (
       // TODO: Once we receive api update from OISF,
       // Need to add MUNICIPALITY || CITY_CORPORATION type here
-      jurisDictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase()
+      jurisdictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase()
     )
   })
 
