@@ -17,7 +17,48 @@ import {
   getAgeInDays,
   getDurationInSeconds
 } from '@metrics/features/registration/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/registration/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
+
+export const generateInCompleteFieldPoints = async (
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+) => {
+  const composition = getComposition(payload)
+  const task = getTask(payload)
+  const inCompleteFieldExtension =
+    task &&
+    task.extension &&
+    task.extension.find(
+      extension =>
+        extension.url ===
+        `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`
+    )
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+  if (!inCompleteFieldExtension || !inCompleteFieldExtension.valueString) {
+    throw new Error('In complete field list extension not found on payload')
+  }
+
+  const tags = {
+    reg_status: 'IN_PROGESS',
+    compositionId: composition.id,
+    ...(await generatePointLocations(payload, authHeader))
+  }
+  return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
+    return {
+      measurement: 'in_complete_fields',
+      tags,
+      fields: {
+        missing_field_full_id: missingFieldId,
+        missing_field_section_id: missingFieldId.split('/')[0],
+        missing_field_group_id: missingFieldId.split('/')[1]
+      }
+    }
+  })
+}
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,

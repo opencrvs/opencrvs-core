@@ -47,3 +47,5 @@ Object {
   },
 }
 `;
+
+exports[`When an in-progress application is recieved writes the in complete field points to influxdb 1`] = `undefined`;
