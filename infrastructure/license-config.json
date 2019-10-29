@@ -1,15 +1,21 @@
 {
   "ignore": [
-    "**/*.@(md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|)",
+    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info)",
+    ".git",
     "**/patches",
     ".secrets",
     ".vscode",
     "data",
-    "backups"
+    "backups",
+    "**/coverage",
+    ".vs",
+    "**/.DS_Store",
+    "AUTHORS",
+    "LICENSE"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
-    "Dockerfile|sh|yml|toml|conf|txt|dotfile": {
+    "Dockerfile|sh|yml|toml|conf|txt|dotfile|graphql": {
       "eachLine": {
         "prepend": "# "
       }
@@ -23,11 +29,6 @@
       "append": " */",
       "eachLine": {
         "prepend": " * "
-      }
-    },
-    "dotfile": {
-      "eachLine": {
-        "prepend": "# "
       }
     },
     "ini": {
