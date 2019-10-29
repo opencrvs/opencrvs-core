@@ -20,4 +20,5 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
     background-color: transparent;
   }
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 `

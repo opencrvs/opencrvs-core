@@ -9,7 +9,8 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
   Event,
-  RADIO_GROUP_WITH_NESTED_FIELDS
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  DATE
 } from '@register/forms'
 import { countries } from '@register/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@register/offline/reducer'

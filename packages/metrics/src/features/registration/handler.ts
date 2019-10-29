@@ -35,12 +35,39 @@ export async function birthRegistrationHandler(
 ) {
   try {
     const points = await Promise.all([
-      generateEventDurationPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
-      }),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['DECLARED', 'VALIDATED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
       generateBirthRegPoint(
         request.payload as fhir.Bundle,
         'mark-existing-application-registered',
+        {
+          Authorization: request.headers.authorization
+        }
+      )
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function birthCertifiedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points = await Promise.all([
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['REGISTERED'],
         {
           Authorization: request.headers.authorization
         }

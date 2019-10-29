@@ -3,7 +3,7 @@ import {
   IPrintableApplication,
   modifyApplication
 } from '@register/applications'
-import { Event } from '@register/forms'
+import { Event, IFormSectionData } from '@register/forms'
 import { messages } from '@register/i18n/messages/views/certificate'
 import {
   goBack,
@@ -11,12 +11,37 @@ import {
   goToReviewCertificate
 } from '@register/navigation'
 import { IStoreState } from '@register/store'
-import { IDVerifier } from '@register/views/PrintCertificate/IDVerifier'
+import {
+  IDVerifier,
+  ICollectorInfo
+} from '@register/views/PrintCertificate/IDVerifier'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { getEventDate, isFreeOfCost } from './utils'
+import { getOfflineData } from '@register/offline/selectors'
+import { IOfflineData } from '@register/offline/reducer'
+interface INameField {
+  firstNamesField: string
+  familyNameField: string
+}
+interface INameFields {
+  [language: string]: INameField
+}
+
+export interface ICertificateCollectorField {
+  identifierTypeField: string
+  identifierOtherTypeField: string
+  identifierField: string
+  nameFields: INameFields
+  birthDateField: string
+  nationalityField: string
+}
+
+export interface ICertificateCollectorDefinition {
+  [collector: string]: ICertificateCollectorField
+}
 
 interface IMatchParams {
   registrationId: string
@@ -26,6 +51,7 @@ interface IMatchParams {
 
 interface IStateProps {
   application: IPrintableApplication
+  offlineResources: IOfflineData
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -76,9 +102,40 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     this.handleVerification()
   }
 
+  getGenericCollectorInfo = (collector: string): ICollectorInfo => {
+    const { intl, application, offlineResources } = this.props
+    const info = application.data[collector]
+    const fields =
+      offlineResources.forms.certificateCollectorDefinition[application.event][
+        collector
+      ]
+    const iD = info[fields.identifierField] as string
+    const iDType = (info[fields.identifierTypeField] ||
+      info[fields.identifierOtherTypeField]) as string
+
+    const firstNames = info[
+      fields.nameFields[intl.locale].firstNamesField
+    ] as string
+    const familyName = info[
+      fields.nameFields[intl.locale].familyNameField
+    ] as string
+
+    const birthDate = info[fields.birthDateField] as string
+    const nationality = info[fields.nationalityField] as string
+
+    return {
+      iD,
+      iDType,
+      firstNames,
+      familyName,
+      birthDate,
+      nationality
+    }
+  }
+
   render() {
     const { collector } = this.props.match.params
-    const { intl, application } = this.props
+    const { intl } = this.props
     return (
       <ActionPageLight
         goBack={this.props.goBack}
@@ -87,7 +144,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         <IDVerifier
           id="idVerifier"
           title={intl.formatMessage(messages.idCheckTitle)}
-          collectorInformation={application.data[collector]}
+          collectorInformation={this.getGenericCollectorInfo(collector)}
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
@@ -115,7 +172,8 @@ const mapStateToProps = (
   ) as IPrintableApplication
 
   return {
-    application
+    application,
+    offlineResources: getOfflineData(state)
   }
 }
 
