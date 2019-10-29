@@ -543,7 +543,9 @@ export interface IConditionals {
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
+  isDefaultCountry: IConditional
   isNotCityLocationPermanent: IConditional
+  isDefaultCountryPermanent: IConditional
   isCityLocationPermanent: IConditional
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
