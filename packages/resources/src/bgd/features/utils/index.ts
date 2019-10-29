@@ -1,5 +1,7 @@
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
+import { A2I_LOCATION_REFERENCE_IDENTIFIER } from '@resources/bgd/features/administrative/scripts/service'
+import { internal } from 'boom'
 
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const JURISDICTION_TYPE_DISTRICT = 'district'
@@ -14,10 +16,18 @@ type ISupportedType =
   | IOISFLocation
 
 export interface IOISFLocation {
-  bbsCode: string
-  name: string
-  nameBn: string
-  id: number
+  geo_id: string
+  name_bng: string
+  name_eng: string
+  bbs_code: string
+  a2i_reference: string
+}
+
+export interface IOISFLocationResponse {
+  divisions: IOISFLocation[]
+  districts: IOISFLocation[]
+  upazilas: IOISFLocation[]
+  unions: IOISFLocation[]
 }
 
 export interface IStatistic {
@@ -32,6 +42,11 @@ export interface ILocation {
   jurisdictionType?: string
   type?: string
   partOf?: string
+}
+
+export interface ILocationSequenceNumber {
+  reference: string
+  sequence_number: string
 }
 
 export const sendToFhir = (
@@ -56,16 +71,54 @@ export const sendToFhir = (
     })
 }
 
-export function getLocationIDByDescription(
+export async function getLocationsByIdentifier(identifier: string) {
+  try {
+    const locationSearchResult = await getFromFhir(
+      `/Location/?identifier=${identifier}&_count=0`
+    )
+    return (
+      (locationSearchResult &&
+        locationSearchResult.entry &&
+        locationSearchResult.entry.map(
+          (locationEntry: fhir.BundleEntry) =>
+            locationEntry.resource as fhir.Location
+        )) ||
+      []
+    )
+  } catch (err) {
+    return internal(err)
+  }
+}
+
+export function getLocationIDByA2IRef(
   locations: fhir.Location[],
-  description: string
+  a2IReference: string
 ) {
-  const location = locations.find(obj => {
-    return obj.description === description
-  }) as fhir.Location
+  const location = locations.find(loc =>
+    matchLocationWithA2IRef(loc, a2IReference)
+  ) as fhir.Location
   return location.id as string
 }
 
+export function matchLocationWithA2IRef(
+  location: fhir.Location,
+  a2IReference: string
+) {
+  const refIdentifier = getA2iInternalRefIndentifierOfLocation(location)
+
+  return refIdentifier ? refIdentifier.value === a2IReference : false
+}
+
+export function getA2iInternalRefIndentifierOfLocation(
+  location: fhir.Location
+) {
+  return (
+    location.identifier &&
+    location.identifier.find(
+      identifier => identifier.system === A2I_LOCATION_REFERENCE_IDENTIFIER
+    )
+  )
+}
 export const getFromFhir = (suffix: string) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     headers: {

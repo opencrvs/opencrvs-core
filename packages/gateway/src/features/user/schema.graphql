@@ -88,4 +88,9 @@ type Mutation {
     password: String!
     securityQNAs: [SecurityQuestionAnswer]!
   ): String
+  changePassword(
+    userId: String!
+    existingPassword: String!
+    password: String!
+  ): String
 }

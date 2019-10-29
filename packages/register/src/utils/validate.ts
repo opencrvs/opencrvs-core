@@ -213,13 +213,66 @@ export const isDateNotInFuture = (date: string) => {
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
-  return new Date(date) >= new Date(JSON.stringify(drafts.deceased.birthDate))
+  const birthDate = drafts.deceased && drafts.deceased.birthDate
+  return birthDate
+    ? new Date(date) >= new Date(JSON.stringify(birthDate))
+    : true
+}
+
+export const isDateAfter = (first: string, second: string) => {
+  return new Date(first) >= new Date(second)
 }
 
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? undefined
+    : {
+        message: messages.isValidBirthDate
+      }
+}
+
+export const isValidChildBirthDate: Validation = (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const childBirthDate = value as string
+  const motherBirthDate = (drafts &&
+    drafts.mother &&
+    drafts.mother.motherBirthDate) as string
+
+  return childBirthDate &&
+    isAValidDateFormat(childBirthDate) &&
+    isDateNotInFuture(childBirthDate)
+    ? motherBirthDate
+      ? isDateAfter(childBirthDate, motherBirthDate)
+        ? undefined
+        : {
+            message: messages.isValidBirthDate
+          }
+      : undefined
+    : {
+        message: messages.isValidBirthDate
+      }
+}
+
+export const isValidMotherBirthDate = (): Validation => (
+  value: IFormFieldValue,
+  drafts
+) => {
+  const motherBirthDate = value as string
+  const childBirthDate = (drafts && drafts.child.childBirthDate) as string
+
+  return motherBirthDate &&
+    isAValidDateFormat(motherBirthDate) &&
+    isDateNotInFuture(motherBirthDate)
+    ? childBirthDate
+      ? isDateAfter(childBirthDate, motherBirthDate)
+        ? undefined
+        : {
+            message: messages.isValidBirthDate
+          }
+      : undefined
     : {
         message: messages.isValidBirthDate
       }
@@ -505,8 +558,9 @@ export const isValidDeathOccurrenceDate: Validation = (
   value: IFormFieldValue,
   drafts
 ) => {
-  const cast = value as string
-  return value &&
+  const cast = value && value.toString()
+
+  return cast &&
     isDateNotInFuture(cast) &&
     isAValidDateFormat(cast) &&
     isDateNotBeforeBirth(cast, drafts as IFormData)

@@ -69,7 +69,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -97,10 +97,10 @@ describe('Create new user page tests', () => {
 
     expect(
       component
-        .find('#registrationOffice-id')
+        .find('#registrationOffice')
         .hostNodes()
         .props().value
-    ).toEqual('Barisal')
+    ).toEqual('Moktarpur Union Parishad')
   })
 
   it('it closes office search modal while modal cancel clicked', () => {
@@ -129,12 +129,12 @@ describe('Create new user page tests', () => {
     expect(component.find('#office-search-modal').hostNodes().length).toBe(0)
   })
 
-  it('it sets value to registerOffice  while modal select clicked', () => {
+  it('it sets value to registerOffice while modal select clicked', () => {
     component
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 
@@ -152,7 +152,7 @@ describe('Create new user page tests', () => {
 
     component.update()
 
-    expect(component.find('#registrationOffice-id').hostNodes().length).toBe(1)
+    expect(component.find('#registrationOffice').hostNodes().length).toBe(1)
   })
 
   it('it opens modal  while edit registration office link clicked', () => {
@@ -160,7 +160,7 @@ describe('Create new user page tests', () => {
       .find('#searchInputText')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { id: 'searchInputText', value: 'Moktarpur' }
       })
     component.update()
 

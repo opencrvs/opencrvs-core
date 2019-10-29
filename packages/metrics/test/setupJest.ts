@@ -89,7 +89,7 @@ beforeEach(() => {
       resourceType: 'Location',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '3476'
         },
         {
@@ -145,7 +145,7 @@ beforeEach(() => {
       resourceType: 'Location',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '165'
         },
         {
@@ -202,7 +202,7 @@ beforeEach(() => {
       resourceType: 'Location',
       identifier: [
         {
-          system: 'http://opencrvs.org/specs/id/a2i-internal-id',
+          system: 'http://opencrvs.org/specs/id/geo-id',
           value: '20'
         },
         {

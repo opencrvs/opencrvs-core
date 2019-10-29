@@ -4,9 +4,11 @@ import { unauthorized } from 'boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateHash } from '@user-mgnt/utils/hash'
 import { logger } from '@user-mgnt/logger'
+import { statuses } from '@user-mgnt/utils/userUtils'
 
 interface IChangePasswordPayload {
   userId: string
+  existingPassword?: string
   password: string
 }
 
@@ -25,6 +27,25 @@ export default async function changePasswordHandler(
     throw unauthorized()
   }
 
+  if (userUpdateData.existingPassword) {
+    if (user.status !== statuses.ACTIVE) {
+      logger.error(
+        `User is not in active state for given userid: ${userUpdateData.userId}`
+      )
+      // Don't return a 404 as this gives away that this user account exists
+      throw unauthorized()
+    }
+    if (
+      generateHash(userUpdateData.existingPassword, user.salt) !==
+      user.passwordHash
+    ) {
+      logger.error(
+        `Password didn't match for given userid: ${userUpdateData.userId}`
+      )
+      // Don't return a 404 as this gives away that this user account exists
+      throw unauthorized()
+    }
+  }
   user.passwordHash = generateHash(userUpdateData.password, user.salt)
 
   try {
@@ -39,5 +60,6 @@ export default async function changePasswordHandler(
 
 export const changePasswordRequestSchema = Joi.object({
   userId: Joi.string().required(),
+  existingPassword: Joi.string().optional(),
   password: Joi.string().required()
 })

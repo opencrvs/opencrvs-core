@@ -867,12 +867,12 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
+                      "operation": "isValidChildBirthDate"
                     }
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": [
                         "birthDate"
                       ]
@@ -2351,7 +2351,7 @@
                       "parameters": [
                         "individual",
                         {
-                          "operation": "fieldNameTransformer",
+                          "operation": "longDateTransformer",
                           "parameters": [
                             "birthDate"
                           ]
@@ -4465,6 +4465,7 @@
                           "description": "field label for reasonNotApplying"
                         },
                         "initialValue": "",
+                        "required": false,
                         "validate": [],
                         "extraValue": "LEGAL_GUARDIAN",
                         "mapping": {
@@ -4617,6 +4618,7 @@
                         },
                         "initialValue": "",
                         "validate": [],
+                        "required": false,
                         "extraValue": "OTHER",
                         "mapping": {
                           "mutation": {
@@ -4663,7 +4665,10 @@
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
                             "reasonsNotApplying",
-                            "primaryCaregiverType"
+                            "primaryCaregiverType",
+                            "",
+                            false,
+                            true
                           ]
                         }
                       ]
@@ -4679,6 +4684,10 @@
                             "primaryCaregiverType",
                             "",
                             [
+                              "MOTHER_AND_FATHER",
+                              "MOTHER",
+                              "FATHER",
+                              "INFORMANT",
                               "OTHER",
                               "LEGAL_GUARDIAN"
                             ]
@@ -5135,6 +5144,13 @@
                         "dependencies": [
                           "dateOfMarriage"
                         ]
+                      },
+                      {
+                        "validator": {
+                          "operation": "isValidMotherBirthDate",
+                          "parameters": []
+                        },
+                        "dependencies": []
                       }
                     ]
                   },
@@ -5148,7 +5164,7 @@
                   "validate": [],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": [
                         "birthDate"
                       ]
@@ -5276,6 +5292,12 @@
                   "required": false,
                   "initialValue": "",
                   "validate": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  },
                   "conditionals": [
                     {
                       "action": "hide",
@@ -7172,7 +7194,7 @@
                   ],
                   "mapping": {
                     "mutation": {
-                      "operation": "fieldNameTransformer",
+                      "operation": "longDateTransformer",
                       "parameters": [
                         "birthDate"
                       ]
@@ -7315,7 +7337,13 @@
                       "action": "hide",
                       "expression": "(!values.maritalStatus || values.maritalStatus !== \"MARRIED\")"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "educationalAttainment",
@@ -9759,7 +9787,13 @@
                     {
                       "operation": "isValidBirthDate"
                     }
-                  ]
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
                 },
                 {
                   "name": "maritalStatus",
@@ -11140,7 +11174,11 @@
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
                       "parameters": [
-                        "deceased"
+                        "deceased",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": []
+                        }
                       ]
                     },
                     "query": {
@@ -11283,9 +11321,9 @@
                     {
                       "value": "OTHER",
                       "label": {
-                        "defaultMessage": "Other Institution",
-                        "description": "Select item for Other Institution",
-                        "id": "form.field.label.otherInstitution"
+                        "defaultMessage": "Other address",
+                        "description": "Select item for Other Address",
+                        "id": "form.field.label.otherAddress"
                       }
                     }
                   ],
@@ -12512,7 +12550,7 @@
             {
               "id": "causeOfDeath-methodOfCauseOfDeathSection",
               "title": {
-                "defaultMessage": "What is the official cause of death?",
+                "defaultMessage": "What is the medically certified cause of death?",
                 "description": "Form section title for Cause of Death",
                 "id": "form.section.causeOfDeath.title"
               },
@@ -12524,75 +12562,28 @@
               ],
               "fields": [
                 {
-                  "name": "methodOfCauseOfDeath",
-                  "type": "SELECT_WITH_OPTIONS",
-                  "initialValue": "",
+                  "name": "paragraph",
+                  "type": "PARAGRAPH",
+                  "hidden": true,
                   "label": {
-                    "defaultMessage": "Method of Cause of Death",
-                    "description": "Label for form field: Method of Cause of Death",
-                    "id": "form.field.label.methodOfCauseOfDeath"
+                    "defaultMessage": " ",
+                    "description": "No Label",
+                    "id": "print.certificate.noLabel"
                   },
-                  "validate": [],
-                  "placeholder": {
-                    "defaultMessage": "Select",
-                    "description": "Placeholder text for a select",
-                    "id": "form.field.select.placeholder"
-                  },
-                  "required": false,
-                  "options": [
-                    {
-                      "value": "VERBAL_AUTOPSY",
-                      "label": {
-                        "defaultMessage": "Verbal autopsy",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.verbalAutopsy"
-                      }
-                    },
-                    {
-                      "value": "MEDICALLY_CERTIFIED",
-                      "label": {
-                        "defaultMessage": "Medically Certified Cause of Death",
-                        "description": "Option for form field: Method of Cause of Death",
-                        "id": "form.field.label.medicallyCertified"
-                      }
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    },
-                    "query": {
-                      "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeathMethod"
-                      ]
-                    }
-                  }
+                  "initialValue": "",
+                  "validate": []
                 },
                 {
                   "name": "causeOfDeathCode",
                   "type": "TEXT",
                   "initialValue": "",
                   "label": {
-                    "defaultMessage": "Cause of Death Code",
+                    "defaultMessage": "Underlying cause of death",
                     "description": "Label for form field: Cause of Death Code",
                     "id": "form.field.label.causeOfDeathCode"
                   },
                   "required": false,
-                  "validate": [
-                    {
-                      "operation": "blockAlphaNumericDot"
-                    },
-                    {
-                      "operation": "maxLength",
-                      "parameters": [
-                        17
-                      ]
-                    }
-                  ],
+                  "validate": [],
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
@@ -13184,7 +13175,7 @@
                       "parameters": [
                         "individual",
                         {
-                          "operation": "fieldNameTransformer",
+                          "operation": "longDateTransformer",
                           "parameters": [
                             "birthDate"
                           ]
@@ -15261,6 +15252,63 @@
           ]
         }
       ]
+    }
+  },
+  "certificateCollectorDefinition": {
+    "birth": {
+      "mother": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "firstNames",
+            "familyNameField": "familyName"
+          }
+        },
+        "birthDateField": "motherBirthDate",
+        "nationalityField": "nationality"
+      },
+      "father": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "iD",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "firstNamesEng",
+            "familyNameField": "familyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "firstNames",
+            "familyNameField": "familyName"
+          }
+        },
+        "birthDateField": "fatherBirthDate",
+        "nationalityField": "nationality"
+      }
+    },
+    "death": {
+      "informant": {
+        "identifierTypeField": "iDType",
+        "identifierOtherTypeField": "iDTypeOther",
+        "identifierField": "applicantID",
+        "nameFields": {
+          "en": {
+            "firstNamesField": "applicantFirstNamesEng",
+            "familyNameField": "applicantFamilyNameEng"
+          },
+          "bn": {
+            "firstNamesField": "applicantFirstNames",
+            "familyNameField": "applicantFamilyName"
+          }
+        },
+        "birthDateField": "applicantBirthDate",
+        "nationalityField": "nationality"
+      }
     }
   }
 }

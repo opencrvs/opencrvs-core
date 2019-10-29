@@ -10,6 +10,7 @@ import { ISerializedForm } from '@register/forms'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@register/utils/userUtils'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import { ICertificateCollectorDefinition } from '@register/views/PrintCertificate/VerifyCollector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -33,6 +34,10 @@ export interface IOfflineData {
     registerForm: {
       birth: ISerializedForm
       death: ISerializedForm
+    }
+    certificateCollectorDefinition: {
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
     }
   }
   templates: {
@@ -198,7 +203,8 @@ function reducer(
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER)
+        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER),
+        state.userDetails!
       )
 
       return {
