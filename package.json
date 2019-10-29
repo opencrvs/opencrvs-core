@@ -59,6 +59,7 @@
     "prettier": "^1.15.2"
   },
   "dependencies": {
+    "doctoc": "^1.4.0",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",

@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [OpenCRVS User Management Service](#opencrvs-user-management-service)
+  - [Dev guide](#dev-guide)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenCRVS User Management Service
 
 A microservice to manage user profile concerns such as user registration and fetching user profiles.

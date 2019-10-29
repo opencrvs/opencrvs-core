@@ -4,7 +4,9 @@
 
 # OpenCRVS
 
-![OpenCRVS Logo](https://go.globalinnovationexchange.org/s3_objs/new/uploads/1553806026-92c3f14033c80137126e0e6489633e00/OpenCRVS-logo.png)
+<p align="center">
+<img width="200" height="200" src="https://go.globalinnovationexchange.org/s3_objs/new/uploads/1553806026-92c3f14033c80137126e0e6489633e00/OpenCRVS-logo.png">
+</p>
 
 **A GLOBAL SOLUTION FOR CIVIL REGISTRATION**
 
@@ -18,13 +20,49 @@ For people to count, they must first be counted, and that’s what a Civil Regis
 
 As the sole continuous source of population data, it provides the foundation for human rights, government service delivery, and the measurement of development goals. Despite this, over 100 countries around the world do not have functioning CRVS systems.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+**Table of Contents**
+
+- [OpenCRVS](#opencrvs)
+  - [Why it matters](#why-it-matters)
+  - [The Solution](#the-solution)
+  - [Core Principles](#core-principles)
+  - [Meet the people we are building OpenCRVS for](#meet-the-people-we-are-building-opencrvs-for)
+  - [System Architecture](#system-architecture)
+    - [Database Layer](#database-layer)
+    - [Business Layer](#business-layer)
+    - [Interoperability Layer](#interoperability-layer)
+    - [Presentation Layer](#presentation-layer)
+  - [Become part of the OpenCRVS Community](#become-part-of-the-opencrvs-community)
+  - [Development environment setup](#development-environment-setup)
+    - [Server installation](#server-installation)
+    - [Manual backup setup (already done for you if you restore the pre-populated db dump)](#manual-backup-setup-already-done-for-you-if-you-restore-the-pre-populated-db-dump)
+    - [Create a new metadata db dump](#create-a-new-metadata-db-dump)
+    - [tmuxed development setup](#tmuxed-development-setup)
+  - [Docker scripts](#docker-scripts)
+  - [Deploying to staging](#deploying-to-staging)
+  - [Deploying to QA](#deploying-to-qa)
+  - [Setting up a new cluster of servers for OpenCRVS](#setting-up-a-new-cluster-of-servers-for-opencrvs)
+  - [Release branches](#release-branches)
+  - [How to do a release](#how-to-do-a-release)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## The Solution
 
-<img align="center" width="844" height="421" src="https://static.wixstatic.com/media/93440e_c5d62bf627ab4edf9d7100441eb9e01c~mv2_d_5500_3694_s_4_2.png/v1/crop/x_0,y_345,w_5500,h_2749/fill/w_844,h_421,al_c,q_80,usm_0.66_1.00_0.01/oCRVS_MockupALL.webp">
+<p align="center">
+<img width="844" height="421" src="https://static.wixstatic.com/media/93440e_c5d62bf627ab4edf9d7100441eb9e01c~mv2_d_5500_3694_s_4_2.png/v1/crop/x_0,y_345,w_5500,h_2749/fill/w_844,h_421,al_c,q_80,usm_0.66_1.00_0.01/oCRVS_MockupALL.webp">
+</p>
 
 Plan International is challenging the current gap in the market for a user-centric and rights-based CRVS system by leading the development of [OpenCRVS](https://www.opencrvs.org), an open-source digital CRVS solution that is free to use, adaptable to the country context, interoperable with other government systems (e.g. health and ID systems), and rights-based to ensure it protects and provides for those most vulnerable.
 
-<img align="center" width="539" height="349" src="https://static.wixstatic.com/media/93440e_2f6fb54e63e7488d9b40f32cea7ca10c~mv2.png/v1/crop/x_0,y_36,w_960,h_622/fill/w_539,h_349,al_c,q_80,usm_0.66_1.00_0.01/Civil%20Registration%20and%20Linkages%20to%20Natio.webp">
+<p align="center">
+<img width="539" height="349" src="https://static.wixstatic.com/media/93440e_2f6fb54e63e7488d9b40f32cea7ca10c~mv2.png/v1/crop/x_0,y_36,w_960,h_622/fill/w_539,h_349,al_c,q_80,usm_0.66_1.00_0.01/Civil%20Registration%20and%20Linkages%20to%20Natio.webp">
+</p>
  
 OpenCRVS has the potential to go well beyond the scope of traditional CRVS systems. We see OpenCRVS as a foundational identity and population data system which will support and maintain the integrity of many other service delivery, statistical and identity management functions. In particular, OpenCRVS will ensure that these functions are above all inclusive, providing a digital response to the global call to “Leave No One Behind”.
 
