@@ -7,6 +7,9 @@ import {
   TFontFamilyTypes
 } from 'pdfmake/build/pdfmake'
 import { IOfflineData } from '@register/offline/reducer'
+import { IAvailableCountries } from '@register/views/PrintCertificate/utils'
+
+export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
@@ -41,7 +44,8 @@ export interface IFunctionTransformer {
   [transformerFunction: string]: (
     data: TemplateTransformerData,
     intl: IntlShape,
-    payload?: TransformerPayload
+    payload?: TransformerPayload,
+    optionalData?: OptionalData
   ) => string | null
 }
 export interface IIntLabelPayload {
@@ -84,6 +88,7 @@ export interface INumberFeildConversionPayload {
 }
 
 export interface IOfflineAddressPayload {
+  language: string
   conditionalKeys: {
     condition: {
       key: string
@@ -91,7 +96,11 @@ export interface IOfflineAddressPayload {
     }
     addressType: string
     addressKey: string
-    formattedKeys: string
+    addresses: {
+      countryCode: string
+      localAddress: string
+      internationalAddress?: string
+    }
   }[]
 }
 
