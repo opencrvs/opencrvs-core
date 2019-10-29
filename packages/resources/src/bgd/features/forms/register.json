@@ -1714,7 +1714,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "placeOfBirth",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -1760,7 +1760,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "placeOfBirth",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3207,7 +3207,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -3249,7 +3249,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4290,7 +4290,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -4336,7 +4336,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -6461,7 +6461,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -6490,7 +6490,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -7273,7 +7273,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -7306,7 +7306,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -8876,7 +8876,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -8909,7 +8909,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -9744,7 +9744,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -9777,7 +9777,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -11523,7 +11523,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -11552,7 +11552,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -12332,7 +12332,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -12365,7 +12365,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -13367,7 +13367,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "privateHome",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -13409,7 +13409,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "privateHome",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -14141,7 +14141,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "otherInstitution",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -14173,7 +14173,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "otherInstitution",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -15866,7 +15866,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -15908,7 +15908,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "currentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -16912,7 +16912,7 @@
                     "id": "form.field.label.internationalState"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
@@ -16958,7 +16958,7 @@
                     "id": "form.field.label.internationalDistrict"
                   },
                   "previewGroup": "permanentAddress",
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "conditionals": [
