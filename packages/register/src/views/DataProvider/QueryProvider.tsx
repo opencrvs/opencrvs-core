@@ -18,6 +18,9 @@ const QueryMapper = {
   [Event.BIRTH]: getBirthQueryMappings,
   [Event.DEATH]: getDeathQueryMappings
 }
+export const getQueryMapping = (event: Event, action: Action) => {
+  return QueryMapper[event] && QueryMapper[event](action)
+}
 
 export const QueryContext = React.createContext({
   loading: false,
