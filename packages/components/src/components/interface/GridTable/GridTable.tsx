@@ -249,22 +249,17 @@ export class GridTable extends React.Component<
         {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             const expanded = this.showExpandedSection(item.id as string)
+            const clickable = this.props.clickable || Boolean(item.rowClickable)
             return (
               <StyledBox key={index}>
                 <RowWrapper
                   id={'row_' + index}
                   expandable={this.props.expandable}
-                  clickable={
-                    (item.rowClickable !== undefined
-                      ? item.rowClickable
-                      : this.props.clickable) as boolean
-                  }
+                  clickable={clickable}
                   onClick={() =>
                     (this.props.expandable &&
                       this.toggleExpanded(item.id as string)) ||
-                    ((item.rowClickable !== undefined
-                      ? item.rowClickable
-                      : this.props.clickable) &&
+                    (clickable &&
                       this.getRowClickHandler(
                         item.rowClickHandler as IAction[]
                       )())
