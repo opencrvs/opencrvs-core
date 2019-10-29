@@ -48,4 +48,18 @@ Object {
 }
 `;
 
-exports[`When an in-progress application is recieved writes the in complete field points to influxdb 1`] = `undefined`;
+exports[`When an in-progress application is recieved writes the in complete field points to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "missing_field_group_id": "child-view-group",
+    "missing_field_id": "placeOfBirth",
+    "missing_field_section_id": "child",
+  },
+  "measurement": "in_complete_fields",
+  "tags": Object {
+    "compositionId": "b2fbb82c-a68d-4793-98e1-87484fc785c4",
+    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
+    "reg_status": "IN_PROGESS",
+  },
+}
+`;

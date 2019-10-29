@@ -48,13 +48,14 @@ export const generateInCompleteFieldPoints = async (
     ...(await generatePointLocations(payload, authHeader))
   }
   return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
+    const missingFieldIds = missingFieldId.split('/')
     return {
       measurement: 'in_complete_fields',
       tags,
       fields: {
-        missing_field_full_id: missingFieldId,
-        missing_field_section_id: missingFieldId.split('/')[0],
-        missing_field_group_id: missingFieldId.split('/')[1]
+        missing_field_section_id: missingFieldIds[0],
+        missing_field_group_id: missingFieldIds[1],
+        missing_field_id: missingFieldIds[2]
       }
     }
   })

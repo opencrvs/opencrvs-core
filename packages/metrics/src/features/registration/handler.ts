@@ -11,12 +11,12 @@ export async function inProgressBirthRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const points = []
   try {
-    points.push(
-      await generateInCompleteFieldPoints(request.payload as fhir.Bundle, {
+    const points = await generateInCompleteFieldPoints(
+      request.payload as fhir.Bundle,
+      {
         Authorization: request.headers.authorization
-      })
+      }
     )
     await writePoints(points)
   } catch (err) {
