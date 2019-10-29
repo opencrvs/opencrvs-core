@@ -94,7 +94,6 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
       }
       mannerOfDeath
-      causeOfDeathMethod
       causeOfDeath
     }
   }

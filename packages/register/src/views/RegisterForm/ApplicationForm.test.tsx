@@ -6,7 +6,10 @@ import {
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
-  setPageVisibility
+  setPageVisibility,
+  getFileFromBase64String,
+  validImageB64String,
+  selectOption
 } from '@register/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@register/navigation/routes'
 import {
@@ -222,6 +225,67 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
             expect(fileInputs).toEqual(4)
+          })
+
+          it('No error while uploading valid file', async () => {
+            selectOption(app, '#uploadDocForMother', 'Other')
+            app.update()
+            app
+              .find('#image_file_uploader_field')
+              .hostNodes()
+              .first()
+              .simulate('change', {
+                target: {
+                  files: [
+                    getFileFromBase64String(
+                      validImageB64String,
+                      'index.png',
+                      'image/png'
+                    )
+                  ]
+                }
+              })
+            await flushPromises()
+            app.update()
+
+            expect(
+              app
+                .find('#upload-error')
+                .hostNodes()
+                .first()
+                .text()
+            ).toBe('')
+          })
+
+          it('Error while uploading invalid file', async () => {
+            selectOption(app, '#uploadDocForMother', 'Other')
+            app.update()
+            app
+              .find('#image_file_uploader_field')
+              .hostNodes()
+              .first()
+              .simulate('change', {
+                target: {
+                  files: [
+                    getFileFromBase64String(
+                      validImageB64String,
+                      'index.bmp',
+                      'image/bmp'
+                    )
+                  ]
+                }
+              })
+            await flushPromises()
+            app.update()
+            expect(
+              app
+                .find('#upload-error')
+                .hostNodes()
+                .first()
+                .text()
+            ).toBe(
+              'File format not supported. Please attach a png, jpf or pdf (max 5mb)'
+            )
           })
         })
       })

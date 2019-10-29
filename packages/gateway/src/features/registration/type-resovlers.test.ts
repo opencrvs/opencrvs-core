@@ -1272,6 +1272,42 @@ describe('Registration type resolvers', () => {
       expect(reasonsNotApplying).toEqual(reasonsNotApplyingMock)
     })
 
+    it('returns reasonsNotApplying', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              fullUrl: 'urn:uuid:<uuid>',
+              resource: {
+                resourceType: 'Observation',
+                context: {
+                  reference: 'Encounter/123'
+                },
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/obs-type',
+                      code: 'primary-caregiver'
+                    }
+                  ]
+                },
+                valueString: 'INFORMANT'
+              }
+            }
+          ]
+        })
+      )
+
+      const reasonsNotApplying = await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
+        primaryCaregiverObj
+      )
+
+      expect(reasonsNotApplying).toEqual([
+        { primaryCaregiverType: 'INFORMANT' }
+      ])
+    })
+
     it('returns empty reasons array if  no observations', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
