@@ -102,6 +102,31 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/changeUserPassword',
+      handler: changePasswordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes password for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/getUserMobile',
       handler: getUserMobile,
       config: {
