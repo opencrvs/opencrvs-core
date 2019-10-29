@@ -74,6 +74,7 @@ interface IUserMessages {
   mismatchedPasswordMsg: MessageDescriptor
   confirmButtonLabel: MessageDescriptor
   requiredfield: MessageDescriptor
+  incorrectPassword: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -287,7 +288,8 @@ const messagesToDefine: IUserMessages = {
     id: 'settings.changePassword'
   },
   changePasswordMessage: {
-    defaultMessage: 'Change password message',
+    defaultMessage:
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     description: 'Password change message',
     id: 'settings.message.changePassword'
   },
@@ -340,6 +342,11 @@ const messagesToDefine: IUserMessages = {
     id: 'register.form.required',
     defaultMessage: 'This field is required',
     description: 'Required field error message'
+  },
+  incorrectPassword: {
+    id: 'system.user.settings.incorrectPassword',
+    defaultMessage: 'Incorrect password. Please try again',
+    description: 'Response message for incorrect password for password change'
   }
 }
 

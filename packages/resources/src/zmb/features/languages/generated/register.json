@@ -966,6 +966,7 @@
         "settings.user.label.nameBN": "Bengali name",
         "settings.user.label.nameEN": "English name",
         "system.user.queryError": "An error occured while loading system users",
+        "system.user.settings.incorrectPassword": "Incorrect password. Please try again",
         "tab.inProgress.selector.field.agents": "Field agents",
         "tab.inProgress.selector.own.drafts": "Yours",
         "unlockApp.incorrectPin": "Incorrect pin. Please try again",
