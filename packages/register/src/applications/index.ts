@@ -212,6 +212,20 @@ export function createApplication(event: Event, initialData?: IFormData) {
     submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
   }
 }
+
+export function makeApplicationReadyToDownload(
+  event: Event,
+  compositionId: string
+) {
+  return {
+    id: compositionId,
+    data: {},
+    event,
+    compositionId,
+    downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+  }
+}
+
 export function createReviewApplication(
   applicationId: string,
   formData: IFormData,

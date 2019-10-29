@@ -27,7 +27,13 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
+import {
+  IApplication,
+  DOWNLOAD_STATUS,
+  makeApplicationReadyToDownload,
+  storeApplication
+} from '@register/applications'
+import { Event } from '@register/forms'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -39,6 +45,7 @@ interface IBaseReviewTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
+  storeApplication: typeof storeApplication
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -87,6 +94,14 @@ class ReviewTabComponent extends React.Component<
     return this.props.scope && this.props.scope.includes('register')
   }
 
+  downloadApplication = (event: Event, compositionId: string) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      event,
+      compositionId
+    )
+    this.props.storeApplication(downloadableApplication)
+  }
+
   transformDeclaredContent = (data: GQLEventSearchResultSet) => {
     if (!data || !data.results) {
       return []
@@ -107,7 +122,7 @@ class ReviewTabComponent extends React.Component<
             label: '',
             icon: () => <Download />,
             handler: () => {
-              console.log('To dispatch download action')
+              this.downloadApplication(reg.event as Event, reg.id)
             },
             loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
             error: downloadStatus === DOWNLOAD_STATUS.FAILED,
@@ -132,7 +147,7 @@ class ReviewTabComponent extends React.Component<
             label: '',
             icon: () => <Download />,
             handler: () => {
-              console.log('To dispatch download action')
+              this.downloadApplication(reg.event as Event, reg.id)
             },
             loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
             error: downloadStatus === DOWNLOAD_STATUS.FAILED,
@@ -283,6 +298,7 @@ export const ReviewTab = connect(
   {
     goToPage,
     goToReviewDuplicate,
-    goToApplicationDetails
+    goToApplicationDetails,
+    storeApplication
   }
 )(injectIntl(withTheme(ReviewTabComponent)))
