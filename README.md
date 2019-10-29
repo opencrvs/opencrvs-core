@@ -136,3 +136,20 @@ All hotfixes that are done for that release should be submitted in a PR against 
 5. Run `git push origin v<version_number>`
 6. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
 7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`
+
+## Contributing
+
+You may view/add issues here: https://github.com/jembi/OpenCRVS/issues
+
+To contribute code, please fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
+
+By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
+
+## License
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration & Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS graphic logo are (registered/a) trademark(s) of Plan International.

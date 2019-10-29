@@ -1,6 +1,8 @@
 {
   "name": "@opencrvs/register",
   "version": "1.0.0-alpha.1.1",
+  "description": "OpenCRVS client application",
+  "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^5.2.1",

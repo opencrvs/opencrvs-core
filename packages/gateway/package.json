@@ -2,6 +2,7 @@
   "name": "@opencrvs/gateway",
   "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS API Gateway with GraphQL",
+  "license": "MPL-2.0",
   "scripts": {
     "start": "concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\"",
     "start:prod": "node build/dist/src/index.js",

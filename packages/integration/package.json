@@ -2,7 +2,7 @@
   "name": "@opencrvs/integration",
   "version": "1.0.0-alpha.1.1",
   "description": "A set of integration and performance tests for OpenCRVS",
-  "license": "NONE",
+  "license": "MPL-2.0",
   "private": true,
   "scripts": {
     "start": "yarn build && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-registration.js && docker run -v `pwd`/build:/build -i loadimpact/k6 run /build/k6-declaration.js",

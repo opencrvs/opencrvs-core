@@ -1,0 +1,40 @@
+{
+  "ignore": [
+    "**/*.@(md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|)",
+    "**/patches",
+    ".secrets",
+    ".vscode",
+    "data",
+    "backups"
+  ],
+  "license": "infrastructure/license-header.txt",
+  "licenseFormats": {
+    "Dockerfile|sh|yml|toml|conf|txt|dotfile": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    },
+    "html|xml|svg": {
+      "prepend": "<!--",
+      "append": "-->"
+    },
+    "ts|tsx|js|css": {
+      "prepend": "/*",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "dotfile": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    },
+    "ini": {
+      "eachLine": {
+        "prepend": "; "
+      }
+    }
+  },
+  "trailingWhitespace": "TRIM"
+}
