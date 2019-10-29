@@ -558,7 +558,7 @@ export const isValidDeathOccurrenceDate: Validation = (
   value: IFormFieldValue,
   drafts
 ) => {
-  const cast = value.toString()
+  const cast = value && value.toString()
 
   return cast &&
     isDateNotInFuture(cast) &&
