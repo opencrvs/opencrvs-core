@@ -83,14 +83,14 @@ export class InboxController {
       `[${this.syncCount}] Syncing ${applications.length} applications`
     )
     for (const application of applications) {
-      await this.callQuery(application)
+      await this.queryData(application)
     }
 
     this.syncRunning = false
     console.debug(`[${this.syncCount}] Finish sync.`)
   }
 
-  public callQuery = async (application: IApplication | undefined) => {
+  public queryData = async (application: IApplication | undefined) => {
     if (!application) {
       return
     }
