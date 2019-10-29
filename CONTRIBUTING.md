@@ -4,10 +4,10 @@
 
 Current Tech Leads:
 
-- Euan
-- Anik
-- Riku
-- Ryan
+- Euan Millar https://github.com/euanmillar
+- Ryan Crichton https://github.com/rcrichton
+- Riku Rouvila https://github.com/rikukissa
+- Anik Mushraful Hoque https://github.com/mushrafulhoque-dsi
 
 We work in 2 week sprints. We will have a meeting day after the end of the previous sprint and before the new sprint starts. This is a time for us to perform the the following sprint ceremonies:
 
@@ -57,3 +57,14 @@ When the designer and QA have feedback they will create new sub-tasks under orig
 3. Submit a PR
 4. Address any comments the core contributors may have
 5. The core contributors will merge the code once it is ready, thanks for you contribution!
+
+By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
+
+## License
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration & Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS graphic logo are (registered/a) trademark(s) of Plan International.

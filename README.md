@@ -141,7 +141,7 @@ All hotfixes that are done for that release should be submitted in a PR against 
 
 You may view/add issues here: https://github.com/jembi/OpenCRVS/issues
 
-To contribute code, please fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
+To contribute code, please review the CONTRIBUTING.md file https://github.com/jembi/OpenCRVS/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
 
 By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
 
