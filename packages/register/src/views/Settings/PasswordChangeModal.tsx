@@ -1,27 +1,24 @@
-import * as React from 'react'
-import styled from '@register/styledComponents'
-import { connect } from 'react-redux'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
-  userMessages as messages,
-  buttonMessages,
-  constantsMessages
-} from '@register/i18n/messages'
-import {
+  ErrorMessage,
   InputField,
-  TextInput,
-  WarningMessage
+  TextInput
 } from '@opencrvs/components/lib/forms'
-import { TickOn, TickOff } from '@opencrvs/components/lib/icons'
+import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { IStoreState } from '@opencrvs/register/src/store'
+import { userMessages as messages } from '@register/i18n/messages'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import styled from '@register/styledComponents'
+import { EMPTY_STRING } from '@register/utils/constants'
+import { IUserDetails } from '@register/utils/userUtils'
+import gql from 'graphql-tag'
+import { get } from 'lodash'
+import * as React from 'react'
+import { Mutation } from 'react-apollo'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
-const CancelButton = styled(TertiaryButton)`
-  height: 40px;
-  & div {
-    padding: 0;
-  }
-`
 const Message = styled.div`
   margin-bottom: 16px;
 `
@@ -93,6 +90,23 @@ const Field = styled.div`
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.error};
 `
+const BoxedError = styled.div`
+  margin-bottom: 10px;
+  display: flex;
+`
+export const changePasswordMutation = gql`
+  mutation changePassword(
+    $userId: String!
+    $existingPassword: String!
+    $password: String!
+  ) {
+    changePassword(
+      userId: $userId
+      existingPassword: $existingPassword
+      password: $password
+    )
+  }
+`
 type State = {
   currentPassword: string
   newPassword: string
@@ -103,12 +117,13 @@ type State = {
   passwordMismatched: boolean
   passwordMatched: boolean
   confirmPressed: boolean
+  errorOccured: boolean
 }
 
 interface IProps {
   showPasswordChange: boolean
   togglePassworkChangeModal: () => void
-  changePassword: () => void
+  userDetails: IUserDetails | null
 }
 type IFullProps = IProps & IntlShapeProps
 
@@ -116,15 +131,16 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: EMPTY_STRING,
+      newPassword: EMPTY_STRING,
+      confirmPassword: EMPTY_STRING,
       validLength: false,
       hasNumber: false,
       hasCases: false,
       passwordMismatched: false,
       passwordMatched: false,
-      confirmPressed: false
+      confirmPressed: false,
+      errorOccured: false
     }
   }
   validateLength = (value: string) => {
@@ -150,7 +166,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
     const value = event.target.value
     this.setState(() => ({
       newPassword: value,
-      confirmPassword: '',
+      confirmPassword: EMPTY_STRING,
       passwordMatched: false,
       passwordMismatched: false,
       confirmPressed: false
@@ -169,7 +185,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       confirmPressed: false
     }))
   }
-  changePassword = () => {
+  changePassword = (mutation: () => void) => {
     this.setState(() => ({
       confirmPressed: true
     }))
@@ -181,11 +197,27 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       this.state.hasNumber &&
       this.state.validLength
     ) {
-      this.props.changePassword()
+      mutation()
     }
   }
+  hideModal = () => {
+    this.setState(() => ({
+      currentPassword: EMPTY_STRING,
+      newPassword: EMPTY_STRING,
+      confirmPassword: EMPTY_STRING
+    }))
+    this.props.togglePassworkChangeModal()
+  }
+  clearForm = () => {
+    this.setState({
+      errorOccured: false,
+      currentPassword: EMPTY_STRING,
+      newPassword: EMPTY_STRING,
+      confirmPassword: EMPTY_STRING
+    })
+  }
   render() {
-    const { intl, showPasswordChange, togglePassworkChangeModal } = this.props
+    const { intl, showPasswordChange } = this.props
     return (
       <ResponsiveModal
         id="ChangePasswordModal"
@@ -193,16 +225,31 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         show={showPasswordChange}
         contentHeight={410}
         actions={[
-          <PrimaryButton
-            id="confirm-button"
-            key="confirm"
-            onClick={this.changePassword}
+          <Mutation
+            mutation={changePasswordMutation}
+            variables={{
+              userId: get(this.props, 'userDetails.userMgntUserID'),
+              existingPassword: this.state.currentPassword,
+              password: this.state.newPassword
+            }}
+            onCompleted={this.clearForm}
+            onError={() => this.setState({ errorOccured: true })}
           >
-            {intl.formatMessage(messages.confirmButtonLabel)}
-          </PrimaryButton>
+            {(changePassword: any) => {
+              return (
+                <PrimaryButton
+                  id="confirm-button"
+                  key="confirm"
+                  onClick={() => this.changePassword(changePassword)}
+                >
+                  {intl.formatMessage(messages.confirmButtonLabel)}
+                </PrimaryButton>
+              )
+            }}
+          </Mutation>
         ]}
         width={1000}
-        handleClose={togglePassworkChangeModal}
+        handleClose={this.hideModal}
       >
         <Message>{intl.formatMessage(messages.changePasswordMessage)}</Message>
 
@@ -214,6 +261,14 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         >
           <Row>
             <PasswordContents>
+              <BoxedError>
+                {this.state.errorOccured && (
+                  <ErrorMessage>
+                    {intl.formatMessage(messages.incorrectPassword)}
+                  </ErrorMessage>
+                )}
+              </BoxedError>
+
               <Field>
                 <InputField
                   id="currentPassword"
@@ -367,4 +422,11 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
   }
 }
 
-export const PasswordChangeModal = injectIntl(PasswordChangeModalComp)
+const mapStateToProps = (state: IStoreState) => {
+  return {
+    userDetails: getUserDetails(state)
+  }
+}
+export const PasswordChangeModal = connect(mapStateToProps)(
+  injectIntl(PasswordChangeModalComp)
+)

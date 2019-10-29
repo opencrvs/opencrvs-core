@@ -181,10 +181,6 @@ class SettingsView extends React.Component<IProps, IState> {
     }
   }
 
-  changePassword = () => {
-    this.togglePassworkChangeModal()
-  }
-
   render() {
     const { userDetails, intl, languages } = this.props
     const langChoice = [] as ILanguageOptions[]
@@ -350,7 +346,6 @@ class SettingsView extends React.Component<IProps, IState> {
         <PasswordChangeModal
           togglePassworkChangeModal={this.togglePassworkChangeModal}
           showPasswordChange={this.state.showPasswordChange}
-          changePassword={this.changePassword}
         />
         <Notification
           type={NOTIFICATION_TYPE.SUCCESS}
