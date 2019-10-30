@@ -17,7 +17,6 @@ export async function generatorHandler(
     case GENERATE_TYPE_RN:
       return {
         registrationNumber: await generateRegistrationNumber(
-          payload.trackingId,
           payload.practitionerId
         )
       }

@@ -215,7 +215,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
-                "formattedKeys": "{child.birthLocation}"
+                "addresses": {
+                  "countryCode": "ZMB",
+                  "localAddress": "{child.birthLocation}"
+                }
               },
               {
                 "condition": {
@@ -224,7 +227,11 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{child.district}, {child.state}"
+                "addresses": {
+                  "countryCode": "child.country",
+                  "localAddress": "{child.district}, {child.state}, {child.country}",
+                  "internationalAddress": "{child.internationalDistrict}, {child.internationalState}, {child.country}"
+                }
               }
             ]
           }
@@ -465,16 +472,37 @@
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deceased.districtPermanent}, {deceased.statePermanent}"
+                "addresses": {
+                  "countryCode": "deceased.countryPermanent",
+                  "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
+                  "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
+                }
               },
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["OTHER"]
+                  "matchValues": ["CURRENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.district}, {deathEvent.state}"
+                "addresses": {
+                  "countryCode": "deceased.country",
+                  "localAddress": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.country}",
+                  "internationalAddress": "{deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
+                }
+              },
+              {
+                "condition": {
+                  "key": "deathEvent.deathPlaceAddress",
+                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                },
+                "addressType": "locations",
+                "addressKey": "name",
+                "addresses": {
+                  "countryCode": "deathEvent.country",
+                  "localAddress": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.country}",
+                  "internationalAddress": "{deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deathEvent.country}"
+                }
               },
               {
                 "condition": {
@@ -483,7 +511,10 @@
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
-                "formattedKeys": "{deathEvent.deathLocation}"
+                "addresses": {
+                  "countryCode": "ZMB",
+                  "localAddress": "{deathEvent.deathLocation}"
+                }
               }
             ]
           }

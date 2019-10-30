@@ -623,6 +623,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   createUser: GQLUser
   activateUser?: string
+  changePassword?: string
 }
 
 export interface GQLNotificationInput {
@@ -2666,6 +2667,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   createUser?: MutationToCreateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
+  changePassword?: MutationToChangePasswordResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2939,6 +2941,23 @@ export interface MutationToActivateUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToActivateUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangePasswordArgs {
+  userId: string
+  existingPassword: string
+  password: string
+}
+export interface MutationToChangePasswordResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToChangePasswordArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

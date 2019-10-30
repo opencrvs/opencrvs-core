@@ -39,7 +39,7 @@ async function prepareAndSaveLocationSequenceNumber(
     console.log(`Saving sequence number for location: ${location.id}`)
     locationsWiseSeqNumbers.push(
       new LocationSequenceNumber({
-        locationId: locations[0].id,
+        locationId: location.id,
         lastUsedSequenceNumber: locWiseSeqNum.sequence_number
       })
     )
