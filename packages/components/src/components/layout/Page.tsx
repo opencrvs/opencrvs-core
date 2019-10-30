@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 import { grid } from '../grid'
 
 export const Page = styled.div`

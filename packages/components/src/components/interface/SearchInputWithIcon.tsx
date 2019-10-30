@@ -2,10 +2,10 @@ import * as React from 'react'
 import { SearchBlue } from '../icons'
 import styled from 'styled-components'
 
-const Wrapper = styled.div.attrs<{
+const Wrapper = styled.div<{
   error?: boolean
   touched?: boolean
-}>({})`
+}>`
   align-items: center;
   background: ${({ theme }) => theme.colors.background};
   display: flex;

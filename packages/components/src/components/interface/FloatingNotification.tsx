@@ -18,7 +18,7 @@ const easeIn = keyframes`
   from { bottom: -200px; }
   to { bottom: 100; }
 `
-const NotificationContainer = styled.div.attrs({})`
+const NotificationContainer = styled.div`
   position: fixed;
   padding: 4px 8px;
   width: 50%;

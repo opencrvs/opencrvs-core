@@ -22,15 +22,15 @@ const ActionContainer = styled(Button)`
   }
 `
 
-export const ActionTitle = styled.h3.attrs<{
+export const ActionTitle = styled.h3<{
   disabled?: boolean
-}>({})`
+}>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
   ${({ theme }) => theme.fonts.h4Style};
   margin-left: 80px;
 `
-const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
+const ActionDescription = styled.p<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
   ${({ theme }) => theme.fonts.bodyStyle};

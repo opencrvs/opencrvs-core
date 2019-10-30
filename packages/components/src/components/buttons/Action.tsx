@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 
 import { ITheme } from '../theme'
 import { Button, IButtonProps } from './Button'
@@ -26,14 +26,14 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
+const ActionTitle = styled.h3<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
   ${({ theme }) => theme.fonts.h4Style};
   margin: 0;
 `
 
-const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
+const ActionDescription = styled.p<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
   ${({ theme }) => theme.fonts.bodyStyle};

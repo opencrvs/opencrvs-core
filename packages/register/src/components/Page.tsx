@@ -23,7 +23,7 @@ import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
-const StyledPage = styled.div.attrs<IPageProps>({})`
+const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   margin-bottom: 80px;
@@ -100,9 +100,9 @@ interface IDispatchProps {
 class Component extends React.Component<
   RouteComponentProps<{}> & IPageProps & IDispatchProps
 > {
-  componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
-    const { hash } = nextProps.location
-    const hashChanged = hash && hash !== this.props.location.hash
+  componentDidUpdate(prevProps: RouteComponentProps<{}>) {
+    const { hash } = this.props.location
+    const hashChanged = hash && hash !== prevProps.location.hash
     if (hashChanged) {
       // Push onto callback queue so it runs after the DOM is updated,
       // this is required when navigating from a different page so that

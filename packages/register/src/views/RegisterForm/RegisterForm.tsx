@@ -87,18 +87,18 @@ const Notice = styled.div`
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
 `
-const Required = styled.span.attrs<
+const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.error};
   flex-grow: 0;
 `
 
-const Optional = styled.span.attrs<
+const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};

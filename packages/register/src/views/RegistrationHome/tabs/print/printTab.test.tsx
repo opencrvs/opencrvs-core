@@ -668,7 +668,12 @@ describe('RegistrarHome ready to print tab related tests', () => {
       '#search-result-error-text-expanded'
     )
 
-    expect(element.children().text()).toBe('An error occurred while searching')
+    expect(
+      element
+        .children()
+        .hostNodes()
+        .text()
+    ).toBe('An error occurred while searching')
   })
 
   it('redirects to print form if print button is clicked', async () => {

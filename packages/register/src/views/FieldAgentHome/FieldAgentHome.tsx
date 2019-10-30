@@ -68,7 +68,7 @@ import { messages } from '@register/i18n/messages/views/fieldAgentHome'
 import { constantsMessages, errorMessages } from '@register/i18n/messages'
 import moment from 'moment'
 
-const IconTab = styled(Button).attrs<{ active: boolean }>({})`
+const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;

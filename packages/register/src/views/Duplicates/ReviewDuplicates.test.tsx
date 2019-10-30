@@ -585,9 +585,12 @@ describe('Review Duplicates component', () => {
       '#duplicates-error-text'
     )
 
-    expect(error.children().text()).toBe(
-      'An error occurred while fetching data'
-    )
+    expect(
+      error
+        .children()
+        .hostNodes()
+        .text()
+    ).toBe('An error occurred while fetching data')
   })
 
   it('displays error text when the query to fetch the duplicates DETAILS fails', async () => {
@@ -622,9 +625,12 @@ describe('Review Duplicates component', () => {
       '#duplicates-error-text'
     )
 
-    expect(error.children().text()).toBe(
-      'An error occurred while fetching data'
-    )
+    expect(
+      error
+        .children()
+        .hostNodes()
+        .text()
+    ).toBe('An error occurred while fetching data')
   })
   describe('reject for duplication', () => {
     let component: ReactWrapper<{}, {}>

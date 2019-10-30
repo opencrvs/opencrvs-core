@@ -60,7 +60,7 @@ const StyledSearchButton = styled(PrimaryButton)`
     }
   }
 `
-const StyledInput = styled.input.attrs<ISearchInputProps>({})`
+const StyledInput = styled.input<ISearchInputProps>`
   flex: 1;
   padding: 5px 15px 5px 5px;
   margin: 0 20px 0 10px;
@@ -128,8 +128,8 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
       this.$element.current!.focus()
     })
   }
-  componentWillReceiveProps(nextProps: ISearchInputProps) {
-    if (!this.props.focusInput && nextProps.focusInput) {
+  componentDidUpdate(prevProps: ISearchInputProps) {
+    if (!prevProps.focusInput && this.props.focusInput) {
       this.focusField()
     }
   }
@@ -159,7 +159,7 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
           <StyledInput
             onChange={this.change}
             value={value}
-            innerRef={this.$element}
+            ref={this.$element}
             {...this.props}
           />
         </SearchIconAndInput>

@@ -1,4 +1,4 @@
-import { RouterAction } from 'react-router-redux'
+import { RouterAction } from 'connected-react-router'
 import { IURLParams } from '@register/utils/authUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'
