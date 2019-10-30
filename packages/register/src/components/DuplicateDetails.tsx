@@ -86,7 +86,7 @@ interface IProps extends IntlShapeProps {
   goToPage: typeof goToPageAction
 }
 
-const DetailsBox = styled(Box).attrs<{ id: string; currentStatus: string }>({})`
+const DetailsBox = styled(Box)<{ id: string; currentStatus: string }>`
   border-top: ${({ theme }) => ` 4px solid ${theme.colors.primary}`};
   ${({ currentStatus }) =>
     currentStatus === 'rejected' ? `box-shadow: none` : ''}

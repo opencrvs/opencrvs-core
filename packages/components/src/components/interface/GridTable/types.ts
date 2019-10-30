@@ -42,6 +42,7 @@ export interface IColumn {
 export interface IDynamicValues {
   [key: string]:
     | string
+    | boolean
     | IAction[]
     | Array<string | null>
     | IStatus[]

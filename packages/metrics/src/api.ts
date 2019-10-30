@@ -19,7 +19,8 @@ export function fetchFHIR<T = any>(
   method: string = 'GET',
   body?: string
 ) {
-  return fetch(`${fhirUrl}${suffix}`, {
+  const url = [fhirUrl.replace(/\/$/, ''), suffix].join('/')
+  return fetch(url, {
     method,
     headers: {
       'Content-Type': 'application/fhir+json',

@@ -33,9 +33,9 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3.attrs<{
+const ActionTitle = styled.h3<{
   disabled?: boolean
-}>({})`
+}>`
   ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};

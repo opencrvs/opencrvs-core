@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AxiosError } from 'axios'
-import { RouterAction, push, goBack as back } from 'react-router-redux'
+import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
   IAuthenticateResponse,
   IAuthenticationData,

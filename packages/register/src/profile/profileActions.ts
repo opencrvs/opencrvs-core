@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RouterAction } from 'react-router-redux'
+
+import { RouterAction } from 'connected-react-router'
 import { IURLParams } from '@register/utils/authUtils'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { ApolloQueryResult } from 'apollo-client'

@@ -11,7 +11,7 @@
  */
 import styled from 'styled-components'
 
-export const Paragraph = styled.p.attrs<{ fontSize?: string }>({})`
+export const Paragraph = styled.p<{ fontSize?: string }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   /* stylelint-disable-next-line opencrvs/no-font-styles */
   font-size: ${({ fontSize, theme }) =>

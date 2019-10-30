@@ -21,8 +21,8 @@ import * as React from 'react'
 import { History } from 'history'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
-import { ConnectedRouter } from 'react-router-redux'
-import { ThemeProvider } from 'styled-components'
+import { ConnectedRouter } from 'connected-react-router'
+import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import { getDefaultLanguage } from './i18n/utils'
 import { ForgottenItem } from './views/resetCredentialsForm/forgottenItemForm'
 import { ResetCredentialsSuccessPage } from './views/resetCredentialsForm/resetCredentialsSuccessPage'
@@ -38,10 +38,20 @@ interface IAppProps {
   history: History
 }
 
+// Injecting global styles for the body tag - used only once
+// @ts-ignore
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    padding: 0;
+  }
+`
+
 export class App extends React.Component<IAppProps> {
   public render() {
     return (
       <ErrorBoundary>
+        <GlobalStyle />
         <Provider store={this.props.store}>
           <IntlContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>

@@ -23,7 +23,10 @@ export const birthDocumentForWhomFhirMapping = {
   Mother: 'MOTHER',
   Parent: 'PARENT',
   Other: 'OTHER',
-  ChildAge: 'CHILD_AGE'
+  ChildAge: 'CHILD_AGE',
+  Applicant: 'APPLICANT_ID_PROOF',
+  AssignedResponsibilityProof: 'ASSIGNED_RESPONSIBILITY_PROOF',
+  LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF'
 }
 
 export const birthSectionMapping = {
@@ -31,20 +34,22 @@ export const birthSectionMapping = {
     birthDocumentForWhomFhirMapping.Child,
     birthDocumentForWhomFhirMapping.ChildAge
   ],
-  [BirthSection.Mother]: [
-    birthDocumentForWhomFhirMapping.Mother,
-    birthDocumentForWhomFhirMapping.Parent
-  ],
-  [BirthSection.Father]: [
-    birthDocumentForWhomFhirMapping.Father,
-    birthDocumentForWhomFhirMapping
+  [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.Mother],
+  [BirthSection.Father]: [birthDocumentForWhomFhirMapping.Father],
+  [BirthSection.Applicant]: [birthDocumentForWhomFhirMapping.Applicant],
+  [BirthSection.Parent]: [
+    birthDocumentForWhomFhirMapping.Parent,
+    birthDocumentForWhomFhirMapping.AssignedResponsibilityProof,
+    birthDocumentForWhomFhirMapping.LegalGuardianProof
   ]
 }
 
 export const birthSectionTitle = {
   [BirthSection.Child]: 'Child',
   [BirthSection.Mother]: 'Mother',
-  [BirthSection.Father]: 'Father'
+  [BirthSection.Father]: 'Father',
+  [BirthSection.Applicant]: 'Applicant',
+  [BirthSection.Parent]: 'Parent'
 }
 
 export const birthDocumentTypeFhirMapping = {
@@ -63,7 +68,9 @@ export const birthDocumentTypeFhirMapping = {
   'Proof of birth from birth attendant': 'BIRTH_ATTENDANT',
   'Tax Payment Receipt': 'TAX_RECEIPT',
   'Original Birth Record': 'ORIGINAL_BIRTH_RECORD',
-  'Under Five Card': 'UNDER_FIVE_CARD'
+  'Under Five Card': 'UNDER_FIVE_CARD',
+  'Proof of legal guardianship': 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  'Proof of assigned responsibility': 'PROOF_OF_ASSIGNED_RESPONSIBILITY'
 }
 
 export function birthFieldToAttachmentTransformer(

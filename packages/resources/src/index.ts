@@ -16,6 +16,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 import { readFileSync } from 'fs'
 import getPlugins from '@resources/config/plugins'
+import * as usrMgntDB from '@resources/database'
 import {
   RESOURCES_HOST,
   RESOURCES_PORT,
@@ -191,11 +192,13 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
+    await usrMgntDB.disconnect()
     server.log('info', 'server stopped')
   }
 
   async function start() {
     await server.start()
+    await usrMgntDB.connect()
     server.log('info', `server started on ${RESOURCES_HOST}:${RESOURCES_PORT}`)
   }
 

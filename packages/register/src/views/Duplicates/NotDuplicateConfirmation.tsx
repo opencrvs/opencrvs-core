@@ -22,9 +22,12 @@ const ConfirmButton = styled.a`
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
 `
+
+// cast to any because of styled-components bug
+// https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
 const StyledModal = styled(Modal)`
   z-index: 4;
-`
+` as any
 
 interface IProps {
   show: boolean

@@ -35,7 +35,7 @@ const ScreenBlocker = styled.div`
   background-color: ${({ theme }) => theme.colors.menuBackground};
   opacity: 0.8;
 `
-const ModalContent = styled.div.attrs<{ width?: number }>({})`
+const ModalContent = styled.div<{ width?: number }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
@@ -63,7 +63,7 @@ const Header = styled.div`
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
 `
-const Body = styled.div.attrs<{ height?: number }>({})`
+const Body = styled.div<{ height?: number }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
   overflow-y: auto;

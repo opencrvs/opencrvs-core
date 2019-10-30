@@ -36,7 +36,7 @@ describe('when user is selecting the vital event', () => {
       await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
-      expect(app.find('#select_vital_event_view')).toHaveLength(2)
+      expect(app.find('#select_vital_event_view').hostNodes()).toHaveLength(1)
     })
     describe('when selects "Birth"', () => {
       beforeEach(() => {

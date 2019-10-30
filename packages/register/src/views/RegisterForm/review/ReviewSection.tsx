@@ -155,9 +155,7 @@ const ZeroDocument = styled.div`
   align-items: flex-start;
 `
 
-const ResponsiveDocumentViewer = styled.div.attrs<{ isRegisterScope: boolean }>(
-  {}
-)`
+const ResponsiveDocumentViewer = styled.div<{ isRegisterScope: boolean }>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: ${({ isRegisterScope }) => (isRegisterScope ? 'block' : 'none')};
     margin-bottom: 11px;

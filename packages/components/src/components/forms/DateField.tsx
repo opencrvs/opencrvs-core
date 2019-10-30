@@ -165,7 +165,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-dd`}
-            innerRef={this.dd}
+            ref={this.dd}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={focusInput}
@@ -179,7 +179,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-mm`}
-            innerRef={this.mm}
+            ref={this.mm}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={false}
@@ -194,7 +194,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-yyyy`}
-            innerRef={this.yyyy}
+            ref={this.yyyy}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={false}

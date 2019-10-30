@@ -16,7 +16,10 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
-import styled, { ThemeProvider } from '@register/styledComponents'
+import styled, {
+  ThemeProvider,
+  createGlobalStyle
+} from '@register/styledComponents'
 import { I18nContainer } from '@register/i18n/components/I18nContainer'
 import { AppStore } from '@register/store'
 import { ProtectedRoute } from '@register/components/ProtectedRoute'
@@ -39,7 +42,7 @@ import { Details } from '@register/views/Home/Details'
 import { StyledErrorBoundary } from '@register/components/StyledErrorBoundary'
 import { RegistrationHome } from '@register/views/RegistrationHome/RegistrationHome'
 import { FieldAgentHome } from '@register/views/FieldAgentHome/FieldAgentHome'
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'connected-react-router'
 import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
@@ -62,10 +65,21 @@ const MainSection = styled.section`
   background: ${({ theme }) => theme.colors.background};
 `
 
+// Injecting global styles for the body tag - used only once
+// eslint-disable-line
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-y: scroll;
+  }
+`
+
 export class App extends React.Component<IAppProps> {
   public render() {
     return (
       <ErrorBoundary>
+        <GlobalStyle />
         <ApolloProvider
           client={this.props.client || createClient(this.props.store)}
         >

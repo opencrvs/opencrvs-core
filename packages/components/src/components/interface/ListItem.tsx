@@ -51,9 +51,7 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
-const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
-  {}
-)`
+const Wrapper = styled.div<{ expanded?: boolean; isBoxShadow?: boolean }>`
   width: 100%;
   margin-bottom: 8px;
   transition: border-top 300ms;
@@ -69,7 +67,7 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
 const ExpandedCellContent = styled.div`
   animation: ${fadeIn} 500ms;
 `
-const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedCellContainer = styled.div<{ expanded: boolean }>`
   overflow: hidden;
   transition: max-height 600ms;
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
@@ -79,7 +77,7 @@ const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
     animation: ${fadeIn} 500ms;
   }
 `
-const ListItemContainer = styled.li.attrs<{ isBoxShadow?: boolean }>({})`
+const ListItemContainer = styled.li<{ isBoxShadow?: boolean }>`
   display: flex;
   flex-flow: row wrap;
   width: 100%;

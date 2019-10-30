@@ -1117,3 +1117,43 @@ describe('When an existing application is marked certified', () => {
     expect(applicationEventPoint).toMatchSnapshot()
   })
 })
+
+describe('When an in-progress application is recieved', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the in complete field points to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/new-in-progress-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/in-progress-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'in_complete_fields'
+    )
+    expect(res.statusCode).toBe(200)
+    expect(inCompleteFieldPoints).toMatchSnapshot()
+  })
+  it('returns 500 for payload without expected extension on task resource', async () => {
+    const payload = require('./test-data/new-in-progress-request.json')
+    payload.entry[1].resource.extension = []
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/in-progress-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    expect(res.statusCode).toBe(500)
+  })
+})

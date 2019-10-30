@@ -29,7 +29,7 @@ const Wrapper = styled.div`
   margin: auto;
   max-width: 300px;
 `
-const Item = styled.div.attrs<{ margin?: string }>({})`
+const Item = styled.div<{ margin?: string }>`
   margin: ${({ margin }) => margin || '0px'};
 `
 const PinButton = styled(PrimaryButton)`

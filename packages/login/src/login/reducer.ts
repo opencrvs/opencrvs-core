@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { loop, LoopReducer, Cmd, Loop } from 'redux-loop'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 import * as actions from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'

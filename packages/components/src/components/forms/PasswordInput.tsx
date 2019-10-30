@@ -30,10 +30,10 @@ interface IPasswordInputState {
 
 export type IPasswordInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
-const StyledField = styled.div.attrs<IPasswordInputProps>({})`
+const StyledField = styled.div<IPasswordInputProps>`
   width: 100%;
 `
-const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
+const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
@@ -138,8 +138,8 @@ export class PasswordInput extends React.Component<
       }
     })
   }
-  componentWillReceiveProps(nextProps: IPasswordInputProps) {
-    if (!this.props.focusInput && nextProps.focusInput) {
+  componentDidUpdate(prevProps: IPasswordInputProps) {
+    if (!prevProps.focusInput && this.props.focusInput) {
       this.focusField()
     }
   }
@@ -154,7 +154,7 @@ export class PasswordInput extends React.Component<
     return (
       <StyledField>
         <StyledInput
-          innerRef={this.$element}
+          ref={this.$element}
           {...this.props}
           type={this.state.isVisible ? 'text' : 'password'}
         />

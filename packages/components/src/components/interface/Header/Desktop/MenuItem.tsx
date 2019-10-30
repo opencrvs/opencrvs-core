@@ -21,7 +21,7 @@ export interface ICustomProps {
 export type IMenuItemContainerProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
-const Item = styled(Button).attrs<IMenuItemContainerProps>({})`
+const Item = styled(Button)<IMenuItemContainerProps>`
   color: ${({ theme, selected }) =>
     selected ? theme.colors.white : theme.colors.disabled};
   ${({ theme }) => theme.fonts.bodyBoldStyle};

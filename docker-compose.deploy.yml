@@ -194,7 +194,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mogno3/user-mgnt?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
     deploy:
       replicas: 2
     networks:
@@ -250,7 +250,7 @@ services:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mogno3/user-mgnt?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
       - TEST_USER_PASSWORD=test
     deploy:
       labels:
@@ -275,7 +275,7 @@ services:
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
-      - mongodb__url=mongodb://mongo1,mongo2,mogno3/hearth-dev?replicaSet=rs0
+      - mongodb__url=mongodb://mongo1,mongo2,mongo3/hearth-dev?replicaSet=rs0
     depends_on:
       - mongo1
       - mongo2
@@ -294,8 +294,8 @@ services:
 
   openhim-core:
     environment:
-      - mongo_url=mongodb://mongo1,mongo2,mogno3/openhim-dev?replicaSet=rs0
-      - mongo_atnaUrl=mongodb://mongo1,mongo2,mogno3/openhim-dev?replicaSet=rs0
+      - mongo_url=mongodb://mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0
+      - mongo_atnaUrl=mongodb://mongo1,mongo2,mongo3/openhim-dev?replicaSet=rs0
     depends_on:
       - mongo1
       - mongo2

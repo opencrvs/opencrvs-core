@@ -20,10 +20,10 @@ import {
 import { createBrowserHistory, History } from 'history'
 import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
-  routerReducer,
+  connectRouter,
   routerMiddleware,
   RouterState
-} from 'react-router-redux'
+} from 'connected-react-router'
 
 import { profileReducer, ProfileState } from '@register/profile/profileReducer'
 import {
@@ -76,27 +76,26 @@ export interface IStoreState {
   userForm: IUserFormState
 }
 
-const reducers = combineReducers<IStoreState>({
-  profile: profileReducer,
-  router: routerReducer,
-  i18n: intlReducer,
-  applicationsState: applicationsReducer,
-  registerForm: registerFormReducer,
-  navigation: navigationReducer,
-  notification: notificationReducer,
-  reviewForm: reviewReducer,
-  reject: rejectReducer,
-  printCertificateForm: printReducer,
-  offline: offlineDataReducer,
-  userForm: userFormReducer
-})
-
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
+  const reducers = combineReducers<IStoreState>({
+    profile: profileReducer,
+    router: connectRouter(history) as any, // @todo
+    i18n: intlReducer,
+    applicationsState: applicationsReducer,
+    registerForm: registerFormReducer,
+    navigation: navigationReducer,
+    notification: notificationReducer,
+    reviewForm: reviewReducer,
+    reject: rejectReducer,
+    printCertificateForm: printReducer,
+    offline: offlineDataReducer,
+    userForm: userFormReducer
+  })
   const enhancer = compose(
     install(),
     applyMiddleware(routerMiddleware(history)),

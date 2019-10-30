@@ -694,6 +694,8 @@ export enum BirthSection {
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
+  Applicant = 'informant',
+  Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'
@@ -767,6 +769,7 @@ export interface IFormSectionGroup {
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
   error?: MessageDescriptor
+  preventContinueIfError?: boolean
 }
 
 export interface IForm {

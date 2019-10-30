@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from '../buttons'
 
 export const Tabs = styled.div`
@@ -25,7 +25,7 @@ export interface IProps extends IButtonProps {
   id: string
 }
 
-export const Tab = styled(Button).attrs<IProps>({})`
+export const Tab = styled(Button)<IProps>`
   color: ${({ theme, active }) =>
     active ? theme.colors.white : theme.colors.disabled};
   opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};

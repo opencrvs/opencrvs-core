@@ -61,13 +61,9 @@ describe('SetupReviewPage page tests', () => {
       />,
       store
     )
-
     const role = testComponent.component
-      .find('#RoleType')
+      .find('#RoleType_value')
       .hostNodes()
-      .childAt(0)
-      .childAt(0)
-      .childAt(1)
       .text()
     expect(role).toEqual('Field Agent')
   })

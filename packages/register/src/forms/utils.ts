@@ -53,7 +53,7 @@ import {
   ILocation,
   IOfflineData
 } from '@register/offline/reducer'
-import { Validation, IValidationResult } from '@register/utils/validate'
+import { Validation } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'

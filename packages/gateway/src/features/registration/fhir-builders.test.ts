@@ -115,7 +115,12 @@ test('should build a minimal FHIR registration document without error', async ()
         paperFormID: '12345678',
         trackingId: 'B123456',
         registrationNumber: '201923324512345671',
-        inProgress: true,
+        inCompleteFields:
+          'child/child-view-group/placeOfBirth,' +
+          'mother/mother-view-group/iDType,' +
+          'mother/mother-view-group/iD,' +
+          'mother/mother-view-group/familyName,' +
+          'mother/mother-view-group/familyNameEng',
         status: [
           {
             comments: [
@@ -781,7 +786,12 @@ test('creates task with contact other relationship', async () => {
         paperFormID: '12345678',
         trackingId: 'B123456',
         registrationNumber: '201923324512345671',
-        inProgress: true,
+        inCompleteFields:
+          'child/child-view-group/placeOfBirth,' +
+          'mother/mother-view-group/iDType,' +
+          'mother/mother-view-group/iD,' +
+          'mother/mother-view-group/familyName,' +
+          'mother/mother-view-group/familyNameEng',
         status: [
           {
             comments: [

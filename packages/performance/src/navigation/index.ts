@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { push, goBack as back } from 'react-router-redux'
+
+import { push, goBack as back } from 'connected-react-router'
 import { HOME } from '@performance/navigation/routes'
 import { getToken } from '@performance/utils/authUtils'
 

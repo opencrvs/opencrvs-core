@@ -92,12 +92,12 @@ export default class ReactPanZoom extends React.PureComponent<
   public state = this.getInitialState()
 
   // tslint:disable-next-line: member-ordering
-  public componentWillReceiveProps(nextProps: IReactPanZoomProps) {
+  public componentDidUpdate(prevProps: IReactPanZoomProps) {
     const { matrixData } = this.state
-    if (matrixData[0] !== nextProps.zoom) {
+    if (matrixData[0] !== this.props.zoom) {
       const newMatrixData = [...this.state.matrixData]
-      newMatrixData[0] = nextProps.zoom || newMatrixData[0]
-      newMatrixData[3] = nextProps.zoom || newMatrixData[3]
+      newMatrixData[0] = this.props.zoom || newMatrixData[0]
+      newMatrixData[3] = this.props.zoom || newMatrixData[3]
       this.setState({
         matrixData: newMatrixData
       })

@@ -69,7 +69,9 @@ describe('Login app step one', () => {
 
       app.find('form#STEP_ONE').simulate('submit')
       moxios.wait(() => {
-        expect(app.find('#login-submitting-spinner')).toHaveLength(3)
+        expect(app.find('#login-submitting-spinner').hostNodes()).toHaveLength(
+          1
+        )
         done()
       })
     })

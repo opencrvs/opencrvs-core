@@ -31,7 +31,7 @@ const Estimate = styled.div`
   padding: 6px;
 `
 
-const Total = styled.div.attrs<{ size: number; colour: string }>({})`
+const Total = styled.div<{ size: number; colour: string }>`
   width: ${({ size }) => size * 100}%;
   background: ${({ colour }) => colour};
   height: 42px;
@@ -47,7 +47,7 @@ const SectionContainer = styled.div`
   width: 100%;
 `
 
-const Section = styled.div.attrs<{ size: number; colour: string }>({})`
+const Section = styled.div<{ size: number; colour: string }>`
   width: ${({ size }) => size * 100}%;
   height: 24px;
   top: 50%;

@@ -21,7 +21,7 @@ import {
   TextInput,
   WarningMessage
 } from '@opencrvs/components/lib/forms'
-import { Check, TickOff, TickOn } from '@opencrvs/components/lib/icons'
+import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -72,12 +72,6 @@ const ValidationRulesSection = styled.div`
     & span {
       margin-left: 8px;
     }
-  }
-`
-const ConfirmButton = styled(PrimaryButton)`
-  display: flex;
-  & svg {
-    margin-right: 16px;
   }
 `
 

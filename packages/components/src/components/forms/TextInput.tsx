@@ -25,7 +25,7 @@ export interface ICustomProps {
 export type ITextInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
-const StyledInput = styled.input.attrs<ITextInputProps>({})`
+const StyledInput = styled.input<ITextInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
@@ -116,8 +116,8 @@ export class TextInput extends React.Component<ITextInputProps> {
       }
     })
   }
-  componentWillReceiveProps(nextProps: ITextInputProps) {
-    if (!this.props.focusInput && nextProps.focusInput) {
+  componentDidUpdate(prevProps: ITextInputProps) {
+    if (!prevProps.focusInput && this.props.focusInput) {
       this.focusField()
     }
   }
@@ -127,7 +127,7 @@ export class TextInput extends React.Component<ITextInputProps> {
 
     return (
       <StyledInput
-        innerRef={this.$element}
+        ref={this.$element}
         name={props.id}
         {...this.props}
         autocomplete={false}

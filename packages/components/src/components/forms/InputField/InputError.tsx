@@ -19,9 +19,7 @@ export interface IInputError {
   color?: string
 }
 
-const styledErrorWrapper = styled.div.attrs<IInputError>({})
-
-const InputErrorWrapper = styledErrorWrapper`
+const InputErrorWrapper = styled.div<IInputError>`
   min-height: 18px;
   width: 100%;
   padding-top:4px;

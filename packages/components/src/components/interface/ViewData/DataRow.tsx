@@ -87,9 +87,13 @@ export class DataRow extends React.Component<IDataProps> {
         {label && (
           <>
             <DataContainer>
-              <Label>{label}</Label>
-              {value && <Value>{value}</Value>}
-              {placeHolder && <PlaceHolder>{placeHolder}</PlaceHolder>}
+              <Label id={`${id}_label`}>{label}</Label>
+              {value && <Value id={`${id}_value`}>{value}</Value>}
+              {placeHolder && (
+                <PlaceHolder id={`${id}_placeholder`}>
+                  {placeHolder}
+                </PlaceHolder>
+              )}
             </DataContainer>
             {action && (
               <Action>

@@ -81,7 +81,7 @@ export interface IQueryData {
   printTab: GQLEventSearchResultSet
 }
 
-export const IconTab = styled(Button).attrs<IProps>({})`
+export const IconTab = styled(Button)<IProps>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;

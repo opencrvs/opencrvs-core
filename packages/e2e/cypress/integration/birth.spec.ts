@@ -591,6 +591,7 @@ context('Birth Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
+    cy.wait(1000)
     cy.get('#next_section').click()
     // APPLICATION FORM
     // CHILD DETAILS

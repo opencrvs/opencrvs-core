@@ -34,7 +34,7 @@ export class ThemeWrapper extends React.Component {
     return (
       <Wrapper>
         <ThemeProvider theme={getTheme(language)}>
-          {this.props.children}
+          {this.props.children as any}
         </ThemeProvider>
       </Wrapper>
     )

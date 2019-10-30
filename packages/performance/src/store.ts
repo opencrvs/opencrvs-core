@@ -20,10 +20,10 @@ import {
 import { createBrowserHistory, History } from 'history'
 import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
-  routerReducer,
+  connectRouter,
   routerMiddleware,
   RouterState
-} from 'react-router-redux'
+} from 'connected-react-router'
 import { profileReducer, ProfileState } from '@performance/profile/reducer'
 import { intlReducer, IntlState } from '@performance/i18n/reducer'
 import * as Sentry from '@sentry/browser'
@@ -35,18 +35,18 @@ export interface IStoreState {
   i18n: IntlState
 }
 
-const reducers = combineReducers<IStoreState>({
-  profile: profileReducer,
-  router: routerReducer,
-  i18n: intlReducer
-})
-
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
+
+  const reducers = combineReducers<IStoreState>({
+    profile: profileReducer,
+    router: connectRouter(history) as any, // @todo
+    i18n: intlReducer
+  })
 
   const enhancer = compose(
     install(),

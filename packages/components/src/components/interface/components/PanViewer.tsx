@@ -24,7 +24,7 @@ const Container = css`
     width: 100%;
   }
 `
-const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
+const ControlsContainer = styled.div<{ centerController?: boolean }>`
   position: absolute;
   z-index: 2;
   ${({ centerController }) =>
@@ -59,6 +59,12 @@ const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
     }
   }
 `
+
+// cast to any because of styled-components bug
+// https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
+const StyledReactPanZoom = styled(ReactPanZoom)`
+  ${Container};
+` as any
 
 interface IProps {
   image: string
@@ -100,9 +106,6 @@ export default class PanViewer extends React.Component<IProps> {
     })
   }
   render() {
-    const StyledReactPanZoom = styled(ReactPanZoom)`
-      ${Container};
-    `
     return (
       <React.Fragment>
         {this.renderPanZoomControls(this.props.controllerCenter)}

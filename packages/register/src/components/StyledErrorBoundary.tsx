@@ -14,9 +14,7 @@ import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from '@register/store'
 import { errorMessages, buttonMessages } from '@register/i18n/messages'
 
 const ErrorContainer = styled.div`
@@ -46,7 +44,7 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-type IFullProps = IntlShapeProps
+type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
 interface IErrorInfo extends React.ErrorInfo {
   [key: string]: string
@@ -108,9 +106,4 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   }
 }
 
-export const StyledErrorBoundary = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language
-  }),
-  {}
-)(injectIntl(StyledErrorBoundaryComponent))
+export const StyledErrorBoundary = injectIntl(StyledErrorBoundaryComponent)

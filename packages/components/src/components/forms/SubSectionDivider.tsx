@@ -26,9 +26,9 @@ const Title = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
 `
-const Optional = styled.span.attrs<
+const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};

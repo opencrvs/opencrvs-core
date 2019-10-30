@@ -12,7 +12,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router'
-import { LoginHeader } from '@login/common/LoginHeader'
 
 export interface IPage {
   submitting: boolean
@@ -21,7 +20,7 @@ export interface IPage {
 
 const languageFromProps = ({ language }: IPage) => language
 
-const StyledPage = styled.div.attrs<IPage>({})`
+const StyledPage = styled.div<IPage>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;

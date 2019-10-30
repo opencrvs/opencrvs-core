@@ -140,6 +140,18 @@ describe('when draft data is transformed to graphql', () => {
     }
   }
 
+  const primaryCaregiver = {
+    parentDetailsType: 'MOTHER_ONLY',
+    reasonMotherNotApplying: '',
+    motherIsDeceased: [],
+    reasonFatherNotApplying: '',
+    fatherIsDeceased: [],
+    primaryCaregiverType: {
+      value: 'INFORMANT',
+      nestedFields: { name: '', phone: '', reasonNotApplying: '' }
+    }
+  }
+
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
     setItem.mockClear()
@@ -161,6 +173,7 @@ describe('when draft data is transformed to graphql', () => {
       father: fatherDetails,
       mother: motherDetails,
       registration: registrationDetails,
+      primaryCaregiver,
       documents: { imageUploader: '' }
     }
 
@@ -199,6 +212,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -214,13 +228,13 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
       expect(
         draftToGqlTransformer(form, data).registration.contactPhoneNumber
       ).toBe('+8801736478884')
     })
-
     it('Pass false as fathersDetailsExist on father section', () => {
       const clonedFather = clone(fatherDetails)
       clonedFather.fathersDetailsExist = false
@@ -230,12 +244,16 @@ describe('when draft data is transformed to graphql', () => {
         father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
       expect(draftToGqlTransformer(form, data).father).toBeUndefined()
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toBeUndefined()
     })
-    it('Raise inProgress flag if in-complete data is given', () => {
+    it('Sends inCompleteFields if in-complete data is given', () => {
       const data = {
         child: {},
         father: {},
@@ -245,22 +263,25 @@ describe('when draft data is transformed to graphql', () => {
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
+        primaryCaregiver,
         documents: {}
       }
-      expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
-        true
-      )
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toContain('child/child-view-group/placeOfBirth')
     })
-    it('Raise inProgress flag when registration data is also missing', () => {
+    it('Sends inCompleteFields when registration data is also missing', () => {
       const data = {
         child: {},
         father: {},
         mother: {},
-        documents: {}
+        documents: {},
+        registration: {},
+        primaryCaregiver: {}
       }
-      expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
-        true
-      )
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toBeDefined()
     })
 
     it('transform primary caregiver data to gql data', () => {

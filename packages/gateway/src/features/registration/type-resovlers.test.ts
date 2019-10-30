@@ -31,7 +31,7 @@ import {
   mockObservationBundle,
   reasonsNotApplyingMock
 } from '@gateway/utils/testUtils'
-import { clone, cloneDeep } from 'lodash'
+import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -852,22 +852,6 @@ describe('Registration type resolvers', () => {
       )
 
       expect(trackingID).toBe('123')
-    })
-    it('returns inProgress flag from the non-draft task object', async () => {
-      const inProgressFlag = await typeResolvers.Registration.inProgress(
-        mockTask
-      )
-
-      expect(inProgressFlag).toBe(false)
-    })
-    it('returns inProgress flag from the draft task object', async () => {
-      const clonedTask = cloneDeep(mockTask)
-      clonedTask.status = 'draft'
-      const inProgressFlag = await typeResolvers.Registration.inProgress(
-        clonedTask
-      )
-
-      expect(inProgressFlag).toBe(true)
     })
     it('returns birth registration number from the task object', async () => {
       const registrationNumber = await typeResolvers.Registration.registrationNumber(

@@ -153,7 +153,8 @@ export class SearchTool extends React.Component<IProps, IState> {
       ) || this.props.searchTypeList[0]
     )
   }
-  search = () => {
+  search = (e: React.FormEvent) => {
+    e.preventDefault()
     return (
       this.state.searchParam &&
       this.props.searchHandler(
@@ -216,7 +217,7 @@ export class SearchTool extends React.Component<IProps, IState> {
   render() {
     const { placeHolderText } = this.state.selectedSearchType
     return (
-      <Wrapper action="javascript:void(0);" onSubmit={this.search}>
+      <Wrapper onSubmit={this.search}>
         <SearchBlue id="searchIconButton" onClick={this.search} />
         <SearchTextInput
           id="searchText"

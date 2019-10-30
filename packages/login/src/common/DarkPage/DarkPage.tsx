@@ -19,7 +19,7 @@ import { getDefaultLanguage } from '@login/i18n/utils'
 import zambiaBackground from './background-zmb.jpg'
 const languageFromProps = ({ language }: IPage) => language
 
-const StyledPage = styled.div.attrs<IPage>({})`
+const StyledPage = styled.div<IPage>`
   ${({ theme }) => theme.gradients.gradientNightshade};
   ${
     window.config.COUNTRY === 'zmb'

@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
-/* stylelint-disable */
+import styled, { StyledComponentBase } from 'styled-components'
+
+// stylelint-disable opencrvs/no-font-styles
 export const EnglishText = styled.span`
   font-family: ${({ theme }) => theme.fonts.englishTextFont};
 `
-/* stylelint-enable */

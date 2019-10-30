@@ -43,7 +43,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   )
 }
 
-const StyledSelect = styled(ReactSelect).attrs<IStyledSelectProps>({})`
+const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
 
   ${({ theme }) => theme.fonts.bodyStyle};

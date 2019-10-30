@@ -22,20 +22,18 @@ export interface IDiaMeter {
   diameter: number | undefined
 }
 
-const styledLoader = styled.div.attrs<ILoader>({})
-
 const StyledSpinner = styled(Spinner)`
   width: 100%;
   height: 100%;
   margin: 24px 0;
 `
-const LoadingContainer = styledLoader`
+const LoadingContainer = styled.div<ILoader>`
   width: 100%;
   margin: ${({ marginPercent }) => marginPercent}% auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction:column;
+  flex-direction: column;
 `
 const LoadingTextContainer = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};

@@ -48,7 +48,9 @@ describe('when user is selecting the vital event', () => {
       await setPinCode(app)
     })
     it('lists the options', () => {
-      expect(app.find('#primary_applicant_selection_view')).toHaveLength(2)
+      expect(
+        app.find('#primary_applicant_selection_view').hostNodes()
+      ).toHaveLength(1)
     })
     describe('when selects "Mother"', () => {
       beforeEach(() => {

@@ -11,7 +11,7 @@
  */
 import styled from 'styled-components'
 
-export const CircleButton = styled.button.attrs<{ dark?: boolean }>({})`
+export const CircleButton = styled.button<{ dark?: boolean }>`
   margin: 0;
   border: none;
   background: none;

@@ -20,12 +20,10 @@ export type IInputLabel = {
   hideAsterisk?: boolean
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
-const styledInputLabel = styled.label.attrs<IInputLabel>({})
-
-const StyledInputLabel = styledInputLabel`
+const StyledInputLabel = styled.label<IInputLabel>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ color, disabled, theme }) =>
-    disabled ? theme.colors.disabled : color ? color : theme.colors.copy} ;
+    disabled ? theme.colors.disabled : color ? color : theme.colors.copy};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
@@ -39,9 +37,9 @@ const StyledInputLabel = styledInputLabel`
   }}
 `
 
-const Required = styled.span.attrs<
+const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.error};
