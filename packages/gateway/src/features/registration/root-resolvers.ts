@@ -249,7 +249,16 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
+  const duplicateEntry = await isDuplicateEntry(
+    details && details.registration && details.registration.draftId,
+    authHeader
+  )
 
+  if (duplicateEntry) {
+    return {
+      draftId: details.registration.draftId
+    }
+  }
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -257,6 +266,27 @@ async function createEventRegistration(
   } else {
     // return tracking-id
     return await getDeclarationIdsFromResponse(res, authHeader)
+  }
+}
+
+async function isDuplicateEntry(identifier: string, authHeader: IAuthHeader) {
+  if (!identifier) {
+    return false
+  }
+  const taskBundle = await fetchFHIR(
+    `/Task?identifier=${identifier}`,
+    authHeader
+  )
+
+  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+    return false
+  }
+  const task = taskBundle.entry[0].resource as fhir.Task
+
+  if (!task.focus || !task.focus.reference) {
+    return false
+  } else {
+    return true
   }
 }
 

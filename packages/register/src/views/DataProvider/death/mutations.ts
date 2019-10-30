@@ -46,7 +46,7 @@ export function getDeathMutationMappings(
         variables:
           form && draft
             ? {
-                details: draftToGqlTransformer(form, draft.data)
+                details: draftToGqlTransformer(form, draft.data, draft.id)
               }
             : {},
         dataKey: 'createDeathRegistration'

@@ -300,6 +300,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
 
 input RegistrationInput {
   _fhirID: ID
+  draftId: String # long uuid for preventing an event from duplicate submission
   # short uuid easy to remember
   trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -321,6 +322,7 @@ input RegistrationInput {
 type Registration { # -> Task
   id: ID # -> .id
   _fhirID: ID # -> .id
+  draftId: String
   # short uuid easy to remember
   trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
