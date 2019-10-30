@@ -173,7 +173,7 @@ class SettingsView extends React.Component<IProps, IState> {
     }))
   }
 
-  togglePassworkChangeModal = () => {
+  togglePasswordChangeModal = () => {
     this.setState(state => ({
       showPasswordChange: !state.showPasswordChange
     }))
@@ -189,7 +189,7 @@ class SettingsView extends React.Component<IProps, IState> {
     }
   }
   changePassword = () => {
-    this.togglePassworkChangeModal()
+    this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
 
@@ -270,7 +270,7 @@ class SettingsView extends React.Component<IProps, IState> {
             action: {
               id: 'BtnChangePassword',
               label: intl.formatMessage(buttonMessages.change),
-              handler: this.togglePassworkChangeModal
+              handler: this.togglePasswordChangeModal
             }
           },
           {
@@ -356,7 +356,7 @@ class SettingsView extends React.Component<IProps, IState> {
           />
         </ResponsiveModal>
         <PasswordChangeModal
-          togglePassworkChangeModal={this.togglePassworkChangeModal}
+          togglePasswordChangeModal={this.togglePasswordChangeModal}
           showPasswordChange={this.state.showPasswordChange}
           passwordChanged={this.changePassword}
         />

@@ -292,7 +292,7 @@ const messagesToDefine: IUserMessages = {
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     description: 'Password change message',
-    id: 'settings.message.changePassword'
+    id: 'newPassword.instruction'
   },
   newPasswordLabel: {
     id: 'password.label.new',

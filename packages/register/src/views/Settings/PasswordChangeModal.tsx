@@ -125,7 +125,7 @@ type State = {
 
 interface IProps {
   showPasswordChange: boolean
-  togglePassworkChangeModal: () => void
+  togglePasswordChangeModal: () => void
   passwordChanged: () => void
   userDetails: IUserDetails | null
 }
@@ -210,7 +210,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       newPassword: EMPTY_STRING,
       confirmPassword: EMPTY_STRING
     }))
-    this.props.togglePassworkChangeModal()
+    this.props.togglePasswordChangeModal()
   }
   passwordChangecompleted = () => {
     this.setState({
