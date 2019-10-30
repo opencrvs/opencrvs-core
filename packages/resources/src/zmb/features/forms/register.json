@@ -6232,6 +6232,326 @@
     "death": {
       "sections": [
         {
+          "id": "registration",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "Registration",
+            "description": "Form section name for Registration",
+            "id": "form.section.application.name"
+          },
+          "title": {
+            "defaultMessage": "Application Details",
+            "description": "Form section title for Registration",
+            "id": "form.section.application.title"
+          },
+          "groups": [
+            {
+              "id": "other-relationship-with-deceased",
+              "title": {
+                "defaultMessage": "What is the applicants relationship to the deceased?",
+                "description": "Form section title for primary applicant",
+                "id": "register.selectInformant.deathInformantSomeOneElseTitle"
+              },
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(!draftData || !draftData.informant || draftData.informant.relationship !== \"OTHER\")"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "otherRelationship",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "label": {
+                    "defaultMessage": "What is the applicants relationship to the deceased?",
+                    "description": "Form section title for primary applicant",
+                    "id": "register.selectInformant.deathInformantSomeoneElseTitle"
+                  },
+                  "hideHeader": true,
+                  "size": "large",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "HEAD_OF_THE_INSTITUTE",
+                      "label": {
+                        "defaultMessage": "Head of the institution where the death occured",
+                        "description": "Option for form field: Head of the institute",
+                        "id": "form.field.label.applicantRelation.headOfTheInstitute"
+                      }
+                    },
+                    {
+                      "value": "OWNER_OF_THE_HOUSE",
+                      "label": {
+                        "defaultMessage": "Owner of the house or building where the death occured",
+                        "description": "Option for form field: Owner of the house",
+                        "id": "form.field.label.applicantRelation.ownerOfTheHouse"
+                      }
+                    },
+                    {
+                      "value": "DRIVER_OF_THE_VEHICLE",
+                      "label": {
+                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the death occured",
+                        "description": "Option for form field: Driver of the vehicle",
+                        "id": "form.field.label.applicantRelation.driverOfTheVehicle"
+                      }
+                    },
+                    {
+                      "value": "OFFICER_IN_CHARGE",
+                      "label": {
+                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the death occured",
+                        "description": "Option for form field: Officer-in-charge",
+                        "id": "form.field.label.applicantRelation.officerInCharge"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Option for form field: Someone else",
+                        "id": "form.field.label.relationSomeoneElse"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "OTHER": [
+                      {
+                        "name": "otherRelationship",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Relationship to deceased",
+                          "id": "register.selectInformant.relationshipLabel",
+                          "description": "Label for input Relationship to deceased"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "informant.otherRelationship"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "informant.otherRelationship"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "informant.otherRelationship"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "point-of-contact",
+              "title": {
+                "defaultMessage": "Who is the main point of contact for this application?",
+                "description": "Form section title for contact point",
+                "id": "register.SelectContactPoint.heading"
+              },
+              "conditionals": [],
+              "fields": [
+                {
+                  "name": "contactPoint",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "label": {
+                    "defaultMessage": "Who is the main point of contact for this application?",
+                    "description": "Form section title for contact point",
+                    "id": "register.SelectContactPoint.heading"
+                  },
+                  "conditionals": [],
+                  "hideHeader": true,
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "size": "large",
+                  "placeholder": {
+                    "defaultMessage": "Select",
+                    "description": "Placeholder text for a select",
+                    "id": "form.field.select.placeholder"
+                  },
+                  "options": [
+                    {
+                      "value": "APPLICANT",
+                      "label": {
+                        "defaultMessage": "Applicant",
+                        "description": "Label for \"Applicant\" radio option",
+                        "id": "form.field.label.application.whoseContactDetails.applicant"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Label for \"Someone else\" radio option",
+                        "id": "form.field.label.someoneElse"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "APPLICANT": [
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "OTHER": [
+                      {
+                        "name": "contactRelationship",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Relationship to deceased",
+                          "id": "register.selectInformant.relationshipLabel",
+                          "description": "Label for input Relationship to deceased"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactRelationship"
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactRelationship"
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "registrationPhone",
+                        "type": "TEL",
+                        "label": {
+                          "defaultMessage": "Phone number",
+                          "description": "Input label for phone input",
+                          "id": "form.field.label.phoneNumber"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "phoneNumberFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "msisdnTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": [
+                              "registration.contactPhoneNumber",
+                              {
+                                "operation": "localPhoneTransformer",
+                                "parameters": [
+                                  "registration.contactPhoneNumber"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "mapping": {
+                    "mutation": {
+                      "operation": "nestedRadioFieldToBundleFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
+                    },
+                    "query": {
+                      "operation": "bundleFieldToNestedRadioFieldTransformer",
+                      "parameters": [
+                        "registration.contact"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "mapping": {
+            "mutation": {
+              "operation": "setBirthRegistrationSectionTransformer"
+            },
+            "query": {
+              "operation": "getBirthRegistrationSectionTransformer"
+            }
+          }
+        },
+        {
           "id": "deceased",
           "viewType": "form",
           "name": {
