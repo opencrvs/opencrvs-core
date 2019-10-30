@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fhirUrl } from '@metrics/constants'
-import urlJoin from 'url-join'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -9,7 +8,8 @@ export function fetchFHIR<T = any>(
   method: string = 'GET',
   body?: string
 ) {
-  return fetch(urlJoin(fhirUrl, suffix), {
+  const url = [fhirUrl.replace(/\/$/, ''), suffix].join('/')
+  return fetch(url, {
     method,
     headers: {
       'Content-Type': 'application/fhir+json',

@@ -55,7 +55,7 @@ const Content = styled.div`
     padding-bottom: 32px;
   }
 `
-const UnderLayBackground = styled.div.attrs<{ background: string }>({})`
+const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
       ? theme.colors.success

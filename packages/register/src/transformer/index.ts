@@ -47,7 +47,7 @@ export const draftToGqlTransformer = (
     throw new Error('Sections are missing in form definition')
   }
   const transformedData: TransformedData = { createdAt: new Date() }
-  let inCompleteData = false
+  let inCompleteFieldList: string[] = []
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
       return
@@ -77,7 +77,9 @@ export const draftToGqlTransformer = (
             `Data is missing for a required field: ${fieldDef.name}` +
               `on section ${section.id}`
           )
-          inCompleteData = true
+          inCompleteFieldList.push(
+            `${section.id}/${groupDef.id}/${fieldDef.name}`
+          )
           return
         }
         if (
@@ -122,11 +124,15 @@ export const draftToGqlTransformer = (
   if (draftData._fhirIDMap) {
     transformedData._fhirIDMap = draftData._fhirIDMap
   }
-  if (inCompleteData) {
+  if (inCompleteFieldList && inCompleteFieldList.length > 0) {
     if (transformedData.registration) {
-      transformedData.registration.inProgress = true
+      transformedData.registration.inCompleteFields = inCompleteFieldList.join(
+        ','
+      )
     } else {
-      transformedData.registration = { inProgress: true }
+      transformedData.registration = {
+        inCompleteFields: inCompleteFieldList.join(',')
+      }
     }
   }
 

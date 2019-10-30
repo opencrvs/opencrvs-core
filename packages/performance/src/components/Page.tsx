@@ -7,7 +7,7 @@ interface IPageProps {
 
 const languageFromProps = ({ language }: IPageProps) => language
 
-const StyledPage = styled.div.attrs<IPageProps>({})`
+const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   display: flex;

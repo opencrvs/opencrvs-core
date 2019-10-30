@@ -16,7 +16,7 @@ import { RouteComponentProps } from 'react-router'
 import { UserTab } from './user/userTab'
 import { messages } from '@register/i18n/messages/views/sysAdmin'
 
-const Tab = styled(Button).attrs<{ active: boolean }>({})`
+const Tab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   outline: none;
   flex-shrink: 0;

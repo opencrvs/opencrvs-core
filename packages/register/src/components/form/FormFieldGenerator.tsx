@@ -476,7 +476,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-interface ITouchedNestedFields {
+export interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean
@@ -484,18 +484,18 @@ interface ITouchedNestedFields {
 }
 
 class FormSectionComponent extends React.Component<Props> {
-  componentWillReceiveProps(nextProps: Props) {
-    const userChangedForm = !isEqual(nextProps.values, this.props.values)
-    const sectionChanged = this.props.id !== nextProps.id
+  componentDidUpdate(prevProps: Props) {
+    const userChangedForm = !isEqual(this.props.values, prevProps.values)
+    const sectionChanged = prevProps.id !== this.props.id
 
     if (userChangedForm) {
-      this.props.onChange(nextProps.values)
+      prevProps.onChange(this.props.values)
     }
 
     if (sectionChanged) {
-      this.props.resetForm()
-      if (nextProps.setAllFieldsDirty) {
-        this.showValidationErrors(nextProps.fields)
+      prevProps.resetForm()
+      if (this.props.setAllFieldsDirty) {
+        this.showValidationErrors(this.props.fields)
       }
     }
   }

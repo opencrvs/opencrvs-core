@@ -1,4 +1,4 @@
-import { RouterAction } from 'react-router-redux'
+import { RouterAction } from 'connected-react-router'
 import { IURLParams } from '@performance/utils/authUtils'
 import { IUserDetails } from '@performance/utils/userUtils'
 import { ApolloQueryResult } from 'apollo-client'

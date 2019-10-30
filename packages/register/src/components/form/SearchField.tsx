@@ -52,9 +52,9 @@ const ListContainer = styled.div`
     border-top: 1px solid ${({ theme }) => theme.colors.greySmoky};
   }
 `
-const ItemContainer = styled.div.attrs<{
+const ItemContainer = styled.div<{
   selected?: boolean
-}>({})`
+}>`
   width: 870px;
   min-height: 96px;
   display: flex;
@@ -70,7 +70,7 @@ interface IItemProps {
   color?: string
 }
 
-const Item = styled.div.attrs<IItemProps>({})`
+const Item = styled.div<IItemProps>`
   display: flex;
   width: ${({ width }) => (width ? width : 280)}px;
   padding: 5px 10px;

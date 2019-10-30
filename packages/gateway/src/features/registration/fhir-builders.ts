@@ -677,6 +677,16 @@ function createInformantShareContactNumber(
   })
 }
 
+function createInCompleteFieldListExt(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`,
+    valueString: fieldValue
+  })
+}
+
 function setResourceIdentifier(
   resource: fhir.Task,
   identifierName: string,
@@ -1727,16 +1737,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
     },
-    inProgress: (
+    inCompleteFields: (
       fhirBundle: ITemplatedBundle,
-      fieldValue: boolean,
+      fieldValue: string,
       context: any
     ) => {
-      if (fieldValue) {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.status = 'draft'
-      }
-      return
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      taskResource.status = 'draft'
+      return createInCompleteFieldListExt(taskResource, fieldValue)
     },
     paperFormID: (
       fhirBundle: ITemplatedBundle,
