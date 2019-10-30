@@ -45,6 +45,7 @@ export interface ILocation {
 }
 
 export interface ILocationSequenceNumber {
+  year: string
   reference: string
   sequence_number: string
 }
@@ -157,6 +158,38 @@ export const titleCase = (str: string) => {
   return stringArray.join(' ')
 }
 
+export async function getPractitionerLocationId(
+  practitionerId: string
+): Promise<string> {
+  const locations: fhir.Location[] = await getPractitionerLocations(
+    practitionerId
+  )
+  const union = locations.find(location => {
+    const jurisdictionIdentifier =
+      location.identifier &&
+      location.identifier.find(
+        identifier =>
+          identifier.system ===
+          `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`
+      )
+    if (!jurisdictionIdentifier) {
+      return false
+    }
+    return (
+      // TODO: Once we receive api update from OISF,
+      // Need to add MUNICIPALITY || CITY_CORPORATION type here
+      jurisdictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase()
+    )
+  })
+
+  if (!union || !union.id) {
+    throw new Error(
+      `No valid union found for given practioner: ${practitionerId}`
+    )
+  }
+  return union.id
+}
+
 export async function getPractitionerLocations(
   practitionerId: string
 ): Promise<fhir.Location[]> {
@@ -202,4 +235,8 @@ export function convertStringToASCII(str: string): string {
   return [...str]
     .map(char => char.charCodeAt(0).toString())
     .reduce((acc, v) => acc.concat(v))
+}
+
+export function convertNumberToString(value: number, size: number) {
+  return value.toString().padStart(size, '0')
 }
