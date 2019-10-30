@@ -129,6 +129,18 @@ describe('when draft data is transformed to graphql', () => {
     }
   }
 
+  const primaryCaregiver = {
+    parentDetailsType: 'MOTHER_ONLY',
+    reasonMotherNotApplying: '',
+    motherIsDeceased: [],
+    reasonFatherNotApplying: '',
+    fatherIsDeceased: [],
+    primaryCaregiverType: {
+      value: 'INFORMANT',
+      nestedFields: { name: '', phone: '', reasonNotApplying: '' }
+    }
+  }
+
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
     setItem.mockClear()
@@ -150,6 +162,7 @@ describe('when draft data is transformed to graphql', () => {
       father: fatherDetails,
       mother: motherDetails,
       registration: registrationDetails,
+      primaryCaregiver,
       documents: { imageUploader: '' }
     }
 
@@ -188,6 +201,7 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -203,13 +217,13 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
       expect(
         draftToGqlTransformer(form, data).registration.contactPhoneNumber
       ).toBe('+8801736478884')
     })
-
     it('Pass false as fathersDetailsExist on father section', () => {
       const clonedFather = clone(fatherDetails)
       clonedFather.fathersDetailsExist = false
@@ -219,6 +233,7 @@ describe('when draft data is transformed to graphql', () => {
         father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
+        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -237,6 +252,7 @@ describe('when draft data is transformed to graphql', () => {
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
+        primaryCaregiver,
         documents: {}
       }
       expect(
@@ -248,7 +264,9 @@ describe('when draft data is transformed to graphql', () => {
         child: {},
         father: {},
         mother: {},
-        documents: {}
+        documents: {},
+        registration: {},
+        primaryCaregiver: {}
       }
       expect(
         draftToGqlTransformer(form, data).registration.inCompleteFields

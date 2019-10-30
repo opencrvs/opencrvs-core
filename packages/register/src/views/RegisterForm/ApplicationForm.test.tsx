@@ -299,7 +299,7 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
@@ -309,7 +309,7 @@ describe('when user has starts a new application', () => {
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
 
           it('No error while uploading valid file', async () => {
