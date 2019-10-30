@@ -346,7 +346,7 @@ const messagesToDefine: IUserMessages = {
   },
   incorrectPassword: {
     id: 'system.user.settings.incorrectPassword',
-    defaultMessage: 'Incorrect password. Please try again',
+    defaultMessage: 'Current password incorrect. Please try again.',
     description: 'Response message for incorrect password for password change'
   },
   passwordUpdated: {

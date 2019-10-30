@@ -68,7 +68,6 @@ const Body = styled.div<{ height?: number }>`
   height: ${({ height }) => (height ? height : 250)}px;
   overflow-y: auto;
   padding: 0 24px 16px;
-  padding-right: 64px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

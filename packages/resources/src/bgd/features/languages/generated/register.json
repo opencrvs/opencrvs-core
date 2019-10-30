@@ -984,7 +984,7 @@
         "settings.user.label.nameBN": "Bengali name",
         "settings.user.label.nameEN": "English name",
         "system.user.queryError": "An error occured while loading system users",
-        "system.user.settings.incorrectPassword": "Incorrect password. Please try again",
+        "system.user.settings.incorrectPassword": "Current password incorrect. Please try again.",
         "system.user.settings.passwordUpdated": "Password was successfully changed",
         "tab.inProgress.selector.field.agents": "Field agents",
         "tab.inProgress.selector.own.drafts": "Yours",
