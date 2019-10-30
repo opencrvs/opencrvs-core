@@ -15534,7 +15534,7 @@
                   }
                 },
                 {
-                  "name": "uploadDocForDeceasedDateOfBirth",
+                  "name": "uploadDocForDeceasedDOB",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
                     "defaultMessage": "Proof of date of birth of deceased",
