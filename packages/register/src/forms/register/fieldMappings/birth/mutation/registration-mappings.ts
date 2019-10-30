@@ -136,6 +136,10 @@ export const changeHirerchyMutationTransformer = (
     field.name
   ] as IFormSectionData).nestedFields as IFormSectionData
 
+  if (!nestedFieldValueObj[nestedField.name]) {
+    return
+  }
+
   if (transformedFieldName) {
     set(
       transformedData,
