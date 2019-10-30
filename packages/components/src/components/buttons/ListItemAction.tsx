@@ -14,19 +14,19 @@ const Container = styled.div`
     margin-left: 0px;
   }
 `
-const ListItemSingleAction = styled(TertiaryButton).attrs<{
+const ListItemSingleAction = styled(TertiaryButton)<{
   isFullHeight?: boolean
-}>({})`
+}>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
-const ExpansionSecion = styled(ExpansionButton).attrs<{
+const ExpansionSecion = styled(ExpansionButton)<{
   isFullHeight?: boolean
-}>({})`
+}>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
-const ArrowExpansionSecion = styled(ArrowExpansionButton).attrs<{
+const ArrowExpansionSecion = styled(ArrowExpansionButton)<{
   isFullHeight?: boolean
-}>({})`
+}>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
 interface IListItemActionProps {

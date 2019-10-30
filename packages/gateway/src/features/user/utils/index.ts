@@ -50,6 +50,14 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
+export function isTokenOwner(authHeader: IAuthHeader, userId: string) {
+  if (!authHeader || !authHeader.Authorization) {
+    return false
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return (tokenPayload.sub && tokenPayload.sub === userId) || false
+}
+
 export const getTokenPayload = (token: string): ITokenPayload => {
   let decoded: ITokenPayload
   try {

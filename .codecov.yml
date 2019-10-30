@@ -59,3 +59,8 @@ ignore:
   - 'packages/workflow/src/index.ts'
   - 'packages/gateway/src/index.ts'
   - 'packages/gateway/src/routes.ts'
+  - 'packages/performance/src/index.tsx'
+  - 'packages/performance/src/storage.ts'
+  - 'packages/performance/src/components/ErrorBoundary.tsx'
+  - 'packages/performance/src/components/TopMenu.tsx'
+  - 'packages/performance/src/navigation/index.tsx'

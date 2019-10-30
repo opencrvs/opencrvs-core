@@ -171,7 +171,9 @@ export enum GQLAttachmentType {
   CORONERS_REPORT = 'CORONERS_REPORT',
   SIGNED_AFFIDAVIT = 'SIGNED_AFFIDAVIT',
   ORIGINAL_BIRTH_RECORD = 'ORIGINAL_BIRTH_RECORD',
-  UNDER_FIVE_CARD = 'UNDER_FIVE_CARD'
+  UNDER_FIVE_CARD = 'UNDER_FIVE_CARD',
+  PROOF_OF_LEGAL_GUARDIANSHIP = 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  PROOF_OF_ASSIGNED_RESPONSIBILITY = 'PROOF_OF_ASSIGNED_RESPONSIBILITY'
 }
 
 export enum GQLAttachmentSubject {
@@ -186,7 +188,9 @@ export enum GQLAttachmentSubject {
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
   DECEASED_BIRTH_PROOF = 'DECEASED_BIRTH_PROOF',
   APPLICANT_ID_PROOF = 'APPLICANT_ID_PROOF',
-  APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF'
+  APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
+  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
+  ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF'
 }
 
 export interface GQLDeceased {
@@ -297,7 +301,7 @@ export interface GQLRegistration {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflow | null>
   type?: GQLRegistrationType
-  inProgress?: boolean
+  inCompleteFields?: string
   attachments?: Array<GQLAttachment | null>
   certificates?: Array<GQLCertificate | null>
   duplicates?: Array<string | null>
@@ -623,6 +627,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   createUser: GQLUser
   activateUser?: string
+  changePassword?: string
 }
 
 export interface GQLNotificationInput {
@@ -755,7 +760,7 @@ export interface GQLRegistrationInput {
   contactPhoneNumber?: string
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
-  inProgress?: boolean
+  inCompleteFields?: string
   attachments?: Array<GQLAttachmentInput | null>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
@@ -1817,7 +1822,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
   type?: RegistrationToTypeResolver<TParent>
-  inProgress?: RegistrationToInProgressResolver<TParent>
+  inCompleteFields?: RegistrationToInCompleteFieldsResolver<TParent>
   attachments?: RegistrationToAttachmentsResolver<TParent>
   certificates?: RegistrationToCertificatesResolver<TParent>
   duplicates?: RegistrationToDuplicatesResolver<TParent>
@@ -1886,7 +1891,7 @@ export interface RegistrationToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface RegistrationToInProgressResolver<
+export interface RegistrationToInCompleteFieldsResolver<
   TParent = any,
   TResult = any
 > {
@@ -2665,6 +2670,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   createUser?: MutationToCreateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
+  changePassword?: MutationToChangePasswordResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2938,6 +2944,23 @@ export interface MutationToActivateUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToActivateUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToChangePasswordArgs {
+  userId: string
+  existingPassword: string
+  password: string
+}
+export interface MutationToChangePasswordResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToChangePasswordArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { injectGlobal } from 'styled-components'
 import * as Sentry from '@sentry/browser'
 import * as LogRocket from 'logrocket'
 import { App } from '@login/App'
@@ -9,15 +8,6 @@ import { storage } from '@login/storage'
 import { createStore } from './store'
 
 storage.configStorage('OpenCRVS')
-
-// Injecting global styles for the body tag - used only once
-// @ts-ignore
-injectGlobal`
-  body {
-    margin: 0;
-    padding: 0;
-  }
-`
 
 if (
   window.location.hostname !== 'localhost' &&

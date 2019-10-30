@@ -113,6 +113,7 @@ describe('ReviewForm tests', () => {
       testComponent.component
         .find('#review-error-text')
         .children()
+        .hostNodes()
         .text()
     ).toBe('An error occurred while fetching birth registration')
   })
@@ -185,6 +186,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   },
@@ -193,6 +195,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   }
@@ -228,6 +231,7 @@ describe('ReviewForm tests', () => {
                 address: {
                   country: 'BGD',
                   state: 'state4',
+                  city: '',
                   district: 'district2',
                   postalCode: '',
                   line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
@@ -275,7 +279,6 @@ describe('ReviewForm tests', () => {
     const data = testComponent.component
       .find(RegisterForm)
       .prop('application') as IApplication
-
     expect(data.data.child).toEqual({
       _fhirID: '16025284-bae2-4b37-ae80-e16745b7a6b9',
       attendantAtBirth: 'NURSE',
@@ -284,16 +287,18 @@ describe('ReviewForm tests', () => {
       familyNameEng: 'Akash',
       gender: 'male',
       placeOfBirth: 'PRIVATE_HOME',
-      birthLocation: undefined,
       country: 'BGD',
-      state: 'state4',
       district: 'district2',
+      state: 'state4',
       addressLine1: 'Rd #10',
       addressLine1CityOption: '',
       addressLine2: 'Akua',
       addressLine3: 'union1',
       addressLine3CityOption: '',
       addressLine4: 'upazila10',
+      internationalAddressLine1: undefined,
+      internationalAddressLine2: undefined,
+      internationalAddressLine3: undefined,
       multipleBirth: 1,
       birthType: 'SINGLE',
       weightAtBirth: 2
@@ -352,6 +357,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   },
@@ -360,6 +366,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   }
@@ -390,6 +397,7 @@ describe('ReviewForm tests', () => {
                 address: {
                   country: 'BGD',
                   state: 'state4',
+                  city: '',
                   district: 'district2',
                   postalCode: '',
                   line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
@@ -495,6 +503,7 @@ describe('ReviewForm tests', () => {
                 address: {
                   country: 'BGD',
                   state: 'state4',
+                  city: '',
                   district: 'district2',
                   postalCode: '',
                   line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
@@ -607,6 +616,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   },
@@ -615,6 +625,7 @@ describe('ReviewForm tests', () => {
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   }
@@ -655,6 +666,7 @@ describe('ReviewForm tests', () => {
                 address: {
                   country: 'BGD',
                   state: 'state4',
+                  city: '',
                   district: 'district2',
                   postalCode: '',
                   line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
@@ -1200,6 +1212,7 @@ describe('ReviewForm tests', () => {
                       ],
                       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      city: '',
                       postalCode: '12',
                       country: 'BGD'
                     },
@@ -1215,6 +1228,7 @@ describe('ReviewForm tests', () => {
                       ],
                       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      city: '',
                       postalCode: '12',
                       country: 'BGD'
                     }
@@ -1266,6 +1280,7 @@ describe('ReviewForm tests', () => {
                         ],
                         district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                         state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        city: '',
                         postalCode: '12',
                         country: 'BGD'
                       },
@@ -1281,6 +1296,7 @@ describe('ReviewForm tests', () => {
                         ],
                         district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                         state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        city: '',
                         postalCode: '12',
                         country: 'BGD'
                       }
@@ -1307,6 +1323,7 @@ describe('ReviewForm tests', () => {
                     line: ['', '', '', '', '', ''],
                     district: '',
                     state: '',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   }
@@ -1387,6 +1404,20 @@ describe('ReviewForm tests', () => {
         postCodeCityOption: '12',
         addressLine1: '121',
         postCode: '12',
+        internationalAddressLine1: '',
+        internationalAddressLine1Permanent: '',
+        internationalAddressLine2: '',
+        internationalAddressLine2Permanent: '',
+        internationalAddressLine3: '',
+        internationalAddressLine3Permanent: '',
+        internationalCity: '',
+        internationalCityPermanent: '',
+        internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        internationalDistrictPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
+        internationalPostcode: '12',
+        internationalPostcodePermanent: '12',
+        internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+        internationalStatePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
         _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
       })
     })
@@ -1446,6 +1477,7 @@ describe('ReviewForm tests', () => {
                       ],
                       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      city: '',
                       postalCode: '12',
                       country: 'BGD'
                     },
@@ -1461,6 +1493,7 @@ describe('ReviewForm tests', () => {
                       ],
                       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                      city: '',
                       postalCode: '12',
                       country: 'BGD'
                     }
@@ -1512,6 +1545,7 @@ describe('ReviewForm tests', () => {
                         ],
                         district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                         state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        city: '',
                         postalCode: '12',
                         country: 'BGD'
                       },
@@ -1527,6 +1561,7 @@ describe('ReviewForm tests', () => {
                         ],
                         district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
                         state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
+                        city: '',
                         postalCode: '12',
                         country: 'BGD'
                       }
@@ -1553,13 +1588,13 @@ describe('ReviewForm tests', () => {
                     line: ['', '', '', '', '', ''],
                     district: '',
                     state: '',
+                    city: '',
                     postalCode: '',
                     country: 'BGD'
                   }
                 },
                 mannerOfDeath: 'ACCIDENT',
-                causeOfDeathMethod: 'Natural',
-                causeOfDeath: '123'
+                causeOfDeath: 'Internal injury in head'
               }
             }
           }
@@ -1602,8 +1637,7 @@ describe('ReviewForm tests', () => {
 
       expect(data.data.causeOfDeath).toEqual({
         causeOfDeathEstablished: true,
-        causeOfDeathCode: '123',
-        methodOfCauseOfDeath: 'Natural'
+        causeOfDeathCode: 'Internal injury in head'
       })
     })
   })
@@ -1645,6 +1679,7 @@ describe('ReviewForm tests', () => {
                   address: {
                     country: 'BGD',
                     state: 'state4',
+                    city: '',
                     district: 'district2',
                     postalCode: '',
                     line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
@@ -1693,6 +1728,7 @@ describe('ReviewForm tests', () => {
         testComponent.component
           .find('#review-unauthorized-error-text')
           .children()
+          .hostNodes()
           .text()
       ).toBe('We are unable to display this page to you')
     })

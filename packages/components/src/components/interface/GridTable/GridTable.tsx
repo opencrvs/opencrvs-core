@@ -40,10 +40,10 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowWrapper = styled.div.attrs<{
+const RowWrapper = styled.div<{
   expandable?: boolean
   clickable?: boolean
-}>({})`
+}>`
   width: 100%;
   padding: 0 24px;
   display: flex;
@@ -53,11 +53,11 @@ const RowWrapper = styled.div.attrs<{
     expandable || clickable ? 'pointer' : 'default'};
 `
 
-const ContentWrapper = styled.span.attrs<{
+const ContentWrapper = styled.span<{
   width: number
   alignment?: string
   color?: string
-}>({})`
+}>`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
@@ -72,7 +72,7 @@ const IconWrapper = styled(ContentWrapper)`
   padding-top: 5px;
 `
 
-const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedSectionContainer = styled.div<{ expanded: boolean }>`
   margin-top: 5px;
   overflow: hidden;
   transition-property: all;
@@ -206,6 +206,7 @@ export class GridTable extends React.Component<
     // perform internal pagination
     const offset = (currentPage - 1) * pageSize
     const displayItems = allItems.slice(offset, offset + pageSize)
+
     return displayItems
   }
 
@@ -248,16 +249,17 @@ export class GridTable extends React.Component<
         {this.getDisplayItems(currentPage, pageSize, content).map(
           (item, index) => {
             const expanded = this.showExpandedSection(item.id as string)
+            const clickable = this.props.clickable || Boolean(item.rowClickable)
             return (
               <StyledBox key={index}>
                 <RowWrapper
                   id={'row_' + index}
                   expandable={this.props.expandable}
-                  clickable={this.props.clickable}
+                  clickable={clickable}
                   onClick={() =>
                     (this.props.expandable &&
                       this.toggleExpanded(item.id as string)) ||
-                    (this.props.clickable &&
+                    (clickable &&
                       this.getRowClickHandler(
                         item.rowClickHandler as IAction[]
                       )())

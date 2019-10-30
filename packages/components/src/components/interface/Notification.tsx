@@ -15,20 +15,20 @@ interface IProps {
   className?: string
 }
 
-const styledNotification = styled.div.attrs({})
 const easeIn = keyframes`
   from { bottom: -100px; }
   to { bottom: 0; }
 `
-const NotificationContainer = styledNotification`
+
+const NotificationContainer = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   position: fixed;
   left: 0;
   right: 0;
   bottom: -100px;
-  height:100px;
+  height: 100px;
   width: 100%;
-  display:flex;
+  display: flex;
   background: ${({ theme }) => theme.colors.secondary};
   z-index: 1;
   justify-content: center;
@@ -37,10 +37,12 @@ const NotificationContainer = styledNotification`
 
   &.show {
     animation: ${easeIn} 500ms;
-    bottom:0;
+    bottom: 0;
   }
 
-  &.success, &.error, &.warning {
+  &.success,
+  &.error,
+  &.warning {
     background: ${({ theme }) => theme.colors.placeholder};
     border-top: 10px solid;
   }
@@ -56,7 +58,7 @@ const NotificationContainer = styledNotification`
     border-color: ${({ theme }) => theme.colors.warning};
   }
   &.clickable {
-    cursor:pointer;
+    cursor: pointer;
   }
 `
 

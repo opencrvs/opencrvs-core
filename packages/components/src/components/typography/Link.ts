@@ -1,7 +1,7 @@
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 
-export const Link = styled.a.attrs<{ error?: boolean }>({})`
+export const Link = styled.a<{ error?: boolean }>`
   width: auto;
   min-height: 44px;
   color: ${({ error, theme }) =>

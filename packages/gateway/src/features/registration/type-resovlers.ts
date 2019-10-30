@@ -221,14 +221,6 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async inProgress(task: fhir.Task) {
-      const taskStatus = (task && task.status) || ''
-      if (taskStatus === 'draft') {
-        return true
-      } else {
-        return false
-      }
-    },
     async attachments(task: fhir.Task, _, authHeader) {
       if (!task.focus) {
         throw new Error(

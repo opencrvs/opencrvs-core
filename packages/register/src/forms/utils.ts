@@ -42,7 +42,7 @@ import {
   ILocation,
   IOfflineData
 } from '@register/offline/reducer'
-import { Validation, IValidationResult } from '@register/utils/validate'
+import { Validation } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
@@ -310,6 +310,10 @@ export function isCityLocation(
   }
 }
 
+export function isDefaultCountry(countryCode: string): boolean {
+  return countryCode === window.config.COUNTRY.toUpperCase()
+}
+
 interface IVars {
   [key: string]: any
 }
@@ -454,6 +458,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.countryPermanent'
   },
+  isDefaultCountryPermanent: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.countryPermanent)'
+  },
   statePermanent: {
     action: 'hide',
     expression: '!values.statePermanent'
@@ -473,6 +481,10 @@ export const conditionals: IConditionals = {
   country: {
     action: 'hide',
     expression: '!values.country'
+  },
+  isDefaultCountry: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.country)'
   },
   state: {
     action: 'hide',

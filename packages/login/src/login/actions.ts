@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios'
-import { RouterAction, push, goBack as back } from 'react-router-redux'
+import { RouterAction, push, goBack as back } from 'connected-react-router'
 import {
   IAuthenticateResponse,
   IAuthenticationData,

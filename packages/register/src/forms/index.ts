@@ -543,7 +543,9 @@ export interface IConditionals {
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
+  isDefaultCountry: IConditional
   isNotCityLocationPermanent: IConditional
+  isDefaultCountryPermanent: IConditional
   isCityLocationPermanent: IConditional
   applicantPermanentAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
@@ -681,6 +683,8 @@ export enum BirthSection {
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
+  Applicant = 'informant',
+  Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'
@@ -754,6 +758,7 @@ export interface IFormSectionGroup {
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
   error?: MessageDescriptor
+  preventContinueIfError?: boolean
 }
 
 export interface IForm {

@@ -6,7 +6,10 @@ import {
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
-  setPageVisibility
+  setPageVisibility,
+  getFileFromBase64String,
+  validImageB64String,
+  selectOption
 } from '@register/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@register/navigation/routes'
 import {
@@ -75,10 +78,79 @@ describe('when user has starts a new application', () => {
       history = testApp.history
       store = testApp.store
     })
+
+    describe('when user tries to continue without providing contact-point datas', () => {
+      let draft: IApplication
+      beforeEach(async () => {
+        const data = {
+          registration: {
+            presentAtBirthRegistration: 'MOTHER'
+          }
+        }
+        draft = createApplication(Event.BIRTH, data)
+        store.dispatch(storeApplication(draft))
+        history.replace(
+          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+        )
+        await waitForElement(app, '#register_form')
+      })
+      describe('when user clicks continue without choosing point of contact', () => {
+        it('prevents from continuing and show radio button error', async () => {
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await waitForElement(app, '#contactPoint_error')
+          expect(app.find('#contactPoint_error').hostNodes()).toHaveLength(1)
+        })
+      })
+      describe('when user clicks continue without entering invalid phone number of contact point ', () => {
+        it('prevents from continuing and shows phone inputfield error', async () => {
+          app
+            .find('#contactPoint_MOTHER')
+            .hostNodes()
+            .simulate('change', { target: { checked: true } })
+          await waitForElement(
+            app,
+            'input[name="contactPoint.nestedFields.registrationPhone"]'
+          )
+          app
+            .find('input[name="contactPoint.nestedFields.registrationPhone"]')
+            .simulate('change', {
+              target: {
+                name: 'contactPoint.nestedFields.registrationPhone',
+                value: '0'
+              }
+            })
+
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await waitForElement(
+            app,
+            'div[id="contactPoint.nestedFields.registrationPhone_error"]'
+          )
+          expect(
+            app
+              .find(
+                'div[id="contactPoint.nestedFields.registrationPhone_error"]'
+              )
+              .hostNodes()
+          ).toHaveLength(1)
+        })
+      })
+    })
+
     describe('when user is in birth registration by parent informant view', () => {
       let draft: IApplication
       beforeEach(async () => {
-        draft = createApplication(Event.BIRTH)
+        const data = {
+          registration: {
+            presentAtBirthRegistration: 'MOTHER'
+          }
+        }
+        draft = createApplication(Event.BIRTH, data)
 
         /*
          * Needs to be done before storeApplication(draft)
@@ -89,6 +161,22 @@ describe('when user has starts a new application', () => {
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
+        app
+          .find('#contactPoint_MOTHER')
+          .hostNodes()
+          .simulate('change', { target: { checked: true } })
+        await waitForElement(
+          app,
+          'input[name="contactPoint.nestedFields.registrationPhone"]'
+        )
+        app
+          .find('input[name="contactPoint.nestedFields.registrationPhone"]')
+          .simulate('change', {
+            target: {
+              name: 'contactPoint.nestedFields.registrationPhone',
+              value: '01999999999'
+            }
+          })
         app
           .find('#next_section')
           .hostNodes()
@@ -211,7 +299,7 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
@@ -221,7 +309,68 @@ describe('when user has starts a new application', () => {
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
+          })
+
+          it('No error while uploading valid file', async () => {
+            selectOption(app, '#uploadDocForMother', 'Other')
+            app.update()
+            app
+              .find('#image_file_uploader_field')
+              .hostNodes()
+              .first()
+              .simulate('change', {
+                target: {
+                  files: [
+                    getFileFromBase64String(
+                      validImageB64String,
+                      'index.png',
+                      'image/png'
+                    )
+                  ]
+                }
+              })
+            await flushPromises()
+            app.update()
+
+            expect(
+              app
+                .find('#upload-error')
+                .hostNodes()
+                .first()
+                .text()
+            ).toBe('')
+          })
+
+          it('Error while uploading invalid file', async () => {
+            selectOption(app, '#uploadDocForMother', 'Other')
+            app.update()
+            app
+              .find('#image_file_uploader_field')
+              .hostNodes()
+              .first()
+              .simulate('change', {
+                target: {
+                  files: [
+                    getFileFromBase64String(
+                      validImageB64String,
+                      'index.bmp',
+                      'image/bmp'
+                    )
+                  ]
+                }
+              })
+            await flushPromises()
+            app.update()
+            expect(
+              app
+                .find('#upload-error')
+                .hostNodes()
+                .first()
+                .text()
+            ).toBe(
+              'File format not supported. Please attach a png, jpf or pdf (max 5mb)'
+            )
           })
         })
       })

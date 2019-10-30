@@ -1,4 +1,4 @@
-import { push, goBack as back } from 'react-router-redux'
+import { push, goBack as back } from 'connected-react-router'
 import { HOME } from '@performance/navigation/routes'
 import { getToken } from '@performance/utils/authUtils'
 

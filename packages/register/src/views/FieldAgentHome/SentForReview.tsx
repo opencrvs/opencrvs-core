@@ -180,6 +180,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           name: name || '',
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
+          rowClickable: Boolean(draft.compositionId),
           rowClickHandler: [
             {
               label: 'rowClickHandler',
@@ -270,7 +271,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
-          clickable={true}
           currentPage={this.state.sentForReviewPageNo}
         />
       </HomeContent>

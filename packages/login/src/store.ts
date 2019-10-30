@@ -16,10 +16,10 @@ import {
   LoopReducer
 } from 'redux-loop'
 import {
-  routerReducer,
+  connectRouter,
   routerMiddleware,
   RouterState
-} from 'react-router-redux'
+} from 'connected-react-router'
 import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
@@ -39,19 +39,19 @@ const formRed: LoopReducer<FormStateMap, FormAction> = (
   action: FormAction
 ) => formReducer(state as FormStateMap, action)
 
-const reducers = combineReducers<IStoreState>({
-  login: loginReducer,
-  router: routerReducer,
-  form: formRed,
-  i18n: intlReducer
-})
-
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = () => {
   const history = createBrowserHistory()
+
+  const reducers = combineReducers<IStoreState>({
+    login: loginReducer,
+    router: connectRouter(history) as any, // @todo
+    form: formRed,
+    i18n: intlReducer
+  })
 
   const enhancer = compose(
     install(),

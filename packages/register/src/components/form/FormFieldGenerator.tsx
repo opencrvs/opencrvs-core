@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   CheckboxGroup,
   DateField,
@@ -95,7 +94,6 @@ import {
 } from 'formik'
 import { IOfflineData } from '@register/offline/reducer'
 import { isEqual, flatten } from 'lodash'
-import { IValidationResult } from '@register/utils/validate'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 import { IStoreState } from '@register/store'
 import { getOfflineData } from '@register/offline/selectors'
@@ -478,7 +476,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-interface ITouchedNestedFields {
+export interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean
@@ -486,18 +484,18 @@ interface ITouchedNestedFields {
 }
 
 class FormSectionComponent extends React.Component<Props> {
-  componentWillReceiveProps(nextProps: Props) {
-    const userChangedForm = !isEqual(nextProps.values, this.props.values)
-    const sectionChanged = this.props.id !== nextProps.id
+  componentDidUpdate(prevProps: Props) {
+    const userChangedForm = !isEqual(this.props.values, prevProps.values)
+    const sectionChanged = prevProps.id !== this.props.id
 
     if (userChangedForm) {
-      this.props.onChange(nextProps.values)
+      prevProps.onChange(this.props.values)
     }
 
     if (sectionChanged) {
-      this.props.resetForm()
-      if (nextProps.setAllFieldsDirty) {
-        this.showValidationErrors(nextProps.fields)
+      prevProps.resetForm()
+      if (this.props.setAllFieldsDirty) {
+        this.showValidationErrors(this.props.fields)
       }
     }
   }
@@ -597,6 +595,7 @@ class FormSectionComponent extends React.Component<Props> {
       draftData,
       setValues
     } = this.props
+
     const language = this.props.intl.locale
 
     const errors = (this.props.errors as unknown) as Errors
@@ -640,6 +639,18 @@ class FormSectionComponent extends React.Component<Props> {
 
           if (conditionalActions.includes('hide')) {
             return null
+          }
+
+          if (
+            field.type === DATE &&
+            touched[`${field.name}-dd`] !== undefined &&
+            touched[`${field.name}-mm`] !== undefined &&
+            touched[`${field.name}-yyyy`] !== undefined
+          ) {
+            touched[field.name] =
+              touched[`${field.name}-dd`] &&
+              touched[`${field.name}-mm`] &&
+              touched[`${field.name}-yyyy`]
           }
 
           const withDynamicallyGeneratedFields =

@@ -8,10 +8,15 @@ import {
 const fieldNameMapping = {
   [birthDocumentForWhomFhirMapping.Mother]: 'uploadDocForMother',
   [birthDocumentForWhomFhirMapping.Father]: 'uploadDocForFather',
+  [birthDocumentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
   [birthDocumentForWhomFhirMapping.Parent]:
     'uploadDocForParentPermanentAddress',
-  [birthDocumentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
-  [birthDocumentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge'
+  [birthDocumentForWhomFhirMapping.Applicant]: 'uploadDocForApplicant',
+  [birthDocumentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge',
+  [birthDocumentForWhomFhirMapping.AssignedResponsibilityProof]:
+    'uploadDocForProofOfAssignedResponsibility',
+  [birthDocumentForWhomFhirMapping.LegalGuardianProof]:
+    'uploadDocForProofOfLegarGuardian'
 }
 
 export function birthAttachmentToFieldTransformer(

@@ -57,7 +57,6 @@ import {
   buttonMessages,
   userMessages
 } from '@register/i18n/messages'
-import { grid } from '@opencrvs/components/lib/grid'
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
