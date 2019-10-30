@@ -223,8 +223,11 @@ describe('when draft data is transformed to graphql', () => {
       }
 
       expect(draftToGqlTransformer(form, data).father).toBeUndefined()
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toBeUndefined()
     })
-    it('Raise inProgress flag if in-complete data is given', () => {
+    it('Sends inCompleteFields if in-complete data is given', () => {
       const data = {
         child: {},
         father: {},
@@ -236,20 +239,20 @@ describe('when draft data is transformed to graphql', () => {
         },
         documents: {}
       }
-      expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
-        true
-      )
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toContain('child/child-view-group/placeOfBirth')
     })
-    it('Raise inProgress flag when registration data is also missing', () => {
+    it('Sends inCompleteFields when registration data is also missing', () => {
       const data = {
         child: {},
         father: {},
         mother: {},
         documents: {}
       }
-      expect(draftToGqlTransformer(form, data).registration.inProgress).toEqual(
-        true
-      )
+      expect(
+        draftToGqlTransformer(form, data).registration.inCompleteFields
+      ).toBeDefined()
     })
 
     it('transform primary caregiver data to gql data', () => {
