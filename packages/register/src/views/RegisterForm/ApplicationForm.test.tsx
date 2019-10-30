@@ -304,13 +304,13 @@ describe('when user has starts a new application', () => {
             app.update()
           })
 
-          it('renders list of document upload field', () => {
+          it('renders list of document upload field', async () => {
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-
-            expect(fileInputs).toEqual(5)
+            await flushPromises()
+            expect(fileInputs).toEqual(4)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
