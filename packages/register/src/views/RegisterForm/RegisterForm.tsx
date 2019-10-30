@@ -16,7 +16,10 @@ import {
   writeApplication
 } from '@register/applications'
 
-import { FormFieldGenerator } from '@register/components/form'
+import {
+  FormFieldGenerator,
+  ITouchedNestedFields
+} from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
   Event,
@@ -41,7 +44,7 @@ import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -49,7 +52,9 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
   getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields
+  getVisibleGroupFields,
+  hasFormError,
+  getSectionFields
 } from '@register/forms/utils'
 import { messages } from '@register/i18n/messages/views/register'
 import { buttonMessages, formMessages } from '@register/i18n/messages'
@@ -59,6 +64,8 @@ import {
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@register/utils/constants'
+
+import { FormikTouched, FormikValues } from 'formik'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -222,6 +229,30 @@ class RegisterFormView extends React.Component<FullProps, State> {
       hasError: false
     }
   }
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  showAllValidationErrors = () => {
+    const touched = getSectionFields(this.props.activeSection).reduce(
+      (memo, field) => {
+        let fieldTouched: boolean | ITouchedNestedFields = true
+        if (field.nestedFields) {
+          fieldTouched = {
+            value: true,
+            nestedFields: flatten(Object.values(field.nestedFields)).reduce(
+              (nestedMemo, nestedField) => ({
+                ...nestedMemo,
+                [nestedField.name]: true
+              }),
+              {}
+            )
+          }
+        }
+        return { ...memo, [field.name]: fieldTouched }
+      },
+      {}
+    )
+    this.setAllFormFieldsTouched(touched)
+  }
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
@@ -314,6 +345,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
     groupId: string,
     event: string
   ) => {
+    const { preventContinueIfError } = this.props.activeSectionGroup
+    if (preventContinueIfError) {
+      const activeSectionFields = this.props.activeSectionGroup.fields
+      const activeSectionValues = this.props.application.data[
+        this.props.activeSection.id
+      ]
+      const groupHasError = hasFormError(
+        activeSectionFields,
+        activeSectionValues
+      )
+      if (groupHasError) {
+        this.showAllValidationErrors()
+        return
+      }
+    }
     this.updateVisitedGroups()
     this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
@@ -552,6 +598,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
                       draftData={application.data}
+                      onSetTouched={setTouchedFunc => {
+                        this.setAllFormFieldsTouched = setTouchedFunc
+                      }}
                     />
                   </form>
                   {nextSectionGroup && (
