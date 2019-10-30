@@ -32,7 +32,6 @@ describe('Test password update form', () => {
       .simulate('change', {
         target: { value: 'missmatch' }
       })
-    console.log(app.debug())
     app
       .find('#continue-button')
       .hostNodes()
