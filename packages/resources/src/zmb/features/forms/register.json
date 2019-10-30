@@ -3389,53 +3389,36 @@
                   }
                 },
                 {
-                  "name": "fatherBirthDate",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "fatherBirthDate",
-                      "labelMapper": {
-                        "operation": "getFatherDateOfBirthLabel"
-                      }
-                    },
-                    "type": {
-                      "kind": "static",
-                      "staticType": "DATE"
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "dateFormatIsCorrect",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateInPast",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateLessThan",
-                          "parameters": []
-                        },
-                        "dependencies": [
-                          "dateOfMarriage"
-                        ]
-                      }
-                    ]
-                  },
+                  "name": "motherBirthDate",
+                  "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
                     "id": "form.field.label.motherDateOfBirth"
                   },
-                  "required": true,
+                  "required": false,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateLessThan",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidMotherBirthDate",
+                      "parameters": [
+                        5
+                      ],
+                      "dependencies": []
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
