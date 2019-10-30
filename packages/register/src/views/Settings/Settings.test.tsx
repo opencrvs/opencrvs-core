@@ -97,18 +97,53 @@ describe('Settings page tests', () => {
       .hostNodes()
       .simulate('click')
   })
-  it('Should display password change modal', () => {
-    component
-      .find('#BtnChangePassword')
-      .hostNodes()
-      .simulate('click')
 
-    const modal = component.find('#ChangePasswordModal').hostNodes()
-    expect(modal.length).toEqual(1)
+  describe('When user changes password', () => {
+    beforeEach(() => {
+      component
+        .find('#BtnChangePassword')
+        .hostNodes()
+        .simulate('click')
+    })
 
-    modal
-      .find('#confirm-button')
-      .hostNodes()
-      .simulate('click')
+    it('Should display password change modal', () => {
+      const modal = component.find('#ChangePasswordModal').hostNodes()
+      expect(modal.length).toEqual(1)
+
+      modal
+        .find('#confirm-button')
+        .hostNodes()
+        .simulate('click')
+    })
+
+    it('Should display match message for valid password', () => {
+      component
+        .find('#CurrentPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'CurrentPassword', value: 'SomePass123' }
+        })
+
+      component
+        .find('#NewPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'NewPassword', value: 'SomePass123' }
+        })
+
+      component
+        .find('#ConfirmPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'ConfirmPassword', value: 'SomePass123' }
+        })
+
+      component.update()
+
+      const validationMsgExist = Boolean(
+        component.find('#passwordMatch').hostNodes().length
+      )
+      expect(validationMsgExist).toBe(true)
+    })
   })
 })
