@@ -220,6 +220,19 @@ export const isDateAfter = (first: string, second: string) => {
   return new Date(first) >= new Date(second)
 }
 
+export const minAgeGapExist = (
+  first: string,
+  second: string,
+  minAgeGap: number
+): boolean => {
+  const diff =
+    (new Date(first).getTime() - new Date(second).getTime()) /
+    (1000 * 60 * 60 * 24) /
+    365
+
+  return diff >= minAgeGap
+}
+
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
   const cast = value as string
   return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
@@ -234,26 +247,17 @@ export const isValidChildBirthDate: Validation = (
   drafts
 ) => {
   const childBirthDate = value as string
-  const motherBirthDate = (drafts &&
-    drafts.mother &&
-    drafts.mother.motherBirthDate) as string
 
   return childBirthDate &&
     isAValidDateFormat(childBirthDate) &&
     isDateNotInFuture(childBirthDate)
-    ? motherBirthDate
-      ? isDateAfter(childBirthDate, motherBirthDate)
-        ? undefined
-        : {
-            message: messages.isValidBirthDate
-          }
-      : undefined
+    ? undefined
     : {
         message: messages.isValidBirthDate
       }
 }
 
-export const isValidMotherBirthDate = (): Validation => (
+export const isValidMotherBirthDate = (minAgeGap: number): Validation => (
   value: IFormFieldValue,
   drafts
 ) => {
@@ -264,7 +268,7 @@ export const isValidMotherBirthDate = (): Validation => (
     isAValidDateFormat(motherBirthDate) &&
     isDateNotInFuture(motherBirthDate)
     ? childBirthDate
-      ? isDateAfter(childBirthDate, motherBirthDate)
+      ? minAgeGapExist(childBirthDate, motherBirthDate, minAgeGap)
         ? undefined
         : {
             message: messages.isValidBirthDate
