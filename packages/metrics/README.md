@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Metrics service](#metrics-service)
+  - [Dev guide](#dev-guide)
+  - [Design details](#design-details)
+    - [Adding new metrics later on](#adding-new-metrics-later-on)
+  - [Database](#database)
+    - [Try it](#try-it)
+      - [Test queries](#test-queries)
+    - [Browse the data with Chronograf](#browse-the-data-with-chronograf)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Metrics service
 
 A microservice that recieves events from the OpenCRVS system and create, stores and responds to queries about CRVS metrics. This service will be used in the preformance app to fetch data for the various graphs that need to be displayed.

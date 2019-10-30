@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Set up Environment Variables](#set-up-environment-variables)
+- [Running the gateway](#running-the-gateway)
+- [Examples](#examples)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Set up Environment Variables
 
 Create a .env file with the following settings

@@ -16,7 +16,7 @@ Check the terminal window where you're running Auth API.
 You should see something like this there after you've finished the first login step:
 
 ```
-@opencrvs/auth: info: Sending a verification SMS {"mobile":"+447111111111","verificationCode":"4991"}
+@opencrvs/auth: info: Sending a verification SMS {"mobile":"+447111111111","verificationCode":"000000"}
 ```
 
 ----
