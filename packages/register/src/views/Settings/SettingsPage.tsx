@@ -124,11 +124,17 @@ type IProps = IntlShapeProps & {
   modifyUserDetails: typeof modifyUserDetailsAction
 }
 
+enum NOTIFICATION_SUBJECT {
+  LANGUAGE,
+  PASSWORD
+}
+
 interface IState {
   showLanguageSettings: boolean
   selectedLanguage: string
   showSuccessNotification: boolean
   showPasswordChange: boolean
+  notificationSubject: NOTIFICATION_SUBJECT | null
 }
 
 interface ILanguageOptions {
@@ -142,7 +148,8 @@ class SettingsView extends React.Component<IProps, IState> {
       showLanguageSettings: false,
       showSuccessNotification: false,
       selectedLanguage: this.props.language,
-      showPasswordChange: false
+      showPasswordChange: false,
+      notificationSubject: null
     }
   }
 
@@ -152,9 +159,10 @@ class SettingsView extends React.Component<IProps, IState> {
     }))
   }
 
-  toggleSuccessNotification = () => {
+  toggleSuccessNotification = (subject: NOTIFICATION_SUBJECT | null = null) => {
     this.setState(state => ({
-      showSuccessNotification: !state.showSuccessNotification
+      showSuccessNotification: !state.showSuccessNotification,
+      notificationSubject: subject
     }))
   }
 
@@ -177,8 +185,12 @@ class SettingsView extends React.Component<IProps, IState> {
       this.props.modifyUserDetails(this.props.userDetails)
 
       this.toggleLanguageSettingsModal()
-      this.toggleSuccessNotification()
+      this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
+  }
+  changePassword = () => {
+    this.togglePassworkChangeModal()
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
 
   render() {
@@ -346,18 +358,27 @@ class SettingsView extends React.Component<IProps, IState> {
         <PasswordChangeModal
           togglePassworkChangeModal={this.togglePassworkChangeModal}
           showPasswordChange={this.state.showPasswordChange}
+          passwordChanged={this.changePassword}
         />
         <Notification
           type={NOTIFICATION_TYPE.SUCCESS}
           show={this.state.showSuccessNotification}
-          callback={this.toggleSuccessNotification}
+          callback={() => this.toggleSuccessNotification()}
         >
-          <FormattedMessage
-            {...messages.changeLanguageSuccessMessage}
-            values={{
-              language: languages[this.state.selectedLanguage].displayName
-            }}
-          />
+          {/* Success notification message for Language Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.LANGUAGE && (
+            <FormattedMessage
+              {...messages.changeLanguageSuccessMessage}
+              values={{
+                language: languages[this.state.selectedLanguage].displayName
+              }}
+            />
+          )}
+
+          {/* Success notification message for Password Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
+            <FormattedMessage {...messages.passwordUpdated} />
+          )}
         </Notification>
       </>
     )

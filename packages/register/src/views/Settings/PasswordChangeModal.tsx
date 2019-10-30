@@ -123,6 +123,7 @@ type State = {
 interface IProps {
   showPasswordChange: boolean
   togglePassworkChangeModal: () => void
+  passwordChanged: () => void
   userDetails: IUserDetails | null
 }
 type IFullProps = IProps & IntlShapeProps
@@ -208,13 +209,20 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
     }))
     this.props.togglePassworkChangeModal()
   }
-  clearForm = () => {
+  passwordChangecompleted = () => {
     this.setState({
-      errorOccured: false,
       currentPassword: EMPTY_STRING,
       newPassword: EMPTY_STRING,
-      confirmPassword: EMPTY_STRING
+      confirmPassword: EMPTY_STRING,
+      validLength: false,
+      hasNumber: false,
+      hasCases: false,
+      passwordMismatched: false,
+      passwordMatched: false,
+      confirmPressed: false,
+      errorOccured: false
     })
+    this.props.passwordChanged()
   }
   render() {
     const { intl, showPasswordChange } = this.props
@@ -232,7 +240,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
               existingPassword: this.state.currentPassword,
               password: this.state.newPassword
             }}
-            onCompleted={this.clearForm}
+            onCompleted={this.passwordChangecompleted}
             onError={() => this.setState({ errorOccured: true })}
           >
             {(changePassword: any) => {

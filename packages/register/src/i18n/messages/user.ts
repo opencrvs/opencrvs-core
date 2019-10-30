@@ -75,6 +75,7 @@ interface IUserMessages {
   confirmButtonLabel: MessageDescriptor
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
+  passwordUpdated: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -347,6 +348,11 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.incorrectPassword',
     defaultMessage: 'Incorrect password. Please try again',
     description: 'Response message for incorrect password for password change'
+  },
+  passwordUpdated: {
+    id: 'system.user.settings.passwordUpdated',
+    defaultMessage: 'Password was successfully changed',
+    description: 'Password change message on success'
   }
 }
 
