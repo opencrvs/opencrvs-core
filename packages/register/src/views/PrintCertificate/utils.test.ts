@@ -1,6 +1,7 @@
 import {
   calculateDays,
-  timeElapsed
+  timeElapsed,
+  getCountryTranslations
 } from '@register/views/PrintCertificate/utils'
 
 describe('calculateDays, timeElapsed tests', () => {
@@ -22,5 +23,39 @@ describe('calculateDays, timeElapsed tests', () => {
     time = timeElapsed(days)
     expect(time.value).toBe(2)
     expect(time.unit).toBe('Month')
+  })
+  it('returns an object with available transaltions for countries', () => {
+    // @ts-ignore
+    const languageState = {
+      en: {
+        lang: 'en',
+        displayName: 'English',
+        messages: {
+          'countries.BGD': 'Bangladesh'
+        }
+      },
+      bn: {
+        lang: 'bn',
+        displayName: 'বাংলা',
+        messages: {
+          'countries.BGD': 'বাংলাদেশ'
+        }
+      }
+    }
+    const countries = [
+      {
+        value: 'BGD',
+        label: {
+          id: 'BGD',
+          defaultMessage: 'Bangladesh',
+          description: 'A label for Bangladesh'
+        }
+      }
+    ]
+    const availableCountries = getCountryTranslations(languageState, countries)
+    expect(availableCountries).toMatchObject([
+      { countries: [{ value: 'BGD', name: 'Bangladesh' }], language: 'en' },
+      { countries: [{ value: 'BGD', name: 'বাংলাদেশ' }], language: 'bn' }
+    ])
   })
 })
