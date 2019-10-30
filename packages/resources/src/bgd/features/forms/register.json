@@ -15389,7 +15389,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "draftData.informant.applicantsRelationToDeceased !== \"OTHER\""
+                      "expression": "(!draftData || !draftData.informant || draftData.informant.relationship !== \"OTHER\")"
                     }
                   ],
                   "mapping": {
@@ -15522,6 +15522,37 @@
                     {
                       "action": "hide",
                       "expression": "(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => [\"National ID (front)\", \"National ID (Back)\"].indexOf(a.optionValues[1]) > -1))"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForDeceasedDateOfBirth",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of date of birth of deceased",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.deceasedDoBProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "DECEASED_BIRTH_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Proof of Date of Birth of Deceased",
+                      "label": {
+                        "defaultMessage": "Proof of date of birth of deceased",
+                        "description": "Option for radio group field: Type of Document To Upload",
+                        "id": "form.field.label.deceasedDoBProof"
+                      }
                     }
                   ],
                   "mapping": {
