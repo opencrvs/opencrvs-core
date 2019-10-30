@@ -756,6 +756,7 @@ export interface IFormSectionGroup {
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
   error?: MessageDescriptor
+  preventContinueIfError?: boolean
 }
 
 export interface IForm {
