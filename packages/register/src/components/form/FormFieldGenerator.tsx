@@ -476,7 +476,7 @@ interface IQueryData {
   [key: string]: any
 }
 
-interface ITouchedNestedFields {
+export interface ITouchedNestedFields {
   value: boolean
   nestedFields: {
     [fieldName: string]: boolean

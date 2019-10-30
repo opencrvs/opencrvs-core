@@ -78,16 +78,80 @@ describe('when user has starts a new application', () => {
       history = testApp.history
       store = testApp.store
     })
-    describe('when user is in birth registration by parent informant view', () => {
+
+    describe('when user tries to continue without providing contact-point datas', () => {
       let draft: IApplication
       beforeEach(async () => {
-        draft = createApplication(Event.BIRTH)
-        draft.data = {
-          ...draft.data,
+        const data = {
           registration: {
             presentAtBirthRegistration: 'MOTHER'
           }
         }
+        draft = createApplication(Event.BIRTH, data)
+        store.dispatch(storeApplication(draft))
+        history.replace(
+          DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
+        )
+        await waitForElement(app, '#register_form')
+      })
+      describe('when user clicks continue without choosing point of contact', () => {
+        it('prevents from continuing and show radio button error', async () => {
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await waitForElement(app, '#contactPoint_error')
+          expect(app.find('#contactPoint_error').hostNodes()).toHaveLength(1)
+        })
+      })
+      describe('when user clicks continue without entering invalid phone number of contact point ', () => {
+        it('prevents from continuing and shows phone inputfield error', async () => {
+          app
+            .find('#contactPoint_MOTHER')
+            .hostNodes()
+            .simulate('change', { target: { checked: true } })
+          await waitForElement(
+            app,
+            'input[name="contactPoint.nestedFields.registrationPhone"]'
+          )
+          app
+            .find('input[name="contactPoint.nestedFields.registrationPhone"]')
+            .simulate('change', {
+              target: {
+                name: 'contactPoint.nestedFields.registrationPhone',
+                value: '0'
+              }
+            })
+
+          app
+            .find('#next_section')
+            .hostNodes()
+            .simulate('click')
+          await waitForElement(
+            app,
+            'div[id="contactPoint.nestedFields.registrationPhone_error"]'
+          )
+          expect(
+            app
+              .find(
+                'div[id="contactPoint.nestedFields.registrationPhone_error"]'
+              )
+              .hostNodes()
+          ).toHaveLength(1)
+        })
+      })
+    })
+
+    describe('when user is in birth registration by parent informant view', () => {
+      let draft: IApplication
+      beforeEach(async () => {
+        const data = {
+          registration: {
+            presentAtBirthRegistration: 'MOTHER'
+          }
+        }
+        draft = createApplication(Event.BIRTH, data)
+
         /*
          * Needs to be done before storeApplication(draft)
          * so offline applications wouldn't override the dispatched ones
@@ -97,6 +161,22 @@ describe('when user has starts a new application', () => {
           DRAFT_BIRTH_PARENT_FORM.replace(':applicationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
+        app
+          .find('#contactPoint_MOTHER')
+          .hostNodes()
+          .simulate('change', { target: { checked: true } })
+        await waitForElement(
+          app,
+          'input[name="contactPoint.nestedFields.registrationPhone"]'
+        )
+        app
+          .find('input[name="contactPoint.nestedFields.registrationPhone"]')
+          .simulate('change', {
+            target: {
+              name: 'contactPoint.nestedFields.registrationPhone',
+              value: '01999999999'
+            }
+          })
         app
           .find('#next_section')
           .hostNodes()
