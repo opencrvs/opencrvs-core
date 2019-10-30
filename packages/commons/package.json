@@ -2,6 +2,7 @@
   "name": "@opencrvs/commons",
   "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS common modules and utils",
+  "license": "MPL-2.0",
   "main": "build/dist/index.js",
   "scripts": {
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
@@ -11,7 +12,6 @@
     "build": "tsc -d",
     "build:clean": "rm -rf build"
   },
-  "license": "NONE",
   "private": true,
   "dependencies": {
     "@types/node-fetch": "^2.3.3",

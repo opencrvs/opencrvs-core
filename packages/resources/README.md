@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [OpenCRVS Resources Module](#opencrvs-resources-module)
+  - [Administrative](#administrative)
+  - [Facilities](#facilities)
+  - [Employees](#employees)
+    - [Developer commands](#developer-commands)
+    - [Create a new metadata db dump](#create-a-new-metadata-db-dump)
+    - [Optional Project Manager command for administrative divisions. Customisable for other features of reference data such as employees or offices.](#optional-project-manager-command-for-administrative-divisions-customisable-for-other-features-of-reference-data-such-as-employees-or-offices)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenCRVS Resources Module
 
 One of the key dependencies for OpenCRVS is a reference data source. This source is likely to be bespoke for every implementing nation. The resources package contains scripts to import all reference data required for OpenCRVS.

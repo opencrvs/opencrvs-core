@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [OpenCRVS Authentication service](#opencrvs-authentication-service)
+  - [Dev guide](#dev-guide)
+  - [Generating new tokens for tests](#generating-new-tokens-for-tests)
+  - [Configuration Props](#configuration-props)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenCRVS Authentication service
 
 A microservice to manage authentication concerns such as user sessions, token generation and and 2 factor auth.

@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Bangaldesh DHIS2 integration mediator](#bangaldesh-dhis2-integration-mediator)
+  - [Production deployment](#production-deployment)
+  - [Dev guide](#dev-guide)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Bangaldesh DHIS2 integration mediator
 
 A mediator to adapt messages that DHIS2 will send us into our FHIR API format.

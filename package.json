@@ -1,11 +1,13 @@
 {
+  "description": "OpenCRVS core workspace",
+  "license": "MPL-2.0",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit"
+      "pre-commit": "yarn check:license && lerna run --parallel precommit"
     }
   },
   "scripts": {
@@ -43,7 +45,9 @@
     "cy": "cd packages/e2e && yarn open",
     "build": "lerna run build --stream --concurrency=1",
     "build:image": "docker build -t opencrvs-build .",
-    "build:clean": "lerna run build:clean"
+    "build:clean": "lerna run build:clean",
+    "check:license": "license-check-and-add check -f infrastructure/license-config.json",
+    "add:license": "license-check-and-add add -f infrastructure/license-config.json"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
@@ -55,6 +59,8 @@
     "prettier": "^1.15.2"
   },
   "dependencies": {
+    "doctoc": "^1.4.0",
+    "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0"

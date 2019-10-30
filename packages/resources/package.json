@@ -2,6 +2,7 @@
   "name": "@opencrvs/resources",
   "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS resources for reference data",
+  "license": "MPL-2.0",
   "scripts": {
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
