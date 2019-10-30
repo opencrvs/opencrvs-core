@@ -17657,10 +17657,10 @@ react-icons@^2.2.7:
   dependencies:
     react-icon-base "2.1.0"
 
-react-idle-timer@^4.2.5:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.2.5.tgz#eb7d6e1b318f7755b5e0ee810254a8e95a2271b7"
-  integrity sha512-8B/OwjG8E/DTx1fHYKTpZ4cnCbL9+LOc5I9t8SYe8tbEkP14KChiYg0xPIuyRpO33wUZHcgmQl93CVePaDhmRA==
+react-idle-timer@^4.2.11:
+  version "4.2.11"
+  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.2.11.tgz#45dc6af7055a55ac8332ea03a419ff67c252e26f"
+  integrity sha512-Bijl9NKdhpiyQtLSLXcmHiXr+uEvBpz6dzWF2jFDtzu4BCYRM9jvXZwq7vZOakRsBTrkdO34mCw+1qZgrKr28A==
 
 react-input-autosize@^2.2.1:
   version "2.2.1"

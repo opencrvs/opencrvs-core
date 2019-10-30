@@ -48,7 +48,7 @@
     "react": "^16.10.1",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.10.1",
-    "react-idle-timer": "^4.2.5",
+    "react-idle-timer": "^4.2.11",
     "react-intl": "^3.1.13",
     "react-moment": "^0.8.4",
     "react-page-visibility": "^3.2.1",
