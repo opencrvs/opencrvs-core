@@ -1705,13 +1705,7 @@ const builders: IFieldBuilders = {
       context: any
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      let draftId
-      if (context.event === EVENT_TYPE.BIRTH) {
-        draftId = 'draft-id'
-      } else {
-        draftId = 'draft-id'
-      }
-      return setResourceIdentifier(taskResource, `${draftId}`, fieldValue)
+      return setResourceIdentifier(taskResource, 'draft-id', fieldValue)
     },
     trackingId: (
       fhirBundle: ITemplatedBundle,

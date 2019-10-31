@@ -191,9 +191,13 @@ describe('when draft data is transformed to graphql', () => {
         documents: { imageUploader: '' }
       }
 
-      expect(draftToGqlTransformer(form, data).eventLocation.type).toBe(
-        'PRIVATE_HOME'
-      )
+      expect(
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c'
+        ).eventLocation.type
+      ).toBe('PRIVATE_HOME')
     })
     it('Check if contactNumber is found properly', () => {
       const registration = clone(registrationDetails)

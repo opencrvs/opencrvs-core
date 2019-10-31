@@ -108,6 +108,8 @@ export class SubmissionController {
       .forEach((app: IApplication) => {
         if (app.submissionStatus) {
           app.submissionStatus = changeStatus[app.submissionStatus]
+          this.store.dispatch(modifyApplication(app))
+          this.store.dispatch(writeApplication(app))
         }
       })
   }

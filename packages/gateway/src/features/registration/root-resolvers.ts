@@ -269,7 +269,10 @@ async function createEventRegistration(
   }
 }
 
-async function isDuplicateEntry(identifier: string, authHeader: IAuthHeader) {
+export async function isDuplicateEntry(
+  identifier: string,
+  authHeader: IAuthHeader
+) {
   if (!identifier) {
     return false
   }

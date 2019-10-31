@@ -1,4 +1,7 @@
-import { resolvers } from '@gateway/features/registration/root-resolvers'
+import {
+  resolvers,
+  isDuplicateEntry
+} from '@gateway/features/registration/root-resolvers'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
@@ -132,6 +135,83 @@ describe('Registration root resolvers', () => {
       )
       expect(composition).toBeDefined()
       expect(composition.id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+  describe('ducplicate entry', () => {
+    const details = {
+      child: {
+        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      mother: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
+        telecom: [{ system: 'phone', value: '+8801622688231' }]
+      },
+      father: {
+        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }]
+      },
+      informant: {
+        relationship: 'FATHER'
+      },
+      registration: {
+        contact: 'MOTHER',
+        draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
+      }
+    }
+    it('checks duplicate draftId', async () => {
+      fetch.mockResponses([
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {
+                resourceType: 'Task',
+
+                focus: {
+                  reference: 'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
+                },
+                id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+              }
+            }
+          ]
+        })
+      ])
+
+      const result = await resolvers.Mutation.createBirthRegistration(
+        {},
+        { details }
+      )
+
+      expect(result).toBeDefined()
+      expect(result).toEqual({
+        draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
+      })
+    })
+    it('checks no task entry with draftId', async () => {
+      fetch.mockResponses([JSON.stringify({})])
+
+      const result = await isDuplicateEntry(
+        '9633042c-ca34-4b9f-959b-9d16909fd85c'
+      )
+
+      expect(result).toBeFalsy()
+    })
+    it('checks no composition available for the task with draftId', async () => {
+      fetch.mockResponses([
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {}
+            }
+          ]
+        })
+      ])
+
+      const result = await isDuplicateEntry(
+        '9633042c-ca34-4b9f-959b-9d16909fd85c'
+      )
+
+      expect(result).toBeFalsy()
     })
   })
   describe('createDeathRegistration()', () => {
