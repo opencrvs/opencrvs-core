@@ -41,6 +41,8 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
 
 export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED' | 'VALIDATED'
 
+export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
+
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
   allowedPreviousStates: APPLICATION_STATUS[]
@@ -102,6 +104,20 @@ export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
   return coding.code as APPLICATION_STATUS
 }
 
+export function getApplicationType(task: Task): APPLICATION_TYPE | null {
+  if (!task.code || !task.code.coding) {
+    return null
+  }
+
+  const coding = task.code.coding.find(
+    ({ system }) => system === 'http://opencrvs.org/specs/types'
+  )
+  if (!coding) {
+    return null
+  }
+  return coding.code as APPLICATION_TYPE
+}
+
 export function getRegLastLocation(bundle: fhir.Bundle) {
   const task: fhir.Task = getResourceByType(
     bundle,
@@ -144,4 +160,22 @@ export function getResourceByType<T = fhir.Resource>(
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task'
+}
+
+export function getTimeLoggedFromTask(task: fhir.Task) {
+  if (!task.extension) {
+    throw new Error(`Task has no extensions defined, task ID: ${task.id}`)
+  }
+
+  const timeLoggedExt = task.extension.find(
+    ext => ext.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
+  )
+
+  if (!timeLoggedExt || !timeLoggedExt.valueInteger) {
+    throw new Error(
+      `No time logged extension found in task, task ID: ${task.id}`
+    )
+  }
+
+  return timeLoggedExt.valueInteger
 }

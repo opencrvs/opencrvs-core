@@ -2,7 +2,8 @@ import * as Joi from 'joi'
 import {
   birthRegistrationHandler,
   newBirthRegistrationHandler,
-  birthCertifiedHandler
+  birthCertifiedHandler,
+  baseHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
@@ -23,8 +24,48 @@ export const getRoutes = () => {
     // Event receiver routes
     {
       method: 'POST',
+      path: '/events/birth/in-progress-declaration',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/in-progress-declaration',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/new-declaration',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-declaration',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/new-registration',
       handler: newBirthRegistrationHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-registration',
+      handler: baseHandler,
       config: {
         tags: ['api']
       }
@@ -39,8 +80,24 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
+      path: '/events/death/mark-registered',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/mark-certified',
       handler: birthCertifiedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-certified',
+      handler: baseHandler,
       config: {
         tags: ['api']
       }

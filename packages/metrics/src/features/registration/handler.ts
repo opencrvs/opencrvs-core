@@ -2,9 +2,25 @@ import * as Hapi from 'hapi'
 import { writePoints } from '@metrics/influxdb/client'
 import {
   generateBirthRegPoint,
-  generateEventDurationPoint
+  generateEventDurationPoint,
+  generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
+
+export async function baseHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
 
 export async function newBirthRegistrationHandler(
   request: Hapi.Request,
@@ -19,8 +35,11 @@ export async function newBirthRegistrationHandler(
         {
           Authorization: request.headers.authorization
         }
-      )
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
     )
+    // tslint:disable-next-line:no-console
+    console.log(JSON.stringify(points))
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -48,7 +67,8 @@ export async function birthRegistrationHandler(
         {
           Authorization: request.headers.authorization
         }
-      )
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
     ])
 
     await writePoints(points)
@@ -71,7 +91,8 @@ export async function birthCertifiedHandler(
         {
           Authorization: request.headers.authorization
         }
-      )
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
     ])
 
     await writePoints(points)
