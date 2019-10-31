@@ -310,7 +310,7 @@ describe('when user has starts a new application', () => {
               .find('section')
               .children().length
             await flushPromises()
-            expect(fileInputs).toEqual(4)
+            expect(fileInputs).toEqual(5)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
