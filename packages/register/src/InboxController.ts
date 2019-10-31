@@ -151,7 +151,11 @@ export class InboxController {
     application.downloadRetryAttempt =
       (application.downloadRetryAttempt || 0) + 1
 
-    if (application.downloadRetryAttempt < MAX_RETRY_ATTEMPT) return
+    if (application.downloadRetryAttempt < MAX_RETRY_ATTEMPT) {
+      application.downloadStatus = DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      this.store.dispatch(modifyApplication(application))
+      return
+    }
 
     let status
     if (error.networkError) {
