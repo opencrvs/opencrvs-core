@@ -1,6 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { injectGlobal } from '@register/styledComponents'
 import { App } from '@register/App'
 import registerServiceWorker from '@register/registerServiceWorker'
 import { createStore } from '@register/store'
@@ -14,16 +24,6 @@ import * as pdfjsLib from 'pdfjs-dist'
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`
 
 storage.configStorage('OpenCRVS')
-
-// Injecting global styles for the body tag - used only once
-// eslint-disable-line
-injectGlobal`
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-y: scroll;
-  }
-`
 
 const { store, history } = createStore()
 

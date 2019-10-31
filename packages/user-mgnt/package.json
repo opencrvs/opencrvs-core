@@ -2,7 +2,7 @@
   "name": "@opencrvs/user-mgnt",
   "version": "1.0.0-alpha.1.1",
   "description": "OpenCRVS user management service",
-  "license": "NONE",
+  "license": "MPL-2.0",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",

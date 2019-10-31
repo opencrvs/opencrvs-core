@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import ReactPanZoom from './PanDraggable'
 import styled, { css } from 'styled-components'
@@ -13,7 +24,7 @@ const Container = css`
     width: 100%;
   }
 `
-const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
+const ControlsContainer = styled.div<{ centerController?: boolean }>`
   position: absolute;
   z-index: 2;
   ${({ centerController }) =>
@@ -48,6 +59,12 @@ const ControlsContainer = styled.div.attrs<{ centerController?: boolean }>({})`
     }
   }
 `
+
+// cast to any because of styled-components bug
+// https://stackoverflow.com/questions/53724583/why-this-wrapped-styled-component-errors-has-no-properties-in-common-with/53902817#53902817
+const StyledReactPanZoom = styled(ReactPanZoom)`
+  ${Container};
+` as any
 
 interface IProps {
   image: string
@@ -89,9 +106,6 @@ export default class PanViewer extends React.Component<IProps> {
     })
   }
   render() {
-    const StyledReactPanZoom = styled(ReactPanZoom)`
-      ${Container};
-    `
     return (
       <React.Fragment>
         {this.renderPanZoomControls(this.props.controllerCenter)}

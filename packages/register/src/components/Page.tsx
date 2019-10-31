@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from '@register/styledComponents'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -23,7 +34,7 @@ import { getInitialApplicationsLoaded } from '@register/applications/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
-const StyledPage = styled.div.attrs<IPageProps>({})`
+const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   margin-bottom: 80px;
@@ -100,9 +111,9 @@ interface IDispatchProps {
 class Component extends React.Component<
   RouteComponentProps<{}> & IPageProps & IDispatchProps
 > {
-  componentWillReceiveProps(nextProps: RouteComponentProps<{}>) {
-    const { hash } = nextProps.location
-    const hashChanged = hash && hash !== this.props.location.hash
+  componentDidUpdate(prevProps: RouteComponentProps<{}>) {
+    const { hash } = this.props.location
+    const hashChanged = hash && hash !== prevProps.location.hash
     if (hashChanged) {
       // Push onto callback queue so it runs after the DOM is updated,
       // this is required when navigating from a different page so that

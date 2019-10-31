@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   IBirthRegistrationPoint,
   IPointLocation,
@@ -19,7 +30,49 @@ import {
   getAgeInDays,
   getDurationInSeconds
 } from '@metrics/features/registration/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/registration/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
+
+export const generateInCompleteFieldPoints = async (
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+) => {
+  const composition = getComposition(payload)
+  const task = getTask(payload)
+  const inCompleteFieldExtension =
+    task &&
+    task.extension &&
+    task.extension.find(
+      extension =>
+        extension.url ===
+        `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`
+    )
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+  if (!inCompleteFieldExtension || !inCompleteFieldExtension.valueString) {
+    throw new Error('In complete field list extension not found on payload')
+  }
+
+  const tags = {
+    reg_status: 'IN_PROGESS',
+    compositionId: composition.id,
+    ...(await generatePointLocations(payload, authHeader))
+  }
+  return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
+    const missingFieldIds = missingFieldId.split('/')
+    return {
+      measurement: 'in_complete_fields',
+      tags,
+      fields: {
+        missing_field_section_id: missingFieldIds[0],
+        missing_field_group_id: missingFieldIds[1],
+        missing_field_id: missingFieldIds[2]
+      }
+    }
+  })
+}
 
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,

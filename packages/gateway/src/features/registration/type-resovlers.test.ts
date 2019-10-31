@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { typeResolvers } from '@gateway/features/registration/type-resovlers'
 import {
   MOTHER_CODE,
@@ -20,7 +31,7 @@ import {
   mockObservationBundle,
   reasonsNotApplyingMock
 } from '@gateway/utils/testUtils'
-import { clone, cloneDeep } from 'lodash'
+import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -841,22 +852,6 @@ describe('Registration type resolvers', () => {
       )
 
       expect(trackingID).toBe('123')
-    })
-    it('returns inProgress flag from the non-draft task object', async () => {
-      const inProgressFlag = await typeResolvers.Registration.inProgress(
-        mockTask
-      )
-
-      expect(inProgressFlag).toBe(false)
-    })
-    it('returns inProgress flag from the draft task object', async () => {
-      const clonedTask = cloneDeep(mockTask)
-      clonedTask.status = 'draft'
-      const inProgressFlag = await typeResolvers.Registration.inProgress(
-        clonedTask
-      )
-
-      expect(inProgressFlag).toBe(true)
     })
     it('returns birth registration number from the task object', async () => {
       const registrationNumber = await typeResolvers.Registration.registrationNumber(

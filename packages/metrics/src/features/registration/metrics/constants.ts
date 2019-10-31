@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const CRUD_BIRTH_RATE_SEC = 'id/statistics-crude-birth-rates'
 export const JURISDICTION_TYPE_SEC = 'id/jurisdiction-type'

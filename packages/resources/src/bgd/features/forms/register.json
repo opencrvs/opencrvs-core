@@ -830,9 +830,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -8042,9 +8040,7 @@
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": [
-                        "birthDate"
-                      ]
+                      "parameters": ["birthDate"]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
@@ -10138,6 +10134,13 @@
                       }
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "description": "Hidden for Parent Details none or Mother only",
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "birthFieldToAttachmentTransformer"
@@ -10209,12 +10212,154 @@
                       }
                     }
                   ],
+                  "conditionals": [
+                    {
+                      "description": "Hidden for Parent Details none or Father only",
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "birthFieldToAttachmentTransformer"
                     },
                     "query": {
                       "operation": "birthAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForApplicant",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of applicant ID",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.applicantIDProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "APPLICANT_ID_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "National ID (front)",
+                      "label": {
+                        "defaultMessage": "National ID (Front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "form.field.label.docTypeNIDFront"
+                      }
+                    },
+                    {
+                      "value": "National ID (back)",
+                      "label": {
+                        "defaultMessage": "National ID (Back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "form.field.label.docTypeNIDBack"
+                      }
+                    },
+                    {
+                      "value": "Birth Registration",
+                      "label": {
+                        "defaultMessage": "Birth registration certificate",
+                        "description": "Label for select option Birth Registration",
+                        "id": "form.field.label.docTypeBR"
+                      }
+                    },
+                    {
+                      "value": "Passport",
+                      "label": {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "form.field.label.docTypePassport"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\" && draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForProofOfLegarGuardian",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of legal guardianship",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.legalGuardianProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "LEGAL_GUARDIAN_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Proof of legal guardianship",
+                      "label": {
+                        "defaultMessage": "Proof of legal guardianship",
+                        "description": "Label for select option radio option NID front",
+                        "id": "form.field.label.legalGuardianProof"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocForProofOfAssignedResponsibility",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of assigned responsibility",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.assignedResponsibilityProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "ASSIGNED_RESPONSIBILITY_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Proof of assigned responsibility",
+                      "label": {
+                        "defaultMessage": "Proof of assigned responsibility",
+                        "description": "Label for select option radio option NID front",
+                        "id": "form.field.label.assignedResponsibilityProof"
+                      }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
                     }
                   }
                 },
@@ -10246,12 +10391,6 @@
                         "description": "Label for radio option Other",
                         "id": "form.field.label.docTypeOther"
                       }
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
                     }
                   ],
                   "mapping": {
@@ -10313,6 +10452,14 @@
                     {
                       "action": "hide",
                       "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
                     }
                   ],
                   "mapping": {
@@ -12002,7 +12149,7 @@
                       "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
-                  ],
+                  ],                  
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -12051,7 +12198,7 @@
                       "action": "hide",
                       "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
                     }
-                  ],
+                  ],                  
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",

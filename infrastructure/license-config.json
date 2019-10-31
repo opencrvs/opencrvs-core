@@ -1,0 +1,45 @@
+{
+  "ignore": [
+    "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub)",
+    ".git",
+    "**/patches",
+    ".secrets",
+    ".vscode",
+    "data",
+    "backups",
+    "**/coverage",
+    ".vs",
+    "**/.DS_Store",
+    "AUTHORS",
+    "LICENSE",
+    "infrastructure/license-header.txt",
+    "**/*Dockerfile",
+    "**/packages/components/lib",
+    "packages/gateway/src/graphql/schema.d.ts"
+  ],
+  "license": "infrastructure/license-header.txt",
+  "licenseFormats": {
+    "sh|yml|toml|conf|txt|dotfile|graphql": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    },
+    "html|xml|svg": {
+      "prepend": "<!--",
+      "append": "-->"
+    },
+    "ts|tsx|js|css": {
+      "prepend": "/*",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "ini": {
+      "eachLine": {
+        "prepend": "; "
+      }
+    }
+  },
+  "trailingWhitespace": "TRIM"
+}

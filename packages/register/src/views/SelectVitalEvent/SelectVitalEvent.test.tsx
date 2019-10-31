@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   createTestApp,
   flushPromises,
@@ -25,7 +36,7 @@ describe('when user is selecting the vital event', () => {
       await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
-      expect(app.find('#select_vital_event_view')).toHaveLength(2)
+      expect(app.find('#select_vital_event_view').hostNodes()).toHaveLength(1)
     })
     describe('when selects "Birth"', () => {
       beforeEach(() => {

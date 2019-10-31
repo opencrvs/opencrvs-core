@@ -1,4 +1,15 @@
 /*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+/*
   FROKED from https://github.com/gomezhyuuga/react-pan-zoom
 
   This is the source code from the above library
@@ -81,12 +92,12 @@ export default class ReactPanZoom extends React.PureComponent<
   public state = this.getInitialState()
 
   // tslint:disable-next-line: member-ordering
-  public componentWillReceiveProps(nextProps: IReactPanZoomProps) {
+  public componentDidUpdate(prevProps: IReactPanZoomProps) {
     const { matrixData } = this.state
-    if (matrixData[0] !== nextProps.zoom) {
+    if (matrixData[0] !== this.props.zoom) {
       const newMatrixData = [...this.state.matrixData]
-      newMatrixData[0] = nextProps.zoom || newMatrixData[0]
-      newMatrixData[3] = nextProps.zoom || newMatrixData[3]
+      newMatrixData[0] = this.props.zoom || newMatrixData[0]
+      newMatrixData[3] = this.props.zoom || newMatrixData[3]
       this.setState({
         matrixData: newMatrixData
       })

@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { IDynamicValues } from '../common-types'
@@ -40,9 +51,7 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
-const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
-  {}
-)`
+const Wrapper = styled.div<{ expanded?: boolean; isBoxShadow?: boolean }>`
   width: 100%;
   margin-bottom: 8px;
   transition: border-top 300ms;
@@ -58,7 +67,7 @@ const Wrapper = styled.div.attrs<{ expanded?: boolean; isBoxShadow?: boolean }>(
 const ExpandedCellContent = styled.div`
   animation: ${fadeIn} 500ms;
 `
-const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedCellContainer = styled.div<{ expanded: boolean }>`
   overflow: hidden;
   transition: max-height 600ms;
   max-height: ${({ expanded }) => (expanded ? '1000px' : '0px')};
@@ -68,7 +77,7 @@ const ExpandedCellContainer = styled.div.attrs<{ expanded: boolean }>({})`
     animation: ${fadeIn} 500ms;
   }
 `
-const ListItemContainer = styled.li.attrs<{ isBoxShadow?: boolean }>({})`
+const ListItemContainer = styled.li<{ isBoxShadow?: boolean }>`
   display: flex;
   flex-flow: row wrap;
   width: 100%;

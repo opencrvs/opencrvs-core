@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
@@ -7,19 +18,26 @@ import { setInitialUserDetails } from '@performance/profile/actions'
 import { Provider } from 'react-redux'
 import { Page } from '@performance/components/Page'
 import { History } from 'history'
-import { ThemeProvider } from '@performance/styledComponents'
+import { ThemeProvider, createGlobalStyle } from '@performance/styledComponents'
 import { I18nContainer } from '@performance/i18n/components/I18nContainer'
 import { createStore, AppStore } from '@performance/store'
 import { Switch } from 'react-router'
 import * as routes from '@performance/navigation/routes'
 import { ProtectedRoute } from '@performance/components/ProtectedRoute'
 import { Home } from '@performance/views/home/Home'
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'connected-react-router'
 import { client } from '@performance/utils/apolloClient'
 import { ApolloProvider } from 'react-apollo'
 import { ErrorBoundary } from '@performance/components/ErrorBoundary'
 import { getDefaultLanguage } from './i18n/utils'
 
+// @ts-ignore
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    padding: 0;
+  }
+`
 interface IAppProps {
   client?: ApolloClient<{}>
   store: AppStore
@@ -28,7 +46,7 @@ interface IAppProps {
 export const store = createStore()
 
 export class App extends React.Component<IAppProps, {}> {
-  componentWillMount() {
+  componentDidMount() {
     this.loadUserDetails()
   }
   async loadUserDetails() {
@@ -39,6 +57,7 @@ export class App extends React.Component<IAppProps, {}> {
   public render() {
     return (
       <ErrorBoundary>
+        <GlobalStyle />
         <ApolloProvider client={this.props.client || client}>
           <Provider store={this.props.store}>
             <I18nContainer>

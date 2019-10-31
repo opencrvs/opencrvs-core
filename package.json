@@ -1,11 +1,13 @@
 {
+  "description": "OpenCRVS core workspace",
+  "license": "MPL-2.0",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --parallel precommit"
+      "pre-commit": "yarn check:license && lerna run --parallel precommit"
     }
   },
   "scripts": {
@@ -21,7 +23,7 @@
     "dev:tmux:kill": "tmux kill-session -t opencrvs",
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
     "lint": "lerna run lint",
-    "test": "CI=true lerna run test --silent --noStackTrace --stream --watchAll=false",
+    "test": "CI=true lerna run test --stream",
     "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
     "compose:all": "yarn build:image && docker-compose -p opencrvs -f docker-compose.yml -f docker-compose.deps.yml -f docker-compose.dev-deps.yml -f docker-compose.dev.yml up",
     "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
@@ -41,20 +43,24 @@
     "cov:login": "cd packages/login && yarn open:cov",
     "cov:performance": "cd packages/performance && yarn open:cov",
     "cy": "cd packages/e2e && yarn open",
-    "build": "lerna run build",
+    "build": "lerna run build --stream --concurrency=1",
     "build:image": "docker build -t opencrvs-build .",
-    "build:clean": "lerna run build:clean"
+    "build:clean": "lerna run build:clean",
+    "check:license": "license-check-and-add check -f infrastructure/license-config.json",
+    "add:license": "license-check-and-add add -f infrastructure/license-config.json"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
     "bundlesize": "^0.18.0",
     "concurrently": "^3.5.1",
     "husky": "1.0.0-rc.13",
-    "lerna": "^2.11.0",
+    "lerna": "^3.18.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.15.2"
   },
   "dependencies": {
+    "doctoc": "^1.4.0",
+    "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0"

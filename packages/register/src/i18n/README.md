@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Internationalisation](#internationalisation)
+  - [Add a new language](#add-a-new-language)
+    - [Message ID format](#message-id-format)
+  - [Using internationalisation in components](#using-internationalisation-in-components)
+  - [Pluralisation & variables](#pluralisation--variables)
+    - [No complex pluralisation structures](#no-complex-pluralisation-structures)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Internationalisation
 
 ## Add a new language
