@@ -381,19 +381,24 @@ function findLocationByNameAndParent(
       offices that the script is unable to exactly match, uncomment the logs below.
     */
 
-    // tslint:disable-next-line:no-console
-    /*console.log(
-      chalk.white(
-        `WARNING: No exact match ${type} found for ${name}. Attempting tp find best match ...`
+    // tslint:disable-next-line:no-unused-expression
+    process.env.DEBUG &&
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.white(
+          `WARNING: No exact match ${type} found for ${name}. Attempting tp find best match ...`
+        )
       )
-    )*/
     const bestMatchResult: BestMatch = findBestMatch(name, namesArray)
-    // tslint:disable-next-line:no-console
-    /*console.log(
-      chalk.white(
-        `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+
+    // tslint:disable-next-line:no-unused-expression
+    process.env.DEBUG &&
+      // tslint:disable-next-line:no-console
+      console.log(
+        chalk.white(
+          `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+        )
       )
-    )*/
     resourcesArray = resources.filter(resource => {
       if (
         resource.name &&
@@ -401,12 +406,14 @@ function findLocationByNameAndParent(
         resource.partOf &&
         resource.partOf.reference === parentRef
       ) {
-        // tslint:disable-next-line:no-console
-        /*console.log(
-          chalk.white(
-            `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+        // tslint:disable-next-line:no-unused-expression
+        process.env.DEBUG &&
+          // tslint:disable-next-line:no-console
+          console.log(
+            chalk.white(
+              `WARNING: Best match for ${name} is ${bestMatchResult.bestMatch.target}, using it instead.`
+            )
           )
-        )*/
         return true
       } else {
         return false
@@ -482,10 +489,6 @@ export async function mapAndSaveHealthFacilities(
       `Location/${upazila.id}`
     )
 
-    // tslint:disable-next-line:no-console
-    console.log(
-      `Saving facility ... type: HEALTH_FACILITY, name: ${facility.name}`
-    )
     const savedLocationResponse = (await sendToFhir(
       newLocation,
       '/Location',

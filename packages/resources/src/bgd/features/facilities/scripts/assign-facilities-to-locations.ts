@@ -101,7 +101,7 @@ export default async function importFacilities() {
       typeCodes => typeCodes.code === facility.facilitytype_code
     )
 
-    return !!foundCode // cast to bool
+    return Boolean(foundCode)
   })
 
   try {
