@@ -11,7 +11,7 @@
  */
 import {
   resolvers,
-  isDuplicateEntry
+  lookForDuplicate
 } from '@gateway/features/registration/root-resolvers'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -169,23 +169,36 @@ describe('Registration root resolvers', () => {
       }
     }
     it('checks duplicate draftId', async () => {
-      fetch.mockResponses([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              resource: {
-                resourceType: 'Task',
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                resource: {
+                  resourceType: 'Task',
 
-                focus: {
-                  reference: 'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
-                },
-                id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+                  focus: {
+                    reference:
+                      'Composition/80b90ac3-1032-4f98-af64-627d2b7443f3'
+                  },
+                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
+                }
               }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'BewpkiM'
             }
-          ]
-        })
-      ])
+          })
+        ]
+      )
 
       const result = await resolvers.Mutation.createBirthRegistration(
         {},
@@ -194,45 +207,32 @@ describe('Registration root resolvers', () => {
 
       expect(result).toBeDefined()
       expect(result).toEqual({
-        draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
+        compositionId: '80b90ac3-1032-4f98-af64-627d2b7443f3',
+        trackingId: 'BewpkiM'
       })
     })
     it('checks no task entry with draftId', async () => {
       fetch.mockResponses([JSON.stringify({})])
 
-      const result = await isDuplicateEntry(
+      const result = await lookForDuplicate(
         '9633042c-ca34-4b9f-959b-9d16909fd85c'
       )
 
-      expect(result).toBeFalsy()
-    })
-    it('checks no composition available for the task with draftId', async () => {
-      fetch.mockResponses([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              resource: {}
-            }
-          ]
-        })
-      ])
-
-      const result = await isDuplicateEntry(
-        '9633042c-ca34-4b9f-959b-9d16909fd85c'
-      )
-
-      expect(result).toBeFalsy()
+      expect(result).toBeUndefined()
     })
   })
   describe('createDeathRegistration()', () => {
     const details = {
       deceased: {
         name: [{ use: 'bn', firstNames: 'অনিক', familyName: 'হক' }]
+      },
+      registration: {
+        draftId: '9633042c-ca34-4b9f-959b-9d16909fd85c'
       }
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -292,14 +292,17 @@ describe('Registration root resolvers', () => {
             resourceType: 'Bundle',
             entry: [
               {
-                response: {
-                  status: '201',
-                  location:
-                    '/fhir/Composition/9633042c-ca34-4b9f-959b-9d16909fd85c/_history/ad390bed-c88f-4a3b-b861-31798c88b405'
+                resource: {
+                  resourceType: 'Task',
+
+                  focus: {
+                    reference:
+                      'Composition/9633042c-ca34-4b9f-959b-9d16909fd85c'
+                  },
+                  id: 'e2324ee0-6e6f-46df-be93-12d4d8df600f'
                 }
               }
-            ],
-            type: 'transaction-response'
+            ]
           })
         ],
         [
@@ -402,6 +405,7 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -457,6 +461,7 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
+        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -559,6 +564,7 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
+        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -584,12 +590,15 @@ describe('Registration root resolvers', () => {
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError(
-        'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
+        'getTrackingId: Invalid composition or composition has no identifier'
       )
     })
 
     it("throws an error when the response isn't what we expect", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
+      fetch.mockResponse(
+        [JSON.stringify({})],
+        [JSON.stringify({ unexpected: true })]
+      )
       await expect(
         resolvers.Mutation.createBirthRegistration({}, { details })
       ).rejects.toThrowError('FHIR did not send a valid response')
@@ -1912,7 +1921,10 @@ describe('Registration root resolvers', () => {
         name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
         telecom: [{ system: 'phone', value: '+8801622688231' }]
       },
-      registration: { contact: 'MOTHER' }
+      registration: {
+        contact: 'MOTHER',
+        draftId: 'cd168e0b-0817-4880-a67f-35de777460a5'
+      }
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponseOnce(

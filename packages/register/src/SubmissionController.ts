@@ -29,7 +29,7 @@ import { client } from '@register/utils/apolloClient'
 import moment from 'moment'
 
 const INTERVAL_TIME = 5000
-const HANGING_EXPIRE_MINUTES = 15
+const HANGING_EXPIRE_MINUTES = 2
 const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT.toString(),
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
@@ -113,7 +113,7 @@ export class SubmissionController {
         return (
           app.submissionStatus &&
           INPROGRESS_STATUS.includes(app.submissionStatus) &&
-          now.diff(app.modifiedOn, 'minutes') >= HANGING_EXPIRE_MINUTES
+          now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
         )
       })
       .forEach((app: IApplication) => {

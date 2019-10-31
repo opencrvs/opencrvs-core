@@ -16,7 +16,9 @@ import {
   getDeclarationIdsFromResponse,
   getIDFromResponse,
   getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition
+  removeDuplicatesFromComposition,
+  getRegistrationIds,
+  getDeclarationIds
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -260,16 +262,25 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-  const duplicateEntry = await isDuplicateEntry(
+  const duplicateCompostion = await lookForDuplicate(
     details && details.registration && details.registration.draftId,
     authHeader
   )
 
-  if (duplicateEntry) {
-    return {
-      draftId: details.registration.draftId
+  if (duplicateCompostion) {
+    if (hasScope(authHeader, 'register')) {
+      return await getRegistrationIds(
+        duplicateCompostion,
+        event,
+        false,
+        authHeader
+      )
+    } else {
+      // return tracking-id
+      return await getDeclarationIds(duplicateCompostion, authHeader)
     }
   }
+
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
     // return the registrationNumber
@@ -280,28 +291,27 @@ async function createEventRegistration(
   }
 }
 
-export async function isDuplicateEntry(
+export async function lookForDuplicate(
   identifier: string,
   authHeader: IAuthHeader
 ) {
-  if (!identifier) {
-    return false
-  }
   const taskBundle = await fetchFHIR(
     `/Task?identifier=${identifier}`,
     authHeader
   )
 
-  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-    return false
-  }
-  const task = taskBundle.entry[0].resource as fhir.Task
+  const task =
+    taskBundle &&
+    taskBundle.entry &&
+    taskBundle.entry[0] &&
+    (taskBundle.entry[0].resource as fhir.Task)
 
-  if (!task.focus || !task.focus.reference) {
-    return false
-  } else {
-    return true
-  }
+  return (
+    task &&
+    task.focus &&
+    task.focus.reference &&
+    task.focus.reference.split('/')[1]
+  )
 }
 
 async function markEventAsValidated(
