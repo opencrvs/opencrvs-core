@@ -15,7 +15,7 @@ env:
 jobs:
   include:
     - stage: tests (unit and integration)
-      script: yarn test && yarn lint
+      script: yarn test && yarn lint && travis_wait yarn build
       after_success:
         - npm install codecov -g
         - codecov
