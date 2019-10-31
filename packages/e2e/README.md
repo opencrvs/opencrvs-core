@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [OpenCRVS integration / end to end tests](#opencrvs-integration--end-to-end-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenCRVS integration / end to end tests
 
 To run the e2e tests locally in the cypress app navigate to the `packages/e2e` folder and run:

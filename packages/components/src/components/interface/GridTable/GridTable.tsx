@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 import { Pagination } from '..'
@@ -40,10 +51,10 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 
-const RowWrapper = styled.div.attrs<{
+const RowWrapper = styled.div<{
   expandable?: boolean
   clickable?: boolean
-}>({})`
+}>`
   width: 100%;
   padding: 0 24px;
   display: flex;
@@ -53,11 +64,11 @@ const RowWrapper = styled.div.attrs<{
     expandable || clickable ? 'pointer' : 'default'};
 `
 
-const ContentWrapper = styled.span.attrs<{
+const ContentWrapper = styled.span<{
   width: number
   alignment?: string
   color?: string
-}>({})`
+}>`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
@@ -72,7 +83,7 @@ const IconWrapper = styled(ContentWrapper)`
   padding-top: 5px;
 `
 
-const ExpandedSectionContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedSectionContainer = styled.div<{ expanded: boolean }>`
   margin-top: 5px;
   overflow: hidden;
   transition-property: all;

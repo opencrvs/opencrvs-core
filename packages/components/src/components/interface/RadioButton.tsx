@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -9,7 +20,7 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Label = styled.label.attrs<{ size?: string; disabled?: boolean }>({})`
+const Label = styled.label<{ size?: string; disabled?: boolean }>`
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
@@ -27,7 +38,7 @@ const CheckOuter = styled.div`
   border-radius: 50%;
   position: relative;
 `
-const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
+const Check = styled.span<{ size?: string; disabled?: boolean }>`
   display: flex;
   justify-content: center;
   border: 2px solid
@@ -59,7 +70,7 @@ const Check = styled.span.attrs<{ size?: string; disabled?: boolean }>({})`
   }
 `
 
-const Input = styled.input.attrs<{ disabled?: boolean }>({})`
+const Input = styled.input<{ disabled?: boolean }>`
   position: absolute;
   opacity: 0;
   z-index: 2;

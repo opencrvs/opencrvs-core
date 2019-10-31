@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { createServer } from '@metrics/index'
 import * as api from '@metrics/api'
 import { readFileSync } from 'fs'
@@ -1104,5 +1115,45 @@ describe('When an existing application is marked certified', () => {
 
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
+  })
+})
+
+describe('When an in-progress application is recieved', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the in complete field points to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/new-in-progress-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/in-progress-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'in_complete_fields'
+    )
+    expect(res.statusCode).toBe(200)
+    expect(inCompleteFieldPoints).toMatchSnapshot()
+  })
+  it('returns 500 for payload without expected extension on task resource', async () => {
+    const payload = require('./test-data/new-in-progress-request.json')
+    payload.entry[1].resource.extension = []
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/in-progress-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    expect(res.statusCode).toBe(500)
   })
 })

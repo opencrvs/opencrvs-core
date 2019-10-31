@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Object Transformation Module](#object-transformation-module)
+  - [Complex field builders](#complex-field-builders)
+  - [Arrays in the source object](#arrays-in-the-source-object)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Object Transformation Module
 
 This module allows an object to be converted field by field into another object. This ensures that every field in the source object has transformation logic as the transformation module will complain if you don't provide a builder function for that field.

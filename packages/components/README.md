@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Environment Variables](#environment-variables)
+- [Running the styleguide](#running-the-styleguide)
+- [Making changes to the styleguide](#making-changes-to-the-styleguide)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Environment Variables
 
 ```

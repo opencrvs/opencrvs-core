@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { Button } from '../buttons'
@@ -15,20 +26,20 @@ interface IProps {
   className?: string
 }
 
-const styledNotification = styled.div.attrs({})
 const easeIn = keyframes`
   from { bottom: -100px; }
   to { bottom: 0; }
 `
-const NotificationContainer = styledNotification`
+
+const NotificationContainer = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   position: fixed;
   left: 0;
   right: 0;
   bottom: -100px;
-  height:100px;
+  height: 100px;
   width: 100%;
-  display:flex;
+  display: flex;
   background: ${({ theme }) => theme.colors.secondary};
   z-index: 1;
   justify-content: center;
@@ -37,10 +48,12 @@ const NotificationContainer = styledNotification`
 
   &.show {
     animation: ${easeIn} 500ms;
-    bottom:0;
+    bottom: 0;
   }
 
-  &.success, &.error, &.warning {
+  &.success,
+  &.error,
+  &.warning {
     background: ${({ theme }) => theme.colors.placeholder};
     border-top: 10px solid;
   }
@@ -56,7 +69,7 @@ const NotificationContainer = styledNotification`
     border-color: ${({ theme }) => theme.colors.warning};
   }
   &.clickable {
-    cursor:pointer;
+    cursor: pointer;
   }
 `
 

@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, TextInput } from './TextInput'
@@ -154,7 +165,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-dd`}
-            innerRef={this.dd}
+            ref={this.dd}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={focusInput}
@@ -168,7 +179,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-mm`}
-            innerRef={this.mm}
+            ref={this.mm}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={false}
@@ -183,7 +194,7 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
           <DateSegment
             {...props}
             id={`${id}-yyyy`}
-            innerRef={this.yyyy}
+            ref={this.yyyy}
             error={Boolean(meta && meta.error)}
             touched={meta && meta.touched}
             focusInput={false}
