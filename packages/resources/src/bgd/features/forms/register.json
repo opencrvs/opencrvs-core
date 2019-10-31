@@ -5716,10 +5716,6 @@
                       "parameters": []
                     },
                     {
-                      "operation": "dateLessThan",
-                      "parameters": []
-                    },
-                    {
                       "operation": "isValidParentsBirthDate",
                       "parameters": [5]
                     }
@@ -7977,10 +7973,6 @@
                     },
                     {
                       "operation": "dateInPast",
-                      "parameters": []
-                    },
-                    {
-                      "operation": "dateLessThan",
                       "parameters": []
                     },
                     {
