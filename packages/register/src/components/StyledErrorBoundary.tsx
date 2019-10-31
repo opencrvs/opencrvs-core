@@ -1,11 +1,20 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import styled from '@register/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/buttons'
-import { IStoreState } from '@register/store'
 import { errorMessages, buttonMessages } from '@register/i18n/messages'
 
 const ErrorContainer = styled.div`
@@ -35,7 +44,7 @@ const GoToHomepage = styled(Button)`
   margin-top: 60px;
 `
 
-type IFullProps = IntlShapeProps
+type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
 interface IErrorInfo extends React.ErrorInfo {
   [key: string]: string
@@ -97,9 +106,4 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   }
 }
 
-export const StyledErrorBoundary = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language
-  }),
-  {}
-)(injectIntl(StyledErrorBoundaryComponent))
+export const StyledErrorBoundary = injectIntl(StyledErrorBoundaryComponent)

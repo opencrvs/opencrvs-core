@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 import { grid } from '../../grid'
@@ -31,22 +42,22 @@ const RowWrapper = styled.div`
   min-height: 64px;
   box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
 `
-const ContentWrapper = styled.span.attrs<{
+const ContentWrapper = styled.span<{
   width: number
   alignment?: string
   color?: string
-}>({})`
+}>`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
   ${({ color }) => color && `color: ${color};`}
 `
-const ValueWrapper = styled.span.attrs<{
+const ValueWrapper = styled.span<{
   width: number
   alignment?: string
   color?: string
-}>({})`
+}>`
   width: ${({ width }) => width}%;
   display: flex;
   margin: auto 0;

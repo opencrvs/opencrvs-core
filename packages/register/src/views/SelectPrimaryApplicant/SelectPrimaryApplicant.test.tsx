@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   createApplication,
   IApplication,
@@ -37,7 +48,9 @@ describe('when user is selecting the vital event', () => {
       await setPinCode(app)
     })
     it('lists the options', () => {
-      expect(app.find('#primary_applicant_selection_view')).toHaveLength(2)
+      expect(
+        app.find('#primary_applicant_selection_view').hostNodes()
+      ).toHaveLength(1)
     })
     describe('when selects "Mother"', () => {
       beforeEach(() => {

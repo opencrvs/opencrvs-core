@@ -1,3 +1,12 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
 enum RegStatus {
   IN_PROGRESS
   DECLARED
@@ -81,6 +90,8 @@ enum AttachmentType {
   SIGNED_AFFIDAVIT
   ORIGINAL_BIRTH_RECORD
   UNDER_FIVE_CARD
+  PROOF_OF_LEGAL_GUARDIANSHIP
+  PROOF_OF_ASSIGNED_RESPONSIBILITY
 }
 
 enum AttachmentSubject {
@@ -96,6 +107,8 @@ enum AttachmentSubject {
   DECEASED_BIRTH_PROOF
   APPLICANT_ID_PROOF
   APPLICANT_ATHORITY_TO_APPLY_PROOF
+  LEGAL_GUARDIAN_PROOF
+  ASSIGNED_RESPONSIBILITY_PROOF
 }
 
 enum RegistrationType {
@@ -313,7 +326,7 @@ input RegistrationInput {
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
-  inProgress: Boolean
+  inCompleteFields: String
   attachments: [AttachmentInput]
   certificates: [CertificateInput]
   location: LocationInput
@@ -335,7 +348,7 @@ type Registration { # -> Task
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
   type: RegistrationType # -> .code
-  inProgress: Boolean # -> .status ('draft' | 'requested')
+  inCompleteFields: String # -> .status ('draft' | 'requested') && extension(url='http://opencrvs.org/specs/extension/in-complete-fields').valueString
   attachments: [Attachment] # -> Composition.section(code='scanned-documents').entry.reference
   certificates: [Certificate] # -> Composition.section(code='certificates').entry.reference
   duplicates: [ID]

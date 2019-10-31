@@ -1057,13 +1057,27 @@
           "type": "http",
           "status": "enabled",
           "forwardAuthHeader": true,
-          "name": "Search -> New Birth Declaration",
+          "name": "Search -> New In-Progress Birth Declaration",
           "secured": false,
           "host": "search",
           "port": 9090,
           "path": "",
           "pathTransform": "",
           "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> New In-Progress Birth Declaration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
           "username": "",
           "password": ""
         }

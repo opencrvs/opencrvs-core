@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [Configuring OpenCRVS for your country](#configuring-opencrvs-for-your-country)
+  - [GET `/assets/<file.png>`](#get-assetsfilepng)
+  - [GET `/definitions` 🔒](#get-definitions-)
+  - [POST `/generate/<brn|drn>` 🔒](#post-generatebrndrn-)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Configuring OpenCRVS for your country
 
 OpenCRVS is designed to be highly configurable. It achieves this by loading a number of resources that it needs from a separate 'resource' service. The code in this folder is for that service. It provides the following endpoints:

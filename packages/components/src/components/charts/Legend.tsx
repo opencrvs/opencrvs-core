@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { IDataPoint, ICategoryDataPoint } from './datapoint'
@@ -33,7 +44,7 @@ const LegendItemBase = styled.div`
     content: ':';
   }
 `
-const LegendItem = styled(LegendItemBase).attrs<{ colour: string }>({})`
+const LegendItem = styled(LegendItemBase)<{ colour: string }>`
   &::before {
     background: ${({ colour }) => colour};
   }
@@ -53,7 +64,7 @@ const DataLabel = styled.label`
   margin-top: 1em;
   margin-bottom: auto;
 `
-const DataTitle = styled.h3.attrs<{ description?: string }>({})`
+const DataTitle = styled.h3<{ description?: string }>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ theme }) => theme.colors.secondary};
   margin: ${({ description }) => (description ? `0` : `0 0 23px 0`)};

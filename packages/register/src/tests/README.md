@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [To generate a new test GraphQL Schema](#to-generate-a-new-test-graphql-schema)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## To generate a new test GraphQL Schema
 
 - Make sure that the server and gateway are running

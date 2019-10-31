@@ -1,22 +1,33 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
 import * as ReactDOM from 'react-dom'
 import { Link } from '../typography'
 
-const SectionDrawerContainer = styled.div.attrs<{ expanded: boolean }>({})`
+const SectionDrawerContainer = styled.div<{ expanded: boolean }>`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: ${({ expanded }) =>
     expanded ? `0 0 12px 0 rgba(0, 0, 0, 0.11)` : ``};
 `
-const TitleContainer = styled.div.attrs<{ expandable: boolean }>({})`
+const TitleContainer = styled.div<{ expandable: boolean }>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   display: flex;
   align-items: center;
   border-bottom: solid 1px ${({ theme }) => theme.colors.background};
   cursor: ${({ expandable }) => (expandable ? 'pointer' : 'auto')};
 `
-const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
+const Title = styled.div<{ visited: boolean; isExpanded: boolean }>`
   width: 100vw;
   padding: 25px;
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
@@ -24,7 +35,7 @@ const Title = styled.div.attrs<{ visited: boolean; isExpanded: boolean }>({})`
     visited && !isExpanded ? theme.colors.primary : theme.colors.copy};
 `
 
-const ExpandedIndicator = styled.div.attrs<{ expanded: boolean }>({})`
+const ExpandedIndicator = styled.div<{ expanded: boolean }>`
   height: 4px;
   border-radius: 1px 1px 0 0;
   transition: background 300ms;
@@ -38,10 +49,10 @@ const Seperator = styled.span`
     content: '|';
   }
 `
-const SectionContainer = styled.div.attrs<{
+const SectionContainer = styled.div<{
   expanded: boolean
   maxHeight: string
-}>({})`
+}>`
   max-height: ${({ expanded, maxHeight }) => (expanded ? maxHeight : `0px`)};
   overflow: hidden;
   transition: ${({ expanded }) =>
