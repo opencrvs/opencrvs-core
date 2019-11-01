@@ -797,12 +797,8 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
-
-      expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
+      const element = await waitForElement(component, '#loader-button-error')
+      expect(element.hostNodes()).toHaveLength(1)
     })
 
     it('displays error message if no registration found by NID', async () => {
