@@ -69,7 +69,7 @@ export class InboxController {
   private sync = async () => {
     this.syncCount++
     console.debug(`[${this.syncCount}] Starting sync...`)
-    if (!navigator.onLine || this.syncRunning) {
+    if (this.syncRunning) {
       console.debug(
         `[${this.syncCount}] Sync exiting early (offline or already syncing)`
       )
@@ -154,6 +154,7 @@ export class InboxController {
     if (application.downloadRetryAttempt < MAX_RETRY_ATTEMPT) {
       application.downloadStatus = DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       this.store.dispatch(modifyApplication(application))
+      this.store.dispatch(writeApplication(application))
       return
     }
 
