@@ -37,11 +37,11 @@ export enum SUBMISSION_STATUS {
 }
 
 export enum DOWNLOAD_STATUS {
-  PENDING = 'PENDING',
   READY_TO_DOWNLOAD = 'READY_TO_DOWNLOAD',
   DOWNLOADING = 'DOWNLOADING',
   DOWNLOADED = 'DOWNLOADED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
+  FAILED_NETWORK = 'FAILED_NETWORK'
 }
 
 export const processingStates = [
@@ -76,6 +76,7 @@ export interface IApplication {
   registrationStatus?: string
   submissionStatus?: string
   downloadStatus?: string
+  downloadRetryAttempt?: number
   action?: string
   trackingId?: string
   compositionId?: string
