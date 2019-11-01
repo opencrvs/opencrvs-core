@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 interface IProps {
   onUnmount: (duration: number) => void // in milliseconds
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export function TimeMounted(props: IProps) {

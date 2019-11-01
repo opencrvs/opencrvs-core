@@ -448,11 +448,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <TimeMounted
-        onUnmount={(duration: number) => {
-          this.logTime(duration)
-        }}
-      >
+      <>
+        <TimeMounted
+          onUnmount={(duration: number) => {
+            this.logTime(duration)
+          }}
+        ></TimeMounted>
         <StyledContainer
           className={PAGE_TRANSITIONS_CLASSNAME}
           id="informant_parent_view"
@@ -691,7 +692,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             />
           )}
         </StyledContainer>
-      </TimeMounted>
+      </>
     )
   }
 }
@@ -722,14 +723,6 @@ function mapStateToProps(
     }>
 ) {
   const { match, registerForm, application } = props
-
-  if (
-    !state.profile.userDetails ||
-    !state.profile.userDetails.userMgntUserID ||
-    !state.profile.userDetails.role
-  ) {
-    throw new Error('User details not properly loaded into redux')
-  }
 
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 

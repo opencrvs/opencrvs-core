@@ -129,7 +129,8 @@ test('should build a minimal FHIR registration document without error', async ()
                 createdAt: '2018-10-31T09:45:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00'
+            timestamp: '2018-10-31T09:45:05+10:00',
+            timeLoggedMS: 1234
           }
         ],
         attachments: [
@@ -173,8 +174,8 @@ test('should build a minimal FHIR registration document without error', async ()
               {
                 paymentId: '1234',
                 type: 'MANUAL',
-                total: 50.0,
-                amount: 50.0,
+                total: 50,
+                amount: 50,
                 outcome: 'COMPLETED',
                 date: '2018-10-22'
               }
@@ -375,6 +376,10 @@ test('should build a minimal FHIR registration document without error', async ()
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: '01733333333'
   })
+  expect(fhir.entry[5].resource.extension[2]).toEqual({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`,
+    valueInteger: 1234
+  })
   expect(fhir.entry[5].resource.status).toEqual('draft')
   expect(fhir.entry[5].resource.lastModified).toEqual(
     '2018-10-31T09:45:05+10:00'
@@ -542,14 +547,14 @@ test('should build a minimal FHIR registration document without error', async ()
       value: '1234'
     }
   ])
-  expect(fhir.entry[11].resource.total).toBe(50.0)
+  expect(fhir.entry[11].resource.total).toBe(50)
   expect(fhir.entry[11].resource.outcome).toEqual({
     coding: [{ code: 'COMPLETED' }]
   })
   expect(fhir.entry[11].resource.detail).toEqual([
     {
       type: { coding: [{ code: 'MANUAL' }] },
-      amount: 50.0,
+      amount: 50,
       date: '2018-10-22'
     }
   ])
@@ -800,7 +805,8 @@ test('creates task with contact other relationship', async () => {
                 createdAt: '2018-10-31T09:45:05+10:00'
               }
             ],
-            timestamp: '2018-10-31T09:45:05+10:00'
+            timestamp: '2018-10-31T09:45:05+10:00',
+            timeLoggedMS: 1234
           }
         ],
         attachments: [

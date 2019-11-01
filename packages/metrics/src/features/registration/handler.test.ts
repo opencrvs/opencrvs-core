@@ -1118,7 +1118,7 @@ describe('When an existing application is marked certified', () => {
   })
 })
 
-describe('When an in-progress application is recieved', () => {
+describe('When an in-progress application is received', () => {
   let server: any
 
   beforeEach(async () => {
