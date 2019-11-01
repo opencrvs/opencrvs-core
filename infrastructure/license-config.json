@@ -15,6 +15,7 @@
     "infrastructure/license-header.txt",
     "**/*Dockerfile",
     "**/packages/components/lib",
+    "**/packages/*/build",
     "packages/gateway/src/graphql/schema.d.ts"
   ],
   "license": "infrastructure/license-header.txt",
