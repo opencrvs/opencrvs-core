@@ -217,7 +217,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     locale
                   ] as string)) ||
                 '',
-              timestamp: status && formatLongDate(status.timestamp, locale),
+              timestamp: status && status.timestamp,
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
