@@ -376,7 +376,7 @@ test('should build a minimal FHIR registration document without error', async ()
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
     valueString: '01733333333'
   })
-  expect(fhir.entry[5].resource.extension[2]).toEqual({
+  expect(fhir.entry[5].resource.extension[3]).toEqual({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`,
     valueInteger: 1234
   })
