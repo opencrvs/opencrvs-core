@@ -33,12 +33,11 @@ import { SettingsPage } from '@register/views/Settings/SettingsPage'
 import { SysAdminHome } from '@register/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@register/views/SysAdmin/views/CreateNewUser'
 import { SelectPrimaryApplicant } from '@register/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
-import { SelectContactPoint } from '@register/views/SelectContactPoint/SelectContactPoint'
-import TransitionWrapper from './components/TransitionWrapper'
+import TransitionWrapper from '@register/components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
-import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
-import { Payment } from './views/PrintCertificate/Payment'
+import { ReviewCertificateAction } from '@register/views/PrintCertificate/ReviewCertificateAction'
+import { Payment } from '@register//views/PrintCertificate/Payment'
 import { CollectorForm } from '@register/views/PrintCertificate/collectorForm/CollectorForm'
 
 interface IAppProps {
@@ -241,20 +240,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.CREATE_USER_SECTION}
                                             component={CreateNewUser}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.SELECT_DEATH_MAIN_CONTACT_POINT
-                                            }
-                                            component={SelectContactPoint}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.SELECT_BIRTH_MAIN_CONTACT_POINT
-                                            }
-                                            component={SelectContactPoint}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
