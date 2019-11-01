@@ -127,9 +127,17 @@ const ErrorText = styled.div`
   margin: 24px;
 `
 
-function LabelValue({ label, value }: { label: string; value: string }) {
+function LabelValue({
+  label,
+  value,
+  id
+}: {
+  id?: string
+  label: string
+  value: string
+}) {
   return (
-    <div>
+    <div id={id}>
       <StyledLabel>{label}:</StyledLabel>
       <StyledValue>{value}</StyledValue>
     </div>
@@ -162,6 +170,8 @@ type IProps = IntlShapeProps & {
   theme: ITheme
   eventId: string
 }
+
+type ISODateString = string
 
 export class RowHistoryViewComponent extends React.Component<IProps> {
   transformer = (data: GQLQuery) => {
@@ -217,7 +227,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                     locale
                   ] as string)) ||
                 '',
-              timestamp: status && status.timestamp,
+              timestamp: status && (status.timestamp as ISODateString),
               practitionerRole:
                 status && status.user && status.user.role
                   ? this.props.intl.formatMessage(
@@ -369,10 +379,9 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                       } = status
                       const type = status.type as string
                       const officeName = status.officeName as string
-                      const timestamp = moment(
-                        status.timestamp as string,
-                        LOCAL_DATE_FORMAT
-                      ).format(CERTIFICATE_DATE_FORMAT)
+                      const timestamp = moment(status.timestamp!).format(
+                        CERTIFICATE_DATE_FORMAT
+                      )
                       return (
                         <HistoryWrapper key={index}>
                           <ExpansionContainer
@@ -382,6 +391,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                             {this.getDeclarationStatusIcon(type)}
                             <ExpansionContentContainer>
                               <LabelValue
+                                id="expanded_history_item_timestamp"
                                 label={intl.formatMessage(
                                   this.getWorkflowDateLabel(type)
                                 )}

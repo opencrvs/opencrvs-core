@@ -485,140 +485,150 @@ describe('RegistrarHome ready to print tab related tests', () => {
       .simulate('click')
   })
 
-  it('renders expanded area for ready to print', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
+  describe('When a row is expanded', () => {
+    let expandedRow: any
+
+    beforeEach(async () => {
+      Date.now = jest.fn(() => 1554055200000)
+      const graphqlMock = [
+        {
+          request: {
+            query: REGISTRATION_HOME_QUERY,
+            variables: {
+              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+              count: 10,
+              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+              inProgressSkip: 0,
+              reviewSkip: 0,
+              rejectSkip: 0,
+              approvalSkip: 0,
+              printSkip: 0
+            }
+          },
+          result: {
+            data: {
+              inProgressTab: { totalItems: 0, results: [] },
+              reviewTab: { totalItems: 0, results: [] },
+              rejectTab: { totalItems: 0, results: [] },
+              approvalTab: { totalItems: 0, results: [] },
+              printTab: mockPrintTabData
+            }
           }
         },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: mockPrintTabData
-          }
-        }
-      },
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-          }
-        },
-        result: {
-          data: {
-            fetchRegistration: {
-              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-              registration: {
-                id: '345678',
-                type: 'BIRTH',
-                certificates: null,
-                status: [
-                  {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                    timestamp: '2019-04-03T07:08:24.936Z',
-                    user: {
-                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Mohammad',
-                          familyName: 'Ashraful'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
+        {
+          request: {
+            query: FETCH_REGISTRATION_BY_COMPOSITION,
+            variables: {
+              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+            }
+          },
+          result: {
+            data: {
+              fetchRegistration: {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                registration: {
+                  id: '345678',
+                  type: 'BIRTH',
+                  certificates: null,
+                  status: [
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
+                      timestamp: '2019-10-20T11:03:20.660Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
+                      },
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
                         }
-                      ],
-                      role: 'LOCAL_REGISTRAR'
-                    },
-                    location: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: ['']
-                    },
-                    office: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: [''],
-                      address: {
-                        district: '7876',
-                        state: 'iuyiuy'
-                      }
-                    },
-                    type: 'REGISTERED',
-                    comments: [
-                      {
-                        comment: 'reason=duplicate&comment=dup'
-                      }
-                    ]
-                  }
-                ],
-                contact: 'MOTHER',
-                contactPhoneNumber: '01622688231'
-              },
-              child: {
-                id: 'FAKE_ID',
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Mushraful',
-                    familyName: 'Hoque'
-                  }
-                ],
-                birthDate: '01-01-1984'
-              },
-              deceased: null,
-              informant: null
+                      },
+                      type: 'REGISTERED',
+                      comments: [
+                        {
+                          comment: 'reason=duplicate&comment=dup'
+                        }
+                      ]
+                    }
+                  ],
+                  contact: 'MOTHER',
+                  contactPhoneNumber: '01622688231'
+                },
+                child: {
+                  id: 'FAKE_ID',
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mushraful',
+                      familyName: 'Hoque'
+                    }
+                  ],
+                  birthDate: '01-01-1984'
+                },
+                deceased: null,
+                informant: null
+              }
             }
           }
         }
-      }
-    ]
+      ]
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'print' } }} />,
-      store,
-      graphqlMock
-    )
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegistrationHome match={{ params: { tabId: 'print' } }} />,
+        store,
+        graphqlMock
+      )
 
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      getItem.mockReturnValue(registerScopeToken)
+      testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      const instance = (await waitForElement(
+        testComponent.component,
+        GridTable
+      )).instance() as any
 
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-    testComponent.component.update()
-    const instance = testComponent.component.find(GridTable).instance() as any
+      instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
 
-    instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
+      expandedRow = await waitForElement(
+        testComponent.component,
+        '#REGISTERED-0'
+      )
     })
 
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#REGISTERED-0').hostNodes().length
-    ).toBe(1)
+    it('renders expanded area for ready to print', async () => {
+      expect(expandedRow.hostNodes().length).toBe(1)
+    })
+
+    it('renders correct timestamps for history steps [OCRVS-2214]', async () => {
+      expect(
+        expandedRow
+          .find('#expanded_history_item_timestamp')
+          .hostNodes()
+          .text()
+      ).toBe('Registered on:20 October 2019')
+    })
   })
 
   it('expanded block renders error text when an error occurs', async () => {
