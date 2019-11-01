@@ -62,9 +62,7 @@ describe('when user is selecting the informant', () => {
           .find('#error_text')
           .hostNodes()
           .text()
-      ).toBe(
-        'Please select the relationship to the deceased and any relevant contact details.'
-      )
+      ).toBe('Please select the relationship to the deceased.')
     })
   })
 
@@ -102,63 +100,11 @@ describe('when user is selecting the informant', () => {
   })
 
   describe('when select other informant', () => {
-    it('show error if neither relationship nor phone number entered', () => {
+    it('advances to additional relationship information if informant is other', async () => {
       app
         .find('#select_informant_OTHER')
         .hostNodes()
         .simulate('change')
-      app
-        .find('#continue')
-        .hostNodes()
-        .simulate('click')
-
-      expect(
-        app
-          .find('#error_text')
-          .hostNodes()
-          .text()
-      ).toBe(
-        'Please select the relationship to the deceased and any relevant contact details.'
-      )
-    })
-    it('show error while giving invalid mobile no', async () => {
-      app
-        .find('#select_informant_OTHER')
-        .hostNodes()
-        .simulate('change')
-
-      await flushPromises()
-      app.update()
-
-      app
-        .find('#phone_number_input')
-        .hostNodes()
-        .simulate('change', {
-          target: { id: 'phone_number_input', value: '016562106' }
-        })
-
-      await flushPromises()
-      app.update()
-
-      expect(
-        app
-          .find('#phone_number_error')
-          .hostNodes()
-          .text()
-      ).toBe('Not a valid mobile number')
-    })
-    it('show error if valid phone number but relationship not entered', async () => {
-      app
-        .find('#select_informant_OTHER')
-        .hostNodes()
-        .simulate('change')
-
-      app
-        .find('#phone_number_input')
-        .hostNodes()
-        .simulate('change', {
-          target: { id: 'phone_number_input', value: '01711111111' }
-        })
 
       app
         .find('#continue')
@@ -169,43 +115,35 @@ describe('when user is selecting the informant', () => {
       app.update()
 
       expect(
-        app
-          .find('#error_text')
-          .hostNodes()
-          .text()
-      ).toBe(
-        'Please select the relationship to the deceased and any relevant contact details.'
-      )
+        app.find('#relationship_HEAD_OF_THE_INSTITUTE').hostNodes()
+      ).toHaveLength(1)
     })
-    it('advances to death application if informant is other', async () => {
+
+    it('advances to contact point if informant is other', async () => {
       app
         .find('#select_informant_OTHER')
         .hostNodes()
         .simulate('change')
 
       app
-        .find('#phone_number_input')
-        .hostNodes()
-        .simulate('change', {
-          target: { id: 'phone_number_input', value: '01711111111' }
-        })
-
-      app
-        .find('#relationship_input')
-        .hostNodes()
-        .simulate('change', {
-          target: { id: 'relationship_input', value: 'Neighbour' }
-        })
-
-      app
         .find('#continue')
+        .hostNodes()
+        .simulate('click')
+
+      app
+        .find('#relationship_OTHER')
+        .hostNodes()
+        .simulate('change')
+
+      app
+        .find('#next_section')
         .hostNodes()
         .simulate('click')
 
       await flushPromises()
       app.update()
 
-      expect(app.find('#firstNamesEng').hostNodes()).toHaveLength(1)
+      expect(app.find('#contactPoint_APPLICANT').hostNodes()).toHaveLength(1)
     })
   })
 

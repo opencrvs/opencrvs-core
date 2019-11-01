@@ -330,18 +330,11 @@ describe('when user is in the register form for death event', () => {
       )
       component = testComponent.component
     })
+
     it('renders the optional label', () => {
       expect(
         component
-          .find('#form_section_opt_label_causeOfDeath-causeOfDeathEstablished')
-          .hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('renders the notice component', () => {
-      expect(
-        component
-          .find('#form_section_notice_causeOfDeath-causeOfDeathEstablished')
+          .find('#form_section_id_causeOfDeath-causeOfDeathEstablished')
           .hostNodes()
       ).toHaveLength(1)
     })

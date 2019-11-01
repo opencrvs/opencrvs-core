@@ -415,6 +415,7 @@ describe('when user is previewing the form data', () => {
       applicantBirthDate: '1996-01-01',
       applicantsRelationToDeceased: 'EXTENDED_FAMILY',
       applicantPhone: '01622688231',
+      relationship: 'SPOUSE',
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
@@ -465,7 +466,10 @@ describe('when user is previewing the form data', () => {
     const registrationDetails = {
       _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
       trackingId: 'DS8QZ0Z',
-      type: 'death'
+      type: 'death',
+      contact: 'OTHER',
+      contactPhoneNumber: '+8801671010143',
+      contactRelationship: 'Friend'
     }
 
     const registerScopeToken =
@@ -522,6 +526,7 @@ describe('when user is previewing the form data', () => {
         .hostNodes()
         .simulate('click')
     })
+
     it('rejecting application redirects to reject confirmation screen', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
 

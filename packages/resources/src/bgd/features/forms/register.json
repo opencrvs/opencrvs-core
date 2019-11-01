@@ -9307,12 +9307,12 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "(!draftData || !draftData.informant || draftData.informant.relationship !== \"OTHER\")"
+                  "expression": "(!draftData || !draftData.informant || ![\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
                 }
               ],
               "fields": [
                 {
-                  "name": "otherRelationship",
+                  "name": "relationship",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
                     "defaultMessage": "What is the applicants relationship to the deceased?",
@@ -9394,20 +9394,24 @@
                           }
                         }
                       }
-                    ]
+                    ],
+                    "OFFICER_IN_CHARGE": [],
+                    "DRIVER_OF_THE_VEHICLE": [],
+                    "OWNER_OF_THE_HOUSE": [],
+                    "HEAD_OF_THE_INSTITUTE": []
                   },
                   "conditionals": [],
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
                       "parameters": [
-                        "informant.otherRelationship"
+                        "informant.relationship"
                       ]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
                       "parameters": [
-                        "informant.otherRelationship"
+                        "informant.relationship"
                       ]
                     }
                   }
@@ -13532,6 +13536,7 @@
                     "description": "Placeholder text for a select",
                     "id": "form.field.select.placeholder"
                   },
+                  "readonly": true,
                   "hidden": true,
                   "options": [
                     {
@@ -13567,6 +13572,22 @@
                       }
                     },
                     {
+                      "value": "SON_IN_LAW",
+                      "label": {
+                        "defaultMessage": "Son in law",
+                        "description": "Label for option Son in law",
+                        "id": "form.field.label.applicantRelation.sonInLaw"
+                      }
+                    },
+                    {
+                      "value": "DAUGHTER_IN_LAW",
+                      "label": {
+                        "defaultMessage": "Daughter in law",
+                        "description": "Label for option Daughter in law",
+                        "id": "form.field.label.applicantRelation.daughterInLaw"
+                      }
+                    },
+                    {
                       "value": "DAUGHTER",
                       "label": {
                         "defaultMessage": "Daughter",
@@ -13575,11 +13596,19 @@
                       }
                     },
                     {
-                      "value": "EXTENDED_FAMILY",
+                      "value": "GRANDSON",
                       "label": {
-                        "defaultMessage": "Extended Family",
-                        "description": "Label for option Extended Family",
-                        "id": "form.field.label.applicantRelation.extendedFamily"
+                        "defaultMessage": "Grandson",
+                        "description": "Label for option Grandson",
+                        "id": "form.field.label.applicantRelation.grandson"
+                      }
+                    },
+                    {
+                      "value": "GRANDDAUGHTER",
+                      "label": {
+                        "defaultMessage": "Granddaughter",
+                        "description": "Label for option Granddaughter",
+                        "id": "form.field.label.applicantRelation.granddaughter"
                       }
                     },
                     {
@@ -13589,6 +13618,24 @@
                         "description": "Label for option Other",
                         "id": "form.field.label.applicantRelation.other"
                       }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"OFFICER_IN_CHARGE\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"DRIVER_OF_THE_VEHICLE\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"OWNER_OF_THE_HOUSE\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"HEAD_OF_THE_INSTITUTE\")"
                     }
                   ],
                   "mapping": {
@@ -13604,44 +13651,6 @@
                       "parameters": [
                         "informant",
                         "relationship"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.phoneNumber"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "hidden": true,
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToPhoneNumberTransformer",
-                          "parameters": []
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "phoneNumberToFieldTransformer"
-                        }
                       ]
                     }
                   }
