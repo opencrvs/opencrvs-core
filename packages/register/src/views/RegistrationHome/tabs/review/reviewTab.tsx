@@ -27,13 +27,8 @@ import { RowHistoryView } from '@register/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
-import {
-  IApplication,
-  DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  storeApplication
-} from '@register/applications'
-import { Event } from '@register/forms'
+import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
+import { Event, Action } from '@register/forms'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -45,13 +40,17 @@ interface IBaseReviewTabProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   registrarLocationId: string | null
   goToApplicationDetails: typeof goToApplicationDetails
-  storeApplication: typeof storeApplication
   outboxApplications: IApplication[]
   queryData: {
     data: GQLEventSearchResultSet
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IReviewTabState {
@@ -94,14 +93,6 @@ class ReviewTabComponent extends React.Component<
     return this.props.scope && this.props.scope.includes('register')
   }
 
-  downloadApplication = (event: Event, compositionId: string) => {
-    const downloadableApplication = makeApplicationReadyToDownload(
-      event,
-      compositionId
-    )
-    this.props.storeApplication(downloadableApplication)
-  }
-
   transformDeclaredContent = (data: GQLEventSearchResultSet) => {
     if (!data || !data.results) {
       return []
@@ -110,7 +101,7 @@ class ReviewTabComponent extends React.Component<
     return transformedData.map(reg => {
       const actions = [] as IAction[]
       const foundApplication = this.props.outboxApplications.find(
-        application => application.compositionId === reg.id
+        application => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -122,10 +113,18 @@ class ReviewTabComponent extends React.Component<
             label: '',
             icon: () => <Download />,
             handler: () => {
-              this.downloadApplication(reg.event as Event, reg.id)
+              this.props.onDownloadApplication(
+                reg.event as Event,
+                reg.id,
+                Action.LOAD_REVIEW_APPLICATION
+              )
             },
-            loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
-            error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+            loading:
+              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+            error:
+              downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
             loadingLabel: this.props.intl.formatMessage(
               constantsMessages.downloading
             )
@@ -147,10 +146,18 @@ class ReviewTabComponent extends React.Component<
             label: '',
             icon: () => <Download />,
             handler: () => {
-              this.downloadApplication(reg.event as Event, reg.id)
+              this.props.onDownloadApplication(
+                reg.event as Event,
+                reg.id,
+                Action.LOAD_REVIEW_APPLICATION
+              )
             },
-            loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
-            error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+            loading:
+              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+            error:
+              downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
             loadingLabel: this.props.intl.formatMessage(
               constantsMessages.downloading
             )
@@ -298,7 +305,6 @@ export const ReviewTab = connect(
   {
     goToPage,
     goToReviewDuplicate,
-    goToApplicationDetails,
-    storeApplication
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(ReviewTabComponent)))

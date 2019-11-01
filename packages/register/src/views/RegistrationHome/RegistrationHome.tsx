@@ -22,7 +22,9 @@ import {
 import {
   IApplication,
   SUBMISSION_STATUS,
-  filterProcessingApplicationsFromQuery
+  filterProcessingApplicationsFromQuery,
+  storeApplication,
+  makeApplicationReadyToDownload
 } from '@register/applications'
 import { Header } from '@register/components/interface/Header/Header'
 import { IViewHeadingProps } from '@register/components/ViewHeading'
@@ -55,6 +57,7 @@ import { errorMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@register/i18n/messages/views/certificate'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import { Event, Action } from '@register/forms'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -127,6 +130,7 @@ interface IBaseRegistrationHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  storeApplication: typeof storeApplication
   tabId: string
   selectorId: string
   drafts: IApplication[]
@@ -225,6 +229,20 @@ export class RegistrationHomeView extends React.Component<
     }
   }
 
+  downloadApplication = (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      // @ts-ignore
+      event.toLowerCase(),
+      compositionId,
+      action
+    )
+    this.props.storeApplication(downloadableApplication)
+  }
+
   render() {
     const {
       theme,
@@ -282,7 +300,7 @@ export class RegistrationHomeView extends React.Component<
                 />
               )
             }
-            if (error) {
+            if (!data && error) {
               return (
                 <ErrorText id="search-result-error-text-count">
                   {intl.formatMessage(errorMessages.queryError)}
@@ -381,6 +399,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.readyForReview && (
@@ -391,6 +410,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={reviewCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.sentForUpdates && (
@@ -401,6 +421,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={updatesCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.sentForApproval && (
@@ -421,6 +442,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={printCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
               </>
@@ -484,6 +506,7 @@ export const RegistrationHome = connect(
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction
+    goToPrintCertificate: goToPrintCertificateAction,
+    storeApplication
   }
 )(injectIntl(withTheme(RegistrationHomeView)))

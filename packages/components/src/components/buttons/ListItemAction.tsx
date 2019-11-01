@@ -92,7 +92,10 @@ export function ListItemAction(props: IListItemActionProps) {
                 isFullHeight={isFullHeight}
                 key={action.label as string}
                 id={`${id}-${action.label as string}`}
-                onClick={action.handler}
+                onClick={e => {
+                  action.handler()
+                  e.stopPropagation()
+                }}
                 icon={action.icon}
               />
             </StatusIndicator>

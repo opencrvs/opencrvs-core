@@ -6,7 +6,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import {
   createReviewApplication,
-  deleteApplication,
   modifyApplication,
   storeApplication,
   writeApplication,
@@ -85,7 +84,6 @@ interface IBaseProps {
   storeApplication: typeof storeApplication
   writeApplication: typeof writeApplication
   modifyApplication: typeof modifyApplication
-  deleteApplication: typeof deleteApplication
   goToPrintCertificate: typeof goToPrintCertificate
   goToVerifyCollector: typeof goToVerifyCollector
   goToReviewCertificate: typeof goToReviewCertificate
@@ -284,6 +282,12 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }))
   }
 
+  resetCertificatesInformation = () => {
+    const application = Object.assign({}, this.props.application)
+    application.data.registration.certificates = []
+    this.props.modifyApplication(application)
+  }
+
   render() {
     const {
       intl,
@@ -293,7 +297,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       formSection,
       formGroup,
       goBack,
-      deleteApplication,
       registerForm
     } = this.props
 
@@ -363,7 +366,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           id="collector_form"
           title={intl.formatMessage(formSection.title)}
           goBack={() => {
-            deleteApplication(applicationToBeCertified)
+            this.resetCertificatesInformation()
             goBack()
           }}
         >
@@ -418,7 +421,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 id="cancel-btn"
                 key="cancel"
                 onClick={() => {
-                  deleteApplication(applicationToBeCertified)
+                  this.resetCertificatesInformation()
                   this.toggleSubmitModalOpen()
                 }}
               >
@@ -513,7 +516,6 @@ export const CollectorForm = connect(
     storeApplication,
     writeApplication,
     modifyApplication,
-    deleteApplication,
     goToPrintCertificate,
     goToVerifyCollector,
     goToReviewCertificate,

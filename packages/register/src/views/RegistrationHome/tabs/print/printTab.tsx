@@ -22,6 +22,7 @@ import { messages } from '@register/i18n/messages/views/registrarHome'
 import { IStoreState } from '@register/store'
 import { IApplication, DOWNLOAD_STATUS } from '@register/applications'
 import { Download } from '@opencrvs/components/lib/icons'
+import { Event, Action } from '@register/forms'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -34,6 +35,11 @@ interface IBasePrintTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IPrintTabState {
@@ -127,7 +133,7 @@ class PrintTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const foundApplication = this.props.outboxApplications.find(
-        application => application.compositionId === reg.id
+        application => application.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
@@ -138,10 +144,18 @@ class PrintTabComponent extends React.Component<
           label: '',
           icon: () => <Download />,
           handler: () => {
-            console.log('To dispatch download action')
+            this.props.onDownloadApplication(
+              (reg.event as unknown) as Event,
+              reg.id,
+              Action.LOAD_CERTIFICATE_APPLICATION
+            )
           },
-          loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
-          error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+          loading:
+            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+          error:
+            downloadStatus === DOWNLOAD_STATUS.FAILED ||
+            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
           loadingLabel: this.props.intl.formatMessage(
             constantsMessages.downloading
           )

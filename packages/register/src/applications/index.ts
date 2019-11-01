@@ -216,13 +216,15 @@ export function createApplication(event: Event, initialData?: IFormData) {
 
 export function makeApplicationReadyToDownload(
   event: Event,
-  compositionId: string
-) {
+  compositionId: string,
+  action: string
+): IApplication {
   return {
     id: compositionId,
     data: {},
     event,
     compositionId,
+    action,
     downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
   }
 }

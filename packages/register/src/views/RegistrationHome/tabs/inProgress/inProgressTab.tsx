@@ -42,6 +42,7 @@ import {
 } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { Download } from '@opencrvs/components/lib/icons'
+import { Action, Event } from '@register/forms'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -92,6 +93,11 @@ interface IBaseRegistrarHomeProps {
   queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IRegistrarHomeState {
@@ -158,7 +164,7 @@ export class InProgressTabComponent extends React.Component<
 
       const actions: IAction[] = []
       const foundApplication = this.props.drafts.find(
-        application => application.compositionId === reg.id
+        application => application.id === reg.id
       )
       const downloadStatus =
         (foundApplication && foundApplication.downloadStatus) || undefined
@@ -168,10 +174,18 @@ export class InProgressTabComponent extends React.Component<
           label: '',
           icon: () => <Download />,
           handler: () => {
-            console.log('To dispatch download action')
+            this.props.onDownloadApplication(
+              (event as unknown) as Event,
+              reg.id,
+              Action.LOAD_REVIEW_APPLICATION
+            )
           },
-          loading: downloadStatus === DOWNLOAD_STATUS.DOWNLOADING,
-          error: downloadStatus === DOWNLOAD_STATUS.FAILED,
+          loading:
+            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+          error:
+            downloadStatus === DOWNLOAD_STATUS.FAILED ||
+            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
           loadingLabel: this.props.intl.formatMessage(
             constantsMessages.downloading
           )
