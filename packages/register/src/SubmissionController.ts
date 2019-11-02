@@ -29,7 +29,7 @@ import { client } from '@register/utils/apolloClient'
 import moment from 'moment'
 
 const INTERVAL_TIME = 5000
-const HANGING_EXPIRE_MINUTES = 2
+const HANGING_EXPIRE_MINUTES = 15
 const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT.toString(),
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
