@@ -252,6 +252,13 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                   id="confirm-button"
                   key="confirm"
                   onClick={() => this.changePassword(changePassword)}
+                  disabled={
+                    !Boolean(this.state.currentPassword.length) ||
+                    !this.state.hasCases ||
+                    !this.state.hasNumber ||
+                    !this.state.validLength ||
+                    !this.state.passwordMatched
+                  }
                 >
                   {intl.formatMessage(messages.confirmButtonLabel)}
                 </PrimaryButton>

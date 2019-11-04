@@ -280,7 +280,7 @@ const messagesToDefine: IUserMessages = {
   },
   currentPassword: {
     id: 'password.label.current',
-    defaultMessage: 'Current password:',
+    defaultMessage: 'Current password',
     description: 'Current password label'
   },
   changePassword: {
