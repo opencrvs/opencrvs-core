@@ -1,6 +1,19 @@
-import { Event, IFormData } from '@register/forms'
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { Event, IFormData, ISelectOption } from '@register/forms'
 import moment from 'moment'
 import { dynamicMessages } from '@register/i18n/messages/views/certificate'
+import { getAvailableLanguages } from '@register/i18n/utils'
+import { ILanguageState } from '@register/i18n/reducer'
 
 const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
 const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
@@ -15,6 +28,36 @@ interface IRange {
   start: number
   end?: number
   value: number
+}
+
+export interface ICountry {
+  value: string
+  name: string
+}
+
+export interface IAvailableCountries {
+  language?: string
+  countries?: ICountry[]
+}
+
+export function getCountryTranslations(
+  languageState: ILanguageState,
+  countries: ISelectOption[]
+): IAvailableCountries[] {
+  const certificateCountries: IAvailableCountries[] = []
+  getAvailableLanguages().forEach((language: string) => {
+    const certificateCountry: IAvailableCountries = { language }
+    const availableCountries: ICountry[] = []
+    countries.forEach(country => {
+      availableCountries.push({
+        value: country.value,
+        name: languageState[language].messages[`countries.${country.value}`]
+      })
+    })
+    certificateCountry.countries = availableCountries
+    certificateCountries.push(certificateCountry)
+  })
+  return certificateCountries
 }
 
 interface IDayRange {

@@ -1,7 +1,21 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import pdfMake, { TCreatedPdf } from 'pdfmake/build/pdfmake'
 import { commonVFS } from '@register/pdfRenderer/common_vfs'
 import { transformers } from '@register/pdfRenderer/transformer'
-import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import {
+  IPDFTemplate,
+  OptionalData
+} from '@register/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
@@ -15,7 +29,8 @@ export function createPDF(
   application: IApplication,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  optionalData?: OptionalData
 ): TCreatedPdf {
   pdfMake.vfs = { ...commonVFS, ...template.vfs }
   let definitionString = JSON.stringify(template.definition)
@@ -32,7 +47,8 @@ export function createPDF(
         transformFunction(
           { application, userDetails, resource: offlineResource },
           intl,
-          transformerDef.parameters
+          transformerDef.parameters,
+          optionalData
         ) || ''
       )
     })
@@ -49,7 +65,15 @@ export function printPDF(
   application: IApplication,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  optionalData?: OptionalData
 ) {
-  createPDF(template, application, userDetails, offlineResource, intl).print()
+  createPDF(
+    template,
+    application,
+    userDetails,
+    offlineResource,
+    intl,
+    optionalData
+  ).print()
 }

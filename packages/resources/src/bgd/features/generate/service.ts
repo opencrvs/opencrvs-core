@@ -1,13 +1,24 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   getPractitionerLocations,
   getJurisDictionalLocations,
-  convertStringToASCII,
+  getPractitionerLocationId,
+  convertNumberToString,
   OPENCRVS_SPECIFICATION_URL
 } from '@resources/bgd/features/utils'
-import * as Verhoeff from 'node-verhoeff'
+import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
 
 export async function generateRegistrationNumber(
-  trackingId: string,
   practionerId: string
 ): Promise<string> {
   /* adding current year */
@@ -15,14 +26,12 @@ export async function generateRegistrationNumber(
   /* appending BBS code for district & upozila & union */
   brn = brn.concat((await getLocationBBSCode(practionerId)) as string)
 
-  /* appending ascii converted tracking id */
-  const brnToGenerateChecksum = brn.concat(convertStringToASCII(trackingId))
-  /* appending tracking id */
-  brn = brn.concat(trackingId)
-
-  /* appending single verhoeff checksum digit */
-  brn = brn.concat(Verhoeff.generate(brnToGenerateChecksum) as string)
-
+  /* appending six digit location wise sequence number */
+  brn = brn.concat(
+    await getLocationWiseSeqNumber(
+      await getPractitionerLocationId(practionerId)
+    )
+  )
   return brn
 }
 
@@ -74,4 +83,9 @@ function isTypeMatched(matchType: string, inputType?: string): boolean {
   } else {
     return inputType.toUpperCase() === matchType.toUpperCase()
   }
+}
+
+async function getLocationWiseSeqNumber(locationId: string): Promise<string> {
+  const nextSeqNumber = await getNextLocationWiseSeqNumber(locationId)
+  return convertNumberToString(nextSeqNumber.lastUsedSequenceNumber, 6)
 }

@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@register/utils/userUtils'
 import { IntlShape, MessageDescriptor } from 'react-intl'
@@ -7,6 +18,9 @@ import {
   TFontFamilyTypes
 } from 'pdfmake/build/pdfmake'
 import { IOfflineData } from '@register/offline/reducer'
+import { IAvailableCountries } from '@register/views/PrintCertificate/utils'
+
+export type OptionalData = IAvailableCountries[]
 
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
@@ -41,7 +55,8 @@ export interface IFunctionTransformer {
   [transformerFunction: string]: (
     data: TemplateTransformerData,
     intl: IntlShape,
-    payload?: TransformerPayload
+    payload?: TransformerPayload,
+    optionalData?: OptionalData
   ) => string | null
 }
 export interface IIntLabelPayload {
@@ -84,6 +99,7 @@ export interface INumberFeildConversionPayload {
 }
 
 export interface IOfflineAddressPayload {
+  language: string
   conditionalKeys: {
     condition: {
       key: string
@@ -91,7 +107,11 @@ export interface IOfflineAddressPayload {
     }
     addressType: string
     addressKey: string
-    formattedKeys: string
+    addresses: {
+      countryCode: string
+      localAddress: string
+      internationalAddress?: string
+    }
   }[]
 }
 

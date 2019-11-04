@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   findCompositionSection,
   findExtension,
@@ -220,14 +231,6 @@ export const typeResolvers: GQLResolver = {
         )
 
       return (foundIdentifier && foundIdentifier.value) || null
-    },
-    async inProgress(task: fhir.Task) {
-      const taskStatus = (task && task.status) || ''
-      if (taskStatus === 'draft') {
-        return true
-      } else {
-        return false
-      }
     },
     async attachments(task: fhir.Task, _, authHeader) {
       if (!task.focus) {

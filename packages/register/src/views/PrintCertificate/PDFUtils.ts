@@ -1,9 +1,21 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { IntlShape } from 'react-intl'
 import { createPDF, printPDF } from '@register/pdfRenderer'
 import { IApplication } from '@register/applications'
 import { IUserDetails } from '@opencrvs/register/src/utils/userUtils'
 import { Event } from '@register/forms'
 import { IOfflineData } from '@register/offline/reducer'
+import { OptionalData } from '@register/pdfRenderer/transformer/types'
 
 export function printMoneyReceipt(
   intl: IntlShape,
@@ -31,7 +43,8 @@ export async function previewCertificate(
   application: IApplication,
   userDetails: IUserDetails | null,
   offlineResource: IOfflineData,
-  callBack: (pdf: string) => void
+  callBack: (pdf: string) => void,
+  optionalData?: OptionalData
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
@@ -43,7 +56,8 @@ export async function previewCertificate(
     application,
     userDetails,
     offlineResource,
-    intl
+    intl,
+    optionalData
   ).getDataUrl((pdf: string) => {
     callBack(pdf)
   })
@@ -53,7 +67,8 @@ export function printCertificate(
   intl: IntlShape,
   application: IApplication,
   userDetails: IUserDetails | null,
-  offlineResource: IOfflineData
+  offlineResource: IOfflineData,
+  optionalData?: OptionalData
 ) {
   if (!userDetails) {
     throw new Error('No user details found')
@@ -65,6 +80,7 @@ export function printCertificate(
     application,
     userDetails,
     offlineResource,
-    intl
+    intl,
+    optionalData
   )
 }

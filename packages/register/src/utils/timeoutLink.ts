@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { ApolloLink, Observable, Operation, NextLink } from 'apollo-link'
 import { DefinitionNode, OperationDefinitionNode } from 'graphql'
 const DEFAULT_TIMEOUT = 30000
@@ -62,7 +73,7 @@ export default class TimeoutLink extends ApolloLink {
       // create local observable with timeout functionality (unsubscibe from chain observable and
       // return an error if the timeout expires before chain observable resolves)
       const localObservable = new Observable(observer => {
-        let timer: NodeJS.Timer
+        let timer: ReturnType<typeof setTimeout>
 
         // listen to chainObservable for result and pass to localObservable if received before timeout
         const subscription = chainObservable.subscribe(

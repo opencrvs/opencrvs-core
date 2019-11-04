@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from 'styled-components'
 import { EyeOn, EyeOff } from '../icons'
@@ -19,10 +30,10 @@ interface IPasswordInputState {
 
 export type IPasswordInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
-const StyledField = styled.div.attrs<IPasswordInputProps>({})`
+const StyledField = styled.div<IPasswordInputProps>`
   width: 100%;
 `
-const StyledInput = styled.input.attrs<IPasswordInputProps>({})`
+const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
@@ -127,8 +138,8 @@ export class PasswordInput extends React.Component<
       }
     })
   }
-  componentWillReceiveProps(nextProps: IPasswordInputProps) {
-    if (!this.props.focusInput && nextProps.focusInput) {
+  componentDidUpdate(prevProps: IPasswordInputProps) {
+    if (!prevProps.focusInput && this.props.focusInput) {
       this.focusField()
     }
   }
@@ -143,7 +154,7 @@ export class PasswordInput extends React.Component<
     return (
       <StyledField>
         <StyledInput
-          innerRef={this.$element}
+          ref={this.$element}
           {...this.props}
           type={this.state.isVisible ? 'text' : 'password'}
         />

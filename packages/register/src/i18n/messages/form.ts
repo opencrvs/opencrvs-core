@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IFormMessages {
@@ -167,6 +178,13 @@ interface IFormMessages {
   givenNames: MessageDescriptor
   healthInstitution: MessageDescriptor
   hospital: MessageDescriptor
+  internationalState: MessageDescriptor
+  internationalDistrict: MessageDescriptor
+  internationalCity: MessageDescriptor
+  internationalAddressLine1: MessageDescriptor
+  internationalAddressLine2: MessageDescriptor
+  internationalAddressLine3: MessageDescriptor
+  internationalPostcode: MessageDescriptor
   iD: MessageDescriptor
   iDType: MessageDescriptor
   iDTypeAlienNumber: MessageDescriptor
@@ -1656,6 +1674,41 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Division',
     description: 'Title for the state select',
     id: 'form.field.label.state'
+  },
+  internationalState: {
+    defaultMessage: 'State',
+    description: 'Title for the international address state field',
+    id: 'form.field.label.internationalState'
+  },
+  internationalDistrict: {
+    defaultMessage: 'District',
+    description: 'Title for the international address district field',
+    id: 'form.field.label.internationalDistrict'
+  },
+  internationalCity: {
+    defaultMessage: 'City / Town',
+    description: 'Title for the international address city field',
+    id: 'form.field.label.internationalCity'
+  },
+  internationalAddressLine1: {
+    defaultMessage: 'Address Line 1',
+    description: 'Title for the international address line 1 field',
+    id: 'form.field.label.internationalAddressLine1'
+  },
+  internationalAddressLine2: {
+    defaultMessage: 'Address Line 2',
+    description: 'Title for the international address line 2 field',
+    id: 'form.field.label.internationalAddressLine2'
+  },
+  internationalAddressLine3: {
+    defaultMessage: 'Address Line 3',
+    description: 'Title for the international address line 3 field',
+    id: 'form.field.label.internationalAddressLine3'
+  },
+  internationalPostcode: {
+    defaultMessage: 'Postcode / Zip',
+    description: 'Title for the international address postcode field',
+    id: 'form.field.label.internationalPostcode'
   },
   typeOfDocument: {
     defaultMessage: 'Choose type of document',

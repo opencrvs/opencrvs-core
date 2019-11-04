@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import {
   createTestComponent,
@@ -819,26 +830,20 @@ describe('when user is in the register form for death event', () => {
         store,
         graphqlMock
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
+
       component = testComponent.component
+      await waitForElement(component, '#iDType')
       selectOption(component, '#iDType', 'National ID')
 
-      const input = component.find('input#iD')
-      // @ts-ignore
-      input
-        .props()
-        // @ts-ignore
-        .onChange({
-          // @ts-ignore
-          target: {
-            // @ts-ignore
-            id: 'iD',
-            value: '1234567898765'
-          }
-        })
+      const input = component.find('input#iD') as any
+
+      input.hostNodes().props().onChange!({
+        target: {
+          id: 'iD',
+          value: '1234567898765'
+        }
+      })
+
       component.update()
 
       component
@@ -849,12 +854,9 @@ describe('when user is in the register form for death event', () => {
         .childAt(0)
         .simulate('click')
 
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      component.update()
+      const element = await waitForElement(component, '#loader-button-error')
 
-      expect(component.find('#loader-button-error').hostNodes()).toHaveLength(1)
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
   describe('when user is death event section', () => {

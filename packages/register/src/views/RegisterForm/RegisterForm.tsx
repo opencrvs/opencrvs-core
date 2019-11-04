@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   ICON_ALIGNMENT,
   PrimaryButton,
@@ -16,7 +27,10 @@ import {
   writeApplication
 } from '@register/applications'
 
-import { FormFieldGenerator } from '@register/components/form'
+import {
+  FormFieldGenerator,
+  ITouchedNestedFields
+} from '@register/components/form'
 import { RejectRegistrationForm } from '@register/components/review/RejectRegistrationForm'
 import {
   Event,
@@ -41,7 +55,7 @@ import { IStoreState } from '@register/store'
 import styled, { keyframes } from '@register/styledComponents'
 import { Scope } from '@register/utils/authUtils'
 import { ReviewSection } from '@register/views/RegisterForm/review/ReviewSection'
-import { isNull, isUndefined, merge } from 'lodash'
+import { isNull, isUndefined, merge, flatten } from 'lodash'
 import debounce from 'lodash/debounce'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -49,7 +63,9 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
   getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields
+  getVisibleGroupFields,
+  hasFormError,
+  getSectionFields
 } from '@register/forms/utils'
 import { messages } from '@register/i18n/messages/views/register'
 import { buttonMessages, formMessages } from '@register/i18n/messages'
@@ -59,6 +75,9 @@ import {
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@register/utils/constants'
+
+import { FormikTouched, FormikValues } from 'formik'
+import { FormEvent } from 'react'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -80,18 +99,18 @@ const Notice = styled.div`
 const StyledLinkButton = styled(LinkButton)`
   margin-left: 32px;
 `
-const Required = styled.span.attrs<
+const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.error};
   flex-grow: 0;
 `
 
-const Optional = styled.span.attrs<
+const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
->({})`
+>`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholder};
@@ -171,7 +190,6 @@ type DispatchProps = {
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
-  handleSubmit: (values: unknown) => void
 }
 
 type Props = {
@@ -221,6 +239,30 @@ class RegisterFormView extends React.Component<FullProps, State> {
       rejectFormOpen: false,
       hasError: false
     }
+  }
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
+
+  showAllValidationErrors = () => {
+    const touched = getSectionFields(this.props.activeSection).reduce(
+      (memo, field) => {
+        let fieldTouched: boolean | ITouchedNestedFields = true
+        if (field.nestedFields) {
+          fieldTouched = {
+            value: true,
+            nestedFields: flatten(Object.values(field.nestedFields)).reduce(
+              (nestedMemo, nestedField) => ({
+                ...nestedMemo,
+                [nestedField.name]: true
+              }),
+              {}
+            )
+          }
+        }
+        return { ...memo, [field.name]: fieldTouched }
+      },
+      {}
+    )
+    this.setAllFormFieldsTouched(touched)
   }
 
   userHasRegisterScope() {
@@ -314,6 +356,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
     groupId: string,
     event: string
   ) => {
+    const { preventContinueIfError } = this.props.activeSectionGroup
+    if (preventContinueIfError) {
+      const activeSectionFields = this.props.activeSectionGroup.fields
+      const activeSectionValues = this.props.application.data[
+        this.props.activeSection.id
+      ]
+      const groupHasError = hasFormError(
+        activeSectionFields,
+        activeSectionValues
+      )
+      if (groupHasError) {
+        this.showAllValidationErrors()
+        return
+      }
+    }
     this.updateVisitedGroups()
     this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
@@ -363,7 +420,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       setAllFieldsDirty,
       application,
       registerForm,
-      handleSubmit,
+
       duplicate,
       activeSection,
       activeSectionGroup
@@ -538,7 +595,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   )}
                   <form
                     id={`form_section_id_${activeSectionGroup.id}`}
-                    onSubmit={handleSubmit}
+                    onSubmit={(event: FormEvent) => event.preventDefault()}
                   >
                     <FormFieldGenerator
                       id={activeSectionGroup.id}
@@ -552,6 +609,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       setAllFieldsDirty={setAllFieldsDirty}
                       fields={getVisibleGroupFields(activeSectionGroup)}
                       draftData={application.data}
+                      onSetTouched={setTouchedFunc => {
+                        this.setAllFormFieldsTouched = setTouchedFunc
+                      }}
                     />
                   </form>
                   {nextSectionGroup && (
@@ -714,9 +774,6 @@ export const RegisterForm = connect<
     goBack: goBackAction,
     goToHome,
     goToHomeTab,
-    toggleDraftSavedNotification,
-    handleSubmit: (values: any) => {
-      console.log(values)
-    }
+    toggleDraftSavedNotification
   }
 )(injectIntl<'intl', FullProps>(RegisterFormView))

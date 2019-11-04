@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled, { StyledFunction } from 'styled-components'
 import { Search } from '../icons'
@@ -60,7 +71,7 @@ const StyledSearchButton = styled(PrimaryButton)`
     }
   }
 `
-const StyledInput = styled.input.attrs<ISearchInputProps>({})`
+const StyledInput = styled.input<ISearchInputProps>`
   flex: 1;
   padding: 5px 15px 5px 5px;
   margin: 0 20px 0 10px;
@@ -128,8 +139,8 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
       this.$element.current!.focus()
     })
   }
-  componentWillReceiveProps(nextProps: ISearchInputProps) {
-    if (!this.props.focusInput && nextProps.focusInput) {
+  componentDidUpdate(prevProps: ISearchInputProps) {
+    if (!prevProps.focusInput && this.props.focusInput) {
       this.focusField()
     }
   }
@@ -159,7 +170,7 @@ export class SearchInput extends React.Component<ISearchInputProps, IState> {
           <StyledInput
             onChange={this.change}
             value={value}
-            innerRef={this.$element}
+            ref={this.$element}
             {...this.props}
           />
         </SearchIconAndInput>

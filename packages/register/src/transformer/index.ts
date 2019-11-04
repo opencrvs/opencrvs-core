@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   IForm,
   IFormData,
@@ -47,7 +58,7 @@ export const draftToGqlTransformer = (
     throw new Error('Sections are missing in form definition')
   }
   const transformedData: TransformedData = { createdAt: new Date() }
-  let inCompleteData = false
+  let inCompleteFieldList: string[] = []
   formDefinition.sections.forEach(section => {
     if (!draftData[section.id]) {
       return
@@ -77,7 +88,9 @@ export const draftToGqlTransformer = (
             `Data is missing for a required field: ${fieldDef.name}` +
               `on section ${section.id}`
           )
-          inCompleteData = true
+          inCompleteFieldList.push(
+            `${section.id}/${groupDef.id}/${fieldDef.name}`
+          )
           return
         }
         if (
@@ -122,11 +135,15 @@ export const draftToGqlTransformer = (
   if (draftData._fhirIDMap) {
     transformedData._fhirIDMap = draftData._fhirIDMap
   }
-  if (inCompleteData) {
+  if (inCompleteFieldList && inCompleteFieldList.length > 0) {
     if (transformedData.registration) {
-      transformedData.registration.inProgress = true
+      transformedData.registration.inCompleteFields = inCompleteFieldList.join(
+        ','
+      )
     } else {
-      transformedData.registration = { inProgress: true }
+      transformedData.registration = {
+        inCompleteFields: inCompleteFieldList.join(',')
+      }
     }
   }
 
