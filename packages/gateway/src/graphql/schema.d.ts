@@ -291,6 +291,7 @@ export interface GQLEventRegistrationNameMap {
 export interface GQLRegistration {
   id?: string
   _fhirID?: string
+  draftId?: string
   trackingId?: string
   registrationNumber?: string
   paperFormID?: string
@@ -750,6 +751,7 @@ export interface GQLBirthRegistrationInput {
 
 export interface GQLRegistrationInput {
   _fhirID?: string
+  draftId?: string
   trackingId?: string
   registrationNumber?: string
   paperFormID?: string
@@ -1812,6 +1814,7 @@ export interface GQLEventRegistrationTypeResolver<TParent = any> {
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
+  draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
@@ -1833,6 +1836,10 @@ export interface RegistrationToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationTo_fhirIDResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToDraftIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

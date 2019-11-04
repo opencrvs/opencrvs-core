@@ -47,6 +47,30 @@ describe('Submission Controller', () => {
     expect(store.dispatch).not.toBeCalled()
   })
 
+  it('changes status of drafts that are hanging for long time', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              modifiedOn: 1572408000000,
+              submissionStatus: SUBMISSION_STATUS.SUBMITTING
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        }
+      }),
+      dispatch: jest.fn()
+    }
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.requeueHangingApplications()
+
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
+  })
+
   it('does nothing if offline', () => {
     const store = {
       getState: () => ({
