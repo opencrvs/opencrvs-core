@@ -18,6 +18,8 @@ export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const JURISDICTION_TYPE_DISTRICT = 'district'
 export const JURISDICTION_TYPE_UPAZILA = 'upazila'
 export const JURISDICTION_TYPE_UNION = 'union'
+export const JURISDICTION_TYPE_MUNICIPALITY = 'municipality'
+export const JURISDICTION_TYPE_CITY_CORPORATION = 'citycorporation'
 export const GENERATE_TYPE_RN = 'registrationNumber'
 
 type ISupportedType =
@@ -59,6 +61,11 @@ export interface ILocationSequenceNumber {
   year: string
   reference: string
   sequence_number: string
+}
+
+export interface IJurisdictionLocation {
+  jurisdictionType: string
+  bbsCode: string
 }
 
 export const sendToFhir = (
@@ -238,8 +245,54 @@ export function getJurisDictionalLocations() {
     {
       jurisdictionType: JURISDICTION_TYPE_UNION,
       bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_MUNICIPALITY,
+      bbsCode: ''
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_CITY_CORPORATION,
+      bbsCode: ''
     }
   ]
+}
+
+export function setRMOCode(locations: IJurisdictionLocation[]) {
+  const rmoLocationTypes = [
+    JURISDICTION_TYPE_UNION,
+    JURISDICTION_TYPE_MUNICIPALITY,
+    JURISDICTION_TYPE_CITY_CORPORATION
+  ]
+
+  const jurisdictionLocation = locations.find(
+    location =>
+      location.bbsCode && rmoLocationTypes.includes(location.jurisdictionType)
+  )
+
+  if (jurisdictionLocation) {
+    if (jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION) {
+      addRmoTypesInJurisdictionLocations(locations, 1)
+    } else if (
+      jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_MUNICIPALITY
+    ) {
+      addRmoTypesInJurisdictionLocations(locations, 2)
+    } else if (
+      jurisdictionLocation.jurisdictionType ===
+      JURISDICTION_TYPE_CITY_CORPORATION
+    ) {
+      addRmoTypesInJurisdictionLocations(locations, 9)
+    }
+  }
+}
+
+export function addRmoTypesInJurisdictionLocations(
+  jurisdictionLocation: IJurisdictionLocation[],
+  code: number
+) {
+  jurisdictionLocation.splice(1, 0, {
+    jurisdictionType: 'rmo',
+    bbsCode: code.toString()
+  })
 }
 
 export function convertStringToASCII(str: string): string {

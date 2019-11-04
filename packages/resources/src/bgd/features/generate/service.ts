@@ -14,7 +14,8 @@ import {
   getJurisDictionalLocations,
   getPractitionerLocationId,
   convertNumberToString,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  setRMOCode
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
 
@@ -72,6 +73,9 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
       }
     })
   }
+
+  setRMOCode(jurisDictionalLocations)
+
   return jurisDictionalLocations.reduce((locBBSCode, loc) => {
     return locBBSCode.concat(loc.bbsCode)
   }, '')
