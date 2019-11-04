@@ -123,7 +123,7 @@ async function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
-  await createApplicationIndex(body, composition.id as string, bundleEntries)
+  await createApplicationIndex(body, composition, bundleEntries)
 }
 
 function createChildIndex(
@@ -211,7 +211,7 @@ function createFatherIndex(
 
 async function createApplicationIndex(
   body: IBirthCompositionBody,
-  compositionId: string,
+  composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const task = findTask(bundleEntries)
@@ -244,6 +244,12 @@ async function createApplicationIndex(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  const compositionTypeCode =
+    composition.type.coding &&
+    composition.type.coding.find(
+      code => code.system === 'http://opencrvs.org/doc-types'
+    )
+
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.type =
@@ -260,8 +266,10 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.compositionType =
+    (compositionTypeCode && compositionTypeCode.code) || 'birth-application'
 
-  const createdBy = await getCreatedBy(compositionId)
+  const createdBy = await getCreatedBy(composition.id || '')
 
   if (createdBy) {
     body.createdBy = createdBy

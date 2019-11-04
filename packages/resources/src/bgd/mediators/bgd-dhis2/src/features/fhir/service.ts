@@ -76,7 +76,9 @@ export function createComposition(
             system: 'http://opencrvs.org/doc-types',
             // TODO add support for notification event detection in workflow 'death-notification'
             code:
-              eventType === 'BIRTH' ? 'birth-notification' : 'death-declaration'
+              eventType === 'BIRTH'
+                ? 'birth-notification'
+                : 'death-notification'
           }
         ],
         text:
