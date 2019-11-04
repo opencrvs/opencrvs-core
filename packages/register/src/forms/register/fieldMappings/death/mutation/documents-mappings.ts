@@ -58,7 +58,7 @@ export const deathDocumentTypeFhirMapping = {
   'Police Brought In Dead Certificate': 'BROUGHT_IN_DEAD_CERTIFICATE',
   'Coroners Report': 'CORONERS_REPORT',
   'Signed Affidavit': 'SIGNED_AFFIDAVIT',
-  'Proof of Date of Birth of Deceased': 'DATE_OF_BIRTH_PAPER',
+  'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF_PAPER',
   Other: 'OTHER'
 }
 
