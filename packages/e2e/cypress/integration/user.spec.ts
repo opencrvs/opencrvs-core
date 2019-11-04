@@ -36,7 +36,7 @@ context('User Integration Test', () => {
     cy.selectOption('#role', 'FIELD_AGENT', 'Field Agent')
     cy.selectOption('#type', 'HOSPITAL', 'Hospital')
     cy.get('#device').type('Xiamoi MI 8')
-    cy.get('#searchInputText').type('Moktarpur')
+    cy.get('#searchInputText').type('Alokbali')
     cy.get('#searchInputIcon').click()
     cy.get('#location-0').click()
     cy.get('#modal_select').click()
