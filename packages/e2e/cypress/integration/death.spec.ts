@@ -36,9 +36,11 @@ context('Death Integration Test', () => {
     cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_APPLICANT').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -137,12 +139,21 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_OTHER').click()
+    cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Friend')
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
+      'Colleague'
+    )
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01678945638'
+    )
+    cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -289,9 +300,11 @@ context('Death Integration Test', () => {
     cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_APPLICANT').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01741123963'
+    )
+    cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -394,12 +407,19 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_OTHER').click()
+    cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Colleague')
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type('Friend')
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01753741963'
+    )
+    cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -530,7 +550,7 @@ context('Death Integration Test', () => {
     cy.wait(5000)
   })
 
-  it('Tests registration by registrar using maximum input', () => {
+  it.only('Tests registration by registrar using maximum input', () => {
     cy.login('registrar')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
@@ -547,12 +567,21 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_HEAD_OF_THE_INSTITUTE').click()
+    cy.wait(500)
+    cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
+      'Colleague'
+    )
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01852741963'
+    )
+    cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')

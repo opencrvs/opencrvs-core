@@ -15648,7 +15648,7 @@
                     "description": "Input label for phone input",
                     "id": "form.field.label.phoneNumber"
                   },
-                  "required": true,
+                  "required": false,
                   "initialValue": "",
                   "validate": [
                     {
