@@ -166,6 +166,5 @@ export const changeHirerchyMutationTransformer = (
     transformedData[nestedField.name] = nestedFieldValueObj[nestedField.name]
   }
 
-  console.log(transformedData)
   return transformedData
 }
