@@ -280,9 +280,6 @@ type IFullProps = {
 
 interface IState {
   informant: string
-  // phoneNumber: string
-  // relationship: string
-  // isPhoneNoError: boolean
   touched: boolean
   isError: boolean
 }
@@ -304,26 +301,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           (this.props.application.data[applicantsSection.id]
             .applicantsRelationToDeceased as string)) ||
         '',
-      // phoneNumber:
-      //   (this.props.application &&
-      //     this.props.application.data &&
-      //     this.props.application.data[registrationSection.id] &&
-      //     (this.props.application.data[registrationSection.id]
-      //       .registrationPhone as string)) ||
-      //   (this.props.application &&
-      //     this.props.application.data &&
-      //     this.props.application.data[applicantsSection.id] &&
-      //     (this.props.application.data[applicantsSection.id]
-      //       .applicantPhone as string)) ||
-      //   '',
-      // relationship:
-      //   (this.props.application &&
-      //     this.props.application.data &&
-      //     this.props.application.data[applicantsSection.id] &&
-      //     (this.props.application.data[applicantsSection.id]
-      //       .applicantOtherRelationship as string)) ||
-      //   '',
-      // isPhoneNoError: false,
       touched: false,
       isError: false
     }
@@ -401,8 +378,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             // TODO: currently contact point is the informant,
             // need to define the difference between informant and contact point on death schema
             relationship: this.state.informant
-            // applicantPhone: '',
-            // applicantOtherRelationship: ''
           }
         }
       }
@@ -416,10 +391,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.state.informant &&
       this.state.informant !== 'error' &&
       this.state.informant === INFORMANT.SOMEONE_ELSE
-      // &&
-      // this.state.phoneNumber &&
-      // !this.state.isPhoneNoError &&
-      // this.state.relationship !== ''
     ) {
       const {
         application,
@@ -434,8 +405,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             ...application.data[applicantsSection.id],
             ...{
               relationship: this.state.informant
-              // applicantPhone: this.state.phoneNumber,
-              // applicantOtherRelationship: this.state.relationship
             }
           }
         }
@@ -492,53 +461,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       this.setState({ informant: 'error' })
     }
   }
-  // handleRelationshipChange = (value: string) => {
-  //   this.setState({
-  //     relationship: value,
-  //     touched: true,
-  //     isError: false
-  //   })
-  // }
-  // handlePhoneNoChange = (value: string) => {
-  //   let invalidPhoneNo = false
-  //   if (phoneNumberFormat(value)) {
-  //     invalidPhoneNo = true
-  //   }
-  //   this.setState({
-  //     isPhoneNoError: invalidPhoneNo ? true : false,
-  //     phoneNumber: value,
-  //     touched: true,
-  //     isError: false
-  //   })
-  // }
-  // renderPhoneNumberField = (): JSX.Element => {
-  //   return (
-  //     <InputField
-  //       id="phone_number"
-  //       label={this.props.intl.formatMessage(formMessages.phoneNumber)}
-  //       touched={this.state.touched}
-  //       error={
-  //         this.state.isPhoneNoError
-  //           ? this.props.intl.formatMessage(
-  //               validationMessages.phoneNumberNotValid
-  //             )
-  //           : ''
-  //       }
-  //       hideAsterisk={true}
-  //     >
-  //       <TextInput
-  //         id="phone_number_input"
-  //         type="tel"
-  //         name={PHONE_NO_FIELD_STRING}
-  //         isSmallSized={true}
-  //         value={this.state.phoneNumber}
-  //         onChange={e => this.handlePhoneNoChange(e.target.value)}
-  //         touched={this.state.touched}
-  //         error={this.state.isPhoneNoError}
-  //       />
-  //     </InputField>
-  //   )
-  // }
   render() {
     const { intl } = this.props
     const event = this.props.location.pathname.includes(Event.BIRTH)
@@ -613,31 +535,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                 />
               )
             })}
-            {/* {this.state.informant === INFORMANT.SOMEONE_ELSE &&
-              event === Event.DEATH && (
-                <ChildContainer>
-                  <InputField
-                    id="relationship"
-                    label={intl.formatMessage(
-                      formMessages.applicantsRelationWithDeceased
-                    )}
-                    touched={this.state.touched}
-                    hideAsterisk={true}
-                  >
-                    <TextInput
-                      id="relationship_input"
-                      name="relationship"
-                      isSmallSized={true}
-                      value={this.state.relationship}
-                      onChange={e =>
-                        this.handleRelationshipChange(e.target.value)
-                      }
-                      touched={this.state.touched}
-                    />
-                  </InputField>
-                  {this.renderPhoneNumberField()}
-                </ChildContainer>
-              )} */}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(buttonMessages.continueButton)}

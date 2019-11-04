@@ -10982,40 +10982,6 @@
                   }
                 },
                 {
-                  "name": "applicantOtherRelationship",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other relation",
-                    "description": "Label for form field: Other relation",
-                    "id": "form.field.label.applicantOtherRelationship"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueSectionExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "otherRelationship"
-                      ]
-                    },
-                    "query": {
-                      "operation": "sectionFieldExchangeTransformer",
-                      "parameters": [
-                        "informant",
-                        "otherRelationship"
-                      ]
-                    }
-                  },
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "values.applicantsRelationToDeceased !== \"OTHER\""
-                    }
-                  ]
-                },
-                {
                   "name": "applicantPhone",
                   "type": "TEL",
                   "label": {
