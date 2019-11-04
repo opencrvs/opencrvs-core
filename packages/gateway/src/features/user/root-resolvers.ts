@@ -152,7 +152,7 @@ export const resolvers: GQLResolver = {
         }
       })
 
-      if (![201, 200].includes(res.status)) {
+      if (res.status !== 200) {
         return await Promise.reject(
           new Error(
             "Something went wrong on user-mgnt service. Couldn't change user password"

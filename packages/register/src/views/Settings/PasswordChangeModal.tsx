@@ -119,7 +119,6 @@ type State = {
   hasCases: boolean
   passwordMismatched: boolean
   passwordMatched: boolean
-  confirmPressed: boolean
   errorOccured: boolean
 }
 
@@ -143,7 +142,6 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       hasCases: false,
       passwordMismatched: false,
       passwordMatched: false,
-      confirmPressed: false,
       errorOccured: false
     }
   }
@@ -172,8 +170,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       newPassword: value,
       confirmPassword: EMPTY_STRING,
       passwordMatched: false,
-      passwordMismatched: false,
-      confirmPressed: false
+      passwordMismatched: false
     }))
     this.validateLength(value)
     this.validateNumber(value)
@@ -185,15 +182,10 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
     this.setState(() => ({
       confirmPassword: value,
       passwordMismatched: value.length > 0 && newPassword !== value,
-      passwordMatched: value.length > 0 && newPassword === value,
-      confirmPressed: false
+      passwordMatched: value.length > 0 && newPassword === value
     }))
   }
   changePassword = (mutation: () => void) => {
-    this.setState(() => ({
-      confirmPressed: true
-    }))
-
     if (
       this.state.passwordMatched &&
       this.state.currentPassword &&
@@ -222,7 +214,6 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
       hasCases: false,
       passwordMismatched: false,
       passwordMatched: false,
-      confirmPressed: false,
       errorOccured: false
     })
     this.props.passwordChanged()
@@ -301,18 +292,8 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     touched={true}
                     value={this.state.currentPassword}
                     onChange={this.setCurrentPassword}
-                    error={
-                      this.state.confirmPressed &&
-                      this.state.currentPassword.length === 0
-                    }
                   />
                 </InputField>
-                {this.state.confirmPressed &&
-                  this.state.currentPassword.length === 0 && (
-                    <GlobalError>
-                      {intl.formatMessage(messages.requiredfield)}
-                    </GlobalError>
-                  )}
               </Field>
             </PasswordContents>
           </Row>
@@ -381,9 +362,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     id="ConfirmPassword"
                     type="password"
                     touched={true}
-                    error={
-                      this.state.confirmPressed && this.state.passwordMismatched
-                    }
+                    error={this.state.passwordMismatched}
                     value={this.state.confirmPassword}
                     onChange={this.matchPassword}
                   />
