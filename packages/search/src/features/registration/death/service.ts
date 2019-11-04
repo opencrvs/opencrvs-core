@@ -190,6 +190,12 @@ async function createApplicationIndex(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  const compositionTypeCode =
+    composition.type.coding &&
+    composition.type.coding.find(
+      code => code.system === 'http://opencrvs.org/doc-types'
+    )
+
   body.contactNumber = informantTelecom && informantTelecom.value
   body.type =
     task &&
@@ -205,6 +211,8 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.compositionType =
+    (compositionTypeCode && compositionTypeCode.code) || 'death-application'
 
   const createdBy = await getCreatedBy(composition.id as string)
 

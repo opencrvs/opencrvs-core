@@ -26,10 +26,10 @@ export const mockBirthFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-declaration'
+              code: 'birth-application'
             }
           ],
-          text: 'Birth Declaration'
+          text: 'Birth Application'
         },
         class: {
           coding: [
@@ -559,10 +559,10 @@ export const mockBirthFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-declaration'
+              code: 'birth-application'
             }
           ],
-          text: 'Birth Declaration'
+          text: 'Birth Application'
         },
         class: {
           coding: [
@@ -849,10 +849,10 @@ export const mockDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-declaration'
+              code: 'death-application'
             }
           ],
-          text: 'Death Declaration'
+          text: 'Death Application'
         },
         class: {
           coding: [
@@ -1240,10 +1240,10 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-declaration'
+              code: 'death-application'
             }
           ],
-          text: 'Death Declaration'
+          text: 'Death Application'
         },
         class: {
           coding: [
@@ -1921,9 +1921,9 @@ export const mockCompositionResponse = {
   status: 'preliminary',
   type: {
     coding: [
-      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-application' }
     ],
-    text: 'Birth Declaration'
+    text: 'Birth Application'
   },
   class: {
     coding: [
