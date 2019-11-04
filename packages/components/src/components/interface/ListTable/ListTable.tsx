@@ -24,7 +24,12 @@ const Wrapper = styled.div`
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.captionStyle};
-  padding: 0 24px;
+  padding: 10px 24px;
+  box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+
+  & span:last-child {
+    text-align: right;
+  }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -39,8 +44,13 @@ const RowWrapper = styled.div`
   padding: 0 24px;
   display: flex;
   align-items: center;
-  min-height: 64px;
+  min-height: 50px;
   box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+
+  & span:last-child {
+    text-align: right;
+    padding-right: 0px;
+  }
 `
 const ContentWrapper = styled.span<{
   width: number
