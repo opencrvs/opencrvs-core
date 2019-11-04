@@ -80,6 +80,7 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -228,6 +229,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -331,6 +333,7 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -448,6 +451,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
@@ -482,6 +486,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -599,6 +604,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
@@ -633,6 +639,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()

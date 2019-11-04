@@ -77,6 +77,7 @@ import {
 } from '@register/utils/constants'
 
 import { FormikTouched, FormikValues } from 'formik'
+import { FormEvent } from 'react'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -189,7 +190,6 @@ type DispatchProps = {
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
-  handleSubmit: (values: unknown) => void
 }
 
 type Props = {
@@ -420,7 +420,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       setAllFieldsDirty,
       application,
       registerForm,
-      handleSubmit,
+
       duplicate,
       activeSection,
       activeSectionGroup
@@ -595,7 +595,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   )}
                   <form
                     id={`form_section_id_${activeSectionGroup.id}`}
-                    onSubmit={handleSubmit}
+                    onSubmit={(event: FormEvent) => event.preventDefault()}
                   >
                     <FormFieldGenerator
                       id={activeSectionGroup.id}
@@ -774,9 +774,6 @@ export const RegisterForm = connect<
     goBack: goBackAction,
     goToHome,
     goToHomeTab,
-    toggleDraftSavedNotification,
-    handleSubmit: (values: any) => {
-      console.log(values)
-    }
+    toggleDraftSavedNotification
   }
 )(injectIntl<'intl', FullProps>(RegisterFormView))
