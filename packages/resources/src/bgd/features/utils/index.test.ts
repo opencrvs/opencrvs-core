@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  insertRMOInJurisDictionalLocations,
+  getRMOCode,
   JURISDICTION_TYPE_DISTRICT,
   JURISDICTION_TYPE_UPAZILA,
   JURISDICTION_TYPE_UNION,
   JURISDICTION_TYPE_MUNICIPALITY,
-  JURISDICTION_TYPE_CITY_CORPORATION,
-  IJurisdictionLocation
+  JURISDICTION_TYPE_CITY_CORPORATION
 } from '@resources/bgd/features/utils'
 
 describe('utils tests', () => {
@@ -44,14 +43,9 @@ describe('utils tests', () => {
       }
     ]
 
-    const rmoLocation = insertRMOInJurisDictionalLocations(
-      jurisDictionalLocations
-    ).find(
-      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
-    ) as IJurisdictionLocation
+    const rmoCode = getRMOCode(jurisDictionalLocations)
 
-    expect(rmoLocation).toBeDefined()
-    expect(rmoLocation.bbsCode).toEqual('1')
+    expect(rmoCode).toEqual(1)
   })
 
   it('test setRmo for municipality', async () => {
@@ -78,14 +72,9 @@ describe('utils tests', () => {
       }
     ]
 
-    const rmoLocation = insertRMOInJurisDictionalLocations(
-      jurisDictionalLocations
-    ).find(
-      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
-    ) as IJurisdictionLocation
+    const rmoCode = getRMOCode(jurisDictionalLocations)
 
-    expect(rmoLocation).toBeDefined()
-    expect(rmoLocation.bbsCode).toEqual('2')
+    expect(rmoCode).toEqual(2)
   })
 
   it('test setRmo for city corporation', async () => {
@@ -112,13 +101,8 @@ describe('utils tests', () => {
       }
     ]
 
-    const rmoLocation = insertRMOInJurisDictionalLocations(
-      jurisDictionalLocations
-    ).find(
-      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
-    ) as IJurisdictionLocation
+    const rmoCode = getRMOCode(jurisDictionalLocations)
 
-    expect(rmoLocation).toBeDefined()
-    expect(rmoLocation.bbsCode).toEqual('9')
+    expect(rmoCode).toEqual(9)
   })
 })

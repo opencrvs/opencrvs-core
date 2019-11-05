@@ -249,8 +249,9 @@ export function getRMOCode(jurisdictionalLocations: IJurisdictionLocation[]) {
     JURISDICTION_TYPE_CITY_CORPORATION
   ]
 
-  const jurisdictionLocation = jurisdictionalLocations.find(location =>
-    rmoLocationTypes.includes(location.jurisdictionType)
+  const jurisdictionLocation = jurisdictionalLocations.find(
+    location =>
+      location.bbsCode && rmoLocationTypes.includes(location.jurisdictionType)
   )
 
   return jurisdictionLocation
