@@ -1184,7 +1184,7 @@ export interface QueryToSearchEventsArgs {
   userId?: string
   locationIds?: Array<string | null>
   status?: Array<string | null>
-  type?: string
+  type?: Array<string | null>
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string

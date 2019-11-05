@@ -56,7 +56,7 @@ export const resolvers: GQLResolver = {
         searchCriteria.status = status as string[]
       }
       if (type) {
-        searchCriteria.type = type
+        searchCriteria.type = type as string[]
       }
       if (userId) {
         searchCriteria.createdBy = userId
