@@ -222,7 +222,7 @@ export async function getPractitionerLocations(
   return locList as fhir.Location[]
 }
 
-export function createJurisDictionalLocations(): IJurisdictionLocation[] {
+export function getJurisdictionalLocations(): IJurisdictionLocation[] {
   return [
     {
       jurisdictionType: JURISDICTION_TYPE_DISTRICT
@@ -242,41 +242,27 @@ export function createJurisDictionalLocations(): IJurisdictionLocation[] {
   ]
 }
 
-export function insertRMOInJurisDictionalLocations(
-  jurisdictionLocations: IJurisdictionLocation[]
-): IJurisdictionLocation[] {
+export function getRMOCode(jurisdictionalLocations: IJurisdictionLocation[]) {
   const rmoLocationTypes = [
     JURISDICTION_TYPE_UNION,
     JURISDICTION_TYPE_MUNICIPALITY,
     JURISDICTION_TYPE_CITY_CORPORATION
   ]
 
-  const jurisdictionLocation = jurisdictionLocations.find(
-    location =>
-      location.bbsCode && rmoLocationTypes.includes(location.jurisdictionType)
+  const jurisdictionLocation = jurisdictionalLocations.find(location =>
+    rmoLocationTypes.includes(location.jurisdictionType)
   )
 
-  if (jurisdictionLocation) {
-    const rmoCode =
-      jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION
-        ? 1
-        : jurisdictionLocation.jurisdictionType ===
-          JURISDICTION_TYPE_MUNICIPALITY
-        ? 2
-        : jurisdictionLocation.jurisdictionType ===
-          JURISDICTION_TYPE_CITY_CORPORATION
-        ? 9
-        : 0
-
-    if (rmoCode > 0) {
-      jurisdictionLocations.splice(1, 0, {
-        jurisdictionType: 'rmo',
-        bbsCode: rmoCode.toString()
-      })
-    }
-  }
-
-  return jurisdictionLocations
+  return jurisdictionLocation
+    ? jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION
+      ? 1
+      : jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_MUNICIPALITY
+      ? 2
+      : jurisdictionLocation.jurisdictionType ===
+        JURISDICTION_TYPE_CITY_CORPORATION
+      ? 9
+      : 0
+    : 0
 }
 
 export function convertStringToASCII(str: string): string {

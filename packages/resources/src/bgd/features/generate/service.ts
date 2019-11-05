@@ -14,8 +14,8 @@ import {
   getPractitionerLocationId,
   convertNumberToString,
   OPENCRVS_SPECIFICATION_URL,
-  createJurisDictionalLocations,
-  insertRMOInJurisDictionalLocations
+  getJurisdictionalLocations,
+  getRMOCode
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
 
@@ -45,13 +45,13 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
 
   const locations = await getPractitionerLocations(practionerId)
 
-  const jurisDictionalLocations = createJurisDictionalLocations()
+  const jurisdictionalLocations = getJurisdictionalLocations()
   for (const location of locations) {
     if (!location || !location.identifier) {
       continue
     }
-    jurisDictionalLocations.forEach(jurisDictionalLocation => {
-      if (jurisDictionalLocation.bbsCode || !location.identifier) {
+    jurisdictionalLocations.forEach(jurisdictionalLocation => {
+      if (jurisdictionalLocation.bbsCode || !location.identifier) {
         return
       }
       const jurisDictionIdentifier = location.identifier.find(
@@ -59,7 +59,7 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
           identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type` &&
           isTypeMatched(
-            jurisDictionalLocation.jurisdictionType,
+            jurisdictionalLocation.jurisdictionType,
             identifier.value
           )
       )
@@ -70,14 +70,17 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
             identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/bbs-code`
         )
       if (bbsCodeIdentifier && bbsCodeIdentifier.value) {
-        jurisDictionalLocation.bbsCode = bbsCodeIdentifier.value
+        jurisdictionalLocation.bbsCode = bbsCodeIdentifier.value
       }
     })
   }
-
-  return insertRMOInJurisDictionalLocations(jurisDictionalLocations).reduce(
+  const bbsCode = jurisdictionalLocations.reduce(
     (locBBSCode, loc) => locBBSCode.concat(loc.bbsCode || ''),
     ''
+  )
+
+  return (
+    bbsCode.slice(0, 2) + getRMOCode(jurisdictionalLocations) + bbsCode.slice(2)
   )
 }
 
