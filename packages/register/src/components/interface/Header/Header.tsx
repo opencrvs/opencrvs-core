@@ -9,77 +9,78 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import {
-  AppHeader,
-  ExpandingMenu,
-  SearchTool,
-  ISearchType
-} from '@opencrvs/components/lib/interface'
-import {
-  Hamburger,
-  SearchDark,
   ApplicationBlack,
   ApplicationBlue,
-  StatsBlack,
-  StatsBlue,
-  SettingsBlack,
-  SettingsBlue,
+  ArrowBack,
+  BRN,
+  Hamburger,
   HelpBlack,
   HelpBlue,
   LogoutBlack,
   LogoutBlue,
-  TrackingID,
-  BRN,
   Phone,
-  ArrowBack,
   Plus,
+  SearchDark,
+  SettingsBlack,
+  SettingsBlue,
+  StatsBlack,
+  StatsBlue,
   SystemBlack,
-  SystemBlue
+  SystemBlue,
+  TrackingID
 } from '@opencrvs/components/lib/icons'
-import { IconButton } from '@opencrvs/components/lib/buttons'
-import { storage } from '@register/storage'
-import { SCREEN_LOCK } from '@register/components/ProtectedPage'
-import { connect } from 'react-redux'
-import { getUserDetails } from '@register/profile/profileSelectors'
-import { IUserDetails, getIndividualNameObj } from '@register/utils/userUtils'
-import { redirectToAuthentication } from '@register/profile/profileActions'
-import { IStoreState } from '@register/store'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
-  goToHome,
-  goToPerformance,
-  goToSearchResult,
-  goToSearch,
-  goToSettings,
-  goToEvents as goToEventsAction
-} from '@register/navigation'
+  AppHeader,
+  ExpandingMenu,
+  ISearchType,
+  SearchTool
+} from '@opencrvs/components/lib/interface'
 import { ProfileMenu } from '@register/components/ProfileMenu'
+import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import {
-  TRACKING_ID_TEXT,
-  BRN_DRN_TEXT,
-  PHONE_TEXT,
-  SYS_ADMIN_ROLES
-} from '@register/utils/constants'
-import styled from 'styled-components'
-import { messages } from '@register/i18n/messages/views/header'
-import {
-  constantsMessages,
   buttonMessages,
+  constantsMessages,
   userMessages
 } from '@register/i18n/messages'
+import { messages } from '@register/i18n/messages/views/header'
+import {
+  goToEvents as goToEventsAction,
+  goToHome,
+  goToPerformance,
+  goToSearch,
+  goToSearchResult,
+  goToSettings
+} from '@register/navigation'
+import { redirectToAuthentication } from '@register/profile/profileActions'
+import { getUserDetails } from '@register/profile/profileSelectors'
+import { storage } from '@register/storage'
+import { IStoreState } from '@register/store'
+import {
+  BRN_DRN_TEXT,
+  PHONE_TEXT,
+  SYS_ADMIN_ROLES,
+  TRACKING_ID_TEXT
+} from '@register/utils/constants'
+import { getIndividualNameObj, IUserDetails } from '@register/utils/userUtils'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
-  title?: string
   goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
   goToHomeAction: typeof goToHome
   goToPerformanceAction: typeof goToPerformance
+  activeMenuItem: ACTIVE_MENU_ITEM
+  title?: string
   searchText?: string
   selectedSearchType?: string
   mobileSearchBar?: boolean
@@ -88,6 +89,11 @@ type IProps = IntlShapeProps & {
 interface IState {
   showMenu: boolean
   showLogoutModal: boolean
+}
+
+enum ACTIVE_MENU_ITEM {
+  APPLICATIONS,
+  PERFORMANCE
 }
 
 const StyledPrimaryButton = styled(IconButton)`
@@ -139,7 +145,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: this.props.intl.formatMessage(
           constantsMessages.performanceTitle
         ),
-        onClick: goToPerformance
+        onClick: this.props.goToPerformanceAction
       },
       {
         icon: <SettingsBlack />,
@@ -267,23 +273,39 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails,
       enableMenuSelection,
       goToHomeAction,
-      goToPerformanceAction
+      goToPerformanceAction,
+      activeMenuItem
     } = this.props
     const title =
-      this.props.title || intl.formatMessage(constantsMessages.applicationTitle)
+      this.props.title ||
+      intl.formatMessage(
+        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+          ? constantsMessages.performanceTitle
+          : constantsMessages.applicationTitle
+      )
 
     let menuItems = [
       {
         key: 'application',
         title: intl.formatMessage(constantsMessages.applicationTitle),
         onClick: goToHomeAction,
-        selected: enableMenuSelection !== undefined ? enableMenuSelection : true
+        selected:
+          enableMenuSelection === undefined || enableMenuSelection
+            ? activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
+              ? true
+              : false
+            : false
       },
       {
         key: 'performance',
         title: intl.formatMessage(constantsMessages.performanceTitle),
         onClick: goToPerformanceAction,
-        selected: false
+        selected:
+          enableMenuSelection === undefined || enableMenuSelection
+            ? activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+              ? true
+              : false
+            : false
       }
     ]
 
@@ -306,6 +328,14 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
+    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
+      rightMenu = [
+        {
+          element: <ProfileMenu key="profileMenu" />
+        }
+      ]
+    }
+
     if (
       userDetails &&
       userDetails.role &&
@@ -327,24 +357,32 @@ class HeaderComp extends React.Component<IProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps = this.props.mobileSearchBar
-      ? {
-          mobileLeft: {
-            icon: () => <ArrowBack />,
-            handler: () => window.history.back()
-          },
-          mobileBody: this.renderSearchInput(this.props, true)
-        }
-      : {
-          mobileLeft: {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          },
-          mobileRight: {
-            icon: () => <SearchDark />,
-            handler: () => this.props.goToSearch()
+    let mobileHeaderActionProps =
+      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+        ? {
+            mobileLeft: {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
           }
-        }
+        : this.props.mobileSearchBar
+        ? {
+            mobileLeft: {
+              icon: () => <ArrowBack />,
+              handler: () => window.history.back()
+            },
+            mobileBody: this.renderSearchInput(this.props, true)
+          }
+        : {
+            mobileLeft: {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            },
+            mobileRight: {
+              icon: () => <SearchDark />,
+              handler: () => this.props.goToSearch()
+            }
+          }
 
     return (
       <>
@@ -362,6 +400,9 @@ class HeaderComp extends React.Component<IProps, IState> {
 
 export const Header = connect(
   (store: IStoreState) => ({
+    activeMenuItem: window.location.href.includes('performance-home')
+      ? ACTIVE_MENU_ITEM.PERFORMANCE
+      : ACTIVE_MENU_ITEM.APPLICATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
   }),

@@ -35,11 +35,13 @@ import {
   SELECT_DEATH_MAIN_CONTACT_POINT,
   VERIFY_COLLECTOR,
   REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE_PAYMENT
+  PRINT_CERTIFICATE_PAYMENT,
+  PERFORMANCE_HOME
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
 import { Event } from '@register/forms'
+import { PERFORMANCE_HOME_TAB_WEEKY } from '@register/utils/constants'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -148,7 +150,9 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
 }
 
 export function goToPerformance() {
-  window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
+  return push(
+    formatUrl(PERFORMANCE_HOME, { tabId: PERFORMANCE_HOME_TAB_WEEKY })
+  )
 }
 
 export function goToSearchResult(
