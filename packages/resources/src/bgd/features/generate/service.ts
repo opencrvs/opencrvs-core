@@ -11,11 +11,11 @@
  */
 import {
   getPractitionerLocations,
-  getJurisDictionalLocations,
   getPractitionerLocationId,
   convertNumberToString,
   OPENCRVS_SPECIFICATION_URL,
-  setRMOCode
+  createJurisDictionalLocations,
+  insertRMOInJurisDictionalLocations
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
 
@@ -33,6 +33,7 @@ export async function generateRegistrationNumber(
       await getPractitionerLocationId(practionerId)
     )
   )
+
   return brn
 }
 
@@ -44,13 +45,13 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
 
   const locations = await getPractitionerLocations(practionerId)
 
-  const jurisDictionalLocations = getJurisDictionalLocations()
+  const jurisDictionalLocations = createJurisDictionalLocations()
   for (const location of locations) {
     if (!location || !location.identifier) {
       continue
     }
     jurisDictionalLocations.forEach(jurisDictionalLocation => {
-      if (jurisDictionalLocation.bbsCode !== '' || !location.identifier) {
+      if (jurisDictionalLocation.bbsCode || !location.identifier) {
         return
       }
       const jurisDictionIdentifier = location.identifier.find(
@@ -74,11 +75,10 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
     })
   }
 
-  setRMOCode(jurisDictionalLocations)
-
-  return jurisDictionalLocations.reduce((locBBSCode, loc) => {
-    return locBBSCode.concat(loc.bbsCode)
-  }, '')
+  return insertRMOInJurisDictionalLocations(jurisDictionalLocations).reduce(
+    (locBBSCode, loc) => locBBSCode.concat(loc.bbsCode || ''),
+    ''
+  )
 }
 
 function isTypeMatched(matchType: string, inputType?: string): boolean {

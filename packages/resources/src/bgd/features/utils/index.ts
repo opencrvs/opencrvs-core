@@ -65,7 +65,7 @@ export interface ILocationSequenceNumber {
 
 export interface IJurisdictionLocation {
   jurisdictionType: string
-  bbsCode: string
+  bbsCode?: string
 }
 
 export const sendToFhir = (
@@ -222,67 +222,61 @@ export async function getPractitionerLocations(
   return locList as fhir.Location[]
 }
 
-export function getJurisDictionalLocations() {
+export function createJurisDictionalLocations(): IJurisdictionLocation[] {
   return [
     {
-      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_DISTRICT
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_UPAZILA
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_UNION,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_UNION
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_MUNICIPALITY,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_MUNICIPALITY
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_CITY_CORPORATION,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_CITY_CORPORATION
     }
   ]
 }
 
-export function setRMOCode(locations: IJurisdictionLocation[]) {
+export function insertRMOInJurisDictionalLocations(
+  jurisdictionLocations: IJurisdictionLocation[]
+): IJurisdictionLocation[] {
   const rmoLocationTypes = [
     JURISDICTION_TYPE_UNION,
     JURISDICTION_TYPE_MUNICIPALITY,
     JURISDICTION_TYPE_CITY_CORPORATION
   ]
 
-  const jurisdictionLocation = locations.find(
+  const jurisdictionLocation = jurisdictionLocations.find(
     location =>
       location.bbsCode && rmoLocationTypes.includes(location.jurisdictionType)
   )
 
   if (jurisdictionLocation) {
-    if (jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION) {
-      addRmoTypesInJurisdictionLocations(locations, 1)
-    } else if (
-      jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_MUNICIPALITY
-    ) {
-      addRmoTypesInJurisdictionLocations(locations, 2)
-    } else if (
-      jurisdictionLocation.jurisdictionType ===
-      JURISDICTION_TYPE_CITY_CORPORATION
-    ) {
-      addRmoTypesInJurisdictionLocations(locations, 9)
+    const rmoCode =
+      jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION
+        ? 1
+        : jurisdictionLocation.jurisdictionType ===
+          JURISDICTION_TYPE_MUNICIPALITY
+        ? 2
+        : jurisdictionLocation.jurisdictionType ===
+          JURISDICTION_TYPE_CITY_CORPORATION
+        ? 9
+        : 0
+
+    if (rmoCode > 0) {
+      jurisdictionLocations.splice(1, 0, {
+        jurisdictionType: 'rmo',
+        bbsCode: rmoCode.toString()
+      })
     }
   }
-}
 
-export function addRmoTypesInJurisdictionLocations(
-  jurisdictionLocation: IJurisdictionLocation[],
-  code: number
-) {
-  jurisdictionLocation.splice(1, 0, {
-    jurisdictionType: 'rmo',
-    bbsCode: code.toString()
-  })
+  return jurisdictionLocations
 }
 
 export function convertStringToASCII(str: string): string {
