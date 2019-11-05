@@ -3472,51 +3472,32 @@
                   }
                 },
                 {
-                  "name": "fatherBirthDate",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "fatherBirthDate",
-                      "labelMapper": {
-                        "operation": "getFatherDateOfBirthLabel"
-                      }
-                    },
-                    "type": {
-                      "kind": "static",
-                      "staticType": "DATE"
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "dateFormatIsCorrect",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateInPast",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateLessThan",
-                          "parameters": []
-                        },
-                        "dependencies": ["dateOfMarriage"]
-                      }
-                    ]
-                  },
+                  "name": "motherBirthDate",
+                  "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
                     "id": "form.field.label.motherDateOfBirth"
                   },
-                  "required": true,
+                  "required": false,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [
+                        5
+                      ],
+                      "dependencies": []
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
@@ -5993,42 +5974,7 @@
                 },
                 {
                   "name": "fatherBirthDate",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "fatherBirthDate",
-                      "labelMapper": {
-                        "operation": "getMotherDateOfBirthLabel"
-                      }
-                    },
-                    "type": {
-                      "kind": "static",
-                      "staticType": "DATE"
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "dateFormatIsCorrect",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateInPast",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateLessThan",
-                          "parameters": []
-                        },
-                        "dependencies": ["dateOfMarriage"]
-                      }
-                    ]
-                  },
+                  "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
@@ -6036,7 +5982,22 @@
                   },
                   "required": true,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [
+                        5
+                      ]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",

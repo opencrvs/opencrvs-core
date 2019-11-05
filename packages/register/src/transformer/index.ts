@@ -52,7 +52,8 @@ const nestedFieldsMapping = (
 
 export const draftToGqlTransformer = (
   formDefinition: IForm,
-  draftData: IFormData
+  draftData: IFormData,
+  draftId?: string
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -144,6 +145,13 @@ export const draftToGqlTransformer = (
       transformedData.registration = {
         inCompleteFields: inCompleteFieldList.join(',')
       }
+    }
+  }
+  if (draftId) {
+    if (transformedData.registration) {
+      transformedData.registration.draftId = draftId
+    } else {
+      transformedData.registration = { draftId }
     }
   }
 
