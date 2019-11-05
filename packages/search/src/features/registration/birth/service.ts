@@ -35,6 +35,7 @@ import { logger } from '@search/logger'
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
 const CHILD_CODE = 'child-details'
+const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
@@ -137,6 +138,12 @@ function createChildIndex(
     bundleEntries
   ) as fhir.Patient
 
+  const birthEncounter = findEntry(
+    BIRTH_ENCOUNTER_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.Encounter
+
   const childName = child && findName(NAME_EN, child)
   const childNameLocal = child && findName(NAME_BN, child)
 
@@ -147,8 +154,13 @@ function createChildIndex(
     childNameLocal && childNameLocal.given && childNameLocal.given.join(' ')
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
-  body.childDoB = child.birthDate
-  body.gender = child.gender
+  body.childDoB = child && child.birthDate
+  body.gender = child && child.gender
+  body.eventLocationId =
+    birthEncounter &&
+    birthEncounter.location &&
+    birthEncounter.location[0].location.reference &&
+    birthEncounter.location[0].location.reference.split('/')[1]
 }
 
 function createMotherIndex(

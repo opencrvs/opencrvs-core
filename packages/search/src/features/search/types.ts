@@ -19,6 +19,7 @@ export interface ISearchQuery {
   contactNumber?: string
   registrationNumber?: string
   event?: string
+  type?: string
   status?: string[]
   applicationLocationId?: string
   createdBy?: string
@@ -30,4 +31,5 @@ export interface ISearchQuery {
 export interface IFilter {
   event?: string
   status?: string[]
+  type?: string
 }

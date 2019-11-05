@@ -30,6 +30,7 @@ import {
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
+const DEATH_ENCOUNTER_CODE = 'death-encounter'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
@@ -130,6 +131,12 @@ function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
+  const deathEncounter = findEntry(
+    DEATH_ENCOUNTER_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.Encounter
+
   const deceasedName = deceased && findName(NAME_EN, deceased)
   const deceasedNameLocal = deceased && findName(NAME_BN, deceased)
 
@@ -144,6 +151,11 @@ function createDeceasedIndex(
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased.deceasedDateTime
+  body.eventLocationId =
+    deathEncounter &&
+    deathEncounter.location &&
+    deathEncounter.location[0].location.reference &&
+    deathEncounter.location[0].location.reference.split('/')[1]
 }
 
 async function createApplicationIndex(

@@ -20,7 +20,8 @@ import {
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
-  fetchUnionByFullBBSCode
+  fetchUnionByFullBBSCode,
+  fetchFacilityByHRISId
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -106,18 +107,19 @@ export async function deathNotificationHandler(
     request.headers.authorization
   )
 
-  const locationId = notification.union_death_ocurred.id
-  const location = await fetchUnionByFullBBSCode(
-    locationId,
+  if (!notification.place_of_death) {
+    throw new Error('Could not find any place of death')
+  }
+  const placeOfDeathFacilityLocation = await fetchFacilityByHRISId(
+    notification.place_of_death.id,
     request.headers.authorization
   )
-
-  if (!location) {
-    throw new Error('Could not find union by full BBS code')
+  if (!placeOfDeathFacilityLocation) {
+    throw new Error('Could not find facility by HRIS ID')
   }
 
   const encounter = createDeathEncounterEntry(
-    `Location/${location.id}`,
+    `Location/${placeOfDeathFacilityLocation.id}`,
     deceased.fullUrl
   )
 
@@ -128,7 +130,17 @@ export async function deathNotificationHandler(
     father.fullUrl,
     encounter.fullUrl
   )
-  const task = createTaskEntry(composition.fullUrl, 'DEATH')
+  const lastRegLocId = notification.union_death_ocurred.id
+  const lastRegLocation = await fetchUnionByFullBBSCode(
+    lastRegLocId,
+    request.headers.authorization
+  )
+
+  if (!lastRegLocation) {
+    throw new Error('Could not find last registered union by full BBS code')
+  }
+
+  const task = createTaskEntry(composition.fullUrl, lastRegLocation, 'DEATH')
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
