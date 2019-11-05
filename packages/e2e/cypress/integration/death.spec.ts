@@ -550,7 +550,7 @@ context('Death Integration Test', () => {
     cy.wait(5000)
   })
 
-  it.only('Tests registration by registrar using maximum input', () => {
+  it('Tests registration by registrar using maximum input', () => {
     cy.login('registrar')
     cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
     cy.get('#createPinBtn', { timeout: 30000 }).click()
