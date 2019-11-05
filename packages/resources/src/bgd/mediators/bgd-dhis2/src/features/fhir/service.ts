@@ -295,21 +295,34 @@ export function createDeathEncounterEntry(
 
 export function createTaskEntry(
   compositionRef: string,
+  lastRegLocation: fhir.Location,
   eventType: 'BIRTH' | 'DEATH'
 ) {
+  const taskResource: fhir.Task = {
+    resourceType: 'Task',
+    status: 'draft',
+    intent: 'unknown',
+    code: {
+      coding: [{ system: 'http://opencrvs.org/specs/types', code: eventType }]
+    },
+    focus: {
+      reference: compositionRef
+    },
+    lastModified: new Date().toISOString()
+  }
+  if (lastRegLocation.id) {
+    taskResource.extension = [
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueReference: {
+          reference: `Location/${lastRegLocation.id}`
+        }
+      }
+    ]
+  }
   return {
     fullUrl: `urn:uuid:${uuid()}`,
-    resource: {
-      resourceType: 'Task',
-      status: 'draft',
-      code: {
-        coding: [{ system: 'http://opencrvs.org/specs/types', code: eventType }]
-      },
-      focus: {
-        reference: compositionRef
-      },
-      lastModified: new Date().toISOString()
-    }
+    resource: taskResource
   }
 }
 

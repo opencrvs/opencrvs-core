@@ -20,7 +20,8 @@ import {
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
-  fetchUnionByFullBBSCode
+  fetchUnionByFullBBSCode,
+  fetchFacilityByHRISId
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -101,19 +102,19 @@ export async function birthNotificationHandler(
     null,
     request.headers.authorization
   )
-
-  const locationId = notification.union_birth_ocurred.id
-  const location = await fetchUnionByFullBBSCode(
-    locationId,
+  if (!notification.place_of_birth) {
+    throw new Error('Could not find any place of birth')
+  }
+  const placeOfBirthFacilityLocation = await fetchFacilityByHRISId(
+    notification.place_of_birth.id,
     request.headers.authorization
   )
-
-  if (!location) {
-    throw new Error('Could not find union by full BBS code')
+  if (!placeOfBirthFacilityLocation) {
+    throw new Error('Could not find facility by HRIS ID')
   }
 
   const encounter = createBirthEncounterEntry(
-    `Location/${location.id}`,
+    `Location/${placeOfBirthFacilityLocation.id}`,
     child.fullUrl
   )
 
@@ -124,7 +125,18 @@ export async function birthNotificationHandler(
     father.fullUrl,
     encounter.fullUrl
   )
-  const task = createTaskEntry(composition.fullUrl, 'BIRTH')
+
+  const lastRegLocId = notification.union_birth_ocurred.id
+  const lastRegLocation = await fetchUnionByFullBBSCode(
+    lastRegLocId,
+    request.headers.authorization
+  )
+
+  if (!lastRegLocation) {
+    throw new Error('Could not find last registered union by full BBS code')
+  }
+
+  const task = createTaskEntry(composition.fullUrl, lastRegLocation, 'BIRTH')
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
