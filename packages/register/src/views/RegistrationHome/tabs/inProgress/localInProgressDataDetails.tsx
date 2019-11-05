@@ -77,7 +77,7 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
 }
 
 type IProps = IntlShapeProps & {
-  draft: IApplication | undefined
+  draft?: IApplication
 }
 
 class LocalInProgressDataDetailsComponent extends React.Component<IProps> {

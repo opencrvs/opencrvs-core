@@ -20,6 +20,15 @@ import {
 import { checkAuth } from '@register/profile/profileActions'
 import moment from 'moment'
 import { waitForElement } from '@register/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
+import { Store } from 'redux'
+import {
+  makeApplicationReadyToDownload,
+  DOWNLOAD_STATUS,
+  modifyApplication,
+  storeApplication
+} from '@register/applications'
+import { Action, Event } from '@register/forms'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -127,7 +136,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('RegistrationHome sent for update tab related tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(() => {
     getItem.mockReturnValue(registerScopeToken)
@@ -604,141 +613,190 @@ describe('RegistrationHome sent for update tab related tests', () => {
     )
   })
 
-  it('redirects user to review page on update action click', async () => {
-    const TIME_STAMP = '1544188309380'
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'REJECTED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
+  describe('handles download status', () => {
+    let testComponent: ReactWrapper<{}, {}>
+    let createdTestComponent: { component: ReactWrapper; store: Store }
+    beforeAll(async () => {
+      const TIME_STAMP = '1544188309380'
+      Date.now = jest.fn(() => 1554055200000)
+      const graphqlMock = [
+        {
+          request: {
+            query: REGISTRATION_HOME_QUERY,
+            variables: {
+              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+              count: 10,
+              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+              inProgressSkip: 0,
+              reviewSkip: 0,
+              rejectSkip: 0,
+              approvalSkip: 0,
+              printSkip: 0
+            }
+          },
+          result: {
+            data: {
+              inProgressTab: { totalItems: 0, results: [] },
+              reviewTab: { totalItems: 0, results: [] },
+              rejectTab: {
+                totalItems: 2,
+                results: [
+                  {
+                    id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                    type: 'Birth',
+                    registration: {
+                      status: 'REJECTED',
+                      contactNumber: '01622688231',
+                      trackingId: 'BW0UTHR',
+                      registrationNumber: null,
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      duplicates: null,
+                      createdAt: '2018-05-23T14:44:58+02:00',
+                      modifiedAt: '2018-05-23T14:44:58+02:00'
                     },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'REJECTED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: '01622688231',
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
+                    dateOfBirth: '2010-10-10',
+                    childName: [
+                      {
+                        firstNames: 'Iliyas',
+                        familyName: 'Khan',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: 'ইলিয়াস',
+                        familyName: 'খান',
+                        use: 'bn'
+                      }
+                    ],
+                    dateOfDeath: null,
+                    deceasedName: null
                   },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
+                  {
+                    id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                    type: 'Death',
+                    registration: {
+                      status: 'REJECTED',
+                      trackingId: 'DW0UTHR',
+                      registrationNumber: null,
+                      contactNumber: '01622688231',
+                      duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                      registeredLocationId:
+                        '308c35b4-04f8-4664-83f5-9790e790cde1',
+                      createdAt: TIME_STAMP,
+                      modifiedAt: TIME_STAMP
                     },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
+                    dateOfBirth: null,
+                    childName: null,
+                    dateOfDeath: '2007-01-01',
+                    deceasedName: [
+                      {
+                        firstNames: 'Iliyas',
+                        familyName: 'Khan',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: 'ইলিয়াস',
+                        familyName: 'খান',
+                        use: 'bn'
+                      }
+                    ]
+                  }
+                ]
+              },
+              approvalTab: { totalItems: 0, results: [] },
+              printTab: { totalItems: 0, results: [] }
+            }
           }
         }
-      }
-    ]
+      ]
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        draftCount={1}
-      />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
+      createdTestComponent = await createTestComponent(
+        // @ts-ignore
+        <RegistrationHome
+          match={{
+            params: {
+              tabId: 'updates'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          draftCount={1}
+        />,
+        store,
+        graphqlMock
+      )
+      testComponent = createdTestComponent.component
+      getItem.mockReturnValue(registerScopeToken)
+      createdTestComponent.store.dispatch(
+        checkAuth({ '?token': registerScopeToken })
+      )
     })
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#ListItemAction-0-Update').hostNodes()
-    ).toHaveLength(1)
-    testComponent.component
-      .find('#ListItemAction-0-Update')
-      .hostNodes()
-      .simulate('click')
 
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
+    it('starts downloading after clicking download button', async () => {
+      const downloadButton = await waitForElement(
+        testComponent,
+        '#ListItemAction-0-icon'
+      )
+
+      downloadButton.hostNodes().simulate('click')
+
+      const loadingIndicator = await waitForElement(
+        testComponent,
+        '#action-loading-ListItemAction-0'
+      )
+
+      expect(loadingIndicator.hostNodes()).toHaveLength(1)
     })
-    testComponent.component.update()
 
-    expect(window.location.href).toContain(
-      '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-    )
+    it('shows update button when download is complete', async () => {
+      const downloadedApplication = makeApplicationReadyToDownload(
+        Event.BIRTH,
+        'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+        Action.LOAD_REVIEW_APPLICATION
+      )
+      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+      createdTestComponent.store.dispatch(
+        modifyApplication(downloadedApplication)
+      )
+
+      const reviewButton = await waitForElement(
+        testComponent,
+        '#ListItemAction-0-Update'
+      )
+
+      reviewButton.hostNodes().simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      expect(history.location.pathname).toContain(
+        '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      )
+    })
+
+    it('shows error when download is failed', async () => {
+      const downloadedApplication = makeApplicationReadyToDownload(
+        Event.DEATH,
+        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+        Action.LOAD_REVIEW_APPLICATION
+      )
+      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
+      createdTestComponent.store.dispatch(
+        storeApplication(downloadedApplication)
+      )
+
+      testComponent.update()
+
+      const errorIcon = await waitForElement(
+        testComponent,
+        '#action-error-ListItemAction-1'
+      )
+
+      expect(errorIcon.hostNodes()).toHaveLength(1)
+    })
   })
 })
 

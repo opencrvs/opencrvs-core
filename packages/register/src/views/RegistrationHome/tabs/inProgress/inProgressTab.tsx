@@ -43,6 +43,7 @@ import {
 import { messages } from '@register/i18n/messages/views/registrarHome'
 import { Download } from '@opencrvs/components/lib/icons'
 import { Action, Event } from '@register/forms'
+import { IStoreState } from '@register/store'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -90,6 +91,7 @@ interface IBaseRegistrarHomeProps {
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
+  outboxApplications: IApplication[]
   queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
@@ -163,7 +165,7 @@ export class InProgressTabComponent extends React.Component<
       }
 
       const actions: IAction[] = []
-      const foundApplication = this.props.drafts.find(
+      const foundApplication = this.props.outboxApplications.find(
         application => application.id === reg.id
       )
       const downloadStatus =
@@ -560,8 +562,14 @@ export class InProgressTabComponent extends React.Component<
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  return {
+    outboxApplications: state.applicationsState.applications
+  }
+}
+
 export const InProgressTab = connect(
-  null,
+  mapStateToProps,
   {
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,

@@ -71,7 +71,7 @@ export function ListItemAction(props: IListItemActionProps) {
       {actions &&
         actions.map((action: IAction) =>
           action.loading && action.loadingLabel ? (
-            <StatusIndicator loading={action.loading}>
+            <StatusIndicator loading={action.loading} key={id}>
               {action.loadingLabel}
               <Spinner id={`action-loading-${id}`} size={24} />
             </StatusIndicator>
@@ -86,12 +86,11 @@ export function ListItemAction(props: IListItemActionProps) {
               {action.label}
             </ListItemSingleAction>
           ) : (
-            <StatusIndicator>
-              {action.error && <Warning />}
+            <StatusIndicator key={`${id}-icon`}>
+              {action.error && <Warning id={`action-error-${id}`} />}
               <ListItemSingleIconAction
                 isFullHeight={isFullHeight}
-                key={action.label as string}
-                id={`${id}-${action.label as string}`}
+                id={`${id}-icon`}
                 onClick={e => {
                   action.handler()
                   e.stopPropagation()

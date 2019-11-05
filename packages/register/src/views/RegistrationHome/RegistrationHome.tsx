@@ -230,13 +230,12 @@ export class RegistrationHomeView extends React.Component<
   }
 
   downloadApplication = (
-    event: Event,
+    event: string,
     compositionId: string,
     action: Action
   ) => {
     const downloadableApplication = makeApplicationReadyToDownload(
-      // @ts-ignore
-      event.toLowerCase(),
+      event.toLowerCase() as Event,
       compositionId,
       action
     )
