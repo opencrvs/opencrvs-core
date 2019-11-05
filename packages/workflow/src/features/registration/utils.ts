@@ -202,6 +202,29 @@ export function isInProgressApplication(fhirBundle: fhir.Bundle) {
   )
 }
 
+export function isEventNotification(fhirBundle: fhir.Bundle) {
+  const compositionEntry =
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry => entry.resource && entry.resource.resourceType === 'Composition'
+    )
+  const composition =
+    compositionEntry && (compositionEntry.resource as fhir.Composition)
+  const compositionDocTypeCode =
+    composition &&
+    composition.type.coding &&
+    composition.type.coding.find(
+      coding => coding.system === 'http://opencrvs.org/doc-types'
+    )
+  return (
+    (compositionDocTypeCode &&
+      compositionDocTypeCode.code &&
+      compositionDocTypeCode.code.endsWith('-notification')) ||
+    false
+  )
+}
+
 export async function getRegistrationNumber(
   trackingId: string,
   practitionerId: string,
