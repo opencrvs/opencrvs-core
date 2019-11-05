@@ -29,7 +29,42 @@ const APPROVE_BIRTH_APPLICATION = gql`
 `
 const REGISTER_BIRTH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
-    markBirthAsRegistered(id: $id, details: $details)
+    markBirthAsRegistered(id: $id, details: $details) {
+      id
+      registration {
+        id
+        status {
+          id
+          user {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
+          }
+        }
+      }
+    }
   }
 `
 const REJECT_BIRTH_APPLICATION = gql`

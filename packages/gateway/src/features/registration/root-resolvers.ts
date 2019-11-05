@@ -151,12 +151,7 @@ export const resolvers: GQLResolver = {
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.BIRTH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
@@ -322,9 +317,10 @@ async function markEventAsRegistered(
     doc = await buildFHIRBundle(details, event)
   }
 
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return the registrationNumber
-  return await getRegistrationIdsFromResponse(res, event, authHeader)
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }
 
 async function markEventAsCertified(
