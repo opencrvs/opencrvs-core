@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   GQLAddress,
   GQLAttachment,
@@ -18,6 +29,11 @@ import { cloneDeep, get } from 'lodash'
 
 interface IName {
   [key: string]: any
+}
+
+interface IIgnoreAddressFields {
+  fieldsToIgnoreForLocalAddress: string[]
+  fieldsToIgnoreForInternationalAddress: string[]
 }
 
 export const nameToFieldTransformer = (
@@ -294,7 +310,8 @@ export function attachmentToFieldTransformer(
 
 export const eventLocationQueryTransformer = (
   lineNumber: number = 0,
-  transformedFieldName?: string
+  transformedFieldName?: string,
+  ignoreAddressFields?: IIgnoreAddressFields
 ) => (
   transformedData: IFormData,
   queryData: any,
@@ -307,14 +324,30 @@ export const eventLocationQueryTransformer = (
   const eventLocation = queryData.eventLocation as fhir.Location
   const address = eventLocation.address as IAddress
   const line = address.line as string[]
+  const country = address.country
+  const fieldValue =
+    address[transformedFieldName ? transformedFieldName : field.name]
   if (lineNumber > 0) {
     transformedData[sectionId][field.name] = line[lineNumber - 1]
-  } else if (
-    address[transformedFieldName ? transformedFieldName : field.name]
-  ) {
-    transformedData[sectionId][field.name] =
-      address[transformedFieldName ? transformedFieldName : field.name]
+  } else if (fieldValue && ignoreAddressFields) {
+    if (
+      (country &&
+        country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
+        !ignoreAddressFields.fieldsToIgnoreForLocalAddress.includes(
+          field.name
+        )) ||
+      (country &&
+        country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
+        !ignoreAddressFields.fieldsToIgnoreForInternationalAddress.includes(
+          field.name
+        ))
+    ) {
+      transformedData[sectionId][field.name] = fieldValue
+    }
+  } else if (fieldValue) {
+    transformedData[sectionId][field.name] = fieldValue
   }
+
   return transformedData
 }
 

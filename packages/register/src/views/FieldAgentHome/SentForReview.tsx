@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
@@ -180,6 +191,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           name: name || '',
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
+          rowClickable: Boolean(draft.compositionId),
           rowClickHandler: [
             {
               label: 'rowClickHandler',
@@ -270,7 +282,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           totalItems={applicationsReadyToSend && applicationsReadyToSend.length}
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
-          clickable={true}
           currentPage={this.state.sentForReviewPageNo}
         />
       </HomeContent>

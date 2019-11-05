@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { PDFViewer } from '@opencrvs/components/lib/forms'
 import { Check } from '@opencrvs/components/lib/icons'
@@ -34,7 +45,9 @@ import {
 } from '@register/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@register/forms/register/application-selectors'
 import { IOfflineData } from '@register/offline/reducer'
+import { getCountryTranslations, IAvailableCountries } from './utils'
 import { getOfflineData } from '@register/offline/selectors'
+import { countries } from '@register/forms/countries'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -97,6 +110,7 @@ type IProps = {
   registrationId: string
   draft: IPrintableApplication
   userDetails: IUserDetails | null
+  countries: IAvailableCountries[]
   registerForm: IForm
   resources: IOfflineData
   modifyApplication: typeof modifyApplication
@@ -130,7 +144,8 @@ class ReviewCertificateActionComponent extends React.Component<
           this.setState({
             certificatePdf: base64PDF
           })
-        }
+        },
+        this.props.countries
       )
     }
   }
@@ -164,7 +179,8 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.intl,
       draft,
       this.props.userDetails,
-      this.props.resources
+      this.props.resources,
+      this.props.countries
     )
   }
 
@@ -302,6 +318,7 @@ function mapStatetoProps(
     event,
     registrationId,
     draft,
+    countries: getCountryTranslations(state.i18n.languages, countries),
     drafts: state.applicationsState,
     userDetails: getUserDetails(state),
     resources: getOfflineData(state),

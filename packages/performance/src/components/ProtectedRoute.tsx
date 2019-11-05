@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import {
   Route,
@@ -21,8 +32,6 @@ interface IDispatchProps {
 
 type Props = RouteProps & RouteComponentProps<{}>
 
-type FullProps = IProps & IDispatchProps & Props
-
 class ProtectedRouteWrapper extends Route<IProps & IDispatchProps & Props> {
   public componentDidMount() {
     const values = parse(this.props.location.search)
@@ -41,11 +50,11 @@ const mapStateToProps = (store: IStoreState): IProps => {
     authenticated: getAuthenticated(store)
   }
 }
-export const ProtectedRoute = withRouter<Props>(
+export const ProtectedRoute = withRouter(
   connect<IProps, IDispatchProps, any, IStoreState>(
     mapStateToProps,
     {
       checkAuth
     }
   )(ProtectedRouteWrapper)
-) as any
+)

@@ -1,5 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { resolvers } from '@gateway/features/user/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
 
@@ -214,6 +227,112 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't activate given user"
+      )
+    })
+  })
+
+  describe('changePassword mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes password for loggedin user', async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      const response = await resolvers.Mutation.changePassword(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          existingPassword: 'test',
+          password: 'NewPassword'
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual({
+        userId: 'ba7022f0ff4822'
+      })
+    })
+    it('throws error if @user-mgnt/changeUserPassword sends anything but 201', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '401'
+        })
+      )
+
+      expect(
+        resolvers.Mutation.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            existingPassword: 'test',
+            password: 'NewPassword'
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user password"
+      )
+    })
+    it("throws error if any user (except sysadmin) tries to update some other user's password", async () => {
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'ba7022f0ff4822'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      expect(
+        resolvers.Mutation.changePassword(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            existingPassword: 'test',
+            password: 'NewPassword'
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })

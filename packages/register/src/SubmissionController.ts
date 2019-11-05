@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import ApolloClient, { ApolloError } from 'apollo-client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
@@ -15,8 +26,10 @@ import { FetchResult } from 'react-apollo'
 import { REGISTRATION_HOME_QUERY } from './views/RegistrationHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@register/utils/apolloClient'
+import moment from 'moment'
 
 const INTERVAL_TIME = 5000
+const HANGING_EXPIRE_MINUTES = 15
 const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_SUBMIT.toString(),
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
@@ -25,6 +38,20 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_CERTIFY.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
+const INPROGRESS_STATUS = [
+  SUBMISSION_STATUS.SUBMITTING.toString(),
+  SUBMISSION_STATUS.APPROVING.toString(),
+  SUBMISSION_STATUS.REGISTERING.toString(),
+  SUBMISSION_STATUS.REJECTING.toString(),
+  SUBMISSION_STATUS.CERTIFYING.toString()
+]
+const changeStatus = {
+  [SUBMISSION_STATUS.SUBMITTING.toString()]: SUBMISSION_STATUS.READY_TO_SUBMIT,
+  [SUBMISSION_STATUS.APPROVING.toString()]: SUBMISSION_STATUS.READY_TO_APPROVE,
+  [SUBMISSION_STATUS.REGISTERING.toString()]: SUBMISSION_STATUS.READY_TO_REGISTER,
+  [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
+  [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY
+}
 
 interface IActionList {
   [key: string]: string
@@ -79,6 +106,24 @@ export class SubmissionController {
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
   }
+  private requeueHangingApplications = () => {
+    const now = moment(Date.now())
+    this.getApplications()
+      .filter((app: IApplication) => {
+        return (
+          app.submissionStatus &&
+          INPROGRESS_STATUS.includes(app.submissionStatus) &&
+          now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
+        )
+      })
+      .forEach((app: IApplication) => {
+        if (app.submissionStatus) {
+          app.submissionStatus = changeStatus[app.submissionStatus]
+          this.store.dispatch(modifyApplication(app))
+          this.store.dispatch(writeApplication(app))
+        }
+      })
+  }
 
   private sync = async () => {
     this.syncCount++
@@ -92,6 +137,7 @@ export class SubmissionController {
 
     this.syncRunning = true
 
+    this.requeueHangingApplications()
     const applications = this.getSubmitableApplications()
     console.debug(
       `[${this.syncCount}] Syncing ${applications.length} applications`

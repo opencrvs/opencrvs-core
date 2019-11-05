@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   compose,
   createStore as createReduxStore,
@@ -9,10 +20,10 @@ import {
 import { createBrowserHistory, History } from 'history'
 import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import {
-  routerReducer,
+  connectRouter,
   routerMiddleware,
   RouterState
-} from 'react-router-redux'
+} from 'connected-react-router'
 import { profileReducer, ProfileState } from '@performance/profile/reducer'
 import { intlReducer, IntlState } from '@performance/i18n/reducer'
 import * as Sentry from '@sentry/browser'
@@ -24,18 +35,18 @@ export interface IStoreState {
   i18n: IntlState
 }
 
-const reducers = combineReducers<IStoreState>({
-  profile: profileReducer,
-  router: routerReducer,
-  i18n: intlReducer
-})
-
 const enhancedCreateStore = createReduxStore as StoreCreator
 
 export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = (): { store: AppStore; history: History } => {
   const history = createBrowserHistory()
+
+  const reducers = combineReducers<IStoreState>({
+    profile: profileReducer,
+    router: connectRouter(history) as any, // @todo
+    i18n: intlReducer
+  })
 
   const enhancer = compose(
     install(),

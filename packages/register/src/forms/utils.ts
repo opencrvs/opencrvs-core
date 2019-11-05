@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   IFormField,
   Ii18nFormField,
@@ -42,7 +53,7 @@ import {
   ILocation,
   IOfflineData
 } from '@register/offline/reducer'
-import { Validation, IValidationResult } from '@register/utils/validate'
+import { Validation } from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
@@ -310,6 +321,10 @@ export function isCityLocation(
   }
 }
 
+export function isDefaultCountry(countryCode: string): boolean {
+  return countryCode === window.config.COUNTRY.toUpperCase()
+}
+
 interface IVars {
   [key: string]: any
 }
@@ -454,6 +469,10 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression: '!values.countryPermanent'
   },
+  isDefaultCountryPermanent: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.countryPermanent)'
+  },
   statePermanent: {
     action: 'hide',
     expression: '!values.statePermanent'
@@ -473,6 +492,10 @@ export const conditionals: IConditionals = {
   country: {
     action: 'hide',
     expression: '!values.country'
+  },
+  isDefaultCountry: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.country)'
   },
   state: {
     action: 'hide',

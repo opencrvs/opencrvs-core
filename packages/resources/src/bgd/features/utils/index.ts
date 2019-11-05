@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
 import { A2I_LOCATION_REFERENCE_IDENTIFIER } from '@resources/bgd/features/administrative/scripts/service'
@@ -45,6 +56,7 @@ export interface ILocation {
 }
 
 export interface ILocationSequenceNumber {
+  year: string
   reference: string
   sequence_number: string
 }
@@ -88,16 +100,6 @@ export async function getLocationsByIdentifier(identifier: string) {
   } catch (err) {
     return internal(err)
   }
-}
-
-export function getLocationIDByA2IRef(
-  locations: fhir.Location[],
-  a2IReference: string
-) {
-  const location = locations.find(loc =>
-    matchLocationWithA2IRef(loc, a2IReference)
-  ) as fhir.Location
-  return location.id as string
 }
 
 export function matchLocationWithA2IRef(
@@ -157,6 +159,38 @@ export const titleCase = (str: string) => {
   return stringArray.join(' ')
 }
 
+export async function getPractitionerLocationId(
+  practitionerId: string
+): Promise<string> {
+  const locations: fhir.Location[] = await getPractitionerLocations(
+    practitionerId
+  )
+  const union = locations.find(location => {
+    const jurisdictionIdentifier =
+      location.identifier &&
+      location.identifier.find(
+        identifier =>
+          identifier.system ===
+          `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type`
+      )
+    if (!jurisdictionIdentifier) {
+      return false
+    }
+    return (
+      // TODO: Once we receive api update from OISF,
+      // Need to add MUNICIPALITY || CITY_CORPORATION type here
+      jurisdictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase()
+    )
+  })
+
+  if (!union || !union.id) {
+    throw new Error(
+      `No valid union found for given practioner: ${practitionerId}`
+    )
+  }
+  return union.id
+}
+
 export async function getPractitionerLocations(
   practitionerId: string
 ): Promise<fhir.Location[]> {
@@ -202,4 +236,8 @@ export function convertStringToASCII(str: string): string {
   return [...str]
     .map(char => char.charCodeAt(0).toString())
     .reduce((acc, v) => acc.concat(v))
+}
+
+export function convertNumberToString(value: number, size: number) {
+  return value.toString().padStart(size, '0')
 }

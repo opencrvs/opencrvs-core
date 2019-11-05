@@ -1,5 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
-import styled, { StyledComponentClass } from 'styled-components'
+import styled, { StyledComponentBase } from 'styled-components'
 
 import { ITheme } from '../theme'
 import { Button, IButtonProps } from './Button'
@@ -26,14 +37,14 @@ const ActionContainer = styled(Button)`
   }
 `
 
-const ActionTitle = styled.h3.attrs<{ disabled?: boolean }>({})`
+const ActionTitle = styled.h3<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.primary};
   ${({ theme }) => theme.fonts.h4Style};
   margin: 0;
 `
 
-const ActionDescription = styled.p.attrs<{ disabled?: boolean }>({})`
+const ActionDescription = styled.p<{ disabled?: boolean }>`
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.secondary};
   ${({ theme }) => theme.fonts.bodyStyle};

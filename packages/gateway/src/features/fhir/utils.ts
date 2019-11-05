@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { v4 as uuid } from 'uuid'
 import {
   createPersonSection,
@@ -851,13 +862,20 @@ export async function getDeclarationIdsFromResponse(
   compId?: string
 ) {
   const compositionId = compId || getIDFromResponse(resBody)
+  return getDeclarationIds(compositionId, authHeader)
+}
+
+export async function getDeclarationIds(
+  compositionId: string,
+  authHeader: IAuthHeader
+) {
   const compositionBundle = await fetchFHIR(
     `/Composition/${compositionId}`,
     authHeader
   )
   if (!compositionBundle || !compositionBundle.identifier) {
     throw new Error(
-      'getTrackingIdFromResponse: Invalid composition or composition has no identifier'
+      'getTrackingId: Invalid composition or composition has no identifier'
     )
   }
   return { trackingId: compositionBundle.identifier.value, compositionId }
@@ -868,16 +886,29 @@ export async function getRegistrationIdsFromResponse(
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  let registrationNumber: string
+  const compositionId = getIDFromResponse(resBody)
+  return getRegistrationIds(
+    compositionId,
+    eventType,
+    isTaskResponse(resBody),
+    authHeader
+  )
+}
 
+export async function getRegistrationIds(
+  compositionId: string,
+  eventType: EVENT_TYPE,
+  isTask: boolean,
+  authHeader: IAuthHeader
+) {
+  let registrationNumber: string
   if (eventType === EVENT_TYPE.BIRTH) {
     registrationNumber = BIRTH_REG_NO
   } else if (eventType === EVENT_TYPE.DEATH) {
     registrationNumber = DEATH_REG_NO
   }
-  const compositionId = getIDFromResponse(resBody)
   let path
-  if (isTaskResponse(resBody)) {
+  if (isTask) {
     path = `/Task/${compositionId}`
   } else {
     path = `/Task?focus=Composition/${compositionId}`
@@ -889,7 +920,7 @@ export async function getRegistrationIdsFromResponse(
   } else if (taskBundle.resourceType === 'Task') {
     taskResource = taskBundle
   } else {
-    throw new Error('getRegistrationNumberFromResponse: Invalid task found')
+    throw new Error('getRegistrationIds: Invalid task found')
   }
   const regIdentifier =
     taskResource.identifier &&
@@ -900,7 +931,7 @@ export async function getRegistrationIdsFromResponse(
     )
   if (!regIdentifier || !regIdentifier.value) {
     throw new Error(
-      'getRegistrationNumberFromResponse: Task does not have any registration identifier'
+      'getRegistrationIds: Task does not have any registration identifier'
     )
   }
   return { registrationNumber: regIdentifier.value, compositionId }

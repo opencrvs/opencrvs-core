@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 /// <reference types="Cypress" />
 
 context('User Integration Test', () => {
@@ -25,7 +36,7 @@ context('User Integration Test', () => {
     cy.selectOption('#role', 'FIELD_AGENT', 'Field Agent')
     cy.selectOption('#type', 'HOSPITAL', 'Hospital')
     cy.get('#device').type('Xiamoi MI 8')
-    cy.get('#searchInputText').type('Moktarpur')
+    cy.get('#searchInputText').type('Alokbali')
     cy.get('#searchInputIcon').click()
     cy.get('#location-0').click()
     cy.get('#modal_select').click()

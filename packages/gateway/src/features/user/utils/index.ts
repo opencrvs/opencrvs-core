@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
 import { logger } from '@gateway/logger'
@@ -48,6 +59,14 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
+}
+
+export function isTokenOwner(authHeader: IAuthHeader, userId: string) {
+  if (!authHeader || !authHeader.Authorization) {
+    return false
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return (tokenPayload.sub && tokenPayload.sub === userId) || false
 }
 
 export const getTokenPayload = (token: string): ITokenPayload => {

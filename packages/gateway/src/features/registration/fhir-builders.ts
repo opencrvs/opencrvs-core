@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import transformObj, { IFieldBuilders } from '@gateway/features/transformation'
 import { v4 as uuid } from 'uuid'
 import {
@@ -673,6 +684,16 @@ function createInformantShareContactNumber(
   }
   resource.extension.push({
     url: `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`,
+    valueString: fieldValue
+  })
+}
+
+function createInCompleteFieldListExt(resource: fhir.Task, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+  resource.extension.push({
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/in-complete-fields`,
     valueString: fieldValue
   })
 }
@@ -1699,6 +1720,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
     },
+    draftId: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(taskResource, 'draft-id', fieldValue)
+    },
     trackingId: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,
@@ -1727,16 +1756,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return setResourceIdentifier(taskResource, `${regNumber}`, fieldValue)
     },
-    inProgress: (
+    inCompleteFields: (
       fhirBundle: ITemplatedBundle,
-      fieldValue: boolean,
+      fieldValue: string,
       context: any
     ) => {
-      if (fieldValue) {
-        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-        taskResource.status = 'draft'
-      }
-      return
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      taskResource.status = 'draft'
+      return createInCompleteFieldListExt(taskResource, fieldValue)
     },
     paperFormID: (
       fhirBundle: ITemplatedBundle,

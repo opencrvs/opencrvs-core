@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  
+
+- [OpenCRVS server setup](#opencrvs-server-setup)
+  - [Enabling encryption](#enabling-encryption)
+  - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenCRVS server setup
 
 This folder contains script to setup a new set of servers for OpenCRVS. It sets up docker swarm and configures the servers to prepare them for a deployment for OpenCRVS.
@@ -19,19 +29,24 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the leader manager and run the following, replacing the values with the actual secrets:
 
 ```sh
-# For BGD
+# For Bangladesh DHIS2 medaitor, allows birth notification API access to the OpenHIM
+printf "<openhim-user>" | docker secret create openhim-user -
+printf "<openhim-password>" | docker secret create openhim-password -
+```
+
+ssh into the leader manager and run the following, replacing the following values with the actual secrets for your SMS provider of choice:
+
+```sh
+# For Zambia we use Clickatell, we have found good Telco coverage in Africa with this provider
 printf "<clickatell-user>" | docker secret create clickatell-user -
 printf "<clickatell-password>" | docker secret create clickatell-password -
 printf "<clickatell-api-id>" | docker secret create clickatell-api-id -
 
-# For BGD DHIS2 medaitor, for API access to the OpenHIM
-printf "<openhim-user>" | docker secret create openhim-user -
-printf "<openhim-password>" | docker secret create openhim-password -
-
-# For ZMB
+# For Bangladesh we use Infobip, we have found good Telco coverage in Asia with this provider
 printf "<infobip-gateway-endpoint>" | docker secret create infobip-gateway-endpoint -
 printf "<infobip-api-key>" | docker secret create infobip-api-key -
 printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
+
 ```
 
 After creating the secrets make sure the commands are removed from the shell history

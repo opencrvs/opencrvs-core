@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { getLanguage } from '@opencrvs/register/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/register/src/store'
 import * as React from 'react'
@@ -68,7 +79,7 @@ import { messages } from '@register/i18n/messages/views/fieldAgentHome'
 import { constantsMessages, errorMessages } from '@register/i18n/messages'
 import moment from 'moment'
 
-const IconTab = styled(Button).attrs<{ active: boolean }>({})`
+const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.subtitleStyle};
   padding-left: 0;

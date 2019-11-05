@@ -1,9 +1,19 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { createServer } from '@user-mgnt/index'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-
 import mockingoose from 'mockingoose'
 
 const fetch = fetchMock as fetchMock.FetchMock
@@ -39,8 +49,8 @@ const mockUser: Partial<IUser & { _id: string }> = {
   scope: ['register'],
   deviceId: 'D444',
   passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345'
+    'c6fdf98bdbb45fb987392b9c2e398cb1dc2915ccbfc7a7d48f9fa7d6b3f1844385517231e98662fbfee5806dcc7a2b0edd7b63cbcfb87efe7e51875ec3e41006',
+  salt: '17cbf362-6a16-4728-adda-6bc700af13b6'
 }
 
 describe('changePassword handler', () => {
@@ -52,7 +62,7 @@ describe('changePassword handler', () => {
     fetch.resetMocks()
   })
 
-  it('activate existing pending user using mongoose', async () => {
+  it('change password for new users', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     mockingoose(User).toReturn({}, 'update')
 
@@ -78,6 +88,93 @@ describe('changePassword handler', () => {
       url: '/changePassword',
       payload: {
         userId: '5d10885374be318fa7689f0b',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+  })
+  it('returns 400 for unable to update password', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn(new Error('boom'), 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changePassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+})
+
+describe('changeUserPassword handler', () => {
+  let server: any
+  beforeEach(async () => {
+    mockUser.status = 'active'
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('Change password for logged-in user', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        existingPassword: 'test',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
+  it('Returns 401 for wrong existing password of logged-in user', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        existingPassword: 'wrong_password',
+        password: 'new_password'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(401)
+  })
+  it('Returns 401 for non-active user', async () => {
+    mockUser.status = 'pending'
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    mockingoose(User).toReturn({}, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/changeUserPassword',
+      payload: {
+        userId: '5d10885374be318fa7689f0b',
+        existingPassword: 'test',
         password: 'new_password'
       },
       headers: {

@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { IAuthHeader } from '@gateway/common-types'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import {
@@ -5,7 +16,9 @@ import {
   getDeclarationIdsFromResponse,
   getIDFromResponse,
   getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition
+  removeDuplicatesFromComposition,
+  getRegistrationIds,
+  getDeclarationIds
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -249,6 +262,24 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
+  const duplicateCompostion = await lookForDuplicate(
+    details && details.registration && details.registration.draftId,
+    authHeader
+  )
+
+  if (duplicateCompostion) {
+    if (hasScope(authHeader, 'register')) {
+      return await getRegistrationIds(
+        duplicateCompostion,
+        event,
+        false,
+        authHeader
+      )
+    } else {
+      // return tracking-id
+      return await getDeclarationIds(duplicateCompostion, authHeader)
+    }
+  }
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
@@ -258,6 +289,29 @@ async function createEventRegistration(
     // return tracking-id
     return await getDeclarationIdsFromResponse(res, authHeader)
   }
+}
+
+export async function lookForDuplicate(
+  identifier: string,
+  authHeader: IAuthHeader
+) {
+  const taskBundle = await fetchFHIR(
+    `/Task?identifier=${identifier}`,
+    authHeader
+  )
+
+  const task =
+    taskBundle &&
+    taskBundle.entry &&
+    taskBundle.entry[0] &&
+    (taskBundle.entry[0].resource as fhir.Task)
+
+  return (
+    task &&
+    task.focus &&
+    task.focus.reference &&
+    task.focus.reference.split('/')[1]
+  )
 }
 
 async function markEventAsValidated(

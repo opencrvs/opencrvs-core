@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
 import * as actions from '@register/offline/actions'
 import * as profileActions from '@register/profile/profileActions'
@@ -10,6 +21,7 @@ import { ISerializedForm } from '@register/forms'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@register/utils/userUtils'
 import { IPDFTemplate } from '@register/pdfRenderer/transformer/types'
+import { ICertificateCollectorDefinition } from '@register/views/PrintCertificate/VerifyCollector'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -33,6 +45,10 @@ export interface IOfflineData {
     registerForm: {
       birth: ISerializedForm
       death: ISerializedForm
+    }
+    certificateCollectorDefinition: {
+      birth: ICertificateCollectorDefinition
+      death: ICertificateCollectorDefinition
     }
   }
   templates: {

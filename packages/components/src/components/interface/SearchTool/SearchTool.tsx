@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
 import styled from 'styled-components'
@@ -142,7 +153,8 @@ export class SearchTool extends React.Component<IProps, IState> {
       ) || this.props.searchTypeList[0]
     )
   }
-  search = () => {
+  search = (e: React.FormEvent) => {
+    e.preventDefault()
     return (
       this.state.searchParam &&
       this.props.searchHandler(
@@ -205,7 +217,7 @@ export class SearchTool extends React.Component<IProps, IState> {
   render() {
     const { placeHolderText } = this.state.selectedSearchType
     return (
-      <Wrapper action="javascript:void(0);" onSubmit={this.search}>
+      <Wrapper onSubmit={this.search}>
         <SearchBlue id="searchIconButton" onClick={this.search} />
         <SearchTextInput
           id="searchText"

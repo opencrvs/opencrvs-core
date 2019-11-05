@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@register/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/register/src/forms'
@@ -213,11 +224,27 @@ export const isDateNotInFuture = (date: string) => {
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
-  return new Date(date) >= new Date(JSON.stringify(drafts.deceased.birthDate))
+  const birthDate = drafts.deceased && drafts.deceased.birthDate
+  return birthDate
+    ? new Date(date) >= new Date(JSON.stringify(birthDate))
+    : true
 }
 
 export const isDateAfter = (first: string, second: string) => {
   return new Date(first) >= new Date(second)
+}
+
+export const minAgeGapExist = (
+  first: string,
+  second: string,
+  minAgeGap: number
+): boolean => {
+  const diff =
+    (new Date(first).getTime() - new Date(second).getTime()) /
+    (1000 * 60 * 60 * 24) /
+    365
+
+  return diff >= minAgeGap
 }
 
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
@@ -234,37 +261,28 @@ export const isValidChildBirthDate: Validation = (
   drafts
 ) => {
   const childBirthDate = value as string
-  const motherBirthDate = (drafts &&
-    drafts.mother &&
-    drafts.mother.motherBirthDate) as string
 
   return childBirthDate &&
     isAValidDateFormat(childBirthDate) &&
     isDateNotInFuture(childBirthDate)
-    ? motherBirthDate
-      ? isDateAfter(childBirthDate, motherBirthDate)
-        ? undefined
-        : {
-            message: messages.isValidBirthDate
-          }
-      : undefined
+    ? undefined
     : {
         message: messages.isValidBirthDate
       }
 }
 
-export const isValidMotherBirthDate = (): Validation => (
+export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
   value: IFormFieldValue,
   drafts
 ) => {
-  const motherBirthDate = value as string
+  const parentsBirthDate = value as string
   const childBirthDate = (drafts && drafts.child.childBirthDate) as string
 
-  return motherBirthDate &&
-    isAValidDateFormat(motherBirthDate) &&
-    isDateNotInFuture(motherBirthDate)
+  return parentsBirthDate &&
+    isAValidDateFormat(parentsBirthDate) &&
+    isDateNotInFuture(parentsBirthDate)
     ? childBirthDate
-      ? isDateAfter(childBirthDate, motherBirthDate)
+      ? minAgeGapExist(childBirthDate, parentsBirthDate, minAgeGap)
         ? undefined
         : {
             message: messages.isValidBirthDate
@@ -555,8 +573,9 @@ export const isValidDeathOccurrenceDate: Validation = (
   value: IFormFieldValue,
   drafts
 ) => {
-  const cast = value as string
-  return value &&
+  const cast = value && value.toString()
+
+  return cast &&
     isDateNotInFuture(cast) &&
     isAValidDateFormat(cast) &&
     isDateNotBeforeBirth(cast, drafts as IFormData)

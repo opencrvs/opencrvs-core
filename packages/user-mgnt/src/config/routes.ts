@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as Hapi from 'hapi'
 import verifyPassHandler, {
   requestSchema as reqAuthSchema,
@@ -99,6 +110,31 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/check-token',
       handler: (request: Hapi.Request) => request.auth.credentials
+    },
+    {
+      method: 'POST',
+      path: '/changeUserPassword',
+      handler: changePasswordHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes password for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
     },
     {
       method: 'POST',

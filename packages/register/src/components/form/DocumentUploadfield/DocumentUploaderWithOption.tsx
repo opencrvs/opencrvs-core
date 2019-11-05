@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import {
   ImageUploader,
   ISelectOption,
@@ -10,13 +21,17 @@ import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@register/utils/constants'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { getBase64Strings as resizeAndRotate } from 'exif-rotate-js/lib'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
 import { buttonMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/imageUpload'
+import imageCompression from 'browser-image-compression'
 
-const MAX_IMAGE_WIDTH_OR_HEIGHT = 2500
+const options = {
+  maxSizeMB: 0.4,
+  maxWidthOrHeight: 1920,
+  useWebWorker: true
+}
 
 const UploaderWrapper = styled.div`
   margin-bottom: 20px;
@@ -153,14 +168,12 @@ class DocumentUploaderWithOptionComp extends React.Component<
       throw new Error(this.props.intl.formatMessage(messages.overSized))
     }
 
-    if (uploadedImage.size > 2097152) {
-      const [resized] = await resizeAndRotate([uploadedImage], {
-        maxSize: MAX_IMAGE_WIDTH_OR_HEIGHT
-      })
-      return resized
-    }
+    const resized =
+      uploadedImage.size > 512000 &&
+      (await imageCompression(uploadedImage, options))
 
-    const fileAsBase64 = await getBase64String(uploadedImage)
+    const fileAsBase64 = await getBase64String(resized || uploadedImage)
+
     return fileAsBase64.toString()
   }
 
@@ -269,11 +282,11 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, intl } = this.props
+    const { label, intl, name } = this.props
 
     return (
       <UploaderWrapper>
-        <ErrorMessage>
+        <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
             <ErrorText>{this.state.errorMessage}</ErrorText>
           )}
@@ -287,6 +300,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
         />
         <Flex>
           <Select
+            id={name}
             options={this.state.dropDownOptions}
             value={this.state.fields.documentType}
             onChange={this.onChange}

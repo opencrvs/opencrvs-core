@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from '@register/styledComponents'
 
@@ -21,6 +32,7 @@ const HeaderContainer = styled.div`
 const ContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
+  width: 100%;
 `
 const IconContainer = styled.div`
   margin: 16px auto 16px auto;
@@ -31,6 +43,9 @@ const TitleContainer = styled.div`
 `
 const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h4Style}
+  width:70%;
+  margin: auto;
+  overflow-wrap: break-word;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h5Style}
   }

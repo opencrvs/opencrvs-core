@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import * as React from 'react'
 import styled from '@register/styledComponents'
 import {
@@ -8,7 +19,6 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { Check, Cross } from '@opencrvs/components/lib/icons'
-import { IFormSectionData } from '@register/forms'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { constantsMessages, countryMessages } from '@register/i18n/messages'
 import { messages as certificateMessages } from '@register/i18n/messages/views/certificate'
@@ -18,6 +28,8 @@ import {
   LabelValuePair
 } from '@opencrvs/components/lib/interface'
 import { formatLongDate } from '@register/utils/date-formatting'
+import { IStoreState } from '@register/store'
+import { getOfflineData } from '@register/offline/selectors'
 
 interface IVerifierActionProps {
   positiveAction: {
@@ -30,10 +42,19 @@ interface IVerifierActionProps {
   }
 }
 
+export interface ICollectorInfo {
+  iD: string
+  iDType: string
+  firstNames: string
+  familyName: string
+  birthDate: string
+  nationality: string
+}
+
 interface IIDVerifierProps {
   id?: string
   title: string
-  collectorInformation: IFormSectionData
+  collectorInformation: ICollectorInfo
   actionProps: IVerifierActionProps
 }
 
@@ -85,78 +106,50 @@ class IDVerifierComponent extends React.Component<
     this.setState(prevState => ({ showPrompt: !prevState.showPrompt }))
   }
 
-  getGenericCollectorInfo = (
-    info: IIDVerifierProps['collectorInformation']
-  ) => {
-    const { locale } = this.props.intl
-    const iD = info.iD || info.applicantID
-    const iDType = info.iDType || info.iDTypeOther
-    const firstNames =
-      locale === 'en'
-        ? info.firstNamesEng || info.applicantFirstNamesEng
-        : info.firstNames || info.applicantFirstNames
-    const familyName =
-      locale === 'en'
-        ? info.familyNameEng || info.applicantFamilyNameEng
-        : info.familyName || info.applicantFamilyName
-    const birthDate =
-      info.motherBirthDate || info.fatherBirthDate || info.applicantBirthDate
-    const nationality = info.nationality
-
-    return {
-      iD,
-      iDType,
-      firstNames,
-      familyName,
-      birthDate,
-      nationality
-    }
-  }
-
   renderLabelValue = () => {
     const { collectorInformation, intl } = this.props
-    const {
-      iD,
-      iDType,
-      firstNames,
-      familyName,
-      birthDate,
-      nationality
-    } = this.getGenericCollectorInfo(collectorInformation)
 
     return (
       <>
         <LabelValuePair
           label={intl.formatMessage(constantsMessages.id)}
           value={
-            intl.formatMessage(identityNameMapper(iDType as string)) +
+            intl.formatMessage(
+              identityNameMapper(collectorInformation.iDType as string)
+            ) +
             ' | ' +
-            iD
+            collectorInformation.iD
           }
         />
-        {firstNames && (
+        {collectorInformation.firstNames && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.firstName)}
-            value={String(firstNames)}
+            value={String(collectorInformation.firstNames)}
           />
         )}
 
         <LabelValuePair
           label={intl.formatMessage(certificateMessages.familyName)}
-          value={String(familyName)}
+          value={String(collectorInformation.familyName)}
         />
 
-        {birthDate && (
+        {collectorInformation.birthDate && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.dateOfBirth)}
-            value={formatLongDate(birthDate as string, intl.locale, 'LL')}
+            value={formatLongDate(
+              collectorInformation.birthDate as string,
+              intl.locale,
+              'LL'
+            )}
           />
         )}
 
-        {nationality && (
+        {collectorInformation.nationality && (
           <LabelValuePair
             label={intl.formatMessage(certificateMessages.nationality)}
-            value={intl.formatMessage(countryMessages[nationality as string])}
+            value={intl.formatMessage(
+              countryMessages[collectorInformation.nationality as string]
+            )}
           />
         )}
       </>

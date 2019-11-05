@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 import { createStore } from '@register/store'
 import { SubmissionController } from '@register/SubmissionController'
 import { SUBMISSION_STATUS } from '@register/applications'
@@ -34,6 +45,30 @@ describe('Submission Controller', () => {
     subCon.sync()
 
     expect(store.dispatch).not.toBeCalled()
+  })
+
+  it('changes status of drafts that are hanging for long time', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              modifiedOn: 1572408000000,
+              submissionStatus: SUBMISSION_STATUS.SUBMITTING
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        }
+      }),
+      dispatch: jest.fn()
+    }
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+    subCon.requeueHangingApplications()
+
+    expect(store.dispatch).toHaveBeenCalledTimes(2)
   })
 
   it('does nothing if offline', () => {

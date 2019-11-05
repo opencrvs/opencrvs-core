@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 // tslint:disable no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 // tslint:enable no-var-requires
@@ -5,6 +16,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 import { readFileSync } from 'fs'
 import getPlugins from '@resources/config/plugins'
+import * as usrMgntDB from '@resources/database'
 import {
   RESOURCES_HOST,
   RESOURCES_PORT,
@@ -180,11 +192,13 @@ export async function createServer() {
 
   async function stop() {
     await server.stop()
+    await usrMgntDB.disconnect()
     server.log('info', 'server stopped')
   }
 
   async function start() {
     await server.start()
+    await usrMgntDB.connect()
     server.log('info', `server started on ${RESOURCES_HOST}:${RESOURCES_PORT}`)
   }
 

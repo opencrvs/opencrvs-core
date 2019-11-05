@@ -1,3 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
 /// <reference types="Cypress" />
 
 context('Death Integration Test', () => {
@@ -69,6 +80,7 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -192,12 +204,7 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeathCode').type('Chronic Obstructive Pulmonary Disease')
     cy.wait(500)
     cy.get('#next_section').click()
     // APPLICANT DETAILS
@@ -227,6 +234,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -335,6 +343,7 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -457,17 +466,13 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeathCode').type('Coronary artery disease')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
@@ -496,6 +501,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
@@ -618,17 +624,13 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
     cy.wait(500)
     cy.get('#next_section').click()
-    cy.selectOption(
-      '#methodOfCauseOfDeath',
-      'MEDICALLY_CERTIFIED',
-      'Medically Certified Cause of Death'
-    )
-    cy.get('#causeOfDeathCode').type('1009')
+    cy.get('#causeOfDeathCode').type('Brain stroke')
     cy.get('#next_section').click()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
@@ -657,6 +659,7 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
+    cy.wait(500)
     cy.get('#next_section').click()
     // DOCUMENT DETAILS
     cy.get('#next_section').click()
