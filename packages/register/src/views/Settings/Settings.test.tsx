@@ -145,5 +145,18 @@ describe('Settings page tests', () => {
       )
       expect(validationMsgExist).toBe(true)
     })
+
+    it('Should hide the password modal', () => {
+      component
+        .find('#close-btn')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      const modalIsClosed = !Boolean(
+        component.find('#ChangePasswordModal').hostNodes().length
+      )
+      expect(modalIsClosed).toBe(true)
+    })
   })
 })
