@@ -26,13 +26,15 @@ export const birthDocumentForWhomFhirMapping = {
   ChildAge: 'CHILD_AGE',
   Applicant: 'APPLICANT_ID_PROOF',
   AssignedResponsibilityProof: 'ASSIGNED_RESPONSIBILITY_PROOF',
-  LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF'
+  LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF',
+  WardCouncillorProof: 'WARD_COUNCILLOR_PROOF'
 }
 
 export const birthSectionMapping = {
   [BirthSection.Child]: [
     birthDocumentForWhomFhirMapping.Child,
-    birthDocumentForWhomFhirMapping.ChildAge
+    birthDocumentForWhomFhirMapping.ChildAge,
+    birthDocumentForWhomFhirMapping.WardCouncillorProof
   ],
   [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.Mother],
   [BirthSection.Father]: [birthDocumentForWhomFhirMapping.Father],
@@ -70,7 +72,8 @@ export const birthDocumentTypeFhirMapping = {
   'Original Birth Record': 'ORIGINAL_BIRTH_RECORD',
   'Under Five Card': 'UNDER_FIVE_CARD',
   'Proof of legal guardianship': 'PROOF_OF_LEGAL_GUARDIANSHIP',
-  'Proof of assigned responsibility': 'PROOF_OF_ASSIGNED_RESPONSIBILITY'
+  'Proof of assigned responsibility': 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
+  'Letter from ward councillor': 'LETTER_FROM_COUNCILLOR'
 }
 
 export function birthFieldToAttachmentTransformer(

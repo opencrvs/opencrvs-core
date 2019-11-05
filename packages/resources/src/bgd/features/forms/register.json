@@ -4637,6 +4637,7 @@
         {
           "id": "primaryCaregiver",
           "viewType": "form",
+          "hasDocumentSection": "true",
           "name": {
             "defaultMessage": "Parents details",
             "description": "Form section name or title for primary caregiver",
@@ -10541,6 +10542,37 @@
                       "operation": "birthAttachmentToFieldTransformer"
                     }
                   }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "birthAttachmentToFieldTransformer"
+                    }
+                  }
                 }
               ]
             }
@@ -12098,7 +12130,7 @@
                       "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -12147,7 +12179,7 @@
                       "action": "hide",
                       "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -17664,6 +17696,37 @@
                     {
                       "action": "hide",
                       "expression": "(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => [\"National ID (front)\", \"National ID (Back)\"].indexOf(a.optionValues[1]) > -1))"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
+                      }
                     }
                   ],
                   "mapping": {
