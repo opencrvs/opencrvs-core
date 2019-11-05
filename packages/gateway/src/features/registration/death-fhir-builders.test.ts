@@ -86,6 +86,7 @@ test('should build a minimal FHIR registration document without error', async ()
         contact: 'MOTHER',
         paperFormID: '12345678',
         trackingId: 'B123456',
+        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
         registrationNumber: '201923324512345671',
         status: [
           {
