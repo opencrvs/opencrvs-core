@@ -79,9 +79,13 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
     ''
   )
 
-  return (
-    bbsCode.slice(0, 2) + getRMOCode(jurisdictionalLocations) + bbsCode.slice(2)
-  )
+  const rmoCode = getRMOCode(jurisdictionalLocations)
+
+  if (rmoCode === 0) {
+    throw new Error("Didn't find any RMO code for practioner: " + practionerId)
+  }
+
+  return bbsCode.slice(0, 2) + rmoCode + bbsCode.slice(2)
 }
 
 function isTypeMatched(matchType: string, inputType?: string): boolean {
