@@ -54,6 +54,7 @@ type Query {
     userId: String
     locationIds: [String]
     status: [String]
+    type: String
     trackingId: String
     registrationNumber: String
     contactNumber: String
