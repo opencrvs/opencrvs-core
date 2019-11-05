@@ -12098,7 +12098,7 @@
                       "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -12147,7 +12147,7 @@
                       "action": "hide",
                       "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
