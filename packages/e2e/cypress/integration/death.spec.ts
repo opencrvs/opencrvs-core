@@ -97,6 +97,11 @@ context('Death Integration Test', () => {
     }
     // LANDING PAGE
     cy.wait(3000)
+    cy.get('#ListItemAction-0-icon').should('exist')
+    cy.get('#ListItemAction-0-icon')
+      .first()
+      .click()
+    cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -250,6 +255,11 @@ context('Death Integration Test', () => {
     }
     // LANDING PAGE
     cy.wait(3000)
+    cy.get('#ListItemAction-0-icon').should('exist')
+    cy.get('#ListItemAction-0-icon')
+      .first()
+      .click()
+    cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -352,6 +362,11 @@ context('Death Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
+    cy.wait(3000)
+    cy.get('#ListItemAction-0-icon').should('exist')
+    cy.get('#ListItemAction-0-icon')
+      .first()
+      .click()
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
@@ -508,6 +523,11 @@ context('Death Integration Test', () => {
         .type(`${i % 2}`)
     }
     // LANDING PAGE
+    cy.wait(3000)
+    cy.get('#ListItemAction-0-icon').should('exist')
+    cy.get('#ListItemAction-0-icon')
+      .first()
+      .click()
     cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
