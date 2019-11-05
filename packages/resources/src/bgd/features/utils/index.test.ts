@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  setRMOCode,
+  insertRMOInJurisDictionalLocations,
   JURISDICTION_TYPE_DISTRICT,
   JURISDICTION_TYPE_UPAZILA,
   JURISDICTION_TYPE_UNION,
@@ -21,7 +21,7 @@ import {
 
 describe('utils tests', () => {
   it('test setRmo for union', async () => {
-    const locations = [
+    const jurisDictionalLocations = [
       {
         jurisdictionType: JURISDICTION_TYPE_DISTRICT,
         bbsCode: '30'
@@ -43,10 +43,11 @@ describe('utils tests', () => {
         bbsCode: ''
       }
     ]
-    setRMOCode(locations)
 
-    const rmoLocation = locations.find(
-      location => location.jurisdictionType === 'rmo'
+    const rmoLocation = insertRMOInJurisDictionalLocations(
+      jurisDictionalLocations
+    ).find(
+      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
     ) as IJurisdictionLocation
 
     expect(rmoLocation).toBeDefined()
@@ -54,7 +55,7 @@ describe('utils tests', () => {
   })
 
   it('test setRmo for municipality', async () => {
-    const locations = [
+    const jurisDictionalLocations = [
       {
         jurisdictionType: JURISDICTION_TYPE_DISTRICT,
         bbsCode: '30'
@@ -76,10 +77,11 @@ describe('utils tests', () => {
         bbsCode: ''
       }
     ]
-    setRMOCode(locations)
 
-    const rmoLocation = locations.find(
-      location => location.jurisdictionType === 'rmo'
+    const rmoLocation = insertRMOInJurisDictionalLocations(
+      jurisDictionalLocations
+    ).find(
+      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
     ) as IJurisdictionLocation
 
     expect(rmoLocation).toBeDefined()
@@ -87,7 +89,7 @@ describe('utils tests', () => {
   })
 
   it('test setRmo for city corporation', async () => {
-    const locations = [
+    const jurisDictionalLocations = [
       {
         jurisdictionType: JURISDICTION_TYPE_DISTRICT,
         bbsCode: '30'
@@ -109,10 +111,11 @@ describe('utils tests', () => {
         bbsCode: '35'
       }
     ]
-    setRMOCode(locations)
 
-    const rmoLocation = locations.find(
-      location => location.jurisdictionType === 'rmo'
+    const rmoLocation = insertRMOInJurisDictionalLocations(
+      jurisDictionalLocations
+    ).find(
+      (location: IJurisdictionLocation) => location.jurisdictionType === 'rmo'
     ) as IJurisdictionLocation
 
     expect(rmoLocation).toBeDefined()
