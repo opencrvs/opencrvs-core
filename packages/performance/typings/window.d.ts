@@ -15,7 +15,7 @@ interface Window {
     COUNTRY: string
     LANGUAGES: string
     LOGIN_URL: string
-    REGISTER_URL: string
+    CLIENT_URL: string
     LOGROCKET: string
     SENTRY: string
   }
