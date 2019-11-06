@@ -32,3 +32,5 @@ docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
 
 docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/$DOW/user-mgnt.gz"
+
+docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/esbackup/snapshot_$DOW?wait_for_completion=true&pretty"

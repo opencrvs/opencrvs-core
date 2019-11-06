@@ -10,6 +10,8 @@
 print_usage_and_exit () {
     echo 'Usage: ./emergency-restore-metadata.sh Mon|Tue|Wed|Thu|Fri|Sat|Sun'
     echo "Script must receive a day of the week parameter to restore data from that specific day"
+    echo "The backup zips you would like to restore from: hearth-dev.gz, openhim-dev.gz and user-mgnt.gz must exist in /backups/<day of the week> folder"
+    echo "The elasticsearch backup snapshot file named: snapshot_<day of the week> must exist in the /backups/elasticsearch folder"
     exit 1
 }
 
@@ -44,5 +46,6 @@ then
      -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/openhim-dev.gz"
     docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
      -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/user-mgnt.gz"
+    docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/esbackup/snapshot_$1/_restore?pretty"
 fi
 
