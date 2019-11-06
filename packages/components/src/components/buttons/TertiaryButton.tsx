@@ -56,6 +56,11 @@ const ButtonBase = styled.button`
     }
   }
   -webkit-tap-highlight-color: transparent;
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+  }
+  padding: 0;
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: () => React.ReactNode
@@ -114,6 +119,7 @@ const LeftButtonIcon = styled.div`
   position: relative !important;
   margin-right: 8px;
   margin-top: 5px;
+  margin-left: -3px;
 `
 const RightButtonIcon = styled.div`
   position: relative !important;

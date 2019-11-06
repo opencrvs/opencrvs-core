@@ -50,8 +50,11 @@ const Label = styled.label`
 const Value = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   flex: 1;
+  overflow-wrap: break-word;
+  max-width: 50%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.bodyStyle};
+    max-width: 100%;
   }
 `
 

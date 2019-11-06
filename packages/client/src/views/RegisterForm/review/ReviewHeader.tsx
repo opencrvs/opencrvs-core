@@ -32,6 +32,7 @@ const HeaderContainer = styled.div`
 const ContentContainer = styled.div`
   flex-direction: column;
   align-items: center;
+  width: 100%;
 `
 const IconContainer = styled.div`
   margin: 16px auto 16px auto;
@@ -42,6 +43,9 @@ const TitleContainer = styled.div`
 `
 const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h4Style}
+  width:70%;
+  margin: auto;
+  overflow-wrap: break-word;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h5Style}
   }
