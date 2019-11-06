@@ -270,7 +270,7 @@ describe('User root resolvers', () => {
           JSON.stringify({
             userId: 'ba7022f0ff4822'
           }),
-          { status: 201 }
+          { status: 200 }
         ],
         [JSON.stringify({})]
       )
@@ -285,9 +285,7 @@ describe('User root resolvers', () => {
         authHeaderValidUser
       )
 
-      expect(response).toEqual({
-        userId: 'ba7022f0ff4822'
-      })
+      expect(response).toEqual(true)
     })
     it('throws error if @user-mgnt/changeUserPassword sends anything but 201', async () => {
       fetch.mockResponseOnce(

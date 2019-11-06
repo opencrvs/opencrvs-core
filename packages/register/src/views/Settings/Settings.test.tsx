@@ -97,4 +97,66 @@ describe('Settings page tests', () => {
       .hostNodes()
       .simulate('click')
   })
+
+  describe('When user changes password', () => {
+    beforeEach(() => {
+      component
+        .find('#BtnChangePassword')
+        .hostNodes()
+        .simulate('click')
+    })
+
+    it('Should display password change modal', () => {
+      const modal = component.find('#ChangePasswordModal').hostNodes()
+      expect(modal.length).toEqual(1)
+
+      modal
+        .find('#confirm-button')
+        .hostNodes()
+        .simulate('click')
+    })
+
+    it('Should display match message for valid password', () => {
+      component
+        .find('#CurrentPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'CurrentPassword', value: 'SomePass123' }
+        })
+
+      component
+        .find('#NewPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'NewPassword', value: 'SomePass123' }
+        })
+
+      component
+        .find('#ConfirmPassword')
+        .hostNodes()
+        .simulate('change', {
+          target: { id: 'ConfirmPassword', value: 'SomePass123' }
+        })
+
+      component.update()
+
+      const validationMsgExist = Boolean(
+        component.find('#passwordMatch').hostNodes().length
+      )
+      expect(validationMsgExist).toBe(true)
+    })
+
+    it('Should hide the password modal', () => {
+      component
+        .find('#close-btn')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      const modalIsClosed = !Boolean(
+        component.find('#ChangePasswordModal').hostNodes().length
+      )
+      expect(modalIsClosed).toBe(true)
+    })
+  })
 })
