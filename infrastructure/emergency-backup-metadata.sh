@@ -19,11 +19,16 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/backups/hearth-dev.gz"
+DOW=$(date +"%a")
+
+mkdir -p /backups/$DOW
+chmod g+rwx /backups/$DOW
 
 docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/backups/openhim-dev.gz"
+ -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/backups/$DOW/hearth-dev.gz"
 
 docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/user-mgnt.gz"
+ -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/backups/$DOW/openhim-dev.gz"
+
+docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/$DOW/user-mgnt.gz"

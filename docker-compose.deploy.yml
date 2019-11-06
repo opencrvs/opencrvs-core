@@ -95,6 +95,7 @@ services:
   elasticsearch:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
+      - '/backups/elasticsearch:/backups/elasticsearch'
     deploy:
       replicas: 1
       placement:

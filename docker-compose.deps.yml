@@ -20,6 +20,9 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    build:
+      context: .
+      dockerfile: ./infrastructure/elasticsearch/Dockerfile
     restart: unless-stopped
 
   influxdb:

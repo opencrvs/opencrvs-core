@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [OpenCRVS server setup](#opencrvs-server-setup)
   - [Enabling encryption](#enabling-encryption)
@@ -13,6 +14,12 @@
 This folder contains script to setup a new set of servers for OpenCRVS. It sets up docker swarm and configures the servers to prepare them for a deployment for OpenCRVS.
 
 Ansible is required to run the server setup. This should be installed on your local machine. Also ensure that you have ssh access with the root user to all the server that you are trying to configure.
+
+Add your users GIT SSH keys to all nodes
+
+```
+curl https://github.com/<git-user>.keys >> ~/.ssh/authorized_keys
+```
 
 Run the configuration script with:
 
@@ -102,4 +109,30 @@ Mongo is enabled with replica sets in order to provide backup in case a node fai
 ```
 docker service scale opencrvs_mongo-rs-init=0
 docker service scale opencrvs_mongo-rs-init=1
+```
+
+## Common Docker Commands
+
+The folllowing docker commands are helpful when managing OpenCRVS and debugging infrastructure issues
+
+### You need to check Docker swarm for the id of the containers running mongo, elasticsearch or resources in order to access
+
+To find which node hosts the container you are looking for, run this command on the manager node.
+
+```
+docker stack ps -f "desired-state=running" opencrvs
+```
+
+### You need to run commands inside a container
+
+After running the previous command to discover which node is running a container, SSH into the right node and run the following to get the container id
+
+```
+docker ps
+```
+
+Run a command on a container like this
+
+```
+docker exec -it <container-id> <command e.g. "ls", "mongo", "printenv">
 ```
