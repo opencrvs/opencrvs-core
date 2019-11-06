@@ -24,7 +24,7 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { UserTab } from './user/userTab'
+import { UserTab } from './tabs/user/userTab'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 
 const Tab = styled(Button)<{ active: boolean }>`

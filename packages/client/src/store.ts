@@ -53,10 +53,7 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
-import {
-  userFormReducer,
-  IUserFormState
-} from '@client/views/SysAdmin/forms/userReducer'
+import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 
 export interface IStoreState {
   profile: ProfileState

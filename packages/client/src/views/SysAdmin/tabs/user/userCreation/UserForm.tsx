@@ -24,10 +24,7 @@ import {
 } from '@client/forms/utils'
 import { goToCreateUserSection, goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
-import {
-  modifyUserFormData,
-  clearUserFormData
-} from '@client/views/SysAdmin/forms/userReducer'
+import { modifyUserFormData, clearUserFormData } from '@client/user/userReducer'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -36,7 +33,7 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};

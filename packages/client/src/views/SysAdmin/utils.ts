@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createUserMutation } from '@client/views/SysAdmin/user/mutations'
+import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
 import {
   IFormField,
   ISelectFormFieldWithOptions,
   ISelectFormFieldWithDynamicOptions
 } from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
-import { getRolesQuery } from './queries'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import { getRolesQuery } from '@client/forms/user/fieldDefinitions/query/queries'
 
 export enum UserStatus {
   ACTIVE,

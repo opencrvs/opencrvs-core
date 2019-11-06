@@ -29,7 +29,6 @@ import * as React from 'react'
 import { Query } from '@client/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { UserStatus } from './utils'
 import { goToCreateNewUser } from '@client/navigation'
 import { connect } from 'react-redux'
 import {
@@ -37,6 +36,7 @@ import {
   constantsMessages,
   errorMessages
 } from '@client/i18n/messages'
+import { UserStatus } from '@client/views/SysAdmin/utils'
 
 const UserTabBodyContent = styled(BodyContent)`
   max-width: 1050px;

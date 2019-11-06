@@ -27,14 +27,16 @@ import { goToCreateUserSection, goBack } from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { FormTitle, Action } from '@client/views/SysAdmin/views/UserForm'
+import {
+  FormTitle,
+  Action
+} from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Dispatch } from 'redux'
-import { submitUserFormData } from '@client/views/SysAdmin/forms/userReducer'
+import { submitUserFormData } from '@client/user/userReducer'
 import ApolloClient from 'apollo-client'
-import { createUserMutation } from '@client/views/SysAdmin/user/mutations'
+import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { userMessages, buttonMessages as messages } from '@client/i18n/messages'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
@@ -43,6 +45,7 @@ import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 
 export interface IUserReviewFormProps {
   section: IFormSection

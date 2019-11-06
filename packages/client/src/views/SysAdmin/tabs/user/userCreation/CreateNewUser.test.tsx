@@ -10,29 +10,26 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  createTestComponent,
-  flushPromises,
-  getFileFromBase64String,
-  validImageB64String
-} from '@client/tests/util'
-import { CreateNewUser } from '@client/views/SysAdmin/views/CreateNewUser'
+import { createTestComponent, flushPromises } from '@client/tests/util'
+import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { modifyUserFormData } from '@client/views/SysAdmin/forms/userReducer'
+import { FormFieldGenerator } from '@client/components/form'
+import { modifyUserFormData } from '@client/user/userReducer'
 import {
+  mockIncompleteFormData,
+  mockCompleteFormData,
+  mockUserGraphqlOperation,
   mockFetchRoleGraphqlOperation,
-  mockDataWithRegistarRoleSelected,
-  mockUserGraphqlOperation
-} from '@client/views/SysAdmin/user/utils'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
-import { waitForElement } from '@client/tests/wait-for-element'
+  mockDataWithRegistarRoleSelected
+} from '@client/views/SysAdmin/utils'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 
-describe('signature upload tests', () => {
+describe('create new user tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
-  describe('when user is in signature upload form page', () => {
+  describe('when user is in create new user form', () => {
     beforeEach(async () => {
       testComponent = (await createTestComponent(
         // @ts-ignore
@@ -40,7 +37,7 @@ describe('signature upload tests', () => {
           match={{
             params: {
               sectionId: 'user',
-              groupId: userSection.groups[1].id
+              groupId: userSection.groups[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -52,100 +49,71 @@ describe('signature upload tests', () => {
       )).component
     })
 
-    it('show the signature form page', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-
-      const title = testComponent
-        .find('#form-title')
-        .hostNodes()
-        .text()
-
-      expect(title).toBe('Attach the registrar’s signature')
-    })
-
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
+      store.dispatch(modifyUserFormData(mockIncompleteFormData))
+
+      testComponent
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+
+      testComponent.update()
+
+      expect(
+        testComponent
+          .find(FormFieldGenerator)
+          .find('#phoneNumber_error')
+          .hostNodes()
+          .text()
+      ).toBe('Required to register a new user')
+    })
+
+    it('clicking on confirm button with complete data takes user to preview page', async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      store.dispatch(modifyUserFormData(mockCompleteFormData))
+
       testComponent
         .find('#confirm_form')
         .hostNodes()
         .simulate('click')
       await flushPromises()
-      testComponent.update()
 
-      const error = testComponent
-        .find('#field-error')
-        .hostNodes()
-        .text()
-
-      expect(error).toBe('Required to register a new user')
+      expect(history.location.pathname).toContain('preview')
     })
 
-    it('No error while uploading if valid file', async () => {
+    it('clicking on confirm by selecting registrar as role will go to signature form page', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: [
-              getFileFromBase64String(
-                validImageB64String,
-                'index.png',
-                'image/png'
-              )
-            ]
-          }
-        })
-      await flushPromises()
-      testComponent.update()
 
-      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
-    })
-
-    it('return if not file', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: []
-          }
-        })
-      await flushPromises()
-      testComponent.update()
-
-      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
-    })
-
-    it('clicking on confirm button will go to review page', async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      const confirmButton = await waitForElement(testComponent, '#confirm_form')
-      confirmButton.hostNodes().simulate('click')
+
+      testComponent
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
       await flushPromises()
-      testComponent.update()
 
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-user-view-group'
+        '/createUser/user/signature-attachment'
       )
     })
   })
 
   describe('when user in review page', () => {
     beforeEach(async () => {
-      store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
+      store.dispatch(modifyUserFormData(mockCompleteFormData))
       testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -171,6 +139,16 @@ describe('signature upload tests', () => {
           .hostNodes()
           .text()
       ).toBe('Please review the new users details')
+    })
+
+    it('clicking change button on a field takes user back to form', async () => {
+      testComponent
+        .find('#btn_change_familyNameEng')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
+      expect(history.location.hash).toBe('#familyNameEng')
     })
 
     it('clicking submit button submits the form data', async () => {

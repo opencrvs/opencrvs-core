@@ -10,24 +10,24 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
 import {
   IFormSectionData,
   IForm,
-  UserSection,
-  IFormSection
+  IFormSection,
+  UserSection
 } from '@client/forms'
 import { Action } from 'redux'
 import { formMessages as messages } from '@client/i18n/messages'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@client/navigation'
-import { transformRoleDataToDefinitions } from '@client/views/SysAdmin/user/utils'
+import { transformRoleDataToDefinitions } from '@client/views/SysAdmin/utils'
 import {
   showSubmitFormSuccessToast,
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { SEARCH_USERS } from '@client/sysadmin/user/queries'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'

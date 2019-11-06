@@ -12,13 +12,12 @@
 import * as React from 'react'
 import { createTestComponent, mockOfflineData } from '@client/tests/util'
 import { createStore } from '@client/store'
-import { UserForm } from '@client/views/SysAdmin/views/UserForm'
+import { UserForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
-import { userSection } from '@client/views/SysAdmin/forms/fieldDefinitions/user-section'
-
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { offlineDataReady } from '@client/offline/actions'
+import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 
 const { store } = createStore()
 
