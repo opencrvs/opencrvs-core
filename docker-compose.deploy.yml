@@ -116,7 +116,7 @@ services:
       - overlay_net
 
   # Configure webapps and add traefik config
-  register:
+  client:
     configs:
       - source: register-config.{{ts}}
         target: /usr/share/nginx/html/config.js

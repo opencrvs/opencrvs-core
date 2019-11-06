@@ -78,7 +78,7 @@ services:
     ports:
       - '1050:1050'
 
-  register:
+  client:
     ports:
       - '3000:80'
   performance:
