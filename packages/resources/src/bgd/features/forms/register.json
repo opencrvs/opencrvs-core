@@ -5467,6 +5467,12 @@
                   "required": true,
                   "initialValue": "",
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.iDType"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentifierTransformer",
@@ -7695,6 +7701,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.iDType"
                     }
                   ],
                   "mapping": {
