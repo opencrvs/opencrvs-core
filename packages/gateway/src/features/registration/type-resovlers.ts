@@ -96,7 +96,7 @@ export const typeResolvers: GQLResolver = {
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
     maritalStatus: person => {
-      return person.maritalStatus.text
+      return person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: person => {
       const occupationExtension = findExtension(
