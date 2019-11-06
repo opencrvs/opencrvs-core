@@ -57,6 +57,39 @@ export async function fetchLocationByIdentifiers(
   return bundle.entry[0].resource as fhir.Location
 }
 
+export async function fetchCRVSOfficeByParentLocation(
+  parentLocation: fhir.Location,
+  authHeader: string
+): Promise<fhir.Location> {
+  // TODO: need to go through the location hierarchy to find crvs office
+  const res = await fetch(
+    `${FHIR_URL}/Location?parentRef=Location/${parentLocation.id}&type=CRVS_OFFICE`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Error status code received in response, ${res.statusText} ${res.status}`
+    )
+  }
+
+  const bundle: fhir.Bundle = await res.json()
+
+  if (!bundle.entry || !bundle.entry[0] || !bundle.entry[0].resource) {
+    throw new Error(
+      `Location not found, parent location: ${JSON.stringify(parentLocation)}`
+    )
+  }
+
+  return bundle.entry[0].resource as fhir.Location
+}
+
 export interface IBNLocationCodes {
   divisionCode: string
   districtCode?: string

@@ -140,7 +140,12 @@ export async function deathNotificationHandler(
     throw new Error('Could not find last registered union by full BBS code')
   }
 
-  const task = createTaskEntry(composition.fullUrl, lastRegLocation, 'DEATH')
+  const task = await createTaskEntry(
+    composition.fullUrl,
+    lastRegLocation,
+    'DEATH',
+    request.headers.authorization
+  )
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)

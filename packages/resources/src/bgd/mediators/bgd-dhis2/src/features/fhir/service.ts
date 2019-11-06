@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { v4 as uuid } from 'uuid'
-import { fetchAllAddressLocations } from '@bgd-dhis2-mediator/features/fhir/api'
+import {
+  fetchAllAddressLocations,
+  fetchCRVSOfficeByParentLocation
+} from '@bgd-dhis2-mediator/features/fhir/api'
 
 export interface IIncomingAddress {
   division: {
@@ -293,10 +296,11 @@ export function createDeathEncounterEntry(
   }
 }
 
-export function createTaskEntry(
+export async function createTaskEntry(
   compositionRef: string,
   lastRegLocation: fhir.Location,
-  eventType: 'BIRTH' | 'DEATH'
+  eventType: 'BIRTH' | 'DEATH',
+  authHeader: string
 ) {
   const taskResource: fhir.Task = {
     resourceType: 'Task',
@@ -319,6 +323,16 @@ export function createTaskEntry(
         }
       }
     ]
+    const lastRegOffice = await fetchCRVSOfficeByParentLocation(
+      lastRegLocation,
+      authHeader
+    )
+    taskResource.extension.push({
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: {
+        reference: `Location/${lastRegOffice.id}`
+      }
+    })
   }
   return {
     fullUrl: `urn:uuid:${uuid()}`,
