@@ -123,7 +123,7 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/src/bgd/mediators/bgd-dhis2"
+      "/src/bgd/mediators/bgd-dhis2/"
     ]
   }
 }
