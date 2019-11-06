@@ -11,7 +11,7 @@ version: '3.3'
 
 services:
   client:
-    image: jembi/ocrvs-register:${VERSION:-latest}
+    image: jembi/ocrvs-client:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/client/Dockerfile
