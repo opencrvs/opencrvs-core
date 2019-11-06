@@ -25,7 +25,7 @@ import {
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
-  getPractitionerOfficeLocation,
+  getPractitionerOffice,
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import {
@@ -324,7 +324,7 @@ export async function setupLastRegLocation(
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const location = await getPractitionerOfficeLocation(practitioner.id)
+  const location = await getPractitionerPrimaryLocation(practitioner.id)
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -350,7 +350,7 @@ export async function setupLastRegLocation(
     })
   }
 
-  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
+  const primaryOffice = await getPractitionerOffice(practitioner.id)
 
   const regUserLastOfficeExtension = taskResource.extension.find(extension => {
     return (
@@ -358,7 +358,9 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+    if (!isNotification) {
+      regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+    }
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
