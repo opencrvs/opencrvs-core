@@ -142,6 +142,10 @@ export async function birthNotificationHandler(
     'BIRTH',
     request.headers.authorization
   )
+  // Contact type is always passing MOTHER
+  // as based on the type both mother last name and phone number is required
+  // TODO: may need to change it based on the available data from dhis2
+  assignBirthContactPoint(task.resource, 'MOTHER', notification.phone_number)
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
@@ -181,4 +185,22 @@ export async function birthNotificationHandler(
   }
 
   return h.response().code(201)
+}
+
+function assignBirthContactPoint(
+  task: fhir.Task,
+  contact: string,
+  number: string
+) {
+  if (!task.extension) {
+    task.extension = []
+  }
+  task.extension.push({
+    url: 'http://opencrvs.org/specs/extension/contact-person',
+    valueString: contact
+  })
+  task.extension.push({
+    url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+    valueString: number
+  })
 }
