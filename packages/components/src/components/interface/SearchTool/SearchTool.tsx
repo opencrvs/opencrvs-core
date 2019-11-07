@@ -104,7 +104,7 @@ const DropDown = styled.div`
     margin-left: auto;
   }
 `
-const ClearTextIcon = styled(ClearText)`
+const ClearTextIcon = styled(props => <ClearText {...props} />)`
   margin: 0 5px;
 `
 export interface ISearchType {

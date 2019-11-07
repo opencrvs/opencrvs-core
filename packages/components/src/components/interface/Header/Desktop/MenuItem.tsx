@@ -33,7 +33,7 @@ const ItemContainer = styled.div`
   margin-right: 8px;
 `
 
-const ItemSelector = styled(Selector)`
+const ItemSelector = styled(props => <Selector {...props} />)`
   position: absolute;
   bottom: -8px;
   left: 50%;
