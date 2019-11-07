@@ -68,26 +68,18 @@ export class InboxController {
 
   private sync = async () => {
     this.syncCount++
-    console.debug(`[${this.syncCount}] Starting sync...`)
     if (this.syncRunning) {
-      console.debug(
-        `[${this.syncCount}] Sync exiting early (offline or already syncing)`
-      )
       return
     }
 
     this.syncRunning = true
 
     const applications = this.getDownloadableApplications()
-    console.debug(
-      `[${this.syncCount}] Syncing ${applications.length} applications`
-    )
     for (const application of applications) {
       await this.queryData(application)
     }
 
     this.syncRunning = false
-    console.debug(`[${this.syncCount}] Finish sync.`)
   }
 
   public queryData = async (application: IApplication | undefined) => {
