@@ -179,7 +179,7 @@ async function createApplicationIndex(
   const task = findTask(bundleEntries)
   const placeOfApplicationExtension = findTaskExtension(
     task,
-    'http://opencrvs.org/specs/extension/regLastLocation'
+    'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
   const trackingIdIdentifier = findTaskIdentifier(

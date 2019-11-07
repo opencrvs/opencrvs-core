@@ -15,7 +15,7 @@ import {
   createBirthEncounterEntry,
   createBundle,
   createTaskEntry,
-  createComposition,
+  createBirthComposition,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
@@ -83,6 +83,7 @@ export async function birthNotificationHandler(
     notification.child.sex || 'unknown',
     null,
     notification.date_birth,
+    null,
     request.headers.authorization
   )
   const mother = await createPersonEntry(
@@ -95,6 +96,7 @@ export async function birthNotificationHandler(
     'female',
     notification.phone_number,
     null,
+    null,
     request.headers.authorization
   )
   const father = await createPersonEntry(
@@ -106,6 +108,7 @@ export async function birthNotificationHandler(
     notification.permanent_address,
     'male',
     notification.phone_number,
+    null,
     null,
     request.headers.authorization
   )
@@ -125,8 +128,7 @@ export async function birthNotificationHandler(
     child.fullUrl
   )
 
-  const composition = createComposition(
-    'BIRTH',
+  const composition = createBirthComposition(
     child.fullUrl,
     mother.fullUrl,
     father.fullUrl,

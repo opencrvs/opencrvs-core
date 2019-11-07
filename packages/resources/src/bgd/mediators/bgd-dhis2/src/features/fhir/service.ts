@@ -59,11 +59,77 @@ export function createBundle(entries: fhir.BundleEntry[]) {
   }
 }
 
-export function createComposition(
-  eventType: 'BIRTH' | 'DEATH',
-  subjectRef: string,
+export function createBirthComposition(
+  childSectionRef: string,
   motherSectionRef: string,
   fatherSectionRef: string,
+  encounterSectionRef: string
+) {
+  const composition = createComposition(
+    'BIRTH',
+    childSectionRef,
+    encounterSectionRef
+  )
+  composition.resource.section = composition.resource.section.concat([
+    {
+      title: "Mother's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'mother-details'
+          }
+        ],
+        text: "Mother's details"
+      },
+      entry: [{ reference: motherSectionRef }]
+    },
+    {
+      title: "Father's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'father-details'
+          }
+        ],
+        text: "Father's details"
+      },
+      entry: [{ reference: fatherSectionRef }]
+    }
+  ])
+  return composition
+}
+
+export function createDeathComposition(
+  deceasedSectionRef: string,
+  informantSectionRef: string,
+  encounterSectionRef: string
+) {
+  const composition = createComposition(
+    'DEATH',
+    deceasedSectionRef,
+    encounterSectionRef
+  )
+  composition.resource.section.push({
+    title: "Informant's details",
+    code: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'informant-details'
+        }
+      ],
+      text: "Informant's details"
+    },
+    entry: [{ reference: informantSectionRef }]
+  })
+  return composition
+}
+
+function createComposition(
+  eventType: 'BIRTH' | 'DEATH',
+  subjectRef: string,
   encounterSectionRef: string
 ) {
   return {
@@ -121,33 +187,6 @@ export function createComposition(
           entry: [{ reference: subjectRef }]
         },
         {
-          title: "Mother's details",
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/sections',
-                code: 'mother-details'
-              }
-            ],
-            text: "Mother's details"
-          },
-          text: '',
-          entry: [{ reference: motherSectionRef }]
-        },
-        {
-          title: "Father's details",
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/doc-sections',
-                code: 'father-details'
-              }
-            ],
-            text: "Father's details"
-          },
-          entry: [{ reference: fatherSectionRef }]
-        },
-        {
           title: eventType === 'BIRTH' ? 'Birth encounter' : 'Death encounter',
           code: {
             coding: [
@@ -166,6 +205,30 @@ export function createComposition(
   }
 }
 
+export function createRelatedPersonEntry(
+  relationShipType: string,
+  informantEntryRef: string
+) {
+  return {
+    fullUrl: `urn:uuid:${uuid()}`,
+    resource: {
+      resourceType: 'RelatedPerson',
+      relationship: {
+        coding: [
+          {
+            system:
+              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            code: relationShipType
+          }
+        ]
+      },
+      patient: {
+        reference: informantEntryRef
+      }
+    }
+  }
+}
+
 export async function createPersonEntry(
   nid: string | null,
   firstNames: [string] | null,
@@ -176,6 +239,7 @@ export async function createPersonEntry(
   gender: 'male' | 'female' | 'unknown',
   phoneNumber: string | null,
   birthDate: string | null,
+  deathDate: string | null,
   authHeader: string
 ) {
   return {
@@ -222,7 +286,9 @@ export async function createPersonEntry(
             )
           ]
         : [],
-      birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT)
+      birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT),
+      deceasedBoolean: !!deathDate,
+      deceasedDateTime: dateFormatter(deathDate, EVENT_DATE_FORMAT)
     }
   }
 }

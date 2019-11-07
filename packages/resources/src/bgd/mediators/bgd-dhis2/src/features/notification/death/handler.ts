@@ -12,9 +12,10 @@
 import * as Hapi from 'hapi'
 import {
   createPersonEntry,
+  createRelatedPersonEntry,
   createDeathEncounterEntry,
   createBundle,
-  createComposition,
+  createDeathComposition,
   createTaskEntry,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
@@ -87,21 +88,13 @@ export async function deathNotificationHandler(
     notification.deceased.sex || 'unknown',
     null,
     notification.deceased.date_birth,
+    notification.death_date,
     request.headers.authorization
   )
-  const mother = await createPersonEntry(
-    notification.mother.nid || null,
-    notification.mother.first_names_bn || null,
-    notification.mother.last_name_bn,
-    notification.mother.first_names_en || null,
-    notification.mother.last_name_en,
-    notification.permanent_address,
-    'female',
-    notification.phone_number,
-    null,
-    request.headers.authorization
-  )
-  const father = await createPersonEntry(
+
+  // Father is always picked as Informant
+  // TODO: may need to change it based on the available data from dhis2
+  const informant = await createPersonEntry(
     notification.father.nid || null,
     notification.father.first_names_bn || null,
     notification.father.last_name_bn,
@@ -111,8 +104,10 @@ export async function deathNotificationHandler(
     'male',
     notification.phone_number,
     null,
+    null,
     request.headers.authorization
   )
+  const relatedPerson = createRelatedPersonEntry('FATHER', informant.fullUrl)
 
   if (!notification.place_of_death) {
     throw new Error('Could not find any place of death')
@@ -130,11 +125,9 @@ export async function deathNotificationHandler(
     deceased.fullUrl
   )
 
-  const composition = createComposition(
-    'DEATH',
+  const composition = createDeathComposition(
     deceased.fullUrl,
-    mother.fullUrl,
-    father.fullUrl,
+    relatedPerson.fullUrl,
     encounter.fullUrl
   )
   const lastRegLocId = notification.union_death_ocurred.id
@@ -158,8 +151,8 @@ export async function deathNotificationHandler(
   entries.push(composition)
   entries.push(task)
   entries.push(deceased)
-  entries.push(mother)
-  entries.push(father)
+  entries.push(relatedPerson)
+  entries.push(informant)
   entries.push(encounter)
 
   const bundle = createBundle(entries)
