@@ -42,7 +42,6 @@ export class InboxController {
   private store: AppStore
   private client: ApolloClient<{}>
   private syncRunning: boolean = false
-  private syncCount: number = 0
 
   constructor(store: AppStore) {
     this.store = store
@@ -67,7 +66,6 @@ export class InboxController {
   }
 
   private sync = async () => {
-    this.syncCount++
     if (this.syncRunning) {
       return
     }
