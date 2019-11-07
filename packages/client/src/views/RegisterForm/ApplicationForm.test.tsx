@@ -304,7 +304,7 @@ describe('when user has starts a new application', () => {
             app.update()
           })
 
-          it('renders list of document upload field', () => {
+          it('renders list of document upload field', async () => {
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
