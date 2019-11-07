@@ -27,6 +27,7 @@ services:
 
   influxdb:
     image: influxdb:1.7
+    build:
       context: .
       dockerfile: ./infrastructure/influxdb/Dockerfile
     restart: unless-stopped
