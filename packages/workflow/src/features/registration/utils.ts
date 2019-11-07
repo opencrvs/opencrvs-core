@@ -156,7 +156,7 @@ export function getCompositionEventType(compoition: fhir.Composition) {
     compoition.type.coding &&
     compoition.type.coding[0].code
 
-  if (eventType === 'death-application') {
+  if (eventType === 'death-application' || eventType === 'death-notification') {
     return EVENT_TYPE.DEATH
   } else {
     return EVENT_TYPE.BIRTH
