@@ -54,6 +54,8 @@ import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollecto
 import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
 import { Payment } from './views/PrintCertificate/Payment'
 import { CollectorForm } from '@register/views/PrintCertificate/collectorForm/CollectorForm'
+import { ReportList } from '@register/views/Performance/ReportList'
+import { Report } from '@register/views/Performance/Report'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -280,6 +282,18 @@ export class App extends React.Component<IAppProps> {
                                               routes.SELECT_BIRTH_MAIN_CONTACT_POINT
                                             }
                                             component={SelectContactPoint}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REPORT_LIST
+                                            }
+                                            component={ReportList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.PERFORMANCE_REPORT}
+                                            component={Report}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
