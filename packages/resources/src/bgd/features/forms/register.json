@@ -4637,6 +4637,7 @@
         {
           "id": "primaryCaregiver",
           "viewType": "form",
+          "hasDocumentSection": "true",
           "name": {
             "defaultMessage": "Parents details",
             "description": "Form section name or title for primary caregiver",
@@ -10531,6 +10532,37 @@
                     {
                       "action": "hide",
                       "expression": "(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === \"between46daysTo5yrs\") || !draftData.child || !draftData.child.childBirthDate"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "birthAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
+                      }
                     }
                   ],
                   "mapping": {
@@ -18025,6 +18057,37 @@
                         "defaultMessage": "Proof of date of birth of deceased",
                         "description": "Option for radio group field: Type of Document To Upload",
                         "id": "form.field.label.deceasedDoBProof"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
                       }
                     }
                   ],

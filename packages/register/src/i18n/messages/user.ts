@@ -61,6 +61,21 @@ interface IUserMessages {
   API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
+  currentPassword: MessageDescriptor
+  changePassword: MessageDescriptor
+  changePasswordMessage: MessageDescriptor
+  newPasswordLabel: MessageDescriptor
+  passwordUpdateFormValidationMsg: MessageDescriptor
+  passwordLengthCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordCaseCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  passwordNumberCharacteristicsForPasswordUpdateForm: MessageDescriptor
+  confirmPasswordLabel: MessageDescriptor
+  matchedPasswordMsg: MessageDescriptor
+  mismatchedPasswordMsg: MessageDescriptor
+  confirmButtonLabel: MessageDescriptor
+  requiredfield: MessageDescriptor
+  incorrectPassword: MessageDescriptor
+  passwordUpdated: MessageDescriptor
 }
 
 interface IDynamicUserMessages {
@@ -262,6 +277,82 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'System',
     description: 'System header',
     id: 'settings.system.tile'
+  },
+  currentPassword: {
+    id: 'password.label.current',
+    defaultMessage: 'Current password',
+    description: 'Current password label'
+  },
+  changePassword: {
+    defaultMessage: 'Change password',
+    description: 'Password change modal header',
+    id: 'settings.changePassword'
+  },
+  changePasswordMessage: {
+    defaultMessage:
+      'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
+    description: 'Password change message',
+    id: 'newPassword.instruction'
+  },
+  newPasswordLabel: {
+    id: 'password.label.new',
+    defaultMessage: 'New password:',
+    description: 'New password label'
+  },
+  passwordUpdateFormValidationMsg: {
+    id: 'password.validation.msg',
+    defaultMessage: 'Password must have:',
+    description: 'Password validation message'
+  },
+  passwordLengthCharacteristicsForPasswordUpdateForm: {
+    id: 'password.minLength',
+    defaultMessage: '{min} characters minimum',
+    description: 'Password validation'
+  },
+  passwordCaseCharacteristicsForPasswordUpdateForm: {
+    id: 'password.cases',
+    defaultMessage: 'Contain upper and lower cases',
+    description: 'Password validation'
+  },
+  passwordNumberCharacteristicsForPasswordUpdateForm: {
+    id: 'password.number',
+    defaultMessage: 'At least one number',
+    description: 'Password validation'
+  },
+  confirmPasswordLabel: {
+    id: 'password.label.confirm',
+    defaultMessage: 'Confirm new password',
+    description: 'Confirm password label'
+  },
+  matchedPasswordMsg: {
+    id: 'password.match',
+    defaultMessage: 'Passwords match',
+    description: 'Password validation'
+  },
+  mismatchedPasswordMsg: {
+    id: 'password.mismatch',
+    defaultMessage: 'Passwords do not match',
+    description: 'Password validation'
+  },
+  confirmButtonLabel: {
+    id: 'buttons.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Label used for confirm button'
+  },
+  requiredfield: {
+    id: 'register.form.required',
+    defaultMessage: 'This field is required',
+    description: 'Required field error message'
+  },
+  incorrectPassword: {
+    id: 'system.user.settings.incorrectPassword',
+    defaultMessage: 'Current password incorrect. Please try again.',
+    description: 'Response message for incorrect password for password change'
+  },
+  passwordUpdated: {
+    id: 'system.user.settings.passwordUpdated',
+    defaultMessage: 'Password was successfully changed',
+    description: 'Password change message on success'
   }
 }
 
