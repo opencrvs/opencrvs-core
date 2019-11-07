@@ -3,6 +3,7 @@ import { InboxController } from '@register/InboxController'
 import { DOWNLOAD_STATUS } from '@register/applications'
 import { Action } from './forms'
 import { Event } from './components/DuplicateDetails'
+import { ErrorResponse } from 'apollo-link-error'
 
 describe('Inbox Controller', () => {
   it('should starts the interval', () => {
@@ -128,9 +129,10 @@ describe('Inbox Controller', () => {
     // @ts-ignore
     const inboxController = new InboxController(store)
 
-    const err = new Error('boom')
-    // @ts-ignore
-    err.networkError = new Error('network boom')
+    const err: Partial<ErrorResponse> = {
+      networkError: new Error('network boom')
+    }
+
     inboxController.client = { query: jest.fn().mockRejectedValueOnce(err) }
 
     await inboxController.sync()
@@ -169,8 +171,7 @@ describe('Inbox Controller', () => {
     // @ts-ignore
     const inboxController = new InboxController(store)
 
-    const err = new Error('boom')
-    // @ts-ignore
+    const err: Partial<ErrorResponse> = {}
     inboxController.client = { query: jest.fn().mockRejectedValueOnce(err) }
 
     await inboxController.sync()
@@ -209,9 +210,9 @@ describe('Inbox Controller', () => {
     // @ts-ignore
     const inboxController = new InboxController(store)
 
-    const err = new Error('boom')
-    // @ts-ignore
-    err.networkError = new Error('network boom')
+    const err: Partial<ErrorResponse> = {
+      networkError: new Error('network-boom')
+    }
     inboxController.client = { query: jest.fn().mockRejectedValueOnce(err) }
 
     await inboxController.sync()
@@ -250,8 +251,7 @@ describe('Inbox Controller', () => {
     // @ts-ignore
     const inboxController = new InboxController(store)
 
-    const err = new Error('boom')
-    // @ts-ignore
+    const err: Partial<ErrorResponse> = {}
     inboxController.client = { query: jest.fn().mockRejectedValueOnce(err) }
 
     await inboxController.sync()
