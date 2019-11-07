@@ -51,7 +51,7 @@ import TransitionWrapper from '@register/components/TransitionWrapper'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { VerifyCollector } from '@register/views/PrintCertificate/VerifyCollector'
 import { ReviewCertificateAction } from '@register/views/PrintCertificate/ReviewCertificateAction'
-import { Payment } from '@register//views/PrintCertificate/Payment'
+import { Payment } from '@register/views/PrintCertificate/Payment'
 import { CollectorForm } from '@register/views/PrintCertificate/collectorForm/CollectorForm'
 
 interface IAppProps {

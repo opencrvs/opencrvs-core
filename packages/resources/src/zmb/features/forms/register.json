@@ -3492,9 +3492,7 @@
                     },
                     {
                       "operation": "isValidParentsBirthDate",
-                      "parameters": [
-                        5
-                      ],
+                      "parameters": [5],
                       "dependencies": []
                     }
                   ],
@@ -5993,9 +5991,7 @@
                     },
                     {
                       "operation": "isValidParentsBirthDate",
-                      "parameters": [
-                        5
-                      ]
+                      "parameters": [5]
                     }
                   ],
                   "conditionals": [
@@ -7440,8 +7436,9 @@
                     "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
+                  "preventContinueIfError": true,
                   "hideHeader": true,
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -7478,7 +7475,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
@@ -7544,7 +7541,7 @@
                           "description": "Input label for phone input",
                           "id": "form.field.label.phoneNumber"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
@@ -9867,6 +9864,10 @@
                     {
                       "action": "hide",
                       "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"HEAD_OF_THE_INSTITUTE\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === \"OTHER\")"
                     }
                   ],
                   "readonly": true,
