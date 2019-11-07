@@ -72,12 +72,15 @@ export async function deathNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification = JSON.parse(
-    request.payload as string
-  ) as IDeathNotification
+  const notification =
+    typeof request.payload === 'string'
+      ? (JSON.parse(request.payload as string) as IDeathNotification)
+      : (request.payload as IDeathNotification)
 
   const deceased = await createPersonEntry(
     notification.deceased.nid || null,
+    notification.deceased.first_names_bn || null,
+    notification.deceased.last_name_bn,
     notification.deceased.first_names_en || null,
     notification.deceased.last_name_en,
     null,
@@ -88,6 +91,8 @@ export async function deathNotificationHandler(
   )
   const mother = await createPersonEntry(
     notification.mother.nid || null,
+    notification.mother.first_names_bn || null,
+    notification.mother.last_name_bn,
     notification.mother.first_names_en || null,
     notification.mother.last_name_en,
     notification.permanent_address,
@@ -97,7 +102,9 @@ export async function deathNotificationHandler(
     request.headers.authorization
   )
   const father = await createPersonEntry(
-    null,
+    notification.father.nid || null,
+    notification.father.first_names_bn || null,
+    notification.father.last_name_bn,
     notification.father.first_names_en || null,
     notification.father.last_name_en,
     notification.permanent_address,

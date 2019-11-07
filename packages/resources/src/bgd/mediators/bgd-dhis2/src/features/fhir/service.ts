@@ -14,6 +14,8 @@ import {
   fetchAllAddressLocations,
   fetchCRVSOfficeByParentLocation
 } from '@bgd-dhis2-mediator/features/fhir/api'
+import * as moment from 'moment'
+import { EVENT_DATE_FORMAT } from '@bgd-dhis2-mediator/constants'
 
 export interface IIncomingAddress {
   division: {
@@ -168,6 +170,8 @@ export async function createPersonEntry(
   nid: string | null,
   firstNames: [string] | null,
   lastName: string,
+  firstNamesEng: [string] | null,
+  lastNameEng: string,
   addressObject: IIncomingAddress | null,
   gender: 'male' | 'female' | 'unknown',
   phoneNumber: string | null,
@@ -191,6 +195,11 @@ export async function createPersonEntry(
       name: [
         {
           use: 'en',
+          family: [lastNameEng],
+          given: firstNamesEng
+        },
+        {
+          use: 'bn',
           family: [lastName],
           given: firstNames
         }
@@ -213,7 +222,7 @@ export async function createPersonEntry(
             )
           ]
         : [],
-      birthDate
+      birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT)
     }
   }
 }
@@ -368,4 +377,11 @@ export async function convertAddressObjToFHIRPermanentAddress(
     postalCode: '',
     country: 'BGD'
   }
+}
+
+export function dateFormatter(date: string | null, formatString: string) {
+  if (!date) {
+    return null
+  }
+  return moment(Number(date)).format(formatString)
 }

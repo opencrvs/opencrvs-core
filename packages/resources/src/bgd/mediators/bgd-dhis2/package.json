@@ -33,6 +33,7 @@
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
+    "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
     "node-verhoeff": "^0.0.11",
     "openhim-mediator-utils": "^0.2.3",
