@@ -48,7 +48,7 @@ import { messages } from '@register/i18n/messages/views/header'
 import {
   goToEvents as goToEventsAction,
   goToHome,
-  goToPerformance,
+  goToPerformanceHome,
   goToSearch,
   goToSearchResult,
   goToSettings
@@ -78,7 +78,7 @@ type IProps = IntlShapeProps & {
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
   goToHomeAction: typeof goToHome
-  goToPerformanceAction: typeof goToPerformance
+  goToPerformanceAction: typeof goToPerformanceHome
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -400,7 +400,7 @@ class HeaderComp extends React.Component<IProps, IState> {
 
 export const Header = connect(
   (store: IStoreState) => ({
-    activeMenuItem: window.location.href.includes('performance-home')
+    activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
       : ACTIVE_MENU_ITEM.APPLICATIONS,
     language: store.i18n.language,
@@ -413,6 +413,6 @@ export const Header = connect(
     goToSettings,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
-    goToPerformanceAction: goToPerformance
+    goToPerformanceAction: goToPerformanceHome
   }
 )(injectIntl<'intl', IProps>(HeaderComp))

@@ -36,12 +36,13 @@ import {
   VERIFY_COLLECTOR,
   REVIEW_CERTIFICATE,
   PRINT_CERTIFICATE_PAYMENT,
-  PERFORMANCE_HOME
+  PERFORMANCE_REPORT_LIST,
+  PERFORMANCE_REPORT
 } from '@register/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getToken, getCurrentUserScope } from '@register/utils/authUtils'
 import { Event } from '@register/forms'
-import { PERFORMANCE_HOME_TAB_WEEKY } from '@register/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -149,10 +150,16 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
   return push(formatUrl(path, { tabId, selectorId }))
 }
 
-export function goToPerformance() {
+export function goToPerformanceHome() {
   return push(
-    formatUrl(PERFORMANCE_HOME, { tabId: PERFORMANCE_HOME_TAB_WEEKY })
+    formatUrl(PERFORMANCE_REPORT_LIST, {
+      reportType: PERFORMANCE_REPORT_TYPE_WEEKY
+    })
   )
+}
+
+export function goToPerformanceReport(reportType: string, title: string) {
+  return push(PERFORMANCE_REPORT, { reportType, title })
 }
 
 export function goToSearchResult(

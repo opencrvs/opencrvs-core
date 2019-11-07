@@ -25,7 +25,7 @@ import styled from '@register/styledComponents'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
-  goToPerformance as goToPerformanceAction
+  goToPerformanceHome as goToPerformanceAction
 } from '@register/navigation'
 import { redirectToAuthentication } from '@register/profile/profileActions'
 import { getLanguages } from '@register/i18n/selectors'
