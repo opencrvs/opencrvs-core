@@ -1983,7 +1983,7 @@
         "register.selectInformant.birthErrorMessage": "Please select who is present and applying.",
         "register.selectInformant.birthInformantTitle": "কে জন্ম নিবন্ধনের জন্য আবেদন করছে?",
         "register.selectInformant.daughter": "কন্যা",
-        "register.selectInformant.deathErrorMessage": "দয়া করে মৃতের সাথে সম্পর্ক নির্বাচন করুন।",
+        "register.selectInformant.deathErrorMessage": "অনুগ্রহ পূর্বক মৃত ব্যাক্তির সাথে বিদ্যমান সম্পর্ক নির্বাচন করুন।",
         "register.selectInformant.deathInformantTitle": "What relationship does the applicant have to the deceased?",
         "register.selectInformant.extendedFamily": "যৌথ পরিবার",
         "register.selectInformant.newBirthRegistration": "জন্মের আবেদন",
