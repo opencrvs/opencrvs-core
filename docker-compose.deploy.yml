@@ -108,6 +108,7 @@ services:
   influxdb:
     volumes:
       - '/data/influxdb:/var/lib/influxdb'
+      - '/backups/influxdb:/backups/influxdb'
     deploy:
       replicas: 1
       placement:

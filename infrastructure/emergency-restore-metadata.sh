@@ -7,6 +7,10 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
+
+# By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
+# This script clears all data and restores a specific day's data.  It is irreversable, so use with caution.
+
 print_usage_and_exit () {
     echo 'Usage: ./emergency-restore-metadata.sh Mon|Tue|Wed|Thu|Fri|Sat|Sun'
     echo "Script must receive a day of the week parameter to restore data from that specific day"
@@ -47,5 +51,19 @@ then
     docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
      -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/user-mgnt.gz"
     docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/esbackup/snapshot_$1/_restore?pretty"
+    # get id and name of any running influxdb container
+    INFLUXDB_CONTAINER_ID=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'
+    INFLUXDB_CONTAINER_NAME=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'
+    # get ip of any node containing any running influxdb container
+    INFLUXDB_HOSTNAME=$(docker service ps -f "desired-state=running" opencrvs_influxdb) | awk '{print $14}'
+    INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
+    SSH_USER=${SSH_USER:-root}
+    # backup influxdb
+    OWN_IP=$(hostname -I | cut -d' ' -f1)
+    if [ $OWN_IP == $INFLUXDB_HOST ]; then
+      docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -database ocrvs /backups/influxdb
+    else
+      ssh $SSH_USER@$INFLUXDB_HOST 'docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -database ocrvs /backups/influxdb'
+    fi
 fi
 

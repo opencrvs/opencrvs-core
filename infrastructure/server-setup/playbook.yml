@@ -175,6 +175,14 @@
         path: /data/influxdb
         state: directory
 
+    - name: 'Create influxdb backup directory'
+      file:
+        path: /backups/influxdb
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
     - name: 'Create acme file for traefik'
       file:
         path: /data/traefik/acme.json

@@ -21,7 +21,29 @@ Add your users GIT SSH keys to all nodes
 curl https://github.com/<git-user>.keys >> ~/.ssh/authorized_keys
 ```
 
-Run the configuration script with:
+Ensure the manager node can ssh into worker nodes (Required for automated backups)
+
+SSH into manager node and create ssh key. Press Enter for defaults and no passphrase
+
+```
+ssh-keygen
+```
+
+Print the key for copying:
+
+```
+cat ~/.ssh/id_rsa.pub
+```
+
+Copy the key and SSH into worker nodes to add manager key into node authorised keys
+
+```
+echo "<manager-node-public-key>" >> ~/.ssh/authorized_keys
+```
+
+Repeat for all workers
+
+un the configuration script from your client computer (You must have Ansible installed):
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"

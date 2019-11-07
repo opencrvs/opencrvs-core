@@ -27,6 +27,8 @@ services:
 
   influxdb:
     image: influxdb:1.7
+      context: .
+      dockerfile: ./infrastructure/influxdb/Dockerfile
     restart: unless-stopped
 
   hearth:
