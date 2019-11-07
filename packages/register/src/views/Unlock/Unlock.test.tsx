@@ -18,7 +18,6 @@ import { storage } from '@register/storage'
 import { pinOps } from '@register/views/Unlock/ComparePINs'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@register/utils/constants'
-import { waitForElement } from '@register/tests/wait-for-element'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -138,9 +137,13 @@ describe('For wrong inputs', () => {
     await flushPromises()
     testComponent.component.update()
 
-    const message = await waitForElement(testComponent.component, '#errorMsg')
-
-    expect(message.hostNodes().text()).toBe('Last Try')
+    setTimeout(() => {
+      const errorElem = testComponent.component
+        .find('#errorMsg')
+        .hostNodes()
+        .text()
+      expect(errorElem).toBe('Last Try')
+    }, 2000)
   })
 
   it('Should display Locked Message', async () => {
