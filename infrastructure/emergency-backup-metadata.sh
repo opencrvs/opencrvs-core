@@ -11,9 +11,6 @@
 # By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
 # Every seven days the backups are overwritten to save harddisk space.  
 
-DIR=$(cd "$(dirname "$0")"; pwd)
-echo "Working dir: $DIR"
-
 if [ "$DEV" = "true" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
@@ -23,33 +20,33 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-DOW=$(date +"%a")
-
+DOW_UPPERCASE=$(date +"%a")
+DOW=${DOW_UPPERCASE,,}
 mkdir -p /backups/$DOW
 chmod g+rwx /backups/$DOW
 
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
+# Backup/Overwrite Hearth, OpenHIM & User database
+docker run --rm -v $DIR/backups/$DOW:/backups/$DOW --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/backups/$DOW/hearth-dev.gz"
-
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v $DIR/backups/$DOW:/backups/$DOW --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/backups/$DOW/openhim-dev.gz"
-
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v $DIR/backups/$DOW:/backups/$DOW --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/$DOW/user-mgnt.gz"
-
-docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/esbackup/snapshot_$DOW?wait_for_completion=true&pretty"
-
-# get id and name of any running influxdb container
-INFLUXDB_CONTAINER_ID=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'
-INFLUXDB_CONTAINER_NAME=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'
-# get ip of any node containing any running influxdb container
-INFLUXDB_HOSTNAME=$(docker service ps -f "desired-state=running" opencrvs_influxdb) | awk '{print $14}'
+# Backup/Overwrite Elasticsearch database
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/backups/elasticsearch/", "compress": true }}'
+docker run --rm --network=$NETWORK appropriate/curl curl -X DELETE "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$DOW"
+docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$DOW?wait_for_completion=true&pretty"
+# Backup/Overwrite InfluxDB database
+if [ -d "/backups/influxdb/$DOW" ]; then rm -Rf /backups/influxdb/$DOW; fi
+INFLUXDB_CONTAINER_ID=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'`
+INFLUXDB_CONTAINER_NAME=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'`
+INFLUXDB_HOSTNAME=`echo $(docker service ps -f "desired-state=running" opencrvs_influxdb) | awk '{print $14}'`
 INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
 SSH_USER=${SSH_USER:-root}
-# backup influxdb
 OWN_IP=$(hostname -I | cut -d' ' -f1)
 if [ $OWN_IP == $INFLUXDB_HOST ]; then
-  docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb
+  docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$DOW
 else
-  ssh $SSH_USER@$INFLUXDB_HOST 'docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb'
+  ssh $SSH_USER@$INFLUXDB_HOST 'docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$DOW'
 fi
+

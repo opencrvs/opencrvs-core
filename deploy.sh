@@ -111,6 +111,3 @@ if [ "$DEV" = "true" ]; then
 else
   NETWORK=opencrvs_overlay_net
 fi
-
-echo "Registering elastic search backup repository with running elasticsearch container..."
-docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/esbackup' -d '{ "type": "fs", "settings": { "location": "/backups/elasticsearch", "compress": true }}'

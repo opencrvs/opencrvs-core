@@ -12,14 +12,14 @@
 # This script clears all data and restores a specific day's data.  It is irreversable, so use with caution.
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-restore-metadata.sh Mon|Tue|Wed|Thu|Fri|Sat|Sun'
-    echo "Script must receive a day of the week parameter to restore data from that specific day"
+    echo 'Usage: ./emergency-restore-metadata.sh mon|tue|wed|thu|fri|sat|sun'
+    echo "Script must receive a lowercase day of the week parameter to restore data from that specific day"
     echo "The backup zips you would like to restore from: hearth-dev.gz, openhim-dev.gz and user-mgnt.gz must exist in /backups/<day of the week> folder"
     echo "The elasticsearch backup snapshot file named: snapshot_<day of the week> must exist in the /backups/elasticsearch folder"
     exit 1
 }
 
-if [ -z "$1" ] || { [ $1 != 'Mon' ] && [ $1 != 'Tue' ] && [ $1 != 'Wed' ] && [ $1 != 'Thu' ] && [ $1 != 'Fri' ] && [ $1 != 'Sat' ] && [ $1 != 'Sun' ] ;} ; then
+if [ -z "$1" ] || { [ $1 != 'mon' ] && [ $1 != 'tue' ] && [ $1 != 'wed' ] && [ $1 != 'thu' ] && [ $1 != 'fri' ] && [ $1 != 'sat' ] && [ $1 != 'sun' ] ;} ; then
     echo "Error: Argument for the day of the week is required in position 1.  You must select which day's data you would like to roll back to."
     print_usage_and_exit
 fi
@@ -50,7 +50,7 @@ then
      -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/openhim-dev.gz"
     docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
      -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/user-mgnt.gz"
-    docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/esbackup/snapshot_$1/_restore?pretty"
+    docker run --rm --network=$NETWORK appropriate/curl curl -X PUT "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
     # get id and name of any running influxdb container
     INFLUXDB_CONTAINER_ID=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'
     INFLUXDB_CONTAINER_NAME=$(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'
