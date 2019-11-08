@@ -9,6 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { BackArrow } from '@opencrvs/components/lib/icons'
+import { buttonMessages } from '@register/i18n/messages'
+import { goBack } from '@register/navigation'
+import styled from '@register/styledComponents'
 import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
 import { Header } from '@register/views/Performance/utils'
 import * as React from 'react'
@@ -17,9 +25,14 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 
+const BackButton = styled(TertiaryButton)`
+  margin-top: 24px;
+`
+
 interface ReportProps {
   title: string
   reportType: string
+  goBack: typeof goBack
 }
 
 type Props = ReportProps &
@@ -30,9 +43,16 @@ type State = {}
 
 class ReportComponent extends React.Component<Props, State> {
   render() {
-    const { reportType, title } = this.props
+    const { reportType, title, intl } = this.props
     return (
       <PerformanceContentWrapper tabId={reportType}>
+        <BackButton
+          align={ICON_ALIGNMENT.LEFT}
+          icon={() => <BackArrow />}
+          onClick={this.props.goBack}
+        >
+          {intl.formatMessage(buttonMessages.back)}
+        </BackButton>
         <Header>{title}</Header>
       </PerformanceContentWrapper>
     )
@@ -48,4 +68,7 @@ function mapStateToProps(state: State, props: Props) {
   }
 }
 
-export const Report = connect(mapStateToProps)(injectIntl(ReportComponent))
+export const Report = connect(
+  mapStateToProps,
+  { goBack }
+)(injectIntl(ReportComponent))
