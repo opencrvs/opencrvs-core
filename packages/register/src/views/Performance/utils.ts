@@ -14,5 +14,4 @@ import styled from '@register/styledComponents'
 export const Header = styled.h3`
   color: ${({ theme }) => theme.colors.menuBackground};
   ${({ theme }) => theme.fonts.h4Style};
-  margin-left: 80px;
 `
