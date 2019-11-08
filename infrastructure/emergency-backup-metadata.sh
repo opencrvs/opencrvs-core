@@ -11,6 +11,8 @@
 # By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
 # Every seven days the backups are overwritten to save harddisk space.  
 
+DIR=$(pwd)
+
 if [ "$DEV" = "true" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
