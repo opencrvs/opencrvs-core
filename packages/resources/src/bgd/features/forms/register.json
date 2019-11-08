@@ -5299,7 +5299,10 @@
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
                             "reasonsNotApplying",
-                            "primaryCaregiverType"
+                            "primaryCaregiverType",
+                            "",
+                            false,
+                            true
                           ]
                         }
                       ]
@@ -5314,7 +5317,14 @@
                             "reasonsNotApplying",
                             "primaryCaregiverType",
                             "",
-                            ["OTHER", "LEGAL_GUARDIAN"]
+                            [
+                              "MOTHER_AND_FATHER",
+                              "MOTHER",
+                              "FATHER",
+                              "INFORMANT",
+                              "OTHER",
+                              "LEGAL_GUARDIAN"
+                            ]
                           ]
                         }
                       ]
