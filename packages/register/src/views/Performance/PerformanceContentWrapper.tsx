@@ -18,6 +18,7 @@ import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
 import { IconTab } from '@register/views/RegistrationHome/RegistrationHome'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
+import styled from 'styled-components'
 
 type Props = WrappedComponentProps & { tabId: string }
 
@@ -26,6 +27,10 @@ type State = {}
 const TAB_ID = {
   weekly: PERFORMANCE_REPORT_TYPE_WEEKY
 }
+
+const Content = styled.div`
+  margin: 0 80px;
+`
 
 class PerformanceContentWrapperComponent extends React.Component<Props, State> {
   renderTopBar() {
@@ -50,7 +55,7 @@ class PerformanceContentWrapperComponent extends React.Component<Props, State> {
         <Header />
         {this.renderTopBar()}
 
-        {this.props.children}
+        <Content>{this.props.children}</Content>
       </Container>
     )
   }
