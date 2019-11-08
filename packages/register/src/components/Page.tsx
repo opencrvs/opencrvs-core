@@ -31,6 +31,7 @@ import { Ii18n } from '@register/type/i18n'
 import { USER_DETAILS } from '@register/utils/userUtils'
 import { getDefaultLanguage } from '@register/i18n/utils'
 import { getInitialApplicationsLoaded } from '@register/applications/selectors'
+import { isRegisterFormReady } from '@register/forms/register/application-selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -98,6 +99,7 @@ interface IPageProps {
   language?: string
   initialApplicationsLoaded: boolean
   offlineDataLoaded: boolean
+  registerFormLoaded: boolean
   loadingError: boolean
 }
 
@@ -134,8 +136,8 @@ class Component extends React.Component<
   async componentDidMount() {
     const values = parse(this.props.location.search)
 
-    await this.props.checkAuth(values)
     this.props.setInitialApplications()
+    await this.props.checkAuth(values)
 
     const userDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
@@ -150,9 +152,11 @@ class Component extends React.Component<
     const {
       initialApplicationsLoaded,
       offlineDataLoaded,
+      registerFormLoaded,
       children
     } = this.props
-    if (offlineDataLoaded && initialApplicationsLoaded) {
+
+    if (offlineDataLoaded && initialApplicationsLoaded && registerFormLoaded) {
       return (
         <div id="readyApplication">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -169,7 +173,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
     language: getLanguage(store),
     initialApplicationsLoaded: getInitialApplicationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
-    loadingError: getOfflineLoadingError(store)
+    loadingError: getOfflineLoadingError(store),
+    registerFormLoaded: isRegisterFormReady(store)
   }
 }
 

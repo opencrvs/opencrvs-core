@@ -90,8 +90,7 @@ function checkIfDone(
 
   if (
     isOfflineDataLoaded(newState.offlineData) &&
-    (!oldState.offlineDataLoaded ||
-      oldState.offlineData !== newState.offlineData)
+    !oldState.offlineDataLoaded
   ) {
     return loop(
       { ...newState, offlineDataLoaded: true },
@@ -102,6 +101,25 @@ function checkIfDone(
       ])
     )
   }
+
+  if (
+    /*
+     * Data was updated with a fresh version from resources
+     */
+    isOfflineDataLoaded(oldState.offlineData) &&
+    isOfflineDataLoaded(newState.offlineData) &&
+    oldState.offlineData !== newState.offlineData
+  ) {
+    return loop(
+      newState,
+      Cmd.list([
+        ...(cmd ? [cmd] : []),
+        Cmd.run(saveOfflineData, { args: [newState.offlineData] }),
+        Cmd.action(actions.offlineDataUpdated(newState.offlineData))
+      ])
+    )
+  }
+
   return loopWithState
 }
 
@@ -154,7 +172,10 @@ function reducer(
             offlineData,
             offlineDataLoaded
           },
-          Cmd.list([Cmd.none])
+          Cmd.list([
+            // Try loading data regardless as it might have been updated.
+            navigator.onLine ? dataLoadingCmds : Cmd.none
+          ])
         )
       }
       return loop(state, dataLoadingCmds)

@@ -23,7 +23,12 @@ export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
   const hasAllRequiredData =
-    state.locations && state.facilities && state.forms && state.languages
+    state.locations &&
+    state.facilities &&
+    state.forms &&
+    state.languages &&
+    state.assets &&
+    state.templates
 
   return Boolean(hasAllRequiredData)
 }
