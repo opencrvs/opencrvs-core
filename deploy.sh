@@ -104,10 +104,3 @@ if [ $3 == "--restore-metadata=yes" ] ; then
     echo
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
 fi
-
-if [ "$DEV" = "true" ]; then
-  NETWORK=opencrvs_default
-  echo "Working in DEV mode"
-else
-  NETWORK=opencrvs_overlay_net
-fi
