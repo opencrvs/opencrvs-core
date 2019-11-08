@@ -137,7 +137,7 @@ class Component extends React.Component<
     const values = parse(this.props.location.search)
 
     this.props.setInitialApplications()
-    await this.props.checkAuth(values)
+    this.props.checkAuth(values)
 
     const userDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
