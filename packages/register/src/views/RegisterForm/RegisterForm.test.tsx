@@ -376,6 +376,43 @@ describe('when user is in the register form for death event', () => {
       selectOption(component, '#iDType', 'Birth Registration Number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
+  })
+
+  describe('when user is in contact point page', () => {
+    it('shows error if click continue without any value', async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+      component
+        .find('#next_section')
+        .hostNodes()
+        .simulate('click')
+
+      await waitForElement(component, '#contactPoint_error')
+      expect(
+        component
+          .find('#contactPoint_error')
+          .hostNodes()
+          .text()
+      ).toBe('Required for registration')
+    })
 
     it('renders loader button when idType is National ID', async () => {
       const testComponent = await createTestComponent(

@@ -40,6 +40,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
+    cy.wait(600)
     cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
@@ -153,6 +154,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01678945638'
     )
+    cy.wait(600)
     cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
@@ -304,6 +306,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01741123963'
     )
+    cy.wait(600)
     cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
@@ -419,6 +422,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01753741963'
     )
+    cy.wait(600)
     cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
@@ -581,6 +585,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01852741963'
     )
+    cy.wait(600)
     cy.get('#next_section').click()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
