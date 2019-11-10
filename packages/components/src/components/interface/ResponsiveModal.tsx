@@ -151,7 +151,7 @@ export class ResponsiveModal extends React.Component<IProps> {
           <Header>
             <Title>{title}</Title>
             <CircleButton type="button" onClick={handleClose}>
-              <Cross />
+              <Cross color="currentColor" />
             </CircleButton>
           </Header>
           <Body height={contentHeight}>{this.props.children}</Body>

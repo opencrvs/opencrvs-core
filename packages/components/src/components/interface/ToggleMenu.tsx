@@ -12,9 +12,10 @@
 import styled from 'styled-components'
 
 import React = require('react')
-
+import { CircleButton } from '../buttons'
 const ToggleMenuContainer = styled.div`
   position: relative;
+  height: 40px;
   display: flex;
   button {
     padding: 0;
@@ -145,6 +146,25 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 }
 
-const Button = styled.span`
-  cursor: pointer;
+const Button = styled(CircleButton)`
+  height: 40px;
+  width: 40px;
+  &:hover {
+    background-color: transparent;
+  }
+  &:hover:not([data-focus-visible-added]):not(:active) {
+    background-color: transparent;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2pt ${({ theme }) => theme.colors.focus};
+  }
+  &:focus:not([data-focus-visible-added]) {
+    outline: none;
+    box-shadow: none;
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    box-shadow: 0 0 0 2pt ${({ theme }) => theme.colors.focus};
+  }
 `

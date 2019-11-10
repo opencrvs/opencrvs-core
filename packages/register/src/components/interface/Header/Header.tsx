@@ -37,7 +37,7 @@ import {
   SystemBlack,
   SystemBlue
 } from '@opencrvs/components/lib/icons'
-import { IconButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { storage } from '@register/storage'
 import { SCREEN_LOCK } from '@register/components/ProtectedPage'
 import { connect } from 'react-redux'
@@ -90,9 +90,10 @@ interface IState {
   showLogoutModal: boolean
 }
 
-const StyledPrimaryButton = styled(IconButton)`
+const StyledPrimaryButton = styled(PrimaryButton)`
   ${({ theme }) => theme.shadows.mistyShadow};
-
+  width: 42px;
+  height: 42px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
