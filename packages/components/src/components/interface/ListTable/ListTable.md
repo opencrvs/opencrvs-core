@@ -1,8 +1,6 @@
 ```js
-function reviewClicked() {
-  alert('review clicked')
-}
-
+const ArrowDownBlue = require('../../icons').ArrowDownBlue
+const isLoading = true
 const list = [
   {
     name: 'Euan',
@@ -41,24 +39,22 @@ const list = [
     status: 'Active'
   }
 ]
-const ColumnContentAlignment = require('../GridTable')
+
 class ListTableExample extends React.Component {
   render() {
     return (
       <ListTable
+        tableTitle="Table Title"
+        isLoading={isLoading}
         content={list}
         columns={[
           {
             label: 'Name',
-            icon: name => {
-              return (
-                <>
-                  <DefaultProfilePhoto /> <span>{name}</span>
-                </>
-              )
-            },
             width: 30,
-            key: 'name'
+            key: 'name',
+            isSortable: true,
+            icon: <ArrowDownBlue />,
+            sortFunction: key => alert(key)
           },
           {
             label: 'Role',
