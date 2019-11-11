@@ -37,36 +37,34 @@ async function transformField(
   fieldBuilderForVal: IFieldBuilderFunction | IFieldBuilders,
   context: any
 ) {
-  if (sourceVal) {
-    if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
-      if (isFieldBuilder(fieldBuilderForVal)) {
-        await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
-        return targetObj
-      }
-
-      throw new Error(
-        `Expected ${JSON.stringify(
-          fieldBuilderForVal
-        )} to be a FieldBuilder object. The current field value is ${JSON.stringify(
-          sourceVal
-        )}.`
-      )
-    }
-
-    if (isBuilderFunction(fieldBuilderForVal)) {
-      // tslint:disable-next-line
-      await fieldBuilderForVal(targetObj, sourceVal, context)
+  if (!(sourceVal instanceof Date) && typeof sourceVal === 'object') {
+    if (isFieldBuilder(fieldBuilderForVal)) {
+      await transformObj(sourceVal, targetObj, fieldBuilderForVal, context)
       return targetObj
     }
 
     throw new Error(
       `Expected ${JSON.stringify(
         fieldBuilderForVal
-      )} to be a FieldBuilderFunction. The current field value is ${JSON.stringify(
+      )} to be a FieldBuilder object. The current field value is ${JSON.stringify(
         sourceVal
       )}.`
     )
   }
+
+  if (isBuilderFunction(fieldBuilderForVal)) {
+    // tslint:disable-next-line
+    await fieldBuilderForVal(targetObj, sourceVal, context)
+    return targetObj
+  }
+
+  throw new Error(
+    `Expected ${JSON.stringify(
+      fieldBuilderForVal
+    )} to be a FieldBuilderFunction. The current field value is ${JSON.stringify(
+      sourceVal
+    )}.`
+  )
 }
 
 export default async function transformObj(
