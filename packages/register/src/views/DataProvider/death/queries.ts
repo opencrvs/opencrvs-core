@@ -187,6 +187,9 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       }
       registration {
         id
+        contact
+        contactRelationship
+        contactPhoneNumber
         attachments {
           data
           type
