@@ -151,7 +151,7 @@ export const changeHirerchyMutationTransformer = (
     set(
       transformedData,
       transformedFieldName,
-      nestedFieldValueObj[nestedField.name]
+      nestedFieldValueObj[nestedField.name] || ''
     )
 
     if (transformerMethod) {
@@ -163,7 +163,8 @@ export const changeHirerchyMutationTransformer = (
       )
     }
   } else {
-    transformedData[nestedField.name] = nestedFieldValueObj[nestedField.name]
+    transformedData[nestedField.name] =
+      nestedFieldValueObj[nestedField.name] || ''
   }
 
   return transformedData
