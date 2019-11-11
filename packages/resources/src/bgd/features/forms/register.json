@@ -373,11 +373,12 @@
                   "label": {
                     "defaultMessage": " ",
                     "description": "Form section title for contact point",
-                    "id": "register.SelectContactPoint.headings"
+                    "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
                   "previewGroup": "contactPointGroup",
                   "required": true,
+                  "hideHeader":true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",

@@ -627,7 +627,7 @@ export interface GQLMutation {
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
-  markBirthAsRegistered: string
+  markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markEventAsVoided: string
   notADuplicate: string
@@ -635,7 +635,7 @@ export interface GQLMutation {
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsValidated?: string
-  markDeathAsRegistered: string
+  markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   createUser: GQLUser
   activateUser?: string

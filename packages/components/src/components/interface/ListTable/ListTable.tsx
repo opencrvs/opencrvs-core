@@ -21,10 +21,23 @@ const Wrapper = styled.div`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: rgba(53, 67, 93, 0.32) 0px 2px 6px;
 `
+const TableTitleLoading = styled.span`
+  background: ${({ theme }) => theme.colors.background};
+  width: 176px;
+  height: 32px;
+  display: block;
+  margin-bottom: 10px;
+`
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.captionStyle};
-  padding: 0 24px;
+  padding: 10px 0px;
+  box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+
+  & span:last-child {
+    text-align: right;
+    padding-right: 0px;
+  }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -36,22 +49,28 @@ const TableBody = styled.div`
 `
 const RowWrapper = styled.div`
   width: 100%;
-  padding: 0 24px;
   display: flex;
   align-items: center;
-  min-height: 64px;
+  min-height: 50px;
   box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+
+  & span:last-child {
+    text-align: right;
+    padding-right: 0px;
+    display: inline-block;
+  }
 `
 const ContentWrapper = styled.span<{
   width: number
   alignment?: string
-  color?: string
+  sortable?: boolean
 }>`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
-  ${({ color }) => color && `color: ${color};`}
+  cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
+  color: ${({ theme }) => theme.colors.tertiary};
 `
 const ValueWrapper = styled.span<{
   width: number
@@ -74,6 +93,17 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
+const H3 = styled.div`
+  ${({ theme }) => theme.fonts.h5Style};
+`
+const LoadingGrey = styled.span<{
+  width?: number
+}>`
+  background: ${({ theme }) => theme.colors.background};
+  display: inline-block;
+  height: 24px;
+  width: ${({ width }) => (width ? `${width}%` : '100%')};
+`
 
 const defaultConfiguration = {
   pageSize: 10,
@@ -88,6 +118,8 @@ interface IListTableProps {
   pageSize?: number
   totalItems?: number
   currentPage?: number
+  isLoading?: boolean
+  tableTitle?: string
 }
 
 interface IListTableState {
@@ -141,7 +173,9 @@ export class ListTable extends React.Component<
       content,
       noResultText,
       pageSize = defaultConfiguration.pageSize,
-      currentPage = defaultConfiguration.currentPage
+      currentPage = defaultConfiguration.currentPage,
+      isLoading = false,
+      tableTitle
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -149,43 +183,82 @@ export class ListTable extends React.Component<
     return (
       <>
         <Wrapper>
-          {content.length > 0 && width > grid.breakpoints.lg && (
+          {!isLoading && tableTitle && <H3>{tableTitle}</H3>}
+          {isLoading && (
+            <>
+              {tableTitle && <TableTitleLoading />}
+              <TableHeader>
+                {columns.map((preference, index) => (
+                  <ContentWrapper
+                    key={index}
+                    width={preference.width}
+                    alignment={preference.alignment}
+                    sortable={preference.isSortable}
+                  >
+                    <LoadingGrey />
+                  </ContentWrapper>
+                ))}
+              </TableHeader>
+              <TableHeader>
+                {columns.map((preference, index) => (
+                  <ContentWrapper
+                    key={index}
+                    width={preference.width}
+                    alignment={preference.alignment}
+                    sortable={preference.isSortable}
+                  >
+                    <LoadingGrey width={30} />
+                  </ContentWrapper>
+                ))}
+              </TableHeader>
+            </>
+          )}
+          {!isLoading && content.length > 0 && width > grid.breakpoints.lg && (
             <TableHeader>
               {columns.map((preference, index) => (
                 <ContentWrapper
                   key={index}
                   width={preference.width}
                   alignment={preference.alignment}
+                  sortable={preference.isSortable}
+                  onClick={() =>
+                    preference.isSortable &&
+                    preference.sortFunction &&
+                    preference.sortFunction(preference.key)
+                  }
                 >
                   {preference.label}
+                  {preference.icon}
                 </ContentWrapper>
               ))}
             </TableHeader>
           )}
-          <TableBody>
-            {this.getDisplayItems(currentPage, pageSize, content).map(
-              (item, index) => {
-                return (
-                  <RowWrapper key={index} id={'row_' + index}>
-                    {columns.map((preference, indx) => {
-                      return (
-                        <ValueWrapper
-                          key={indx}
-                          width={preference.width}
-                          alignment={preference.alignment}
-                          color={preference.color}
-                        >
-                          {item[preference.key] || (
-                            <Error>{preference.errorValue}</Error>
-                          )}
-                        </ValueWrapper>
-                      )
-                    })}
-                  </RowWrapper>
-                )
-              }
-            )}
-          </TableBody>
+          {!isLoading && (
+            <TableBody>
+              {this.getDisplayItems(currentPage, pageSize, content).map(
+                (item, index) => {
+                  return (
+                    <RowWrapper key={index} id={'row_' + index}>
+                      {columns.map((preference, indx) => {
+                        return (
+                          <ValueWrapper
+                            key={indx}
+                            width={preference.width}
+                            alignment={preference.alignment}
+                            color={preference.color}
+                          >
+                            {item[preference.key] || (
+                              <Error>{preference.errorValue}</Error>
+                            )}
+                          </ValueWrapper>
+                        )
+                      })}
+                    </RowWrapper>
+                  )
+                }
+              )}
+            </TableBody>
+          )}
         </Wrapper>
 
         {totalItems > pageSize && (
