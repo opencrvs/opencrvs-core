@@ -71,7 +71,7 @@ class ListTableExample extends React.Component {
             width: 30,
             key: 'name',
             isSortable: true,
-            sortIcon: <ArrowDownBlue />,
+            icon: <ArrowDownBlue />,
             sortFunction: key => alert(`Sort by: ${key}`)
           },
           {
@@ -79,7 +79,7 @@ class ListTableExample extends React.Component {
             width: 30,
             key: 'role',
             isSortable: true,
-            sortIcon: <ArrowDownBlue />,
+            icon: <ArrowDownBlue />,
             sortFunction: key => alert(`Sort by: ${key}`)
           },
           {

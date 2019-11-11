@@ -283,7 +283,7 @@ export class ListTable extends React.Component<
                         this.state.sortKey === preference.key
                       }
                     >
-                      {preference.sortIcon}
+                      {preference.icon}
                     </ToggleSortIcon>
                   </ContentWrapper>
                 ))}
