@@ -72,7 +72,7 @@ Cypress.Commands.add('login', (userType, options = {}) => {
       })
         .its('body')
         .then(body => {
-          cy.visit(`${Cypress.env('REGISTER_URL')}?token=${body.token}`)
+          cy.visit(`${Cypress.env('CLIENT_URL')}?token=${body.token}`)
         })
     })
 

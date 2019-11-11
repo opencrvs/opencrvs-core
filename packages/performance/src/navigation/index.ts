@@ -23,5 +23,5 @@ export function goToHome() {
 }
 
 export function goToRegister() {
-  window.location.assign(`${window.config.REGISTER_URL}?token=${getToken()}`)
+  window.location.assign(`${window.config.CLIENT_URL}?token=${getToken()}`)
 }

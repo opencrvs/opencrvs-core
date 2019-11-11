@@ -1,0 +1,74 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { IRegisterFormState } from '@client/forms/register/reducer'
+import { IStoreState } from '@opencrvs/client/src/store'
+import {
+  Section,
+  IFormSection,
+  Event,
+  DeathSection,
+  BirthSection
+} from '@client/forms'
+
+const getPartialState = (state: IStoreState): IRegisterFormState =>
+  state.registerForm
+
+function getKey<K extends keyof IRegisterFormState>(
+  state: IStoreState,
+  key: K
+) {
+  return getPartialState(state)[key]
+}
+
+// Register form needs to be ready before this function is called
+export const getRegisterForm = (state: IStoreState) => {
+  const form = getKey(state, 'registerForm')
+  if (!form) {
+    throw new Error(
+      'Selector called before data was ready. This should never happen'
+    )
+  }
+
+  return form
+}
+
+export const getEventRegisterForm = (state: IStoreState, event: Event) => {
+  return getRegisterForm(state)[event]
+}
+
+export const getRegisterFormSection = (
+  state: IStoreState,
+  key: Section,
+  event: Event
+): IFormSection => {
+  const eventRegisterForm = getEventRegisterForm(state, event)
+
+  const section = eventRegisterForm.sections.find(
+    (section: IFormSection) => section.id === key
+  )!
+
+  if (!section) {
+    throw new Error(
+      'Selector called with an unknown section. This should never happen'
+    )
+  }
+
+  return section
+}
+
+export const getBirthSection = (state: IStoreState, section: BirthSection) => {
+  return getRegisterFormSection(state, section, Event.BIRTH)
+}
+
+export const getDeathSection = (state: IStoreState, section: DeathSection) => {
+  return getRegisterFormSection(state, section, Event.DEATH)
+}
