@@ -90,12 +90,14 @@ export function getPrimaryLocationFromLocationList(
     primaryOffice.partOf.reference.split('/')[1]
 
   if (!primaryLocationId) {
-    throw new Error('No primary office found')
+    throw new Error('No primary location found')
   }
 
   const location = locations.find(loc => loc.id === primaryLocationId)
   if (!location) {
-    throw new Error(`Location not found for ${location}`)
+    throw new Error(
+      `No primary location not found for office: ${primaryLocationId}`
+    )
   }
   return location
 }

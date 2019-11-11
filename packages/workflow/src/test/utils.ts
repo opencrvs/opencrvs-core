@@ -778,6 +778,9 @@ export const upazilaMock = JSON.stringify({
       value: 'UPAZILA'
     }
   ],
+  partOf: {
+    reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd9173'
+  },
   physicalType: {
     coding: [
       {
@@ -802,6 +805,9 @@ export const unionMock = JSON.stringify({
       value: 'UNION'
     }
   ],
+  partOf: {
+    reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdxxx'
+  },
   physicalType: {
     coding: [
       {
@@ -826,6 +832,9 @@ export const officeMock = JSON.stringify({
       value: 'CRVS_OFFICE'
     }
   ],
+  partOf: {
+    reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
+  },
   type: {
     coding: [{ code: 'CRVS_OFFICE' }]
   },
