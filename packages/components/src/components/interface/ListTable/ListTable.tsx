@@ -104,6 +104,35 @@ const LoadingGrey = styled.span<{
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
+const TableScroller = styled.div<{
+  height?: number
+}>`
+  height: ${({ height }) => (height ? `${height}px` : 'auto')};
+  overflow: auto;
+  padding-right: 10px;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.scrollBarGrey};
+    border-radius: 10px;
+  }
+`
+const TableHeaderWrapper = styled.div`
+  padding-right: 10px;
+`
+const ToggleSortIcon = styled.div<{
+  toggle?: boolean
+}>`
+  margin-left: 5px;
+  display: inline;
+
+  svg {
+    transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};
+  }
+`
 
 const defaultConfiguration = {
   pageSize: 10,
@@ -114,6 +143,7 @@ interface IListTableProps {
   content: IDynamicValues[]
   columns: IColumn[]
   noResultText: string
+  tableHeight?: number
   onPageChange?: (currentPage: number) => void
   pageSize?: number
   totalItems?: number
@@ -124,6 +154,8 @@ interface IListTableProps {
 
 interface IListTableState {
   width: number
+  sortIconInverted: boolean
+  sortKey: string | null
 }
 
 export class ListTable extends React.Component<
@@ -131,7 +163,9 @@ export class ListTable extends React.Component<
   IListTableState
 > {
   state = {
-    width: window.innerWidth
+    width: window.innerWidth,
+    sortIconInverted: false,
+    sortKey: null
   }
   componentDidMount() {
     window.addEventListener('resize', this.recordWindowWidth)
@@ -167,6 +201,18 @@ export class ListTable extends React.Component<
     return displayItems
   }
 
+  invertSortIcon = (sortKey: string) => {
+    let sortIconInverted: boolean
+
+    if (this.state.sortKey === sortKey || this.state.sortKey === null) {
+      sortIconInverted = !this.state.sortIconInverted
+    } else {
+      sortIconInverted = true
+    }
+    this.setState({ sortIconInverted, sortKey })
+    return true
+  }
+
   render() {
     const {
       columns,
@@ -175,7 +221,8 @@ export class ListTable extends React.Component<
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
-      tableTitle
+      tableTitle,
+      tableHeight = 280
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -214,50 +261,62 @@ export class ListTable extends React.Component<
             </>
           )}
           {!isLoading && content.length > 0 && width > grid.breakpoints.lg && (
-            <TableHeader>
-              {columns.map((preference, index) => (
-                <ContentWrapper
-                  key={index}
-                  width={preference.width}
-                  alignment={preference.alignment}
-                  sortable={preference.isSortable}
-                  onClick={() =>
-                    preference.isSortable &&
-                    preference.sortFunction &&
-                    preference.sortFunction(preference.key)
-                  }
-                >
-                  {preference.label}
-                  {preference.icon}
-                </ContentWrapper>
-              ))}
-            </TableHeader>
+            <TableHeaderWrapper>
+              <TableHeader>
+                {columns.map((preference, index) => (
+                  <ContentWrapper
+                    key={index}
+                    width={preference.width}
+                    alignment={preference.alignment}
+                    sortable={preference.isSortable}
+                    onClick={() =>
+                      preference.isSortable &&
+                      preference.sortFunction &&
+                      this.invertSortIcon(preference.key) &&
+                      preference.sortFunction(preference.key)
+                    }
+                  >
+                    {preference.label}
+                    <ToggleSortIcon
+                      toggle={
+                        this.state.sortIconInverted &&
+                        this.state.sortKey === preference.key
+                      }
+                    >
+                      {preference.sortIcon}
+                    </ToggleSortIcon>
+                  </ContentWrapper>
+                ))}
+              </TableHeader>
+            </TableHeaderWrapper>
           )}
           {!isLoading && (
-            <TableBody>
-              {this.getDisplayItems(currentPage, pageSize, content).map(
-                (item, index) => {
-                  return (
-                    <RowWrapper key={index} id={'row_' + index}>
-                      {columns.map((preference, indx) => {
-                        return (
-                          <ValueWrapper
-                            key={indx}
-                            width={preference.width}
-                            alignment={preference.alignment}
-                            color={preference.color}
-                          >
-                            {item[preference.key] || (
-                              <Error>{preference.errorValue}</Error>
-                            )}
-                          </ValueWrapper>
-                        )
-                      })}
-                    </RowWrapper>
-                  )
-                }
-              )}
-            </TableBody>
+            <TableScroller height={tableHeight}>
+              <TableBody>
+                {this.getDisplayItems(currentPage, pageSize, content).map(
+                  (item, index) => {
+                    return (
+                      <RowWrapper key={index} id={'row_' + index}>
+                        {columns.map((preference, indx) => {
+                          return (
+                            <ValueWrapper
+                              key={indx}
+                              width={preference.width}
+                              alignment={preference.alignment}
+                              color={preference.color}
+                            >
+                              {item[preference.key] || (
+                                <Error>{preference.errorValue}</Error>
+                              )}
+                            </ValueWrapper>
+                          )
+                        })}
+                      </RowWrapper>
+                    )
+                  }
+                )}
+              </TableBody>
+            </TableScroller>
           )}
         </Wrapper>
 
