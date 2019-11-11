@@ -52,12 +52,13 @@ const ArrowExpansionSecion = styled(ArrowExpansionButton)<{
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
 const StatusIndicator = styled.div<{
-  loading?: boolean
+  isLoading?: boolean
 }>`
   display: flex;
   flex-grow: 1;
   align-items: center;
-  justify-content: ${({ loading }) => (loading ? `space-between` : `flex-end`)};
+  justify-content: ${({ isLoading }) =>
+    isLoading ? `space-between` : `flex-end`};
 `
 interface IListItemActionProps {
   actions: IAction[]
@@ -82,7 +83,7 @@ export function ListItemAction(props: IListItemActionProps) {
       {actions &&
         actions.map((action: IAction) =>
           action.loading && action.loadingLabel ? (
-            <StatusIndicator loading={action.loading} key={id}>
+            <StatusIndicator isLoading={action.loading} key={id}>
               {action.loadingLabel}
               <Spinner id={`action-loading-${id}`} size={24} />
             </StatusIndicator>
