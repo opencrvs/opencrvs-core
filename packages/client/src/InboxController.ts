@@ -15,10 +15,10 @@ import {
   modifyApplication,
   writeApplication,
   createReviewApplication
-} from '@register/applications'
-import { Action, IForm, IFormData } from '@register/forms'
-import { AppStore } from '@register/store'
-import { client } from '@register/utils/apolloClient'
+} from '@client/applications'
+import { Action, IForm, IFormData } from '@client/forms'
+import { AppStore } from '@client/store'
+import { client } from '@client/utils/apolloClient'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import ApolloClient, { ApolloError } from 'apollo-client'

@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@register/store'
-import { InboxController } from '@register/InboxController'
-import { DOWNLOAD_STATUS } from '@register/applications'
+import { createStore } from '@client/store'
+import { InboxController } from '@client/InboxController'
+import { DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from './forms'
 import { Event } from './components/DuplicateDetails'
 import { ErrorResponse } from 'apollo-link-error'
