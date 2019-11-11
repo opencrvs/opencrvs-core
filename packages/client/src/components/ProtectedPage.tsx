@@ -113,8 +113,10 @@ class ProtectedPageComponent extends React.Component<
   }
 
   onIdle() {
+    storage.setItem(SCREEN_LOCK, 'true')
     this.setState({ secured: false })
   }
+
   render() {
     const { pendingUser, secured, pinExists } = this.state
 
