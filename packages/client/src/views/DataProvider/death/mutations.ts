@@ -29,7 +29,42 @@ const APPROVE_DEATH_APPLICATION = gql`
 `
 const REGISTER_DEATH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
-    markDeathAsRegistered(id: $id, details: $details)
+    markDeathAsRegistered(id: $id, details: $details) {
+      id
+      registration {
+        id
+        status {
+          id
+          user {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
+          }
+        }
+      }
+    }
   }
 `
 const REJECT_DEATH_APPLICATION = gql`
