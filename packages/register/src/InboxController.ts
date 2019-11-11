@@ -53,7 +53,6 @@ export class InboxController {
   private store: AppStore
   private client: ApolloClient<{}>
   private syncRunning: boolean = false
-  private syncCount: number = 0
 
   constructor(store: AppStore) {
     this.store = store
@@ -78,27 +77,18 @@ export class InboxController {
   }
 
   private sync = async () => {
-    this.syncCount++
-    console.debug(`[${this.syncCount}] Starting sync...`)
-    if (!navigator.onLine || this.syncRunning) {
-      console.debug(
-        `[${this.syncCount}] Sync exiting early (offline or already syncing)`
-      )
+    if (this.syncRunning) {
       return
     }
 
     this.syncRunning = true
 
     const applications = this.getDownloadableApplications()
-    console.debug(
-      `[${this.syncCount}] Syncing ${applications.length} applications`
-    )
     for (const application of applications) {
       await this.queryData(application)
     }
 
     this.syncRunning = false
-    console.debug(`[${this.syncCount}] Finish sync.`)
   }
 
   public queryData = async (application: IApplication | undefined) => {
@@ -165,6 +155,7 @@ export class InboxController {
     if (application.downloadRetryAttempt < MAX_RETRY_ATTEMPT) {
       application.downloadStatus = DOWNLOAD_STATUS.READY_TO_DOWNLOAD
       this.store.dispatch(modifyApplication(application))
+      this.store.dispatch(writeApplication(application))
       return
     }
 

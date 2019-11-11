@@ -68,7 +68,7 @@ import {
 import { StyledSpinner } from '@register/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { debounce, flatten, cloneDeep } from 'lodash'
+import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -313,8 +313,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     const { showError, showModalForNoSignedAffidavit } = this.state
 
-    const debouncedModifyApplication = debounce(this.modifyApplication, 500)
-
     const nextSectionGroup = getNextSectionIds(
       formSection,
       formGroup,
@@ -396,7 +394,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           <FormFieldGenerator
             id={formGroup.id}
             onChange={values => {
-              debouncedModifyApplication(values, applicationToBeCertified)
+              this.modifyApplication(values, applicationToBeCertified)
             }}
             setAllFieldsDirty={false}
             fields={formGroup.fields}

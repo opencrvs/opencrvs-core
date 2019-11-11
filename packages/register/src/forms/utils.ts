@@ -53,7 +53,11 @@ import {
   ILocation,
   IOfflineData
 } from '@register/offline/reducer'
-import { Validation } from '@register/utils/validate'
+import {
+  Validation,
+  isAValidDateFormat,
+  isDateNotInFuture
+} from '@register/utils/validate'
 import moment from 'moment'
 import { IDynamicValues } from '@opencrvs/register/src/navigation'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
@@ -292,6 +296,7 @@ export const getFieldOptionsByValueMapper = (
 }
 
 export const diffDoB = (doB: string) => {
+  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB)) return 'within45days'
   const todaysDate = moment(Date.now())
   const birthDate = moment(doB)
   const diffInDays = todaysDate.diff(birthDate, 'days')
