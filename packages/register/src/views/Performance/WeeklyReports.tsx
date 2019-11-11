@@ -12,6 +12,7 @@
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { ListTable } from '@opencrvs/components/lib/interface'
+import { constantsMessages } from '@register/i18n/messages'
 import { messages } from '@register/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@register/navigation'
 import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
@@ -20,8 +21,6 @@ import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
-import { constantsMessages } from '@register/i18n/messages'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
@@ -77,6 +76,28 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
 
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.birth)}
+          isLoading={false}
+          content={this.getContent()}
+          columns={[
+            {
+              label: intl.formatMessage(constantsMessages.week),
+              width: 70,
+              key: 'week',
+              isSortable: true,
+              icon: <ArrowDownBlue />,
+              sortFunction: () => console.log('sorted')
+            },
+            {
+              label: intl.formatMessage(constantsMessages.export),
+              width: 30,
+              key: 'export'
+            }
+          ]}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+        />
+
+        <ListTable
+          tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
           content={this.getContent()}
           columns={[
