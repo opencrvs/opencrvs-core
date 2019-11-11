@@ -29,7 +29,7 @@ import * as labels from './mappings/label'
 import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
-import { ICertificate } from '@client/applications'
+import { ICertificate as IApplicationCertificate } from '@client/applications'
 import { IOfflineData } from '@client/offline/reducer'
 
 export const TEXT = 'TEXT'
@@ -162,7 +162,7 @@ export type IFormFieldValue =
   | number
   | boolean
   | Date
-  | ICertificate
+  | IApplicationCertificate
   | IFileValue
   | IAttachmentValue
   | FieldValueArray
