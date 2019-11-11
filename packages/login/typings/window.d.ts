@@ -15,7 +15,7 @@ interface Window {
     COUNTRY: string
     LANGUAGES: string
     PERFORMANCE_APP_URL: string
-    REGISTER_APP_URL: string
+    CLIENT_APP_URL: string
     LOGROCKET: string
     SENTRY: string
   }

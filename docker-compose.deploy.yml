@@ -116,9 +116,9 @@ services:
       - overlay_net
 
   # Configure webapps and add traefik config
-  register:
+  client:
     configs:
-      - source: register-config.{{ts}}
+      - source: client-config.{{ts}}
         target: /usr/share/nginx/html/config.js
     deploy:
       labels:
@@ -342,8 +342,8 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  register-config.{{ts}}:
-    file: ./infrastructure/register-config.js
+  client-config.{{ts}}:
+    file: ./infrastructure/client-config.js
   performance-config.{{ts}}:
     file: ./infrastructure/performance-config.js
   login-config.{{ts}}:

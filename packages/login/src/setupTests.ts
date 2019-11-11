@@ -15,5 +15,5 @@
   COUNTRY: 'bgd',
   LANGUAGES: 'bn,en',
   PERFORMANCE_APP_URL: 'http://localhost:3001/',
-  REGISTER_APP_URL: 'http://localhost:3000/'
+  CLIENT_APP_URL: 'http://localhost:3000/'
 }

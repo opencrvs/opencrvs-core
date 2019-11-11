@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "path": "packages/register/build/static/js/*.chunk.js",
+      "path": "packages/client/build/static/js/*.chunk.js",
       "maxSize": "2MB"
     },
     {
