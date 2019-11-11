@@ -175,6 +175,9 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             max={31}
             value={this.state.dd}
             onChange={this.change}
+            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+              event.currentTarget.blur()
+            }}
           />
           <DateSegment
             {...props}
@@ -190,6 +193,9 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             max={12}
             value={this.state.mm}
             onChange={this.change}
+            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+              event.currentTarget.blur()
+            }}
           />
           <DateSegment
             {...props}
@@ -204,6 +210,9 @@ export class DateField extends React.Component<IDateFieldProps, IState> {
             min={1900}
             value={this.state.yyyy}
             onChange={this.change}
+            onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+              event.currentTarget.blur()
+            }}
           />
         </DateWrapper>
       </>
