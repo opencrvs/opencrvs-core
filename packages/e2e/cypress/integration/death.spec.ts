@@ -37,6 +37,7 @@ context('Death Integration Test', () => {
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_APPLICANT').click()
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
@@ -145,12 +146,15 @@ context('Death Integration Test', () => {
     // SELECT ADDITIONAL INFORMANT
     cy.get('#relationship_OTHER').click()
     cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Friend')
+    cy.wait(600)
     cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_OTHER').click()
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
       'Colleague'
     )
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01678945638'
     )
@@ -303,6 +307,7 @@ context('Death Integration Test', () => {
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_APPLICANT').click()
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01741123963'
     )
@@ -418,7 +423,9 @@ context('Death Integration Test', () => {
     cy.get('#next_section').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_OTHER').click()
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type('Friend')
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01753741963'
     )
@@ -582,6 +589,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
       'Colleague'
     )
+    cy.wait(600)
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01852741963'
     )
