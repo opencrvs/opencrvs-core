@@ -22,11 +22,11 @@ import { Action } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { AppStore } from '@client/store'
 import { getMutationMapping } from '@client/views/DataProvider/MutationProvider'
-import { FetchResult } from 'react-apollo'
 import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
+import { FetchResult } from 'apollo-link'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -192,7 +192,10 @@ export class SubmissionController {
     }
   }
 
-  private onSuccess = (application: IApplication, result: FetchResult) => {
+  private onSuccess = (
+    application: IApplication,
+    result: FetchResult<any, any, any>
+  ) => {
     const submissionStatus =
       SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED

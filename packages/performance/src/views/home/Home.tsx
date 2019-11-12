@@ -240,13 +240,17 @@ interface IData {
   description?: string
   categoricalData?: ICategoryDataPoint[]
 }
-interface IHomeProps {
-  theme: ITheme
+
+interface IStateProps {
   language: string
   userDetails: IUserDetails | null
 }
 
-type FullProps = IHomeProps & IntlShapeProps
+interface IHomeProps {
+  theme: ITheme
+}
+
+type FullProps = IHomeProps & IntlShapeProps & IStateProps
 
 const getKeyFigureLabel = (type: string, intl: IntlShape): string => {
   switch (type) {
@@ -438,7 +442,6 @@ const mapStateToProps = (store: IStoreState) => {
     userDetails: getUserDetails(store)
   }
 }
-export const Home = connect(
-  mapStateToProps,
-  null
-)(injectIntl(withTheme(HomeView)))
+export const Home = connect<IStateProps, {}, {}, IStoreState>(mapStateToProps)(
+  injectIntl(withTheme(HomeView))
+)
