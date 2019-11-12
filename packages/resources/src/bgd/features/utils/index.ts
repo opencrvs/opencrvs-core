@@ -18,6 +18,8 @@ export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const JURISDICTION_TYPE_DISTRICT = 'district'
 export const JURISDICTION_TYPE_UPAZILA = 'upazila'
 export const JURISDICTION_TYPE_UNION = 'union'
+export const JURISDICTION_TYPE_MUNICIPALITY = 'municipality'
+export const JURISDICTION_TYPE_CITY_CORPORATION = 'citycorporation'
 export const GENERATE_TYPE_RN = 'registrationNumber'
 
 type ISupportedType =
@@ -61,6 +63,11 @@ export interface ILocationSequenceNumber {
   sequence_number: string
 }
 
+export interface IJurisdictionLocation {
+  jurisdictionType: string
+  bbsCode?: string
+}
+
 export const sendToFhir = (
   doc: ISupportedType,
   suffix: string,
@@ -100,16 +107,6 @@ export async function getLocationsByIdentifier(identifier: string) {
   } catch (err) {
     return internal(err)
   }
-}
-
-export function getLocationIDByA2IRef(
-  locations: fhir.Location[],
-  a2IReference: string
-) {
-  const location = locations.find(loc =>
-    matchLocationWithA2IRef(loc, a2IReference)
-  ) as fhir.Location
-  return location.id as string
 }
 
 export function matchLocationWithA2IRef(
@@ -225,21 +222,48 @@ export async function getPractitionerLocations(
   return locList as fhir.Location[]
 }
 
-export function getJurisDictionalLocations() {
+export function getJurisdictionalLocations(): IJurisdictionLocation[] {
   return [
     {
-      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_DISTRICT
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_UPAZILA
     },
     {
-      jurisdictionType: JURISDICTION_TYPE_UNION,
-      bbsCode: ''
+      jurisdictionType: JURISDICTION_TYPE_UNION
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_MUNICIPALITY
+    },
+    {
+      jurisdictionType: JURISDICTION_TYPE_CITY_CORPORATION
     }
   ]
+}
+
+export function getRMOCode(jurisdictionalLocations: IJurisdictionLocation[]) {
+  const rmoLocationTypes = [
+    JURISDICTION_TYPE_UNION,
+    JURISDICTION_TYPE_MUNICIPALITY,
+    JURISDICTION_TYPE_CITY_CORPORATION
+  ]
+
+  const jurisdictionLocation = jurisdictionalLocations.find(
+    location =>
+      location.bbsCode && rmoLocationTypes.includes(location.jurisdictionType)
+  )
+
+  return jurisdictionLocation
+    ? jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_UNION
+      ? 1
+      : jurisdictionLocation.jurisdictionType === JURISDICTION_TYPE_MUNICIPALITY
+      ? 2
+      : jurisdictionLocation.jurisdictionType ===
+        JURISDICTION_TYPE_CITY_CORPORATION
+      ? 9
+      : 0
+    : 0
 }
 
 export function convertStringToASCII(str: string): string {

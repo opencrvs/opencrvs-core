@@ -278,7 +278,7 @@ That's it! You should be running OpenCRVS with test users and test locations. Ap
 
 - Styleguide: http://localhost:6060/
 - Login: http://localhost:3020/ - A test user you can use is u: sakibal.hasan, p: test, code: 000000
-- Register: http://localhost:3000/
+- Client: http://localhost:3000/
 - Performance management: http://localhost:3001/
 
 You can open all of them by running `yarn open`
@@ -338,7 +338,7 @@ The deploy is easily executed by just running: `yarn deploy:staging <<insert cou
 
 The applications will be available here:
 
-- [Register app](https://register.opencrvs-staging.jembi.org/)
+- [Client app](https://register.opencrvs-staging.jembi.org/)
 - [Login app](https://login.opencrvs-staging.jembi.org/)
 - [GraphQl gateway](https://gateway.opencrvs-staging.jembi.org/)
 - [Auth service](https://auth.opencrvs-staging.jembi.org/)
@@ -359,7 +359,7 @@ Deploying to QA is much the same as above, however you may specify a version to 
 
 The applications will be available here:
 
-- [Register app](https://register.opencrvs.qa1.jembi.org/)
+- [Client app](https://register.opencrvs.qa1.jembi.org/)
 - [Login app](https://login.opencrvs.qa1.jembi.org/)
 - [GraphQl gateway](https://gateway.opencrvs.qa1.jembi.org/)
 - [Auth service](https://auth.opencrvs.qa1.jembi.org/)
@@ -376,7 +376,7 @@ All hotfixes that are done for that release should be submitted in a PR against 
 
 ## How to do a release
 
-1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `register` depend on `components`, so update the dependency: Do a find and replace for `1.0.0-alpha.2` and replace with `1.0.0-alpha.3`
+1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `client` depend on `components`, so update the dependency: Do a find and replace for `1.0.0-alpha.2` and replace with `1.0.0-alpha.3`
 2. Run `yarn` to ensure there are no version errors.
 3. Run `yarn test` and ensure all passed.
 4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.1.1`

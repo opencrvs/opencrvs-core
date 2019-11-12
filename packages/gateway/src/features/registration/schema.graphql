@@ -92,6 +92,7 @@ enum AttachmentType {
   UNDER_FIVE_CARD
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
+  LETTER_FROM_COUNCILLOR
 }
 
 enum AttachmentSubject {
@@ -109,6 +110,7 @@ enum AttachmentSubject {
   APPLICANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
   ASSIGNED_RESPONSIBILITY_PROOF
+  WARD_COUNCILLOR_PROOF
 }
 
 enum RegistrationType {
@@ -314,6 +316,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
 
 input RegistrationInput {
   _fhirID: ID
+  draftId: String # long uuid for preventing an event from duplicate submission
   # short uuid easy to remember
   trackingId: String
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -335,6 +338,7 @@ input RegistrationInput {
 type Registration { # -> Task
   id: ID # -> .id
   _fhirID: ID # -> .id
+  draftId: String
   # short uuid easy to remember
   trackingId: String # -> .identifier
   # BRN (Birth Registration Number) DRN (Death Registration Number) - Format to be decided
@@ -456,7 +460,10 @@ type Mutation {
     details: BirthRegistrationInput
   ): BirthRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration - internally call update if details exists
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
-  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
+  markBirthAsRegistered(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
@@ -469,6 +476,9 @@ type Mutation {
     details: DeathRegistrationInput
   ): DeathRegistration # updates status to 'verified' + audit? - attachments are valid and in order, ready for registration
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
-  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
+  markDeathAsRegistered(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
 }

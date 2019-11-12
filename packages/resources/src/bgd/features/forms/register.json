@@ -373,11 +373,12 @@
                   "label": {
                     "defaultMessage": " ",
                     "description": "Form section title for contact point",
-                    "id": "register.SelectContactPoint.headings"
+                    "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
                   "previewGroup": "contactPointGroup",
                   "required": true,
+                  "hideHeader":true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -4637,6 +4638,7 @@
         {
           "id": "primaryCaregiver",
           "viewType": "form",
+          "hasDocumentSection": "true",
           "name": {
             "defaultMessage": "Parents details",
             "description": "Form section name or title for primary caregiver",
@@ -5466,6 +5468,12 @@
                   "required": true,
                   "initialValue": "",
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.iDType"
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToIdentifierTransformer",
@@ -5698,42 +5706,7 @@
                 },
                 {
                   "name": "motherBirthDate",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "motherBirthDate",
-                      "labelMapper": {
-                        "operation": "getMotherDateOfBirthLabel"
-                      }
-                    },
-                    "type": {
-                      "kind": "static",
-                      "staticType": "DATE"
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "dateFormatIsCorrect",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateInPast",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateLessThan",
-                          "parameters": []
-                        },
-                        "dependencies": ["dateOfMarriage"]
-                      }
-                    ]
-                  },
+                  "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
@@ -5741,7 +5714,20 @@
                   },
                   "required": false,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [5]
+                    }
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "longDateTransformer",
@@ -7716,6 +7702,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.iDType"
                     }
                   ],
                   "mapping": {
@@ -7795,6 +7785,10 @@
                   },
                   "validate": [],
                   "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
@@ -7980,49 +7974,7 @@
                 },
                 {
                   "name": "fatherBirthDate",
-                  "type": "FIELD_WITH_DYNAMIC_DEFINITIONS",
-                  "dynamicDefinitions": {
-                    "label": {
-                      "dependency": "fatherBirthDate",
-                      "labelMapper": {
-                        "operation": "getFatherDateOfBirthLabel"
-                      }
-                    },
-                    "type": {
-                      "kind": "static",
-                      "staticType": "DATE"
-                    },
-                    "validate": [
-                      {
-                        "validator": {
-                          "operation": "dateFormatIsCorrect",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateInPast",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      },
-                      {
-                        "validator": {
-                          "operation": "dateLessThan",
-                          "parameters": []
-                        },
-                        "dependencies": ["dateOfMarriage"]
-                      },
-                      {
-                        "validator": {
-                          "operation": "isValidMotherBirthDate",
-                          "parameters": []
-                        },
-                        "dependencies": []
-                      }
-                    ]
-                  },
+                  "type": "DATE",
                   "label": {
                     "defaultMessage": "Date of birth",
                     "description": "Label for form field: Date of birth",
@@ -8030,7 +7982,20 @@
                   },
                   "required": false,
                   "initialValue": "",
-                  "validate": [],
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [5]
+                    }
+                  ],
                   "conditionals": [
                     {
                       "action": "hide",
@@ -10592,6 +10557,37 @@
                       "operation": "birthAttachmentToFieldTransformer"
                     }
                   }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "birthAttachmentToFieldTransformer"
+                    }
+                  }
                 }
               ]
             }
@@ -12149,7 +12145,7 @@
                       "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -12198,7 +12194,7 @@
                       "action": "hide",
                       "expression": "!(resources && resources.locations && isCityLocation(resources.locations,values.addressLine4))"
                     }
-                  ],                  
+                  ],
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
@@ -12777,9 +12773,7 @@
                     },
                     "query": {
                       "operation": "deceasedDateToFieldTransformation",
-                      "parameters": [
-                        "deceased"
-                      ]
+                      "parameters": ["deceased"]
                     }
                   }
                 }
@@ -14305,10 +14299,20 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "state", {
-                        "fieldsToIgnoreForLocalAddress": ["internationalDistrict", "internationalState"],
-                        "fieldsToIgnoreForInternationalAddress": ["district", "state"]
-                      }]
+                      "parameters": [
+                        0,
+                        "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }
+                      ]
                     }
                   }
                 },
@@ -14337,10 +14341,20 @@
                     },
                     "query": {
                       "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "district", {
-                        "fieldsToIgnoreForLocalAddress": ["internationalDistrict", "internationalState"],
-                        "fieldsToIgnoreForInternationalAddress": ["district", "state"]
-                      }]
+                      "parameters": [
+                        0,
+                        "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }
+                      ]
                     }
                   }
                 },
@@ -14614,15 +14628,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": [
-                        "causeOfDeath"
-                      ]
+                      "parameters": ["causeOfDeath"]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": [
-                        "causeOfDeath"
-                      ]
+                      "parameters": ["causeOfDeath"]
                     }
                   }
                 }
@@ -17701,6 +17711,37 @@
                     {
                       "action": "hide",
                       "expression": "(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => [\"National ID (front)\", \"National ID (Back)\"].indexOf(a.optionValues[1]) > -1))"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
+                },
+                {
+                  "name": "uploadDocFromCounsilor",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Ward councillor acknowledgement",
+                    "description": "Label for select Ward councillor acknowledgement",
+                    "id": "form.field.label.docTypeWardCounsiloracknowledgement"
+                  },
+                  "initialValue": "",
+                  "extraValue": "WARD_COUNCILLOR_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Letter from ward councillor",
+                      "label": {
+                        "defaultMessage": "Letter from ward councillor",
+                        "description": "Document type label for Letter from ward councillor",
+                        "id": "form.field.label.docTypeLetterFromCouncillor"
+                      }
                     }
                   ],
                   "mapping": {

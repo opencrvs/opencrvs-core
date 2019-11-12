@@ -30,9 +30,9 @@ coverage:
         paths:
           - packages/notification
         threshold: 0.5
-      register:
+      client:
         paths:
-          - packages/register
+          - packages/client
         threshold: 0.5
       performance:
         paths:
@@ -60,11 +60,16 @@ coverage:
         threshold: 0.5
 
 ignore:
-  - 'packages/register/src/extract-translations.ts'
-  - 'packages/register/src/index.tsx'
-  - 'packages/register/src/registerServiceWorker.ts'
-  - 'packages/register/src/src-sw.js'
-  - 'packages/register/src/tests/graphql-schema-mock.ts'
+  - 'packages/client/src/extract-translations.ts'
+  - 'packages/client/src/index.tsx'
+  - 'packages/client/src/registerServiceWorker.ts'
+  - 'packages/client/src/src-sw.js'
+  - 'packages/client/src/tests/graphql-schema-mock.ts'
   - 'packages/workflow/src/index.ts'
   - 'packages/gateway/src/index.ts'
   - 'packages/gateway/src/routes.ts'
+  - 'packages/performance/src/index.tsx'
+  - 'packages/performance/src/storage.ts'
+  - 'packages/performance/src/components/ErrorBoundary.tsx'
+  - 'packages/performance/src/components/TopMenu.tsx'
+  - 'packages/performance/src/navigation/index.tsx'

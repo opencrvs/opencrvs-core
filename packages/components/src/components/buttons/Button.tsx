@@ -33,6 +33,10 @@ const ButtonBase = styled.button`
     }
   }
   -webkit-tap-highlight-color: transparent;
+  &:focus {
+    outline: none;
+  }
+  padding: 0;
 `
 export interface IButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

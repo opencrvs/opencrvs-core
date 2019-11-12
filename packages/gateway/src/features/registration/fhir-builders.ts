@@ -1720,6 +1720,14 @@ const builders: IFieldBuilders = {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
     },
+    draftId: (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+      return setResourceIdentifier(taskResource, 'draft-id', fieldValue)
+    },
     trackingId: (
       fhirBundle: ITemplatedBundle,
       fieldValue: string,

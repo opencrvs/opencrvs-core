@@ -11,10 +11,11 @@
  */
 import {
   getPractitionerLocations,
-  getJurisDictionalLocations,
   getPractitionerLocationId,
   convertNumberToString,
-  OPENCRVS_SPECIFICATION_URL
+  OPENCRVS_SPECIFICATION_URL,
+  getJurisdictionalLocations,
+  getRMOCode
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
 
@@ -32,6 +33,7 @@ export async function generateRegistrationNumber(
       await getPractitionerLocationId(practionerId)
     )
   )
+
   return brn
 }
 
@@ -43,13 +45,13 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
 
   const locations = await getPractitionerLocations(practionerId)
 
-  const jurisDictionalLocations = getJurisDictionalLocations()
+  const jurisdictionalLocations = getJurisdictionalLocations()
   for (const location of locations) {
     if (!location || !location.identifier) {
       continue
     }
-    jurisDictionalLocations.forEach(jurisDictionalLocation => {
-      if (jurisDictionalLocation.bbsCode !== '' || !location.identifier) {
+    jurisdictionalLocations.forEach(jurisdictionalLocation => {
+      if (jurisdictionalLocation.bbsCode || !location.identifier) {
         return
       }
       const jurisDictionIdentifier = location.identifier.find(
@@ -57,7 +59,7 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
           identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type` &&
           isTypeMatched(
-            jurisDictionalLocation.jurisdictionType,
+            jurisdictionalLocation.jurisdictionType,
             identifier.value
           )
       )
@@ -68,13 +70,22 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
             identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/bbs-code`
         )
       if (bbsCodeIdentifier && bbsCodeIdentifier.value) {
-        jurisDictionalLocation.bbsCode = bbsCodeIdentifier.value
+        jurisdictionalLocation.bbsCode = bbsCodeIdentifier.value
       }
     })
   }
-  return jurisDictionalLocations.reduce((locBBSCode, loc) => {
-    return locBBSCode.concat(loc.bbsCode)
-  }, '')
+  const bbsCode = jurisdictionalLocations.reduce(
+    (locBBSCode, loc) => locBBSCode.concat(loc.bbsCode || ''),
+    ''
+  )
+
+  const rmoCode = getRMOCode(jurisdictionalLocations)
+
+  if (rmoCode === 0) {
+    throw new Error("Didn't find any RMO code for practioner: " + practionerId)
+  }
+
+  return bbsCode.slice(0, 2) + rmoCode + bbsCode.slice(2)
 }
 
 function isTypeMatched(matchType: string, inputType?: string): boolean {

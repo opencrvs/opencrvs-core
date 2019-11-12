@@ -173,7 +173,8 @@ export enum GQLAttachmentType {
   ORIGINAL_BIRTH_RECORD = 'ORIGINAL_BIRTH_RECORD',
   UNDER_FIVE_CARD = 'UNDER_FIVE_CARD',
   PROOF_OF_LEGAL_GUARDIANSHIP = 'PROOF_OF_LEGAL_GUARDIANSHIP',
-  PROOF_OF_ASSIGNED_RESPONSIBILITY = 'PROOF_OF_ASSIGNED_RESPONSIBILITY'
+  PROOF_OF_ASSIGNED_RESPONSIBILITY = 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
+  LETTER_FROM_COUNCILLOR = 'LETTER_FROM_COUNCILLOR'
 }
 
 export enum GQLAttachmentSubject {
@@ -190,7 +191,8 @@ export enum GQLAttachmentSubject {
   APPLICANT_ID_PROOF = 'APPLICANT_ID_PROOF',
   APPLICANT_ATHORITY_TO_APPLY_PROOF = 'APPLICANT_ATHORITY_TO_APPLY_PROOF',
   LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
-  ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF'
+  ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
+  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF'
 }
 
 export interface GQLDeceased {
@@ -291,6 +293,7 @@ export interface GQLEventRegistrationNameMap {
 export interface GQLRegistration {
   id?: string
   _fhirID?: string
+  draftId?: string
   trackingId?: string
   registrationNumber?: string
   paperFormID?: string
@@ -615,7 +618,7 @@ export interface GQLMutation {
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
-  markBirthAsRegistered: string
+  markBirthAsRegistered: GQLBirthRegistration
   markBirthAsCertified: string
   markEventAsVoided: string
   notADuplicate: string
@@ -623,7 +626,7 @@ export interface GQLMutation {
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsValidated?: string
-  markDeathAsRegistered: string
+  markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   createUser: GQLUser
   activateUser?: string
@@ -750,6 +753,7 @@ export interface GQLBirthRegistrationInput {
 
 export interface GQLRegistrationInput {
   _fhirID?: string
+  draftId?: string
   trackingId?: string
   registrationNumber?: string
   paperFormID?: string
@@ -1813,6 +1817,7 @@ export interface GQLEventRegistrationTypeResolver<TParent = any> {
 export interface GQLRegistrationTypeResolver<TParent = any> {
   id?: RegistrationToIdResolver<TParent>
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
+  draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
@@ -1834,6 +1839,10 @@ export interface RegistrationToIdResolver<TParent = any, TResult = any> {
 }
 
 export interface RegistrationTo_fhirIDResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToDraftIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -113,6 +113,7 @@ test('should build a minimal FHIR registration document without error', async ()
         contact: 'MOTHER',
         contactPhoneNumber: '01733333333',
         paperFormID: '12345678',
+        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
         trackingId: 'B123456',
         registrationNumber: '201923324512345671',
         inCompleteFields:
@@ -390,6 +391,10 @@ test('should build a minimal FHIR registration document without error', async ()
   })
   expect(fhir.entry[5].resource.identifier).toEqual([
     { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '12345678' },
+    {
+      system: 'http://opencrvs.org/specs/id/draft-id',
+      value: '8f18a6ea-89d1-4b03-80b3-57509a7eebce'
+    },
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',
       value: 'B123456'

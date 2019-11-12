@@ -16,7 +16,9 @@ import {
   getDeclarationIdsFromResponse,
   getIDFromResponse,
   getRegistrationIdsFromResponse,
-  removeDuplicatesFromComposition
+  removeDuplicatesFromComposition,
+  getRegistrationIds,
+  getDeclarationIds
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -151,12 +153,7 @@ export const resolvers: GQLResolver = {
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
-        return await markEventAsRegistered(
-          id,
-          authHeader,
-          EVENT_TYPE.BIRTH,
-          details
-        )
+        return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
@@ -260,6 +257,24 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
+  const duplicateCompostion = await lookForDuplicate(
+    details && details.registration && details.registration.draftId,
+    authHeader
+  )
+
+  if (duplicateCompostion) {
+    if (hasScope(authHeader, 'register')) {
+      return await getRegistrationIds(
+        duplicateCompostion,
+        event,
+        false,
+        authHeader
+      )
+    } else {
+      // return tracking-id
+      return await getDeclarationIds(duplicateCompostion, authHeader)
+    }
+  }
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   if (hasScope(authHeader, 'register')) {
@@ -269,6 +284,29 @@ async function createEventRegistration(
     // return tracking-id
     return await getDeclarationIdsFromResponse(res, authHeader)
   }
+}
+
+export async function lookForDuplicate(
+  identifier: string,
+  authHeader: IAuthHeader
+) {
+  const taskBundle = await fetchFHIR(
+    `/Task?identifier=${identifier}`,
+    authHeader
+  )
+
+  const task =
+    taskBundle &&
+    taskBundle.entry &&
+    taskBundle.entry[0] &&
+    (taskBundle.entry[0].resource as fhir.Task)
+
+  return (
+    task &&
+    task.focus &&
+    task.focus.reference &&
+    task.focus.reference.split('/')[1]
+  )
 }
 
 async function markEventAsValidated(
@@ -322,9 +360,10 @@ async function markEventAsRegistered(
     doc = await buildFHIRBundle(details, event)
   }
 
-  const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-  // return the registrationNumber
-  return await getRegistrationIdsFromResponse(res, event, authHeader)
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }
 
 async function markEventAsCertified(
