@@ -10,11 +10,11 @@
 version: '3.3'
 
 services:
-  register:
-    image: jembi/ocrvs-register:${VERSION:-latest}
+  client:
+    image: jembi/ocrvs-client:${VERSION:-latest}
     build:
       context: .
-      dockerfile: ./packages/register/Dockerfile
+      dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
 
   performance:

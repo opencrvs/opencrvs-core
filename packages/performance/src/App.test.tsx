@@ -112,7 +112,7 @@ describe('when user navigates', () => {
     app.update()
     expect(window.location.assign).toHaveBeenCalled()
     expect((window.location.assign as jest.Mock).mock.calls[0][0]).toContain(
-      `${window.config.REGISTER_URL}?token=`
+      `${window.config.CLIENT_URL}?token=`
     )
   })
 })
