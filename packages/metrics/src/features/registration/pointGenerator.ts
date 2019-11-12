@@ -187,9 +187,6 @@ export function generateTimeLoggedPoint(payload: fhir.Bundle) {
     throw new Error('Current task not found')
   }
 
-  // tslint:disable-next-line:no-console
-  console.log(currentTask)
-
   const fields = {
     time_spent_editing: getTimeLoggedFromTask(currentTask),
     application_id: composition.id
