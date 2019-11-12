@@ -89,7 +89,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         (action.payload.token &&
           Cmd.run(() => {
             window.location.assign(
-              `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
             )
           })) ||
           Cmd.action(push(routes.STEP_TWO))
@@ -153,7 +153,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.run(() => {
           window.location.assign(
-            `${window.config.REGISTER_APP_URL}?token=${action.payload.token}`
+            `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
           )
         })
       )
@@ -164,7 +164,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.run(() => {
           window.location.assign(
-            `${window.config.REGISTER_APP_URL}?token=${state.token}`
+            `${window.config.CLIENT_APP_URL}?token=${state.token}`
           )
         })
       )

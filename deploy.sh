@@ -58,7 +58,7 @@ echo
 mkdir -p /tmp/compose/infrastructure/backups
 
 # Copy selected country config to public & infrastructure folder
-cp packages/resources/src/$COUNTRY/config/register-config.prod.js /tmp/compose/infrastructure/register-config.js
+cp packages/resources/src/$COUNTRY/config/client-config.prod.js /tmp/compose/infrastructure/client-config.js
 cp packages/resources/src/$COUNTRY/config/login-config.prod.js /tmp/compose/infrastructure/login-config.js
 
 # Copy selected country backups to infrastructure backups folder

@@ -10,7 +10,7 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "eslint.workingDirectories": [
     { "directory": "./packages/performance", "changeProcessCWD": true },
-    { "directory": "./packages/register", "changeProcessCWD": true },
+    { "directory": "./packages/client", "changeProcessCWD": true },
     { "directory": "./packages/login", "changeProcessCWD": true }
   ]
 }
