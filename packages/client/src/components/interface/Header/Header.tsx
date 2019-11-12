@@ -217,6 +217,38 @@ class HeaderComp extends React.Component<IProps, IState> {
     )
   }
 
+  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
+    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
+      return {
+        mobileLeft: {
+          icon: () => this.hamburger(),
+          handler: this.toggleMenu
+        }
+      }
+    } else {
+      if (this.props.mobileSearchBar) {
+        return {
+          mobileLeft: {
+            icon: () => <ArrowBack />,
+            handler: () => window.history.back()
+          },
+          mobileBody: this.renderSearchInput(this.props, true)
+        }
+      } else {
+        return {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          },
+          mobileRight: {
+            icon: () => <SearchDark />,
+            handler: () => this.props.goToSearch()
+          }
+        }
+      }
+    }
+  }
+
   logout = () => {
     storage.removeItem(SCREEN_LOCK)
     this.props.redirectToAuthentication()
@@ -271,7 +303,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     const {
       intl,
       userDetails,
-      enableMenuSelection,
+      enableMenuSelection = true,
       goToHomeAction,
       goToPerformanceAction,
       activeMenuItem
@@ -290,22 +322,15 @@ class HeaderComp extends React.Component<IProps, IState> {
         title: intl.formatMessage(constantsMessages.applicationTitle),
         onClick: goToHomeAction,
         selected:
-          enableMenuSelection === undefined || enableMenuSelection
-            ? activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
-              ? true
-              : false
-            : false
+          enableMenuSelection &&
+          activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
       },
       {
         key: 'performance',
         title: intl.formatMessage(constantsMessages.performanceTitle),
         onClick: goToPerformanceAction,
         selected:
-          enableMenuSelection === undefined || enableMenuSelection
-            ? activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-              ? true
-              : false
-            : false
+          enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
       }
     ]
 
@@ -357,32 +382,9 @@ class HeaderComp extends React.Component<IProps, IState> {
       ]
     }
 
-    let mobileHeaderActionProps =
-      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-        ? {
-            mobileLeft: {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
-            }
-          }
-        : this.props.mobileSearchBar
-        ? {
-            mobileLeft: {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
-            },
-            mobileBody: this.renderSearchInput(this.props, true)
-          }
-        : {
-            mobileLeft: {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
-            },
-            mobileRight: {
-              icon: () => <SearchDark />,
-              handler: () => this.props.goToSearch()
-            }
-          }
+    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
+      activeMenuItem
+    )
 
     return (
       <>
