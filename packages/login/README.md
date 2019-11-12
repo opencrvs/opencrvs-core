@@ -887,13 +887,13 @@ The following variables exist.
 
 ```
 ENV REACT_APP_AUTH_API_URL
-ENV REACT_APP_REGISTER_APP_URL
+ENV REACT_APP_CLIENT_APP_URL
 ENV REACT_APP_COUNTRY=gbr
 ENV REACT_APP_LANGUAGE=en
 ```
 
 For ENV REACT_APP_AUTH_API_URL link to auth package URL
-For ENV REACT_APP_REGISTER_APP_URL link to the register package URL
+For ENV REACT_APP_CLIENT_APP_URL link to the register package URL
 
 For REACT_APP_COUNTRY, use lowercase two-letter [ISO "Alpha-3" country code](https://unstats.un.org/unsd/methodology/m49/)
 
