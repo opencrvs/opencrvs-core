@@ -285,7 +285,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
-  // TODO will this be called before a submission?
   logTime(timeMs: number) {
     const application = this.props.application
     if (!application.timeLoggedMS) {

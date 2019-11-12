@@ -164,6 +164,13 @@ export const appendGqlMetadataFromDraft = (
   gqlDetails: TransformedData
 ) => {
   const { timeLoggedMS } = draft
+
+  if (!gqlDetails.registration.status) {
+    gqlDetails.registration.status = []
+  }
+  if (!gqlDetails.registration.status[0]) {
+    gqlDetails.registration.status[0] = {}
+  }
   gqlDetails.registration.status[0].timeLoggedMS = timeLoggedMS
 }
 
