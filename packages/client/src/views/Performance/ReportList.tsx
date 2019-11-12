@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'

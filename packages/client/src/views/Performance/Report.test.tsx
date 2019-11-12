@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PERFORMANCE_REPORT } from '@register/navigation/routes'
-import { createTestApp } from '@register/tests/util'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@register/utils/constants'
+import { PERFORMANCE_REPORT } from '@client/navigation/routes'
+import { createTestApp } from '@client/tests/util'
+import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Header } from './utils'

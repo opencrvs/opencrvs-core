@@ -11,8 +11,8 @@
  */
 import { Button } from '@opencrvs/components/lib/buttons'
 import { ListTable } from '@opencrvs/components/lib/interface'
-import { createStore } from '@register/store'
-import { createTestComponent } from '@register/tests/util'
+import { createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { WeeklyReports } from './WeeklyReports'
