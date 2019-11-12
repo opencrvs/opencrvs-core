@@ -368,6 +368,9 @@ function GeneratedInputField({
           step={fieldDefinition.step}
           {...inputProps}
           value={inputProps.value as string}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
         />
       </InputField>
     )
