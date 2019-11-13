@@ -73,6 +73,7 @@ import {
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@client/utils/constants'
+import { TimeMounted } from '@client/components/TimeMounted'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -284,6 +285,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     })
   }
 
+  logTime(timeMs: number) {
+    const application = this.props.application
+    if (!application.timeLoggedMS) {
+      application.timeLoggedMS = 0
+    }
+    application.timeLoggedMS += timeMs
+    this.props.modifyApplication(application)
+  }
+
   confirmSubmission = (
     application: IApplication,
     submissionStatus: string,
@@ -434,244 +444,253 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
     return (
-      <StyledContainer
-        className={PAGE_TRANSITIONS_CLASSNAME}
-        id="informant_parent_view"
-      >
-        {isErrorOccured && (
-          <ErrorText id="error_message_section">
-            {intl.formatMessage(messages.registerFormQueryError)}
-          </ErrorText>
-        )}
-        {!isErrorOccured && (
-          <>
-            {activeSection.viewType === VIEW_TYPE.PREVIEW && (
-              <>
-                <EventTopBar
-                  title={intl.formatMessage(
-                    messages.newVitalEventRegistration,
-                    {
-                      event: application.event
+      <>
+        <TimeMounted
+          onUnmount={(duration: number) => {
+            this.logTime(duration)
+          }}
+        ></TimeMounted>
+        <StyledContainer
+          className={PAGE_TRANSITIONS_CLASSNAME}
+          id="informant_parent_view"
+        >
+          {isErrorOccured && (
+            <ErrorText id="error_message_section">
+              {intl.formatMessage(messages.registerFormQueryError)}
+            </ErrorText>
+          )}
+          {!isErrorOccured && (
+            <>
+              {activeSection.viewType === VIEW_TYPE.PREVIEW && (
+                <>
+                  <EventTopBar
+                    title={intl.formatMessage(
+                      messages.newVitalEventRegistration,
+                      {
+                        event: application.event
+                      }
+                    )}
+                    iconColor={
+                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                        ? 'violet'
+                        : 'orange'
                     }
-                  )}
-                  iconColor={
-                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'violet'
-                      : 'orange'
-                  }
-                  saveAction={{
-                    handler: this.onSaveAsDraftClicked,
-                    label: intl.formatMessage(buttonMessages.saveExitButton)
-                  }}
-                  menuItems={[
-                    {
-                      label: 'Delete Application',
-                      handler: () => this.onDeleteApplication(application)
+                    saveAction={{
+                      handler: this.onSaveAsDraftClicked,
+                      label: intl.formatMessage(buttonMessages.saveExitButton)
+                    }}
+                    menuItems={[
+                      {
+                        label: 'Delete Application',
+                        handler: () => this.onDeleteApplication(application)
+                      }
+                    ]}
+                  />
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    submitClickEvent={this.confirmSubmission}
+                    onChangeReviewForm={this.modifyApplication}
+                  />
+                </>
+              )}
+              {activeSection.viewType === VIEW_TYPE.REVIEW && (
+                <>
+                  <EventTopBar
+                    title={intl.formatMessage(
+                      messages.newVitalEventRegistration,
+                      {
+                        event: application.event
+                      }
+                    )}
+                    iconColor={
+                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                        ? 'violet'
+                        : 'orange'
                     }
-                  ]}
-                />
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  submitClickEvent={this.confirmSubmission}
-                  onChangeReviewForm={this.modifyApplication}
-                />
-              </>
-            )}
-            {activeSection.viewType === VIEW_TYPE.REVIEW && (
-              <>
-                <EventTopBar
-                  title={intl.formatMessage(
-                    messages.newVitalEventRegistration,
-                    {
-                      event: application.event
-                    }
-                  )}
-                  iconColor={
-                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'violet'
-                      : 'orange'
-                  }
-                  saveAction={{
-                    handler: () =>
-                      this.props.goToHomeTab(
-                        this.getRedirectionTabOnSaveOrExit()
-                      ),
-                    label: intl.formatMessage(buttonMessages.exitButton)
-                  }}
-                />
-                <ReviewSection
-                  pageRoute={this.props.pageRoute}
-                  draft={application}
-                  rejectApplicationClickEvent={this.toggleRejectForm}
-                  submitClickEvent={this.confirmSubmission}
-                  onChangeReviewForm={this.modifyApplication}
-                />
-              </>
-            )}
+                    saveAction={{
+                      handler: () =>
+                        this.props.goToHomeTab(
+                          this.getRedirectionTabOnSaveOrExit()
+                        ),
+                      label: intl.formatMessage(buttonMessages.exitButton)
+                    }}
+                  />
+                  <ReviewSection
+                    pageRoute={this.props.pageRoute}
+                    draft={application}
+                    rejectApplicationClickEvent={this.toggleRejectForm}
+                    submitClickEvent={this.confirmSubmission}
+                    onChangeReviewForm={this.modifyApplication}
+                  />
+                </>
+              )}
 
-            {activeSection.viewType === VIEW_TYPE.FORM && (
-              <>
-                <EventTopBar
-                  title={intl.formatMessage(
-                    messages.newVitalEventRegistration,
-                    {
-                      event: application.event
+              {activeSection.viewType === VIEW_TYPE.FORM && (
+                <>
+                  <EventTopBar
+                    title={intl.formatMessage(
+                      messages.newVitalEventRegistration,
+                      {
+                        event: application.event
+                      }
+                    )}
+                    iconColor={
+                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
+                        ? 'violet'
+                        : 'orange'
                     }
-                  )}
-                  iconColor={
-                    application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                      ? 'violet'
-                      : 'orange'
-                  }
-                  saveAction={{
-                    handler: this.onSaveAsDraftClicked,
-                    label: intl.formatMessage(buttonMessages.saveExitButton)
-                  }}
-                  menuItems={[
-                    {
-                      label: 'Delete Application',
-                      handler: () => this.onDeleteApplication(application)
-                    }
-                  ]}
-                />
-                <BodyContent id="register_form">
-                  <TertiaryButton
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <BackArrow />}
-                    onClick={this.props.goBack}
-                  >
-                    {intl.formatMessage(buttonMessages.back)}
-                  </TertiaryButton>
-                  <FormSectionTitle
-                    id={`form_section_title_${activeSectionGroup.id}`}
-                  >
-                    {(!activeSectionGroup.ignoreSingleFieldView &&
-                      activeSectionGroup.fields.length === 1 && (
+                    saveAction={{
+                      handler: this.onSaveAsDraftClicked,
+                      label: intl.formatMessage(buttonMessages.saveExitButton)
+                    }}
+                    menuItems={[
+                      {
+                        label: 'Delete Application',
+                        handler: () => this.onDeleteApplication(application)
+                      }
+                    ]}
+                  />
+                  <BodyContent id="register_form">
+                    <TertiaryButton
+                      align={ICON_ALIGNMENT.LEFT}
+                      icon={() => <BackArrow />}
+                      onClick={this.props.goBack}
+                    >
+                      {intl.formatMessage(buttonMessages.back)}
+                    </TertiaryButton>
+                    <FormSectionTitle
+                      id={`form_section_title_${activeSectionGroup.id}`}
+                    >
+                      {(!activeSectionGroup.ignoreSingleFieldView &&
+                        activeSectionGroup.fields.length === 1 && (
+                          <>
+                            {(activeSectionGroup.fields[0].hideHeader = true)}
+                            {intl.formatMessage(
+                              activeSectionGroup.fields[0].label
+                            )}
+                            {activeSectionGroup.fields[0].required && (
+                              <Required
+                                disabled={
+                                  activeSectionGroup.disabled ||
+                                  activeSection.disabled ||
+                                  false
+                                }
+                              >
+                                &nbsp;*
+                              </Required>
+                            )}
+                          </>
+                        )) || (
                         <>
-                          {(activeSectionGroup.fields[0].hideHeader = true)}
                           {intl.formatMessage(
-                            activeSectionGroup.fields[0].label
+                            activeSectionGroup.title || activeSection.title
                           )}
-                          {activeSectionGroup.fields[0].required && (
-                            <Required
+                          {activeSection.optional && (
+                            <Optional
+                              id={`form_section_opt_label_${activeSectionGroup.id}`}
                               disabled={
                                 activeSectionGroup.disabled ||
-                                activeSection.disabled ||
-                                false
+                                activeSection.disabled
                               }
                             >
-                              &nbsp;*
-                            </Required>
+                              &nbsp;&nbsp;•&nbsp;
+                              {intl.formatMessage(formMessages.optionalLabel)}
+                            </Optional>
                           )}
                         </>
-                      )) || (
-                      <>
-                        {intl.formatMessage(
-                          activeSectionGroup.title || activeSection.title
-                        )}
-                        {activeSection.optional && (
-                          <Optional
-                            id={`form_section_opt_label_${activeSectionGroup.id}`}
-                            disabled={
-                              activeSectionGroup.disabled ||
-                              activeSection.disabled
-                            }
-                          >
-                            &nbsp;&nbsp;•&nbsp;
-                            {intl.formatMessage(formMessages.optionalLabel)}
-                          </Optional>
-                        )}
-                      </>
+                      )}
+                    </FormSectionTitle>
+                    {activeSection.notice && (
+                      <Notice
+                        id={`form_section_notice_${activeSectionGroup.id}`}
+                      >
+                        {intl.formatMessage(activeSection.notice)}
+                      </Notice>
                     )}
-                  </FormSectionTitle>
-                  {activeSection.notice && (
-                    <Notice id={`form_section_notice_${activeSectionGroup.id}`}>
-                      {intl.formatMessage(activeSection.notice)}
-                    </Notice>
-                  )}
-                  <form
-                    id={`form_section_id_${activeSectionGroup.id}`}
-                    onSubmit={(event: React.FormEvent) =>
-                      event.preventDefault()
-                    }
-                  >
-                    <FormFieldGenerator
-                      id={activeSectionGroup.id}
-                      onChange={values => {
-                        debouncedModifyApplication(
-                          values,
-                          activeSection,
-                          application
-                        )
-                      }}
-                      setAllFieldsDirty={setAllFieldsDirty}
-                      fields={getVisibleGroupFields(activeSectionGroup)}
-                      draftData={application.data}
-                      onSetTouched={setTouchedFunc => {
-                        this.setAllFormFieldsTouched = setTouchedFunc
-                      }}
-                    />
-                  </form>
-                  {nextSectionGroup && (
-                    <FooterArea>
-                      <PrimaryButton
-                        id="next_section"
-                        onClick={() => {
-                          this.continueButtonHandler(
-                            this.props.pageRoute,
-                            application.id,
-                            nextSectionGroup.sectionId,
-                            nextSectionGroup.groupId,
-                            application.event.toLowerCase()
+                    <form
+                      id={`form_section_id_${activeSectionGroup.id}`}
+                      onSubmit={(event: React.FormEvent) =>
+                        event.preventDefault()
+                      }
+                    >
+                      <FormFieldGenerator
+                        id={activeSectionGroup.id}
+                        onChange={values => {
+                          debouncedModifyApplication(
+                            values,
+                            activeSection,
+                            application
                           )
                         }}
-                      >
-                        {intl.formatMessage(buttonMessages.continueButton)}
-                      </PrimaryButton>
-                      {application.review && (
-                        <StyledLinkButton
-                          id="back-to-review-button"
-                          className="item"
+                        setAllFieldsDirty={setAllFieldsDirty}
+                        fields={getVisibleGroupFields(activeSectionGroup)}
+                        draftData={application.data}
+                        onSetTouched={setTouchedFunc => {
+                          this.setAllFormFieldsTouched = setTouchedFunc
+                        }}
+                      />
+                    </form>
+                    {nextSectionGroup && (
+                      <FooterArea>
+                        <PrimaryButton
+                          id="next_section"
                           onClick={() => {
                             this.continueButtonHandler(
                               this.props.pageRoute,
                               application.id,
-                              application.submissionStatus &&
-                                application.submissionStatus ===
-                                  SUBMISSION_STATUS.DRAFT
-                                ? 'preview'
-                                : 'review',
-                              application.submissionStatus &&
-                                application.submissionStatus ===
-                                  SUBMISSION_STATUS.DRAFT
-                                ? 'preview-view-group'
-                                : 'review-view-group',
+                              nextSectionGroup.sectionId,
+                              nextSectionGroup.groupId,
                               application.event.toLowerCase()
                             )
                           }}
                         >
-                          {intl.formatMessage(messages.backToReviewButton)}
-                        </StyledLinkButton>
-                      )}
-                    </FooterArea>
-                  )}
-                </BodyContent>
-              </>
-            )}
-          </>
-        )}
-        {this.state.rejectFormOpen && (
-          <RejectRegistrationForm
-            onBack={this.toggleRejectForm}
-            confirmRejectionEvent={this.confirmSubmission}
-            duplicate={duplicate}
-            draftId={application.id}
-            event={this.getEvent()}
-            application={application}
-          />
-        )}
-      </StyledContainer>
+                          {intl.formatMessage(buttonMessages.continueButton)}
+                        </PrimaryButton>
+                        {application.review && (
+                          <StyledLinkButton
+                            id="back-to-review-button"
+                            className="item"
+                            onClick={() => {
+                              this.continueButtonHandler(
+                                this.props.pageRoute,
+                                application.id,
+                                application.submissionStatus &&
+                                  application.submissionStatus ===
+                                    SUBMISSION_STATUS.DRAFT
+                                  ? 'preview'
+                                  : 'review',
+                                application.submissionStatus &&
+                                  application.submissionStatus ===
+                                    SUBMISSION_STATUS.DRAFT
+                                  ? 'preview-view-group'
+                                  : 'review-view-group',
+                                application.event.toLowerCase()
+                              )
+                            }}
+                          >
+                            {intl.formatMessage(messages.backToReviewButton)}
+                          </StyledLinkButton>
+                        )}
+                      </FooterArea>
+                    )}
+                  </BodyContent>
+                </>
+              )}
+            </>
+          )}
+          {this.state.rejectFormOpen && (
+            <RejectRegistrationForm
+              onBack={this.toggleRejectForm}
+              confirmRejectionEvent={this.confirmSubmission}
+              duplicate={duplicate}
+              draftId={application.id}
+              event={this.getEvent()}
+              application={application}
+            />
+          )}
+        </StyledContainer>
+      </>
     )
   }
 }

@@ -219,6 +219,7 @@ input RegWorkflowInput {
   timestamp: Date
   comments: [CommentInput]
   location: LocationInput
+  timeLoggedMS: Int
 }
 
 type RegWorkflow { # Task

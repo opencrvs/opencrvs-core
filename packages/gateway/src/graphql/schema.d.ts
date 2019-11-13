@@ -785,6 +785,7 @@ export interface GQLRegWorkflowInput {
   timestamp?: GQLDate
   comments?: Array<GQLCommentInput | null>
   location?: GQLLocationInput
+  timeLoggedMS?: number
 }
 
 export interface GQLUserInput {
