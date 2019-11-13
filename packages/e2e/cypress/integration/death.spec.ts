@@ -123,7 +123,7 @@ context('Death Integration Test', () => {
     // SELECT ADDITIONAL INFORMANT
     cy.get('#relationship_OTHER').click()
     cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Friend')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_OTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
@@ -132,7 +132,7 @@ context('Death Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01678945638'
     )
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -163,16 +163,16 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -181,12 +181,12 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Chronic Obstructive Pulmonary Disease')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -214,9 +214,9 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
@@ -257,8 +257,8 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
+    cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
-    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_APPLICANT').click()
 
@@ -266,7 +266,7 @@ context('Death Integration Test', () => {
       '01741123963'
     )
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -282,23 +282,23 @@ context('Death Integration Test', () => {
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // MANNER OF DEATH
     cy.get('#manner_NATURAL_CAUSES').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#applicantFamilyName').type('উদ্দিন')
@@ -309,9 +309,9 @@ context('Death Integration Test', () => {
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
@@ -360,7 +360,7 @@ context('Death Integration Test', () => {
     // SELECT ADDITIONAL INFORMANT
     cy.get('#relationship_OTHER').click()
     cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Colleague')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_OTHER').click()
 
@@ -370,7 +370,7 @@ context('Death Integration Test', () => {
       '01753741963'
     )
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -402,18 +402,18 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -423,13 +423,13 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Coronary artery disease')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -458,9 +458,9 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
@@ -509,7 +509,7 @@ context('Death Integration Test', () => {
     // SELECT ADDITIONAL INFORMANT
     cy.get('#relationship_HEAD_OF_THE_INSTITUTE').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_OTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
@@ -520,7 +520,7 @@ context('Death Integration Test', () => {
       '01852741963'
     )
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -552,18 +552,18 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -573,13 +573,13 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Brain stroke')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -608,9 +608,9 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
 
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#registerApplicationBtn').click()
     // MODAL
