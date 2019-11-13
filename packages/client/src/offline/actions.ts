@@ -92,6 +92,7 @@ export type IFilterLocationsAction = {
   payload: ILanguageState
 }
 export const READY = 'OFFLINE/READY' as const
+export const UPDATED = 'OFFLINE/UPDATED' as const
 
 export const locationsLoaded = (
   payload: ILocationDataResponse
@@ -163,6 +164,11 @@ export const offlineDataReady = (state: IOfflineData) => ({
   payload: state
 })
 
+export const offlineDataUpdated = (state: IOfflineData) => ({
+  type: UPDATED,
+  payload: state
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -178,3 +184,4 @@ export type Action =
   | AssetsFailedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
+  | ReturnType<typeof offlineDataUpdated>
