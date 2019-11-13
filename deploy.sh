@@ -55,16 +55,16 @@ echo
 echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
-mkdir -p /tmp/compose/infrastructure/backups
+mkdir -p /tmp/compose/infrastructure/default_backups
 
 # Copy selected country config to public & infrastructure folder
 cp packages/resources/src/$COUNTRY/config/register-config.prod.js /tmp/compose/infrastructure/register-config.js
 cp packages/resources/src/$COUNTRY/config/login-config.prod.js /tmp/compose/infrastructure/login-config.js
 
-# Copy selected country backups to infrastructure backups folder
-cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/backups/hearth-dev.gz
-cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastructure/backups/openhim-dev.gz
-cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/backups/user-mgnt.gz
+# Copy selected country default backups to infrastructure default_backups folder
+cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
+cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
+cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/

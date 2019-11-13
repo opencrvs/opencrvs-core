@@ -59,9 +59,9 @@
     - name: "Setup crontab to backup the opencrvs data"
       cron:
         name: "backup opencrvs"
-        minute: "30"
-        hour: "4"
-        job: "cd ~/ && sh /tmp/compose/infrastructure/emergency-backup-metadata.sh >> /var/log/opencrvs-backup.log 2>&1"
+        minute: "0"
+        hour: "0"
+        job: "cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh >> /var/log/opencrvs-backup.log 2>&1"
 
     - name: "Check file for encrypted file system exists"
       stat:

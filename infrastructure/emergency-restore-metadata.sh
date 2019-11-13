@@ -12,16 +12,16 @@
 # This script clears all data and restores a specific day's data.  It is irreversable, so use with caution.
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-restore-metadata.sh mon|tue|wed|thu|fri|sat|sun'
-    echo "Script must receive a lowercase day of the week parameter to restore data from that specific day"
-    echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev.gz, openhim-dev.gz and user-mgnt.gz must exist in /backups/<day of the week> folder"
-    echo "The Elasticsearch backup snapshot file named: snapshot_<day of the week> must exist in the /backups/elasticsearch folder"
-    echo "The InfluxDB backup files must exist in the /backups/influxdb/<day of the week> folder"
+    echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01'
+    echo "Script must receive a date parameter to restore data from that specific day"
+    echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /backups/mongo/{date} folder"
+    echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /backups/elasticsearch folder"
+    echo "The InfluxDB backup files must exist in the /backups/influxdb/{date} folder"
     exit 1
 }
 
-if [ -z "$1" ] || { [ $1 != 'mon' ] && [ $1 != 'tue' ] && [ $1 != 'wed' ] && [ $1 != 'thu' ] && [ $1 != 'fri' ] && [ $1 != 'sat' ] && [ $1 != 'sun' ] ;} ; then
-    echo "Error: Argument for the day of the week is required in position 1.  You must select which day's data you would like to roll back to."
+if [ -z "$1" ] ; then
+    echo "Error: Argument for the date is required in position 1.  You must select which day's data you would like to roll back to."
     print_usage_and_exit
 fi
 
@@ -59,12 +59,12 @@ docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasti
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP DATABASE \"ocrvs\"" -v
 # Restore Hearth, OpenHIM and User db from backup
-docker run --rm -v $DIR/backups/$1:/backups/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/hearth-dev.gz"
-docker run --rm -v $DIR/backups/$1:/backups/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/openhim-dev.gz"
-docker run --rm -v $DIR/backups/$1:/backups/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/$1/user-mgnt.gz"
+docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev.gz"
+docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev.gz"
+docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt.gz"
 # Restore Elasticsearch from backup
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
 # Restore InfluxDb from backup
