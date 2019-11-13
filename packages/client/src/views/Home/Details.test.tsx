@@ -29,9 +29,11 @@ import {
   createApplication,
   storeApplication,
   modifyApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import { Event } from '@client/forms'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
@@ -647,90 +649,141 @@ describe('Field Agnet tests', () => {
 describe('Registrar tests', () => {
   const { store } = createStore()
 
+  const graphqlMock = [
+    {
+      request: {
+        query: FETCH_REGISTRATION_BY_COMPOSITION,
+        variables: {
+          id: '1'
+        }
+      },
+      result: {
+        data: {
+          fetchRegistration: {
+            id: '1',
+            // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+            // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+            child: {
+              id: 'FAKE_ID',
+              name: [
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'Anik'
+                },
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'অনিক'
+                }
+              ]
+            },
+            deceased: {
+              name: [
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'Anik'
+                },
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'অনিক'
+                }
+              ]
+            },
+            informant: {
+              individual: {
+                telecom: [
+                  {
+                    use: '',
+                    system: 'phone',
+                    value: '01622688231'
+                  }
+                ]
+              }
+            },
+            registration: {
+              id: '1',
+              type: 'death',
+              trackingId: 'DQRZWDR',
+              contactPhoneNumber: '',
+              status: [
+                {
+                  ...registrarDefaultStatus,
+                  type: 'REJECTED',
+                  comments: [
+                    {
+                      comment: 'reason=duplicate&comment=dup'
+                    }
+                  ]
+                },
+                { ...registrarDefaultStatus, type: 'APPLICATION' }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+
   beforeAll(() => {
     merge(mockUserResponse, registrarNameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
   })
 
-  it('Shows update button for a rejected application if the user is a registrar', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: '1'
-          }
-        },
-        result: {
-          data: {
-            fetchRegistration: {
-              id: '1',
-              // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
-              child: {
-                id: 'FAKE_ID',
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: '',
-                    familyName: 'Anik'
-                  },
-                  {
-                    use: 'bn',
-                    firstNames: '',
-                    familyName: 'অনিক'
-                  }
-                ]
-              },
-              deceased: {
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: '',
-                    familyName: 'Anik'
-                  },
-                  {
-                    use: 'bn',
-                    firstNames: '',
-                    familyName: 'অনিক'
-                  }
-                ]
-              },
-              informant: {
-                individual: {
-                  telecom: [
-                    {
-                      use: '',
-                      system: 'phone',
-                      value: '01622688231'
-                    }
-                  ]
-                }
-              },
-              registration: {
-                id: '1',
-                type: 'death',
-                trackingId: 'DQRZWDR',
-                contactPhoneNumber: '',
-                status: [
-                  {
-                    ...registrarDefaultStatus,
-                    type: 'REJECTED',
-                    comments: [
-                      {
-                        comment: 'reason=duplicate&comment=dup'
-                      }
-                    ]
-                  },
-                  { ...registrarDefaultStatus, type: 'APPLICATION' }
-                ]
-              }
-            }
-          }
-        }
-      }
-    ]
+  it('Shows download for a rejected application if the user is a registrar', async () => {
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: '1'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    getItem.mockReturnValue(registerScopeToken)
+    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    testComponent.component.update()
+    const downloadButton = testComponent.component.find('#action-download')
+    expect(downloadButton.hostNodes()).toHaveLength(1)
+    downloadButton.hostNodes().simulate('click')
+
+    testComponent.component.update()
+    expect(
+      testComponent.component.find('#action-loading').hostNodes()
+    ).toHaveLength(1)
+  })
+
+  it('Shows update button for a downloaded rejected application if the user is a registrar', async () => {
+    store.dispatch(
+      modifyApplication({
+        id: '1',
+        event: Event.DEATH,
+        downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
+        data: {}
+      })
+    )
     const testComponent = await createTestComponent(
       // @ts-ignore
       <Details

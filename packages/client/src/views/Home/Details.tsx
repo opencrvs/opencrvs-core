@@ -12,7 +12,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS,
+  makeApplicationReadyToDownload,
+  storeApplication
+} from '@client/applications'
 import {
   goToPage as goToPageAction,
   goBack as goBackAction,
@@ -27,7 +33,9 @@ import {
   StatusGreen,
   StatusCollected,
   StatusRejected,
-  StatusFailed
+  StatusFailed,
+  Download,
+  Warning
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -45,8 +53,8 @@ import {
   GQLRegStatus,
   GQLComment
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Event } from '@opencrvs/client/src/forms'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Event, Action } from '@opencrvs/client/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
@@ -107,6 +115,15 @@ const StatusContainer = styled.div`
 const ActionButton = styled(PrimaryButton)`
   margin: 6px 50px 30px;
 `
+const DownloadStatusIndicator = styled.div`
+  margin: 6px 50px 30px 40px;
+  display: flex;
+  align-items: center;
+
+  & > :first-child {
+    margin-right: 8px;
+  }
+`
 const QuerySpinner = styled(Spinner)`
   width: 70px;
   height: 70px;
@@ -133,10 +150,12 @@ interface IDetailProps {
   language: string
   applicationId: string
   draft: IApplication | null
+  outboxApplications: IApplication[]
   userDetails: IUserDetails | null
   goToPage: typeof goToPageAction
   goBack: typeof goBackAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  storeApplication: typeof storeApplication
   scope: Scope | null
 }
 
@@ -370,10 +389,24 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     }
   }
 
+  downloadApplication = (
+    event: string,
+    compositionId: string,
+    action: string
+  ) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      event.toLowerCase() as Event,
+      compositionId,
+      action
+    )
+    this.props.storeApplication(downloadableApplication)
+  }
+
   getActionForStateAndScope = (
     event: string | undefined,
     id: string | undefined,
-    applicationState: DraftStatus | GQLRegStatus | null
+    applicationState: DraftStatus | GQLRegStatus | null,
+    downloadStatus?: string
   ) => {
     if (
       applicationState === REJECTED &&
@@ -388,6 +421,30 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       applicationState === REGISTERED.toUpperCase() &&
       this.userHasRegisterOrValidateScope()
     ) {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        return downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ? (
+          <DownloadStatusIndicator>
+            <span>{this.props.intl.formatMessage(messages.downloading)}</span>
+            <Spinner id="action-loading" size={24} />
+          </DownloadStatusIndicator>
+        ) : (
+          <DownloadStatusIndicator>
+            {downloadStatus === DOWNLOAD_STATUS.FAILED && <Warning />}
+            <TertiaryButton
+              id="action-download"
+              icon={() => <Download />}
+              onClick={() => {
+                this.downloadApplication(
+                  event as string,
+                  id as string,
+                  Action.LOAD_CERTIFICATE_APPLICATION
+                )
+              }}
+            />
+          </DownloadStatusIndicator>
+        )
+      }
       return (
         <ActionButton
           id="registrar_print"
@@ -408,6 +465,31 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         applicationState === REJECTED) &&
       this.userHasRegisterOrValidateScope()
     ) {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        return downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ? (
+          <DownloadStatusIndicator>
+            <span>{this.props.intl.formatMessage(messages.downloading)}</span>
+            <Spinner id="action-loading" size={24} />
+          </DownloadStatusIndicator>
+        ) : (
+          <DownloadStatusIndicator>
+            {downloadStatus === DOWNLOAD_STATUS.FAILED && <Warning />}
+            <TertiaryButton
+              id="action-download"
+              icon={() => <Download />}
+              onClick={() => {
+                this.downloadApplication(
+                  event as string,
+                  id as string,
+                  Action.LOAD_REVIEW_APPLICATION
+                )
+              }}
+            />
+          </DownloadStatusIndicator>
+        )
+      }
+
       return (
         <ActionButton
           id="registrar_update"
@@ -495,6 +577,13 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       data.fetchRegistration &&
       data.fetchRegistration.id &&
       (data.fetchRegistration.id as string)
+
+    const foundApplication = this.props.outboxApplications.find(
+      application => application.id === id
+    )
+
+    const downloadStatus =
+      (foundApplication && foundApplication.downloadStatus) || undefined
     return {
       title:
         (applicant &&
@@ -505,7 +594,12 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         '',
       history,
       action: applicationState
-        ? this.getActionForStateAndScope(event, id, applicationState)
+        ? this.getActionForStateAndScope(
+            event,
+            id,
+            applicationState,
+            downloadStatus
+          )
         : undefined
     }
   }
@@ -601,6 +695,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
             variables={{
               id: this.props.applicationId
             }}
+            fetchPolicy="no-cache"
           >
             {({
               loading,
@@ -642,6 +737,7 @@ function mapStateToProps(
     userDetails: getUserDetails(state),
     scope: getScope(state),
     applicationId: match && match.params && match.params.applicationId,
+    outboxApplications: state.applicationsState.applications,
     draft:
       (state.applicationsState.applications &&
         match &&
@@ -664,6 +760,7 @@ export const Details = connect(
   {
     goToPage: goToPageAction,
     goBack: goBackAction,
-    goToPrintCertificate: goToPrintCertificateAction
+    goToPrintCertificate: goToPrintCertificateAction,
+    storeApplication
   }
 )(injectIntl(withTheme(DetailView)))
