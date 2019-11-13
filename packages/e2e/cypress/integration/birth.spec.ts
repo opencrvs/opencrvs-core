@@ -17,37 +17,37 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests from application to registration using minimum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
+
     // LOGIN
     cy.login('fieldWorker')
-    // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
+
     // LANDING PAGE
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
+
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
     cy.get('#continue').click()
+
     // SELECT INFORMANT
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
+
     // SELECT APPLICANT
     cy.get('#applicant_MOTHER').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_MOTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('স্পিভক')
@@ -62,8 +62,8 @@ context('Birth Integration Test', () => {
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
@@ -76,49 +76,46 @@ context('Birth Integration Test', () => {
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_false').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // DOCUMENTS
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // PREVIEW
     cy.get('#submit_form').click()
+
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
+    cy.waitUntilApplicationSynced()
+    cy.get('#row_0 #submitted0').should('exist')
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
+
     // LOGIN AS LOCAL REGISTRAR
     cy.get('#username').type('mohammad.ashraful')
     cy.get('#password').type('test')
     cy.get('#login-mobile-submit').click()
     cy.get('#code').type('000000')
     cy.get('#login-mobile-submit').click()
-    // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
+
     // LANDING PAGE
-    cy.wait(3000)
-    cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review', { timeout: 30000 }).should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
     cy.get('#registerApplicationBtn').click()
+
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 
   it('Tests from application to registration using maximum input', () => {
