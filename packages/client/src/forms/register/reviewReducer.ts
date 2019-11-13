@@ -45,6 +45,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
+    case offlineActions.DEFINITIONS_LOADED:
       const birth = deserializeForm(action.payload.forms.registerForm.birth)
       const death = deserializeForm(action.payload.forms.registerForm.death)
 
