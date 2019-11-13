@@ -17,7 +17,8 @@ context('Death Integration Test', () => {
   })
 
   it('Tests from application to registration using minimum input', () => {
-    cy.clock()
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
@@ -104,7 +105,8 @@ context('Death Integration Test', () => {
   })
 
   it('Tests from application to registration using maximum input', () => {
-    cy.clock()
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
@@ -242,7 +244,8 @@ context('Death Integration Test', () => {
   })
 
   it('Tests from application to rejection using minimum input', () => {
-    cy.clock()
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
@@ -339,7 +342,8 @@ context('Death Integration Test', () => {
   })
 
   it('Tests from application to rejection using maximum input', () => {
-    cy.clock()
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
@@ -487,7 +491,8 @@ context('Death Integration Test', () => {
   })
 
   it('Tests registration by registrar using maximum input', () => {
-    cy.clock()
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('registrar')
     // CREATE PIN
     cy.createPin()
