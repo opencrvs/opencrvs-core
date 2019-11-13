@@ -869,7 +869,6 @@ describe('when user is in the register form for death event', () => {
         <RegisterForm
           location={mock}
           scope={mock}
-          foform
           history={history}
           staticContext={mock}
           registerForm={form}

@@ -9,13 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-declare namespace Cypress {
-  interface Chainable {
-    login: (userType: string) => void
-    logout: () => void
-    selectOption: (selector: string, text: string, option: string) => void
-    goToNextFormSection: () => void
-    createPin: () => void
-    waitUntilApplicationSynced: () => void
-  }
-}
+import styled from '@client/styledComponents'
+
+export const Header = styled.h3`
+  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.h4Style};
+`

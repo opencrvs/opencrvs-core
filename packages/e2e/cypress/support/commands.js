@@ -94,3 +94,23 @@ Cypress.Commands.add('logout', () => {
   cy.get('#sub-menu').click()
   cy.get('#Logout-menu-item').click()
 })
+
+Cypress.Commands.add('goToNextFormSection', () => {
+  cy.tick(1000) // Clear debounce wait from form
+  cy.get('#next_section').click()
+})
+
+Cypress.Commands.add('createPin', () => {
+  // CREATE PIN
+  cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
+  cy.get('#createPinBtn', { timeout: 30000 }).click()
+  for (let i = 1; i <= 8; i++) {
+    cy.get('#pin-keypad-container')
+      .click()
+      .type(`${i % 2}`)
+  }
+})
+Cypress.Commands.add('waitUntilApplicationSynced', () => {
+  cy.log('Waiting for application to sync...')
+  cy.tick(6000)
+})

@@ -9,13 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-declare namespace Cypress {
-  interface Chainable {
-    login: (userType: string) => void
-    logout: () => void
-    selectOption: (selector: string, text: string, option: string) => void
-    goToNextFormSection: () => void
-    createPin: () => void
-    waitUntilApplicationSynced: () => void
+import { defineMessages } from 'react-intl'
+
+const messagesToDefine = {
+  weeklyTabTitle: {
+    id: 'performance.topbar.tab.title.weekly',
+    defaultMessage: 'Weekly',
+    description: 'Title used for weekly tab in performance page header'
+  },
+  weeklyReportsBodyHeader: {
+    id: 'performance.body.header.weekly.reports',
+    defaultMessage: 'Weekly reports',
+    description: 'Header used for the body of weekly reports page'
   }
 }
+
+export const messages = defineMessages(messagesToDefine)
