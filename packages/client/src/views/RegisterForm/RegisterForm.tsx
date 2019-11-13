@@ -352,15 +352,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
     event: string
   ) => {
     const { preventContinueIfError } = this.props.activeSectionGroup
+    let groupHasError = false
     if (preventContinueIfError) {
-      const activeSectionFields = this.props.activeSectionGroup.fields
-      const activeSectionValues = this.props.application.data[
-        this.props.activeSection.id
-      ]
-      const groupHasError = hasFormError(
-        activeSectionFields,
-        activeSectionValues
-      )
+      if (!this.props.application.data[this.props.activeSection.id]) {
+        groupHasError = true
+      } else {
+        const activeSectionFields = this.props.activeSectionGroup.fields
+        const activeSectionValues = this.props.application.data[
+          this.props.activeSection.id
+        ]
+        groupHasError = hasFormError(activeSectionFields, activeSectionValues)
+      }
       if (groupHasError) {
         this.showAllValidationErrors()
         return

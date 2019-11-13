@@ -50,8 +50,7 @@ const messagesToDefine: ISelectInformantMessages = {
   },
   deathErrorMessage: {
     id: 'register.selectInformant.deathErrorMessage',
-    defaultMessage:
-      'Please select the relationship to the deceased and any relevant contact details.',
+    defaultMessage: 'Please select the relationship to the deceased.',
     description: 'Error Message to show when no informant is selected for death'
   }
 }

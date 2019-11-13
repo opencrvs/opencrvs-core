@@ -1091,6 +1091,9 @@ describe('Certificate collector test for a death registration', () => {
                 }
               ],
               type: 'DEATH',
+              contact: 'OTHER',
+              contactPhoneNumber: '+8801671010143',
+              contactRelationship: 'Friend',
               trackingId: 'DUFPWEZ',
               registrationNumber: '2019333494DUFPWEZ4',
               __typename: 'Registration'
