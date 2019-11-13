@@ -53,6 +53,8 @@ import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/Coll
 import TransitionWrapper from '@client/components/TransitionWrapper'
 import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { Payment } from '@client/views/PrintCertificate/Payment'
+import { ReportList } from '@client/views/Performance/ReportList'
+import { Report } from '@client/views/Performance/Report'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -265,6 +267,18 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.CREATE_USER_SECTION}
                                             component={CreateNewUser}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_REPORT_LIST
+                                            }
+                                            component={ReportList}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.PERFORMANCE_REPORT}
+                                            component={Report}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

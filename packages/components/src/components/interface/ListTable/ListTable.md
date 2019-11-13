@@ -37,6 +37,24 @@ const list = [
     role: 'Registrar',
     type: 'Chairman',
     status: 'Active'
+  },
+  {
+    name: 'Euan',
+    role: 'Registrar',
+    type: 'Chairman',
+    status: 'Active'
+  },
+  {
+    name: 'Euan',
+    role: 'Registrar',
+    type: 'Chairman',
+    status: 'Active'
+  },
+  {
+    name: 'Euan',
+    role: 'Registrar',
+    type: 'Chairman',
+    status: 'Active'
   }
 ]
 
@@ -54,12 +72,15 @@ class ListTableExample extends React.Component {
             key: 'name',
             isSortable: true,
             icon: <ArrowDownBlue />,
-            sortFunction: key => alert(key)
+            sortFunction: key => alert(`Sort by: ${key}`)
           },
           {
             label: 'Role',
             width: 30,
-            key: 'role'
+            key: 'role',
+            isSortable: true,
+            icon: <ArrowDownBlue />,
+            sortFunction: key => alert(`Sort by: ${key}`)
           },
           {
             label: 'Type',

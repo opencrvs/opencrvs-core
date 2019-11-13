@@ -197,9 +197,10 @@ class DocumentUploaderWithOptionComp extends React.Component<
       ]
     }))
 
-    const minimumProcessingTime = new Promise(resolve =>
+    const minimumProcessingTime = new Promise<void>(resolve =>
       setTimeout(resolve, 2000)
     )
+
     try {
       // Start processing
       ;[fileAsBase64] = await Promise.all([

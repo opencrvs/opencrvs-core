@@ -249,7 +249,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
           path: '',
           url: ''
         }}
-        draftCount={1}
       />,
       store,
       graphqlMock
@@ -300,7 +299,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
           path: '',
           url: ''
         }}
-        draftCount={1}
       />,
       store,
       graphqlMock
@@ -366,7 +364,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
           path: '',
           url: ''
         }}
-        draftCount={1}
       />,
       store,
       graphqlMock
