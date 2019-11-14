@@ -48,7 +48,7 @@ Object {
 }
 `;
 
-exports[`When an in-progress application is recieved writes the in complete field points to influxdb 1`] = `
+exports[`When an in-progress application is received writes the in complete field points to influxdb 1`] = `
 Object {
   "fields": Object {
     "missing_field_group_id": "child-view-group",

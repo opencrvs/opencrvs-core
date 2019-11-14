@@ -180,6 +180,10 @@
             "valueReference": {
               "reference": "Practitioner/70cf7c52-2cc5-41fa-a5f4-6dea9af29bd3"
             }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 1234
           }
         ],
         "lastModified": "2019-10-08T06:42:07.666Z",

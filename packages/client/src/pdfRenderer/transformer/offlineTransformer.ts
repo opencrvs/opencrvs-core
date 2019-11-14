@@ -86,7 +86,6 @@ function getTransformedAddress(
         return value.replace(new RegExp(`${key}`, 'g'), keyValues[key])
       }
     } else {
-      console.log(JSON.stringify(key))
       const addresses =
         templateData.resource[addressType as keyof typeof templateData.resource]
       const address = addresses[keyValues[key] as keyof typeof addresses]
@@ -97,7 +96,7 @@ function getTransformedAddress(
 
 export const offlineTransformers: IFunctionTransformer = {
   /*
-    OfflineCompanyLogo provides the company logo from offline data.    
+    OfflineCompanyLogo provides the company logo from offline data.
   */
   OfflineCompanyLogo: (
     templateData: TemplateTransformerData,
@@ -108,11 +107,11 @@ export const offlineTransformers: IFunctionTransformer = {
 
   /*
     OfflineAddress allows you to get coditional address fields from offline data
-    @params: 
+    @params:
       -  conditionalKeys []: it expects an array of conditional blocks.
          - codition: holds the actual condition. Right now it's only equal matches
          - addressType: offline address type. Ex: facilities | locations
-         - addressKey: field name of the address object. Ex: name | alias 
+         - addressKey: field name of the address object. Ex: name | alias
          - adddresses: Mendatory object. It is an object containing a countryCode and formatted keyes to determine how to parse local and international addresses and be able to traverse through the object structure
            and fetch the appropriate value if found otherwise will throw exception.  countryCode & localAddress are mandatory fields of the addresses object
            Ex: '{child.addressLine4}, {child.district}, {child.state}'

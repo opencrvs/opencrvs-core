@@ -191,6 +191,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -444,6 +448,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -697,6 +705,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -934,6 +946,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -1118,7 +1134,7 @@ describe('When an existing application is marked certified', () => {
   })
 })
 
-describe('When an in-progress application is recieved', () => {
+describe('When an in-progress application is received', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1136,10 +1152,11 @@ describe('When an in-progress application is recieved', () => {
       },
       payload
     })
-    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
+    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0][0].find(
       ({ measurement }: { measurement: string }) =>
         measurement === 'in_complete_fields'
     )
+
     expect(res.statusCode).toBe(200)
     expect(inCompleteFieldPoints).toMatchSnapshot()
   })

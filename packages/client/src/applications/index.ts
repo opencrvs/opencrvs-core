@@ -76,6 +76,7 @@ export interface IVisitedGroupId {
   sectionId: string
   groupId: string
 }
+
 export interface IApplication {
   id: string
   data: IFormData
@@ -94,6 +95,7 @@ export interface IApplication {
   registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
+  timeLoggedMS?: number
 }
 
 type Relation =

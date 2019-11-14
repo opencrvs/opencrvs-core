@@ -113,6 +113,7 @@ export const intlReducer: LoopReducer<IntlState, any> = (
       }
 
     case offlineActions.READY:
+    case offlineActions.UPDATED:
       const languages = action.payload.languages
 
       const loadedLanguagesState: ILanguageState = languages.reduce(

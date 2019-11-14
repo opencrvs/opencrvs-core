@@ -104,6 +104,10 @@ enum INFORMANT {
   SPOUSE = 'SPOUSE',
   SON = 'SON',
   DAUGHTER = 'DAUGHTER',
+  SON_IN_LAW = 'SON_IN_LAW',
+  DAUGHTER_IN_LAW = 'DAUGHTER_IN_LAW',
+  GRANDSON = 'GRANDSON',
+  GRANDDAUGHTER = 'GRANDDAUGHTER',
   EXTENDED_FAMILY = 'EXTENDED_FAMILY'
 }
 
@@ -171,22 +175,6 @@ const setInformantFields = (
   } else {
     return [
       {
-        id: `select_informant_${INFORMANT.MOTHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.mother),
-          value: INFORMANT.MOTHER
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.FATHER}`,
-        option: {
-          label: intl.formatMessage(formMessages.father),
-          value: INFORMANT.FATHER
-        },
-        disabled: false
-      },
-      {
         id: `select_informant_${INFORMANT.SPOUSE}`,
         option: {
           label: intl.formatMessage(formMessages.spouse),
@@ -211,10 +199,50 @@ const setInformantFields = (
         disabled: false
       },
       {
-        id: `select_informant_${INFORMANT.EXTENDED_FAMILY}`,
+        id: `select_informant_${INFORMANT.SON_IN_LAW}`,
         option: {
-          label: intl.formatMessage(formMessages.relationExtendedFamily),
-          value: INFORMANT.EXTENDED_FAMILY
+          label: intl.formatMessage(formMessages.sonInLaw),
+          value: INFORMANT.SON_IN_LAW
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.DAUGHTER_IN_LAW}`,
+        option: {
+          label: intl.formatMessage(formMessages.daughterInLaw),
+          value: INFORMANT.DAUGHTER_IN_LAW
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.FATHER}`,
+        option: {
+          label: intl.formatMessage(formMessages.father),
+          value: INFORMANT.FATHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.MOTHER}`,
+        option: {
+          label: intl.formatMessage(formMessages.mother),
+          value: INFORMANT.MOTHER
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.GRANDSON}`,
+        option: {
+          label: intl.formatMessage(formMessages.grandson),
+          value: INFORMANT.GRANDSON
+        },
+        disabled: false
+      },
+      {
+        id: `select_informant_${INFORMANT.GRANDDAUGHTER}`,
+        option: {
+          label: intl.formatMessage(formMessages.granddaughter),
+          value: INFORMANT.GRANDDAUGHTER
         },
         disabled: false
       },
@@ -252,9 +280,6 @@ type IFullProps = {
 
 interface IState {
   informant: string
-  phoneNumber: string
-  relationship: string
-  isPhoneNoError: boolean
   touched: boolean
   isError: boolean
 }
@@ -276,26 +301,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           (this.props.application.data[applicantsSection.id]
             .applicantsRelationToDeceased as string)) ||
         '',
-      phoneNumber:
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[registrationSection.id] &&
-          (this.props.application.data[registrationSection.id]
-            .registrationPhone as string)) ||
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[applicantsSection.id] &&
-          (this.props.application.data[applicantsSection.id]
-            .applicantPhone as string)) ||
-        '',
-      relationship:
-        (this.props.application &&
-          this.props.application.data &&
-          this.props.application.data[applicantsSection.id] &&
-          (this.props.application.data[applicantsSection.id]
-            .applicantOtherRelationship as string)) ||
-        '',
-      isPhoneNoError: false,
       touched: false,
       isError: false
     }
@@ -305,6 +310,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     const event = this.props.location.pathname.includes(Event.BIRTH)
       ? Event.BIRTH
       : Event.DEATH
+
     if (
       this.state.informant &&
       this.state.informant !== 'error' &&
@@ -343,7 +349,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
       const {
         application,
         goToBirthRegistrationAsParent,
-        goToDeathContactPoint,
+        goToDeathRegistration,
         registrationSection,
         applicantsSection
       } = this.props
@@ -371,9 +377,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             // Need to empty those bacause next screen will fill this up
             // TODO: currently contact point is the informant,
             // need to define the difference between informant and contact point on death schema
-            applicantsRelationToDeceased: '',
-            applicantPhone: '',
-            applicantOtherRelationship: ''
+            relationship: this.state.informant
           }
         }
       }
@@ -381,15 +385,12 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
 
       this.props.location.pathname.includes(Event.BIRTH)
         ? goToBirthRegistrationAsParent(this.props.match.params.applicationId)
-        : goToDeathContactPoint(this.props.match.params.applicationId)
+        : goToDeathRegistration(this.props.match.params.applicationId)
     } else if (
       event === Event.DEATH &&
       this.state.informant &&
       this.state.informant !== 'error' &&
-      this.state.informant === INFORMANT.SOMEONE_ELSE &&
-      this.state.phoneNumber &&
-      !this.state.isPhoneNoError &&
-      this.state.relationship !== ''
+      this.state.informant === INFORMANT.SOMEONE_ELSE
     ) {
       const {
         application,
@@ -403,9 +404,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
           [applicantsSection.id]: {
             ...application.data[applicantsSection.id],
             ...{
-              applicantsRelationToDeceased: this.state.informant,
-              applicantPhone: this.state.phoneNumber,
-              applicantOtherRelationship: this.state.relationship
+              relationship: this.state.informant
             }
           }
         }
@@ -461,53 +460,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
     } else {
       this.setState({ informant: 'error' })
     }
-  }
-  handleRelationshipChange = (value: string) => {
-    this.setState({
-      relationship: value,
-      touched: true,
-      isError: false
-    })
-  }
-  handlePhoneNoChange = (value: string) => {
-    let invalidPhoneNo = false
-    if (phoneNumberFormat(value)) {
-      invalidPhoneNo = true
-    }
-    this.setState({
-      isPhoneNoError: invalidPhoneNo ? true : false,
-      phoneNumber: value,
-      touched: true,
-      isError: false
-    })
-  }
-  renderPhoneNumberField = (): JSX.Element => {
-    return (
-      <InputField
-        id="phone_number"
-        label={this.props.intl.formatMessage(formMessages.phoneNumber)}
-        touched={this.state.touched}
-        error={
-          this.state.isPhoneNoError
-            ? this.props.intl.formatMessage(
-                validationMessages.phoneNumberNotValid
-              )
-            : ''
-        }
-        hideAsterisk={true}
-      >
-        <TextInput
-          id="phone_number_input"
-          type="tel"
-          name={PHONE_NO_FIELD_STRING}
-          isSmallSized={true}
-          value={this.state.phoneNumber}
-          onChange={e => this.handlePhoneNoChange(e.target.value)}
-          touched={this.state.touched}
-          error={this.state.isPhoneNoError}
-        />
-      </InputField>
-    )
   }
   render() {
     const { intl } = this.props
@@ -583,31 +535,6 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
                 />
               )
             })}
-            {this.state.informant === INFORMANT.SOMEONE_ELSE &&
-              event === Event.DEATH && (
-                <ChildContainer>
-                  <InputField
-                    id="relationship"
-                    label={intl.formatMessage(
-                      formMessages.applicantsRelationWithDeceased
-                    )}
-                    touched={this.state.touched}
-                    hideAsterisk={true}
-                  >
-                    <TextInput
-                      id="relationship_input"
-                      name="relationship"
-                      isSmallSized={true}
-                      value={this.state.relationship}
-                      onChange={e =>
-                        this.handleRelationshipChange(e.target.value)
-                      }
-                      touched={this.state.touched}
-                    />
-                  </InputField>
-                  {this.renderPhoneNumberField()}
-                </ChildContainer>
-              )}
           </Actions>
           <PrimaryButton id="continue" onClick={this.handleContinue}>
             {intl.formatMessage(buttonMessages.continueButton)}
