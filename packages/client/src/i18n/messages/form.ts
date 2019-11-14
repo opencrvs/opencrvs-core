@@ -84,6 +84,8 @@ interface IFormMessages {
   currentAddressSameAsPermanent: MessageDescriptor
   dateOfMarriage: MessageDescriptor
   daughter: MessageDescriptor
+  daughterInLaw: MessageDescriptor
+  granddaughter: MessageDescriptor
   deathAtFacility: MessageDescriptor
   deathAtOtherLocation: MessageDescriptor
   deathAtPrivateHome: MessageDescriptor
@@ -271,7 +273,13 @@ interface IFormMessages {
   signedAffidavitConfirmation: MessageDescriptor
   someoneElse: MessageDescriptor
   son: MessageDescriptor
+  sonInLaw: MessageDescriptor
+  grandson: MessageDescriptor
   spouse: MessageDescriptor
+  headOfTheInstitute: MessageDescriptor
+  driverOfTheVehicle: MessageDescriptor
+  ownerOfTheHouse: MessageDescriptor
+  officerInCharge: MessageDescriptor
   state: MessageDescriptor
   typeOfDocument: MessageDescriptor
   uploadDocForChild: MessageDescriptor
@@ -694,6 +702,16 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter',
     id: 'form.field.label.applicantRelation.daughter'
+  },
+  daughterInLaw: {
+    defaultMessage: 'Daughter in law',
+    description: 'Label for option Daughter in law',
+    id: 'form.field.label.applicantRelation.daughterInLaw'
+  },
+  granddaughter: {
+    defaultMessage: 'Granddaughter',
+    description: 'Label for option Granddaughter',
+    id: 'form.field.label.applicantRelation.granddaughter'
   },
   deathAtFacility: {
     defaultMessage: 'What hospital did the death occur at?',
@@ -1615,10 +1633,42 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for option Son',
     id: 'form.field.label.applicantRelation.son'
   },
+  sonInLaw: {
+    defaultMessage: 'Son in law',
+    description: 'Label for option Son in law',
+    id: 'form.field.label.applicantRelation.sonInLaw'
+  },
+  grandson: {
+    defaultMessage: 'Grandson',
+    description: 'Label for option Grandson',
+    id: 'form.field.label.applicantRelation.grandson'
+  },
   spouse: {
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse',
     id: 'form.field.label.applicantRelation.spouse'
+  },
+  headOfTheInstitute: {
+    defaultMessage: 'Head of the institution where the death occured',
+    description: 'Option for form field: Head of the institute',
+    id: 'form.field.label.applicantRelation.headOfTheInstitute'
+  },
+  driverOfTheVehicle: {
+    defaultMessage:
+      'Driver or operator of the land or water vehicle or aircraft where the death occured',
+    description: 'Option for form field: Driver of the vehicle',
+    id: 'form.field.label.applicantRelation.driverOfTheVehicle'
+  },
+  ownerOfTheHouse: {
+    defaultMessage: 'Owner of the house or building where the death occured',
+    description: 'Option for form field: Owner of the house',
+    id: 'form.field.label.applicantRelation.ownerOfTheHouse'
+  },
+  officerInCharge: {
+    defaultMessage:
+      'Officer-in-charge of the Thana of a road or public space where the death occured',
+    description: 'Option for form field: Officer-in-charge',
+    id: 'form.field.label.applicantRelation.officerInCharge'
   },
   state: {
     defaultMessage: 'Division',

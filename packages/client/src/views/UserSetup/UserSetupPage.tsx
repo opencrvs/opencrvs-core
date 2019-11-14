@@ -77,14 +77,20 @@ const NextButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
-interface IUserSetupPageProp {
-  userDetails: IUserDetails | null
+interface IOwnProps {
   setupData: IProtectedAccountSetupData
   goToStep: (
     step: ProtectedAccoutStep,
     data: IProtectedAccountSetupData
   ) => void
 }
+
+interface IStateData {
+  userDetails: IUserDetails | null
+}
+
+type IUserSetupPageProp = IOwnProps & IStateData
+
 export class UserSetupView extends React.Component<
   IUserSetupPageProp & IntlShapeProps
 > {
@@ -143,11 +149,10 @@ export class UserSetupView extends React.Component<
   }
 }
 
-export const UserSetupPage = connect(
-  function mapStateToProps(state: IStoreState) {
+export const UserSetupPage = connect<IStateData, {}, IOwnProps, IStoreState>(
+  (state: IStoreState) => {
     return {
       userDetails: getUserDetails(state)
     }
-  },
-  null
+  }
 )(injectIntl(UserSetupView))

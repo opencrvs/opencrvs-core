@@ -257,7 +257,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
           path: '',
           url: ''
         }}
-        draftCount={1}
       />,
       store,
       graphqlMock
@@ -426,7 +425,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
           path: '',
           url: ''
         }}
-        draftCount={1}
       />,
       store,
       graphqlMock

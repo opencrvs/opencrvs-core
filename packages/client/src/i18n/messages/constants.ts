@@ -39,6 +39,7 @@ interface IConstantsMessages {
   dod: MessageDescriptor
   downloading: MessageDescriptor
   eventDate: MessageDescriptor
+  export: MessageDescriptor
   failedToSend: MessageDescriptor
   gender: MessageDescriptor
   id: MessageDescriptor
@@ -67,12 +68,14 @@ interface IConstantsMessages {
   sentOn: MessageDescriptor
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
+  to: MessageDescriptor
   trackingId: MessageDescriptor
   type: MessageDescriptor
   update: MessageDescriptor
   user: MessageDescriptor
   username: MessageDescriptor
   waitingToSend: MessageDescriptor
+  week: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -216,6 +219,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for event date in list item',
     id: 'constants.eventDate'
   },
+  export: {
+    defaultMessage: 'Export',
+    description: 'Label used for export',
+    id: 'constants.export'
+  },
   failedToSend: {
     defaultMessage: 'Failed to send',
     description: 'Label for application status Failed',
@@ -357,6 +365,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for table header of column Submission status',
     id: 'constants.submissionStatus'
   },
+  to: {
+    defaultMessage: 'to',
+    description: 'Used in sentence',
+    id: 'constants.to'
+  },
   trackingId: {
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type',
@@ -386,6 +399,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Waiting to send',
     description: 'Label for application status Ready to Submit',
     id: 'constants.waitingToSend'
+  },
+  week: {
+    defaultMessage: 'Week',
+    description: 'Label for week',
+    id: 'constants.week'
   }
 }
 

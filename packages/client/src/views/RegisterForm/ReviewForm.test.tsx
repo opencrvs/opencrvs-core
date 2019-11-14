@@ -1247,7 +1247,7 @@ describe('ReviewForm tests', () => {
                 },
                 informant: {
                   id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
-                  relationship: 'EXTENDED_FAMILY',
+                  relationship: 'OTHER',
                   otherRelationship: 'Patternal uncle',
                   individual: {
                     id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
@@ -1323,6 +1323,9 @@ describe('ReviewForm tests', () => {
                     }
                   ],
                   type: 'DEATH',
+                  contact: 'OTHER',
+                  contactPhoneNumber: '+8801671010143',
+                  contactRelationship: 'Friend',
                   trackingId: 'DS8QZ0Z',
                   registrationNumber: null
                 },
@@ -1588,6 +1591,9 @@ describe('ReviewForm tests', () => {
                     }
                   ],
                   type: 'DEATH',
+                  contact: 'OTHER',
+                  contactPhoneNumber: '+8801671010143',
+                  contactRelationship: 'Friend',
                   trackingId: 'DS8QZ0Z',
                   registrationNumber: '2019123223DS8QZ0Z1'
                 },

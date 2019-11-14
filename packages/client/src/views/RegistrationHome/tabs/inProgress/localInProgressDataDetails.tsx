@@ -87,11 +87,13 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
   )
 }
 
-type IProps = IntlShapeProps & {
-  draft?: IApplication
+type IProps = {
+  draft: IApplication | undefined
 }
 
-class LocalInProgressDataDetailsComponent extends React.Component<IProps> {
+class LocalInProgressDataDetailsComponent extends React.Component<
+  IProps & IntlShapeProps
+> {
   transformer = (draft: IApplication | undefined) => {
     return {
       draftStartedOn: draft && draft.savedOn,
@@ -172,7 +174,9 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
   }
 }
 
-export const LocalInProgressDataDetails = connect(
-  mapStateToProps,
-  null
-)(injectIntl(LocalInProgressDataDetailsComponent))
+export const LocalInProgressDataDetails = connect<
+  IProps,
+  {},
+  { eventId: string },
+  IStoreState
+>(mapStateToProps)(injectIntl(LocalInProgressDataDetailsComponent))

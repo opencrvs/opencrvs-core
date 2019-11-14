@@ -17,14 +17,11 @@ context('Death Integration Test', () => {
   })
 
   it('Tests from application to registration using minimum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
+    // LOGIN
     cy.login('fieldWorker')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
@@ -36,9 +33,11 @@ context('Death Integration Test', () => {
     cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_APPLICANT').click()
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01526972106'
+    )
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -53,24 +52,21 @@ context('Death Integration Test', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // MANNER OF DEATH
     cy.get('#manner_NATURAL_CAUSES').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'No ID available', 'No ID available')
     cy.get('#applicantFamilyName').type('উদ্দিন')
@@ -80,40 +76,29 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000) // Wait for application to be sync'd
+    cy.waitUntilApplicationSynced()
+    cy.get('#row_0 #submitted0').should('exist')
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -121,19 +106,16 @@ context('Death Integration Test', () => {
     cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 
   it('Tests from application to registration using maximum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
+    // LOGIN
     cy.login('fieldWorker')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
@@ -142,12 +124,21 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_OTHER').click()
+    cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Friend')
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
+      'Colleague'
+    )
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01678945638'
+    )
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -178,19 +169,16 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -199,14 +187,12 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Chronic Obstructive Pulmonary Disease')
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -234,40 +220,30 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
+    cy.waitUntilApplicationSynced()
+    cy.get('#row_0 #submitted0').should('exist')
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -275,19 +251,16 @@ context('Death Integration Test', () => {
     cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 
   it('Tests from application to rejection using minimum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('fieldWorker')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    // CREATE PIN
+    cy.createPin()
     // LANDING
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
@@ -299,9 +272,13 @@ context('Death Integration Test', () => {
     cy.get('#select_informant_SON').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_APPLICANT').click()
+
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01741123963'
+    )
+
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#familyName').type('খান')
@@ -316,24 +293,24 @@ context('Death Integration Test', () => {
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
     cy.get('#currentAddressSameAsPermanent_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // MANNER OF DEATH
     cy.get('#manner_NATURAL_CAUSES').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DEATH OCCURRING PLACE
     cy.get('#deathPlaceAddress_PERMANENT').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_false').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'No_ID', 'No ID available')
     cy.get('#applicantFamilyName').type('উদ্দিন')
@@ -343,40 +320,30 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
+    cy.waitUntilApplicationSynced()
+    cy.get('#row_0 #submitted0').should('exist')
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -388,19 +355,16 @@ context('Death Integration Test', () => {
       'Lack of information, please notify informant about it.'
     )
     cy.get('#submit_reject_form').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 
   it('Tests from application to rejection using maximum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('fieldWorker')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    // CREATE PIN
+    cy.createPin()
     // LANDING
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
@@ -409,12 +373,22 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_OTHER').click()
+    cy.get('#relationship\\.nestedFields\\.otherRelationship').type('Colleague')
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type('Friend')
+
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01753741963'
+    )
+
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -445,19 +419,19 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -466,14 +440,14 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Coronary artery disease')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -501,40 +475,30 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#submit_form').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
+    cy.waitUntilApplicationSynced()
+    cy.get('#row_0 #submitted0').should('exist')
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
+    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -546,19 +510,16 @@ context('Death Integration Test', () => {
       'Lack of information, please notify informant about it.'
     )
     cy.get('#submit_reject_form').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 
   it('Tests registration by registrar using maximum input', () => {
+    // Fix time to 2019-11-12
+    cy.clock(1573557567230)
     cy.login('registrar')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    // CREATE PIN
+    cy.createPin()
     // LANDING
     cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
     cy.get('#header_new_event').click()
@@ -567,12 +528,23 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_OTHER').click()
     cy.get('#continue').click()
+    // SELECT ADDITIONAL INFORMANT
+    cy.get('#relationship_HEAD_OF_THE_INSTITUTE').click()
+
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
-    cy.get('#contact_SON').click()
-    cy.get('#phone_number_input').type('01526972106')
-    cy.get('#continue').click()
+    cy.get('#contactPoint_OTHER').click()
+    cy.get('#contactPoint\\.nestedFields\\.contactRelationship').type(
+      'Colleague'
+    )
+
+    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
+      '01852741963'
+    )
+
+    cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1020607910288')
@@ -603,19 +575,19 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // EVENT DETAILS
     cy.get('#deathDate-dd').type('18')
     cy.get('#deathDate-mm').type('01')
     cy.get('#deathDate-yyyy').type('2019')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.get('#manner_HOMICIDE').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     cy.get('#deathPlaceAddress_PRIVATE_HOME').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
@@ -624,14 +596,14 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // CAUSE OF DEATH DETAILS
     cy.get('#causeOfDeathEstablished_true').click()
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     cy.get('#causeOfDeathCode').type('Brain stroke')
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICANT DETAILS
     cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
     cy.get('#applicantID').type('JS0013011C00001')
@@ -659,15 +631,15 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(500)
-    cy.get('#next_section').click()
+
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
     cy.get('#registerApplicationBtn').click()
     // MODAL
     cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+    cy.waitUntilApplicationSynced()
+    cy.get('#Spinner').should('not.exist')
   })
 })

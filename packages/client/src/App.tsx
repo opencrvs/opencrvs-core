@@ -47,13 +47,14 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { SysAdminHome } from '@client/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
-import { SelectContactPoint } from '@client/views/SelectContactPoint/SelectContactPoint'
-import TransitionWrapper from './components/TransitionWrapper'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
-import { ReviewCertificateAction } from './views/PrintCertificate/ReviewCertificateAction'
-import { Payment } from './views/PrintCertificate/Payment'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
+import TransitionWrapper from '@client/components/TransitionWrapper'
+import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
+import { Payment } from '@client/views/PrintCertificate/Payment'
+import { ReportList } from '@client/views/Performance/ReportList'
+import { Report } from '@client/views/Performance/Report'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -270,16 +271,14 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.SELECT_DEATH_MAIN_CONTACT_POINT
+                                              routes.PERFORMANCE_REPORT_LIST
                                             }
-                                            component={SelectContactPoint}
+                                            component={ReportList}
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={
-                                              routes.SELECT_BIRTH_MAIN_CONTACT_POINT
-                                            }
-                                            component={SelectContactPoint}
+                                            path={routes.PERFORMANCE_REPORT}
+                                            component={Report}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

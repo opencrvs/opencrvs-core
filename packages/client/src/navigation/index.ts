@@ -35,11 +35,14 @@ import {
   SELECT_DEATH_MAIN_CONTACT_POINT,
   VERIFY_COLLECTOR,
   REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE_PAYMENT
+  PRINT_CERTIFICATE_PAYMENT,
+  PERFORMANCE_REPORT_LIST,
+  PERFORMANCE_REPORT
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
-import { getToken, getCurrentUserScope } from '@client/utils/authUtils'
+import { getCurrentUserScope } from '@client/utils/authUtils'
 import { Event } from '@client/forms'
+import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -147,8 +150,16 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
   return push(formatUrl(path, { tabId, selectorId }))
 }
 
-export function goToPerformance() {
-  window.location.assign(`${window.config.PERFORMANCE_URL}?token=${getToken()}`)
+export function goToPerformanceHome() {
+  return push(
+    formatUrl(PERFORMANCE_REPORT_LIST, {
+      reportType: PERFORMANCE_REPORT_TYPE_WEEKY
+    })
+  )
+}
+
+export function goToPerformanceReport(reportType: string, title: string) {
+  return push(PERFORMANCE_REPORT, { reportType, title })
 }
 
 export function goToSearchResult(

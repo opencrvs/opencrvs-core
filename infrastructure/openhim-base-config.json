@@ -169,6 +169,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> New Birth Declaration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "priority": 1
@@ -598,6 +612,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> New Death Declaration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "requestBody": true,
@@ -769,6 +797,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> New Death Registration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "requestBody": true,
@@ -826,6 +868,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Death Registration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "requestBody": true,
@@ -881,6 +937,20 @@
           "path": "",
           "pathTransform": "",
           "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Death Certification",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
           "username": "",
           "password": ""
         }
@@ -1123,6 +1193,20 @@
           "path": "",
           "pathTransform": "",
           "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> New Death Declaration",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
           "username": "",
           "password": ""
         }
