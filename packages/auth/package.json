@@ -19,14 +19,13 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "@types/hapi-pino": "^6.3.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "crypto": "^1.0.1",
     "dotenv": "^6.1.0",
-    "good": "^8.1.1",
-    "good-console": "^7.1.0",
-    "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
+    "hapi-pino": "^6.3.0",
     "io-ts": "^1.2.1",
     "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
