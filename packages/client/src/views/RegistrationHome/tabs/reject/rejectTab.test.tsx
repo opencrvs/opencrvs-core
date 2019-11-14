@@ -730,7 +730,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
             path: '',
             url: ''
           }}
-          draftCount={1}
         />,
         store,
         graphqlMock
