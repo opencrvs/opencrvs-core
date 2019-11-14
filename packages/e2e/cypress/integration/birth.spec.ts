@@ -88,11 +88,7 @@ context('Birth Integration Test', () => {
     cy.get('#ProfileMenuItem1').click()
 
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     cy.createPin()
 
     // LANDING PAGE
@@ -236,11 +232,7 @@ context('Birth Integration Test', () => {
     cy.get('#ProfileMenuItem1').click()
 
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
 
     // CREATE PIN
     cy.createPin()
@@ -316,11 +308,7 @@ context('Birth Integration Test', () => {
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
@@ -455,11 +443,7 @@ context('Birth Integration Test', () => {
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
@@ -681,11 +665,7 @@ context('Birth Integration Test', () => {
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
