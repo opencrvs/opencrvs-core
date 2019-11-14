@@ -9974,44 +9974,6 @@
                   }
                 },
                 {
-                  "name": "applicantPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.phoneNumber"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "hidden": true,
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToPhoneNumberTransformer",
-                          "parameters": []
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "phoneNumberToFieldTransformer"
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
                   "name": "permanentAddress",
                   "type": "SUBSECTION",
                   "label": {
