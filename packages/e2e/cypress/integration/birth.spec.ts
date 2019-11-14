@@ -67,6 +67,7 @@ context('Birth Integration Test', () => {
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#familyName').type('বেগম')
     cy.get('#familyNameEng').type('Begum')
     cy.get('#motherBirthDate-dd').type('01')
@@ -335,6 +336,7 @@ context('Birth Integration Test', () => {
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
+    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#familyName').type('আক্তার')
     cy.get('#familyNameEng').type('Aktar')
     cy.get('#motherBirthDate-dd').type('23')
