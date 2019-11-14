@@ -16,6 +16,10 @@ declare namespace Cypress {
     selectOption: (selector: string, text: string, option: string) => void
     goToNextFormSection: () => void
     createPin: () => void
-    waitUntilApplicationSynced: () => void
+    submitApplication: () => void
+    rejectApplication: () => void
+    registerApplication: () => void
+    verifyLandingPageVisible: () => void
+    initializeFakeTimers: () => void
   }
 }
