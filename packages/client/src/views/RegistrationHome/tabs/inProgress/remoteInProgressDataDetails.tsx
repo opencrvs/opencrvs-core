@@ -222,10 +222,7 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
                     const { practitionerName, practitionerRole } = status
                     const type = status.type as string
                     const officeName = status.officeName as string
-                    const timestamp = moment(
-                      status.timestamp as string,
-                      LOCAL_DATE_FORMAT
-                    ).format(CERTIFICATE_DATE_FORMAT)
+                    const timestamp = status.timestamp as string
                     return (
                       <HistoryWrapper key={index}>
                         <ExpansionContainer id={type + '-' + index}>
@@ -257,7 +254,7 @@ class RemoteInProgressDataDetailsComponent extends React.Component<IProps> {
                             <ValueContainer>
                               <StyledLabel>
                                 {this.props.intl.formatMessage(
-                                  constantsMessages.applicationInformantLabel
+                                  constantsMessages.by
                                 )}
                                 :
                               </StyledLabel>

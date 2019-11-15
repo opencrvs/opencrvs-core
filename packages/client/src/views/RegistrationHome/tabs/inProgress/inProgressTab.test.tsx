@@ -327,6 +327,14 @@ describe('In Progress tab', () => {
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
+            registration: {
+              contactPoint: {
+                value: 'MOTHER',
+                nestedFields: {
+                  registrationPhone: '01722222222'
+                }
+              }
+            },
             child: {
               firstNamesEng: 'Anik',
               firstNames: 'অনিক',
