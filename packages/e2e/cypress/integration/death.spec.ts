@@ -89,10 +89,7 @@ context('Death Integration Test', () => {
     cy.createPin()
     // LANDING PAGE
 
-    cy.get('#ListItemAction-0-icon').should('exist')
-    cy.get('#ListItemAction-0-icon')
-      .first()
-      .click()
+    cy.downloadFirstApplication()
 
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
@@ -224,10 +221,7 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.get('#ListItemAction-0-icon').should('exist')
-    cy.get('#ListItemAction-0-icon')
-      .first()
-      .click()
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -312,10 +306,7 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.get('#ListItemAction-0-icon').should('exist')
-    cy.get('#ListItemAction-0-icon')
-      .first()
-      .click()
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -453,10 +444,7 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.get('#ListItemAction-0-icon').should('exist')
-    cy.get('#ListItemAction-0-icon')
-      .first()
-      .click()
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()

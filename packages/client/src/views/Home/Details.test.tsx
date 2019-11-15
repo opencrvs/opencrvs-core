@@ -647,7 +647,7 @@ describe('Field Agnet tests', () => {
 })
 
 describe('Registrar tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   const graphqlMock = [
     {
@@ -932,6 +932,12 @@ describe('Registrar tests', () => {
     expect(
       testComponent.component.find('#registrar_print').hostNodes()
     ).toHaveLength(1)
+
+    testComponent.component
+      .find('#registrar_print')
+      .hostNodes()
+      .simulate('click')
+    expect(history.location.pathname).toContain('cert')
   })
 
   it('Renders error page in-case of any network error', async () => {
