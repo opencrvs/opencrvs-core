@@ -19,13 +19,7 @@ context('User Integration Test', () => {
   it('create user as SYSTEM ADMIN and to activate account login for the first time as FIELD AGENT', () => {
     // LOG IN AS SYSTEM ADMIN
     cy.login('sysAdmin')
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     cy.get('#add-user').click()
     cy.get('#firstNames').type('নাইম')
     cy.get('#familyName').type('আহমেদ')
@@ -43,7 +37,7 @@ context('User Integration Test', () => {
     cy.get('#confirm_form').click()
     // PREVIEW
     cy.get('#submit_user_form').click()
-    cy.wait(5000) // Wait for application to be sync'd
+    cy.get('#submissionSuccessToast').should('be.visible') // Wait for application to be sync'd
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
