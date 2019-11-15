@@ -17,16 +17,12 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests from application to registration using minimum input', () => {
-    // Fix time to 2019-11-12
-    cy.clock(1573557567230)
+    cy.initializeFakeTimers()
 
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
-
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
 
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
@@ -85,59 +81,38 @@ context('Birth Integration Test', () => {
     // DOCUMENTS
     cy.goToNextFormSection()
 
-    // PREVIEW
-    cy.get('#submit_form').click()
-
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#row_0 #submitted0').should('exist')
+    cy.submitApplication()
 
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
 
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     cy.createPin()
 
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
 
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+    cy.registerApplication()
   })
 
   it('Tests from application to registration using maximum input', () => {
+    cy.initializeFakeTimers()
+
     // LOGIN AS FIELD WORKER
     cy.login('fieldWorker')
-    // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+
+    cy.createPin()
+    cy.verifyLandingPageVisible()
+
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -145,15 +120,15 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#applicant_MOTHER').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_FATHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')
@@ -177,8 +152,8 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
@@ -212,8 +187,8 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // FATHER DETAILS
     // cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National_ID', 'National ID')
@@ -249,66 +224,42 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // DOCUMENTS
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(6000) // Wait for application to be sync'd
+    cy.goToNextFormSection()
+
+    cy.submitApplication()
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
+
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
+
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+
+    cy.registerApplication()
   })
 
   it('Tests from application to rejection using minimum input', () => {
+    cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.createPin()
+    cy.verifyLandingPageVisible()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -318,15 +269,13 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     // SELECT APPLICANT
     cy.get('#applicant_MOTHER').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_MOTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#familyName').type('চৌধুরী')
@@ -341,8 +290,7 @@ context('Birth Integration Test', () => {
     cy.selectOption('#state', 'Dhaka', 'Dhaka')
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('6684176876871')
@@ -355,73 +303,42 @@ context('Birth Integration Test', () => {
     cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
     cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_false').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENTS
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.goToNextFormSection()
+
+    cy.submitApplication()
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+
+    cy.rejectApplication()
   })
 
   it('Tests from application to rejection using maximum input', () => {
+    cy.initializeFakeTimers()
     // LOGIN AS FIELD WORKER
     cy.login('fieldWorker')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn').click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.createPin()
+    cy.verifyLandingPageVisible()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -429,15 +346,13 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#applicant_MOTHER').click()
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_MOTHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('তাহ্মিদ')
@@ -461,8 +376,7 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1234567898765')
@@ -496,8 +410,7 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National_ID', 'National ID')
@@ -533,69 +446,39 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENTS
-    cy.wait(1000)
-    cy.get('#next_section').click()
-    // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.wait(6000)
+    cy.goToNextFormSection()
+
+    cy.submitApplication()
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.wait(3000)
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.wait(3000)
+
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000)
+
+    cy.rejectApplication()
   })
 
   it('Tests registration by registrar using maximum input', () => {
+    cy.initializeFakeTimers()
     // LOGIN AS FIELD WORKER
     cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.createPin()
+    cy.verifyLandingPageVisible()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -603,14 +486,13 @@ context('Birth Integration Test', () => {
     cy.get('#select_informant_BOTH_PARENTS').click()
     cy.get('#continue').click()
     cy.get('#applicant_MOTHER').click()
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_FATHER').click()
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // APPLICATION FORM
     // CHILD DETAILS
     cy.get('#firstNames').type('মারুফ')
@@ -634,8 +516,7 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1994789456123')
@@ -669,10 +550,9 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2').type('My street')
     cy.get('#addressLine1').type('40')
     cy.get('#postCode').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
+
     // FATHER DETAILS
-    // cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National_ID', 'National ID')
     cy.get('#iD').type('1994789456123')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -706,35 +586,21 @@ context('Birth Integration Test', () => {
     cy.get('#addressLine2Permanent').type('My street')
     cy.get('#addressLine1Permanent').type('40')
     cy.get('#postCodePermanent').type('1024')
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // DOCUMENTS
-    cy.wait(1000)
-    cy.get('#next_section').click()
+    cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.log('Waiting for application to sync...')
-    cy.wait(5000) // Wait for application to be sync'd
+
+    cy.registerApplication() // Wait for application to be sync'd
   })
 
   it('Test Someone else journey using minimum input', () => {
-    // Fix time to 2019-11-12
-    cy.clock(1573557567230)
+    cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
-    // LANDING PAGE
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.createPin()
+    cy.verifyLandingPageVisible()
     // EVENTS
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_birth_event').click()
@@ -744,7 +610,6 @@ context('Birth Integration Test', () => {
     cy.get('#continue').click()
     // SELECT APPLICANT
     cy.get('#applicant_OTHER').click()
-    cy.wait(1000)
     cy.get('#applicant\\.nestedFields\\.otherRelationShip').type(
       'Unnamed relation'
     )
@@ -754,7 +619,6 @@ context('Birth Integration Test', () => {
     cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
       '01526972106'
     )
-    cy.waitUntilApplicationSynced()
     cy.goToNextFormSection()
     // APPLICATION FORM
     // CHILD DETAILS
@@ -789,7 +653,6 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     //  Why are the mother and father not applying?
     cy.get('#motherIsDeceaseddeceased').click()
-    cy.wait(1000)
     cy.get('#fatherIsDeceaseddeceased').click()
     cy.goToNextFormSection()
     //  Who is looking after the child?
@@ -813,42 +676,26 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // DOCUMENTS
     cy.goToNextFormSection()
-    // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+
+    cy.submitApplication()
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
-    cy.get('#username').type('mohammad.ashraful')
-    cy.get('#password').type('test')
-    cy.get('#login-mobile-submit').click()
-    cy.get('#code').type('000000')
-    cy.get('#login-mobile-submit').click()
+    cy.login('registrar')
     // CREATE PIN
-    cy.get('#createPinBtn', { timeout: 30000 }).should('be.visible')
-    cy.get('#createPinBtn', { timeout: 30000 }).click()
-    for (let i = 1; i <= 8; i++) {
-      cy.get('#pin-keypad-container')
-        .click()
-        .type(`${i % 2}`)
-    }
+    cy.createPin()
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
+
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+
+    cy.registerApplication()
   })
 })

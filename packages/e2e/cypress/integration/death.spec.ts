@@ -22,9 +22,7 @@ context('Death Integration Test', () => {
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -80,10 +78,7 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+    cy.submitApplication()
     cy.get('#row_0 #submitted0').should('exist')
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
@@ -93,21 +88,17 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
+
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
+
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+    cy.registerApplication()
   })
 
   it('Tests from application to registration using maximum input', () => {
@@ -116,9 +107,7 @@ context('Death Integration Test', () => {
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -224,10 +213,7 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+    cy.submitApplication()
     cy.get('#row_0 #submitted0').should('exist')
 
     // LOG OUT
@@ -238,21 +224,15 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+    cy.registerApplication()
   })
 
   it('Tests from application to rejection using minimum input', () => {
@@ -261,9 +241,7 @@ context('Death Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -325,12 +303,8 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#row_0 #submitted0').should('exist')
-    // LOG OUT
+    cy.submitApplication()
+
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
@@ -338,25 +312,16 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.rejectApplication()
   })
 
   it('Tests from application to rejection using maximum input', () => {
@@ -365,9 +330,7 @@ context('Death Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -480,11 +443,8 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#row_0 #submitted0').should('exist')
+    cy.submitApplication()
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
@@ -493,25 +453,16 @@ context('Death Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-icon').should('exist')
     cy.get('#ListItemAction-0-icon')
       .first()
       .click()
-    cy.waitUntilApplicationSynced()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.rejectApplication()
   })
 
   it('Tests registration by registrar using maximum input', () => {
@@ -520,9 +471,7 @@ context('Death Integration Test', () => {
     cy.login('registrar')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -635,11 +584,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
-    // PREVIEW
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.registerApplication()
   })
 })
