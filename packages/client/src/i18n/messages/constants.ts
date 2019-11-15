@@ -481,9 +481,9 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     description: 'Label for option Daughter'
   },
   MOTHER: {
-    id: 'form.field.label.applicantRelation.father',
-    defaultMessage: 'Father',
-    description: 'Label for option Father'
+    id: 'form.field.label.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
   },
   FATHER: {
     id: 'form.field.label.applicantRelation.father',
@@ -530,6 +530,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
+  },
+  APPLICANT: {
+    defaultMessage: 'Applicant',
+    description: 'Applicant Label',
+    id: 'form.field.label.applicant'
   }
 }
 
