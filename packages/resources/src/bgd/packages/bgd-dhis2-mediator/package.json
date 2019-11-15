@@ -25,11 +25,9 @@
   "dependencies": {
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
-    "good": "^8.1.1",
-    "good-console": "^7.1.0",
-    "good-squeeze": "^5.1.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
+    "hapi-pino": "^6.3.0",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
