@@ -37,7 +37,8 @@ context('Death Integration Test', () => {
     )
     cy.goToNextFormSection()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#iD').type('1020607910288')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -66,7 +67,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_false').click()
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1234567891234')
     cy.get('#applicantFamilyName').type('উদ্দিন')
     cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
@@ -124,7 +126,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1020617910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -177,8 +179,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Chronic Obstructive Pulmonary Disease')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607917288')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
@@ -248,7 +250,8 @@ context('Death Integration Test', () => {
 
     cy.goToNextFormSection()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#iD').type('1120607910288')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -280,7 +283,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_false').click()
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607910266')
     cy.get('#applicantFamilyName').type('উদ্দিন')
     cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
@@ -340,7 +344,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1110607910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -398,8 +402,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Coronary artery disease')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1440607910288')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
@@ -478,7 +482,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1020607933388')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -536,8 +540,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Brain stroke')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607914444')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
