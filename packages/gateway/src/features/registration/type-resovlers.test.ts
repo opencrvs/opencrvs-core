@@ -1117,7 +1117,7 @@ describe('Registration type resolvers', () => {
       type: {
         coding: [
           {
-            code: 'birth-declaration'
+            code: 'birth-application'
           }
         ]
       }
@@ -1130,7 +1130,7 @@ describe('Registration type resolvers', () => {
       type: {
         coding: [
           {
-            code: 'death-declaration'
+            code: 'death-application'
           }
         ]
       }

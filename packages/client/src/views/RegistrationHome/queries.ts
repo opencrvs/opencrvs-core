@@ -56,6 +56,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     inProgressTab: searchEvents(
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
+      type: ["birth-application", "death-application"]
       count: $count
       skip: $inProgressSkip
     ) {

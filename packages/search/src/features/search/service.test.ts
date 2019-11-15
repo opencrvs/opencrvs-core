@@ -22,6 +22,7 @@ describe('elasticsearch db helper', () => {
       registrationNumber: 'dummy',
       event: 'EMPTY_STRING',
       status: ['DECLARED'],
+      type: ['birth-application', 'death-application'],
       applicationLocationId: 'EMPTY_STRING',
       from: 0,
       size: 10
