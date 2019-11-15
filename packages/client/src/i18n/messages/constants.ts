@@ -530,6 +530,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
+  },
+  APPLICANT: {
+    defaultMessage: 'Applicant',
+    description: 'Applicant Label',
+    id: 'form.field.label.applicant'
   }
 }
 
