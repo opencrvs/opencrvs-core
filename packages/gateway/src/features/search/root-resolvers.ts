@@ -21,6 +21,7 @@ export const resolvers: GQLResolver = {
         userId,
         locationIds,
         status,
+        type,
         trackingId,
         registrationNumber,
         contactNumber,
@@ -53,6 +54,9 @@ export const resolvers: GQLResolver = {
       }
       if (status) {
         searchCriteria.status = status as string[]
+      }
+      if (type) {
+        searchCriteria.type = type as string[]
       }
       if (userId) {
         searchCriteria.createdBy = userId

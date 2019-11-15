@@ -15,5 +15,22 @@
         ]
       }
     }
+  },
+  "Location": {
+    "parentRef": {
+      "extension": true,
+      "url": "http://opencrvs.org/extension/parent-location-reference",
+      "path": "valueString",
+      "type": "string",
+      "propertyDef": {
+        "min": 0,
+        "max": "1",
+        "types": [
+          {
+            "code": "string"
+          }
+        ]
+      }
+    }
   }
 }

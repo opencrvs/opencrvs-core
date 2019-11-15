@@ -30,6 +30,7 @@ import {
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
+const DEATH_ENCOUNTER_CODE = 'death-encounter'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
@@ -130,6 +131,12 @@ function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
+  const deathEncounter = findEntry(
+    DEATH_ENCOUNTER_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.Encounter
+
   const deceasedName = deceased && findName(NAME_EN, deceased)
   const deceasedNameLocal = deceased && findName(NAME_BN, deceased)
 
@@ -144,6 +151,11 @@ function createDeceasedIndex(
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased.deceasedDateTime
+  body.eventLocationId =
+    deathEncounter &&
+    deathEncounter.location &&
+    deathEncounter.location[0].location.reference &&
+    deathEncounter.location[0].location.reference.split('/')[1]
 }
 
 async function createApplicationIndex(
@@ -167,7 +179,7 @@ async function createApplicationIndex(
   const task = findTask(bundleEntries)
   const placeOfApplicationExtension = findTaskExtension(
     task,
-    'http://opencrvs.org/specs/extension/regLastLocation'
+    'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
   const trackingIdIdentifier = findTaskIdentifier(
@@ -190,6 +202,12 @@ async function createApplicationIndex(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  const compositionTypeCode =
+    composition.type.coding &&
+    composition.type.coding.find(
+      code => code.system === 'http://opencrvs.org/doc-types'
+    )
+
   body.contactNumber = informantTelecom && informantTelecom.value
   body.type =
     task &&
@@ -205,6 +223,8 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.compositionType =
+    (compositionTypeCode && compositionTypeCode.code) || 'death-application'
 
   const createdBy = await getCreatedBy(composition.id as string)
 
