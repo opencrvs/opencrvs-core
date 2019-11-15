@@ -24,6 +24,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     registrationNumber = EMPTY_STRING,
     event = EMPTY_STRING,
     status,
+    type,
     applicationLocationId = EMPTY_STRING,
     createdBy = EMPTY_STRING,
     from = 0,
@@ -43,7 +44,7 @@ export const searchComposition = async (params: ISearchQuery) => {
         registrationNumber,
         applicationLocationId,
         createdBy,
-        { event, status }
+        { event, status, type }
       ),
       sort: [{ dateOfApplication: sort }]
     }

@@ -745,9 +745,11 @@ export function findExtension(
   url: string,
   extensions: fhir.Extension[]
 ): fhir.Extension | undefined {
-  const extension = extensions.find((obj: fhir.Extension) => {
-    return obj.url === url
-  })
+  const extension =
+    extensions &&
+    extensions.find((obj: fhir.Extension) => {
+      return obj.url === url
+    })
   return extension
 }
 
