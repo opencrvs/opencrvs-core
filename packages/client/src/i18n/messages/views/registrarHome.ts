@@ -16,6 +16,7 @@ interface IregistrationHomeMessages {
   inProgress: MessageDescriptor
   inProgressFieldAgents: MessageDescriptor
   inProgressOwnDrafts: MessageDescriptor
+  hospitalDrafts: MessageDescriptor
   listItemAction: MessageDescriptor
   listItemApplicationDate: MessageDescriptor
   listItemRegisteredDate: MessageDescriptor
@@ -48,6 +49,11 @@ const messagesToDefine: IregistrationHomeMessages = {
     defaultMessage: 'Yours',
     description: 'The title of In progress own drafts',
     id: 'tab.inProgress.selector.own.drafts'
+  },
+  hospitalDrafts: {
+    defaultMessage: 'Hospitals',
+    description: 'The title of In progress Hospitals',
+    id: 'tab.inProgress.selector.hospital.drafts'
   },
   listItemAction: {
     defaultMessage: 'Action',

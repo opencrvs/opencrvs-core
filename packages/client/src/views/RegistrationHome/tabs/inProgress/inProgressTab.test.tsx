@@ -96,7 +96,7 @@ describe('In Progress tab', () => {
         drafts={localDrafts}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
-          data: {}
+          inProgressData: {}
         }}
       />,
       store
@@ -159,7 +159,7 @@ describe('In Progress tab', () => {
         selectorId={'you'}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
-          data: { totalItems: 5 }
+          inProgressData: { totalItems: 5 }
         }}
       />,
       store
@@ -262,7 +262,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            data: {}
+            inProgressData: {}
           }}
         />,
         store
@@ -296,7 +296,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            data: {}
+            inProgressData: {}
           }}
         />,
         store
@@ -411,7 +411,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            data: {}
+            inProgressData: {}
           }}
         />,
         store
@@ -453,7 +453,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            data: {
+            inProgressData: {
               totalItems: 2,
               results: [
                 {
@@ -519,7 +519,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            data: { totalItems: 12 }
+            inProgressData: { totalItems: 12 }
           }}
         />,
         store
@@ -636,7 +636,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            data: {
+            inProgressData: {
               totalItems: 1,
               results: [
                 {
@@ -696,7 +696,7 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            data: {
+            inProgressData: {
               totalItems: 1,
               results: [
                 {
@@ -778,7 +778,7 @@ describe('Tablet tests', () => {
         selectorId={SELECTOR_ID.fieldAgentDrafts}
         registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         queryData={{
-          data: {
+          inProgressData: {
             totalItems: 1,
             results: [
               {

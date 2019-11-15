@@ -880,6 +880,7 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   childName?: Array<GQLHumanName | null>
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
+  applicationLocationId?: string
 }
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
@@ -3014,6 +3015,9 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   childName?: BirthEventSearchSetToChildNameResolver<TParent>
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
+  applicationLocationId?: BirthEventSearchSetToApplicationLocationIdResolver<
+    TParent
+  >
 }
 
 export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -3042,6 +3046,13 @@ export interface BirthEventSearchSetToDateOfBirthResolver<
 }
 
 export interface BirthEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthEventSearchSetToApplicationLocationIdResolver<
   TParent = any,
   TResult = any
 > {

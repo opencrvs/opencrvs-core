@@ -65,6 +65,18 @@ export const REGISTRATION_HOME_QUERY = gql`
         ${allSearchFields}
       }
     }
+    notificationTab: searchEvents(
+      locationIds: $locationIds
+      status: ["IN_PROGRESS"]
+      type: ["birth-notification", "death-notification"]
+      count: $count
+      skip: $inProgressSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
     reviewTab: searchEvents(
       locationIds: $locationIds
       status: $reviewStatuses

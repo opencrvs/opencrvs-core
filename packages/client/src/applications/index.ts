@@ -520,6 +520,10 @@ export function filterProcessingApplicationsFromQuery(
       queryData.inProgressTab,
       processingApplicationIds
     ),
+    notificationTab: filterProcessingApplications(
+      queryData.notificationTab,
+      processingApplicationIds
+    ),
     reviewTab: filterProcessingApplications(
       queryData.reviewTab,
       processingApplicationIds
