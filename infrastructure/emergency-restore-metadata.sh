@@ -10,10 +10,12 @@
 
 # By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
 # This script clears all data and restores a specific day's data.  It is irreversable, so use with caution.
+#------------------------------------------------------------------------------------------------------------------
 
 print_usage_and_exit () {
     echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01'
-    echo "Script must receive a date parameter to restore data from that specific day"
+    echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
+    echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
     echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /backups/mongo/{date} folder"
     echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /backups/elasticsearch folder"
     echo "The InfluxDB backup files must exist in the /backups/influxdb/{date} folder"
@@ -25,6 +27,8 @@ if [ -z "$1" ] ; then
     print_usage_and_exit
 fi
 
+# Retrieve 2-step verification to continue
+#-----------------------------------------
 function ask_yes_or_no() {
     read -p "$1 ([y]es or [N]o): "
     case $(echo $REPLY | tr '[A-Z]' '[a-z]') in
@@ -39,9 +43,13 @@ then
     exit 0
 fi
 
+# Directory where data to restore is located locally
+#---------------------------------------------------
 DIR=$(pwd)
-echo "Working dir: $DIR"
+BACKUP_DIR=$DIR/backups
 
+# Select docker network and replica set in production
+#----------------------------------------------------
 if [ "$DEV" = "true" ]; then
   HOST=mongo1
   NETWORK=opencrvs_default
@@ -51,31 +59,48 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-
+# Delete all data from Hearth, OpenHIM and any other service related Mongo databases
+#-----------------------------------------------------------------------------------
 docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
 docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
 docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
+
+# Delete all data from search
+#----------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
+
+# Delete all data from metrics
+#-----------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP DATABASE \"ocrvs\"" -v
-# Restore Hearth, OpenHIM and User db from backup
-docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+
+# Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
+#--------------------------------------------------------------------------------------------------
+docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev.gz"
-docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev.gz"
-docker run --rm -v $DIR/backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt.gz"
-# Restore Elasticsearch from backup
+
+# Restore all data from a backup into search
+#-------------------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
-# Restore InfluxDb from backup
+
+# Get the container ID and host detaild of any running InfluxDB container, as the only way to restore is by using the Influxd CLI inside a running opencrvs_metrics container
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 INFLUXDB_CONTAINER_ID=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'`
 INFLUXDB_CONTAINER_NAME=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'`
 INFLUXDB_HOSTNAME=`echo $(docker service ps -f "desired-state=running" opencrvs_influxdb) | awk '{print $14}'`
 INFLUXDB_HOST=$(docker node inspect --format '{{.Status.Addr}}' "$HOSTNAME")
-SSH_USER=${SSH_USER:-root}
+INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
+
+# If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder 
+#------------------------------------------------------------------------------------------------------------------------------
 OWN_IP=$(hostname -I | cut -d' ' -f1)
 if [ $OWN_IP == $INFLUXDB_HOST ]; then
-  docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs $BACKUP_DIR/influxdb/$DOW
 else
-  ssh $SSH_USER@$INFLUXDB_HOST 'docker exec -it $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW'
+  scp -r $BACKUP_DIR/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:backups/influxdb
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST 'docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs backups/influxdb/$DOW'
 fi
