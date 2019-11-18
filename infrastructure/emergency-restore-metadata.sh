@@ -8,6 +8,7 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+#------------------------------------------------------------------------------------------------------------------
 # By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
 # This script clears all data and restores a specific day's data.  It is irreversable, so use with caution.
 #------------------------------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mon
 #-------------------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://elasticsearch:9200/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
 
-# Get the container ID and host detaild of any running InfluxDB container, as the only way to restore is by using the Influxd CLI inside a running opencrvs_metrics container
+# Get the container ID and host details of any running InfluxDB container, as the only way to restore is by using the Influxd CLI inside a running opencrvs_metrics container
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 INFLUXDB_CONTAINER_ID=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $11}'`
 INFLUXDB_CONTAINER_NAME=`echo $(docker service ps --no-trunc -f "desired-state=running" opencrvs_influxdb) | awk '{print $12}'`
