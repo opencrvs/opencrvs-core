@@ -2190,7 +2190,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
                     }
                   ],
                   "modalTitle": {
@@ -5431,7 +5431,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
                     }
                   ],
                   "modalTitle": {
@@ -7621,7 +7621,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
                     }
                   ],
                   "modalTitle": {
@@ -10919,7 +10919,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
                     }
                   ],
                   "modalTitle": {
@@ -14910,7 +14910,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
                     }
                   ],
                   "modalTitle": {
