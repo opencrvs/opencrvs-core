@@ -78,7 +78,7 @@ export async function newBirthRegistrationHandler(
   return h.response().code(200)
 }
 
-export async function birthRegistrationHandler(
+export async function markRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -109,7 +109,7 @@ export async function birthRegistrationHandler(
   return h.response().code(200)
 }
 
-export async function birthCertifiedHandler(
+export async function markCertifiedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -118,6 +118,33 @@ export async function birthCertifiedHandler(
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markValidatedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points = await Promise.all([
+      generateEventDurationPoint(request.payload as fhir.Bundle, ['DECLARED'], {
+        Authorization: request.headers.authorization
+      }),
+      generateBirthRegPoint(
+        request.payload as fhir.Bundle,
+        'mark-existing-application-validated',
         {
           Authorization: request.headers.authorization
         }
