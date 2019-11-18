@@ -693,7 +693,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         itemData={{}}
         actions={listItemActions}
         isBoxShadow={true}
-        isItemFullHeight={true}
+        isItemFullHeight={false}
         expandedCellRenderer={() => (
           <ListItemExpansion>
             {this.renderExpansionContent(item.id)}
