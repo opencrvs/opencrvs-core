@@ -396,7 +396,7 @@ class ReviewActionComponent extends React.Component<
               <DangerButton
                 id="rejectApplicationBtn"
                 align={ICON_ALIGNMENT.LEFT}
-                icon={() => <Cross color="white" />}
+                icon={() => <Cross color="currentColor" />}
                 onClick={rejectApplicationAction}
               >
                 {intl.formatMessage(buttonMessages.reject)}
