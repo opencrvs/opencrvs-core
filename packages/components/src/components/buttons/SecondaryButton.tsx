@@ -45,7 +45,7 @@ export const SecondaryButton = styled(Button)`
   }
 
   &:active {
-    outline: 3px solid ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {
