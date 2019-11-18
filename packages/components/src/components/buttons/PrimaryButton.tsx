@@ -26,6 +26,14 @@ export const PrimaryButton = styled(Button)`
   }
   &:focus {
     outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
   }
 
   &:active:enabled {
