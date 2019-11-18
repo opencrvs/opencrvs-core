@@ -11,6 +11,7 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "CERTIFIED",
+    "event_type": "BIRTH",
     "previous_status": "REGISTERED",
   },
 }
@@ -27,6 +28,7 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "REGISTERED",
+    "event_type": "BIRTH",
     "previous_status": "DECLARED",
   },
 }
@@ -43,6 +45,7 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "REGISTERED",
+    "event_type": "BIRTH",
     "previous_status": "VALIDATED",
   },
 }
