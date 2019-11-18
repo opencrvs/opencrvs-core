@@ -1,9 +1,12 @@
-OpenCRVS was originally coded between 2017 and 2019 by the organisations
-Plan International, Jembi Health Systems & Dynamic Solution Innovators
+OpenCRVS has been produced by the funding and support from the organisations
+Plan International, Jembi Health Systems & Vital Strategies, 
+with coding assistance from Dynamic Solution Innovators & Futurice.
 
 https://plan-international.org/
 https://www.jembi.org/
 http://www.dsinnovators.com/
+https://www.vitalstrategies.org/
+https://www.futurice.com/
 
 Here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted code and generally made OpenCRVS that much better:
@@ -26,6 +29,14 @@ Arman Bhuiyan https://github.com/arman37
 The core product and design team, list of supporters and supporting organisations
 can be found at https://www.opencrvs.org without who's leadership, funding and guidance
 OpenCRVS would never have existed. THANK YOU!
+
+OpenCRVS is the brainchild of our Product Manager Ed Duffus from Plan International.
+
+Ed Duffus https://github.com/eduffus
+
+Extra special thanks to our Plan International Product Owner Annina Wersun, and Design Lead Jonathan Pye-Finch
+
+Design and Product thanks must also be extended to Umesh Pandya, Isa Jokela-Gomes & George Bevan.
 
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
