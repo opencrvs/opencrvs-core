@@ -12,11 +12,12 @@
 import * as Joi from 'joi'
 import {
   inProgressBirthRegistrationHandler,
-  markRegisteredHandler,
+  markBirthRegisteredHandler,
   newBirthRegistrationHandler,
   markCertifiedHandler,
   markValidatedHandler,
-  baseHandler
+  baseHandler,
+  markDeathRegisteredHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
@@ -98,7 +99,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/mark-registered',
-      handler: markRegisteredHandler,
+      handler: markBirthRegisteredHandler,
       config: {
         tags: ['api']
       }
@@ -106,7 +107,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-registered',
-      handler: markRegisteredHandler,
+      handler: markDeathRegisteredHandler,
       config: {
         tags: ['api']
       }

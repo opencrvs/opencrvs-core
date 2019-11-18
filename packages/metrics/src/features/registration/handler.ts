@@ -78,7 +78,7 @@ export async function newBirthRegistrationHandler(
   return h.response().code(200)
 }
 
-export async function markRegisteredHandler(
+export async function markBirthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -94,6 +94,29 @@ export async function markRegisteredHandler(
       generateBirthRegPoint(
         request.payload as fhir.Bundle,
         'mark-existing-application-registered',
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+export async function markDeathRegisteredHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points = await Promise.all([
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['DECLARED', 'VALIDATED'],
         {
           Authorization: request.headers.authorization
         }
@@ -142,13 +165,6 @@ export async function markValidatedHandler(
       generateEventDurationPoint(request.payload as fhir.Bundle, ['DECLARED'], {
         Authorization: request.headers.authorization
       }),
-      generateBirthRegPoint(
-        request.payload as fhir.Bundle,
-        'mark-existing-application-validated',
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
       generateTimeLoggedPoint(request.payload as fhir.Bundle)
     ])
 
