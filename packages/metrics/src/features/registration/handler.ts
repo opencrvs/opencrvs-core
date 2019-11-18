@@ -144,8 +144,7 @@ export async function markCertifiedHandler(
         {
           Authorization: request.headers.authorization
         }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      )
     ])
 
     await writePoints(points)
