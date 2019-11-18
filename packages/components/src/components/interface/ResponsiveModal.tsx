@@ -68,7 +68,6 @@ const Body = styled.div<{ height?: number }>`
   height: ${({ height }) => (height ? height : 250)}px;
   overflow-y: auto;
   padding: 0 24px 16px;
-  padding-right: 64px;
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -150,7 +149,7 @@ export class ResponsiveModal extends React.Component<IProps> {
         <ModalContent width={width}>
           <Header>
             <Title>{title}</Title>
-            <CircleButton type="button" onClick={handleClose}>
+            <CircleButton id="close-btn" type="button" onClick={handleClose}>
               <Cross color="currentColor" />
             </CircleButton>
           </Header>

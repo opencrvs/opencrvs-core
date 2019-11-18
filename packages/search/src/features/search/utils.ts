@@ -109,6 +109,14 @@ export function queryBuilder(
     })
   }
 
+  if (filters.type) {
+    must.push({
+      terms: {
+        'compositionType.keyword': filters.type
+      }
+    })
+  }
+
   return {
     bool: {
       must,

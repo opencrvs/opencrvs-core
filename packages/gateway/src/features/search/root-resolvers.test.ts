@@ -54,6 +54,23 @@ describe('Search root resolvers', () => {
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
+    it('returns an array of composition results for type', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          type: ['birth-application', 'death-application']
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
     it('returns an array of composition results for locationIds', async () => {
       fetch.mockResponse(
         JSON.stringify({

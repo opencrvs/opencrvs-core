@@ -35,6 +35,7 @@ import { logger } from '@search/logger'
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
 const CHILD_CODE = 'child-details'
+const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 const NAME_EN = 'en'
 const NAME_BN = 'bn'
 
@@ -123,7 +124,7 @@ async function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
-  await createApplicationIndex(body, composition.id as string, bundleEntries)
+  await createApplicationIndex(body, composition, bundleEntries)
 }
 
 function createChildIndex(
@@ -137,6 +138,12 @@ function createChildIndex(
     bundleEntries
   ) as fhir.Patient
 
+  const birthEncounter = findEntry(
+    BIRTH_ENCOUNTER_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.Encounter
+
   const childName = child && findName(NAME_EN, child)
   const childNameLocal = child && findName(NAME_BN, child)
 
@@ -147,8 +154,13 @@ function createChildIndex(
     childNameLocal && childNameLocal.given && childNameLocal.given.join(' ')
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
-  body.childDoB = child.birthDate
-  body.gender = child.gender
+  body.childDoB = child && child.birthDate
+  body.gender = child && child.gender
+  body.eventLocationId =
+    birthEncounter &&
+    birthEncounter.location &&
+    birthEncounter.location[0].location.reference &&
+    birthEncounter.location[0].location.reference.split('/')[1]
 }
 
 function createMotherIndex(
@@ -211,7 +223,7 @@ function createFatherIndex(
 
 async function createApplicationIndex(
   body: IBirthCompositionBody,
-  compositionId: string,
+  composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const task = findTask(bundleEntries)
@@ -221,7 +233,7 @@ async function createApplicationIndex(
   )
   const placeOfApplicationExtension = findTaskExtension(
     task,
-    'http://opencrvs.org/specs/extension/regLastLocation'
+    'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
   const trackingIdIdentifier = findTaskIdentifier(
@@ -244,6 +256,12 @@ async function createApplicationIndex(
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  const compositionTypeCode =
+    composition.type.coding &&
+    composition.type.coding.find(
+      code => code.system === 'http://opencrvs.org/doc-types'
+    )
+
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.type =
@@ -260,8 +278,10 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.compositionType =
+    (compositionTypeCode && compositionTypeCode.code) || 'birth-application'
 
-  const createdBy = await getCreatedBy(compositionId)
+  const createdBy = await getCreatedBy(composition.id || '')
 
   if (createdBy) {
     body.createdBy = createdBy

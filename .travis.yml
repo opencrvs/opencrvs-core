@@ -40,7 +40,7 @@ jobs:
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
         - CYPRESS_LOGIN_URL=http://localhost:3020/
-        - CYPRESS_REGISTER_URL=http://localhost:3000/
+        - CYPRESS_CLIENT_URL=http://localhost:3000/
         - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
         - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
@@ -56,12 +56,12 @@ jobs:
       services:
         - docker
 
-    - stage: deploy to staging
-      if: branch = master AND type = push
-      install: skip
-      script: yarn deploy:staging:bgd
-      addons:
-        ssh_known_hosts: opencrvs-staging.jembi.org
+    #- stage: deploy to staging
+    #  if: branch = master AND type = push
+    #  install: skip
+    #  script: yarn deploy:staging:bgd
+    #  addons:
+    #    ssh_known_hosts: opencrvs-staging.jembi.org
 
     - stage: integration tests on staging
       if: branch = master AND type = push
@@ -73,7 +73,7 @@ jobs:
       script: cd packages/e2e && yarn && yarn start --record false
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
-        - CYPRESS_REGISTER_URL=https://register.opencrvs-staging.jembi.org/
+        - CYPRESS_CLIENT_URL=https://register.opencrvs-staging.jembi.org/
         - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
 

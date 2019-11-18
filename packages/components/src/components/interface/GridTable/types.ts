@@ -37,6 +37,9 @@ export interface IColumn {
   isActionColumn?: boolean
   isIconColumn?: boolean
   color?: string
+  isSortable?: boolean
+  icon?: JSX.Element | React.ReactNode
+  sortFunction?: (key: string) => void
 }
 
 export interface IDynamicValues {
