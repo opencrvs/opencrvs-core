@@ -7,24 +7,24 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: '3.3'
+version: "3.3"
 
 services:
   notification:
     secrets:
-      - infobip-gateway-endpoint
-      - infobip-api-key
-      - infobip-sender-id
+      - clickatell-user
+      - clickatell-password
+      - clickatell-api-id
     environment:
-      - LANGUAGES=bn,en
-      - SMS_PROVIDER=infobip
-      - INFOBIP_GATEWAY_ENDPOINT_PATH=/run/secrets/infobip-gateway-endpoint
-      - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
-      - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
+      - LANGUAGES=en
+      - SMS_PROVIDER=clickatell
+      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
+      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
+      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
 
   workflow:
     environment:
-      - LANGUAGES=bn,en
+      - LANGUAGES=en
 
   bgd-dhis2-mediator:
     image: jembi/ocrvs-bgd-dhis2-mediator

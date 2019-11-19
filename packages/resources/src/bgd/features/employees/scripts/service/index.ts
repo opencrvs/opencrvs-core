@@ -191,7 +191,7 @@ export async function composeAndSavePractitioners(
       ],
       username: practitioner.username,
       email: practitioner.email,
-      mobile: convertToMSISDN(practitioner.mobile, 'bgd'),
+      mobile: convertToMSISDN(practitioner.mobile, 'gbr'),
       passwordHash: pass.hash,
       salt: pass.salt,
       role: practitioner.role,

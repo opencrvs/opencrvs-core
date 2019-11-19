@@ -15,7 +15,7 @@
 #------------------------------------------------------------------------------------------------------------------
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP'
+    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP REMOTE_DIR'
     echo "Script must receive SSH details and a target directory of a remote server to copy backup files to."
     echo "7 days of backup data will be retained in the manager node"
     exit 1
@@ -37,6 +37,10 @@ if [ -z "$4" ] ; then
     echo "Error: Argument for the PRODUCTION_IP is required in position 4."
     print_usage_and_exit
 fi
+if [ -z "$5" ] ; then
+    echo "Error: Argument for the REMOTE_DIR is required in position 5."
+    print_usage_and_exit
+fi
 
 # Host and directory where backups will be remotely saved
 #--------------------------------------------------------
@@ -44,6 +48,7 @@ SSH_USER=$1
 SSH_HOST=$2
 SSH_PORT=$3
 PRODUCTION_IP=$4
+REMOTE_DIR=$5
 
 # Select docker network and replica set in production
 #----------------------------------------------------
@@ -107,7 +112,7 @@ fi
 # Copy the backups to an offsite server in production 
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
-  scp -P -r $SSH_PORT /backups $SSH_USER@$SSH_HOST
+  scp -P -r $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR
   echo "Copied backup files to remote server."
 fi
 # Cleanup any old backups. Keep previous 7 days of data 
