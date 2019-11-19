@@ -10,10 +10,12 @@
 
 #------------------------------------------------------------------------------------------------------------------
 # By default OpenCRVS saves a backup of all data on a cron job every day in case of an emergency data loss incident
+# This cron job is already configured in the Ansible playbook.yml in the infrastructure > server-setup directory.
+# Change SSH connection settings and IPs to suit your deployment, and re-run the Ansible script to update.
 #------------------------------------------------------------------------------------------------------------------
 
 print_usage_and_exit () {
-    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST REMOTE_DIR'
+    echo 'Usage: ./emergency-backup-metadata.sh SSH_USER SSH_HOST SSH_PORT PRODUCTION_IP'
     echo "Script must receive SSH details and a target directory of a remote server to copy backup files to."
     echo "7 days of backup data will be retained in the manager node"
     exit 1
@@ -28,7 +30,11 @@ if [ -z "$2" ] ; then
     print_usage_and_exit
 fi
 if [ -z "$3" ] ; then
-    echo "Error: Argument for the REMOTE_DIR is required in position 3."
+    echo "Error: Argument for the SSH_PORT is required in position 3."
+    print_usage_and_exit
+fi
+if [ -z "$4" ] ; then
+    echo "Error: Argument for the PRODUCTION_IP is required in position 4."
     print_usage_and_exit
 fi
 
@@ -36,12 +42,8 @@ fi
 #--------------------------------------------------------
 SSH_USER=$1
 SSH_HOST=$2
-REMOTE_DIR=$3
-
-# Directory where backups will be locally saved for 7 days
-#---------------------------------------------------------
-DIR=$(pwd)
-BACKUP_DIR=$DIR/backups
+SSH_PORT=$3
+PRODUCTION_IP=$4
 
 # Select docker network and replica set in production
 #----------------------------------------------------
@@ -54,22 +56,27 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
+# Directory where backups will be locally saved for 7 days
+#---------------------------------------------------------
+DIR=$(pwd)
+BACKUP_DIR=$DIR/backups
+
 # Today's date is used for filenames
 #-----------------------------------
 BACKUP_DATE=$(date +%Y-%m-%d)
 
 # Backup Hearth, OpenHIM and any other service related Mongo databases into a mongo sub folder
 #---------------------------------------------------------------------------------------------
-docker run --rm -v $BACKUP_DIR/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
-docker run --rm -v $BACKUP_DIR/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
-docker run --rm -v $BACKUP_DIR/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
  -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
 
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "$BACKUP_DIR/elasticsearch/", "compress": true }}'
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/backups/elasticsearch", "compress": true }}'
 
 # Backup Elasticsearch as a set of snapshot files into an elasticsearch sub folder
 #---------------------------------------------------------------------------------
@@ -86,20 +93,23 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 # If required, SSH into the node running the opencrvs_metrics container and backup the metrics data into an influxdb subfolder 
 #-----------------------------------------------------------------------------------------------------------------------------
 OWN_IP=$(hostname -I | cut -d' ' -f1)
-if [ $OWN_IP == $INFLUXDB_HOST ]; then
+if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
+  echo "Backing up Influx on own node"
   docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs $BACKUP_DIR/influxdb/$BACKUP_DATE
 else
-  scp -r $BACKUP_DIR/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST 'docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs backups/influxdb/$BACKUP_DATE'
+  echo "Backing up Influx on other node $INFLUXDB_HOST"
+  scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs $BACKUP_DIR/influxdb/$BACKUP_DATE"
+  echo "Replacing backup for influxdb on manager node with new backup"
+  scp -r $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb /backups/influxdb
 fi
 
-# Copy the backups to an offsite server 
-#--------------------------------------
-scp $BACKUP_DIR $SSH_USER@$SSH_HOST:$REMOTE_DIR
-echo "Copied backup files to remote server."
-
+# Copy the backups to an offsite server in production 
+#----------------------------------------------------
+if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
+  scp -P -r $SSH_PORT /backups $SSH_USER@$SSH_HOST
+  echo "Copied backup files to remote server."
+fi
 # Cleanup any old backups. Keep previous 7 days of data 
 #------------------------------------------------------
-find $BACKUP_DIR -mtime +7 -exec rm {} \;
-
-
+find /backups -mtime +7 -exec rm {} \;

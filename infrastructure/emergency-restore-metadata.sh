@@ -44,11 +44,6 @@ then
     exit 0
 fi
 
-# Directory where data to restore is located locally
-#---------------------------------------------------
-DIR=$(pwd)
-BACKUP_DIR=$DIR/backups
-
 # Select docker network and replica set in production
 #----------------------------------------------------
 if [ "$DEV" = "true" ]; then
@@ -77,11 +72,11 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 
 # Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
-docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev.gz"
-docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev.gz"
-docker run --rm -v $BACKUP_DIR/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
+docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
  -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt.gz"
 
 # Restore all data from a backup into search
@@ -98,10 +93,10 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
 # If required, SSH into the node running the opencrvs_metrics container and restore the metrics data from an influxdb subfolder 
 #------------------------------------------------------------------------------------------------------------------------------
-OWN_IP=$(hostname -I | cut -d' ' -f1)
-if [ $OWN_IP == $INFLUXDB_HOST ]; then
-  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs $BACKUP_DIR/influxdb/$DOW
+OWN_IP=`echo $(hostname -I | cut -d' ' -f1)`
+if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW
 else
-  scp -r $BACKUP_DIR/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST 'docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs backups/influxdb/$DOW'
+  scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST 'docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW'
 fi

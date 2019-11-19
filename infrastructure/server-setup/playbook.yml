@@ -61,7 +61,7 @@
         name: "backup opencrvs"
         minute: "0"
         hour: "0"
-        job: "cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh >> /var/log/opencrvs-backup.log 2>&1"
+        job: "cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 104.248.172.212 >> /var/log/opencrvs-backup.log 2>&1"
 
     - name: "Check file for encrypted file system exists"
       stat:
@@ -82,6 +82,14 @@
       file:
         path: /data/mongo
         state: directory
+
+    - name: "Create mongo backup directory"
+      file:
+        path: /backups/mongo
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
     - name: "Create traefik data directory"
       file:
