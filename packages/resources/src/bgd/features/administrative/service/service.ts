@@ -11,7 +11,11 @@
  */
 import { FHIR_URL } from '@resources/constants'
 import fetch from 'node-fetch'
-import { generateLocationResource } from '@resources/bgd/features/administrative/scripts/service'
+import {
+  generateLocationResource,
+  getTokenForOISF,
+  fetchFromOISF
+} from '@resources/bgd/features/administrative/scripts/service'
 import { ILocation } from '@resources/bgd/features/utils'
 
 export interface ILocationDataResponse {
@@ -39,4 +43,13 @@ export async function getLocations(): Promise<ILocationDataResponse> {
   }
 
   return locations
+}
+
+export async function verifyAndFetchNidInfo(nid: string, dob: string) {
+  const nidInfo = await fetchFromOISF(
+    'nid/information?dob=' + dob + '&nid=' + nid,
+    { Authorization: `Bearer ${await getTokenForOISF()}` }
+  )
+
+  return nidInfo
 }
