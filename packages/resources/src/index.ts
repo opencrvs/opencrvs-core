@@ -43,6 +43,7 @@ import {
   requestSchema as zmbGeneratorRequestSchema,
   responseSchema as zmbGeneratorResponseSchema
 } from '@resources/zmb/features/generate/handler'
+import { bgdValidateRegistrationHandler } from '@resources/bgd/features/validate/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -114,6 +115,7 @@ export async function createServer() {
   })
 
   server.route({
+    // TODO this route can be removed once the validate route is fully functional
     method: 'POST',
     path: '/bgd/generate/{type}',
     handler: bgdGeneratorHandler,
@@ -127,6 +129,20 @@ export async function createServer() {
       },
       description:
         'Generates registration numbers based on country specific implementation logic'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/bgd/validate/registration',
+    handler: bgdValidateRegistrationHandler,
+    options: {
+      tags: ['api'],
+      response: {
+        schema: bgdGeneratorResponseSchema
+      },
+      description:
+        'Validates a registration and if successful returns a BRN for that record'
     }
   })
 

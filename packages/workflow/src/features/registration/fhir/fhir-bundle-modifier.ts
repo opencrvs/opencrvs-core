@@ -116,6 +116,7 @@ export async function markBundleAsRegistered(
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
+  // TODO move the setting of the registration number below
   /* Setting registration number here */
   const eventType = getEventType(bundle)
   if (eventType === EVENT_TYPE.BIRTH) {
@@ -140,6 +141,8 @@ export async function markBundleAsRegistered(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
+
+  // TODO validate registration with resource service and set resulting registration number
 
   return bundle
 }
