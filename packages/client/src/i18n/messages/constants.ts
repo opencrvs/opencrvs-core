@@ -40,6 +40,7 @@ interface IConstantsMessages {
   eventDate: MessageDescriptor
   lastUpdated: MessageDescriptor
   startedBy: MessageDescriptor
+  export: MessageDescriptor
   failedToSend: MessageDescriptor
   gender: MessageDescriptor
   id: MessageDescriptor
@@ -68,12 +69,14 @@ interface IConstantsMessages {
   sentOn: MessageDescriptor
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
+  to: MessageDescriptor
   trackingId: MessageDescriptor
   type: MessageDescriptor
   update: MessageDescriptor
   user: MessageDescriptor
   username: MessageDescriptor
   waitingToSend: MessageDescriptor
+  week: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -222,6 +225,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for Started by in list item',
     id: 'constants.startedBy'
   },
+  export: {
+    defaultMessage: 'Export',
+    description: 'Label used for export',
+    id: 'constants.export'
+  },
   failedToSend: {
     defaultMessage: 'Failed to send',
     description: 'Label for application status Failed',
@@ -363,6 +371,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for table header of column Submission status',
     id: 'constants.submissionStatus'
   },
+  to: {
+    defaultMessage: 'to',
+    description: 'Used in sentence',
+    id: 'constants.to'
+  },
   trackingId: {
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type',
@@ -392,6 +405,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Waiting to send',
     description: 'Label for application status Ready to Submit',
     id: 'constants.waitingToSend'
+  },
+  week: {
+    defaultMessage: 'Week',
+    description: 'Label for week',
+    id: 'constants.week'
   }
 }
 
@@ -475,9 +493,9 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     description: 'Label for option Daughter'
   },
   MOTHER: {
-    id: 'form.field.label.applicantRelation.father',
-    defaultMessage: 'Father',
-    description: 'Label for option Father'
+    id: 'form.field.label.applicantRelation.mother',
+    defaultMessage: 'Mother',
+    description: 'Label for option Mother'
   },
   FATHER: {
     id: 'form.field.label.applicantRelation.father',
@@ -524,6 +542,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     defaultMessage: 'Someone else',
     description: 'Other Label',
     id: 'form.field.label.someoneElse'
+  },
+  APPLICANT: {
+    defaultMessage: 'Applicant',
+    description: 'Applicant Label',
+    id: 'form.field.label.applicant'
   }
 }
 

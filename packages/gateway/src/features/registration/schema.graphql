@@ -88,6 +88,7 @@ enum AttachmentType {
   BROUGHT_IN_DEAD_CERTIFICATE
   CORONERS_REPORT
   SIGNED_AFFIDAVIT
+  DECEASED_BIRTH_PROOF_PAPER
   ORIGINAL_BIRTH_RECORD
   UNDER_FIVE_CARD
   PROOF_OF_LEGAL_GUARDIANSHIP
@@ -218,6 +219,7 @@ input RegWorkflowInput {
   timestamp: Date
   comments: [CommentInput]
   location: LocationInput
+  timeLoggedMS: Int
 }
 
 type RegWorkflow { # Task

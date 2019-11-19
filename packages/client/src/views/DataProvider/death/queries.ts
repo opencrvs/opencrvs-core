@@ -50,6 +50,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       informant {
         id
         relationship
+        otherRelationship
         individual {
           id
           identifier {
@@ -81,6 +82,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       }
       registration {
         id
+        contact
+        contactRelationship
+        contactPhoneNumber
         attachments {
           data
           type
@@ -183,6 +187,9 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       }
       registration {
         id
+        contact
+        contactRelationship
+        contactPhoneNumber
         attachments {
           data
           type

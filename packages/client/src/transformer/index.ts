@@ -22,6 +22,7 @@ import {
   getConditionalActionsForField,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
+import { IApplication } from '@client/applications'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -156,6 +157,21 @@ export const draftToGqlTransformer = (
   }
 
   return transformedData
+}
+
+export const appendGqlMetadataFromDraft = (
+  draft: IApplication,
+  gqlDetails: TransformedData
+) => {
+  const { timeLoggedMS } = draft
+
+  if (!gqlDetails.registration.status) {
+    gqlDetails.registration.status = []
+  }
+  if (!gqlDetails.registration.status[0]) {
+    gqlDetails.registration.status[0] = {}
+  }
+  gqlDetails.registration.status[0].timeLoggedMS = timeLoggedMS
 }
 
 export const gqlToDraftTransformer = (

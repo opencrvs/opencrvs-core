@@ -22,6 +22,7 @@ import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
+import { FieldValueMap } from '@client/forms'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -87,24 +88,26 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
   )
 }
 
-type IProps = IntlShapeProps & {
+type IProps = {
   draft: IApplication | undefined
 }
 
-class LocalInProgressDataDetailsComponent extends React.Component<IProps> {
+class LocalInProgressDataDetailsComponent extends React.Component<
+  IProps & IntlShapeProps
+> {
   transformer = (draft: IApplication | undefined) => {
+    const contactPoint =
+      draft && (draft.data.registration.contactPoint as FieldValueMap)
+    const relation = contactPoint && (contactPoint.value as string)
+    const registrationPhone =
+      contactPoint &&
+      contactPoint.nestedFields &&
+      ((contactPoint.nestedFields as FieldValueMap).registrationPhone as string)
+
     return {
       draftStartedOn: draft && draft.savedOn,
-      informantRelation:
-        draft &&
-        draft.data &&
-        draft.data.registration &&
-        (draft.data.registration.whoseContactDetails as string),
-      informantContactNumber:
-        draft &&
-        draft.data &&
-        draft.data.registration &&
-        (draft.data.registration.registrationPhone as string)
+      informantRelation: relation,
+      informantContactNumber: registrationPhone
     }
   }
 
@@ -172,7 +175,9 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
   }
 }
 
-export const LocalInProgressDataDetails = connect(
-  mapStateToProps,
-  null
-)(injectIntl(LocalInProgressDataDetailsComponent))
+export const LocalInProgressDataDetails = connect<
+  IProps,
+  {},
+  { eventId: string },
+  IStoreState
+>(mapStateToProps)(injectIntl(LocalInProgressDataDetailsComponent))

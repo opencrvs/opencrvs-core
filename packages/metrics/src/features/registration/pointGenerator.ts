@@ -22,7 +22,9 @@ import {
   getPreviousTask,
   getComposition,
   APPLICATION_STATUS,
-  getApplicationStatus
+  getApplicationStatus,
+  getTimeLoggedFromTask,
+  getApplicationType
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -163,11 +165,41 @@ export async function generateEventDurationPoint(
 
   const tags = {
     current_status: getApplicationStatus(currentTask),
-    previous_status: getApplicationStatus(previousTask)
+    previous_status: getApplicationStatus(previousTask),
+    event_type: getApplicationType(currentTask)
   }
 
   return {
     measurement: 'application_event_duration',
+    tags,
+    fields
+  }
+}
+
+export function generateTimeLoggedPoint(payload: fhir.Bundle) {
+  const composition = getComposition(payload)
+  const currentTask = getTask(payload)
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  if (!currentTask) {
+    throw new Error('Current task not found')
+  }
+
+  const fields = {
+    time_spent_editing: getTimeLoggedFromTask(currentTask),
+    application_id: composition.id
+  }
+
+  const tags = {
+    current_status: getApplicationStatus(currentTask),
+    event_type: getApplicationType(currentTask)
+  }
+
+  return {
+    measurement: 'application_time_logged',
     tags,
     fields
   }

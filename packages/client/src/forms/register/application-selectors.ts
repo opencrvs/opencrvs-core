@@ -40,6 +40,10 @@ export const getRegisterForm = (state: IStoreState) => {
 
   return form
 }
+export const isRegisterFormReady = (state: IStoreState) => {
+  const form = getKey(state, 'registerForm')
+  return Boolean(form)
+}
 
 export const getEventRegisterForm = (state: IStoreState, event: Event) => {
   return getRegisterForm(state)[event]

@@ -1810,6 +1810,34 @@ const builders: IFieldBuilders = {
         const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
         taskResource.lastModified = fieldValue
         return
+      },
+      timeLoggedMS: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: number,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+
+        if (!taskResource.extension) {
+          taskResource.extension = []
+        }
+
+        const hasTimeLoggedMS = taskResource.extension.find(
+          extension =>
+            extension.url ===
+            `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`
+        )
+
+        if (hasTimeLoggedMS && hasTimeLoggedMS.valueInteger) {
+          hasTimeLoggedMS.valueInteger =
+            hasTimeLoggedMS.valueInteger + fieldValue
+        } else {
+          taskResource.extension.push({
+            url: `${OPENCRVS_SPECIFICATION_URL}extension/timeLoggedMS`,
+            valueInteger: fieldValue
+          })
+        }
+        return
       }
     },
     attachments: {

@@ -191,6 +191,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -444,6 +448,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -697,6 +705,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -934,6 +946,10 @@ describe('When a new registration event is received', () => {
                 valueReference: {
                   reference: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
                 }
+              },
+              {
+                url: `http://opencrvs.org/specs/extension/timeLoggedMS`,
+                valueInteger: 1234
               }
             ]
           }
@@ -1089,6 +1105,28 @@ describe('When an existing application is marked registered', () => {
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
+
+  describe('a death application', () => {
+    it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/mark-death-registered-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/mark-registered',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
+
+      expect(res.statusCode).toBe(200)
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
+  })
 })
 describe('When an existing application is marked certified', () => {
   let server: any
@@ -1116,9 +1154,30 @@ describe('When an existing application is marked certified', () => {
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
+  describe('a death application', () => {
+    it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/mark-death-certified-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/mark-certified',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'application_event_duration'
+      )
+
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
+  })
 })
 
-describe('When an in-progress application is recieved', () => {
+describe('When an in-progress application is received', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1136,10 +1195,11 @@ describe('When an in-progress application is recieved', () => {
       },
       payload
     })
-    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
+    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0][0].find(
       ({ measurement }: { measurement: string }) =>
         measurement === 'in_complete_fields'
     )
+
     expect(res.statusCode).toBe(200)
     expect(inCompleteFieldPoints).toMatchSnapshot()
   })

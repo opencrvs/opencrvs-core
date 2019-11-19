@@ -25,7 +25,7 @@ import styled from '@client/styledComponents'
 import {
   goBack as goBackAction,
   goToHome as goToHomeAction,
-  goToPerformance as goToPerformanceAction
+  goToPerformanceHome as goToPerformanceAction
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getLanguages } from '@client/i18n/selectors'

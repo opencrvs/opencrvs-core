@@ -30,7 +30,7 @@
     "jwt-decode": "^2.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "typescript": "^3.0.1",
+    "typescript": "^3.7.2",
     "winston": "^3.0.0"
   },
   "devDependencies": {
@@ -39,6 +39,7 @@
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",
+    "@types/hapi-pino": "^6.3.0",
     "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",
     "@types/jsonwebtoken": "^8.3.0",

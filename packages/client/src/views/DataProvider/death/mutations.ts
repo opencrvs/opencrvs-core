@@ -12,7 +12,10 @@
 import gql from 'graphql-tag'
 import { IForm, Action } from '@client/forms'
 import { IApplication } from '@client/applications'
-import { draftToGqlTransformer } from '@client/transformer'
+import {
+  draftToGqlTransformer,
+  appendGqlMetadataFromDraft
+} from '@client/transformer'
 
 const SUBMIT_DEATH_APPLICATION = gql`
   mutation submitMutation($details: DeathRegistrationInput!) {
@@ -29,7 +32,42 @@ const APPROVE_DEATH_APPLICATION = gql`
 `
 const REGISTER_DEATH_APPLICATION = gql`
   mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
-    markDeathAsRegistered(id: $id, details: $details)
+    markDeathAsRegistered(id: $id, details: $details) {
+      id
+      registration {
+        id
+        status {
+          id
+          user {
+            id
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role
+          }
+          location {
+            id
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+          type
+          timestamp
+          comments {
+            comment
+          }
+        }
+      }
+    }
   }
 `
 const REJECT_DEATH_APPLICATION = gql`
@@ -50,40 +88,35 @@ export function getDeathMutationMappings(
   form?: IForm,
   draft?: IApplication
 ) {
+  let gqlDetails = {}
+  if (form && draft) {
+    gqlDetails = draftToGqlTransformer(form, draft.data, draft.id)
+    appendGqlMetadataFromDraft(draft, gqlDetails)
+  }
+
   switch (action) {
     case Action.SUBMIT_FOR_REVIEW:
       return {
         mutation: SUBMIT_DEATH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                details: draftToGqlTransformer(form, draft.data, draft.id)
-              }
-            : {},
+        variables: { details: gqlDetails },
         dataKey: 'createDeathRegistration'
       }
     case Action.APPROVE_APPLICATION:
       return {
         mutation: APPROVE_DEATH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markDeathAsValidated'
       }
     case Action.REGISTER_APPLICATION:
       return {
         mutation: REGISTER_DEATH_APPLICATION,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markDeathAsRegistered'
       }
     case Action.REJECT_APPLICATION:
@@ -97,13 +130,10 @@ export function getDeathMutationMappings(
     case Action.COLLECT_CERTIFICATE:
       return {
         mutation: COLLECT_DEATH_CERTIFICATE,
-        variables:
-          form && draft
-            ? {
-                id: draft.id,
-                details: draftToGqlTransformer(form, draft.data)
-              }
-            : {},
+        variables: {
+          id: draft && draft.id,
+          details: gqlDetails
+        },
         dataKey: 'markDeathAsCertified'
       }
     default:

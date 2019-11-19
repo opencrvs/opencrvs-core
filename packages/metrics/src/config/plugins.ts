@@ -18,7 +18,8 @@ export default function getPlugins() {
     {
       plugin: Pino,
       options: {
-        prettyPrint: process.env.NODE_ENV !== 'production'
+        prettyPrint: false,
+        logPayload: false
       }
     }
   ]
