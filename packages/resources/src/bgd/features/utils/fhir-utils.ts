@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+import { OPENCRVS_SPECIFICATION_URL } from '@resources/bgd/features/utils'
+
 export function getTaskResource(
   bundle: fhir.Bundle & fhir.BundleEntry
 ): fhir.Task | undefined {
@@ -50,4 +53,22 @@ export function findExtension(
     return obj.url === url
   })
   return extension
+}
+
+export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
+  const trackingIdentifier =
+    taskResource &&
+    taskResource.identifier &&
+    taskResource.identifier.find(identifier => {
+      return (
+        identifier.system ===
+          `${OPENCRVS_SPECIFICATION_URL}id/birth-tracking-id` ||
+        identifier.system ===
+          `${OPENCRVS_SPECIFICATION_URL}id/death-tracking-id`
+      )
+    })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
 }

@@ -138,9 +138,6 @@ export async function createServer() {
     handler: bgdValidateRegistrationHandler,
     options: {
       tags: ['api'],
-      response: {
-        schema: bgdGeneratorResponseSchema
-      },
       description:
         'Validates a registration and if successful returns a BRN for that record'
     }

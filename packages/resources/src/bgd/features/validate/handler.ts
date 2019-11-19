@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import * as Joi from 'joi'
 import { generateRegistrationNumber } from '@resources/bgd/features/generate/service'
 import fetch from 'node-fetch'
 import {
@@ -19,7 +18,8 @@ import {
 } from '@resources/constants'
 import {
   getTaskResource,
-  findExtension
+  findExtension,
+  getTrackingIdFromTaskResource
 } from '@resources/bgd/features/utils/fhir-utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -30,52 +30,58 @@ export async function bgdValidateRegistrationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const bundle = request.payload as fhir.Bundle
-  const taskResource = getTaskResource(bundle)
+  try {
+    const bundle = request.payload as fhir.Bundle
+    const taskResource = getTaskResource(bundle)
 
-  if (!taskResource || !taskResource.extension) {
-    throw new Error(
-      'Failed to validate registration: could not find task resource in bundle or task resource had no extensions, '
-    )
-  }
-  const practitionerRefExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-    taskResource.extension
-  )
-
-  if (
-    !practitionerRefExt ||
-    !practitionerRefExt.valueReference ||
-    !practitionerRefExt.valueReference.reference
-  ) {
-    throw new Error(
-      'Failed to validate registration: practitioner reference not found in task resource'
-    )
-  }
-
-  const practitioner = await getFromFhir(
-    practitionerRefExt.valueReference.reference
-  )
-
-  if (VALIDATE_IN_BDRIS2 === 'false') {
-    const webHookResponse = {
-      registrationNumber: await generateRegistrationNumber(practitioner.id)
+    if (!taskResource || !taskResource.extension) {
+      throw new Error(
+        'Failed to validate registration: could not find task resource in bundle or task resource had no extensions, '
+      )
     }
 
-    // send web hook to workflow service to continue registration, don't wait for response
+    const trackingId = getTrackingIdFromTaskResource(taskResource)
+    const practitionerRefExt = findExtension(
+      `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+      taskResource.extension
+    )
+
+    if (
+      !practitionerRefExt ||
+      !practitionerRefExt.valueReference ||
+      !practitionerRefExt.valueReference.reference
+    ) {
+      throw new Error(
+        'Failed to validate registration: practitioner reference not found in task resource'
+      )
+    }
+
+    const practitioner = await getFromFhir(
+      practitionerRefExt.valueReference.reference
+    )
+
+    if (VALIDATE_IN_BDRIS2 === 'false') {
+      const webHookResponse = {
+        trackingId,
+        registrationNumber: await generateRegistrationNumber(practitioner.id)
+      }
+
+      // send web hook to workflow service to continue registration, don't wait for response
+      fetch(CONFIRM_REGISTRATION_URL, {
+        method: 'POST',
+        body: JSON.stringify(webHookResponse),
+        headers: { Authorization: request.headers.authorization }
+      })
+    } else {
+      // TODO add to queue for worker to pickup and validate
+    }
+  } catch (err) {
     fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
-      body: JSON.stringify(webHookResponse)
+      body: JSON.stringify({ error: err.message }),
+      headers: { Authorization: request.headers.authorization }
     })
-  } else {
-    // TODO add to queue for worker to pickup and validate
   }
 
   return h.response().code(202)
 }
-
-export const responseSchema = Joi.object({
-  trackingId: Joi.string(),
-  registrationNumber: Joi.string(),
-  error: Joi.string().optional()
-})
