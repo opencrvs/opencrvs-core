@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as path from 'path'
+import { readFileSync } from 'fs'
 
 export const ADMIN_STRUCTURE_SOURCE = path.join(
   process.cwd(),
@@ -39,6 +40,10 @@ export const SEQUENCE_NUMBER_SOURCE = path.join(
   'src/bgd/features/generate/sequenceNumbers/'
 )
 export const ADMINISTRATIVE_STRUCTURE_URL = 'http://esb.beta.doptor.gov.bd:8280'
+
+export const OISF_SECRET = process.env.OISF_SECRET
+  ? readFileSync(process.env.OISF_SECRET).toString()
+  : ''
 
 export const MIN_SEQ_NUMBER = 0
 export const MAX_SEQ_NUMBER = 999999

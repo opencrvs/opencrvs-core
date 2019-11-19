@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch, { Response } from 'node-fetch'
-import { ADMINISTRATIVE_STRUCTURE_URL } from '@resources/bgd/constants'
+import {
+  ADMINISTRATIVE_STRUCTURE_URL,
+  OISF_SECRET
+} from '@resources/bgd/constants'
 import { ORG_URL } from '@resources/constants'
 import {
   sendToFhir,
@@ -96,7 +99,7 @@ export const appendLocations = (
 }
 
 export async function getTokenForOISF() {
-  const secret = process.argv[2]
+  const secret = process.argv[2] || OISF_SECRET
   if (!secret) {
     // tslint:disable-next-line:no-console
     console.log('No secret found for OISF token generation')
