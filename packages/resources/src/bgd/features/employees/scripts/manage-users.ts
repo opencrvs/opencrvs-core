@@ -17,23 +17,29 @@ import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'
 export function getScope(role: string): string[] {
   switch (role) {
     case 'FIELD_AGENT':
-      return ['declare', 'demo']
+      return ['declare' /*, 'demo'*/]
     case 'REGISTRATION_AGENT':
-      return ['validate', 'certify', 'demo']
+      return ['validate', 'certify' /*, 'demo'*/]
     case 'LOCAL_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo']
+      return ['register', 'performance', 'certify' /*, 'demo'*/]
     case 'DISTRICT_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo']
+      return ['register', 'performance', 'certify' /*, 'demo'*/]
     case 'STATE_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo']
+      return ['register', 'performance', 'certify' /*, 'demo'*/]
     case 'NATIONAL_REGISTRAR':
-      return ['register', 'performance', 'certify', 'config', 'teams', 'demo']
+      return [
+        'register',
+        'performance',
+        'certify',
+        'config',
+        'teams' /*, 'demo'*/
+      ]
     case 'LOCAL_SYSTEM_ADMIN':
-      return ['sysadmin', 'demo']
+      return ['sysadmin' /*, 'demo'*/]
     case 'API_USER':
       return ['declare', 'api']
     default:
-      return ['declare', 'demo']
+      return ['declare' /*, 'demo'*/]
   }
 }
 
