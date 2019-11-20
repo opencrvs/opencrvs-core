@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { v4 as uuid } from 'uuid'
-import { fetchAllAddressLocations } from '@bgd-dhis2-mediator/features/fhir/api'
+import {
+  fetchAllAddressLocations,
+  fetchCRVSOfficeByParentLocation
+} from '@bgd-dhis2-mediator/features/fhir/api'
+import * as moment from 'moment'
+import { EVENT_DATE_FORMAT } from '@bgd-dhis2-mediator/constants'
 
 export interface IIncomingAddress {
   division: {
@@ -54,11 +59,77 @@ export function createBundle(entries: fhir.BundleEntry[]) {
   }
 }
 
-export function createComposition(
-  eventType: 'BIRTH' | 'DEATH',
-  subjectRef: string,
+export function createBirthComposition(
+  childSectionRef: string,
   motherSectionRef: string,
   fatherSectionRef: string,
+  encounterSectionRef: string
+) {
+  const composition = createComposition(
+    'BIRTH',
+    childSectionRef,
+    encounterSectionRef
+  )
+  composition.resource.section = composition.resource.section.concat([
+    {
+      title: "Mother's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'mother-details'
+          }
+        ],
+        text: "Mother's details"
+      },
+      entry: [{ reference: motherSectionRef }]
+    },
+    {
+      title: "Father's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-sections',
+            code: 'father-details'
+          }
+        ],
+        text: "Father's details"
+      },
+      entry: [{ reference: fatherSectionRef }]
+    }
+  ])
+  return composition
+}
+
+export function createDeathComposition(
+  deceasedSectionRef: string,
+  informantSectionRef: string,
+  encounterSectionRef: string
+) {
+  const composition = createComposition(
+    'DEATH',
+    deceasedSectionRef,
+    encounterSectionRef
+  )
+  composition.resource.section.push({
+    title: "Informant's details",
+    code: {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/sections',
+          code: 'informant-details'
+        }
+      ],
+      text: "Informant's details"
+    },
+    entry: [{ reference: informantSectionRef }]
+  })
+  return composition
+}
+
+function createComposition(
+  eventType: 'BIRTH' | 'DEATH',
+  subjectRef: string,
   encounterSectionRef: string
 ) {
   return {
@@ -76,7 +147,9 @@ export function createComposition(
             system: 'http://opencrvs.org/doc-types',
             // TODO add support for notification event detection in workflow 'death-notification'
             code:
-              eventType === 'BIRTH' ? 'birth-notification' : 'death-declaration'
+              eventType === 'BIRTH'
+                ? 'birth-notification'
+                : 'death-notification'
           }
         ],
         text:
@@ -114,33 +187,6 @@ export function createComposition(
           entry: [{ reference: subjectRef }]
         },
         {
-          title: "Mother's details",
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/sections',
-                code: 'mother-details'
-              }
-            ],
-            text: "Mother's details"
-          },
-          text: '',
-          entry: [{ reference: motherSectionRef }]
-        },
-        {
-          title: "Father's details",
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/doc-sections',
-                code: 'father-details'
-              }
-            ],
-            text: "Father's details"
-          },
-          entry: [{ reference: fatherSectionRef }]
-        },
-        {
           title: eventType === 'BIRTH' ? 'Birth encounter' : 'Death encounter',
           code: {
             coding: [
@@ -159,14 +205,41 @@ export function createComposition(
   }
 }
 
+export function createRelatedPersonEntry(
+  relationShipType: string,
+  informantEntryRef: string
+) {
+  return {
+    fullUrl: `urn:uuid:${uuid()}`,
+    resource: {
+      resourceType: 'RelatedPerson',
+      relationship: {
+        coding: [
+          {
+            system:
+              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+            code: relationShipType
+          }
+        ]
+      },
+      patient: {
+        reference: informantEntryRef
+      }
+    }
+  }
+}
+
 export async function createPersonEntry(
   nid: string | null,
   firstNames: [string] | null,
   lastName: string,
+  firstNamesEng: [string] | null,
+  lastNameEng: string,
   addressObject: IIncomingAddress | null,
   gender: 'male' | 'female' | 'unknown',
   phoneNumber: string | null,
   birthDate: string | null,
+  deathDate: string | null,
   authHeader: string
 ) {
   return {
@@ -186,6 +259,11 @@ export async function createPersonEntry(
       name: [
         {
           use: 'en',
+          family: [lastNameEng],
+          given: firstNamesEng
+        },
+        {
+          use: 'bn',
           family: [lastName],
           given: firstNames
         }
@@ -208,7 +286,9 @@ export async function createPersonEntry(
             )
           ]
         : [],
-      birthDate
+      birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT),
+      deceasedBoolean: !!deathDate,
+      deceasedDateTime: dateFormatter(deathDate, EVENT_DATE_FORMAT)
     }
   }
 }
@@ -291,23 +371,47 @@ export function createDeathEncounterEntry(
   }
 }
 
-export function createTaskEntry(
+export async function createTaskEntry(
   compositionRef: string,
-  eventType: 'BIRTH' | 'DEATH'
+  lastRegLocation: fhir.Location,
+  eventType: 'BIRTH' | 'DEATH',
+  authHeader: string
 ) {
+  const taskResource: fhir.Task = {
+    resourceType: 'Task',
+    status: 'draft',
+    intent: 'unknown',
+    code: {
+      coding: [{ system: 'http://opencrvs.org/specs/types', code: eventType }]
+    },
+    focus: {
+      reference: compositionRef
+    },
+    lastModified: new Date().toISOString()
+  }
+  if (lastRegLocation.id) {
+    taskResource.extension = [
+      {
+        url: 'http://opencrvs.org/specs/extension/regLastLocation',
+        valueReference: {
+          reference: `Location/${lastRegLocation.id}`
+        }
+      }
+    ]
+    const lastRegOffice = await fetchCRVSOfficeByParentLocation(
+      lastRegLocation,
+      authHeader
+    )
+    taskResource.extension.push({
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: {
+        reference: `Location/${lastRegOffice.id}`
+      }
+    })
+  }
   return {
     fullUrl: `urn:uuid:${uuid()}`,
-    resource: {
-      resourceType: 'Task',
-      status: 'draft',
-      code: {
-        coding: [{ system: 'http://opencrvs.org/specs/types', code: eventType }]
-      },
-      focus: {
-        reference: compositionRef
-      },
-      lastModified: new Date().toISOString()
-    }
+    resource: taskResource
   }
 }
 
@@ -339,4 +443,11 @@ export async function convertAddressObjToFHIRPermanentAddress(
     postalCode: '',
     country: 'BGD'
   }
+}
+
+export function dateFormatter(date: string | null, formatString: string) {
+  if (!date) {
+    return null
+  }
+  return moment(Number(date)).format(formatString)
 }

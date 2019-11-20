@@ -12,15 +12,17 @@
 import * as Hapi from 'hapi'
 import {
   createPersonEntry,
+  createRelatedPersonEntry,
   createDeathEncounterEntry,
   createBundle,
-  createComposition,
+  createDeathComposition,
   createTaskEntry,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
-  fetchUnionByFullBBSCode
+  fetchUnionByFullBBSCode,
+  fetchFacilityByHRISId
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -71,71 +73,86 @@ export async function deathNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification = JSON.parse(
-    request.payload as string
-  ) as IDeathNotification
+  const notification =
+    typeof request.payload === 'string'
+      ? (JSON.parse(request.payload as string) as IDeathNotification)
+      : (request.payload as IDeathNotification)
 
   const deceased = await createPersonEntry(
     notification.deceased.nid || null,
+    notification.deceased.first_names_bn || null,
+    notification.deceased.last_name_bn,
     notification.deceased.first_names_en || null,
     notification.deceased.last_name_en,
     null,
     notification.deceased.sex || 'unknown',
     null,
     notification.deceased.date_birth,
+    notification.death_date,
     request.headers.authorization
   )
-  const mother = await createPersonEntry(
-    notification.mother.nid || null,
-    notification.mother.first_names_en || null,
-    notification.mother.last_name_en,
-    notification.permanent_address,
-    'female',
-    notification.phone_number,
-    null,
-    request.headers.authorization
-  )
-  const father = await createPersonEntry(
-    null,
+
+  // Father is always picked as Informant
+  // TODO: may need to change it based on the available data from dhis2
+  const informant = await createPersonEntry(
+    notification.father.nid || null,
+    notification.father.first_names_bn || null,
+    notification.father.last_name_bn,
     notification.father.first_names_en || null,
     notification.father.last_name_en,
     notification.permanent_address,
     'male',
     notification.phone_number,
     null,
+    null,
     request.headers.authorization
   )
+  const relatedPerson = createRelatedPersonEntry('FATHER', informant.fullUrl)
 
-  const locationId = notification.union_death_ocurred.id
-  const location = await fetchUnionByFullBBSCode(
-    locationId,
+  if (!notification.place_of_death) {
+    throw new Error('Could not find any place of death')
+  }
+  const placeOfDeathFacilityLocation = await fetchFacilityByHRISId(
+    notification.place_of_death.id,
     request.headers.authorization
   )
-
-  if (!location) {
-    throw new Error('Could not find union by full BBS code')
+  if (!placeOfDeathFacilityLocation) {
+    throw new Error('Could not find facility by HRIS ID')
   }
 
   const encounter = createDeathEncounterEntry(
-    `Location/${location.id}`,
+    `Location/${placeOfDeathFacilityLocation.id}`,
     deceased.fullUrl
   )
 
-  const composition = createComposition(
-    'DEATH',
+  const composition = createDeathComposition(
     deceased.fullUrl,
-    mother.fullUrl,
-    father.fullUrl,
+    relatedPerson.fullUrl,
     encounter.fullUrl
   )
-  const task = createTaskEntry(composition.fullUrl, 'DEATH')
+  const lastRegLocId = notification.union_death_ocurred.id
+  const lastRegLocation = await fetchUnionByFullBBSCode(
+    lastRegLocId,
+    request.headers.authorization
+  )
+
+  if (!lastRegLocation) {
+    throw new Error('Could not find last registered union by full BBS code')
+  }
+
+  const task = await createTaskEntry(
+    composition.fullUrl,
+    lastRegLocation,
+    'DEATH',
+    request.headers.authorization
+  )
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
   entries.push(task)
   entries.push(deceased)
-  entries.push(mother)
-  entries.push(father)
+  entries.push(relatedPerson)
+  entries.push(informant)
   entries.push(encounter)
 
   const bundle = createBundle(entries)

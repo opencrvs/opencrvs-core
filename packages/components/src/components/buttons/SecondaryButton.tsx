@@ -30,8 +30,22 @@ export const SecondaryButton = styled(Button)`
     opacity: 0.8;
   }
 
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+    border: none;
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    color: ${({ theme }) => theme.colors.secondary};
+    background: ${({ theme }) => theme.colors.white};
+    border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
+  }
+
   &:active {
-    outline: 3px solid ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {

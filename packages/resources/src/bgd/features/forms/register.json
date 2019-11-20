@@ -378,7 +378,7 @@
                   "conditionals": [],
                   "previewGroup": "contactPointGroup",
                   "required": true,
-                  "hideHeader":true,
+                  "hideHeader": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -2019,27 +2019,11 @@
                   },
                   "options": [
                     {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
                       "value": "NATIONAL_ID",
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeNationalID"
-                      }
-                    },
-                    {
-                      "value": "DRIVING_LICENSE",
-                      "label": {
-                        "defaultMessage": "Drivers License",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeDrivingLicense"
                       }
                     },
                     {
@@ -2049,38 +2033,6 @@
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeBRN"
                       }
-                    },
-                    {
-                      "value": "REFUGEE_NUMBER",
-                      "label": {
-                        "defaultMessage": "Refugee Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeRefugeeNumber"
-                      }
-                    },
-                    {
-                      "value": "ALIEN_NUMBER",
-                      "label": {
-                        "defaultMessage": "Alien Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeAlienNumber"
-                      }
-                    },
-                    {
-                      "value": "NO_ID",
-                      "label": {
-                        "defaultMessage": "No ID available",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNoID"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
                     }
                   ],
                   "mapping": {
@@ -2101,46 +2053,6 @@
                         {
                           "operation": "identifierToFieldTransformer",
                           "parameters": ["type"]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToIdentifierTransformer",
-                          "parameters": ["otherType"]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "identifierToFieldTransformer",
-                          "parameters": ["otherType"]
                         }
                       ]
                     }
@@ -5386,22 +5298,6 @@
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeBRN"
                       }
-                    },
-                    {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
                     }
                   ],
                   "mapping": {
@@ -5412,34 +5308,6 @@
                     "query": {
                       "operation": "identifierToFieldTransformer",
                       "parameters": ["type"]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
-                      "parameters": ["otherType"]
-                    },
-                    "query": {
-                      "operation": "identifierToFieldTransformer",
-                      "parameters": ["otherType"]
                     }
                   }
                 },
@@ -5590,7 +5458,7 @@
                     "description": "Label for form field: Nationality",
                     "id": "form.field.label.deceased.nationality"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "BGD",
                   "validate": [],
                   "placeholder": {
@@ -7606,22 +7474,6 @@
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeBRN"
                       }
-                    },
-                    {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
                     }
                   ],
                   "conditionals": [
@@ -7638,38 +7490,6 @@
                     "query": {
                       "operation": "identifierToFieldTransformer",
                       "parameters": ["type"]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
-                      "parameters": ["otherType"]
-                    },
-                    "query": {
-                      "operation": "identifierToFieldTransformer",
-                      "parameters": ["otherType"]
                     }
                   }
                 },
@@ -7828,7 +7648,7 @@
                     "description": "Label for form field: Nationality",
                     "id": "form.field.label.deceased.nationality"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "BGD",
                   "validate": [],
                   "placeholder": {
@@ -10952,27 +10772,11 @@
                   },
                   "options": [
                     {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
                       "value": "NATIONAL_ID",
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeNationalID"
-                      }
-                    },
-                    {
-                      "value": "DRIVING_LICENSE",
-                      "label": {
-                        "defaultMessage": "Drivers License",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeDrivingLicense"
                       }
                     },
                     {
@@ -10982,38 +10786,6 @@
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeBRN"
                       }
-                    },
-                    {
-                      "value": "REFUGEE_NUMBER",
-                      "label": {
-                        "defaultMessage": "Refugee Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeRefugeeNumber"
-                      }
-                    },
-                    {
-                      "value": "ALIEN_NUMBER",
-                      "label": {
-                        "defaultMessage": "Alien Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeAlienNumber"
-                      }
-                    },
-                    {
-                      "value": "NO_ID",
-                      "label": {
-                        "defaultMessage": "No ID available",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNoID"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
                     }
                   ],
                   "mapping": {
@@ -11024,34 +10796,6 @@
                     "query": {
                       "operation": "identifierToFieldTransformer",
                       "parameters": ["type"]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldToIdentifierTransformer",
-                      "parameters": ["otherType"]
-                    },
-                    "query": {
-                      "operation": "identifierToFieldTransformer",
-                      "parameters": ["otherType"]
                     }
                   }
                 },
@@ -14995,27 +14739,11 @@
                   },
                   "options": [
                     {
-                      "value": "PASSPORT",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypePassport"
-                      }
-                    },
-                    {
                       "value": "NATIONAL_ID",
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeNationalID"
-                      }
-                    },
-                    {
-                      "value": "DRIVING_LICENSE",
-                      "label": {
-                        "defaultMessage": "Drivers License",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeDrivingLicense"
                       }
                     },
                     {
@@ -15025,38 +14753,6 @@
                         "description": "Option for form field: Type of ID",
                         "id": "form.field.label.iDTypeBRN"
                       }
-                    },
-                    {
-                      "value": "REFUGEE_NUMBER",
-                      "label": {
-                        "defaultMessage": "Refugee Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeRefugeeNumber"
-                      }
-                    },
-                    {
-                      "value": "ALIEN_NUMBER",
-                      "label": {
-                        "defaultMessage": "Alien Number",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeAlienNumber"
-                      }
-                    },
-                    {
-                      "value": "NO_ID",
-                      "label": {
-                        "defaultMessage": "No ID available",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNoID"
-                      }
-                    },
-                    {
-                      "value": "OTHER",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeOther"
-                      }
                     }
                   ],
                   "mapping": {
@@ -15077,46 +14773,6 @@
                         {
                           "operation": "identifierToFieldTransformer",
                           "parameters": ["type"]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "iDTypeOther",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Other type of ID",
-                    "description": "Label for form field: Other type of ID",
-                    "id": "form.field.label.iDTypeOtherLabel"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.iDType || (values.iDType !== 'OTHER')"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToIdentifierTransformer",
-                          "parameters": ["otherType"]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "identifierToFieldTransformer",
-                          "parameters": ["otherType"]
                         }
                       ]
                     }
@@ -15648,44 +15304,6 @@
                     "query": {
                       "operation": "sectionFieldExchangeTransformer",
                       "parameters": ["informant", "relationship"]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantPhone",
-                  "type": "TEL",
-                  "label": {
-                    "defaultMessage": "Phone number",
-                    "description": "Input label for phone input",
-                    "id": "form.field.label.phoneNumber"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "phoneNumberFormat"
-                    }
-                  ],
-                  "hidden": true,
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldToPhoneNumberTransformer",
-                          "parameters": []
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "phoneNumberToFieldTransformer"
-                        }
-                      ]
                     }
                   }
                 },

@@ -36,6 +36,7 @@ export const OPENHIM_PASSWORD =
   'password'
 export const OPENHIM_URL = process.env.OPENHIM_URL || 'https://localhost:8080'
 export const TRUST_SELF_SIGNED = process.env.TRUST_SELF_SIGNED || 'true'
+export const EVENT_DATE_FORMAT = 'YYYY-MM-DD'
 
 // constants that shouldn't change
 export const MEDIATOR_URN = 'urn:opencrvs:dhis-mediator'

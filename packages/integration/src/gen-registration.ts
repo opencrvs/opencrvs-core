@@ -75,10 +75,10 @@ export default rates => {
             coding: [
               {
                 system: 'http://opencrvs.org/doc-types',
-                code: 'birth-declaration'
+                code: 'birth-application'
               }
             ],
-            text: 'Birth Declaration'
+            text: 'Birth Application'
           },
           class: {
             coding: [

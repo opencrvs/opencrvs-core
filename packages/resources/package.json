@@ -8,7 +8,7 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
     "test": "jest  --silent --noStackTrace --coverage && yarn test:compilation && yarn test:dhis2-mediator",
-    "test:dhis2-mediator": "cd src/bgd/packages/bgd-dhis2-mediator/ && yarn install && yarn test",
+    "test:dhis2-mediator": "cd src/bgd/mediators/bgd-dhis2/ && yarn install && yarn test",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
@@ -57,11 +57,9 @@
     "crypto": "^1.0.1",
     "eslint": "^5.8.0",
     "eslint-config-prettier": "^3.1.0",
-    "good": "^8.1.1",
-    "good-console": "^7.1.0",
-    "good-squeeze": "^5.1.0",
     "hapi": "^17.8.1",
     "hapi-auth-jwt2": "8.1.0",
+    "hapi-pino": "^6.3.0",
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "joi": "^14.3.1",
@@ -123,7 +121,7 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/src/bgd/packages/bgd-dhis2-mediator"
+      "/src/bgd/mediators/bgd-dhis2/"
     ]
   }
 }

@@ -14,6 +14,7 @@ import {
   generateDeathTrackingId,
   getEventType,
   isInProgressApplication,
+  isEventNotification,
   getRegistrationNumber
 } from '@workflow/features/registration/utils'
 import {
@@ -24,7 +25,7 @@ import {
 import {
   getLoggedInPractitionerResource,
   getPractitionerPrimaryLocation,
-  getPractitionerOfficeLocation,
+  getPractitionerOffice,
   getPractitionerRef
 } from '@workflow/features/user/utils'
 import {
@@ -79,7 +80,11 @@ export async function modifyRegistrationBundle(
   setupLastRegUser(taskResource, practitioner)
 
   /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
+  await setupLastRegLocation(
+    taskResource,
+    practitioner,
+    isEventNotification(fhirBundle)
+  )
 
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
@@ -316,12 +321,13 @@ export async function setupRegistrationWorkflow(
 
 export async function setupLastRegLocation(
   taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
+  practitioner: fhir.Practitioner,
+  isNotification: boolean = false
 ): Promise<fhir.Task> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
   }
-  const location = await getPractitionerOfficeLocation(practitioner.id)
+  const location = await getPractitionerPrimaryLocation(practitioner.id)
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -337,7 +343,9 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+    if (!isNotification) {
+      regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+    }
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
@@ -345,7 +353,7 @@ export async function setupLastRegLocation(
     })
   }
 
-  const primaryOffice = await getPractitionerPrimaryLocation(practitioner.id)
+  const primaryOffice = await getPractitionerOffice(practitioner.id)
 
   const regUserLastOfficeExtension = taskResource.extension.find(extension => {
     return (
@@ -353,7 +361,9 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+    if (!isNotification) {
+      regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+    }
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,

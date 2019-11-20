@@ -22,9 +22,7 @@ context('Death Integration Test', () => {
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -39,7 +37,8 @@ context('Death Integration Test', () => {
     )
     cy.goToNextFormSection()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#iD').type('1020607910288')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -68,7 +67,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_false').click()
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No ID available', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1234567891234')
     cy.get('#applicantFamilyName').type('উদ্দিন')
     cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
@@ -80,10 +80,7 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+    cy.submitApplication()
     cy.get('#row_0 #submitted0').should('exist')
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
@@ -97,11 +94,7 @@ context('Death Integration Test', () => {
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+    cy.registerApplication()
   })
 
   it('Tests from application to registration using maximum input', () => {
@@ -110,9 +103,7 @@ context('Death Integration Test', () => {
     // LOGIN
     cy.login('fieldWorker')
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -135,7 +126,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1020617910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -188,8 +179,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Chronic Obstructive Pulmonary Disease')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607917288')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
@@ -218,10 +209,7 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
+    cy.submitApplication()
     cy.get('#row_0 #submitted0').should('exist')
 
     // LOG OUT
@@ -236,11 +224,7 @@ context('Death Integration Test', () => {
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+    cy.registerApplication()
   })
 
   it('Tests from application to rejection using minimum input', () => {
@@ -249,9 +233,7 @@ context('Death Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -268,7 +250,8 @@ context('Death Integration Test', () => {
 
     cy.goToNextFormSection()
     // DECEASED DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#iD').type('1120607910288')
     cy.get('#familyName').type('খান')
     cy.get('#familyNameEng').type('Khan')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
@@ -300,7 +283,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathEstablished_false').click()
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'No_ID', 'No ID available')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607910266')
     cy.get('#applicantFamilyName').type('উদ্দিন')
     cy.get('#applicantFamilyNameEng').type('Uddin')
     cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
@@ -313,12 +297,8 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#row_0 #submitted0').should('exist')
-    // LOG OUT
+    cy.submitApplication()
+
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
     // LOGIN AS LOCAL REGISTRAR
@@ -330,15 +310,8 @@ context('Death Integration Test', () => {
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.rejectApplication()
   })
 
   it('Tests from application to rejection using maximum input', () => {
@@ -347,9 +320,7 @@ context('Death Integration Test', () => {
     cy.login('fieldWorker')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -373,7 +344,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1110607910288')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -431,8 +402,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Coronary artery disease')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1440607910288')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
@@ -462,11 +433,8 @@ context('Death Integration Test', () => {
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
-    cy.get('#submit_form').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#row_0 #submitted0').should('exist')
+    cy.submitApplication()
+
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()
     cy.get('#ProfileMenuItem1').click()
@@ -479,15 +447,8 @@ context('Death Integration Test', () => {
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
-    cy.get('#rejectApplicationBtn').click()
-    // REJECT MODAL
-    cy.get('#rejectionReasonother').click()
-    cy.get('#rejectionCommentForHealthWorker').type(
-      'Lack of information, please notify informant about it.'
-    )
-    cy.get('#submit_reject_form').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.rejectApplication()
   })
 
   it('Tests registration by registrar using maximum input', () => {
@@ -496,9 +457,7 @@ context('Death Integration Test', () => {
     cy.login('registrar')
     // CREATE PIN
     cy.createPin()
-    // LANDING
-    cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
-    cy.get('#header_new_event').click()
+    cy.verifyLandingPageVisible()
     // APPLICATION FORM
     cy.get('#select_vital_event_view').should('be.visible')
     cy.get('#select_death_event').click()
@@ -523,7 +482,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DECEASED DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1020607910288')
+    cy.get('#iD').type('1020607933388')
     cy.get('#firstNames').type('ক ম আব্দুল্লাহ আল আমিন ')
     cy.get('#familyName').type('খান')
     cy.get('#firstNamesEng').type('K M Abdullah al amin')
@@ -581,8 +540,8 @@ context('Death Integration Test', () => {
     cy.get('#causeOfDeathCode').type('Brain stroke')
     cy.goToNextFormSection()
     // APPLICANT DETAILS
-    cy.selectOption('#iDType', 'Drivers_License', 'Drivers License')
-    cy.get('#applicantID').type('JS0013011C00001')
+    cy.selectOption('#iDType', 'National_ID', 'National ID')
+    cy.get('#applicantID').type('1020607914444')
     cy.get('#applicantFirstNames').type('জামাল উদ্দিন খান')
     cy.get('#applicantFamilyName').type('খান')
     cy.get('#applicantFirstNamesEng').type('Jamal Uddin Khan')
@@ -611,11 +570,7 @@ context('Death Integration Test', () => {
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
-    // PREVIEW
-    cy.get('#registerApplicationBtn').click()
-    // MODAL
-    cy.get('#submit_confirm').click()
-    cy.waitUntilApplicationSynced()
-    cy.get('#Spinner').should('not.exist')
+
+    cy.registerApplication()
   })
 })

@@ -15,12 +15,13 @@ import {
   createBirthEncounterEntry,
   createBundle,
   createTaskEntry,
-  createComposition,
+  createBirthComposition,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
-  fetchUnionByFullBBSCode
+  fetchUnionByFullBBSCode,
+  fetchFacilityByHRISId
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -67,64 +68,93 @@ export async function birthNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification = JSON.parse(
-    request.payload as string
-  ) as IBirthNotification
+  const notification =
+    typeof request.payload === 'string'
+      ? (JSON.parse(request.payload as string) as IBirthNotification)
+      : (request.payload as IBirthNotification)
 
   const child = await createPersonEntry(
     null,
+    notification.child.first_names_bn || null,
+    notification.child.last_name_bn,
     notification.child.first_names_en || null,
     notification.child.last_name_en,
     null,
     notification.child.sex || 'unknown',
     null,
     notification.date_birth,
+    null,
     request.headers.authorization
   )
   const mother = await createPersonEntry(
     notification.mother.nid || null,
+    notification.mother.first_names_bn || null,
+    notification.mother.last_name_bn,
     notification.mother.first_names_en || null,
     notification.mother.last_name_en,
     notification.permanent_address,
     'female',
     notification.phone_number,
     null,
+    null,
     request.headers.authorization
   )
   const father = await createPersonEntry(
     notification.father.nid || null,
+    notification.father.first_names_bn || null,
+    notification.father.last_name_bn,
     notification.father.first_names_en || null,
     notification.father.last_name_en,
     notification.permanent_address,
     'male',
     notification.phone_number,
     null,
+    null,
     request.headers.authorization
   )
-
-  const locationId = notification.union_birth_ocurred.id
-  const location = await fetchUnionByFullBBSCode(
-    locationId,
+  if (!notification.place_of_birth) {
+    throw new Error('Could not find any place of birth')
+  }
+  const placeOfBirthFacilityLocation = await fetchFacilityByHRISId(
+    notification.place_of_birth.id,
     request.headers.authorization
   )
-
-  if (!location) {
-    throw new Error('Could not find union by full BBS code')
+  if (!placeOfBirthFacilityLocation) {
+    throw new Error('Could not find facility by HRIS ID')
   }
 
   const encounter = createBirthEncounterEntry(
-    `Location/${location.id}`,
+    `Location/${placeOfBirthFacilityLocation.id}`,
     child.fullUrl
   )
 
-  const composition = createComposition(
-    'BIRTH',
+  const composition = createBirthComposition(
     child.fullUrl,
     mother.fullUrl,
     father.fullUrl,
     encounter.fullUrl
   )
-  const task = createTaskEntry(composition.fullUrl, 'BIRTH')
+
+  const lastRegLocId = notification.union_birth_ocurred.id
+  const lastRegLocation = await fetchUnionByFullBBSCode(
+    lastRegLocId,
+    request.headers.authorization
+  )
+
+  if (!lastRegLocation) {
+    throw new Error('Could not find last registered union by full BBS code')
+  }
+
+  const task = await createTaskEntry(
+    composition.fullUrl,
+    lastRegLocation,
+    'BIRTH',
+    request.headers.authorization
+  )
+  // Contact type is always passing MOTHER
+  // as based on the type both mother last name and phone number is required
+  // TODO: may need to change it based on the available data from dhis2
+  assignBirthContactPoint(task.resource, 'MOTHER', notification.phone_number)
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
@@ -164,4 +194,22 @@ export async function birthNotificationHandler(
   }
 
   return h.response().code(201)
+}
+
+function assignBirthContactPoint(
+  task: fhir.Task,
+  contact: string,
+  number: string
+) {
+  if (!task.extension) {
+    task.extension = []
+  }
+  task.extension.push({
+    url: 'http://opencrvs.org/specs/extension/contact-person',
+    valueString: contact
+  })
+  task.extension.push({
+    url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+    valueString: number
+  })
 }

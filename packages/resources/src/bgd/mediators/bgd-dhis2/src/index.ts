@@ -80,7 +80,7 @@ export async function createServer() {
               {
                 name: 'OpenCRVS DHIS Mediator',
                 host: HOST,
-                port: 8040
+                port: PORT
               }
             ]
           },
@@ -98,12 +98,12 @@ export async function createServer() {
     }
 
     await server.start()
-    server.log('info', `Search server started on ${HOST}:${PORT}`)
+    server.log('info', `DHIS2 mediator server started on ${HOST}:${PORT}`)
   }
 
   async function stop() {
     await server.stop()
-    server.log('info', 'Search server stopped')
+    server.log('info', 'DHIS2 mediator server stopped')
   }
 
   return { server, start, stop }

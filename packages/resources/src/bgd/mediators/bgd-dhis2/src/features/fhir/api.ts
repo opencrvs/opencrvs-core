@@ -18,9 +18,9 @@ interface IIdentifier {
   value: string
 }
 
-export async function fetchLocationByIdentifiersAndParent(
+export async function fetchLocationByIdentifiers(
   identifiers: IIdentifier[],
-  partOfRef: string,
+  querySuffix: string,
   authHeader: string
 ): Promise<fhir.Location> {
   const identifierQueryStrings = identifiers.map(
@@ -28,9 +28,7 @@ export async function fetchLocationByIdentifiersAndParent(
   )
 
   const res = await fetch(
-    `${FHIR_URL}/Location?${identifierQueryStrings.join(
-      '&'
-    )}&partof=${partOfRef}`,
+    `${FHIR_URL}/Location?${identifierQueryStrings.join('&')}&${querySuffix}`,
     {
       method: 'GET',
       headers: {
@@ -52,7 +50,40 @@ export async function fetchLocationByIdentifiersAndParent(
     throw new Error(
       `Location not found, identifiers: ${JSON.stringify(
         identifiers
-      )}, parentRef: ${partOfRef}`
+      )}, query suffix: ${querySuffix}`
+    )
+  }
+
+  return bundle.entry[0].resource as fhir.Location
+}
+
+export async function fetchCRVSOfficeByParentLocation(
+  parentLocation: fhir.Location,
+  authHeader: string
+): Promise<fhir.Location> {
+  // TODO: need to go through the location hierarchy to find crvs office
+  const res = await fetch(
+    `${FHIR_URL}/Location?parentRef=Location/${parentLocation.id}&type=CRVS_OFFICE`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authHeader,
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(
+      `Error status code received in response, ${res.statusText} ${res.status}`
+    )
+  }
+
+  const bundle: fhir.Bundle = await res.json()
+
+  if (!bundle.entry || !bundle.entry[0] || !bundle.entry[0].resource) {
+    throw new Error(
+      `Location not found, parent location: ${JSON.stringify(parentLocation)}`
     )
   }
 
@@ -86,7 +117,7 @@ export async function fetchHierarchicalBangladeshLocations(
   const result: IBNLocationResult = {}
 
   if (codes.divisionCode) {
-    result.division = await fetchLocationByIdentifiersAndParent(
+    result.division = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -97,7 +128,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'DIVISION'
         }
       ],
-      'Location/0', // the root location
+      'partof=Location/0', // the root location
       authHeader
     )
   }
@@ -107,7 +138,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('Division does not have a partOf reference')
     }
 
-    result.district = await fetchLocationByIdentifiersAndParent(
+    result.district = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -118,7 +149,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'DISTRICT'
         }
       ],
-      `Location/${result.division.id}`,
+      `partof=Location/${result.division.id}`,
       authHeader
     )
   }
@@ -128,7 +159,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('District does not have a partOf reference')
     }
 
-    result.upazila = await fetchLocationByIdentifiersAndParent(
+    result.upazila = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -139,7 +170,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'UPAZILA'
         }
       ],
-      `Location/${result.district.id}`,
+      `partof=Location/${result.district.id}`,
       authHeader
     )
   }
@@ -149,7 +180,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('Upazila does not have a partOf reference')
     }
 
-    result.union = await fetchLocationByIdentifiersAndParent(
+    result.union = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -160,7 +191,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'UNION'
         }
       ],
-      `Location/${result.upazila.id}`,
+      `partof=Location/${result.upazila.id}`,
       authHeader
     )
   }
@@ -170,7 +201,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('Upazila does not have a partOf reference')
     }
 
-    result.municipality = await fetchLocationByIdentifiersAndParent(
+    result.municipality = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -181,7 +212,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'MUNICIPALITY'
         }
       ],
-      `Location/${result.upazila.id}`,
+      `partof=Location/${result.upazila.id}`,
       authHeader
     )
   }
@@ -191,7 +222,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('District does not have a partOf reference')
     }
 
-    result.cityCorp = await fetchLocationByIdentifiersAndParent(
+    result.cityCorp = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -202,7 +233,7 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'CITY_CORPORATION'
         }
       ],
-      `Location/${result.district.id}`,
+      `partof=Location/${result.district.id}`,
       authHeader
     )
   }
@@ -213,7 +244,7 @@ export async function fetchHierarchicalBangladeshLocations(
       throw new Error('CityCorp does not have a partOf reference')
     }
 
-    result.ward = await fetchLocationByIdentifiersAndParent(
+    result.ward = await fetchLocationByIdentifiers(
       [
         {
           system: 'http://opencrvs.org/specs/id/bbs-code',
@@ -224,12 +255,28 @@ export async function fetchHierarchicalBangladeshLocations(
           value: 'WARD'
         }
       ],
-      `Location/${result.cityCorp.id}`,
+      `partof=Location/${result.cityCorp.id}`,
       authHeader
     )
   }
 
   return result
+}
+
+export async function fetchFacilityByHRISId(
+  hrisId: string,
+  authHeader: string
+) {
+  return await fetchLocationByIdentifiers(
+    [
+      {
+        system: 'http://opencrvs.org/specs/id/hris-internal-id',
+        value: hrisId
+      }
+    ],
+    'type=HEALTH_FACILITY',
+    authHeader
+  )
 }
 
 export async function fetchUnionByFullBBSCode(

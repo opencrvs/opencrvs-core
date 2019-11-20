@@ -22,6 +22,7 @@ const ButtonStyled = styled.button`
   outline: none;
   border: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   &:hover:enabled {
     ${({ theme }) => theme.gradients.gradientSkyDark};
     color: ${({ theme }) => theme.colors.white};

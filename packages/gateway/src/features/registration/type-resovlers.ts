@@ -57,7 +57,7 @@ export const typeResolvers: GQLResolver = {
   EventRegistration: {
     // tslint:disable-next-line
     __resolveType(obj) {
-      if (obj.type.coding[0].code === 'birth-declaration') {
+      if (obj.type.coding[0].code === 'birth-application') {
         return 'BirthRegistration'
       } else {
         return 'DeathRegistration'
@@ -96,7 +96,7 @@ export const typeResolvers: GQLResolver = {
       return (marriageExtension && marriageExtension.valueDateTime) || null
     },
     maritalStatus: person => {
-      return person.maritalStatus.text
+      return person && person.maritalStatus && person.maritalStatus.text
     },
     occupation: person => {
       const occupationExtension = findExtension(
