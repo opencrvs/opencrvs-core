@@ -36,7 +36,7 @@ export async function bgdValidateRegistrationHandler(
 
     if (!taskResource || !taskResource.extension) {
       throw new Error(
-        'Failed to validate registration: could not find task resource in bundle or task resource had no extensions, '
+        'Failed to validate registration: could not find task resource in bundle or task resource had no extensions'
       )
     }
 

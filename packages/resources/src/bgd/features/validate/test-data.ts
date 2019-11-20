@@ -194,3 +194,52 @@ export const testFhirBundle = {
     }
   ]
 }
+
+export const testFhirBundleNoTaskResource = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      resource: {
+        resourceType: 'Task'
+      }
+    }
+  ]
+}
+
+export const testFhirBundleNoTaskExtension = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        intent: '',
+        focus: {
+          reference: 'urn:uuid:888'
+        },
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'birth-registration'
+            }
+          ]
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/paper-form-id',
+            value: '12345678'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B5WGYJE'
+          }
+        ],
+        extension: []
+      }
+    }
+  ]
+}

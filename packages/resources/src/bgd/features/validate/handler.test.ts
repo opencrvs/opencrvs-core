@@ -13,7 +13,11 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@resources/index'
 // tslint:disable-next-line:no-relative-imports
-import { testFhirBundle } from './test-data'
+import {
+  testFhirBundle,
+  testFhirBundleNoTaskExtension,
+  testFhirBundleNoTaskResource
+} from './test-data'
 import * as fetchMock from 'jest-fetch-mock'
 import * as generateService from '@resources/bgd/features/generate/service'
 
@@ -32,7 +36,7 @@ describe('administrative handler receives a request', () => {
   })
 
   describe('Validation handler tests', () => {
-    it('return a 202 and calls callback webhook', async () => {
+    it('returns a 202 and calls callback webhook', async () => {
       fetch.mockResponses(
         [
           JSON.stringify({ resourceType: 'Practitioner', id: '123' }),
@@ -66,6 +70,64 @@ describe('administrative handler receives a request', () => {
         'http://localhost:5050/confirm/registration',
         {
           body: '{"trackingId":"B5WGYJE","registrationNumber":"000000"}',
+          method: 'POST',
+          headers: expect.anything()
+        }
+      ])
+    })
+
+    it('returns a 202 but calls callback webhook with an error - no task resource', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:resources-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/bgd/validate/registration',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload: testFhirBundleNoTaskResource
+      })
+
+      expect(res.statusCode).toBe(202)
+
+      expect(fetch.mock.calls[0]).toEqual([
+        'http://localhost:5050/confirm/registration',
+        {
+          body:
+            '{"error":"Failed to validate registration: could not find task resource in bundle or task resource had no extensions"}',
+          method: 'POST',
+          headers: expect.anything()
+        }
+      ])
+    })
+
+    it('returns a 202 but calls callback webhook with an error - no extensions in task', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:resources-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/bgd/validate/registration',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload: testFhirBundleNoTaskExtension
+      })
+
+      expect(res.statusCode).toBe(202)
+
+      expect(fetch.mock.calls[0]).toEqual([
+        'http://localhost:5050/confirm/registration',
+        {
+          body:
+            '{"error":"Failed to validate registration: practitioner reference not found in task resource"}',
           method: 'POST',
           headers: expect.anything()
         }

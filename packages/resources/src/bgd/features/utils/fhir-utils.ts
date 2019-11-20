@@ -19,6 +19,7 @@ export function getTaskResource(
     !bundle ||
     bundle.type !== 'document' ||
     !bundle.entry ||
+    !bundle.entry[0] ||
     !bundle.entry[0].resource
   ) {
     throw new Error('Invalid FHIR bundle found')
@@ -42,6 +43,7 @@ export function getTaskResourceFromFhirBundle(fhirBundle: fhir.Bundle) {
       }
       return false
     })
+
   return taskEntry && (taskEntry.resource as fhir.Task)
 }
 
