@@ -12,6 +12,7 @@
 import * as Hapi from 'hapi'
 import { generateRegistrationNumber } from '@resources/bgd/features/generate/service'
 import fetch from 'node-fetch'
+import * as Pino from 'pino'
 import {
   VALIDATE_IN_BDRIS2,
   CONFIRM_REGISTRATION_URL
@@ -25,6 +26,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   getFromFhir
 } from '@resources/bgd/features/utils'
+
+const logger = Pino()
 
 export async function bgdValidateRegistrationHandler(
   request: Hapi.Request,
@@ -81,6 +84,8 @@ export async function bgdValidateRegistrationHandler(
       body: JSON.stringify({ error: err.message }),
       headers: { Authorization: request.headers.authorization }
     })
+
+    logger.error(err)
   }
 
   return h.response().code(202)
