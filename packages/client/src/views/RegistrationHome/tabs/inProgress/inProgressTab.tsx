@@ -51,6 +51,10 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { get } from 'lodash'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -108,7 +112,11 @@ interface IRegistrarHomeState {
   width: number
 }
 
-type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps
+interface IProps {
+  resources: IOfflineData
+}
+
+type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps & IProps
 
 export const TAB_ID = {
   inProgress: 'progress',
@@ -155,6 +163,10 @@ export class InProgressTabComponent extends React.Component<
         ''
       const trackingId = reg && reg.registration && reg.registration.trackingId
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
+      const applicationLocationID = reg.applicationLocationId || ''
+      const facility =
+        get(this.props.resources.facilities, applicationLocationID) || {}
+      const startedBy = facility.name || ''
 
       let name
       if (reg.registration && reg.type === 'Birth') {
@@ -169,7 +181,7 @@ export class InProgressTabComponent extends React.Component<
         name = namesMap[locale] || namesMap[LANG_EN]
       }
 
-      const actions = [
+      const updateAction = [
         {
           label: intl.formatMessage(buttonMessages.update),
           handler: () =>
@@ -181,6 +193,20 @@ export class InProgressTabComponent extends React.Component<
             )
         }
       ]
+
+      const downloadAction = [
+        {
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () =>
+            this.props.goToPage(
+              pageRoute,
+              regId,
+              'review',
+              (event && event.toLowerCase()) || ''
+            )
+        }
+      ]
+
       moment.locale(locale)
       return {
         id: regId,
@@ -192,10 +218,13 @@ export class InProgressTabComponent extends React.Component<
           '',
         name,
         trackingId,
+        startedBy,
         dateOfModification:
-          (lastModificationDate && moment(lastModificationDate).fromNow()) ||
+          (lastModificationDate &&
+            moment(parseInt(lastModificationDate)).fromNow()) ||
           '',
-        actions,
+        updateAction,
+        downloadAction,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -528,7 +557,7 @@ export class InProgressTabComponent extends React.Component<
         },
         {
           width: 20,
-          key: 'actions',
+          key: 'updateAction',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
         }
@@ -576,11 +605,11 @@ export class InProgressTabComponent extends React.Component<
         {
           label: this.props.intl.formatMessage(constantsMessages.startedBy),
           width: 15,
-          key: 'trackingId'
+          key: 'startedBy'
         },
         {
           width: 20,
-          key: 'actions',
+          key: 'downloadAction',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
         }
@@ -647,7 +676,9 @@ export class InProgressTabComponent extends React.Component<
 }
 
 export const InProgressTab = connect(
-  null,
+  (state: IStoreState) => ({
+    resources: getOfflineData(state)
+  }),
   {
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,

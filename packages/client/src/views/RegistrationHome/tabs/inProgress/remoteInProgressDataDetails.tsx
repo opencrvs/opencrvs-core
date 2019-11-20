@@ -108,9 +108,9 @@ function LabelValue({ label, value }: { label: string; value: string }) {
 function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
   return (
     <ValueContainer>
-      {props.strings.map((value, index) => (
-        <span key={index}>{value}</span>
-      ))}
+      {props.strings.map(
+        (value, index) => value && <span key={index}>{value}</span>
+      )}
     </ValueContainer>
   )
 }

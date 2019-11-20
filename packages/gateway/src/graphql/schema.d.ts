@@ -584,6 +584,7 @@ export interface GQLEventSearchSet {
   id: string
   type?: string
   registration?: GQLRegistrationSearchSet
+  applicationLocationId?: string
 }
 
 /** Use this to resolve interface type EventSearchSet */
@@ -899,6 +900,7 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLDate
   registration?: GQLRegistrationSearchSet
+  applicationLocationId?: string
 }
 
 /*********************************
@@ -3075,6 +3077,9 @@ export interface GQLDeathEventSearchSetTypeResolver<TParent = any> {
   deceasedName?: DeathEventSearchSetToDeceasedNameResolver<TParent>
   dateOfDeath?: DeathEventSearchSetToDateOfDeathResolver<TParent>
   registration?: DeathEventSearchSetToRegistrationResolver<TParent>
+  applicationLocationId?: DeathEventSearchSetToApplicationLocationIdResolver<
+    TParent
+  >
 }
 
 export interface DeathEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -3103,6 +3108,13 @@ export interface DeathEventSearchSetToDateOfDeathResolver<
 }
 
 export interface DeathEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathEventSearchSetToApplicationLocationIdResolver<
   TParent = any,
   TResult = any
 > {

@@ -26,6 +26,7 @@ const allSearchFields = `
     }
     ... on BirthEventSearchSet {
       dateOfBirth
+      applicationLocationId
       childName {
         firstNames
         familyName
@@ -34,6 +35,7 @@ const allSearchFields = `
     }
     ... on DeathEventSearchSet {
       dateOfDeath
+      applicationLocationId
       deceasedName {
         firstNames
         familyName
