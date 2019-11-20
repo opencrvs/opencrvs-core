@@ -112,7 +112,7 @@ fi
 # Copy the backups to an offsite server in production 
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
-  scp -P -r $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR
+  scp -r -P $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR
   echo "Copied backup files to remote server."
 fi
 # Cleanup any old backups. Keep previous 7 days of data 
