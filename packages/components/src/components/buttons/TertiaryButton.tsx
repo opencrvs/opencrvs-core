@@ -18,23 +18,42 @@ export const TertiaryButton = styled(Button)`
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
+  border-radius: 2px;
   text-transform: none !important;
   cursor: pointer;
   height: 32px;
   & > div {
     padding: 0 8px;
+    height: 32px;
   }
   color: ${({ theme }) => theme.colors.tertiary};
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
-  }
   &:hover {
     opacity: 0.8;
     background: ${({ theme }) => theme.colors.background};
   }
-
-  &:active {
+  &:not([data-focus-visible-added]):hover {
+    opacity: 0.8;
+    background: ${({ theme }) => theme.colors.background};
+  }
+  &:focus {
+    outline: none;
     background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.tertiary};
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+    opacity: 1;
+  }
+
+  &:disabled {
+    background: ${({ theme }) => theme.colors.disabled};
   }
 `
 
@@ -56,10 +75,6 @@ const ButtonBase = styled.button`
     }
   }
   -webkit-tap-highlight-color: transparent;
-  &:focus {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-  }
   padding: 0;
 `
 interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -117,8 +132,10 @@ const CenterWrapper = styled.div`
 `
 const LeftButtonIcon = styled.div`
   position: relative !important;
-  margin-right: 8px;
-  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 1px;
   margin-left: -3px;
 `
 const RightButtonIcon = styled.div`
