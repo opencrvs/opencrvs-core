@@ -137,7 +137,7 @@ export async function createServer() {
 
   server.route({
     method: 'POST',
-    path: '/bgd/verify/nid',
+    path: '/verify/nid/bgd',
     handler: bgdNidVerificationHandler,
     options: {
       tags: ['api'],
@@ -147,7 +147,7 @@ export async function createServer() {
       response: {
         schema: bgdNidResponseSchema
       },
-      description: 'Verify nid'
+      description: 'Verify NID for Bangladesh'
     }
   })
 
