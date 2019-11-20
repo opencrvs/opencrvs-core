@@ -518,7 +518,8 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
   switch (typeOfID) {
     case NATIONAL_ID:
       return hasValidLength(value, validNationalIDLength) &&
-        isNumber(value.toString())
+        isNumber(value.toString()) &&
+        (value > 0 && value % 1 == 0)
         ? undefined
         : {
             message: messages.validNationalId,
