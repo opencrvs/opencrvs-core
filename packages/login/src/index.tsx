@@ -17,7 +17,7 @@ import { App } from '@login/App'
 import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
-
+import 'focus-visible/dist/focus-visible.js'
 storage.configStorage('OpenCRVS')
 
 if (

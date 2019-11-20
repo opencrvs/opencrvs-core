@@ -66,7 +66,7 @@ export const EventTopBar = (props: IProps) => {
       <Item>
         {goHome && (
           <CircleButton id="crcl-btn" onClick={goHome}>
-            <Cross />
+            <Cross color="currentColor" />
           </CircleButton>
         )}
         {saveAction && (
@@ -84,11 +84,7 @@ export const EventTopBar = (props: IProps) => {
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"
-            toggleButton={
-              <CircleButton>
-                <VerticalThreeDots />
-              </CircleButton>
-            }
+            toggleButton={<VerticalThreeDots />}
             menuItems={menuItems}
           />
         )}

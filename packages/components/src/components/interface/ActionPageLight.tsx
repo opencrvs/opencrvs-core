@@ -95,7 +95,7 @@ export class ActionPageLight extends React.Component<
           <BodyContent>
             <BackButtonContainer id="action_page_back_button" onClick={goBack}>
               <CircleButton>
-                <BackButton icon={icon || (() => <BackArrowDeepBlue />)} />
+                {(icon && icon()) || <BackArrowDeepBlue />}
               </CircleButton>
               <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
             </BackButtonContainer>

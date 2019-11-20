@@ -110,7 +110,14 @@ const IconTab = styled(Button)<{ active: boolean }>`
     margin-right: 8px;
   }
   &:focus {
-    outline: 0;
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 const FABContainer = styled.div`

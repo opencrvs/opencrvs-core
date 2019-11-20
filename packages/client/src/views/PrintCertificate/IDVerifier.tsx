@@ -178,7 +178,7 @@ class IDVerifierComponent extends React.Component<
           <DangerButton
             id="verifyNegative"
             onClick={this.togglePrompt}
-            icon={() => <Cross color="white" />}
+            icon={() => <Cross color="currentColor" />}
             align={ICON_ALIGNMENT.LEFT}
           >
             {negativeAction.label}
