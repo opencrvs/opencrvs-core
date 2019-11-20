@@ -26,6 +26,7 @@ import {
   birthIdentityOptions,
   deathIdentityOptions,
   identityNameMapper,
+  identityTooltipMapper,
   identityTypeMapper
 } from '@client/forms/identity'
 import { conditionals } from '@client/forms/utils'
@@ -109,6 +110,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           name: 'iDTypeOther',
           type: TEXT,
           label: formMessages.iDTypeOtherLabel,
+          toolTip: formMessages.tooltipNationalID,
           required: true,
           initialValue: '',
           validate: [],
@@ -121,6 +123,10 @@ export const collectBirthCertificateFormSection: IFormSection = {
             label: {
               dependency: 'iDType',
               labelMapper: identityNameMapper
+            },
+            toolTip: {
+              dependency: 'iDType',
+              toolTipMapper: identityTooltipMapper
             },
             type: {
               kind: 'dynamic',

@@ -63,6 +63,17 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
+export function identityTooltipMapper(code: string): MessageDescriptor {
+  switch (code) {
+    case 'NATIONAL_ID':
+      return messages.tooltipNationalID
+    case 'BIRTH_REGISTRATION_NUMBER':
+      return messages.iDTypeBRN
+    default:
+      return messages.iD
+  }
+}
+
 export function identityNameMapper(code: string): MessageDescriptor {
   switch (code) {
     case 'NATIONAL_ID':

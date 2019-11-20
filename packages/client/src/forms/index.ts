@@ -107,6 +107,8 @@ export interface IDynamicFormFieldValidators {
 
 export type IDynamicFormFieldLabelMapper = (key: string) => MessageDescriptor
 
+export type IDynamicFormFieldToolTipMapper = (key: string) => MessageDescriptor
+
 export type IDynamicValueMapper = (key: string) => string
 
 export type IDynamicFieldTypeMapper = (key: string) => string
@@ -115,6 +117,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
+  }
+  toolTip?: {
+    dependency: string
+    toolTipMapper: Operation<typeof labels>
   }
   type?:
     | IStaticFieldType
@@ -131,6 +137,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
 
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
+  toolTip?: IDynamicFieldToolTip
   type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
 }
@@ -138,6 +145,11 @@ export interface IDynamicFormFieldDefinitions {
 export interface IDynamicFieldLabel {
   dependency: string
   labelMapper: IDynamicFormFieldLabelMapper
+}
+
+export interface IDynamicFieldToolTip {
+  dependency: string
+  toolTipMapper: IDynamicFormFieldToolTipMapper
 }
 
 export interface IDynamicFieldType {
@@ -315,6 +327,7 @@ export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: MessageDescriptor
+  toolTip?: MessageDescriptor
   validate: validators.Validation[]
   required?: boolean
   prefix?: string
@@ -788,6 +801,7 @@ export interface Ii18nFormFieldBase {
   name: string
   type: string
   label: string
+  toolTip?: string
   description?: string
   validate: validators.Validation[]
   required?: boolean

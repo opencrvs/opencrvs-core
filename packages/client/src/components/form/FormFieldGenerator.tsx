@@ -27,6 +27,7 @@ import {
   getConditionalActionsForField,
   getFieldOptions,
   getFieldLabel,
+  getFieldLabelToolTip,
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData,
@@ -158,6 +159,7 @@ function GeneratedInputField({
   const inputFieldProps = {
     id: fieldDefinition.name,
     label: fieldDefinition.label,
+    toolTip: fieldDefinition.toolTip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
     disabled: fieldDefinition.disabled,
@@ -682,7 +684,11 @@ class FormSectionComponent extends React.Component<Props> {
               ? ({
                   ...field,
                   type: getFieldType(field as IDynamicFormField, values),
-                  label: getFieldLabel(field as IDynamicFormField, values)
+                  label: getFieldLabel(field as IDynamicFormField, values),
+                  toolTip: getFieldLabelToolTip(
+                    field as IDynamicFormField,
+                    values
+                  )
                 } as ITextFormField)
               : field.type === DYNAMIC_LIST
               ? ({

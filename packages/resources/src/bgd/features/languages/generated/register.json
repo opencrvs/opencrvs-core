@@ -1068,7 +1068,8 @@
         "certificate.receipt.service.45day": "{event} registration after 45 days of event",
         "certificate.receipt.service.5year": "{event} registration after 5 years of event",
         "certificate.receipt.service.45day.amount": "\u09F3 25.00",
-        "certificate.receipt.service..5year.amount": "\u09F3 50.00"
+        "certificate.receipt.service..5year.amount": "\u09F3 50.00",
+        "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID."
       }
     },
     {
@@ -2143,7 +2144,8 @@
         "certificate.receipt.service.45day": "{event} তারিখের ৪৫ দিনের পরে জন্ম নিবন্ধন",
         "certificate.receipt.service.5year": "{event} তারিখের ৫ বছর পরে জন্ম নিবন্ধন",
         "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
-        "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০"
+        "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০",
+        "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000। যদি জাতীয় আইডি নম্বরটি 10 ​​ডিজিটের দীর্ঘ আইডি হয় তবে দয়া করে একটি পুরানো আইডি ব্যবহার করুন।"
       }
     }
   ]

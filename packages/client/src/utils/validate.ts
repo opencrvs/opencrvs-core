@@ -506,7 +506,7 @@ const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
 export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
-  const validNationalIDLength = 13
+  const validNationalIDLength = 17
   const validBirthRegistrationNumberLength = {
     min: 17,
     max: 18

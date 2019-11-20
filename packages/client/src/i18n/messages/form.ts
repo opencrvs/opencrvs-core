@@ -333,6 +333,7 @@ interface IFormMessages {
   reasonNotApplyingFieldLabel: MessageDescriptor
   reasonMotherNotApplyingPreview: MessageDescriptor
   reasonFatherNotApplyingPreview: MessageDescriptor
+  tooltipNationalID: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1969,6 +1970,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Reason not applying',
     description: 'Label for form field: ReasonNotApplying',
     id: 'form.field.label.ReasonNotApplying'
+  },
+  tooltipNationalID: {
+    defaultMessage:
+      'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
+    description: 'Tooltip for form field: iD number',
+    id: 'form.field.tooltip.tooltipNationalID'
   }
 }
 
