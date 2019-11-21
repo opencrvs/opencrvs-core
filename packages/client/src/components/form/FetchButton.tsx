@@ -36,6 +36,7 @@ interface IFetchButtonProps {
   successTitle: string
   errorTitle: string
   onFetch?: (response: any) => void
+  isDisabled?: boolean
 }
 
 interface IFetchButtonState {
@@ -188,7 +189,8 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       modalTitle,
       successTitle,
       errorTitle,
-      queryData
+      queryData,
+      isDisabled
     } = this.props
     const { loading, error, success, show, isDisconnected } = this.state
 
@@ -199,7 +201,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
             return (
               <div>
                 <StyledPrimaryButton
-                  disabled={isDisconnected}
+                  disabled={isDisabled || isDisconnected}
                   onClick={async (event: React.MouseEvent<HTMLElement>) => {
                     this.performQuery(client)
                     event.preventDefault()

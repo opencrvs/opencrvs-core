@@ -141,6 +141,7 @@ type GeneratedInputFieldProps = {
   touched: boolean
   error: string
   draftData?: IFormData
+  disabled?: boolean
 }
 
 function GeneratedInputField({
@@ -154,7 +155,8 @@ function GeneratedInputField({
   touched,
   value,
   nestedFields,
-  draftData
+  draftData,
+  disabled
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -429,6 +431,7 @@ function GeneratedInputField({
         successTitle={fieldDefinition.successTitle}
         errorTitle={fieldDefinition.errorTitle}
         onFetch={fieldDefinition.onFetch}
+        isDisabled={disabled}
       />
     )
   }
@@ -657,6 +660,10 @@ class FormSectionComponent extends React.Component<Props> {
             return null
           }
 
+          if (conditionalActions.includes('disable')) {
+            field.disabled = true
+          }
+
           if (
             field.type === DATE &&
             touched[`${field.name}-dd`] !== undefined &&
@@ -760,6 +767,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
+                      disabled={conditionalActions.includes('disable')}
                     />
                   )}
                 </Field>

@@ -2202,6 +2202,10 @@
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.applicantBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -5454,6 +5458,10 @@
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.motherBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -7655,6 +7663,10 @@
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.fatherBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -10964,6 +10976,10 @@
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.birthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -14966,6 +14982,10 @@
                     {
                       "action": "hide",
                       "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.applicantBirthDate)"
                     }
                   ],
                   "modalTitle": {
