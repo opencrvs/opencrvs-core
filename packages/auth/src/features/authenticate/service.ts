@@ -126,8 +126,6 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
-  logger.info(`PRODUCTION ${PRODUCTION}`)
-  logger.info(`isDemoUser ${isDemoUser}`)
   if (!PRODUCTION || isDemoUser) {
     logger.info('Sending a verification SMS', {
       mobile: mobile,

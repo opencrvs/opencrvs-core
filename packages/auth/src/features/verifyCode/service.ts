@@ -71,12 +71,11 @@ export async function sendVerificationCode(
     message: verificationCode
   }
 
-  logger.info('message', verificationCode)
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      Authorization: `Bearer ${createToken(
+      Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
         ['opencrvs:notification-user'],
