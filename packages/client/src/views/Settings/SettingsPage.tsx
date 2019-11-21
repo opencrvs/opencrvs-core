@@ -42,7 +42,6 @@ import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 
 const Container = styled.div`
-  ${({ theme }) => theme.fonts.regularFont};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
@@ -66,6 +65,12 @@ const SettingsTitle = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+const Version = styled.div`
+  color: ${({ theme }) => theme.colors.disabled};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  margin-top: 3rem;
+  text-transform: none;
 `
 const Content = styled.div`
   display: flex;
@@ -310,6 +315,10 @@ class SettingsView extends React.Component<IProps, IState> {
               {sections.map((sec, index: number) => (
                 <DataSection key={index} {...sec} />
               ))}
+              <Version>
+                OpenCRVS version{' '}
+                {process.env.REACT_APP_VERSION || 'development'}
+              </Version>
             </Left>
             <Right>
               <Avatar className="tablet" />
