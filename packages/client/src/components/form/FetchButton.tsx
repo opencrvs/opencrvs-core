@@ -44,6 +44,7 @@ interface IFetchButtonState {
   success?: boolean
   loading?: boolean
   show?: boolean
+  isDisconnected: boolean
 }
 
 type IFullProps = IFetchButtonProps & IntlShapeProps
@@ -117,9 +118,31 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     super(props)
     this.state = {
       loading: false,
-      error: false
+      error: false,
+      isDisconnected: false
     }
   }
+
+  componentDidMount() {
+    this.handleConnectionChange()
+    window.addEventListener('online', this.handleConnectionChange)
+    window.addEventListener('offline', this.handleConnectionChange)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('online', this.handleConnectionChange)
+    window.removeEventListener('offline', this.handleConnectionChange)
+  }
+
+  handleConnectionChange = () => {
+    const condition = navigator.onLine ? 'online' : 'offline'
+    if (condition === 'online') {
+      return this.setState({ isDisconnected: false })
+    }
+
+    return this.setState({ isDisconnected: true })
+  }
+
   hideModal = () => {
     this.setState({
       show: false,
@@ -167,7 +190,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       errorTitle,
       queryData
     } = this.props
-    const { loading, error, success, show } = this.state
+    const { loading, error, success, show, isDisconnected } = this.state
 
     return (
       <Container {...this.props}>
@@ -176,7 +199,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
             return (
               <div>
                 <StyledPrimaryButton
-                  disabled={!navigator.onLine}
+                  disabled={isDisconnected}
                   onClick={async (event: React.MouseEvent<HTMLElement>) => {
                     this.performQuery(client)
                     event.preventDefault()
