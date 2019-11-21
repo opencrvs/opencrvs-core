@@ -19,7 +19,6 @@ import {
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { createToken } from '@auth/features/authenticate/service'
-import { logger } from '@auth/logger'
 
 interface ICodeDetails {
   code: string
