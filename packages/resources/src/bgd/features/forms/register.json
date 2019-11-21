@@ -2068,6 +2068,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "toolTip": {
+                      "dependency": "iDType",
+                      "toolTipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -2089,6 +2095,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "toolTip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -2126,7 +2137,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Informant's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchInformantDetails"
                   },
@@ -5378,7 +5389,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Mother's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchMotherDetails"
                   },
@@ -7514,6 +7525,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "toolTip": {
+                      "dependency": "iDType",
+                      "toolTipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -7535,6 +7552,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "toolTip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -7564,7 +7586,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Father's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchFatherDetails"
                   },
@@ -10820,6 +10842,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "toolTip": {
+                      "dependency": "iDType",
+                      "toolTipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -10841,6 +10869,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "toolTip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -10866,7 +10899,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Deceased's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchDeceasedDetails"
                   },
@@ -14799,6 +14832,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "toolTip": {
+                      "dependency": "iDType",
+                      "toolTipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -14820,6 +14859,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "toolTip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -14857,7 +14901,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Informant's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchInformantDetails"
                   },

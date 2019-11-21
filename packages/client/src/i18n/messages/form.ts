@@ -1129,7 +1129,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fetchInformantDetails'
   },
   fetchMotherDetails: {
-    defaultMessage: "Retrieve Mother's Details",
+    defaultMessage: 'VERIFY NATIONAL ID',
     description: 'Label for loader button',
     id: 'form.field.label.fetchMotherDetails'
   },
