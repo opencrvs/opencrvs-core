@@ -16,7 +16,6 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
-  applicationLocationId: String
 }
 
 type RegistrationSearchSet {
@@ -40,7 +39,6 @@ type BirthEventSearchSet implements EventSearchSet {
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
-  applicationLocationId: String
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -49,7 +47,6 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
-  applicationLocationId: String
 }
 
 type Query {

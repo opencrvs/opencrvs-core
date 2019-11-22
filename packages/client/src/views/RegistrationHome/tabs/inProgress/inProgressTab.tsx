@@ -163,9 +163,9 @@ export class InProgressTabComponent extends React.Component<
         ''
       const trackingId = reg && reg.registration && reg.registration.trackingId
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
-      const applicationLocationID = reg.applicationLocationId || ''
+      const eventLocationId = get(reg, 'registration.eventLocationId') || ''
       const facility =
-        get(this.props.resources.facilities, applicationLocationID) || {}
+        get(this.props.resources.facilities, eventLocationId) || {}
       const startedBy = facility.name || ''
 
       let name

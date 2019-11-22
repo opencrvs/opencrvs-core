@@ -18,15 +18,15 @@ const allSearchFields = `
       status
       contactNumber
       trackingId
+      eventLocationId
       registrationNumber
-      registeredLocationId
+      registeredLocationId      
       duplicates
       createdAt
       modifiedAt
     }
     ... on BirthEventSearchSet {
-      dateOfBirth
-      applicationLocationId
+      dateOfBirth      
       childName {
         firstNames
         familyName
@@ -34,8 +34,7 @@ const allSearchFields = `
       }
     }
     ... on DeathEventSearchSet {
-      dateOfDeath
-      applicationLocationId
+      dateOfDeath      
       deceasedName {
         firstNames
         familyName

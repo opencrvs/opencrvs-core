@@ -88,11 +88,6 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
-    },
-    applicationLocationId(resultSet: ISearchEventDataTemplate) {
-      return (
-        (resultSet._source && resultSet._source.applicationLocationId) || null
-      )
     }
   },
   DeathEventSearchSet: {
@@ -140,11 +135,6 @@ export const searchTypeResolvers: GQLResolver = {
     },
     dateOfDeath(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.deathDate) || null
-    },
-    applicationLocationId(resultSet: ISearchEventDataTemplate) {
-      return (
-        (resultSet._source && resultSet._source.applicationLocationId) || null
-      )
     }
   },
   RegistrationSearchSet: {
@@ -153,6 +143,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registeredLocationId(searchData: ISearchDataTemplate) {
       return searchData.applicationLocationId
+    },
+    eventLocationId(searchData: ISearchDataTemplate) {
+      return searchData.eventLocationId
     },
     duplicates(searchData: ISearchDataTemplate) {
       return searchData.relatesTo

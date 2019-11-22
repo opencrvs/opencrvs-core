@@ -584,7 +584,6 @@ export interface GQLEventSearchSet {
   id: string
   type?: string
   registration?: GQLRegistrationSearchSet
-  applicationLocationId?: string
 }
 
 /** Use this to resolve interface type EventSearchSet */
@@ -891,7 +890,6 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   childName?: Array<GQLHumanName | null>
   dateOfBirth?: GQLDate
   registration?: GQLRegistrationSearchSet
-  applicationLocationId?: string
 }
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
@@ -900,7 +898,6 @@ export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLDate
   registration?: GQLRegistrationSearchSet
-  applicationLocationId?: string
 }
 
 /*********************************
@@ -3027,9 +3024,6 @@ export interface GQLBirthEventSearchSetTypeResolver<TParent = any> {
   childName?: BirthEventSearchSetToChildNameResolver<TParent>
   dateOfBirth?: BirthEventSearchSetToDateOfBirthResolver<TParent>
   registration?: BirthEventSearchSetToRegistrationResolver<TParent>
-  applicationLocationId?: BirthEventSearchSetToApplicationLocationIdResolver<
-    TParent
-  >
 }
 
 export interface BirthEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -3064,22 +3058,12 @@ export interface BirthEventSearchSetToRegistrationResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthEventSearchSetToApplicationLocationIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLDeathEventSearchSetTypeResolver<TParent = any> {
   id?: DeathEventSearchSetToIdResolver<TParent>
   type?: DeathEventSearchSetToTypeResolver<TParent>
   deceasedName?: DeathEventSearchSetToDeceasedNameResolver<TParent>
   dateOfDeath?: DeathEventSearchSetToDateOfDeathResolver<TParent>
   registration?: DeathEventSearchSetToRegistrationResolver<TParent>
-  applicationLocationId?: DeathEventSearchSetToApplicationLocationIdResolver<
-    TParent
-  >
 }
 
 export interface DeathEventSearchSetToIdResolver<TParent = any, TResult = any> {
@@ -3108,13 +3092,6 @@ export interface DeathEventSearchSetToDateOfDeathResolver<
 }
 
 export interface DeathEventSearchSetToRegistrationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface DeathEventSearchSetToApplicationLocationIdResolver<
   TParent = any,
   TResult = any
 > {
