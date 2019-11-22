@@ -11,9 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { PrimaryButton } from '../buttons'
+import { SecondaryButton } from '../buttons'
 
-const ImageBase = styled(PrimaryButton.withComponent('label'))`
+const ImageBase = styled(SecondaryButton)`
   width: auto;
   height: 48px;
   padding: 0 35px;
@@ -42,17 +42,22 @@ interface IImagePickerProps {
 }
 
 export class ImageUploader extends React.Component<IImagePickerProps, {}> {
+  fileUploader: React.RefObject<HTMLInputElement> = React.createRef()
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
     return files && this.props.handleFileChange(files[0])
   }
+  clickOnFileUploader = () => {
+    this.fileUploader.current!.click()
+  }
   render() {
     const { icon, title, ...otherProps } = this.props
     return (
-      <ImageBase {...otherProps}>
+      <ImageBase {...otherProps} onClick={this.clickOnFileUploader}>
         {title}
         {icon && <Icon>{icon()}</Icon>}
         <HiddenInput
+          ref={this.fileUploader}
           id="image_file_uploader_field"
           type="file"
           accept="image/*"

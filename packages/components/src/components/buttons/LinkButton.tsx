@@ -21,11 +21,22 @@ export const LinkButton = styled(Button)`
   & div {
     padding: 0;
   }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.tertiary};
+  }
 
   &:active {
     outline: 0;
     opacity: 1.0 !important;
     background-color: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
   }
 
   &:hover {

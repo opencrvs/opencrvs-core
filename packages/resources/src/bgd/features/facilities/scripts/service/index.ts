@@ -97,6 +97,12 @@ const createFhirLocationFromORGJson = (
     partOf: {
       reference: partOfReference // Reference to the location this office falls under, if any
     },
+    extension: [
+      {
+        url: `${ORG_URL}/extension/parent-location-reference`, // This will allow us to search office by parent id
+        valueString: partOfReference
+      }
+    ],
     type: {
       coding: [
         {

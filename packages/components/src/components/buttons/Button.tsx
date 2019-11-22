@@ -35,7 +35,6 @@ const ButtonBase = styled.button`
   -webkit-tap-highlight-color: transparent;
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
   }
   padding: 0;
 `
@@ -81,7 +80,7 @@ export function Button({
   }
 }
 const Wrapper = styled.div`
-  padding: 0 32px;
+  padding: 0 8px;
   align-items: center;
   justify-content: space-between;
   display: flex;

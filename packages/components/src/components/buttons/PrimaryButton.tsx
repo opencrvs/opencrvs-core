@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { Button } from './Button'
 
 export const PrimaryButton = styled(Button)`
+  padding: 0 8px;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
   ${({ theme }) => theme.shadows.mistyShadow};
@@ -26,11 +27,19 @@ export const PrimaryButton = styled(Button)`
   }
   &:focus {
     outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
   }
 
   &:active:enabled {
     background: ${({ theme }) => theme.colors.primary};
-    outline: 3px solid ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
   }
 
   &:disabled {

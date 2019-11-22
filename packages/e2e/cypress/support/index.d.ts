@@ -14,5 +14,12 @@ declare namespace Cypress {
     login: (userType: string) => void
     logout: () => void
     selectOption: (selector: string, text: string, option: string) => void
+    goToNextFormSection: () => void
+    createPin: () => void
+    submitApplication: () => void
+    rejectApplication: () => void
+    registerApplication: () => void
+    verifyLandingPageVisible: () => void
+    initializeFakeTimers: () => void
   }
 }

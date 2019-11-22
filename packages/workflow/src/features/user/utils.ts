@@ -71,7 +71,7 @@ export async function getPractitionerPrimaryLocation(
   )
 }
 
-export async function getPractitionerOfficeLocation(
+export async function getPractitionerOffice(
   practitionerId: string
 ): Promise<fhir.Location> {
   return getOfficeLocationFromLocationList(
@@ -82,24 +82,24 @@ export async function getPractitionerOfficeLocation(
 export function getPrimaryLocationFromLocationList(
   locations: [fhir.Location]
 ): fhir.Location {
-  const primaryOffice =
-    locations &&
-    locations.find(location => {
-      if (
-        location.physicalType &&
-        location.physicalType.coding &&
-        location.physicalType.coding[0].display
-      ) {
-        return (
-          location.physicalType.coding[0].display.toLowerCase() === 'building'
-        )
-      }
-      return false
-    })
-  if (!primaryOffice) {
-    throw new Error('No primary office found')
+  const primaryOffice = getOfficeLocationFromLocationList(locations)
+  const primaryLocationId =
+    primaryOffice &&
+    primaryOffice.partOf &&
+    primaryOffice.partOf.reference &&
+    primaryOffice.partOf.reference.split('/')[1]
+
+  if (!primaryLocationId) {
+    throw new Error('No primary location found')
   }
-  return primaryOffice
+
+  const location = locations.find(loc => loc.id === primaryLocationId)
+  if (!location) {
+    throw new Error(
+      `No primary location not found for office: ${primaryLocationId}`
+    )
+  }
+  return location
 }
 
 function getOfficeLocationFromLocationList(

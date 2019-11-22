@@ -20,6 +20,7 @@
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.13.0",
+    "focus-visible": "^5.0.2",
     "history": "^4.7.2",
     "lint-staged": "^7.1.0",
     "lodash": "^4.17.10",
@@ -93,7 +94,7 @@
     "stylelint-processor-styled-components": "^1.3.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1",
-    "typescript": "^3.0.1",
+    "typescript": "^3.7.2",
     "workbox-cli": "^4.0.0-alpha.0"
   },
   "jest": {

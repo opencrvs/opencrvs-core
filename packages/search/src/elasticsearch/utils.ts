@@ -23,6 +23,7 @@ export const enum EVENT {
 
 export interface ICompositionBody {
   compositionId?: string
+  compositionType?: string
   event?: EVENT
   type?: string
   contactNumber?: string

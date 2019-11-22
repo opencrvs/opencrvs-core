@@ -16,7 +16,7 @@ export const EyeOn = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       clipRule="evenodd"
       d="M4 12s3-6 8.25-6 8.25 6 8.25 6-3 6-8.25 6S4 12 4 12z"
-      stroke="#4C68C1"
+      stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -24,7 +24,7 @@ export const EyeOn = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       clipRule="evenodd"
       d="M12.25 14.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5z"
-      stroke="#4C68C1"
+      stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
