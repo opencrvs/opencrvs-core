@@ -108,8 +108,13 @@ fi
 # Copy the backups to an offsite server in production 
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
-  scp -r -P $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR && echo "Copied backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /backups/elasticsearch/ $SSH_USER@$SSH_HOST:$REMOTE_DIR" && echo "Copied elasticsearch backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /backups/influxdb/$BACKUP_DATE $SSH_USER@$SSH_HOST:$REMOTE_DIR/influxdb" && echo "Copied influx backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/hearth-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied hearth backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/user-mgnt-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied user backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
 fi
+
 # Cleanup any old backups. Keep previous 7 days of data 
 #------------------------------------------------------
 find /backups -mtime +7 -exec rm {} \;

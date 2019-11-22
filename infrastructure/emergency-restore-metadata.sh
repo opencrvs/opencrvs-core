@@ -37,8 +37,8 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "Are you sure?") || \
-      "no" == $(ask_yes_or_no "Are you *really* sure?") ]]
+if [[ "no" == $(ask_yes_or_no "Are you sure?  This script will clear all data from OpenCRVS and restore from a backup") || \
+      "no" == $(ask_yes_or_no "Are you *really* sure?  Have you tested these backup files in a restore process on a development environment first?") ]]
 then
     echo "Skipped."
     exit 0
@@ -68,15 +68,16 @@ docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasti
 # Delete all data from metrics
 #-----------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
+docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP DATABASE \"ocrvs\"" -v
 
 # Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
-docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev-$1.gz"
-docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev-$1.gz"
-docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt-$1.gz"
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/hearth-dev-$1.gz"
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/openhim-dev-$1.gz"
+docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/user-mgnt-$1.gz"
 
 # Restore all data from a backup into search
 #-------------------------------------------
@@ -94,8 +95,9 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 #------------------------------------------------------------------------------------------------------------------------------
 OWN_IP=`echo $(hostname -I | cut -d' ' -f1)`
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
-  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW
+  docker cp backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/backups/influxdb/$1
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$1
 else
   scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST 'docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$DOW'
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker cp backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/backups/influxdb/$1 && docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$1"
 fi

@@ -1,7 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [OpenCRVS server setup](#opencrvs-server-setup)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
@@ -43,15 +42,21 @@ Print the key for copying:
 cat ~/.ssh/id_rsa.pub
 ```
 
-Copy the key and SSH into worker nodes to add manager key into node authorised keys
+Copy the key and SSH into worker nodes to add manager key into node authorised keys, and repeat for all workers
 
 ```
 echo "<manager-node-public-key>" >> ~/.ssh/authorized_keys
 ```
 
-Repeat for all workers
+Edit the automatic cron job backup to suit your external server set-up on line 64 of the Ansible playbook.yml
 
-un the configuration script from your client computer (You must have Ansible installed):
+```
+job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ssh-user> <external-server-for-remote-backup-host> <ssh-port> <your-production-environment-manger-node-host> <path-to-encrypted-volume-on-external-server> >> /var/log/opencrvs-backup.log 2>&1'
+```
+
+Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
+
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed):
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
@@ -152,19 +157,21 @@ password protected and encrypted external harddrive and stored in a secure and a
 Hearth, OpenHIM and the Users database is saved in a mongo zip file here:
 
 ```
-/backups/<day of the week>
+/backups/mongo/hearth-dev-<date>.gz
+/backups/mongo/openhim-dev-<date>.gz
+/backups/mongo/user-mgnt-<date>.gz
 ```
 
 Elasticsearch snapshot file is saved here:
 
 ```
-/backups/elasticsearch/snapshot_<day of the week>
+/backups/elasticsearch
 ```
 
 InfluxDB backup files are saved here:
 
 ```
-/backups/influxdb<day of the week>
+/backups/influxdb/<date>
 ```
 
 To perform a restore, ensure that you have backup files in the day's folders you wish to restore from.
@@ -181,12 +188,6 @@ Run the following script but beware that **ALL DATA WILL BE REPLACED BY YOUR BAC
 
 The folllowing docker commands are helpful when managing OpenCRVS and debugging infrastructure issues
 
-### You have made a change to OpenHIM base config. Before you deploy, take down the entire stack
-
-```
-docker stack down opencrvs
-```
-
 ### To check the status of all running services
 
 ```
@@ -198,6 +199,10 @@ docker service ls
 ```
 docker service scale <service name e.g.: "opencrvs_metrics">=1
 ```
+
+### You want to get all stack information and see if there are any errors
+
+docker stack ps opencrvs —no-trunc
 
 ### To check the logs on a service
 
@@ -231,3 +236,22 @@ docker logs -f <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72en
 ```
 docker exec -it <container-id> <command e.g. "ls", "mongo", "printenv", "influxd">
 ```
+
+Running
+
+```
+netstat -plant
+```
+
+Inside a container will tell you which ports are open and listening
+
+### You need to inspect a container to see networking and all other information
+
+```
+docker ps # to get the container id
+docker inspect <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72enu">
+```
+
+### You need to rollback the changes made to a service
+
+docker service rollback opencrvs_user-mgnt
