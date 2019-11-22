@@ -68,16 +68,15 @@ docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasti
 # Delete all data from metrics
 #-----------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
-docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP DATABASE \"ocrvs\"" -v
 
 # Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
 docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev.gz"
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/hearth-dev-$1.gz"
 docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev.gz"
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/openhim-dev-$1.gz"
 docker run --rm -v /backups/mongo/$1:/backups/mongo/$1 --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt.gz"
+ -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/$1/user-mgnt-$1.gz"
 
 # Restore all data from a backup into search
 #-------------------------------------------

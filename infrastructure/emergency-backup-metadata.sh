@@ -61,11 +61,6 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-# Directory where backups will be locally saved for 7 days
-#---------------------------------------------------------
-DIR=$(pwd)
-BACKUP_DIR=$DIR/backups
-
 # Today's date is used for filenames
 #-----------------------------------
 BACKUP_DATE=$(date +%Y-%m-%d)
@@ -97,14 +92,15 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
 # If required, SSH into the node running the opencrvs_metrics container and backup the metrics data into an influxdb subfolder 
 #-----------------------------------------------------------------------------------------------------------------------------
+mkdir -p /backups/influxdb/$BACKUP_DATE
 OWN_IP=$(hostname -I | cut -d' ' -f1)
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
   echo "Backing up Influx on own node"
-  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs $BACKUP_DIR/influxdb/$BACKUP_DATE
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$BACKUP_DATE
 else
   echo "Backing up Influx on other node $INFLUXDB_HOST"
   scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs $BACKUP_DIR/influxdb/$BACKUP_DATE"
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$BACKUP_DATE"
   echo "Replacing backup for influxdb on manager node with new backup"
   scp -r $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb /backups/influxdb
 fi
@@ -112,8 +108,7 @@ fi
 # Copy the backups to an offsite server in production 
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
-  scp -r -P $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR
-  echo "Copied backup files to remote server."
+  scp -r -P $SSH_PORT /backups $SSH_USER@$SSH_HOST:$REMOTE_DIR && echo "Copied backup files to remote server."
 fi
 # Cleanup any old backups. Keep previous 7 days of data 
 #------------------------------------------------------
