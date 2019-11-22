@@ -200,14 +200,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
 
-  beforeEach(() => {
+  beforeEach(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     const createdStore = createStore()
     store = createdStore.store
     history = createdStore.history
 
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
   it('check sent for review tab count', async () => {
@@ -305,7 +305,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
 
@@ -370,7 +372,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
     const data = gridTable.prop('content')
@@ -414,7 +418,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const pagination = await waitForElement(
       testComponent.component,
@@ -616,7 +622,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = (await waitForElement(
       testComponent.component,
@@ -819,7 +827,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const instance = (await waitForElement(
       testComponent.component,
@@ -870,7 +880,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const action = await waitForElement(
       testComponent.component,
@@ -924,7 +936,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const action = await waitForElement(
       testComponent.component,
@@ -1041,7 +1055,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const validate = await waitForElement(testComponent.component, Validate)
 
@@ -1052,9 +1068,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
 describe('Tablet tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
     resizeWindow(800, 1280)
   })
 
@@ -1164,7 +1180,9 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const row = await waitForElement(testComponent.component, '#row_0')
     row.hostNodes().simulate('click')

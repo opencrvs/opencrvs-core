@@ -49,6 +49,7 @@ export async function previewCertificate(
   if (!userDetails) {
     throw new Error('No user details found')
   }
+
   await createPDF(
     application.event === Event.BIRTH
       ? offlineResource.templates.certificates.birth
