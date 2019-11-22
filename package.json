@@ -32,7 +32,7 @@
     "compose:push": "yarn compose:build && docker-compose push && yarn compose:push:version",
     "compose:push:version": "export VERSION=`git log -1 --pretty=format:%h` && yarn compose:build && docker-compose push && unset VERSION",
     "compose:push:release": "export VERSION=`git describe --tags --abbrev=0` && git checkout -b release-`git describe --tags --abbrev=0` && yarn compose:build && docker-compose push && unset VERSION",
-    "deploy:staging:bgd": "bash deploy.sh bgd --clear-data=yes --restore-metadata=yes opencrvs-staging.jembi.org development",
+    "deploy:staging:bgd": "bash deploy.sh bgd --clear-data=yes --restore-metadata=yes opencrvs-staging.jembi.org development latest",
     "deploy:staging:zmb": "bash deploy.sh zmb --clear-data=yes --restore-metadata=yes opencrvs.zmb-qa1.jembi.org development",
     "deploy:pen:bgd": "bash deploy.sh bgd --clear-data=no --restore-metadata=no opencrvs.pen1.jembi.org production",
     "deploy:qa:bgd": "bash deploy.sh bgd --clear-data=yes --restore-metadata=yes opencrvs.qa1.jembi.org production",

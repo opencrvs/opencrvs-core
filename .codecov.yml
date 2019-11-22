@@ -73,4 +73,3 @@ ignore:
   - 'packages/performance/src/components/ErrorBoundary.tsx'
   - 'packages/performance/src/components/TopMenu.tsx'
   - 'packages/performance/src/navigation/index.tsx'
-  - 'infrastructure'
