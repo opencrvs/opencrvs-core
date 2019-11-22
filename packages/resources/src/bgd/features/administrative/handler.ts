@@ -53,17 +53,15 @@ export const nidVerificationReqSchema = Joi.object({
 })
 
 export const nidResponseSchema = Joi.object({
-  mother: Joi.string(),
-  gender: Joi.string(),
-  presentAddress: Joi.string(),
-  dob: Joi.date(),
-  father: Joi.string(),
-  name: Joi.string(),
-  nid: Joi.number().unsafe(),
-  photo: Joi.string(),
-  nameEn: Joi.string(),
-  permanentAddress: Joi.string(),
-  serviceId: Joi.number(),
+  data: Joi.object({
+    name: Joi.array().items(
+      Joi.object({
+        use: Joi.string(),
+        family: Joi.string()
+      })
+    ),
+    gender: Joi.string()
+  }),
   operationResult: Joi.object({
     success: Joi.boolean(),
     error: Joi.object({

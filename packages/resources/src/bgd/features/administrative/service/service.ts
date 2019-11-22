@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FHIR_URL } from '@resources/constants'
-import fetch from 'node-fetch'
-import {
-  generateLocationResource,
-  getTokenForOISF,
-  fetchFromOISF
-} from '@resources/bgd/features/administrative/scripts/service'
+import fetch, { BodyInit, HeadersInit } from 'node-fetch'
+import { generateLocationResource } from '@resources/bgd/features/administrative/scripts/service'
 import { ILocation } from '@resources/bgd/features/utils'
+import { OISF_SECRET, OPENHIM_URL } from '@resources/bgd/constants'
+import { logger } from '@resources/logger'
+import { createPersonEntry } from '@resources/bgd/features/fhir/service'
 
 export interface ILocationDataResponse {
   data: ILocation[]
@@ -46,10 +45,49 @@ export async function getLocations(): Promise<ILocationDataResponse> {
 }
 
 export async function verifyAndFetchNidInfo(nid: string, dob: string) {
-  const nidInfo = await fetchFromOISF(
-    'nid/information?dob=' + dob + '&nid=' + nid,
-    { Authorization: `Bearer ${await getTokenForOISF()}` }
+  const token = await getTokenForNidAccess()
+  const res = await fetchFromOpenHim(
+    '/nid/information?dob=' + dob + '&nid=' + nid,
+    'GET',
+    {
+      Authorization: `Bearer ${token}`
+    }
   )
 
-  return nidInfo
+  return {
+    data: createPersonEntry(res.nid, res.name, res.nameEn, res.gender),
+    operationResult: res.operationResult
+  }
+}
+
+async function getTokenForNidAccess() {
+  const secret = OISF_SECRET
+  if (!secret) {
+    logger.error('No secret found for NID token generation')
+    process.exit(1)
+  }
+  const res = await fetchFromOpenHim('/token/create', 'POST', {
+    Authorization: `Secret ${secret}`
+  })
+
+  return res.token
+}
+
+async function fetchFromOpenHim(
+  route: string,
+  method: string,
+  authHeaders?: HeadersInit,
+  body?: BodyInit
+) {
+  try {
+    const res = await fetch(`${OPENHIM_URL}${route}`, {
+      method,
+      body: JSON.stringify(body),
+      headers: authHeaders
+    })
+
+    return await res.json()
+  } catch (err) {
+    logger.error(`Unable to forward to openhim for error : ${err}`)
+  }
 }
