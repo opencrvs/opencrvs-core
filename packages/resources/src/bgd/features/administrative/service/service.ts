@@ -62,7 +62,7 @@ export async function verifyAndFetchNidInfo(nid: string, dob: string) {
 
 async function getTokenForNidAccess() {
   if (!OISF_SECRET) {
-    process.exit(1)
+    throw new Error('OISF_SECRET not for NID access')
   }
   const res = await fetchFromOpenHim('/token/create', 'POST', {
     Authorization: `Secret ${OISF_SECRET}`
@@ -71,7 +71,7 @@ async function getTokenForNidAccess() {
   return res.token
 }
 
-async function fetchFromOpenHim(
+export async function fetchFromOpenHim(
   route: string,
   method: string,
   authHeaders?: HeadersInit,

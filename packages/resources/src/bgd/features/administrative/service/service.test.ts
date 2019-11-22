@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getLocations } from '@resources/bgd/features/administrative/service/service'
+import {
+  getLocations,
+  fetchFromOpenHim
+} from '@resources/bgd/features/administrative/service/service'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -416,5 +419,28 @@ describe('admin service', () => {
       fetch.mockRejectOnce(new Error('boom'))
       expect(getLocations()).rejects.toThrowError('boom')
     })
+  })
+
+  it('fetchFromOpenHim()', async () => {
+    const res = {
+      validity: 86400,
+      token: 'Lsd92sak42AS4Th1MWGIMs1as1PJOMh'
+    }
+    fetch.mockResponses([JSON.stringify(res)])
+    const data = await fetchFromOpenHim('/token/create', 'POST', {
+      Authorization: `Secret 'SE3RET!'`
+    })
+
+    expect(data).toBeDefined()
+    expect(data).toEqual(res)
+  })
+
+  it('error in fetchFromOpenHim()', async () => {
+    fetch.mockResponses([undefined])
+    const data = await fetchFromOpenHim('/token/create', 'POST', {
+      Authorization: `Secret 'SE3RET!'`
+    })
+
+    expect(data).toBeUndefined()
   })
 })
