@@ -191,7 +191,7 @@ export async function composeAndSavePractitioners(
       ],
       username: practitioner.username,
       email: practitioner.email,
-      mobile: convertToMSISDN(practitioner.mobile, 'gbr'),
+      mobile: convertToMSISDN(practitioner.mobile, 'bgd'), // # PEN_TEST change to gbr
       passwordHash: pass.hash,
       salt: pass.salt,
       role: practitioner.role,

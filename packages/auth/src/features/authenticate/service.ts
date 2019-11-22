@@ -132,7 +132,6 @@ export async function generateAndSendVerificationCode(
       verificationCode
     })
   } else {
-    logger.info('sending SMS')
     await sendVerificationCode(mobile, verificationCode)
   }
 }
