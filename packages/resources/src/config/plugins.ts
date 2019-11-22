@@ -9,38 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Good from 'good'
+import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 
 export default function getPlugins() {
   const plugins: any[] = [
     JWT,
     {
-      plugin: Good,
+      plugin: Pino,
       options: {
-        ops: {
-          interval: 1000
-        },
-        reporters: {
-          console: [
-            {
-              module: 'good-squeeze',
-              name: 'Squeeze',
-              args: [
-                {
-                  log: '*',
-                  response: '*',
-                  request: '*',
-                  error: '*'
-                }
-              ]
-            },
-            {
-              module: 'good-console'
-            },
-            'stdout'
-          ]
-        }
+        prettyPrint: false,
+        logPayload: false
       }
     }
   ]

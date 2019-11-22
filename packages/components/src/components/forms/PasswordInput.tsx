@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { EyeOn, EyeOff } from '../icons'
+import { TertiaryButton, CircleButton } from '../buttons'
 
 interface ICustomProps {
   error?: boolean
@@ -32,6 +33,8 @@ export type IPasswordInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 const StyledField = styled.div<IPasswordInputProps>`
   width: 100%;
+  display: flex;
+  align-items: center;
 `
 const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
@@ -102,15 +105,30 @@ const StyledInput = styled.input<IPasswordInputProps>`
   }}
 `
 
-const IconButton = styled.button`
-  border: none;
-  cursor: pointer;
-  outline: none;
-  height: 40px;
+const IconButton = styled(CircleButton)`
+  height: 32px;
+  width: 32px;
+  margin-right: 4px;
+  padding: 0px 4px;
   right: 0;
   position: absolute;
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.background};
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    color: ${({ theme }) => theme.colors.secondary};
+    background: ${({ theme }) => theme.colors.background};
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
 `
 
 export class PasswordInput extends React.Component<
@@ -164,16 +182,12 @@ export class PasswordInput extends React.Component<
               hideIcon ? (
                 hideIcon
               ) : (
-                <span title="Hide password">
-                  <EyeOn />{' '}
-                </span>
+                <EyeOn />
               )
             ) : showIcon ? (
               showIcon
             ) : (
-              <span title="Show password">
-                <EyeOff />{' '}
-              </span>
+              <EyeOff />
             )}
           </IconButton>
         )}

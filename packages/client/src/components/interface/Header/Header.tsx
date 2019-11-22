@@ -36,7 +36,7 @@ import {
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
-import { IconButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { connect } from 'react-redux'
@@ -96,9 +96,10 @@ enum ACTIVE_MENU_ITEM {
   PERFORMANCE
 }
 
-const StyledPrimaryButton = styled(IconButton)`
+const StyledPrimaryButton = styled(PrimaryButton)`
   ${({ theme }) => theme.shadows.mistyShadow};
-
+  width: 42px;
+  height: 42px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }

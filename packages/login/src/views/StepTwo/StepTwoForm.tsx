@@ -35,6 +35,7 @@ import {
   Container,
   LogoContainer,
   StyledButton,
+  StyledButtonWrapper,
   FieldWrapper
 } from '@login/views/StepOne/StepOneForm'
 
@@ -214,13 +215,15 @@ export class StepTwoForm extends React.Component<FullProps> {
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>{' '}
             <br />
-            <StyledButton
-              onClick={this.props.onResendSMS}
-              id="login-mobile-resend"
-              type="button"
-            >
-              {intl.formatMessage(messages.resend)}
-            </StyledButton>
+            <StyledButtonWrapper>
+              <StyledButton
+                onClick={this.props.onResendSMS}
+                id="login-mobile-resend"
+                type="button"
+              >
+                {intl.formatMessage(messages.resend)}
+              </StyledButton>
+            </StyledButtonWrapper>
           </ActionWrapper>
         </FormWrapper>
       </Container>

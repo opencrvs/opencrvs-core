@@ -1,5 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`When an existing application is marked certified a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "application_id": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
+    "current_task_id": "75ba4bd8-009e-4a02-896c-148979dde09a",
+    "duration_in_seconds": 3564388,
+    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "current_status": "CERTIFIED",
+    "event_type": "DEATH",
+    "previous_status": "REGISTERED",
+  },
+}
+`;
+
 exports[`When an existing application is marked certified writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
@@ -11,7 +28,25 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "CERTIFIED",
+    "event_type": "BIRTH",
     "previous_status": "REGISTERED",
+  },
+}
+`;
+
+exports[`When an existing application is marked registered a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "application_id": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
+    "current_task_id": "75ba4bd8-009e-4a02-896c-148979dde09a",
+    "duration_in_seconds": 3727875,
+    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "current_status": "REGISTERED",
+    "event_type": "DEATH",
+    "previous_status": "DECLARED",
   },
 }
 `;
@@ -27,6 +62,7 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "REGISTERED",
+    "event_type": "BIRTH",
     "previous_status": "DECLARED",
   },
 }
@@ -43,6 +79,7 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "current_status": "REGISTERED",
+    "event_type": "BIRTH",
     "previous_status": "VALIDATED",
   },
 }
