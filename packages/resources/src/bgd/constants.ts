@@ -45,7 +45,7 @@ export const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
 
 export const OISF_SECRET = process.env.OISF_SECRET
   ? readFileSync(process.env.OISF_SECRET).toString()
-  : 'saGtvp5iYa51WiYFWGwVlMUtinKqXoe8S5wv0mNJymxiD9yAr2JdO1bZzTmwQahRezhgL24d9zU6UHatSaEGErmlQgxv9pPh9ggyuhQnFl9DeI7HKfBNkohfosua9PN2a98abHb1kSaUS5BS5Z1QCNNACEX4YdplR1SkSykeIbKkwiU9AgWcKL5dycSdw1Olaz0fFnWjoVCDO26suisQA1hTkTTwuitmaGD611t1koksOxQfc7RLpFbpNBvuYXJT'
+  : ''
 
 export const MIN_SEQ_NUMBER = 0
 export const MAX_SEQ_NUMBER = 999999
