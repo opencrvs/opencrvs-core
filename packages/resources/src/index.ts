@@ -44,6 +44,7 @@ import {
   responseSchema as zmbGeneratorResponseSchema
 } from '@resources/zmb/features/generate/handler'
 import { bgdValidateRegistrationHandler } from '@resources/bgd/features/validate/handler'
+import { bgdBDRISQueueTriggerHandler } from '@resources/bgd/features/bdris-queue/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -140,6 +141,17 @@ export async function createServer() {
       tags: ['api'],
       description:
         'Validates a registration and if successful returns a BRN for that record'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/bgd/bdris-queue/trigger',
+    handler: bgdBDRISQueueTriggerHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Triggers the queue to try send outstanding registration for BDRIS validation'
     }
   })
 
