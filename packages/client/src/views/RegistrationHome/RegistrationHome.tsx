@@ -35,7 +35,8 @@ import {
   SUBMISSION_STATUS,
   filterProcessingApplicationsFromQuery,
   storeApplication,
-  makeApplicationReadyToDownload
+  makeApplicationReadyToDownload,
+  downloadApplication
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
@@ -141,7 +142,7 @@ interface IBaseRegistrationHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  storeApplication: typeof storeApplication
+  downloadApplication: typeof downloadApplication
   tabId: string
   selectorId: string
   drafts: IApplication[]
@@ -250,7 +251,7 @@ export class RegistrationHomeView extends React.Component<
       compositionId,
       action
     )
-    this.props.storeApplication(downloadableApplication)
+    this.props.downloadApplication(downloadableApplication)
   }
 
   render() {
@@ -517,6 +518,6 @@ export const RegistrationHome = connect(
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
-    storeApplication
+    downloadApplication
   }
 )(injectIntl(withTheme(RegistrationHomeView)))

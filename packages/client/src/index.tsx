@@ -86,4 +86,3 @@ ReactDOM.render(
 
 registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()
-new InboxController(store).start()

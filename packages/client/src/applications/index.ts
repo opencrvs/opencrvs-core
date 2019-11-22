@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event, IFormData, IFormFieldValue } from '@client/forms'
+import {
+  Event,
+  IFormData,
+  IFormFieldValue,
+  Action as ApplicationAction,
+  IForm
+} from '@client/forms'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
 import { storage } from '@client/storage'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -17,6 +23,12 @@ import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
+import { client } from '@client/utils/apolloClient'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { IStoreState } from '@client/store'
+import { ApolloQueryResult, ApolloError } from 'apollo-client'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -25,6 +37,9 @@ const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
+const ENQUEUE_DOWNLOAD_APPLICATION = 'APPLICATION/ENQUEUE_DOWNLOAD_APPLICATION'
+const DOWNLOAD_APPLICATION_SUCCESS = 'APPLICATION/DOWNLOAD_APPLICATION_SUCCESS'
+const DOWNLOAD_APPLICATION_FAIL = 'APPLICATION/DOWNLOAD_APPLICATION_FAIL'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -67,6 +82,18 @@ export const processingStates = [
   SUBMISSION_STATUS.READY_TO_CERTIFY,
   SUBMISSION_STATUS.CERTIFYING
 ]
+
+const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
+interface IActionList {
+  [key: string]: string
+}
+
+const ACTION_LIST: IActionList = {
+  [ApplicationAction.LOAD_REVIEW_APPLICATION]:
+    ApplicationAction.LOAD_REVIEW_APPLICATION,
+  [ApplicationAction.LOAD_CERTIFICATE_APPLICATION]:
+    ApplicationAction.LOAD_CERTIFICATE_APPLICATION
+}
 
 export interface IPayload {
   [key: string]: IFormFieldValue
@@ -190,6 +217,35 @@ interface IGetStorageApplicationsFailedAction {
   type: typeof GET_APPLICATIONS_FAILED
 }
 
+interface IDownloadApplication {
+  type: typeof ENQUEUE_DOWNLOAD_APPLICATION
+  payload: {
+    application: IApplication
+  }
+}
+
+interface IDownloadApplicationSuccess {
+  type: typeof DOWNLOAD_APPLICATION_SUCCESS
+  payload: {
+    queryData: any
+    form: {
+      [key in Event]: IForm
+    }
+  }
+}
+
+interface IDownloadApplicationFail {
+  type: typeof DOWNLOAD_APPLICATION_FAIL
+  payload: {
+    error: ApolloError
+    application: IApplication
+  }
+}
+
+interface IApplicationRequestQueue {
+  id: string
+  action: Action
+}
 export type Action =
   | IStoreApplicationAction
   | IModifyApplicationAction
@@ -199,6 +255,9 @@ export type Action =
   | IDeleteApplicationAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
+  | IDownloadApplication
+  | IDownloadApplicationSuccess
+  | IDownloadApplicationFail
 
 export interface IUserData {
   userID: string
@@ -401,6 +460,89 @@ export async function deleteApplicationByUser(
   return JSON.stringify(currentUserData)
 }
 
+export function downloadApplication(
+  application: IApplication
+): IDownloadApplication {
+  return {
+    type: ENQUEUE_DOWNLOAD_APPLICATION,
+    payload: {
+      application
+    }
+  }
+}
+
+function createRequestForApplication(application: IApplication) {
+  const applicationAction = ACTION_LIST[application.action as string] || null
+  const result = getQueryMapping(
+    application.event,
+    applicationAction as ApplicationAction
+  )
+  const { query } = result || {
+    query: null
+  }
+
+  return {
+    request: client.query,
+    requestArgs: [{ query, variables: { id: application.id } }]
+  }
+}
+
+function requestWithStateWrapper(
+  mainRequest: Promise<ApolloQueryResult<any>>,
+  getState: () => IStoreState
+) {
+  const store = getState()
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await mainRequest
+      resolve({ data, store })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
+function getDataKey(application: IApplication) {
+  const result = getQueryMapping(
+    application.event,
+    application.action as ApplicationAction
+  )
+
+  const { dataKey } = result || { dataKey: null }
+  return dataKey
+}
+
+function downloadApplicationSuccess({
+  data,
+  store
+}: {
+  data: any
+  store: IStoreState
+}): IDownloadApplicationSuccess {
+  const form = getRegisterForm(store)
+
+  return {
+    type: DOWNLOAD_APPLICATION_SUCCESS,
+    payload: {
+      queryData: data,
+      form
+    }
+  }
+}
+
+function downloadApplicationFail(
+  error: ApolloError,
+  application: IApplication
+): IDownloadApplicationFail {
+  return {
+    type: DOWNLOAD_APPLICATION_FAIL,
+    payload: {
+      error,
+      application
+    }
+  }
+}
+
 export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
   state: IApplicationsState = initialState,
   action: Action
@@ -490,6 +632,268 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         ...state,
         initialApplicationsLoaded: true
       }
+    case ENQUEUE_DOWNLOAD_APPLICATION:
+      const { applications } = state
+      const { application } = action.payload
+      const downloadIsRunning = applications.some(
+        application =>
+          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+      )
+
+      const applicationIndex = applications.findIndex(
+        app => application.id === app.id
+      )
+      let newApplicationsAfterStartingDownload = Array.from(applications)
+
+      // Download is running, so enqueue
+      if (downloadIsRunning) {
+        // Application is not in list
+        if (applicationIndex === -1) {
+          newApplicationsAfterStartingDownload = applications.concat([
+            application
+          ])
+        } else {
+          // Application is failed before, just make it ready to download
+          newApplicationsAfterStartingDownload[applicationIndex] = application
+        }
+
+        // Download is running just return the state
+        return {
+          ...state,
+          applications: newApplicationsAfterStartingDownload
+        }
+      }
+      // Download is not running
+      else {
+        // Application is not in list, so push it
+        if (applicationIndex === -1) {
+          newApplicationsAfterStartingDownload = applications.concat([
+            {
+              ...application,
+              downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
+            }
+          ])
+        }
+        // Application is in list make it downloading
+        else {
+          newApplicationsAfterStartingDownload[applicationIndex] = {
+            ...application,
+            downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
+          }
+        }
+      }
+
+      const newState = {
+        ...state,
+        applications: newApplicationsAfterStartingDownload
+      }
+
+      const { request, requestArgs } = createRequestForApplication(application)
+
+      return loop(
+        newState,
+        Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+          requestWithStateWrapper,
+          {
+            args: [request(...requestArgs), Cmd.getState],
+            successActionCreator: downloadApplicationSuccess,
+            failActionCreator: err =>
+              downloadApplicationFail(err, {
+                ...application,
+                downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
+              })
+          }
+        )
+      )
+    case DOWNLOAD_APPLICATION_SUCCESS:
+      const { queryData, form } = action.payload
+
+      const downloadingApplicationIndex = state.applications.findIndex(
+        application =>
+          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+      )
+      const newApplicationsAfterDownload = Array.from(state.applications)
+      const downloadingApplication =
+        newApplicationsAfterDownload[downloadingApplicationIndex]
+
+      const dataKey = getDataKey(downloadingApplication)
+      const transData = gqlToDraftTransformer(
+        form[downloadingApplication.event],
+        queryData.data[dataKey as string]
+      )
+      newApplicationsAfterDownload[
+        downloadingApplicationIndex
+      ] = createReviewApplication(
+        downloadingApplication.id,
+        transData,
+        downloadingApplication.event
+      )
+      newApplicationsAfterDownload[downloadingApplicationIndex].downloadStatus =
+        DOWNLOAD_STATUS.DOWNLOADED
+
+      const newStateAfterDownload = {
+        ...state,
+        applications: newApplicationsAfterDownload
+      }
+
+      // Check if there is more to download
+      const downloadQueueInprogress = state.applications.filter(
+        application =>
+          application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      )
+
+      // If not then, write to IndexedDB and return state
+      if (!downloadQueueInprogress.length) {
+        return loop(
+          newStateAfterDownload,
+          Cmd.run(writeApplicationByUser, {
+            args: [
+              state.userID,
+              newApplicationsAfterDownload[downloadingApplicationIndex]
+            ],
+            failActionCreator: err =>
+              downloadApplicationFail(
+                err,
+                newApplicationsAfterDownload[downloadingApplicationIndex]
+              )
+          })
+        )
+      }
+
+      const applicationToDownload = downloadQueueInprogress[0]
+      applicationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
+      const {
+        request: nextRequest,
+        requestArgs: nextRequestArgs
+      } = createRequestForApplication(applicationToDownload)
+
+      // Return state, write to indexedDBand download the next ready to download application, all in sequence
+      return loop(
+        newStateAfterDownload,
+        Cmd.list(
+          [
+            Cmd.run(writeApplicationByUser, {
+              args: [
+                state.userID,
+                newApplicationsAfterDownload[downloadingApplicationIndex]
+              ],
+              failActionCreator: downloadApplicationFail
+            }),
+            Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+              requestWithStateWrapper,
+              {
+                args: [nextRequest(...nextRequestArgs), Cmd.getState],
+                successActionCreator: downloadApplicationSuccess,
+                failActionCreator: err =>
+                  downloadApplicationFail(
+                    err,
+                    newApplicationsAfterDownload[downloadingApplicationIndex]
+                  )
+              }
+            )
+          ],
+          { sequence: true }
+        )
+      )
+
+    case DOWNLOAD_APPLICATION_FAIL:
+      const { application: erroredApplication, error } = action.payload
+      erroredApplication.downloadRetryAttempt =
+        (erroredApplication.downloadRetryAttempt || 0) + 1
+
+      const {
+        request: retryRequest,
+        requestArgs: retryRequestArgs
+      } = createRequestForApplication(erroredApplication)
+
+      const applicationsAfterError = Array.from(state.applications)
+      const erroredApplicationIndex = applicationsAfterError.findIndex(
+        application =>
+          application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
+      )
+
+      applicationsAfterError[erroredApplicationIndex] = erroredApplication
+
+      // Retry download if not limit reached
+      if (
+        erroredApplication.downloadRetryAttempt < DOWNLOAD_MAX_RETRY_ATTEMPT
+      ) {
+        return loop(
+          {
+            ...state,
+            applications: applicationsAfterError
+          },
+          Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
+            requestWithStateWrapper,
+            {
+              args: [retryRequest(...retryRequestArgs), Cmd.getState],
+              successActionCreator: downloadApplicationSuccess,
+              failActionCreator: err =>
+                downloadApplicationFail(err, erroredApplication)
+            }
+          )
+        )
+      }
+
+      let status
+      if (error.networkError) {
+        status = DOWNLOAD_STATUS.FAILED_NETWORK
+      } else {
+        status = DOWNLOAD_STATUS.FAILED
+      }
+
+      erroredApplication.downloadStatus = status
+
+      applicationsAfterError[erroredApplicationIndex] = erroredApplication
+
+      const downloadQueueFollowing = state.applications.filter(
+        application =>
+          application.downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+      )
+
+      // If nothing more to download, return the state and write the applications
+      if (!downloadQueueFollowing.length) {
+        return loop(
+          {
+            ...state,
+            applications: applicationsAfterError
+          },
+          Cmd.run(() =>
+            writeApplicationByUser(state.userID, erroredApplication)
+          )
+        )
+      }
+
+      // If there are more to download in queue, start the next request
+      const nextApplication = downloadQueueFollowing[0]
+      const {
+        request: nextApplicationRequest,
+        requestArgs: nextApplicationRequestArgs
+      } = createRequestForApplication(nextApplication)
+      return loop(
+        {
+          ...state,
+          applications: applicationsAfterError
+        },
+        Cmd.list(
+          [
+            Cmd.run(() =>
+              writeApplicationByUser(state.userID, erroredApplication)
+            ),
+            Cmd.run(requestWithStateWrapper, {
+              args: [
+                nextApplicationRequest(...nextApplicationRequestArgs),
+                Cmd.getState
+              ],
+              successActionCreator: downloadApplicationSuccess,
+              failActionCreator: err =>
+                downloadApplicationFail(err, nextApplication)
+            })
+          ],
+          { sequence: true }
+        )
+      )
+
     default:
       return state
   }
