@@ -26,6 +26,8 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
+import fetch from 'node-fetch'
+import { RESOURCES_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -98,6 +100,32 @@ export const resolvers: GQLResolver = {
         const person = personBundle.entry[0].resource as fhir.Person
 
         return person
+      } else {
+        return await Promise.reject(
+          new Error('User does not have enough scope')
+        )
+      }
+    },
+    async queryPersonByNidIdentifier(_, { dob, nid, country }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare')
+      ) {
+        const response = await fetch(`${RESOURCES_URL}/verify/nid/${country}`, {
+          method: 'POST',
+          body: JSON.stringify({ dob, nid }),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        }).then(data => data.json())
+
+        if (!response.operationResult.success) {
+          throw new Error(response.operationResult.error.errorMessage)
+        } else {
+          return response.data
+        }
       } else {
         return await Promise.reject(
           new Error('User does not have enough scope')
