@@ -20,7 +20,7 @@ import {
 import styled from 'styled-components'
 import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
 
-import { PrimaryButton, Button } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   TextInput,
@@ -139,18 +139,37 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
   margin-bottom: 10px;
 `
 
-export const StyledButton = styled(Button)`
+export const StyledButton = styled(LinkButton)`
   color: ${({ theme }) => theme.colors.white};
   flex-direction: row;
   justify-content: center;
-  padding: 10px ${({ theme }) => theme.grid.margin}px;
+  text-decoration: none;
+  margin: 10px ${({ theme }) => theme.grid.margin}px;
   ${({ theme }) => theme.fonts.bodyStyle};
   :hover {
     text-decoration: underline;
     text-decoration-color: ${({ theme }) => theme.colors.secondary};
   }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.white};
+  }
+  &:active:not([data-focus-visible-added]):enabled {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
 `
-
+export const StyledButtonWrapper = styled.div`
+  display: inline-flex;
+  justify-content: center;
+`
 export const FieldWrapper = styled.div`
   min-height: 6.5em;
 `
@@ -273,13 +292,15 @@ export class StepOneForm extends React.Component<FullProps> {
             <PrimaryButton id="login-mobile-submit" type="submit">
               {intl.formatMessage(messages.submit)}
             </PrimaryButton>
-            <StyledButton
-              id="login-forgot-password"
-              type="button"
-              onClick={() => (window.location.href = '/forgotten-item')}
-            >
-              {intl.formatMessage(messages.forgotPassword)}
-            </StyledButton>
+            <StyledButtonWrapper>
+              <StyledButton
+                id="login-forgot-password"
+                type="button"
+                onClick={() => (window.location.href = '/forgotten-item')}
+              >
+                {intl.formatMessage(messages.forgotPassword)}
+              </StyledButton>
+            </StyledButtonWrapper>
           </ActionWrapper>
         </FormWrapper>
       </Container>

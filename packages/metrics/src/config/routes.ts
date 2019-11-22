@@ -12,28 +12,18 @@
 import * as Joi from 'joi'
 import {
   inProgressBirthRegistrationHandler,
-  birthRegistrationHandler,
+  markBirthRegisteredHandler,
   newBirthRegistrationHandler,
-  birthCertifiedHandler,
-  baseHandler
+  markCertifiedHandler,
+  markValidatedHandler,
+  baseHandler,
+  markDeathRegisteredHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
 export const getRoutes = () => {
   const routes = [
-    // add ping route by default for health check
-    {
-      method: 'GET',
-      path: '/ping',
-      handler: (request: any, h: any) => {
-        return 'pong'
-      },
-      config: {
-        tags: ['api']
-      }
-    },
-
-    // Event receiver routes
+    // In progress declaration
     {
       method: 'POST',
       path: '/events/birth/in-progress-declaration',
@@ -50,6 +40,8 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+
+    // New declaration
     {
       method: 'POST',
       path: '/events/birth/new-declaration',
@@ -66,6 +58,8 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+
+    // New registration
     {
       method: 'POST',
       path: '/events/birth/new-registration',
@@ -82,10 +76,30 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+
+    // Mark validated
+    {
+      method: 'POST',
+      path: '/events/birth/mark-validated',
+      handler: markValidatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-validated',
+      handler: markValidatedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Mark registered
     {
       method: 'POST',
       path: '/events/birth/mark-registered',
-      handler: birthRegistrationHandler,
+      handler: markBirthRegisteredHandler,
       config: {
         tags: ['api']
       }
@@ -93,15 +107,17 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-registered',
-      handler: baseHandler,
+      handler: markDeathRegisteredHandler,
       config: {
         tags: ['api']
       }
     },
+
+    // Mark certified
     {
       method: 'POST',
       path: '/events/birth/mark-certified',
-      handler: birthCertifiedHandler,
+      handler: markCertifiedHandler,
       config: {
         tags: ['api']
       }
@@ -109,7 +125,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/mark-certified',
-      handler: baseHandler,
+      handler: markCertifiedHandler,
       config: {
         tags: ['api']
       }
@@ -128,6 +144,18 @@ export const getRoutes = () => {
             locationId: Joi.string().required()
           })
         },
+        tags: ['api']
+      }
+    },
+
+    // add ping route by default for health check
+    {
+      method: 'GET',
+      path: '/ping',
+      handler: (request: any, h: any) => {
+        return 'pong'
+      },
+      config: {
         tags: ['api']
       }
     }

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrow } from '../icons'
-import { Button } from '../buttons'
+import { Button, CircleButton } from '../buttons'
 import { Box } from './Box'
 
 const SubPageContainer = styled.div`
@@ -32,14 +32,10 @@ const HeaderBlock = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin-bottom: 1px;
+  align-items: center;
 `
-const BackButton = styled(Button)`
-  width: 24px;
-  height: 24px;
-  padding: 0px;
+const BackButton = styled(CircleButton)`
   background: '#35495d00';
-  justify-content: center;
-  cursor: pointer;
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 const MenuTitle = styled.span`
@@ -67,11 +63,9 @@ export class SubPage extends React.Component<IProps> {
     return (
       <SubPageContainer>
         <HeaderBlock>
-          <BackButton
-            id="sub_page_back_button"
-            onClick={goBack}
-            icon={() => <BackArrow />}
-          />
+          <BackButton id="sub_page_back_button" onClick={goBack}>
+            <BackArrow />
+          </BackButton>
           {(title && <MenuTitle>{title}</MenuTitle>) || (
             <EmptyTitle>{emptyTitle}</EmptyTitle>
           )}

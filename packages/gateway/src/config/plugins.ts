@@ -10,8 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { graphqlHapi } from 'apollo-server-hapi'
-import * as Good from 'good'
+
 import * as JWT from 'hapi-auth-jwt2'
+import * as Pino from 'hapi-pino'
 import { getExecutableSchema } from '@gateway/graphql/config'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
@@ -21,32 +22,11 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
   plugins.push(
     JWT,
     {
-      plugin: Good,
+      plugin: Pino,
       options: {
-        ops: {
-          interval: 1000
-        },
-        reporters: {
-          console: [
-            {
-              module: 'good-squeeze',
-              name: 'Squeeze',
-              args: [
-                {
-                  log: '*',
-                  response: '*'
-                }
-              ]
-            },
-            {
-              module: 'good-console'
-            },
-            'stdout'
-          ]
-        }
-      },
-      name: 'good',
-      version: '8.1.1'
+        prettyPrint: false,
+        logPayload: false
+      }
     },
     {
       plugin: graphqlHapi,

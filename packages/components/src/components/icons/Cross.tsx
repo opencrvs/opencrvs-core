@@ -17,6 +17,9 @@ export const Cross = (props: React.HTMLAttributes<SVGElement>) => {
     case 'white':
       fill = 'white'
       break
+    case 'currentColor':
+      fill = 'currentColor'
+      break
     default:
       fill = '#4C68C1'
   }

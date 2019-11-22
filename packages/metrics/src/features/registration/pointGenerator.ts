@@ -165,7 +165,8 @@ export async function generateEventDurationPoint(
 
   const tags = {
     current_status: getApplicationStatus(currentTask),
-    previous_status: getApplicationStatus(previousTask)
+    previous_status: getApplicationStatus(previousTask),
+    event_type: getApplicationType(currentTask)
   }
 
   return {
