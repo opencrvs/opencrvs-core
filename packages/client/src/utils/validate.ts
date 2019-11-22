@@ -519,11 +519,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
     case NATIONAL_ID:
       const containsOnlyNumbers = value.match(/^[0-9]+$/)
 
-      if (
-        hasValidLength(value, validNationalIDLength) &&
-        isNumber(value.toString()) &&
-        containsOnlyNumbers
-      ) {
+      if (hasValidLength(value, validNationalIDLength) && containsOnlyNumbers) {
         return undefined
       }
       return {
