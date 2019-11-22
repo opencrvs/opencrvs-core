@@ -63,6 +63,17 @@ const BlueButton = styled(Button)`
   ${({ theme }) => theme.fonts.smallButtonStyle};
   border-radius: 4px;
   ${({ theme }) => theme.shadows.mistyShadow};
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.white};
+  }
 `
 const WhiteButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
@@ -72,6 +83,17 @@ const WhiteButton = styled(Button)`
   ${({ theme }) => theme.shadows.mistyShadow};
   &:hover {
     background: ${({ theme }) => theme.colors.dropdownHover};
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 const TabGroup = styled.div`

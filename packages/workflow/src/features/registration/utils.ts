@@ -156,7 +156,7 @@ export function getCompositionEventType(compoition: fhir.Composition) {
     compoition.type.coding &&
     compoition.type.coding[0].code
 
-  if (eventType === 'death-declaration') {
+  if (eventType === 'death-application' || eventType === 'death-notification') {
     return EVENT_TYPE.DEATH
   } else {
     return EVENT_TYPE.BIRTH
@@ -198,6 +198,29 @@ export function isInProgressApplication(fhirBundle: fhir.Bundle) {
     (taskEntry &&
       taskEntry.resource &&
       (taskEntry.resource as fhir.Task).status === 'draft') ||
+    false
+  )
+}
+
+export function isEventNotification(fhirBundle: fhir.Bundle) {
+  const compositionEntry =
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry.find(
+      entry => entry.resource && entry.resource.resourceType === 'Composition'
+    )
+  const composition =
+    compositionEntry && (compositionEntry.resource as fhir.Composition)
+  const compositionDocTypeCode =
+    composition &&
+    composition.type.coding &&
+    composition.type.coding.find(
+      coding => coding.system === 'http://opencrvs.org/doc-types'
+    )
+  return (
+    (compositionDocTypeCode &&
+      compositionDocTypeCode.code &&
+      compositionDocTypeCode.code.endsWith('-notification')) ||
     false
   )
 }

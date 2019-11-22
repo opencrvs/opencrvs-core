@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
+import { CircleButton } from '../../buttons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -20,6 +21,7 @@ const Wrapper = styled.form`
   display: flex;
   ${({ theme }) => theme.fonts.bodyStyle};
   padding: 0px 10px;
+  padding-right: 0;
   margin-bottom: 1px;
   position: relative;
 `
@@ -54,6 +56,34 @@ const DropDownWrapper = styled.ul`
   margin: 3px 0px;
   cursor: pointer;
 `
+
+export const IconRingButton = styled(CircleButton)`
+  background: transparent;
+  border: none;
+  height: 24px;
+  width: 24px;
+  margin: 0 5px;
+  padding: 0;
+  & > svg {
+    display: block;
+    margin: 0 auto;
+  }
+  &:focus {
+    outline: none;
+    border: 3px solid ${({ theme }) => theme.colors.focus};
+    background: transparent;
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    border: none;
+  }
+  &:active:not([data-focus-visible-added]) {
+    border: 3px solid ${({ theme }) => theme.colors.focus};
+    background: transparent;
+    outline: none;
+  }
+`
 const DropDownItem = styled.li`
   display: flex;
   align-items: center;
@@ -81,7 +111,6 @@ const SelectedSearchCriteria = styled.span`
   padding: 5px 10px;
   color: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.captionStyle};
-  margin-right: 10px;
   display: flex;
   & .selected-icon {
     display: none;
@@ -238,7 +267,9 @@ export class SearchTool extends React.Component<IProps, IState> {
               {this.state.selectedSearchType.label}
             </span>
           </SelectedSearchCriteria>
-          <ArrowDownBlue />
+          <IconRingButton>
+            <ArrowDownBlue />
+          </IconRingButton>
         </DropDown>
         {this.dropdown()}
       </Wrapper>

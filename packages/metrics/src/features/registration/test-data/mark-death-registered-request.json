@@ -1,0 +1,479 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:9e578394-cbdd-408a-890f-1977bbd3d15f",
+      "resource": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "9e578394-cbdd-408a-890f-1977bbd3d15f"
+        },
+        "resourceType": "Composition",
+        "status": "preliminary",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "death-application"
+            }
+          ],
+          "text": "Death Application"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "title": "Death Application",
+        "section": [
+          {
+            "title": "Deceased details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "deceased-details"
+                }
+              ],
+              "text": "Deceased details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:653661a4-05b7-41c9-8527-aa04b1a148a7"
+              }
+            ]
+          },
+          {
+            "title": "Informant's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "informant-details"
+                }
+              ],
+              "text": "Informant's details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:a811ad0c-bf80-4814-9e79-7f10baa1f70e"
+              }
+            ]
+          },
+          {
+            "title": "Death encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "death-encounter"
+                }
+              ],
+              "text": "Death encounter"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:880638f2-56dd-4f89-851d-225d5a110826"
+              }
+            ]
+          }
+        ],
+        "subject": {},
+        "date": "2019-11-18T10:49:32.586Z",
+        "author": [],
+        "id": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4c94b282-9c5b-44d0-9afc-4ce89ba83e00",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/types",
+              "code": "DEATH"
+            }
+          ]
+        },
+        "focus": {
+          "reference": "urn:uuid:9e578394-cbdd-408a-890f-1977bbd3d15f"
+        },
+        "id": "75ba4bd8-009e-4a02-896c-148979dde09a",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/death-tracking-id",
+            "value": "DAVE8IV"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/death-registration-number",
+            "value": "20196816020000112"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "APPLICANT"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+8801700000000"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 4333
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/2711a485-edfb-48bb-8c2a-9ce8753e3488"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/d8cfd240-4b5a-4557-9df7-b1591a11d843"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/2d11389d-f58e-4d47-a562-b934f1b85936"
+            }
+          }
+        ],
+        "lastModified": "2019-11-18T10:49:32.990Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REGISTERED"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:653661a4-05b7-41c9-8527-aa04b1a148a7",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "e698d227-096f-4cb1-a36a-2c9003416e36",
+        "identifier": [
+          {
+            "value": "1231312312311",
+            "type": "NATIONAL_ID"
+          }
+        ],
+        "name": [
+          {
+            "use": "bn",
+            "family": ["আপনার"]
+          },
+          {
+            "use": "en",
+            "family": ["Registrar"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1992-12-12",
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/StructureDefinition/marital-status",
+              "code": "M"
+            }
+          ],
+          "text": "MARRIED"
+        },
+        "address": [
+          {
+            "type": "PERMANENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "b6bc6cef-5930-4d39-ae70-aa73a484ad72"
+            ],
+            "district": "e3935295-6e18-4354-a4d2-3309dd1d6db9",
+            "state": "2e9b295d-c866-4726-88d5-9fa2ec090564",
+            "country": "BGD"
+          },
+          {
+            "type": "CURRENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "b6bc6cef-5930-4d39-ae70-aa73a484ad72"
+            ],
+            "district": "e3935295-6e18-4354-a4d2-3309dd1d6db9",
+            "state": "2e9b295d-c866-4726-88d5-9fa2ec090564",
+            "country": "BGD"
+          }
+        ],
+        "deceasedBoolean": true,
+        "deceasedDateTime": "1992-12-12",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "urn:iso:std:iso:3166",
+                      "code": "BGD"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "period",
+                "valuePeriod": {
+                  "start": "",
+                  "end": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a811ad0c-bf80-4814-9e79-7f10baa1f70e",
+      "resource": {
+        "resourceType": "RelatedPerson",
+        "id": "b05d81ed-7574-4192-9d91-3e79ddadb81a",
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype",
+              "code": "SPOUSE"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "urn:uuid:aae47150-29ed-41f0-b5ef-132f276f7465"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:aae47150-29ed-41f0-b5ef-132f276f7465",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "8dca837e-738d-47ba-9fc4-5d182969b675",
+        "identifier": [
+          {
+            "value": "3423423423223",
+            "type": "NATIONAL_ID"
+          }
+        ],
+        "name": [
+          {
+            "use": "bn",
+            "family": ["পাসওয়ার্ড"]
+          },
+          {
+            "use": "en",
+            "family": ["kekke"]
+          }
+        ],
+        "birthDate": "1994-12-12",
+        "address": [
+          {
+            "type": "CURRENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "e1224817-4eaa-4eec-9bbe-8c1845b20e6f"
+            ],
+            "district": "8b85ea5f-fb9e-403c-a1b3-e4da22b27865",
+            "state": "b4a96043-6990-4d14-8036-d830d7d4fe18",
+            "country": "BGD"
+          },
+          {
+            "type": "PERMANENT",
+            "line": [
+              "",
+              "",
+              "",
+              "",
+              "",
+              "e1224817-4eaa-4eec-9bbe-8c1845b20e6f"
+            ],
+            "district": "8b85ea5f-fb9e-403c-a1b3-e4da22b27865",
+            "state": "b4a96043-6990-4d14-8036-d830d7d4fe18",
+            "country": "BGD"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "urn:iso:std:iso:3166",
+                      "code": "BGD"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "period",
+                "valuePeriod": {
+                  "start": "",
+                  "end": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:880638f2-56dd-4f89-851d-225d5a110826",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:9de264a3-8358-4f72-8b14-6079416d7fb3"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9de264a3-8358-4f72-8b14-6079416d7fb3",
+      "resource": {
+        "resourceType": "Location",
+        "mode": "instance",
+        "partOf": {
+          "reference": "Location/b6bc6cef-5930-4d39-ae70-aa73a484ad72"
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "PERMANENT"
+            }
+          ]
+        },
+        "address": {
+          "type": "PERMANENT",
+          "line": ["", "", "", "", "", "b6bc6cef-5930-4d39-ae70-aa73a484ad72"],
+          "district": "e3935295-6e18-4354-a4d2-3309dd1d6db9",
+          "state": "2e9b295d-c866-4726-88d5-9fa2ec090564",
+          "country": "BGD"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4452b81f-e685-4c79-95ef-1bc88320c9de",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:880638f2-56dd-4f89-851d-225d5a110826"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "uncertified-manner-of-death",
+              "display": "Uncertified manner of death"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/icd-10",
+              "code": "NATURAL_CAUSES"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5aa0e986-1ae0-4239-be93-eeb928d0b319",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:880638f2-56dd-4f89-851d-225d5a110826"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "ICD10",
+              "display": "Cause of death"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/icd-10",
+              "code": "moro"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2019-11-18T10:49:32.586Z"
+  }
+}

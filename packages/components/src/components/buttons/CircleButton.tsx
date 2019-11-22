@@ -12,6 +12,7 @@
 import styled from 'styled-components'
 
 export const CircleButton = styled.button<{ dark?: boolean }>`
+  color: ${({ color = '#4C68C1' }) => color};
   margin: 0;
   border: none;
   background: none;
@@ -27,14 +28,28 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
         ? theme.gradients.gradientSkyDark
         : 'background-color: ' + theme.colors.dropdownHover};
   }
-  &:active {
-    background-color: transparent;
+  &:not([data-focus-visible-added]):hover {
+    ${({ theme, dark }) =>
+      dark
+        ? theme.gradients.gradientSkyDark
+        : 'background-color: ' + theme.colors.dropdownHover};
   }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:focus {
     outline: none;
     background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: none;
+    outline: none;
+    color: ${({ color = '#4C68C1' }) => color};
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
   }
   padding: 0 8px;
 `

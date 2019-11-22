@@ -35,10 +35,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-declaration'
+                  code: 'birth-application'
                 }
               ],
-              text: 'Birth Declaration'
+              text: 'Birth Application'
             },
             class: {
               coding: [
@@ -247,10 +247,10 @@ describe('fhirUtils', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-declaration'
+                  code: 'birth-application'
                 }
               ],
-              text: 'Birth Declaration'
+              text: 'Birth Application'
             },
             class: {
               coding: [

@@ -11,7 +11,7 @@
  */
 import * as fetchMock from 'jest-fetch-mock'
 import {
-  fetchLocationByIdentifiersAndParent,
+  fetchLocationByIdentifiers,
   fetchHierarchicalBangladeshLocations,
   fetchAllAddressLocations,
   postBundle
@@ -28,7 +28,7 @@ describe('FHIR API module tests', () => {
     fetch.resetMocks()
   })
 
-  describe('.fetchLocationByIdentifiersAndParent()', () => {
+  describe('.fetchLocationByIdentifiers()', () => {
     it('Sends correct request and return the first entry in the response', async () => {
       const mock = fetch.mockResponseOnce(
         JSON.stringify({
@@ -37,12 +37,12 @@ describe('FHIR API module tests', () => {
         })
       )
 
-      await fetchLocationByIdentifiersAndParent(
+      await fetchLocationByIdentifiers(
         [
           { system: 'test1', value: 'test1' },
           { system: 'test2', value: 'test2' }
         ],
-        'Location/0',
+        'partof=Location/0',
         'bearer xyz'
       )
 
@@ -62,12 +62,12 @@ describe('FHIR API module tests', () => {
       fetch.mockResponseOnce('', { status: 401 })
 
       await expect(
-        fetchLocationByIdentifiersAndParent(
+        fetchLocationByIdentifiers(
           [
             { system: 'test1', value: 'test1' },
             { system: 'test2', value: 'test2' }
           ],
-          'Location/0',
+          'partof=Location/0',
           'bearer xyz'
         )
       ).rejects.toThrowError(
@@ -84,16 +84,16 @@ describe('FHIR API module tests', () => {
       )
 
       await expect(
-        fetchLocationByIdentifiersAndParent(
+        fetchLocationByIdentifiers(
           [
             { system: 'test1', value: 'test1' },
             { system: 'test2', value: 'test2' }
           ],
-          'Location/0',
+          'partof=Location/0',
           'bearer xyz'
         )
       ).rejects.toThrowError(
-        'Location not found, identifiers: [{"system":"test1","value":"test1"},{"system":"test2","value":"test2"}], parentRef: Location/0'
+        'Location not found, identifiers: [{"system":"test1","value":"test1"},{"system":"test2","value":"test2"}], query suffix: partof=Location/0'
       )
     })
   })

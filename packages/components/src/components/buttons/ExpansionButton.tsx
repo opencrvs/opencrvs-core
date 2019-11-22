@@ -15,22 +15,33 @@ import { Button, IButtonProps } from './Button'
 import { PlusTransparent, MinusTransparent } from '../icons'
 
 export const StyledButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.secondary};
-  display: flex;
-  padding: 0 8px;
-  flex-shrink: 1;
-  background: ${({ theme }) => theme.colors.white};
-  margin-bottom: 1px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-  justify-content: center;
-  align-items: center;
-  & > div {
-    top: 0;
-  }
   border: none;
-  outline: none;
+  background: none;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  border-radius: 100%;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.dropdownHover};
+  }
+  &:not([data-focus-visible-added]):hover {
+    background-color: ${({ theme }) => theme.colors.dropdownHover};
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: none;
+    outline: none;
+    color: ${({ color = '#4C68C1' }) => color};
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
 `
 export interface IExpansionButtonProps extends IButtonProps {
   expanded?: boolean

@@ -112,7 +112,14 @@ export const IconTab = styled(Button)<IProps>`
     margin-right: 8px;
   }
   &:focus {
-    outline: 0;
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 export const StyledSpinner = styled(Spinner)`

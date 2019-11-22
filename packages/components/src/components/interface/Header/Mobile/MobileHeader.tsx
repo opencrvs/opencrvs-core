@@ -73,6 +73,7 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
               id="mobile_header_left"
               onClick={mobileLeft.handler}
               dark={true}
+              color="#fff"
             >
               {mobileLeft.icon()}
             </CircleButton>
@@ -89,6 +90,7 @@ class MobileHeader extends React.Component<IMobileHeaderProps> {
               id="mobile_header_right"
               onClick={mobileRight.handler}
               dark={true}
+              color="#fff"
             >
               {mobileRight.icon()}
             </CircleButton>
