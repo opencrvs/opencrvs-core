@@ -2226,4 +2226,78 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have enough scope')
     })
   })
+
+  describe('queryPersonByNidIdentifier()', () => {
+    const response = {
+      data: {
+        name: [
+          {
+            use: 'en',
+            family: 'Hasib'
+          },
+          {
+            use: 'bn',
+            family: 'হাসিব'
+          }
+        ],
+        gender: 'male'
+      },
+      operationResult: {
+        success: true
+      }
+    }
+
+    it('returns person with name and gender', async () => {
+      fetch.mockResponseOnce(JSON.stringify(response))
+      const data = await resolvers.Query.queryPersonByNidIdentifier(
+        {},
+        {
+          dob: '1992-12-30',
+          nid: '1234567898000'
+        },
+        authHeaderRegCert
+      )
+      expect(data).toBeDefined()
+      expect(data).toEqual(response.data)
+    })
+    it("throws an error when the nid and dob  don't match", async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          operationResult: {
+            success: false,
+            error: {
+              errorMessage:
+                'Invalid value for:  No voter matched with given DoB',
+              errorCode: 11
+            }
+          }
+        })
+      )
+      await expect(
+        resolvers.Query.queryPersonByNidIdentifier(
+          {},
+          {
+            dob: '1992-12-30',
+            nid: '1234567898000'
+          },
+          authHeaderRegCert
+        )
+      ).rejects.toThrowError(
+        'Invalid value for:  No voter matched with given DoB'
+      )
+    })
+
+    it("throws an error when the user doesn't have required scope", async () => {
+      expect(
+        resolvers.Query.queryPersonByNidIdentifier(
+          {},
+          {
+            dob: '1992-12-30',
+            nid: '1234567898000'
+          },
+          authHeaderCertify
+        )
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+  })
 })
