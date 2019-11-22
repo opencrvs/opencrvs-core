@@ -66,12 +66,7 @@ const SettingsTitle = styled.div`
     display: none;
   }
 `
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
-  margin-top: 3rem;
-  text-transform: none;
-`
+
 const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -315,10 +310,6 @@ class SettingsView extends React.Component<IProps, IState> {
               {sections.map((sec, index: number) => (
                 <DataSection key={index} {...sec} />
               ))}
-              <Version>
-                OpenCRVS version{' '}
-                {process.env.REACT_APP_VERSION || 'development'}
-              </Version>
             </Left>
             <Right>
               <Avatar className="tablet" />
