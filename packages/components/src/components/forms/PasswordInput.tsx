@@ -105,7 +105,7 @@ const StyledInput = styled.input<IPasswordInputProps>`
   }}
 `
 
-const IconButton = styled(CircleButton)`
+const IconButton = styled(props => <CircleButton {...props} />)`
   height: 32px;
   width: 32px;
   margin-right: 4px;

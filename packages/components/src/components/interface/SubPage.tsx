@@ -34,7 +34,7 @@ const HeaderBlock = styled.div`
   margin-bottom: 1px;
   align-items: center;
 `
-const BackButton = styled(CircleButton)`
+const BackButton = styled(props => <CircleButton {...props} />)`
   background: '#35495d00';
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `

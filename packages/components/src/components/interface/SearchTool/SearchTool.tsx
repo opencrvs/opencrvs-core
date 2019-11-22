@@ -57,7 +57,7 @@ const DropDownWrapper = styled.ul`
   cursor: pointer;
 `
 
-export const IconRingButton = styled(CircleButton)`
+export const IconRingButton = styled(props => <CircleButton {...props} />)`
   background: transparent;
   border: none;
   height: 24px;

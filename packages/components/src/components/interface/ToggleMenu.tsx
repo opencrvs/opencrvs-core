@@ -153,7 +153,7 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 }
 
-const Button = styled(CircleButton)<ToggleButtonProps>`
+const Button = styled(props => <CircleButton {...props} />)<ToggleButtonProps>`
   height: 40px;
   width: 40px;
   &:hover {
