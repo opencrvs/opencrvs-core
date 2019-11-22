@@ -59,9 +59,10 @@ function getCountryMessage(
       return country.language === language
     }
   )[0].countries as ICountry[]
-  return countries.filter((country: ICountry) => {
+  const country = countries.find((country: ICountry) => {
     return country.value === countryValue
-  })[0].name
+  })
+  return (country && country.name) || ''
 }
 
 function getTransformedAddress(
@@ -133,6 +134,14 @@ export const offlineTransformers: IFunctionTransformer = {
 
     const matchedCondition = params.conditionalKeys.find(conditionalKey => {
       try {
+        if (conditionalKey.condition.default) {
+          return true
+        } else if (
+          !conditionalKey.condition.matchValues ||
+          !conditionalKey.condition.key
+        ) {
+          throw new Error('Condition keys like matchValues or key is missing')
+        }
         return conditionalKey.condition.matchValues.includes(
           // Will throw an exception when value is not found for given key
           getValueFromApplicationDataByKey(
