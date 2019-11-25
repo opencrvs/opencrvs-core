@@ -845,7 +845,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
   describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: { component: ReactWrapper; store: Store }
-    beforeAll(async () => {
+    beforeEach(async () => {
       Date.now = jest.fn(() => 1554055200000)
       const graphqlMock = [
         {
@@ -897,12 +897,11 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
       downloadButton.hostNodes().simulate('click')
 
-      const loadingIndicator = await waitForElement(
-        testComponent,
-        '#action-loading-ListItemAction-0'
-      )
+      testComponent.update()
 
-      expect(loadingIndicator.hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('shows review button when download is complete', async () => {
@@ -913,7 +912,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       )
       downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
       createdTestComponent.store.dispatch(
-        modifyApplication(downloadedApplication)
+        storeApplication(downloadedApplication)
       )
 
       const action = await waitForElement(
@@ -956,7 +955,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     })
   })
 
-  describe('handles download sattus for possible duplicate application', () => {
+  describe('handles download status for possible duplicate application', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: { component: ReactWrapper; store: Store }
     beforeAll(async () => {
@@ -1009,13 +1008,11 @@ describe('RegistrationHome sent for review tab related tests', () => {
       )
 
       downloadButton.hostNodes().simulate('click')
+      testComponent.update()
 
-      const loadingIndicator = await waitForElement(
-        testComponent,
-        '#action-loading-ListItemAction-1'
-      )
-
-      expect(loadingIndicator.hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('shows review button when download is complete', async () => {

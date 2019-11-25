@@ -707,7 +707,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
   describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: { component: ReactWrapper; store: Store }
-    beforeAll(async () => {
+    beforeEach(async () => {
       Date.now = jest.fn(() => 1554055200000)
       const graphqlMock = [
         {
@@ -757,12 +757,11 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       downloadButton.hostNodes().simulate('click')
 
-      const loadingIndicator = await waitForElement(
-        testComponent,
-        '#action-loading-ListItemAction-0'
-      )
+      testComponent.update()
 
-      expect(loadingIndicator.hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+      ).toHaveLength(1)
     })
 
     it('shows print button when download is complete', async () => {
