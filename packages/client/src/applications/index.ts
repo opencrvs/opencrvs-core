@@ -17,6 +17,10 @@ import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  USER_DETAILS_AVAILABLE,
+  UserDetailsAvailable
+} from '@client/profile/profileActions'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -199,6 +203,7 @@ export type Action =
   | IDeleteApplicationAction
   | IGetStorageApplicationsSuccessAction
   | IGetStorageApplicationsFailedAction
+  | UserDetailsAvailable
 
 export interface IUserData {
   userID: string
@@ -283,6 +288,7 @@ export function writeApplication(
 
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
+
   if (!userDetails) {
     return ''
   }
@@ -297,13 +303,16 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserID = await getCurrentUserID()
+
   const allUserData = JSON.parse(storageTable) as IUserData[]
+
   if (!allUserData.length) {
     // No user-data at all
     const payloadWithoutApplications: IUserData = {
       userID: currentUserID,
       applications: []
     }
+
     return JSON.stringify(payloadWithoutApplications)
   }
 
@@ -446,7 +455,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           args: [state.userID, action.payload.application]
         })
       )
-    case SET_INITIAL_APPLICATION:
+    case USER_DETAILS_AVAILABLE:
       return loop(
         {
           ...state
