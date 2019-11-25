@@ -22,7 +22,6 @@ import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import { FieldValueMap } from '@client/forms'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -89,20 +88,50 @@ function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
 }
 
 type IProps = {
-  draft: IApplication | undefined
+  draft?: IApplicationWithContactPoint
+}
+
+type NestedFields = {
+  contactRelationshipOther: string
+  registrationPhone: string
+}
+
+type IApplicationWithContactPoint = IApplication & {
+  data: {
+    registration: {
+      contactPoint: {
+        value: string
+        nestedFields?: NestedFields
+      }
+    }
+  }
+}
+
+function getInformant(draft: IApplicationWithContactPoint): string {
+  const contactPoint = draft.data.registration.contactPoint
+  const informantType = contactPoint && contactPoint.value
+
+  if (informantType === 'OTHER') {
+    return contactPoint.nestedFields!.contactRelationshipOther
+  }
+  return informantType
 }
 
 class LocalInProgressDataDetailsComponent extends React.Component<
   IProps & IntlShapeProps
 > {
-  transformer = (draft: IApplication | undefined) => {
-    const contactPoint =
-      draft && (draft.data.registration.contactPoint as FieldValueMap)
-    const relation = contactPoint && (contactPoint.value as string)
+  transformer = (draft?: IApplicationWithContactPoint) => {
+    if (!draft) {
+      return {}
+    }
+
+    const contactPoint = draft.data.registration.contactPoint
+    const relation = getInformant(draft)
+
     const registrationPhone =
       contactPoint &&
       contactPoint.nestedFields &&
-      ((contactPoint.nestedFields as FieldValueMap).registrationPhone as string)
+      contactPoint.nestedFields.registrationPhone
 
     return {
       draftStartedOn: draft && draft.savedOn,
@@ -117,6 +146,23 @@ class LocalInProgressDataDetailsComponent extends React.Component<
     const timestamp = moment(transformedData.draftStartedOn).format(
       CERTIFICATE_DATE_FORMAT
     )
+
+    function getInformantText() {
+      const { informantRelation } = transformedData
+
+      if (!informantRelation) {
+        return ''
+      }
+
+      const message = dynamicConstantsMessages[informantRelation]
+
+      if (!message) {
+        return informantRelation
+      }
+
+      return intl.formatMessage(dynamicConstantsMessages[informantRelation])
+    }
+
     return (
       <ExpansionContent>
         <HistoryWrapper>
@@ -140,13 +186,7 @@ class LocalInProgressDataDetailsComponent extends React.Component<
                 </StyledLabel>
                 <ValuesWithSeparator
                   strings={[
-                    (transformedData.informantRelation &&
-                      intl.formatMessage(
-                        dynamicConstantsMessages[
-                          transformedData.informantRelation
-                        ]
-                      )) ||
-                      '',
+                    getInformantText(),
                     transformedData.informantContactNumber || ''
                   ]}
                 />
@@ -165,12 +205,12 @@ function mapStateToProps(state: IStoreState, props: { eventId: string }) {
     draft:
       (state.applicationsState.applications &&
         eventId &&
-        state.applicationsState.applications.find(
+        (state.applicationsState.applications.find(
           application =>
             application.id === eventId &&
             application.submissionStatus ===
               SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        )) ||
+        ) as IApplicationWithContactPoint)) ||
       undefined
   }
 }
