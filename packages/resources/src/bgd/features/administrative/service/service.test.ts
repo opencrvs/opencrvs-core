@@ -11,7 +11,8 @@
  */
 import {
   getLocations,
-  fetchFromOpenHim
+  fetchFromOpenHim,
+  verifyAndFetchNidInfo
 } from '@resources/bgd/features/administrative/service/service'
 import * as fetchAny from 'jest-fetch-mock'
 
@@ -435,12 +436,18 @@ describe('admin service', () => {
     expect(data).toEqual(res)
   })
 
-  it('error in fetchFromOpenHim()', async () => {
+  it('error in verifyAndFetchNidInfo()', async () => {
     fetch.mockResponses([undefined])
-    const data = await fetchFromOpenHim('/token/create', 'POST', {
-      Authorization: `Secret 'SE3RET!'`
-    })
+    const data = await verifyAndFetchNidInfo('1992-12-30', '1234567891234')
 
-    expect(data).toBeUndefined()
+    expect(data).toEqual({
+      operationResult: {
+        error: {
+          errorCode: 500,
+          errorMessage: 'An internal server error occurred'
+        },
+        success: false
+      }
+    })
   })
 })
