@@ -24,3 +24,9 @@ export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD || 'test'
+// Send registration to BDRIS2 for validation before confirming registration
+// This needs to be a string to make it easy to pass as an ENV var.
+export const VALIDATE_IN_BDRIS2 = process.env.VALIDATE_IN_BDRIS2 || 'false'
+export const CONFIRM_REGISTRATION_URL =
+  process.env.CONFIRM_REGISTRATION_URL ||
+  'http://localhost:5050/confirm/registration'
