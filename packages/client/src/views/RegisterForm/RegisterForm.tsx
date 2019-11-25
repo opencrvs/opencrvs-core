@@ -354,6 +354,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     )
   }
 
+  onCloseApplication = () => {
+    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+  }
+
   continueButtonHandler = (
     pageRoute: string,
     applicationId: string,
@@ -443,6 +447,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const isErrorOccured = this.state.hasError
     const debouncedModifyApplication = debounce(this.modifyApplication, 500)
 
+    const menuItemDeleteOrClose =
+      application.submissionStatus === SUBMISSION_STATUS.DRAFT
+        ? {
+            label: 'Delete Application',
+            handler: () => this.onDeleteApplication(application)
+          }
+        : {
+            label: 'Close Application',
+            handler: () => this.onCloseApplication()
+          }
+
     return (
       <>
         <TimeMounted
@@ -479,12 +494,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       handler: this.onSaveAsDraftClicked,
                       label: intl.formatMessage(buttonMessages.saveExitButton)
                     }}
-                    menuItems={[
-                      {
-                        label: 'Delete Application',
-                        handler: () => this.onDeleteApplication(application)
-                      }
-                    ]}
+                    menuItems={[menuItemDeleteOrClose]}
                   />
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
@@ -544,12 +554,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       handler: this.onSaveAsDraftClicked,
                       label: intl.formatMessage(buttonMessages.saveExitButton)
                     }}
-                    menuItems={[
-                      {
-                        label: 'Delete Application',
-                        handler: () => this.onDeleteApplication(application)
-                      }
-                    ]}
+                    menuItems={[menuItemDeleteOrClose]}
                   />
                   <BodyContent id="register_form">
                     <TertiaryButton
