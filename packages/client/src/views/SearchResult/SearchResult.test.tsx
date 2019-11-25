@@ -49,9 +49,9 @@ queries.fetchUserDetails = mockFetchUserDetails
 describe('SearchResult tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
   it('sets loading state while waiting for data', async () => {

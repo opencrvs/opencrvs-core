@@ -76,10 +76,10 @@ merge(mockUserResponse, nameObj)
 describe('FieldAgentHome tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth({ '?token': validToken }))
   })
 
   it('renders loading icon while loading page', async () => {

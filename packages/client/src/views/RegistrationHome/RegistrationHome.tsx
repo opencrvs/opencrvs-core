@@ -501,6 +501,7 @@ function mapStateToProps(
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
 ) {
   const { match } = props
+
   return {
     applications: state.applicationsState.applications,
     language: state.i18n.language,

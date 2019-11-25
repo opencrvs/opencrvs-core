@@ -28,6 +28,10 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { IStoreState } from '@client/store'
 import ApolloClient, { ApolloQueryResult, ApolloError } from 'apollo-client'
+import {
+  USER_DETAILS_AVAILABLE,
+  UserDetailsAvailable
+} from '@client/profile/profileActions'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -260,6 +264,7 @@ export type Action =
   | IDownloadApplication
   | IDownloadApplicationSuccess
   | IDownloadApplicationFail
+  | UserDetailsAvailable
 
 export interface IUserData {
   userID: string
@@ -360,6 +365,7 @@ export function writeApplication(
 
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
+
   if (!userDetails) {
     return ''
   }
@@ -374,13 +380,16 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   }
 
   const currentUserID = await getCurrentUserID()
+
   const allUserData = JSON.parse(storageTable) as IUserData[]
+
   if (!allUserData.length) {
     // No user-data at all
     const payloadWithoutApplications: IUserData = {
       userID: currentUserID,
       applications: []
     }
+
     return JSON.stringify(payloadWithoutApplications)
   }
 
@@ -617,7 +626,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           args: [state.userID, action.payload.application]
         })
       )
-    case SET_INITIAL_APPLICATION:
+    case USER_DETAILS_AVAILABLE:
       return loop(
         {
           ...state

@@ -22,7 +22,6 @@ import {
   getOfflineLoadingError
 } from '@client/offline/selectors'
 import { parse } from 'querystring'
-import { IURLParams } from '@client/utils/authUtils'
 import { checkAuth } from '@client/profile/profileActions'
 import { showConfigurationErrorNotification } from '@client/notification/actions'
 import { storage } from '@client/storage'
@@ -105,7 +104,7 @@ interface IPageProps {
 
 interface IDispatchProps {
   setInitialApplications: () => void
-  checkAuth: (urlValues: IURLParams) => void
+  checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
   changeLanguage: (values: Ii18n) => void
 }
@@ -136,7 +135,6 @@ class Component extends React.Component<
   async componentDidMount() {
     const values = parse(this.props.location.search)
 
-    this.props.setInitialApplications()
     this.props.checkAuth(values)
 
     const userDetails = JSON.parse(

@@ -153,12 +153,12 @@ storage.setItem = jest.fn()
 describe('Field Agnet tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
     getItem.mockReturnValue(fieldAgentScopeToken)
-    store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
+    await store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
   it('loads properly for draft application with create row', async () => {
@@ -808,7 +808,9 @@ describe('Registrar tests', () => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -922,7 +924,9 @@ describe('Registrar tests', () => {
       setTimeout(resolve, 100)
     })
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
