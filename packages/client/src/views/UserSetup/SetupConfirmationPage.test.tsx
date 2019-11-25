@@ -19,9 +19,9 @@ const getItem = window.localStorage.getItem as jest.Mock
 
 describe('Setup confirmation page tests', () => {
   const { store } = createStore()
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth({ '?token': validToken }))
   })
   it('renders page successfully', async () => {
     const testComponent = await createTestComponent(
