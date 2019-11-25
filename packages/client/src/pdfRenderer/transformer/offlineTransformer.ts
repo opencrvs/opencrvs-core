@@ -136,18 +136,17 @@ export const offlineTransformers: IFunctionTransformer = {
       try {
         if (conditionalKey.condition.default) {
           return true
-        } else if (
-          !conditionalKey.condition.matchValues ||
-          !conditionalKey.condition.key
-        ) {
-          throw new Error('Condition keys like matchValues or key is missing')
         }
-        return conditionalKey.condition.matchValues.includes(
-          // Will throw an exception when value is not found for given key
-          getValueFromApplicationDataByKey(
-            templateData.application.data,
-            conditionalKey.condition.key
-          )
+        return (
+          (conditionalKey.condition.matchValues &&
+            conditionalKey.condition.matchValues.includes(
+              // Will throw an exception when value is not found for given key
+              getValueFromApplicationDataByKey(
+                templateData.application.data,
+                conditionalKey.condition.key || ''
+              )
+            )) ||
+          false
         )
       } catch (error) {
         return false

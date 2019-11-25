@@ -84,7 +84,46 @@ describe('PDF template offline data related field transformer tests', () => {
         'Shaheed Taj Uddin Ahmad Medical College'
       )
     })
+    it('Returns default offline address with running any condition', () => {
+      const intl = createIntl({
+        locale: 'en'
+      })
 
+      const transformedValue = offlineTransformers.OfflineAddress(
+        data,
+        intl,
+        {
+          language: 'en',
+          conditionalKeys: [
+            {
+              condition: {
+                default: true
+              },
+              addressType: 'facilities',
+              addressKey: 'name',
+              addresses: {
+                countryCode: 'BGD',
+                localAddress: '{child.birthLocation}'
+              }
+            }
+          ]
+        },
+        [
+          {
+            language: 'en',
+            countries: [
+              {
+                value: 'BGD',
+                name: 'Bangladesh'
+              }
+            ]
+          }
+        ]
+      )
+      expect(transformedValue).toEqual(
+        'Shaheed Taj Uddin Ahmad Medical College'
+      )
+    })
     it('Throws exception if parameter is missing', () => {
       const intl = createIntl({
         locale: 'en'
@@ -93,6 +132,45 @@ describe('PDF template offline data related field transformer tests', () => {
       expect(() => offlineTransformers.OfflineAddress(data, intl)).toThrowError(
         'No payload found for this transformer'
       )
+    })
+    it('Throws exception if parameter is missing for wrong payload', () => {
+      const intl = createIntl({
+        locale: 'en'
+      })
+
+      expect(() =>
+        offlineTransformers.OfflineAddress(
+          data,
+          intl,
+          {
+            language: 'en',
+            conditionalKeys: [
+              {
+                condition: {
+                  default: false
+                },
+                addressType: 'facilities',
+                addressKey: 'name',
+                addresses: {
+                  countryCode: 'BGD',
+                  localAddress: '{child.birthLocation}'
+                }
+              }
+            ]
+          },
+          [
+            {
+              language: 'en',
+              countries: [
+                {
+                  value: 'BGD',
+                  name: 'Bangladesh'
+                }
+              ]
+            }
+          ]
+        )
+      ).toThrowError('No condition has matched for this transformer')
     })
     it('Throws exception if no condition matches', () => {
       const intl = createIntl({
