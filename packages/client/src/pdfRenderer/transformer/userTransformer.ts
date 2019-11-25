@@ -12,7 +12,10 @@
 import { IntlShape } from 'react-intl'
 import {
   IFunctionTransformer,
-  TemplateTransformerData
+  TemplateTransformerData,
+  TransformerPayload,
+  ILanguagePayload,
+  ILocationPayload
 } from '@client/pdfRenderer/transformer/types'
 import { userMessages } from '@client/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
@@ -100,5 +103,59 @@ export const userTransformers: IFunctionTransformer = {
     return templateData.userDetails.localRegistrar.signature
       ? templateData.userDetails.localRegistrar.signature.data || ''
       : ''
+  },
+
+  CRVSOfficeName: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape,
+    payload?: TransformerPayload
+  ) => {
+    const langKey = payload && (payload as ILanguagePayload)
+    if (!langKey || langKey.language === 'en') {
+      return (
+        (templateData.userDetails.primaryOffice &&
+          templateData.userDetails.primaryOffice.name) ||
+        ''
+      )
+    }
+    return (
+      (templateData.userDetails.primaryOffice &&
+        templateData.userDetails.primaryOffice.alias &&
+        templateData.userDetails.primaryOffice.alias[0]) ||
+      ''
+    )
+  },
+
+  CRVSLocationName: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape,
+    payload?: TransformerPayload
+  ) => {
+    const key = payload && (payload as ILocationPayload)
+    if (!key) {
+      throw new Error('No payload found for this transformer')
+    }
+    if (!templateData.userDetails.catchmentArea) {
+      return ''
+    }
+    const crvsLocation =
+      templateData.userDetails.catchmentArea &&
+      templateData.userDetails.catchmentArea.find(cArea => {
+        return (
+          (cArea.identifier &&
+            cArea.identifier.find(
+              identifier =>
+                identifier.system ===
+                  'http://opencrvs.org/specs/id/jurisdiction-type' &&
+                identifier.value === key.jurisdictionType
+            )) ||
+          false
+        )
+      })
+
+    if (!key.language || key.language === 'en') {
+      return (crvsLocation && crvsLocation.name) || ''
+    }
+    return (crvsLocation && crvsLocation.alias && crvsLocation.alias[0]) || ''
   }
 }

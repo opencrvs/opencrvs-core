@@ -38,11 +38,15 @@ export type TransformerPayload =
   | IFormattedFeildValuePayload
   | INumberFeildConversionPayload
   | IOfflineAddressPayload
+  | ILanguagePayload
+  | ILocationPayload
+  | IPersonIdentifierValuePayload
 
 export interface IFieldTransformer {
   field: string
   operation: string
   parameters?: TransformerPayload
+  valueIndex?: number // this will allow us to pick a specific char from the whole result
 }
 
 export type TemplateTransformerData = {
@@ -72,6 +76,7 @@ export interface IApplicantNamePayload {
     [language: string]: string[] // corresponding field names
   }
   language?: string
+  allCapital?: boolean
 }
 
 export interface IFeildValuePayload {
@@ -102,8 +107,9 @@ export interface IOfflineAddressPayload {
   language: string
   conditionalKeys: {
     condition: {
-      key: string
-      matchValues: string[]
+      default?: boolean
+      key?: string
+      matchValues?: string[]
     }
     addressType: string
     addressKey: string
@@ -113,6 +119,21 @@ export interface IOfflineAddressPayload {
       internationalAddress?: string
     }
   }[]
+}
+
+export interface ILanguagePayload {
+  language: string
+}
+
+export interface ILocationPayload {
+  language?: string
+  jurisdictionType: string
+}
+
+export interface IPersonIdentifierValuePayload {
+  idTypeKey: string // ex: mother.iDType
+  idTypeValue: string // ex: NATIONAL_ID
+  idValueKey: string // ex: mother.iD
 }
 
 // Based on the need, add more here

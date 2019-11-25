@@ -222,4 +222,15 @@ describe('PDF template field transformer tests', () => {
       )
     })
   })
+  describe('IdentifierValue transformer tests', () => {
+    it('Throws exception if payload is not provided', () => {
+      const intl = createIntl({
+        locale: 'en'
+      })
+
+      expect(() => fieldTransformers.IdentifierValue(data, intl)).toThrowError(
+        'No payload found for this transformer'
+      )
+    })
+  })
 })
