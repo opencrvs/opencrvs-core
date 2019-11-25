@@ -40,11 +40,7 @@ export async function nidVerificationHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as INidVerification
-  try {
-    return await verifyAndFetchNidInfo(payload.nid, payload.dob)
-  } catch (err) {
-    throw Error(err)
-  }
+  return verifyAndFetchNidInfo(payload.nid, payload.dob)
 }
 
 export const nidVerificationReqSchema = Joi.object({

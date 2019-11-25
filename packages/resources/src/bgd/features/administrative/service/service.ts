@@ -45,18 +45,30 @@ export async function getLocations(): Promise<ILocationDataResponse> {
 }
 
 export async function verifyAndFetchNidInfo(nid: string, dob: string) {
-  const token = await getTokenForNidAccess()
-  const res = await fetchFromOpenHim(
-    '/nid/information?dob=' + dob + '&nid=' + nid,
-    'GET',
-    {
-      Authorization: `Bearer ${token}`
-    }
-  )
+  try {
+    const token = await getTokenForNidAccess()
+    const res = await fetchFromOpenHim(
+      '/nid/information?dob=' + dob + '&nid=' + nid,
+      'GET',
+      {
+        Authorization: `Bearer ${token}`
+      }
+    )
 
-  return {
-    data: createPersonEntry(res.nid, res.name, res.nameEn, res.gender),
-    operationResult: res.operationResult
+    return {
+      data: createPersonEntry(res.nid, res.name, res.nameEn, res.gender),
+      operationResult: res.operationResult
+    }
+  } catch (error) {
+    return {
+      operationResult: {
+        success: false,
+        error: {
+          errorMessage: 'An internal server error occurred',
+          errorCode: 500
+        }
+      }
+    }
   }
 }
 
@@ -64,11 +76,16 @@ async function getTokenForNidAccess() {
   if (!OISF_SECRET) {
     throw new Error('OISF_SECRET not for NID access')
   }
-  const res = await fetchFromOpenHim('/token/create', 'POST', {
-    Authorization: `Secret ${OISF_SECRET}`
-  })
 
-  return res.token
+  try {
+    const res = await fetchFromOpenHim('/token/create', 'POST', {
+      Authorization: `Secret ${OISF_SECRET}`
+    })
+
+    return res.token
+  } catch (error) {
+    return ''
+  }
 }
 
 export async function fetchFromOpenHim(
@@ -85,7 +102,8 @@ export async function fetchFromOpenHim(
     })
 
     return await res.json()
-  } catch (err) {
-    logger.error(`Unable to forward to openhim for error : ${err}`)
+  } catch (error) {
+    logger.error(`Unable to forward to openhim for error : ${error}`)
+    throw error
   }
 }
