@@ -601,6 +601,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
             variables={{
               id: this.props.applicationId
             }}
+            fetchPolicy="no-cache"
           >
             {({
               loading,
