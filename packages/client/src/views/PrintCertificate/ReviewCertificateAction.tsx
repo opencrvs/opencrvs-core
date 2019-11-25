@@ -172,9 +172,9 @@ class ReviewCertificateActionComponent extends React.Component<
         }
       ]
     }
-    // this.props.modifyApplication(draft)
-    // this.toggleModal()
-    // this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    this.props.modifyApplication(draft)
+    this.toggleModal()
+    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
     printCertificate(
       this.props.intl,
       draft,

@@ -2580,16 +2580,9 @@
     },
     "death": {
       "definition": {
-        "pageSize": {
-          "width": 595.28,
-          "height": 791.89
-        },
-        "info": {
-          "title": "Death Registration Certificate"
-        },
-        "defaultStyle": {
-          "font": "notosans"
-        },
+        "pageSize": { "width": 595.28, "height": 970 },
+        "info": { "title": "Death Registration Certificate" },
+        "defaultStyle": { "font": "notosans" },
         "content": [
           {
             "table": {
@@ -2597,222 +2590,426 @@
               "body": [
                 [
                   {
-                    "margin": [30, 25, 30, 25],
+                    "border": [false, false, false, false],
                     "stack": [
                       {
-                        "image": "{countryLogo}",
-                        "fit": [78, 78]
-                      },
-                      "\n",
-                      {
                         "text": [
                           {
-                            "text": "Death Registration No",
-                            "style": "lightHeader"
-                          },
-                          {
-                            "text": " / ",
-                            "style": "lightHeader"
-                          },
-                          {
-                            "text": "মৃত্যু নিবন্ধন নং: ",
-                            "style": "bnLightHeader"
-                          }
-                        ]
-                      },
-                      {
-                        "text": [
-                          {
-                            "text": "{registrationNumber}",
-                            "style": "boldHeader"
-                          },
-                          {
-                            "text": " / ",
-                            "style": "boldHeader"
-                          },
-                          {
-                            "text": "{bnRegistrationNumber}",
+                            "text": "গণপ্রজাতন্ত্রী বাংলাদেশ সরকার",
+                            "alignment": "center",
                             "style": "bnBoldHeader"
+                          },
+                          "\n",
+                          {
+                            "text": "(Government of the People's Republic of Bangladesh)"
+                          },
+                          "\n",
+                          {
+                            "text": "জন্ম ও মৃত্যু নিবন্ধকের কার্যালয়/",
+                            "style": "bnBoldHeader"
+                          },
+                          {
+                            "text": "Office of Birth and Death Registrar",
+                            "style": "boldHeader"
+                          },
+                          "\n",
+                          {
+                            "text": "{crvsOfficeLocationBnName}, ",
+                            "style": "bnText"
+                          },
+                          {
+                            "text": "উপজেলা/থানাঃ {crvsOfficeUpazilaBnName}",
+                            "style": "bnText"
+                          },
+                          "\n",
+                          {
+                            "text": "জেলাঃ {crvsOfficeDistrictBnName}, ",
+                            "style": "bnText"
+                          },
+                          { "text": "বাংলাদেশ ।", "style": "bnText" },
+                          "\n",
+                          {
+                            "text": "মৃত্যু নিবন্ধন সনদ/",
+                            "style": "bnBoldHeader"
+                          },
+                          {
+                            "text": "Death Registration Certificate",
+                            "style": "boldHeader"
                           }
-                        ]
+                        ],
+                        "alignment": "center"
                       },
                       "\n",
                       {
                         "text": [
                           {
-                            "text": "Date of issuance of certificate: {certificateDate}"
-                          }
-                        ]
-                      },
-                      {
-                        "text": [
+                            "text": "[বিধি ১১ ও ১২ দ্রষ্টব্য]",
+                            "style": "boldBnText"
+                          },
+                          "\n",
                           {
-                            "text": "সনদ প্রদানের তারিখ: {bnCertificateDate}",
+                            "text": "(মৃত্যু নিবন্ধন বহি হইতে উদ্ধৃত)",
                             "style": "bnText"
                           }
-                        ]
-                      },
-                      "\n",
-                      {
-                        "canvas": [
-                          {
-                            "type": "line",
-                            "x1": 0,
-                            "y1": 0,
-                            "x2": 445,
-                            "y2": 0,
-                            "lineWidth": 1,
-                            "color": "#DADEDF"
-                          }
-                        ]
+                        ],
+                        "alignment": "center"
                       },
                       "\n",
                       {
                         "table": {
-                          "widths": ["28%", "72%"],
+                          "widths": ["20%", "18%", "62%"],
                           "body": [
                             [
                               {
                                 "border": [false, false, false, false],
-                                "text": "This is to certify that",
-                                "style": "boldText"
+                                "text": [
+                                  {
+                                    "text": "নিবন্ধন বহি নংঃ",
+                                    "style": "boldBnText"
+                                  },
+                                  "\n\n",
+                                  { "text": "(Register no)" }
+                                ]
                               },
+                              { "text": "" },
                               {
                                 "border": [false, false, false, false],
-                                "text": "{applicantName}",
-                                "style": "subHeader"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "এটি প্রত্যয়ন করা হয় যে",
-                                "style": "bnText"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "{applicantBnName}",
-                                "style": "bnSubHeader"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "\n"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "\n"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "Died on",
-                                "style": "boldText"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "{eventDate}",
-                                "style": "subHeader"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "মৃত্যুবরণ করেন",
-                                "style": "bnText"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "{eventBnDate}",
-                                "style": "bnSubHeader"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "\n"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "\n"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "Place of death",
-                                "style": "boldText"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "{placeOfDeath}",
-                                "style": "subHeader"
-                              }
-                            ],
-                            [
-                              {
-                                "border": [false, false, false, false],
-                                "text": "মৃত্যুবরণ স্থান",
-                                "style": "bnText"
-                              },
-                              {
-                                "border": [false, false, false, false],
-                                "text": "{bnPlaceOfDeath}",
-                                "style": "bnSubHeader"
+                                "alignment": "right",
+                                "text": [
+                                  {
+                                    "text": "সনদ ইস্যুর তারিখঃ ",
+                                    "style": "boldBnText"
+                                  },
+                                  {
+                                    "text": "{certificationDate}",
+                                    "style": "boldText"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "Date of issuance of certificate (dd/mm/yyyy)"
+                                  }
+                                ]
                               }
                             ]
                           ]
                         }
                       },
-                      "\n",
                       {
-                        "canvas": [
+                        "margin": [0, 10, 0, 5],
+                        "text": [
                           {
-                            "type": "line",
-                            "x1": 0,
-                            "y1": 0,
-                            "x2": 445,
-                            "y2": 0,
-                            "lineWidth": 1,
-                            "color": "#DADEDF"
+                            "text": "নিবন্ধনের তারিখঃ  ",
+                            "style": "boldBnText"
+                          },
+                          { "text": "{registrationDate}", "style": "boldText" },
+                          "\n",
+                          { "text": "Date of registration (dd/mm/yyyy)" }
+                        ]
+                      },
+                      {
+                        "table": {
+                          "widths": [
+                            "49%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%"
+                          ],
+                          "body": [
+                            [
+                              {
+                                "text": [
+                                  {
+                                    "text": "মৃত্যু নিবন্ধন নম্বর",
+                                    "style": "boldBnText"
+                                  },
+                                  "\n",
+                                  { "text": "(Death Registration No)" }
+                                ]
+                              },
+                              {
+                                "text": "{registrationNumberChar1}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar2}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar3}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar4}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar5}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar6}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar7}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar8}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar9}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar10}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar11}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar12}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar13}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar14}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar15}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar16}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{registrationNumberChar17}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [0, 10, 0, 0],
+                        "text": [
+                          { "text": "নাম (বাংলায়) :    ", "style": "bnText" },
+                          {
+                            "text": "{deacesedBnFullName}",
+                            "style": "boldBnText"
                           }
                         ]
                       },
-                      "\n\n\n",
                       {
-                        "text": "This event was registered at {registrationLocation}"
+                        "text": [
+                          { "text": "Name (In capital letter) :    " },
+                          {
+                            "text": "{deacesedFullNameInCapital}",
+                            "style": "boldText"
+                          }
+                        ]
                       },
                       {
-                        "text": "{registrationBnLocation} এ ঘটনাটি নিবন্ধিত হয়েছিল",
-                        "style": "bnText"
-                      },
-                      "\n\n\n\n\n",
-                      {
+                        "margin": [0, 10, 0, 0],
                         "table": {
-                          "widths": ["30%"],
+                          "widths": [
+                            "49%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%",
+                            "3%"
+                          ],
+                          "body": [
+                            [
+                              {
+                                "text": [
+                                  {
+                                    "text": "ব্যক্তির জন্ম নিবন্ধন নম্বর",
+                                    "style": "boldBnText"
+                                  },
+                                  "\n",
+                                  { "text": "Birth Registration Number" }
+                                ]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar1}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar2}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar3}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar4}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar5}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar6}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar7}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar8}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar9}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar10}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar11}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar12}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar13}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar14}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar15}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar16}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              },
+                              {
+                                "text": "{birthRegistrationNumberChar17}",
+                                "style": "boldText",
+                                "margin": [0, 8, 0, 0]
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [0, 5, 0, 0],
+                        "text": [
+                          { "text": "জন্ম তারিখঃ  ", "style": "bnText" },
+                          {
+                            "text": "{deceasedBirthDate}",
+                            "style": "boldText"
+                          },
+                          "\n",
+                          { "text": "Date of Birth (dd/mm/yyyy)" }
+                        ]
+                      },
+                      {
+                        "margin": [-5, 5, 0, 0],
+                        "table": {
+                          "widths": ["60%", "40%"],
                           "body": [
                             [
                               {
                                 "border": [false, false, false, false],
-                                "alignment": "center",
-                                "image": "{registrarSignature}",
-                                "fit": [78, 50]
-                              }
-                            ],
-                            [
+                                "text": [
+                                  {
+                                    "text": "মৃত্যু তারিখঃ (সংখ্যায়) (খ্রিঃ): ",
+                                    "style": "bnText"
+                                  },
+                                  {
+                                    "text": "{deceasedDeathDate}",
+                                    "style": "boldText"
+                                  }
+                                ]
+                              },
                               {
                                 "border": [false, false, false, false],
-                                "canvas": [
+                                "text": [
+                                  { "text": "Sex: " },
                                   {
-                                    "type": "line",
-                                    "x1": 0,
-                                    "y1": 0,
-                                    "x2": 150,
-                                    "y2": 0,
-                                    "lineWidth": 0.5,
-                                    "color": "#DADEDF"
+                                    "text": "{deceasedSex}",
+                                    "style": "boldText"
                                   }
                                 ]
                               }
@@ -2820,8 +3017,316 @@
                             [
                               {
                                 "border": [false, false, false, false],
-                                "alignment": "center",
-                                "text": "{registrarName} ({role})"
+                                "text": "Date of Death in number (dd/mm/yyyy)"
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "(লিঙ্গ)",
+                                "style": "bnText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "table": {
+                          "widths": ["35%", "65%"],
+                          "body": [
+                            [
+                              {
+                                "margin": [40, 0, 0, 0],
+                                "border": [false, false, false, false],
+                                "text": "(কথায়) (খ্রিঃ):",
+                                "style": "bnText"
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "{deceasedFormattedDeathDate}",
+                                "style": "boldText"
+                              }
+                            ],
+                            [
+                              {
+                                "margin": [40, 0, 0, 0],
+                                "border": [false, false, false, false],
+                                "text": "In word (dd/mm/yyyy)"
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": ""
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["28%", "72%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "মৃত্যু স্থান ",
+                                    "style": "bnText"
+                                  },
+                                  { "text": "(Place of Death) :  " }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "{placeOfDeath}",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["38%", "62%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "মৃত্যুর কারণ (আইসিডি ভার্সন অনুসারে):",
+                                    "style": "bnText"
+                                  },
+                                  "\n",
+                                  { "text": "(Cause of Death as per ICD)" }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "{icdCauseOfDeath}",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["30%", "70%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  { "text": "পিতার নাম ", "style": "bnText" },
+                                  { "text": "(Father's name) :" }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": " ",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["30%", "70%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  { "text": "মাতার নাম ", "style": "bnText" },
+                                  { "text": "(Mother's name) :" }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": " ",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["26%", "74%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "স্বামী/স্ত্রীর নাম (যদি থাকে):",
+                                    "style": "bnText"
+                                  },
+                                  "\n",
+                                  { "text": "[Spouse name (if any)]" }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": " ",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["44%", "56%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "মৃত ব্যক্তির মৃত্যুর পূর্বের স্থায়ী ঠিকানাঃ",
+                                    "style": "bnText"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "(Permanent address of the deceased)"
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "{deceasedPermanentAddress}",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 0, 0, 0],
+                        "table": {
+                          "widths": ["44%", "56%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "মৃত্যুর সময় বর্তমান ঠিকানাঃ",
+                                    "style": "bnText"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "(Current address of the deceased)"
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": "{deceasedCurrentAddress}",
+                                "style": "boldText"
+                              }
+                            ]
+                          ]
+                        }
+                      },
+                      {
+                        "margin": [-5, 5, 0, 0],
+                        "table": {
+                          "widths": ["30%", "18%", "28%", "27%"],
+                          "body": [
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "canvas": [
+                                  {
+                                    "type": "rect",
+                                    "x": 28,
+                                    "y": 0,
+                                    "w": 75,
+                                    "h": 75,
+                                    "lineWidth": 1,
+                                    "dash": { "length": 2, "space": 3 },
+                                    "r": 100
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": ""
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": ""
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": ""
+                              }
+                            ],
+                            [
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "নিবন্ধকের কার্যালয়ের সিলমোহর",
+                                    "style": "bnBoldFooter"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "(Seal of Registrar's Office)",
+                                    "style": "boldFooter"
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "প্রস্তুতকারীর স্বাক্ষর",
+                                    "style": "bnBoldFooter"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "(Prepared by)",
+                                    "style": "boldFooter"
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "যাচাইকারীর নাম, স্বাক্ষর ও সিল",
+                                    "style": "bnBoldFooter"
+                                  },
+                                  "\n",
+                                  {
+                                    "margin": [50, 0, 0, 0],
+                                    "text": "(Verified by)",
+                                    "style": "boldFooter"
+                                  }
+                                ]
+                              },
+                              {
+                                "border": [false, false, false, false],
+                                "text": [
+                                  {
+                                    "text": "নিবন্ধকের স্বাক্ষর ও নামসহ সিল",
+                                    "style": "bnBoldFooter"
+                                  },
+                                  "\n",
+                                  {
+                                    "text": "(Signature of the Registrar)",
+                                    "style": "boldFooter"
+                                  }
+                                ]
                               }
                             ]
                           ]
@@ -2835,148 +3340,382 @@
           }
         ],
         "styles": {
-          "lightHeader": {
-            "fontSize": 18
-          },
-          "boldHeader": {
-            "fontSize": 18,
-            "bold": true
-          },
-          "bnLightHeader": {
-            "fontSize": 18,
-            "font": "notosansbn"
-          },
+          "boldHeader": { "fontSize": 15, "bold": true },
           "bnBoldHeader": {
-            "fontSize": 18,
+            "fontSize": 15,
             "bold": true,
             "font": "notosansbn"
           },
-          "bnText": {
-            "font": "notosansbn"
-          },
-          "boldText": {
-            "bold": true
-          },
-          "boldBnText": {
+          "boldFooter": { "fontSize": 10, "bold": true },
+          "bnBoldFooter": {
+            "fontSize": 10,
             "bold": true,
             "font": "notosansbn"
           },
-          "subHeader": {
-            "fontSize": 13,
-            "bold": true
-          },
-          "bnSubHeader": {
-            "fontSize": 12,
-            "bold": true,
-            "font": "notosansbn"
-          }
+          "bnText": { "font": "notosansbn" },
+          "boldText": { "bold": true },
+          "boldBnText": { "bold": true, "font": "notosansbn" }
         }
       },
       "transformers": [
         {
-          "field": "countryLogo",
-          "operation": "OfflineCompanyLogo"
+          "field": "crvsOfficeLocationBnName",
+          "operation": "CRVSOfficeName",
+          "parameters": { "language": "bn" }
         },
         {
-          "field": "registrationNumber",
-          "operation": "FieldValue",
-          "parameters": {
-            "valueKey": "registration.registrationNumber"
-          }
+          "field": "crvsOfficeUpazilaBnName",
+          "operation": "CRVSLocationName",
+          "parameters": { "language": "bn", "jurisdictionType": "UPAZILA" }
         },
         {
-          "field": "bnRegistrationNumber",
-          "operation": "NumberConversion",
-          "parameters": {
-            "valueKey": "registration.registrationNumber",
-            "conversionMap": {
-              "0": "০",
-              "1": "১",
-              "2": "২",
-              "3": "৩",
-              "4": "৪",
-              "5": "৫",
-              "6": "৬",
-              "7": "৭",
-              "8": "৮",
-              "9": "৯"
-            }
-          }
+          "field": "crvsOfficeDistrictBnName",
+          "operation": "CRVSLocationName",
+          "parameters": { "language": "bn", "jurisdictionType": "DISTRICT" }
         },
         {
-          "field": "certificateDate",
+          "field": "certificationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD MMMM YYYY",
+            "format": "DD/MM/YYYY",
             "language": "en",
-            "momentLocale": {
-              "en": "locale/en-ie"
-            }
+            "momentLocale": { "en": "locale/en-ie" }
           }
         },
         {
-          "field": "bnCertificateDate",
+          "field": "registrationDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "format": "DD MMMM YYYY",
-            "language": "bn",
-            "momentLocale": {
-              "bn": "locale/bn"
-            }
+            "format": "DD/MM/YYYY",
+            "language": "en",
+            "key": { "death": "registration.regStatus.statusDate" },
+            "momentLocale": { "en": "locale/en-ie" }
           }
         },
         {
-          "field": "applicantName",
-          "operation": "ApplicantName",
-          "parameters": {
-            "key": {
-              "death": "deceased"
-            },
-            "format": {
-              "en": ["firstNamesEng", "familyNameEng"]
-            },
-            "language": "en"
-          }
+          "field": "registrationNumberChar1",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 0
         },
         {
-          "field": "applicantBnName",
+          "field": "registrationNumberChar2",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 1
+        },
+        {
+          "field": "registrationNumberChar3",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 2
+        },
+        {
+          "field": "registrationNumberChar4",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 3
+        },
+        {
+          "field": "registrationNumberChar5",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 4
+        },
+        {
+          "field": "registrationNumberChar6",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 5
+        },
+        {
+          "field": "registrationNumberChar7",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 6
+        },
+        {
+          "field": "registrationNumberChar8",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 7
+        },
+        {
+          "field": "registrationNumberChar9",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 8
+        },
+        {
+          "field": "registrationNumberChar10",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 9
+        },
+        {
+          "field": "registrationNumberChar11",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 10
+        },
+        {
+          "field": "registrationNumberChar12",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 11
+        },
+        {
+          "field": "registrationNumberChar13",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 12
+        },
+        {
+          "field": "registrationNumberChar14",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 13
+        },
+        {
+          "field": "registrationNumberChar15",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 14
+        },
+        {
+          "field": "registrationNumberChar16",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 15
+        },
+        {
+          "field": "registrationNumberChar17",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "registration.registrationNumber" },
+          "valueIndex": 16
+        },
+        {
+          "field": "deacesedBnFullName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "death": "deceased"
-            },
-            "format": {
-              "bn": ["firstNames", "familyName"]
-            },
+            "key": { "death": "deceased" },
+            "format": { "bn": ["firstNames", "familyName"] },
             "language": "bn"
           }
         },
         {
-          "field": "eventDate",
-          "operation": "DateFieldValue",
+          "field": "deacesedFullNameInCapital",
+          "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "death": "deathEvent.deathDate"
-            },
-            "format": "DD MMMM YYYY",
-            "language": "en",
-            "momentLocale": {
-              "en": "locale/en-ie"
-            }
+            "key": { "death": "deceased" },
+            "format": { "en": ["firstNamesEng", "familyNameEng"] },
+            "allCapital": true,
+            "language": "en"
           }
         },
         {
-          "field": "eventBnDate",
+          "field": "birthRegistrationNumberChar1",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 0
+        },
+        {
+          "field": "birthRegistrationNumberChar2",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 1
+        },
+        {
+          "field": "birthRegistrationNumberChar3",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 2
+        },
+        {
+          "field": "birthRegistrationNumberChar4",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 3
+        },
+        {
+          "field": "birthRegistrationNumberChar5",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 4
+        },
+        {
+          "field": "birthRegistrationNumberChar6",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 5
+        },
+        {
+          "field": "birthRegistrationNumberChar7",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 6
+        },
+        {
+          "field": "birthRegistrationNumberChar8",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 7
+        },
+        {
+          "field": "birthRegistrationNumberChar9",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 8
+        },
+        {
+          "field": "birthRegistrationNumberChar10",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 9
+        },
+        {
+          "field": "birthRegistrationNumberChar11",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 10
+        },
+        {
+          "field": "birthRegistrationNumberChar12",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 11
+        },
+        {
+          "field": "birthRegistrationNumberChar13",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 12
+        },
+        {
+          "field": "birthRegistrationNumberChar14",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 13
+        },
+        {
+          "field": "birthRegistrationNumberChar15",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 14
+        },
+        {
+          "field": "birthRegistrationNumberChar16",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 15
+        },
+        {
+          "field": "birthRegistrationNumberChar17",
+          "operation": "IdentifierValue",
+          "parameters": {
+            "idTypeKey": "deceased.iDType",
+            "idTypeValue": "BIRTH_REGISTRATION_NUMBER",
+            "idValueKey": "deceased.iD"
+          },
+          "valueIndex": 16
+        },
+        {
+          "field": "deceasedBirthDate",
           "operation": "DateFieldValue",
           "parameters": {
-            "key": {
-              "death": "deathEvent.deathDate"
-            },
-            "format": "DD MMMM YYYY",
-            "language": "bn",
-            "momentLocale": {
-              "bn": "locale/bn"
-            }
+            "format": "DD/MM/YYYY",
+            "language": "en",
+            "key": { "death": "deceased.birthDate" },
+            "momentLocale": { "en": "locale/en-ie" }
+          }
+        },
+        {
+          "field": "deceasedDeathDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "format": "DD/MM/YYYY",
+            "language": "en",
+            "key": { "death": "deathEvent.deathDate" },
+            "momentLocale": { "en": "locale/en-ie" }
+          }
+        },
+        {
+          "field": "deceasedSex",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "deceased.gender" }
+        },
+        {
+          "field": "deceasedFormattedDeathDate",
+          "operation": "DateFieldValue",
+          "parameters": {
+            "format": "DD MMMM, YYYY",
+            "language": "en",
+            "key": { "death": "deathEvent.deathDate" },
+            "momentLocale": { "en": "locale/en-ie" }
           }
         },
         {
@@ -3040,90 +3779,47 @@
           }
         },
         {
-          "field": "bnPlaceOfDeath",
+          "field": "deceasedPermanentAddress",
           "operation": "OfflineAddress",
           "parameters": {
-            "language": "bn",
+            "language": "en",
             "conditionalKeys": [
               {
-                "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PERMANENT"]
-                },
+                "condition": { "default": true },
                 "addressType": "locations",
-                "addressKey": "alias",
+                "addressKey": "name",
                 "addresses": {
                   "countryCode": "deceased.countryPermanent",
                   "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
                   "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
-                }
-              },
-              {
-                "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["CURRENT"]
-                },
-                "addressType": "locations",
-                "addressKey": "alias",
-                "addresses": {
-                  "countryCode": "deceased.country",
-                  "localAddress": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.country}",
-                  "internationalAddress": "{deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
-                }
-              },
-              {
-                "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
-                },
-                "addressType": "locations",
-                "addressKey": "alias",
-                "addresses": {
-                  "countryCode": "deathEvent.country",
-                  "localAddress": "{deathEvent.addressLine4}, {deathEvent.district}, {deathEvent.state}, {deathEvent.country}",
-                  "internationalAddress": "{deathEvent.internationalDistrict}, {deathEvent.internationalState}, {deathEvent.country}"
-                }
-              },
-              {
-                "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["HEALTH_FACILITY"]
-                },
-                "addressType": "facilities",
-                "addressKey": "alias",
-                "addresses": {
-                  "countryCode": "BGD",
-                  "localAddress": "{deathEvent.deathLocation}"
                 }
               }
             ]
           }
         },
         {
-          "field": "registrationLocation",
-          "operation": "FormattedFieldValue",
+          "field": "deceasedCurrentAddress",
+          "operation": "OfflineAddress",
           "parameters": {
-            "formattedKeys": "{registration.regStatus.officeName}, {registration.regStatus.officeAddressLevel3}, {registration.regStatus.officeAddressLevel4}"
+            "language": "en",
+            "conditionalKeys": [
+              {
+                "condition": { "default": true },
+                "addressType": "locations",
+                "addressKey": "name",
+                "addresses": {
+                  "countryCode": "deceased.country",
+                  "localAddress": "{deceased.addressLine4}, {deceased.district}, {deceased.state}, {deceased.country}",
+                  "internationalAddress": "{deceased.internationalDistrict}, {deceased.internationalState}, {deceased.country}"
+                }
+              }
+            ]
           }
         },
         {
-          "field": "registrationBnLocation",
-          "operation": "FormattedFieldValue",
-          "parameters": {
-            "formattedKeys": "{registration.regStatus.officeAlias}"
-          }
-        },
-        {
-          "field": "registrarSignature",
-          "operation": "LocalRegistrarUserSignature"
-        },
-        {
-          "field": "registrarName",
-          "operation": "LocalRegistrarUserName"
-        },
-        {
-          "field": "role",
-          "operation": "LocalRegistrarUserRole"
+          "field": "icdCauseOfDeath",
+          "operation": "FieldValue",
+          "parameters": { "valueKey": "causeOfDeath.causeOfDeathCode" }
         }
       ],
       "fonts": {
