@@ -96,7 +96,8 @@ describe('In Progress tab', () => {
         drafts={localDrafts}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
-          inProgressData: {}
+          inProgressData: {},
+          notificationData: {}
         }}
       />,
       store
@@ -159,7 +160,8 @@ describe('In Progress tab', () => {
         selectorId={'you'}
         registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
         queryData={{
-          inProgressData: { totalItems: 5 }
+          inProgressData: { totalItems: 5 },
+          notificationData: { totalItems: 3 }
         }}
       />,
       store
@@ -262,7 +264,8 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            inProgressData: {}
+            inProgressData: {},
+            notificationData: {}
           }}
         />,
         store
@@ -296,7 +299,8 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            inProgressData: {}
+            inProgressData: {},
+            notificationData: {}
           }}
         />,
         store
@@ -419,7 +423,8 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.ownDrafts}
           registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
-            inProgressData: {}
+            inProgressData: {},
+            notificationData: {}
           }}
         />,
         store
@@ -495,7 +500,8 @@ describe('In Progress tab', () => {
                   ]
                 } as GQLDeathEventSearchSet
               ]
-            }
+            },
+            notificationData: {}
           }}
         />,
         store
@@ -507,13 +513,12 @@ describe('In Progress tab', () => {
       })
       testComponent.component.update()
       const data = testComponent.component.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = moment(TIME_STAMP).fromNow()
+      const EXPECTED_DATE_OF_REJECTION = moment(Number(TIME_STAMP)).fromNow()
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
       expect(data[0].name).toBe('Anik Hoque')
       expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
-      expect(data[0].actions).toBeDefined()
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
@@ -527,7 +532,8 @@ describe('In Progress tab', () => {
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            inProgressData: { totalItems: 12 }
+            inProgressData: { totalItems: 12 },
+            notificationData: { totalItems: 2 }
           }}
         />,
         store
@@ -663,7 +669,8 @@ describe('In Progress tab', () => {
                   ]
                 } as GQLBirthEventSearchSet
               ]
-            }
+            },
+            notificationData: {}
           }}
         />,
         store,
@@ -723,7 +730,8 @@ describe('In Progress tab', () => {
                   ]
                 } as GQLBirthEventSearchSet
               ]
-            }
+            },
+            notificationData: {}
           }}
         />,
         store
@@ -805,7 +813,8 @@ describe('Tablet tests', () => {
                 ]
               } as GQLBirthEventSearchSet
             ]
-          }
+          },
+          notificationData: {}
         }}
       />,
       store
