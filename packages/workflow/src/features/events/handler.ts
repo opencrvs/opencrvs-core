@@ -9,34 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
-import {
-  createRegistrationHandler,
-  markEventAsRegisteredHandler,
-  markEventAsCertifiedHandler,
-  markEventAsValidatedHandler
-} from '@workflow/features/registration/handler'
+import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
+import { isUserAuthorized } from '@workflow/features/events/auth'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
   hasDeathRegistrationNumber
 } from '@workflow/features/registration/fhir/fhir-utils'
-import updateTaskHandler from '@workflow/features/task/handler'
-import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
-import fetch, { RequestInit } from 'node-fetch'
-import { logger } from '@workflow/logger'
-import { isUserAuthorized } from '@workflow/features/events/auth'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  createRegistrationHandler,
+  markEventAsCertifiedHandler,
+  markEventAsValidatedHandler,
+  markEventAsWaitingValidationHandler
+} from '@workflow/features/registration/handler'
 import {
   getEventType,
   isInProgressApplication
 } from '@workflow/features/registration/utils'
+import updateTaskHandler from '@workflow/features/task/handler'
+import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
+import * as Hapi from 'hapi'
+import fetch, { RequestInit } from 'node-fetch'
 
 export enum Events {
   BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration',
   BIRTH_NEW_DEC = '/events/birth/new-declaration',
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_WAITING_VALIDATION = '/events/birth/waiting-validation',
+  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation',
   BIRTH_NEW_REG = '/events/birth/new-registration',
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
@@ -46,6 +47,7 @@ export enum Events {
   DEATH_NEW_DEC = '/events/death/new-declaration',
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_WAITING_VALIDATION = '/events/death/waiting-validation',
+  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation',
   DEATH_NEW_REG = '/events/death/new-registration',
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
@@ -77,14 +79,14 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.BIRTH_MARK_VALID
               }
               if (hasRegisterScope(request)) {
-                return Events.BIRTH_MARK_REG
+                return Events.BIRTH_WAITING_VALIDATION
               }
             } else {
               return Events.BIRTH_MARK_CERT
             }
           } else {
             if (hasRegisterScope(request)) {
-              return Events.BIRTH_NEW_REG
+              return Events.BIRTH_NEW_WAITING_VALIDATION
             }
 
             if (hasValidateScope(request)) {
@@ -102,14 +104,14 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.DEATH_MARK_VALID
               }
               if (hasRegisterScope(request)) {
-                return Events.DEATH_MARK_REG
+                return Events.DEATH_WAITING_VALIDATION
               }
             } else {
               return Events.DEATH_MARK_CERT
             }
           } else {
             if (hasRegisterScope(request)) {
-              return Events.DEATH_NEW_REG
+              return Events.DEATH_NEW_WAITING_VALIDATION
             }
 
             if (hasValidateScope(request)) {
@@ -216,13 +218,21 @@ export async function fhirWorkflowEventHandler(
       response = await createRegistrationHandler(request, h, event)
       await forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
       break
+    case Events.BIRTH_WAITING_VALIDATION:
+      response = await markEventAsWaitingValidationHandler(request, h, event)
+      await forwardToOpenHim(Events.BIRTH_WAITING_VALIDATION, request)
+      break
+    case Events.DEATH_WAITING_VALIDATION:
+      response = await markEventAsWaitingValidationHandler(request, h, event)
+      await forwardToOpenHim(Events.DEATH_WAITING_VALIDATION, request)
+      break
     case Events.DEATH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
       await forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
       break
-    case Events.BIRTH_NEW_REG:
+    case Events.BIRTH_NEW_WAITING_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_NEW_REG, request)
+      await forwardToOpenHim(Events.BIRTH_NEW_WAITING_VALIDATION, request)
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
@@ -232,9 +242,9 @@ export async function fhirWorkflowEventHandler(
       response = await createRegistrationHandler(request, h, event)
       await forwardToOpenHim(Events.DEATH_NEW_DEC, request)
       break
-    case Events.DEATH_NEW_REG:
+    case Events.DEATH_NEW_WAITING_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_NEW_REG, request)
+      await forwardToOpenHim(Events.DEATH_NEW_WAITING_VALIDATION, request)
       break
     case Events.BIRTH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
@@ -245,11 +255,11 @@ export async function fhirWorkflowEventHandler(
       await forwardToOpenHim(Events.DEATH_MARK_VALID, request)
       break
     case Events.BIRTH_MARK_REG:
-      response = await markEventAsRegisteredHandler(request, h, event)
+      response = await markEventAsWaitingValidationHandler(request, h, event)
       await forwardToOpenHim(Events.BIRTH_MARK_REG, request)
       break
     case Events.DEATH_MARK_REG:
-      response = await markEventAsRegisteredHandler(request, h, event)
+      response = await markEventAsWaitingValidationHandler(request, h, event)
       await forwardToOpenHim(Events.DEATH_MARK_REG, request)
       break
     case Events.BIRTH_MARK_CERT:
