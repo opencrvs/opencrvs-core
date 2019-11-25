@@ -70,6 +70,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { Event, Action } from '@client/forms'
+import { withApollo } from 'react-apollo'
+import ApolloClient from 'apollo-client'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -156,6 +158,7 @@ interface IBaseRegistrationHomeProps {
   applications: IApplication[]
   goToEvents: typeof goToEventsAction
   storedApplications: IApplication[]
+  client: ApolloClient<{}>
 }
 
 interface IRegistrationHomeState {
@@ -258,7 +261,7 @@ export class RegistrationHomeView extends React.Component<
       compositionId,
       action
     )
-    this.props.downloadApplication(downloadableApplication)
+    this.props.downloadApplication(downloadableApplication, this.props.client)
   }
 
   render() {
@@ -527,4 +530,4 @@ export const RegistrationHome = connect(
     goToPrintCertificate: goToPrintCertificateAction,
     downloadApplication
   }
-)(injectIntl(withTheme(RegistrationHomeView)))
+)(injectIntl(withTheme(withApollo(RegistrationHomeView))))

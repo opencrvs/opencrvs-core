@@ -24,11 +24,10 @@ import { v4 as uuid } from 'uuid'
 import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { client } from '@client/utils/apolloClient'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { IStoreState } from '@client/store'
-import { ApolloQueryResult, ApolloError } from 'apollo-client'
+import ApolloClient, { ApolloQueryResult, ApolloError } from 'apollo-client'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -221,6 +220,7 @@ interface IDownloadApplication {
   type: typeof ENQUEUE_DOWNLOAD_APPLICATION
   payload: {
     application: IApplication
+    client: ApolloClient<{}>
   }
 }
 
@@ -231,6 +231,7 @@ interface IDownloadApplicationSuccess {
     form: {
       [key in Event]: IForm
     }
+    client: ApolloClient<{}>
   }
 }
 
@@ -239,6 +240,7 @@ interface IDownloadApplicationFail {
   payload: {
     error: ApolloError
     application: IApplication
+    client: ApolloClient<{}>
   }
 }
 
@@ -461,17 +463,22 @@ export async function deleteApplicationByUser(
 }
 
 export function downloadApplication(
-  application: IApplication
+  application: IApplication,
+  client: ApolloClient<{}>
 ): IDownloadApplication {
   return {
     type: ENQUEUE_DOWNLOAD_APPLICATION,
     payload: {
-      application
+      application,
+      client
     }
   }
 }
 
-function createRequestForApplication(application: IApplication) {
+function createRequestForApplication(
+  application: IApplication,
+  client: ApolloClient<{}>
+) {
   const applicationAction = ACTION_LIST[application.action as string] || null
   const result = getQueryMapping(
     application.event,
@@ -483,19 +490,20 @@ function createRequestForApplication(application: IApplication) {
 
   return {
     request: client.query,
-    requestArgs: [{ query, variables: { id: application.id } }]
+    requestArgs: { query, variables: { id: application.id } }
   }
 }
 
 function requestWithStateWrapper(
   mainRequest: Promise<ApolloQueryResult<any>>,
-  getState: () => IStoreState
+  getState: () => IStoreState,
+  client: ApolloClient<{}>
 ) {
   const store = getState()
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      resolve({ data, store })
+      resolve({ data, store, client })
     } catch (error) {
       reject(error)
     }
@@ -514,10 +522,12 @@ function getDataKey(application: IApplication) {
 
 function downloadApplicationSuccess({
   data,
-  store
+  store,
+  client
 }: {
   data: any
   store: IStoreState
+  client: ApolloClient<{}>
 }): IDownloadApplicationSuccess {
   const form = getRegisterForm(store)
 
@@ -525,20 +535,23 @@ function downloadApplicationSuccess({
     type: DOWNLOAD_APPLICATION_SUCCESS,
     payload: {
       queryData: data,
-      form
+      form,
+      client
     }
   }
 }
 
 function downloadApplicationFail(
   error: ApolloError,
-  application: IApplication
+  application: IApplication,
+  client: ApolloClient<{}>
 ): IDownloadApplicationFail {
   return {
     type: DOWNLOAD_APPLICATION_FAIL,
     payload: {
       error,
-      application
+      application,
+      client
     }
   }
 }
@@ -634,7 +647,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       }
     case ENQUEUE_DOWNLOAD_APPLICATION:
       const { applications } = state
-      const { application } = action.payload
+      const { application, client } = action.payload
       const downloadIsRunning = applications.some(
         application =>
           application.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING
@@ -688,25 +701,32 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         applications: newApplicationsAfterStartingDownload
       }
 
-      const { request, requestArgs } = createRequestForApplication(application)
+      const { request, requestArgs } = createRequestForApplication(
+        application,
+        client
+      )
 
       return loop(
         newState,
         Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
           requestWithStateWrapper,
           {
-            args: [request(...requestArgs), Cmd.getState],
+            args: [request(requestArgs), Cmd.getState, client],
             successActionCreator: downloadApplicationSuccess,
             failActionCreator: err =>
-              downloadApplicationFail(err, {
-                ...application,
-                downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
-              })
+              downloadApplicationFail(
+                err,
+                {
+                  ...application,
+                  downloadStatus: DOWNLOAD_STATUS.DOWNLOADING
+                },
+                client
+              )
           }
         )
       )
     case DOWNLOAD_APPLICATION_SUCCESS:
-      const { queryData, form } = action.payload
+      const { queryData, form, client: clientFromSuccess } = action.payload
 
       const downloadingApplicationIndex = state.applications.findIndex(
         application =>
@@ -754,7 +774,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             failActionCreator: err =>
               downloadApplicationFail(
                 err,
-                newApplicationsAfterDownload[downloadingApplicationIndex]
+                newApplicationsAfterDownload[downloadingApplicationIndex],
+                clientFromSuccess
               )
           })
         )
@@ -765,9 +786,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const {
         request: nextRequest,
         requestArgs: nextRequestArgs
-      } = createRequestForApplication(applicationToDownload)
+      } = createRequestForApplication(applicationToDownload, clientFromSuccess)
 
-      // Return state, write to indexedDBand download the next ready to download application, all in sequence
+      // Return state, write to indexedDB and download the next ready to download application, all in sequence
       return loop(
         newStateAfterDownload,
         Cmd.list(
@@ -782,12 +803,17 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
               requestWithStateWrapper,
               {
-                args: [nextRequest(...nextRequestArgs), Cmd.getState],
+                args: [
+                  nextRequest(nextRequestArgs),
+                  Cmd.getState,
+                  clientFromSuccess
+                ],
                 successActionCreator: downloadApplicationSuccess,
                 failActionCreator: err =>
                   downloadApplicationFail(
                     err,
-                    newApplicationsAfterDownload[downloadingApplicationIndex]
+                    newApplicationsAfterDownload[downloadingApplicationIndex],
+                    clientFromSuccess
                   )
               }
             )
@@ -797,14 +823,18 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       )
 
     case DOWNLOAD_APPLICATION_FAIL:
-      const { application: erroredApplication, error } = action.payload
+      const {
+        application: erroredApplication,
+        error,
+        client: clientFromFail
+      } = action.payload
       erroredApplication.downloadRetryAttempt =
         (erroredApplication.downloadRetryAttempt || 0) + 1
 
       const {
         request: retryRequest,
         requestArgs: retryRequestArgs
-      } = createRequestForApplication(erroredApplication)
+      } = createRequestForApplication(erroredApplication, clientFromFail)
 
       const applicationsAfterError = Array.from(state.applications)
       const erroredApplicationIndex = applicationsAfterError.findIndex(
@@ -814,7 +844,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       applicationsAfterError[erroredApplicationIndex] = erroredApplication
 
-      // Retry download if not limit reached
+      // Retry download until limit reached
       if (
         erroredApplication.downloadRetryAttempt < DOWNLOAD_MAX_RETRY_ATTEMPT
       ) {
@@ -826,10 +856,14 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
             requestWithStateWrapper,
             {
-              args: [retryRequest(...retryRequestArgs), Cmd.getState],
+              args: [
+                retryRequest(retryRequestArgs),
+                Cmd.getState,
+                clientFromFail
+              ],
               successActionCreator: downloadApplicationSuccess,
               failActionCreator: err =>
-                downloadApplicationFail(err, erroredApplication)
+                downloadApplicationFail(err, erroredApplication, clientFromFail)
             }
           )
         )
@@ -869,7 +903,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       const {
         request: nextApplicationRequest,
         requestArgs: nextApplicationRequestArgs
-      } = createRequestForApplication(nextApplication)
+      } = createRequestForApplication(nextApplication, clientFromFail)
       return loop(
         {
           ...state,
@@ -882,12 +916,13 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             ),
             Cmd.run(requestWithStateWrapper, {
               args: [
-                nextApplicationRequest(...nextApplicationRequestArgs),
-                Cmd.getState
+                nextApplicationRequest(nextApplicationRequestArgs),
+                Cmd.getState,
+                clientFromFail
               ],
               successActionCreator: downloadApplicationSuccess,
               failActionCreator: err =>
-                downloadApplicationFail(err, nextApplication)
+                downloadApplicationFail(err, nextApplication, clientFromFail)
             })
           ],
           { sequence: true }

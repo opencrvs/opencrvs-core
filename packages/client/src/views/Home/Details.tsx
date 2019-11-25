@@ -17,7 +17,7 @@ import {
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS,
   makeApplicationReadyToDownload,
-  storeApplication
+  downloadApplication
 } from '@client/applications'
 import {
   goToPage as goToPageAction,
@@ -79,6 +79,8 @@ import {
   VALIDATED
 } from '@client/utils/constants'
 import { Scope } from '@client/utils/authUtils'
+import { withApollo } from 'react-apollo'
+import ApolloClient from 'apollo-client'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px 10px 10px;
@@ -155,8 +157,9 @@ interface IDetailProps {
   goToPage: typeof goToPageAction
   goBack: typeof goBackAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  storeApplication: typeof storeApplication
+  downloadApplication: typeof downloadApplication
   scope: Scope | null
+  client: ApolloClient<{}>
 }
 
 interface IStatus {
@@ -399,7 +402,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       compositionId,
       action
     )
-    this.props.storeApplication(downloadableApplication)
+    this.props.downloadApplication(downloadableApplication, this.props.client)
   }
 
   getActionForStateAndScope = (
@@ -761,6 +764,6 @@ export const Details = connect(
     goToPage: goToPageAction,
     goBack: goBackAction,
     goToPrintCertificate: goToPrintCertificateAction,
-    storeApplication
+    downloadApplication
   }
-)(injectIntl(withTheme(DetailView)))
+)(injectIntl(withTheme(withApollo(DetailView))))
