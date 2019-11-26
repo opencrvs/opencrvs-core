@@ -52,9 +52,11 @@
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
+    "@types/js-yaml": "^3.12.1",
     "bundlesize": "^0.18.0",
     "concurrently": "^3.5.1",
     "husky": "1.0.0-rc.13",
+    "js-yaml": "^3.13.1",
     "lerna": "^3.18.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.15.2"
@@ -64,6 +66,7 @@
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
     "patch-package": "^6.1.2",
-    "postinstall-postinstall": "^2.0.0"
+    "postinstall-postinstall": "^2.0.0",
+    "ts-node": "^8.5.2"
   }
 }
