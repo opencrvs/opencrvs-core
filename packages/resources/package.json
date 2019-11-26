@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/resources",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS resources for reference data",
   "license": "MPL-2.0",
   "scripts": {
@@ -29,8 +29,8 @@
     "jsonwebtoken": "^8.3.0"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.1",
-    "@opencrvs/user-mgnt": "^1.0.0-alpha.1.1",
+    "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@opencrvs/user-mgnt": "^1.0.0-alpha.1.2",
     "@types/chalk": "^2.2.0",
     "@types/code": "^4.0.3",
     "@types/csv2json": "^1.4.0",
