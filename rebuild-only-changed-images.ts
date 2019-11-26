@@ -63,6 +63,20 @@ const IMAGE_NAME_TO_DIRECTORY = {
   styleguide: 'components'
 }
 
+async function preventBuildImageFromBeingBuilt() {
+  const pkg = JSON.parse(readFileSync('./package.json', 'utf8'))
+  pkg.scripts['build:image'] = 'echo "Skipping build image creation..."'
+  writeFileSync('./package.json', JSON.stringify(pkg))
+}
+async function ignoreFromBuild(packages: string[]) {
+  const pkg = JSON.parse(readFileSync('./package.json', 'utf8'))
+  pkg.scripts['build'] =
+    pkg.scripts['build'] +
+    ' ' +
+    packages.map(directory => `--ignore ${directory}`).join(' ')
+  writeFileSync('./package.json', JSON.stringify(pkg))
+}
+
 async function run() {
   const compose = yaml.safeLoad(readFileSync('./docker-compose.yml', 'utf8'))
 
@@ -71,7 +85,11 @@ async function run() {
   // Not sure why but docker hub's API sometimes fails if you query it right after getting a token
   await new Promise(resolve => setTimeout(resolve, 1000))
 
-  for (const serviceName of Object.keys(compose.services)) {
+  const serviceNames = Object.keys(compose.services)
+
+  const packagesThatAreUpToDate = []
+
+  for (const serviceName of serviceNames) {
     const service = compose.services[serviceName]
     const { image } = service
     const repository = image.split(':')[0]
@@ -84,7 +102,7 @@ async function run() {
 
     const latestTag = await getLatestTag(token, repository)
     if (!latestTag) {
-      console.log(service, 'no tags found')
+      console.log('⚠️ ', serviceName, ': no tags found!')
       continue
     }
 
@@ -93,13 +111,23 @@ async function run() {
     try {
       // Check that image hash is newer or the same as the latest commit of this package
       await exec(`git merge-base --is-ancestor ${latestGitHash} ${imageHash}`)
-
+      console.log('✅ ', serviceName, ': no rebuild needed')
       service.image = `${repository}:latest`
       delete service.build
-    } catch {}
+      packagesThatAreUpToDate.push(directory)
+    } catch {
+      console.log('♻️ ', serviceName, ': rebuilding...')
+    }
   }
-
   writeFileSync('./docker-compose.yml', yaml.safeDump(compose))
+
+  // All services can be fetched from docker hub
+  if (packagesThatAreUpToDate.length === serviceNames.length) {
+    console.log('No packages to rebuild. Removing build image creation step.')
+    await preventBuildImageFromBeingBuilt()
+  } else {
+    await ignoreFromBuild(packagesThatAreUpToDate)
+  }
 }
 
 run()
