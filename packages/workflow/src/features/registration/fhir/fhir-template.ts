@@ -12,7 +12,11 @@
 import { v4 as uuid } from 'uuid'
 import {
   OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE
+  EVENT_TYPE,
+  CHILD_SECTION_CODE,
+  MOTHER_SECTION_CODE,
+  FATHER_SECTION_CODE,
+  DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
@@ -231,16 +235,55 @@ export function selectInformantResource(
   return informantEntry && (informantEntry.resource as fhir.Patient)
 }
 
-export async function createFhirBundle(taskEntry: fhir.Task) {
+export async function createFhirBundle(
+  taskEntry: fhir.Task,
+  eventType: EVENT_TYPE
+) {
   const composition: fhir.Composition = await getFromFhir(`/${taskEntry.focus}`)
 
   const fhirBundle: fhir.Bundle = {
     resourceType: 'Bundle',
-    type: 'searchset' //not sure what does the type mean here
+    type: 'document'
   }
-  fhirBundle.entry = [] as fhir.BundleEntry[]
-  fhirBundle.entry.push(composition)
-  fhirBundle.entry.push(taskEntry)
 
+  fhirBundle.entry = [] as fhir.BundleEntry[]
+  fhirBundle.entry.push({
+    resource: composition
+  })
+
+  fhirBundle.entry.push({
+    resource: taskEntry
+  })
+
+  if (eventType === EVENT_TYPE.BIRTH) {
+    await getPerson(fhirBundle, composition, CHILD_SECTION_CODE)
+    await getPerson(fhirBundle, composition, MOTHER_SECTION_CODE)
+    await getPerson(fhirBundle, composition, FATHER_SECTION_CODE)
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    await getPerson(fhirBundle, composition, DECEASED_SECTION_CODE)
+    await getPerson(fhirBundle, composition, INFORMANT_CODE)
+  }
   return fhirBundle
+}
+
+async function getPerson(
+  bundle: fhir.Bundle,
+  composition: fhir.Composition,
+  sectionCode: string
+) {
+  const personSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  const person: fhir.Patient = await getFromFhir(
+    `/${personSectionEntry.reference}`
+  )
+  return (
+    bundle &&
+    bundle.entry &&
+    bundle.entry.push({
+      fullUrl: personSectionEntry.reference,
+      resource: person
+    })
+  )
 }

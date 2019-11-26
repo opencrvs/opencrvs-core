@@ -161,7 +161,7 @@ export async function markEventAsRegisteredCallbackHandler(
   const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
 
   const event = getTaskEventType(task)
-  const fhirBundle = await createFhirBundle(task)
+  const fhirBundle = await createFhirBundle(task, event)
 
   try {
     await markEventAsRegistered(task, registrationNumber, getToken(request))
