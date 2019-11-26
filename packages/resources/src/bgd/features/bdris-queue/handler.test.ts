@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import { createServer } from '@resources/index'
 import * as fetchMock from 'jest-fetch-mock'
 import QueueItem from '@resources/bgd/features/bdris-queue/model'
+import { State } from '@resources/bgd/features/bdris-queue/service'
 // tslint:disable-next-line:no-relative-imports
 import { testFhirBundle } from './test-data'
 import * as generateService from '@resources/bgd/features/generate/service'
@@ -57,7 +58,7 @@ describe('BDRIS Queue handler tests', () => {
           Promise.resolve({
             created: new Date(),
             payload: JSON.stringify(testFhirBundle),
-            status: 'WAITING_FOR_VALIDATION',
+            status: State.WAITING_FOR_VALIDATION,
             token: '',
             set: setMock,
             save: saveMock
@@ -84,7 +85,7 @@ describe('BDRIS Queue handler tests', () => {
 
     expect(res.statusCode).toBe(200)
 
-    expect(setMock).toBeCalledWith('status', 'VALID')
+    expect(setMock).toBeCalledWith('status', State.VALID)
     expect(saveMock).toBeCalled()
 
     expect(fetch.mock.calls[1]).toEqual([
@@ -117,7 +118,7 @@ describe('BDRIS Queue handler tests', () => {
           Promise.resolve({
             created: new Date(),
             payload: JSON.stringify({ throw: true, ...testFhirBundle }),
-            status: 'WAITING_FOR_VALIDATION',
+            status: State.WAITING_FOR_VALIDATION,
             token: '',
             set: setMock,
             save: saveMock
@@ -140,7 +141,7 @@ describe('BDRIS Queue handler tests', () => {
 
     expect(res.statusCode).toBe(200)
 
-    expect(setMock).toBeCalledWith('status', 'ERROR')
+    expect(setMock).toBeCalledWith('status', State.ERROR)
     expect(setMock).toBeCalledWith(
       'error',
       'Failed to validate with BDRIS: test error'
@@ -177,7 +178,7 @@ describe('BDRIS Queue handler tests', () => {
           Promise.resolve({
             created: new Date(),
             payload: JSON.stringify(testFhirBundle),
-            status: 'WAITING_FOR_VALIDATION',
+            status: State.WAITING_FOR_VALIDATION,
             token: '',
             set: setMock,
             save: saveMock
@@ -200,7 +201,7 @@ describe('BDRIS Queue handler tests', () => {
 
     expect(res.statusCode).toBe(200)
 
-    expect(setMock).toBeCalledWith('status', 'ERROR')
+    expect(setMock).toBeCalledWith('status', State.ERROR)
     expect(setMock).toBeCalledWith(
       'error',
       'Failed to send confirmation: FHIR request failed: boom'

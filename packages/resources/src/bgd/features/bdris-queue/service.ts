@@ -16,6 +16,13 @@ import { CONFIRM_REGISTRATION_URL } from '@resources/constants'
 import fetch from 'node-fetch'
 import { createWebHookResponseFromBundle } from '@resources/bgd/features/validate/service'
 
+export enum State {
+  WAITING_FOR_VALIDATION = 'WAITING_FOR_VALIDATION',
+  PROCESSING = 'PROCESSING',
+  VALID = 'VALID',
+  ERROR = 'ERROR'
+}
+
 export function covertBundleToBDRISFormat(bundle: fhir.Bundle) {
   // TODO implement this when we know the JSON format - OCRVS-2331
   // @ts-ignore
@@ -30,7 +37,7 @@ export async function addToQueue(payload: Object, token: string) {
   const queueItem = new QueueItem({
     created: new Date(),
     payload: JSON.stringify(payload),
-    status: 'WAITING_FOR_VALIDATION',
+    status: State.WAITING_FOR_VALIDATION,
     token
   } as IQueueItemModel)
 
@@ -39,8 +46,8 @@ export async function addToQueue(payload: Object, token: string) {
 
 async function pickNextItem() {
   return QueueItem.findOneAndUpdate(
-    { status: 'WAITING_FOR_VALIDATION' },
-    { $set: { status: 'PROCESSING' } }
+    { status: State.WAITING_FOR_VALIDATION },
+    { $set: { status: State.PROCESSING } }
   ).exec()
 }
 
@@ -66,7 +73,7 @@ async function validateWithBDRIS(item: IQueueItemModel) {
       headers: { Authorization: item.token }
     })
 
-    item.set('status', 'ERROR')
+    item.set('status', State.ERROR)
     item.set('error', errMsg)
     return item.save()
   }
@@ -81,12 +88,12 @@ async function validateWithBDRIS(item: IQueueItemModel) {
       headers: { Authorization: item.token }
     })
   } catch (err) {
-    item.set('status', 'ERROR')
+    item.set('status', State.ERROR)
     item.set('error', `Failed to send confirmation: ${err.message}`)
     return item.save()
   }
 
-  item.set('status', 'VALID')
+  item.set('status', State.VALID)
   return item.save()
 }
 
