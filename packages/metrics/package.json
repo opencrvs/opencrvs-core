@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/metrics",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS metrics service",
   "license": "MPL-2.0",
   "private": true,
@@ -18,7 +18,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.1",
+    "@opencrvs/commons": "^1.0.0-alpha.1.2",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "hapi": "^17.5.1",

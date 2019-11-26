@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/search",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS search service",
   "license": "MPL-2.0",
   "private": true,
@@ -17,7 +17,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.1",
+    "@opencrvs/commons": "^1.0.0-alpha.1.2",
     "@types/hapi-pino": "^6.3.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
