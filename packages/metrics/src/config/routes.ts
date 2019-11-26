@@ -70,7 +70,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-validatoin',
+      path: '/events/death/waiting-validation',
       handler: baseHandler,
       config: {
         tags: ['api']
