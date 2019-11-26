@@ -165,6 +165,7 @@ describe('ReviewForm tests', () => {
                     familyName: 'Akash'
                   }
                 ],
+                multipleBirth: 1,
                 birthDate: '2001-01-01',
                 gender: 'male'
               },
@@ -190,7 +191,6 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                multipleBirth: 1,
                 address: [
                   {
                     type: 'PERMANENT',
