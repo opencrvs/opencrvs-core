@@ -25,7 +25,12 @@ import {
   AUTH_URL
 } from '@resources/constants'
 import { validateFunc } from '@opencrvs/commons'
-import { locationsHandler as bgdLocationsHandler } from '@resources/bgd/features/administrative/handler'
+import {
+  locationsHandler as bgdLocationsHandler,
+  nidVerificationHandler as bgdNidVerificationHandler,
+  nidVerificationReqSchema as bgdNidVerificationReqSchema,
+  nidResponseSchema as bgdNidResponseSchema
+} from '@resources/bgd/features/administrative/handler'
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
 import { assetHandler as bgdAssetHandler } from '@resources/bgd/features/assets/handler'
@@ -140,6 +145,22 @@ export async function createServer() {
       tags: ['api'],
       description:
         'Validates a registration and if successful returns a BRN for that record'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/verify/nid/bgd',
+    handler: bgdNidVerificationHandler,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: bgdNidVerificationReqSchema
+      },
+      response: {
+        schema: bgdNidResponseSchema
+      },
+      description: 'Verify NID for Bangladesh'
     }
   })
 
