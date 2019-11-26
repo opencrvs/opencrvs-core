@@ -18,7 +18,8 @@ import {
   IOISFLocationResponse,
   ILocation,
   titleCase,
-  getA2iInternalRefIndentifierOfLocation
+  getA2iInternalRefIndentifierOfLocation,
+  getFromFhir
 } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 
@@ -322,4 +323,33 @@ export async function fetchFromOISF(
   }
 
   return await res.json()
+}
+
+export async function composeAndSaveHardcodedLocations(
+  hardCodededLocations: fhir.Location[],
+  jurisdictionType: string
+): Promise<fhir.Location[]> {
+  const locations: fhir.Location[] = []
+  for (const hardcodedLocation of hardCodededLocations) {
+    if (hardcodedLocation.partOf) {
+      const parentResponse = await getFromFhir(
+        `/Location?name=${hardcodedLocation.partOf.reference}&identifier=${jurisdictionType}`
+      )
+      const parentResource: fhir.Location = parentResponse.entry[0].resource
+      hardcodedLocation.partOf.reference = `Location/${parentResource.id}`
+    }
+    const savedLocationResponse = (await sendToFhir(
+      hardcodedLocation,
+      '/Location',
+      'POST'
+    ).catch(err => {
+      throw Error('Cannot save location to FHIR')
+    })) as Response
+    const locationHeader = savedLocationResponse.headers.get(
+      'location'
+    ) as string
+    hardcodedLocation.id = locationHeader.split('/')[3]
+    locations.push(hardcodedLocation)
+  }
+  return locations
 }

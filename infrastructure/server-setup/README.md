@@ -1,10 +1,18 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
 
 - [OpenCRVS server setup](#opencrvs-server-setup)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
+  - [Emergency Backup & Restore](#emergency-backup--restore)
+  - [Some useful Docker and Docker Swarm commands](#some-useful-docker-and-docker-swarm-commands)
+    - [You have made a change to OpenHIM base config. Before you deploy, take down the entire stack](#you-have-made-a-change-to-openhim-base-config-before-you-deploy-take-down-the-entire-stack)
+    - [To check the status of all running services](#to-check-the-status-of-all-running-services)
+    - [To scale a service that hasnt started, in order to check for bugs](#to-scale-a-service-that-hasnt-started-in-order-to-check-for-bugs)
+    - [To check the logs on a service](#to-check-the-logs-on-a-service)
+    - [To check logs or access a specific container](#to-check-logs-or-access-a-specific-container)
+    - [You need to check logs on the container](#you-need-to-check-logs-on-the-container)
+    - [You need to run commands inside a container](#you-need-to-run-commands-inside-a-container)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -14,7 +22,41 @@ This folder contains script to setup a new set of servers for OpenCRVS. It sets 
 
 Ansible is required to run the server setup. This should be installed on your local machine. Also ensure that you have ssh access with the root user to all the server that you are trying to configure.
 
-Run the configuration script with:
+Add your users GIT SSH keys to all nodes
+
+```
+curl https://github.com/<git-user>.keys >> ~/.ssh/authorized_keys
+```
+
+Ensure the manager node can ssh into worker nodes (Required for automated backups)
+
+SSH into manager node and create ssh key. Press Enter for defaults and no passphrase
+
+```
+ssh-keygen
+```
+
+Print the key for copying:
+
+```
+cat ~/.ssh/id_rsa.pub
+```
+
+Copy the key and SSH into worker nodes to add manager key into node authorised keys, and repeat for all workers
+
+```
+echo "<manager-node-public-key>" >> ~/.ssh/authorized_keys
+```
+
+Edit the automatic cron job backup to suit your external server set-up on line 64 of the Ansible playbook.yml
+
+```
+job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ssh-user> <external-server-for-remote-backup-host> <ssh-port> <your-production-environment-manger-node-host> <path-to-encrypted-volume-on-external-server> >> /var/log/opencrvs-backup.log 2>&1'
+```
+
+Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
+
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed):
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
@@ -103,3 +145,113 @@ Mongo is enabled with replica sets in order to provide backup in case a node fai
 docker service scale opencrvs_mongo-rs-init=0
 docker service scale opencrvs_mongo-rs-init=1
 ```
+
+## Emergency Backup & Restore
+
+Every day OpenCRVS automatically backs up all databases to the following directories on the manager node.  
+Every 7 days the data is overwritten to save disk space.
+
+Servers can be stolen, so we highly recommend that once a week, these files should be saved to a
+password protected and encrypted external harddrive and stored in a secure and approved location.
+
+Hearth, OpenHIM and the Users database is saved in a mongo zip file here:
+
+```
+/backups/mongo/hearth-dev-<date>.gz
+/backups/mongo/openhim-dev-<date>.gz
+/backups/mongo/user-mgnt-<date>.gz
+```
+
+Elasticsearch snapshot file is saved here:
+
+```
+/backups/elasticsearch
+```
+
+InfluxDB backup files are saved here:
+
+```
+/backups/influxdb/<date>
+```
+
+To perform a restore, ensure that you have backup files in the day's folders you wish to restore from.
+
+SSH into the manager node and cd to the / directory
+
+Run the following script but beware that **ALL DATA WILL BE REPLACED BY YOUR BACKUP DATA**
+
+```
+./tmp/compose/infrastructure/emergency-restore-metadata.sh <day of the week to restore from>
+```
+
+## Some useful Docker and Docker Swarm commands
+
+The folllowing docker commands are helpful when managing OpenCRVS and debugging infrastructure issues
+
+### To check the status of all running services
+
+```
+docker service ls
+```
+
+### To scale a service that hasnt started, in order to check for bugs
+
+```
+docker service scale <service name e.g.: "opencrvs_metrics">=1
+```
+
+### You want to get all stack information and see if there are any errors
+
+docker stack ps opencrvs —no-trunc
+
+### To check the logs on a service
+
+```
+docker service logs <service name e.g.: "opencrvs_metrics">
+```
+
+### To check logs or access a specific container
+
+You need to check Docker swarm for the id of the containers running mongo, elasticsearch or resources in order to access
+To find which node hosts the container you are looking for, run this command on the manager node.
+
+```
+docker stack ps -f "desired-state=running" opencrvs
+```
+
+After running the previous command to discover which node is running a container, SSH into the right node and run the following to get the container id
+
+```
+docker ps
+```
+
+### You need to check logs on the container
+
+```
+docker logs -f <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72enu">
+```
+
+### You need to run commands inside a container
+
+```
+docker exec -it <container-id> <command e.g. "ls", "mongo", "printenv", "influxd">
+```
+
+Running
+
+```
+netstat -plant
+```
+
+Inside a container will tell you which ports are open and listening
+
+### You need to inspect a container to see networking and all other information
+
+```
+docker ps # to get the container id
+docker inspect <container id e.g. "opencrvs_user-mgnt.1.t0178z73i4tjcll68a7r72enu">
+```
+
+### You need to rollback the changes made to a service
+
+docker service rollback opencrvs_user-mgnt
