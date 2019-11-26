@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@client/tests/util'
 
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
@@ -42,6 +43,7 @@ import {
   storeApplication
 } from '@client/applications'
 import { Action, Event } from '@client/forms'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -145,7 +147,7 @@ const mockReviewTabData = {
   totalItems: 2,
   results: [
     {
-      id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+      id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
       type: 'Birth',
       registration: {
         status: 'DECLARED',
@@ -327,7 +329,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     ).fromNow()
 
     expect(data.length).toBe(2)
-    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
     expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
     expect(data[0].trackingId).toBe('BW0UTHR')
@@ -881,6 +883,120 @@ describe('RegistrationHome sent for review tab related tests', () => {
               printTab: { totalItems: 0, results: [] }
             }
           }
+        },
+        {
+          request: {
+            query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
+            variables: { id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269' }
+          },
+          result: {
+            data: {
+              fetchBirthRegistration: {
+                id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                _fhirIDMap: {
+                  composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                  encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                  observation: {
+                    birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                    weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                    attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                    presentAtBirthRegistration:
+                      'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  }
+                },
+                child: null,
+                informant: null,
+                primaryCaregiver: null,
+                mother: {
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'ময়না'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: '',
+                      familyName: 'Moyna'
+                    }
+                  ],
+                  birthDate: '2001-01-01',
+                  maritalStatus: 'MARRIED',
+                  occupation: 'Mother Occupation',
+                  dateOfMarriage: '2001-01-01',
+                  educationalAttainment: 'PRIMARY_ISCED_1',
+                  nationality: ['BGD'],
+                  identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
+                  multipleBirth: 1,
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: ['12', '', 'union1', 'upazila10'],
+                      district: 'district2',
+                      state: 'state2',
+                      city: '',
+                      postalCode: '',
+                      country: 'BGD'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: ['12', '', 'union1', 'upazila10'],
+                      district: 'district2',
+                      state: 'state2',
+                      city: '',
+                      postalCode: '',
+                      country: 'BGD'
+                    }
+                  ],
+                  telecom: [
+                    {
+                      system: 'phone',
+                      value: '01711111111'
+                    }
+                  ],
+                  id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
+                },
+                father: null,
+                registration: {
+                  id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
+                  contact: 'MOTHER',
+                  contactRelationship: 'Contact Relation',
+                  contactPhoneNumber: '01733333333',
+                  attachments: null,
+                  status: [
+                    {
+                      comments: [
+                        {
+                          comment: 'This is a note'
+                        }
+                      ],
+                      type: 'DECLARED'
+                    }
+                  ],
+                  trackingId: 'B123456',
+                  registrationNumber: null,
+                  type: 'BIRTH'
+                },
+                attendantAtBirth: 'NURSE',
+                weightAtBirth: 2,
+                birthType: 'SINGLE',
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    city: '',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
+                presentAtBirthRegistration: 'MOTHER_ONLY'
+              }
+            }
+          }
         }
       ]
 
@@ -899,7 +1015,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
       testComponent = createdTestComponent.component
     })
 
-    it('starts downloading after clicking download button', async () => {
+    it('downloads application after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -912,34 +1028,24 @@ describe('RegistrationHome sent for review tab related tests', () => {
       expect(
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
-    })
 
-    it('shows review button when download is complete', async () => {
-      const downloadedApplication = makeApplicationReadyToDownload(
-        Event.BIRTH,
-        'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-        Action.LOAD_REVIEW_APPLICATION
-      )
-      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-      createdTestComponent.store.dispatch(
-        storeApplication(downloadedApplication)
-      )
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
 
       const action = await waitForElement(
         testComponent,
         '#ListItemAction-0-Review'
       )
-
       action.hostNodes().simulate('click')
 
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      await waitFor(() =>
-        window.location.href.includes(
-          '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-        )
+      expect(history.location.pathname).toBe(
+        '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
       )
     })
 

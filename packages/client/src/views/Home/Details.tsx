@@ -433,7 +433,10 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
           </DownloadStatusIndicator>
         ) : (
           <DownloadStatusIndicator>
-            {downloadStatus === DOWNLOAD_STATUS.FAILED && <Warning />}
+            {(downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK) && (
+              <Warning id="download-error" />
+            )}
             <TertiaryButton
               id="action-download"
               icon={() => <Download />}
@@ -477,7 +480,10 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
           </DownloadStatusIndicator>
         ) : (
           <DownloadStatusIndicator>
-            {downloadStatus === DOWNLOAD_STATUS.FAILED && <Warning />}
+            {(downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK) && (
+              <Warning id="download-error" />
+            )}
             <TertiaryButton
               id="action-download"
               icon={() => <Download />}
