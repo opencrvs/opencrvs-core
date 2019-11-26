@@ -256,17 +256,17 @@ export async function createFhirBundle(
   })
 
   if (eventType === EVENT_TYPE.BIRTH) {
-    await getPerson(fhirBundle, composition, CHILD_SECTION_CODE)
-    await getPerson(fhirBundle, composition, MOTHER_SECTION_CODE)
-    await getPerson(fhirBundle, composition, FATHER_SECTION_CODE)
+    await addPersonInBundle(fhirBundle, composition, CHILD_SECTION_CODE)
+    await addPersonInBundle(fhirBundle, composition, MOTHER_SECTION_CODE)
+    await addPersonInBundle(fhirBundle, composition, FATHER_SECTION_CODE)
   } else if (eventType === EVENT_TYPE.DEATH) {
-    await getPerson(fhirBundle, composition, DECEASED_SECTION_CODE)
-    await getPerson(fhirBundle, composition, INFORMANT_CODE)
+    await addPersonInBundle(fhirBundle, composition, DECEASED_SECTION_CODE)
+    await addPersonInBundle(fhirBundle, composition, INFORMANT_CODE)
   }
   return fhirBundle
 }
 
-async function getPerson(
+async function addPersonInBundle(
   bundle: fhir.Bundle,
   composition: fhir.Composition,
   sectionCode: string
