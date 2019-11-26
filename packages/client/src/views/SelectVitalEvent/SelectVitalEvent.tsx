@@ -56,7 +56,7 @@ from {
 `
 const StyledContainer = styled.div`
   top: 0;
-  min-height: calc(100vh - 40px);
+  min-height: calc(100vh);
   width: 100%;
   &.${PAGE_TRANSITIONS_CLASSNAME}-enter {
     animation: ${fadeFromBottom} ${PAGE_TRANSITIONS_ENTER_TIME}ms

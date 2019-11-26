@@ -98,7 +98,23 @@ const Right = styled.div`
     }
   }
 `
-
+const Version = styled.div`
+  color: ${({ theme }) => theme.colors.disabled};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  text-transform: none;
+  margin-top: 2rem;
+  span:last-child {
+    display: none;
+  }
+  :hover {
+    span:first-child {
+      display: none;
+    }
+    span:last-child {
+      display: inline;
+    }
+  }
+`
 const Message = styled.div`
   margin-bottom: 16px;
 `
@@ -310,6 +326,10 @@ class SettingsView extends React.Component<IProps, IState> {
               {sections.map((sec, index: number) => (
                 <DataSection key={index} {...sec} />
               ))}
+              <Version>
+                <span>OpenCRVS v1.1.0</span>
+                <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+              </Version>
             </Left>
             <Right>
               <Avatar className="tablet" />
