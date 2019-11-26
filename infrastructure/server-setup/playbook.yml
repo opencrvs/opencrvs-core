@@ -56,6 +56,13 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
+    - name: 'Setup crontab to backup the opencrvs data'
+      cron:
+        name: 'backup opencrvs'
+        minute: '0'
+        hour: '0'
+        job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 172.16.17.54 /mnt/crypthome >> /var/log/opencrvs-backup.log 2>&1'
+
     - name: 'Check file for encrypted file system exists'
       stat:
         path: /cryptfs_file_sparse.img
@@ -76,6 +83,14 @@
         path: /data/mongo
         state: directory
 
+    - name: 'Create mongo backup directory'
+      file:
+        path: /backups/mongo
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
     - name: 'Create traefik data directory'
       file:
         path: /data/traefik
@@ -84,6 +99,14 @@
     - name: 'Create elasticsearch data directory'
       file:
         path: /data/elasticsearch
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
+    - name: 'Create elasticsearch backup directory'
+      file:
+        path: /backups/elasticsearch
         state: directory
         group: 1000
         owner: 1000
@@ -159,6 +182,14 @@
       file:
         path: /data/influxdb
         state: directory
+
+    - name: 'Create influxdb backup directory'
+      file:
+        path: /backups/influxdb
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
     - name: 'Create acme file for traefik'
       file:

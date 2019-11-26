@@ -118,7 +118,9 @@ export async function generateAndSendVerificationCode(
   scope: string[]
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
-
+  logger.info('isDemoUser', {
+    isDemoUser: isDemoUser
+  })
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'
@@ -126,7 +128,6 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
-
   if (!PRODUCTION || isDemoUser) {
     logger.info('Sending a verification SMS', {
       mobile: mobile,
