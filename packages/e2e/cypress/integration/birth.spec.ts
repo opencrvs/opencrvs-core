@@ -643,22 +643,6 @@ context('Birth Integration Test', () => {
     //  Who is looking after the child?
     cy.get('#primaryCaregiverType_INFORMANT').click()
     cy.goToNextFormSection()
-    // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('6684176876871')
-    cy.get('#familyName').type('বেগম')
-    cy.get('#familyNameEng').type('Begum')
-    cy.get('#motherBirthDate-dd').type('01')
-    cy.get('#motherBirthDate-mm').type('08')
-    cy.get('#motherBirthDate-yyyy').type('1971')
-    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
-    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.goToNextFormSection()
-    // FATHER DETAILS
-    cy.get('#fathersDetailsExist_false').click()
-    cy.goToNextFormSection()
     // DOCUMENTS
     cy.goToNextFormSection()
 
