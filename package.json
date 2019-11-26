@@ -45,7 +45,7 @@
     "cov:performance": "cd packages/performance && yarn open:cov",
     "cy": "cd packages/e2e && yarn open",
     "build": "lerna run build --stream --concurrency=1",
-    "build:image": "docker build -t opencrvs-build .",
+    "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",
     "check:license": "license-check-and-add check -f infrastructure/license-config.json",
     "add:license": "license-check-and-add add -f infrastructure/license-config.json"

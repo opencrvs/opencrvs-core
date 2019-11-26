@@ -35,11 +35,14 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
+    release: process.env.REACT_APP_VERSION,
     dsn: window.config.SENTRY
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET)
+  LogRocket.init(window.config.LOGROCKET, {
+    release: process.env.REACT_APP_VERSION
+  })
 
   // Integrate the two
   Sentry.configureScope(scope => {

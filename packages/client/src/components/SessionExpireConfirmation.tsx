@@ -33,9 +33,7 @@ interface IProps {
 class SessionExpireComponent extends React.Component<
   SessionExpireProps & IProps & IntlShapeProps
 > {
-  handleLogin = () => {
-    console.log('login')
-  }
+  handleLogin = () => {}
   render() {
     const { intl, sessionExpired } = this.props
     return (

@@ -58,6 +58,8 @@ describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
+    await store.dispatch(checkAuth({ '?token': validToken }))
+
     await store.dispatch(
       storeApplication(({
         id: 'mockDeath1234',
@@ -65,7 +67,6 @@ describe('when user wants to review death certificate', () => {
         event: Event.DEATH
       } as unknown) as IApplication)
     )
-    await store.dispatch(checkAuth({ '?token': validToken }))
     const testComponent = await createTestComponent(
       <ReviewCertificateAction
         location={mockLocation}
@@ -99,6 +100,8 @@ describe('when user wants to review birth certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
+    await store.dispatch(checkAuth({ '?token': validToken }))
+
     await store.dispatch(
       storeApplication(({
         id: 'asdhdqe2472487jsdfsdf',
@@ -106,8 +109,6 @@ describe('when user wants to review birth certificate', () => {
         event: Event.BIRTH
       } as unknown) as IApplication)
     )
-
-    await store.dispatch(checkAuth({ '?token': validToken }))
 
     const testComponent = await createTestComponent(
       <ReviewCertificateAction

@@ -118,7 +118,9 @@ export async function generateAndSendVerificationCode(
   scope: string[]
 ) {
   const isDemoUser = scope.indexOf('demo') > -1
-
+  logger.info('isDemoUser', {
+    isDemoUser: isDemoUser
+  })
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'

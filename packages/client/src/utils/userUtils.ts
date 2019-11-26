@@ -29,6 +29,7 @@ export interface IGQLLocation {
   id: string
   identifier?: IIdentifier[]
   name?: string
+  alias?: (string | null)[]
   status?: string
 }
 
@@ -92,6 +93,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     userDetails.primaryOffice = {
       id: primaryOffice.id,
       name: primaryOffice.name,
+      alias: primaryOffice.alias,
       status: primaryOffice.status
     }
   }
@@ -105,6 +107,7 @@ export function getUserDetails(user: GQLUser): IUserDetails {
           return {
             id: cArea.id,
             name: cArea.name,
+            alias: cArea.alias,
             status: cArea.status,
             identifier: identifiers.map((identifier: GQLIdentifier) => {
               return {
