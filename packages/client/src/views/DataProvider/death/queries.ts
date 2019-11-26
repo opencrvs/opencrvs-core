@@ -93,6 +93,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         status {
           type
+          timestamp
         }
         type
         trackingId
@@ -201,6 +202,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             comment
           }
           type
+          timestamp
           location {
             name
             alias

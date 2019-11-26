@@ -73,12 +73,15 @@ export const userDetailsAvailable = (payload: IUserDetails) => ({
   payload
 })
 
+export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
+
 export const modifyUserDetails = (
   payload: IUserDetails
 ): ModifyUserDetailsAction => ({
   type: MODIFY_USER_DETAILS,
   payload
 })
+
 export const setInitialUserDetails = (): ISetInitialUserDetails => ({
   type: SET_INITIAL_USER_DETAILS
 })
@@ -109,4 +112,4 @@ export type Action =
   | IGetStorageUserDetailsSuccessAction
   | IGetStorageUserDetailsFailedAction
   | ModifyUserDetailsAction
-  | ReturnType<typeof userDetailsAvailable>
+  | UserDetailsAvailable
