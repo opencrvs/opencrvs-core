@@ -35,6 +35,7 @@ export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
 export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
 export const MOTHER_TITLE = "Mother's details"
 export const FATHER_TITLE = "Father's details"
+export const SPOUSE_TITLE = "Spouse's details"
 export const CHILD_TITLE = 'Child details'
 export const DECEASED_TITLE = 'Deceased details'
 export const INFORMANT_TITLE = "Informant's details"
