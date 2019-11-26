@@ -764,6 +764,74 @@ describe('In Progress tab', () => {
       )
     })
   })
+
+  describe('When Notification (Hospital) tab is selected', () => {
+    it('Should render all items returned from graphQL', async () => {
+      const TIME_STAMP = '1562912635549'
+      const drafts: IApplication[] = []
+      drafts.push(createApplication(Event.BIRTH))
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.hospitalDrafts}
+          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
+          queryData={{
+            notificationData: {
+              totalItems: 2,
+              results: [
+                {
+                  id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
+                  type: 'Birth',
+                  registration: {
+                    trackingId: 'BQ2IDOP',
+                    modifiedAt: TIME_STAMP
+                  },
+                  childName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLBirthEventSearchSet,
+                {
+                  id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
+                  type: 'Death',
+                  registration: {
+                    trackingId: 'DZECJZC',
+                    modifiedAt: TIME_STAMP
+                  },
+                  deceasedName: [
+                    {
+                      use: 'en',
+                      firstNames: 'Anik',
+                      familyName: 'Hoque'
+                    }
+                  ]
+                } as GQLDeathEventSearchSet
+              ]
+            },
+            inProgressData: {}
+          }}
+        />,
+        store
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      const data = testComponent.component.find(GridTable).prop('content')
+      const EXPECTED_DATE_OF_REJECTION = moment(Number(TIME_STAMP)).fromNow()
+
+      expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+      expect(data[0].name).toBe('Anik Hoque')
+      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].event).toBe('Birth')
+    })
+  })
 })
 
 describe('Tablet tests', () => {
