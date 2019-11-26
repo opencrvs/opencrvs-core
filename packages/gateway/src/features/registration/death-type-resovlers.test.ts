@@ -180,7 +180,36 @@ describe('Registration type resolvers', () => {
       expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
       expect(informant.resource.relationship.text).toEqual('Nephew')
     })
+    it('returns mother', async () => {
+      fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
 
+      // @ts-ignore
+      const mother = await typeResolvers.DeathRegistration.mother(
+        mockDeathComposition
+      )
+      expect(mother).toBeDefined()
+      expect(mother.resourceType).toEqual('Patient')
+    })
+    it('returns father', async () => {
+      fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
+
+      // @ts-ignore
+      const father = await typeResolvers.DeathRegistration.father(
+        mockDeathComposition
+      )
+      expect(father).toBeDefined()
+      expect(father.resourceType).toEqual('Patient')
+    })
+    it('returns spouse', async () => {
+      fetch.mockResponseOnce(JSON.stringify({ resourceType: 'Patient' }))
+
+      // @ts-ignore
+      const spouse = await typeResolvers.DeathRegistration.spouse(
+        mockDeathComposition
+      )
+      expect(spouse).toBeDefined()
+      expect(spouse.resourceType).toEqual('Patient')
+    })
     it('returns RelatedPerson id', async () => {
       const resourceID = await typeResolvers.RelatedPerson.id({
         id: '1',

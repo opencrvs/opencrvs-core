@@ -40,7 +40,8 @@ import {
   REASON_FATHER_NOT_APPLYING,
   REASON_CAREGIVER_NOT_APPLYING,
   PRIMARY_CAREGIVER,
-  PARENT_DETAILS
+  PARENT_DETAILS,
+  SPOUSE_CODE
 } from '@gateway/features/fhir/templates'
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
@@ -661,6 +662,36 @@ export const typeResolvers: GQLResolver = {
     },
     createdAt(composition: ITemplatedComposition) {
       return composition.date
+    },
+    async mother(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(MOTHER_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+    },
+    async father(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(FATHER_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+    },
+    async spouse(composition: ITemplatedComposition, _, authHeader) {
+      const patientSection = findCompositionSection(SPOUSE_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      return await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
     },
     async deceased(composition: ITemplatedComposition, _, authHeader) {
       const patientSection = findCompositionSection(DECEASED_CODE, composition)

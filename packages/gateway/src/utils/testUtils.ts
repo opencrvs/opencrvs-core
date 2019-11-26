@@ -588,6 +588,60 @@ export const mockDeathComposition = {
       ]
     },
     {
+      title: "Mother's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'mother-details'
+          }
+        ],
+        text: "Mother's details"
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        }
+      ]
+    },
+    {
+      title: "Father's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'father-details'
+          }
+        ],
+        text: "Father's details"
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        }
+      ]
+    },
+    {
+      title: "Spouse's details",
+      code: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/sections',
+            code: 'spouse-details'
+          }
+        ],
+        text: "Spouse's details"
+      },
+      text: '',
+      entry: [
+        {
+          reference: 'urn:uuid:xxx' // reference to a Patient resource contained below, by fullUrl
+        }
+      ]
+    },
+    {
       title: 'Death Encounter',
       code: {
         coding: [

@@ -291,9 +291,9 @@ input DeathRegistrationInput {
   # Remember to mark person as deceased
   deceased: PersonInput
   informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: RelatedPersonInput # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: RelatedPersonInput # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: RelatedPersonInput # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  mother: PersonInput # -> Use for applicant ->.section(code='mother-details').entry.reference
+  father: PersonInput # -> Use for applicant ->.section(code='father-details').entry.reference
+  spouse: PersonInput # -> Use for applicant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
@@ -310,9 +310,9 @@ type DeathRegistration implements EventRegistration { # -> Composition
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
   informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: RelatedPerson # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: RelatedPerson # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: RelatedPerson # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  mother: Person # -> Use for applicant ->.section(code='mother-details').entry.reference
+  father: Person # -> Use for applicant ->.section(code='father-details').entry.reference
+  spouse: Person # -> Use for applicant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept

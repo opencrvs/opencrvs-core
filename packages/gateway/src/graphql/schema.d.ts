@@ -519,9 +519,9 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   registration?: GQLRegistration
   deceased?: GQLPerson
   informant?: GQLRelatedPerson
-  mother?: GQLRelatedPerson
-  father?: GQLRelatedPerson
-  spouse?: GQLRelatedPerson
+  mother?: GQLPerson
+  father?: GQLPerson
+  spouse?: GQLPerson
   eventLocation?: GQLLocation
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
@@ -870,9 +870,9 @@ export interface GQLDeathRegistrationInput {
   registration?: GQLRegistrationInput
   deceased?: GQLPersonInput
   informant?: GQLRelatedPersonInput
-  mother?: GQLRelatedPersonInput
-  father?: GQLRelatedPersonInput
-  spouse?: GQLRelatedPersonInput
+  mother?: GQLPersonInput
+  father?: GQLPersonInput
+  spouse?: GQLPersonInput
   eventLocation?: GQLLocationInput
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
