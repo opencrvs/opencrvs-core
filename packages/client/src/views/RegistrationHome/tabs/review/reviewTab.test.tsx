@@ -970,7 +970,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
                           comment: 'This is a note'
                         }
                       ],
-                      type: 'DECLARED'
+                      type: 'DECLARED',
+                      timestamp: null
                     }
                   ],
                   trackingId: 'B123456',

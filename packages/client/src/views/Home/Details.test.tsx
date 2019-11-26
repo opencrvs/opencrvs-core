@@ -812,7 +812,8 @@ describe('Registrar tests', () => {
                       comment: 'This is a note'
                     }
                   ],
-                  type: 'DECLARED'
+                  type: 'DECLARED',
+                  timestamp: null
                 }
               ],
               trackingId: 'B123456',
@@ -1279,7 +1280,8 @@ describe('Registrar tests', () => {
                         district: 'Narsingdi',
                         state: 'Dhaka'
                       }
-                    }
+                    },
+                    timestamp: null
                   },
                   {
                     comments: null,
@@ -1295,7 +1297,8 @@ describe('Registrar tests', () => {
                         district: 'Narsingdi',
                         state: 'Dhaka'
                       }
-                    }
+                    },
+                    timestamp: null
                   }
                 ],
                 type: 'DEATH',

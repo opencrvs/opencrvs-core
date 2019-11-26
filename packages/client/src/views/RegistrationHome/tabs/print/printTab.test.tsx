@@ -904,7 +904,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                           district: 'Narsingdi',
                           state: 'Dhaka'
                         }
-                      }
+                      },
+                      timestamp: null
                     },
                     {
                       comments: null,
@@ -920,7 +921,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
                           district: 'Narsingdi',
                           state: 'Dhaka'
                         }
-                      }
+                      },
+                      timestamp: null
                     }
                   ],
                   type: 'DEATH',

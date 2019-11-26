@@ -812,7 +812,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
                           comment: 'This is a note'
                         }
                       ],
-                      type: 'REJECTED'
+                      type: 'REJECTED',
+                      timestamp: null
                     },
                     {
                       comments: [
@@ -820,7 +821,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
                           comment: 'This is a note'
                         }
                       ],
-                      type: 'DECLARED'
+                      type: 'DECLARED',
+                      timestamp: null
                     }
                   ],
                   trackingId: 'B123456',
