@@ -27,6 +27,7 @@ jobs:
           packages:
             - libgconf-2-4
       script:
+        - ./node_modules/.bin/ts-node rebuild-only-changed-images.ts
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init
