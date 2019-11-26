@@ -51,6 +51,7 @@ services:
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - AUTH_URL=http://auth:4040
+      - RESOURCES_URL=http://resources:3040
 
   # User facing services
   workflow:
@@ -149,3 +150,4 @@ services:
       - NODE_ENV=DEVELOPMENT
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
+      - OPENHIM_URL=http://openhim-core:5001

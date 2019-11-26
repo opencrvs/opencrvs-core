@@ -39,7 +39,7 @@ module.exports = {
         semi: false
       }
     ],
-    'no-console': 'off',
+    'no-console': 'warn',
     'no-return-assign': 'off',
     'no-restricted-imports': [
       'error',

@@ -42,14 +42,21 @@ export function createPDF(
           `No transform function found for given name: ${transformerDef.operation}`
         )
       }
+      let result = transformFunction(
+        { application, userDetails, resource: offlineResource },
+        intl,
+        transformerDef.parameters,
+        optionalData
+      )
+      if (
+        typeof transformerDef.valueIndex !== 'undefined' && // Checking type of the object as it can contain 0
+        typeof result === 'string'
+      ) {
+        result = (result as string).charAt(transformerDef.valueIndex) || ''
+      }
       definitionString = definitionString.replace(
         new RegExp(`{${transformerDef.field}}`, 'gi'),
-        transformFunction(
-          { application, userDetails, resource: offlineResource },
-          intl,
-          transformerDef.parameters,
-          optionalData
-        ) || ''
+        result || ''
       )
     })
   }
