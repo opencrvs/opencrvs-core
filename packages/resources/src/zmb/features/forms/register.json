@@ -6187,7 +6187,7 @@
                     "id": "form.field.label.permanentAddressSameAsMother"
                   },
                   "required": true,
-                  "initialValue": true,
+                  "initialValue": false,
                   "validate": [],
                   "options": [
                     {
@@ -6211,6 +6211,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType ===  \"NONE\" ))"
                     }
                   ],
                   "mapping": {
