@@ -145,7 +145,7 @@ export async function createServer() {
   })
 
   server.route({
-    method: 'POST',
+    method: 'GET',
     path: '/bgd/bdris-queue/trigger',
     handler: bgdBDRISQueueTriggerHandler,
     options: {

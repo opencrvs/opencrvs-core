@@ -18,6 +18,11 @@ import { createWebHookResponseFromBundle } from '@resources/bgd/features/validat
 
 export function covertBundleToBDRISFormat(bundle: fhir.Bundle) {
   // TODO implement this when we know the JSON format - OCRVS-2331
+  // @ts-ignore
+  if (bundle.throw) {
+    throw new Error('test error')
+  }
+
   return bundle
 }
 
@@ -53,14 +58,16 @@ async function validateWithBDRIS(item: IQueueItemModel) {
     })
   } catch (err) {
     // call workflow webhook with error
+    const errMsg = `Failed to validate with BDRIS: ${err.message}`
+
     await fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: errMsg }),
       headers: { Authorization: item.token }
     })
 
     item.set('status', 'ERROR')
-    item.set('error', `Failed to validate with BDRIS: ${err.message}`)
+    item.set('error', errMsg)
     return item.save()
   }
 
