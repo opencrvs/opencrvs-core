@@ -19,11 +19,11 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/hearth-dev.gz"
+docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/hearth-dev.gz"
 
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/openhim-dev.gz"
+docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/openhim-dev.gz"
 
-docker run --rm -v $DIR/backups:/backups --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/user-mgnt.gz"
+docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/user-mgnt.gz"

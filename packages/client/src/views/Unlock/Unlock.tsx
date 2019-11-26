@@ -37,7 +37,7 @@ const PageWrapper = styled.div`
   ${window.config.COUNTRY === 'zmb'
     ? `background: url(${zambiaBackground});`
     : ''}
-  height: calc(100vh + 80px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -12,6 +12,7 @@
 import {
   composeAndSaveLocations,
   composeAndSaveLocationsByParent,
+  composeAndSaveHardcodedLocations,
   generateLocationResource,
   fetchAndProcessLocationsFromOISF
 } from '@resources/bgd/features/administrative/scripts/service'
@@ -25,6 +26,7 @@ export default async function importAdminStructure() {
   let districts: fhir.Location[]
   let upazilas: fhir.Location[]
   let unions: fhir.Location[]
+  let municipalities: fhir.Location[]
   // tslint:disable-next-line:no-console
   console.log(
     `${chalk.blueBright(
@@ -123,6 +125,31 @@ export default async function importAdminStructure() {
     return
   }
 
+  try {
+    const hardcodedMunicipalities = JSON.parse(
+      fs
+        .readFileSync(
+          `${ADMIN_STRUCTURE_SOURCE}municipalities/municipalities.json`
+        )
+        .toString()
+    )
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${chalk.yellow('Saving hardcoded locations:')} ${
+        hardcodedMunicipalities.municipalities.length
+      } municipalities. Please wait for 10 mins ....`
+    )
+    municipalities = await composeAndSaveHardcodedLocations(
+      hardcodedMunicipalities.municipalities,
+      'UPAZILA'
+    )
+  } catch (err) {
+    // tslint:disable-next-line:no-console
+    console.log(err)
+    process.exit(1)
+    return
+  }
+
   fs.writeFileSync(
     `${ADMIN_STRUCTURE_SOURCE}locations/divisions.json`,
     JSON.stringify({ divisions }, null, 2)
@@ -143,11 +170,17 @@ export default async function importAdminStructure() {
     JSON.stringify({ unions }, null, 2)
   )
 
+  fs.writeFileSync(
+    `${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`,
+    JSON.stringify({ municipalities }, null, 2)
+  )
+
   const fhirLocations: fhir.Location[] = []
   fhirLocations.push(...divisions)
   fhirLocations.push(...districts)
   fhirLocations.push(...upazilas)
   fhirLocations.push(...unions)
+  fhirLocations.push(...municipalities)
 
   const data: ILocation[] = []
   for (const location of fhirLocations) {

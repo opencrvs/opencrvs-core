@@ -26,7 +26,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   ${({ theme }) => theme.gradients.gradientNightshade};
-  height: calc(100vh + 80px);
+  height: 100vh;
   width: 100%;
   position: absolute;
   overflow-y: hidden;
