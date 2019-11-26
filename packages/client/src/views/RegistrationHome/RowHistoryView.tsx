@@ -319,6 +319,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
           variables={{
             id: this.props.eventId
           }}
+          fetchPolicy="no-cache"
         >
           {({
             loading,
