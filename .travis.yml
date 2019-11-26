@@ -27,6 +27,8 @@ jobs:
           packages:
             - libgconf-2-4
       script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - ./node_modules/.bin/ts-node rebuild-only-changed-images.ts
         - yarn global add wait-on
         - yarn dev:secrets:gen
         - docker swarm init

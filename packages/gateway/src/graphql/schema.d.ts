@@ -19,6 +19,7 @@ export interface GQLQuery {
   fetchDeathRegistration?: GQLDeathRegistration
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
+  queryPersonByNidIdentifier?: GQLPerson
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -978,6 +979,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
+  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
+    TParent
+  >
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -1114,6 +1118,23 @@ export interface QueryToFetchRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToQueryPersonByNidIdentifierArgs {
+  dob?: string
+  nid?: string
+  country?: string
+}
+export interface QueryToQueryPersonByNidIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToQueryPersonByNidIdentifierArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

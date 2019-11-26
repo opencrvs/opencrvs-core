@@ -22,6 +22,12 @@ services:
       - INFOBIP_API_KEY_PATH=/run/secrets/infobip-api-key
       - INFOBIP_SENDER_ID=/run/secrets/infobip-sender-id
 
+  resources:
+    secrets:
+      - oisf-secret
+    environment:
+      - OISF_SECRET=/run/secrets/oisf-secret
+
   workflow:
     environment:
       - LANGUAGES=bn,en
@@ -57,4 +63,6 @@ secrets:
   openhim-user:
     external: true
   openhim-password:
+    external: true
+  oisf-secret:
     external: true
