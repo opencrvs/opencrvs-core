@@ -33,7 +33,49 @@ import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
 
-export const certCollectorGroupForBirthAppWithFatherDetails: IFormSectionGroup = {
+export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup = {
+  id: 'certCollector',
+  title: certificateMessages.whoToCollect,
+  error: certificateMessages.certificateCollectorError,
+  fields: [
+    {
+      name: 'type',
+      type: RADIO_GROUP,
+      size: RadioSize.LARGE,
+      label: certificateMessages.whoToCollect,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'MOTHER', label: formMessages.contactDetailsMother },
+        { value: 'OTHER', label: formMessages.someoneElse }
+      ]
+    }
+  ]
+}
+
+export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGroup = {
+  id: 'certCollector',
+  title: certificateMessages.whoToCollect,
+  error: certificateMessages.certificateCollectorError,
+  fields: [
+    {
+      name: 'type',
+      type: RADIO_GROUP,
+      size: RadioSize.LARGE,
+      label: certificateMessages.whoToCollect,
+      required: true,
+      initialValue: '',
+      validate: [],
+      options: [
+        { value: 'FATHER', label: formMessages.contactDetailsFather },
+        { value: 'OTHER', label: formMessages.someoneElse }
+      ]
+    }
+  ]
+}
+
+export const certCollectorGroupForBirthAppWithparentDetails: IFormSectionGroup = {
   id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,
@@ -55,7 +97,7 @@ export const certCollectorGroupForBirthAppWithFatherDetails: IFormSectionGroup =
   ]
 }
 
-export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup = {
+export const certCollectorGroupForBirthAppWithoutparentDetails: IFormSectionGroup = {
   id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,
@@ -68,10 +110,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
       required: true,
       initialValue: '',
       validate: [],
-      options: [
-        { value: 'MOTHER', label: formMessages.contactDetailsMother },
-        { value: 'OTHER', label: formMessages.someoneElse }
-      ]
+      options: [{ value: 'OTHER', label: formMessages.someoneElse }]
     }
   ]
 }

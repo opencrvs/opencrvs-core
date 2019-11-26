@@ -35,10 +35,6 @@ import {
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
-import {
-  certCollectorGroupForBirthAppWithFatherDetails,
-  certCollectorGroupForBirthAppWithoutFatherDetails
-} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   getValidationErrorsForForm,
@@ -77,6 +73,12 @@ import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
+import {
+  certCollectorGroupForBirthAppWithparentDetails,
+  certCollectorGroupForBirthAppWithoutFatherDetails,
+  certCollectorGroupForBirthAppWithoutparentDetails,
+  certCollectorGroupForBirthAppWithoutMotherDetails
+} from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -488,16 +490,29 @@ const mapStateToProps = (
   const formSection = getCollectCertificateForm(event, state)
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
-    if (application && application.data && application.data.father) {
-      if (application.data.father.fathersDetailsExist) {
-        clonedFormSection.groups.unshift(
-          certCollectorGroupForBirthAppWithFatherDetails
-        )
-      } else {
-        clonedFormSection.groups.unshift(
-          certCollectorGroupForBirthAppWithoutFatherDetails
-        )
-      }
+    const applicationData = application && application.data
+    const motherDataExist = applicationData && applicationData.mother
+    const fatherDataExist =
+      applicationData &&
+      applicationData.father &&
+      applicationData.father.fathersDetailsExist
+
+    if (motherDataExist && fatherDataExist) {
+      clonedFormSection.groups.unshift(
+        certCollectorGroupForBirthAppWithparentDetails
+      )
+    } else if (fatherDataExist && !motherDataExist) {
+      clonedFormSection.groups.unshift(
+        certCollectorGroupForBirthAppWithoutMotherDetails
+      )
+    } else if (motherDataExist && !fatherDataExist) {
+      clonedFormSection.groups.unshift(
+        certCollectorGroupForBirthAppWithoutFatherDetails
+      )
+    } else if (!motherDataExist && !fatherDataExist) {
+      clonedFormSection.groups.unshift(
+        certCollectorGroupForBirthAppWithoutparentDetails
+      )
     }
   }
   const formGroup =
