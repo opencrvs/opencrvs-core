@@ -75,7 +75,7 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
   ]
 }
 
-export const certCollectorGroupForBirthAppWithparentDetails: IFormSectionGroup = {
+export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup = {
   id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,
@@ -97,7 +97,7 @@ export const certCollectorGroupForBirthAppWithparentDetails: IFormSectionGroup =
   ]
 }
 
-export const certCollectorGroupForBirthAppWithoutparentDetails: IFormSectionGroup = {
+export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGroup = {
   id: 'certCollector',
   title: certificateMessages.whoToCollect,
   error: certificateMessages.certificateCollectorError,

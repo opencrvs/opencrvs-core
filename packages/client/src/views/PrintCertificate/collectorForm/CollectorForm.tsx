@@ -73,9 +73,9 @@ import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import {
-  certCollectorGroupForBirthAppWithparentDetails,
+  certCollectorGroupForBirthAppWithParentDetails,
   certCollectorGroupForBirthAppWithoutFatherDetails,
-  certCollectorGroupForBirthAppWithoutparentDetails,
+  certCollectorGroupForBirthAppWithoutParentDetails,
   certCollectorGroupForBirthAppWithoutMotherDetails
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
@@ -502,7 +502,7 @@ const mapStateToProps = (
 
     if (motherDataExist && fatherDataExist) {
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithparentDetails
+        certCollectorGroupForBirthAppWithParentDetails
       )
     } else if (fatherDataExist && !motherDataExist) {
       clonedFormSection.groups.unshift(
@@ -514,7 +514,7 @@ const mapStateToProps = (
       )
     } else if (!motherDataExist && !fatherDataExist) {
       clonedFormSection.groups.unshift(
-        certCollectorGroupForBirthAppWithoutparentDetails
+        certCollectorGroupForBirthAppWithoutParentDetails
       )
     }
   }
