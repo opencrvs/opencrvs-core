@@ -15,7 +15,8 @@ import {
   getEventType,
   isInProgressApplication,
   isEventNotification,
-  getRegistrationNumber
+  getRegistrationNumber,
+  getTaskEventType
 } from '@workflow/features/registration/utils'
 import {
   getFromFhir,
@@ -150,6 +151,45 @@ export async function markBundleAsRegistered(
   // TODO validate registration with resource service and set resulting registration number
 
   return bundle
+}
+
+export async function markEventAsRegistered(
+  taskResource: fhir.Task,
+  registrationNumber: string,
+  token: string
+): Promise<fhir.Task> {
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* Setting registration number here */
+  const eventType = getTaskEventType(taskResource)
+  let identifierName
+  if (eventType === EVENT_TYPE.BIRTH) {
+    identifierName = 'birth-registration-number'
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    identifierName = 'death-registration-number'
+  }
+
+  if (taskResource && taskResource.identifier) {
+    taskResource.identifier.push({
+      system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
+      value: registrationNumber
+    })
+  }
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_REGISTERED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  return taskResource
 }
 
 export async function markBundleAsCertified(

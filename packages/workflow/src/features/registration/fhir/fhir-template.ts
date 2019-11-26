@@ -230,3 +230,17 @@ export function selectInformantResource(
 
   return informantEntry && (informantEntry.resource as fhir.Patient)
 }
+
+export async function createFhirBundle(taskEntry: fhir.Task) {
+  const composition: fhir.Composition = await getFromFhir(`/${taskEntry.focus}`)
+
+  const fhirBundle: fhir.Bundle = {
+    resourceType: 'Bundle',
+    type: 'searchset' //not sure what does the type mean here
+  }
+  fhirBundle.entry = [] as fhir.BundleEntry[]
+  fhirBundle.entry.push(composition)
+  fhirBundle.entry.push(taskEntry)
+
+  return fhirBundle
+}

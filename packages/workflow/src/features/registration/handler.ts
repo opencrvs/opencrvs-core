@@ -13,20 +13,26 @@ import { HEARTH_URL } from '@workflow/constants'
 import { Events } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
-  markBundleAsRegistered,
   markBundleAsValidated,
   modifyRegistrationBundle,
-  setTrackingId
+  setTrackingId,
+  markEventAsRegistered,
+  markBundleAsRegistered
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getSharedContactMsisdn,
-  postToHearth
+  postToHearth,
+  getFromFhir
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { sendEventNotification } from '@workflow/features/registration/utils'
+import {
+  sendEventNotification,
+  getTaskEventType
+} from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
+import { createFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -143,6 +149,45 @@ export async function markEventAsValidatedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsRegisteredCallbackHandler(
+  request: Hapi.Request,
+  trackingId: string,
+  registrationNumber: string
+) {
+  const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
+
+  const event = getTaskEventType(task)
+  const fhirBundle = await createFhirBundle(task)
+
+  try {
+    await markEventAsRegistered(task, registrationNumber, getToken(request))
+    const resBundle = await postToHearth(fhirBundle)
+
+    const msisdn = await getSharedContactMsisdn(fhirBundle)
+
+    /* sending notification to the contact */
+    if (msisdn) {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler sending event notification'
+      )
+      sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, msisdn, {
+        Authorization: request.headers.authorization
+      })
+    } else {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler could not send event notification'
+      )
+    }
+
+    return resBundle
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
+    )
     throw new Error(error)
   }
 }
