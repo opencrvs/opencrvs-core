@@ -56,12 +56,12 @@ jobs:
       services:
         - docker
 
-    #- stage: deploy to staging
-    #  if: branch = master AND type = push
-    #  install: skip
-    #  script: yarn deploy:staging:bgd
-    #  addons:
-    #    ssh_known_hosts: opencrvs-staging.jembi.org
+    - stage: deploy to staging
+      if: branch = master AND type = push
+      install: skip
+      script: yarn deploy:staging:bgd
+      addons:
+        ssh_known_hosts: opencrvs-staging.jembi.org
 
     - stage: integration tests on staging
       if: branch = master AND type = push
