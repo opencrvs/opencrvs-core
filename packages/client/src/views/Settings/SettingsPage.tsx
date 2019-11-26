@@ -266,7 +266,7 @@ class SettingsView extends React.Component<IProps, IState> {
         items: [
           {
             label: intl.formatMessage(constantsMessages.labelPassword),
-            placeHolder: 'Last change 4 days ago',
+            placeHolder: '********',
             action: {
               id: 'BtnChangePassword',
               label: intl.formatMessage(buttonMessages.change),
@@ -275,7 +275,7 @@ class SettingsView extends React.Component<IProps, IState> {
           },
           {
             label: intl.formatMessage(constantsMessages.labelPin),
-            placeHolder: 'Last change 4 days ago',
+            placeHolder: '****',
             action: {
               label: intl.formatMessage(buttonMessages.change),
               disabled: true
