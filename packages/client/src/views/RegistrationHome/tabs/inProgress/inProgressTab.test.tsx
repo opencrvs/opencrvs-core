@@ -708,7 +708,7 @@ describe('In Progress tab', () => {
         selectorId: SELECTOR_ID.fieldAgentDrafts,
         registrarLocationId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
         queryData: {
-          data: {
+          inProgressData: {
             totalItems: 1,
             results: [
               {
@@ -727,7 +727,8 @@ describe('In Progress tab', () => {
                 ]
               } as GQLBirthEventSearchSet
             ]
-          }
+          },
+          notificationData: {}
         }
       }
       it('renders download button when not downloaded', async () => {

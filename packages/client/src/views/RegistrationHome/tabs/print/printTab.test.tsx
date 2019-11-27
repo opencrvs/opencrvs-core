@@ -154,6 +154,7 @@ const mockPrintTabData = {
         contactNumber: null,
         trackingId: 'DG6PECX',
         registrationNumber: '20196816020000113',
+        eventLocationId: null,
         registeredLocationId: 'd8cfd240-4b5a-4557-9df7-b1591a11d843',
         duplicates: null,
         createdAt: '1574696143372',
@@ -746,6 +747,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: { totalItems: 0, results: [] },
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },

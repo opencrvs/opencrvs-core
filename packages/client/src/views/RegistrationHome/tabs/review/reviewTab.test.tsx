@@ -1108,6 +1108,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: mockReviewTabData,
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
