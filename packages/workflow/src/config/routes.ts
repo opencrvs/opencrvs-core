@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
+import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -22,6 +23,16 @@ export const getRoutes = () => {
       },
       config: {
         tags: ['api']
+      }
+    },
+    {
+      method: '*',
+      path: '/confirm/registration',
+      handler: markEventAsRegisteredCallbackHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Register event based on tracking id and registration number.'
       }
     },
     {
