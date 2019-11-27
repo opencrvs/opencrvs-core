@@ -85,7 +85,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
               key: 'week',
               isSortable: true,
               icon: <ArrowDownBlue />,
-              sortFunction: () => console.log('sorted')
+              sortFunction: () => {}
             },
             {
               label: intl.formatMessage(constantsMessages.export),
@@ -107,7 +107,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
               key: 'week',
               isSortable: true,
               icon: <ArrowDownBlue />,
-              sortFunction: () => console.log('sorted')
+              sortFunction: () => {}
             },
             {
               label: intl.formatMessage(constantsMessages.export),

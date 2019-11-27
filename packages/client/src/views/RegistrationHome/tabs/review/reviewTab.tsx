@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+import { Duplicate, Validate, Download } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -38,7 +38,8 @@ import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IApplication } from '@client/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { Event, Action } from '@client/forms'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -56,6 +57,11 @@ interface IBaseReviewTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IReviewTabState {
@@ -105,28 +111,82 @@ class ReviewTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
       const actions = [] as IAction[]
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
       let icon: JSX.Element = <div />
+
       if (reg.duplicates && reg.duplicates.length > 0) {
-        actions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () => this.props.goToReviewDuplicate(reg.id)
-        })
+        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+          actions.push({
+            label: '',
+            icon: () => <Download />,
+            handler: () => {
+              this.props.onDownloadApplication(
+                reg.event as Event,
+                reg.id,
+                Action.LOAD_REVIEW_APPLICATION
+              )
+            },
+            loading:
+              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+            error:
+              downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
+            loadingLabel: this.props.intl.formatMessage(
+              constantsMessages.downloading
+            )
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        }
+
         icon = <Duplicate />
       } else {
         if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
           icon = <Validate data-tip data-for="validateTooltip" />
         }
-        actions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              reg.id,
-              'review',
-              reg.event ? reg.event.toLowerCase() : ''
+        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+          actions.push({
+            label: '',
+            icon: () => <Download />,
+            handler: () => {
+              this.props.onDownloadApplication(
+                reg.event as Event,
+                reg.id,
+                Action.LOAD_REVIEW_APPLICATION
+              )
+            },
+            loading:
+              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+            error:
+              downloadStatus === DOWNLOAD_STATUS.FAILED ||
+              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
+            loadingLabel: this.props.intl.formatMessage(
+              constantsMessages.downloading
             )
-        })
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
+          })
+        }
       }
+
       return {
         ...reg,
         eventTimeElapsed:

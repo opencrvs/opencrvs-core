@@ -298,11 +298,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application: IApplication,
     submissionStatus: string,
     action: string,
-    payload?: IPayload
+    payload?: IPayload,
+    downloadStatus?: string
   ) => {
     application.submissionStatus = submissionStatus
     application.action = action
     application.payload = payload
+    application.downloadStatus = downloadStatus
     this.props.modifyApplication(application)
     this.props.history.push(HOME)
   }

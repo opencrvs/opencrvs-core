@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^5.2.1",
-    "@opencrvs/components": "^1.0.0-alpha.1.1",
+    "@opencrvs/components": "^1.0.0-alpha.1.2",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -71,7 +71,7 @@
     "postinstall": "patch-package",
     "precommit": "lint-staged",
     "start": "BROWSER=none PORT=3000 craco start",
-    "build": "craco --max_old_space_size=8000 build && yarn gen:sw",
+    "build": "REACT_APP_VERSION=$VERSION craco --max_old_space_size=8000 build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",

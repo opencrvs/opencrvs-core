@@ -12,29 +12,32 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrow } from '../icons'
-import { Button, CircleButton } from '../buttons'
+import { CircleButton } from '../buttons'
 import { Box } from './Box'
 
 const SubPageContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 80px);
   ${({ theme }) => theme.fonts.bodyStyle};
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 const HeaderBlock = styled.div`
   box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   height: 64px;
+  width: 100%;
   max-width: 940px;
-  margin: auto;
   padding: 20px 10px;
   display: flex;
   flex-flow: row nowrap;
   margin-bottom: 1px;
   align-items: center;
 `
-const BackButton = styled(CircleButton)`
+const BackButton = styled(props => <CircleButton {...props} />)`
   background: '#35495d00';
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
@@ -46,9 +49,9 @@ const EmptyTitle = styled(MenuTitle)`
   color: ${({ theme }) => theme.colors.error};
 `
 const BodyContainer = styled(Box)`
+  width: 100%;
   max-width: 940px;
-  height: inherit;
-  margin: auto;
+  flex-grow: 1;
 `
 interface IProps {
   title?: string
@@ -70,7 +73,7 @@ export class SubPage extends React.Component<IProps> {
             <EmptyTitle>{emptyTitle}</EmptyTitle>
           )}
         </HeaderBlock>
-        <BodyContainer>{this.props.children}</BodyContainer>π{' '}
+        <BodyContainer>{this.props.children}</BodyContainer>
       </SubPageContainer>
     )
   }

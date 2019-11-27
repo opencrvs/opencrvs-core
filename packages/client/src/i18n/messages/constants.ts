@@ -37,6 +37,7 @@ interface IConstantsMessages {
   declared: MessageDescriptor
   dob: MessageDescriptor
   dod: MessageDescriptor
+  downloading: MessageDescriptor
   eventDate: MessageDescriptor
   export: MessageDescriptor
   failedToSend: MessageDescriptor
@@ -207,6 +208,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'D.o.D',
     description: 'Label for DoD in work queue list item',
     id: 'constants.dod'
+  },
+  downloading: {
+    defaultMessage: 'Downloading...',
+    description: 'Label for application download status Downloading',
+    id: 'constants.downloading'
   },
   eventDate: {
     defaultMessage: 'Date of event',

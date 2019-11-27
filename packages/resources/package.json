@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/resources",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS resources for reference data",
   "license": "MPL-2.0",
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "jest  --silent --noStackTrace --coverage && yarn test:compilation && yarn test:dhis2-mediator",
     "test:dhis2-mediator": "cd src/bgd/mediators/bgd-dhis2/ && yarn install && yarn test",
     "test:compilation": "tsc --noEmit",
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
     "prep:employees:bgd": "ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/prepare-source-employees.ts",
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
@@ -29,8 +29,8 @@
     "jsonwebtoken": "^8.3.0"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.1",
-    "@opencrvs/user-mgnt": "^1.0.0-alpha.1.1",
+    "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@opencrvs/user-mgnt": "^1.0.0-alpha.1.2",
     "@types/chalk": "^2.2.0",
     "@types/code": "^4.0.3",
     "@types/csv2json": "^1.4.0",

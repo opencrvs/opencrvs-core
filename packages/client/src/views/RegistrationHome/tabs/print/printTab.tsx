@@ -11,7 +11,8 @@
  */
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -30,7 +31,9 @@ import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IStoreState } from '@client/store'
-import { IApplication } from '@client/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { Download } from '@opencrvs/components/lib/icons'
+import { Event, Action } from '@client/forms'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -43,6 +46,11 @@ interface IBasePrintTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IPrintTabState {
@@ -96,7 +104,7 @@ class PrintTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(messages.listItemRegisteredDate),
-          width: 24,
+          width: 16,
           key: 'dateOfRegistration'
         },
         {
@@ -106,7 +114,7 @@ class PrintTabComponent extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 12,
+          width: 20,
           key: 'actions',
           alignment: ColumnContentAlignment.CENTER,
           isActionColumn: true
@@ -135,16 +143,45 @@ class PrintTabComponent extends React.Component<
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map(reg => {
-      const actions = [
-        {
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const actions: IAction[] = []
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          label: '',
+          icon: () => <Download />,
+          handler: () => {
+            this.props.onDownloadApplication(
+              (reg.event as unknown) as Event,
+              reg.id,
+              Action.LOAD_CERTIFICATE_APPLICATION
+            )
+          },
+          loading:
+            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+          error:
+            downloadStatus === DOWNLOAD_STATUS.FAILED ||
+            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
+          loadingLabel: this.props.intl.formatMessage(
+            constantsMessages.downloading
+          )
+        })
+      } else {
+        actions.push({
           label: this.props.intl.formatMessage(buttonMessages.print),
           handler: () =>
             this.props.goToPrintCertificate(
               reg.id,
               reg.event.toLocaleLowerCase() || ''
             )
-        }
-      ]
+        })
+      }
+
       return {
         ...reg,
         dateOfRegistration:

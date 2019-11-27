@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  flushPromises
 } from '@client/tests/util'
 
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
@@ -33,6 +34,16 @@ import {
 import { checkAuth } from '@client/profile/profileActions'
 import moment from 'moment'
 import { Validate } from '@opencrvs/components/lib/icons'
+import { ReactWrapper } from 'enzyme'
+import { Store } from 'redux'
+import {
+  makeApplicationReadyToDownload,
+  DOWNLOAD_STATUS,
+  modifyApplication,
+  storeApplication
+} from '@client/applications'
+import { Action, Event } from '@client/forms'
+import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -136,7 +147,7 @@ const mockReviewTabData = {
   totalItems: 2,
   results: [
     {
-      id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+      id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
       type: 'Birth',
       registration: {
         status: 'DECLARED',
@@ -200,14 +211,14 @@ describe('RegistrationHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
 
-  beforeEach(() => {
+  beforeEach(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
     const createdStore = createStore()
     store = createdStore.store
     history = createdStore.history
 
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
   it('check sent for review tab count', async () => {
@@ -305,7 +316,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
 
@@ -316,7 +329,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     ).fromNow()
 
     expect(data.length).toBe(2)
-    expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+    expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
     expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
     expect(data[0].trackingId).toBe('BW0UTHR')
@@ -370,7 +383,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = await waitForElement(testComponent.component, GridTable)
     const data = gridTable.prop('content')
@@ -414,7 +429,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const pagination = await waitForElement(
       testComponent.component,
@@ -616,7 +633,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const gridTable = (await waitForElement(
       testComponent.component,
@@ -819,7 +838,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const instance = (await waitForElement(
       testComponent.component,
@@ -833,110 +854,330 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(element.hostNodes().length).toBe(1)
   })
 
-  it('redirects user to review page on review action click', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
+  describe('handles download status', () => {
+    let testComponent: ReactWrapper<{}, {}>
+    let createdTestComponent: { component: ReactWrapper; store: Store }
+    beforeEach(async () => {
+      Date.now = jest.fn(() => 1554055200000)
+      const graphqlMock = [
+        {
+          request: {
+            query: REGISTRATION_HOME_QUERY,
+            variables: {
+              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+              count: 10,
+              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+              inProgressSkip: 0,
+              reviewSkip: 0,
+              rejectSkip: 0,
+              approvalSkip: 0,
+              printSkip: 0
+            }
+          },
+          result: {
+            data: {
+              inProgressTab: { totalItems: 0, results: [] },
+              reviewTab: mockReviewTabData,
+              rejectTab: { totalItems: 0, results: [] },
+              approvalTab: { totalItems: 0, results: [] },
+              printTab: { totalItems: 0, results: [] }
+            }
           }
         },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            reviewTab: mockReviewTabData,
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
+        {
+          request: {
+            query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
+            variables: { id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269' }
+          },
+          result: {
+            data: {
+              fetchBirthRegistration: {
+                id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                _fhirIDMap: {
+                  composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                  encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                  observation: {
+                    birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                    weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                    attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                    presentAtBirthRegistration:
+                      'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                  }
+                },
+                child: null,
+                informant: null,
+                primaryCaregiver: null,
+                mother: {
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'ময়না'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: '',
+                      familyName: 'Moyna'
+                    }
+                  ],
+                  birthDate: '2001-01-01',
+                  maritalStatus: 'MARRIED',
+                  occupation: 'Mother Occupation',
+                  dateOfMarriage: '2001-01-01',
+                  educationalAttainment: 'PRIMARY_ISCED_1',
+                  nationality: ['BGD'],
+                  identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
+                  multipleBirth: 1,
+                  address: [
+                    {
+                      type: 'PERMANENT',
+                      line: ['12', '', 'union1', 'upazila10'],
+                      district: 'district2',
+                      state: 'state2',
+                      city: '',
+                      postalCode: '',
+                      country: 'BGD'
+                    },
+                    {
+                      type: 'CURRENT',
+                      line: ['12', '', 'union1', 'upazila10'],
+                      district: 'district2',
+                      state: 'state2',
+                      city: '',
+                      postalCode: '',
+                      country: 'BGD'
+                    }
+                  ],
+                  telecom: [
+                    {
+                      system: 'phone',
+                      value: '01711111111'
+                    }
+                  ],
+                  id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
+                },
+                father: null,
+                registration: {
+                  id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
+                  contact: 'MOTHER',
+                  contactRelationship: 'Contact Relation',
+                  contactPhoneNumber: '01733333333',
+                  attachments: null,
+                  status: [
+                    {
+                      comments: [
+                        {
+                          comment: 'This is a note'
+                        }
+                      ],
+                      type: 'DECLARED',
+                      timestamp: null
+                    }
+                  ],
+                  trackingId: 'B123456',
+                  registrationNumber: null,
+                  type: 'BIRTH'
+                },
+                attendantAtBirth: 'NURSE',
+                weightAtBirth: 2,
+                birthType: 'SINGLE',
+                eventLocation: {
+                  address: {
+                    country: 'BGD',
+                    state: 'state4',
+                    city: '',
+                    district: 'district2',
+                    postalCode: '',
+                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                    postCode: '1020'
+                  },
+                  type: 'PRIVATE_HOME',
+                  partOf: 'Location/upazila10'
+                },
+                presentAtBirthRegistration: 'MOTHER_ONLY'
+              }
+            }
           }
         }
-      }
-    ]
+      ]
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
-
-    const action = await waitForElement(
-      testComponent.component,
-      '#ListItemAction-0-Review'
-    )
-    expect(action.hostNodes()).toHaveLength(1)
-    action.hostNodes().simulate('click')
-
-    testComponent.component.update()
-    await waitFor(() =>
-      window.location.href.includes(
-        '/reviews/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+      createdTestComponent = await createTestComponent(
+        // @ts-ignore
+        <RegistrationHome />,
+        store,
+        graphqlMock
       )
-    )
+
+      getItem.mockReturnValue(registerScopeToken)
+      await createdTestComponent.store.dispatch(
+        checkAuth({ '?token': registerScopeToken })
+      )
+
+      testComponent = createdTestComponent.component
+    })
+
+    it('downloads application after clicking download button', async () => {
+      const downloadButton = await waitForElement(
+        testComponent,
+        '#ListItemAction-0-icon'
+      )
+
+      downloadButton.hostNodes().simulate('click')
+
+      testComponent.update()
+
+      expect(
+        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+      ).toHaveLength(1)
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+
+      const action = await waitForElement(
+        testComponent,
+        '#ListItemAction-0-Review'
+      )
+      action.hostNodes().simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      expect(history.location.pathname).toBe(
+        '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
+      )
+    })
+
+    it('shows error when download is failed', async () => {
+      const downloadedApplication = makeApplicationReadyToDownload(
+        Event.DEATH,
+        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+        Action.LOAD_REVIEW_APPLICATION
+      )
+      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
+      createdTestComponent.store.dispatch(
+        storeApplication(downloadedApplication)
+      )
+
+      testComponent.update()
+
+      const errorIcon = await waitForElement(
+        testComponent,
+        '#action-error-ListItemAction-1'
+      )
+
+      expect(errorIcon.hostNodes()).toHaveLength(1)
+    })
   })
 
-  it('redirects user to duplicate page on review action click', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            reviewTab: mockReviewTabData,
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
+  describe('handles download status for possible duplicate application', () => {
+    let testComponent: ReactWrapper<{}, {}>
+    let createdTestComponent: { component: ReactWrapper; store: Store }
+    beforeAll(async () => {
+      Date.now = jest.fn(() => 1554055200000)
+      const graphqlMock = [
+        {
+          request: {
+            query: REGISTRATION_HOME_QUERY,
+            variables: {
+              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+              count: 10,
+              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
+              inProgressSkip: 0,
+              reviewSkip: 0,
+              rejectSkip: 0,
+              approvalSkip: 0,
+              printSkip: 0
+            }
+          },
+          result: {
+            data: {
+              inProgressTab: { totalItems: 0, results: [] },
+              reviewTab: mockReviewTabData,
+              rejectTab: { totalItems: 0, results: [] },
+              approvalTab: { totalItems: 0, results: [] },
+              printTab: { totalItems: 0, results: [] }
+            }
           }
         }
-      }
-    ]
+      ]
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome />,
-      store,
-      graphqlMock
-    )
+      createdTestComponent = await createTestComponent(
+        // @ts-ignore
+        <RegistrationHome />,
+        store,
+        graphqlMock
+      )
 
-    getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      getItem.mockReturnValue(registerScopeToken)
+      await createdTestComponent.store.dispatch(
+        checkAuth({ '?token': registerScopeToken })
+      )
+      testComponent = createdTestComponent.component
+    })
 
-    const action = await waitForElement(
-      testComponent.component,
-      '#ListItemAction-1-Review'
-    )
+    it('starts downloading after clicking download button', async () => {
+      const downloadButton = await waitForElement(
+        testComponent,
+        '#ListItemAction-1-icon'
+      )
 
-    expect(action.hostNodes()).toHaveLength(1)
-    action.hostNodes().simulate('click')
+      downloadButton.hostNodes().simulate('click')
+      testComponent.update()
 
-    expect(history.location.pathname).toContain(
-      '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
-    )
+      expect(
+        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
+      ).toHaveLength(1)
+    })
+
+    it('shows review button when download is complete', async () => {
+      const downloadedApplication = makeApplicationReadyToDownload(
+        Event.DEATH,
+        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+        Action.LOAD_REVIEW_APPLICATION
+      )
+      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+      createdTestComponent.store.dispatch(
+        modifyApplication(downloadedApplication)
+      )
+
+      const action = await waitForElement(
+        testComponent,
+        '#ListItemAction-1-Review'
+      )
+
+      expect(action.hostNodes()).toHaveLength(1)
+      action.hostNodes().simulate('click')
+
+      await waitFor(() =>
+        window.location.href.includes(
+          '/duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e95'
+        )
+      )
+    })
+
+    it('shows error when download is failed', async () => {
+      const downloadedApplication = makeApplicationReadyToDownload(
+        Event.DEATH,
+        'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+        Action.LOAD_REVIEW_APPLICATION
+      )
+      downloadedApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
+      createdTestComponent.store.dispatch(
+        modifyApplication(downloadedApplication)
+      )
+
+      testComponent.update()
+
+      const errorIcon = await waitForElement(
+        testComponent,
+        '#action-error-ListItemAction-1'
+      )
+
+      expect(errorIcon.hostNodes()).toHaveLength(1)
+    })
   })
 
   it('check the validate icon', async () => {
@@ -1041,7 +1282,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const validate = await waitForElement(testComponent.component, Validate)
 
@@ -1052,9 +1295,9 @@ describe('RegistrationHome sent for review tab related tests', () => {
 describe('Tablet tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
     resizeWindow(800, 1280)
   })
 
@@ -1164,7 +1407,9 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     const row = await waitForElement(testComponent.component, '#row_0')
     row.hostNodes().simulate('click')

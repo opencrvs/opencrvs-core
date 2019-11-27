@@ -45,9 +45,9 @@ describe('verify collector tests', () => {
   }
 
   describe('in case of birth application', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       getItem.mockReturnValue(validToken)
-      store.dispatch(checkAuth({ '?token': validToken }))
+      await store.dispatch(checkAuth({ '?token': validToken }))
 
       store.dispatch(storeApplication(birthApplication))
     })

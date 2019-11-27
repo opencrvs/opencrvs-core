@@ -10,11 +10,12 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh COUNTRY --clear-data=yes|no --restore-metadata=yes|no HOST VERSION'
+    echo 'Usage: ./deploy.sh COUNTRY --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION'
     echo "  Script must receive a first COUNTRY parameter of 'bgd' or 'zmb' set  as a supported alpha-3 country code e.g.: ./deploy.sh bgd"
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo '  HOST    is the server to deploy to'
+    echo "  ENV can be 'production' or 'development'"
     echo "  VERSION can be any docker image tag or 'latest'"
     exit 1
 }
@@ -40,13 +41,19 @@ if [ -z "$4" ] ; then
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument VERSION is required in postition 5.'
+    echo 'Error: Argument ENV is required in postition 5.'
+    print_usage_and_exit
+fi
+
+if [ -z "$6" ] ; then
+    echo 'Error: Argument VERSION is required in postition 6.'
     print_usage_and_exit
 fi
 
 COUNTRY=$1
 HOST=$4
-VERSION=$5
+ENV=$5
+VERSION=$6
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -55,16 +62,16 @@ echo
 echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
-mkdir -p /tmp/compose/infrastructure/backups
+mkdir -p /tmp/compose/infrastructure/default_backups
 
 # Copy selected country config to public & infrastructure folder
 cp packages/resources/src/$COUNTRY/config/client-config.prod.js /tmp/compose/infrastructure/client-config.js
 cp packages/resources/src/$COUNTRY/config/login-config.prod.js /tmp/compose/infrastructure/login-config.js
 
-# Copy selected country backups to infrastructure backups folder
-cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/backups/hearth-dev.gz
-cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastructure/backups/openhim-dev.gz
-cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/backups/user-mgnt.gz
+# Copy selected country default backups to infrastructure default_backups folder
+cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
+cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
+cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
@@ -76,13 +83,20 @@ rsync -rP packages/resources/src/$COUNTRY/config/docker-compose* infrastructure 
 rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
 
 # Prepare docker-compose.deploy.yml and docker-compose.<COUNTRY>.yml file - rotate secrets etc
-ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.'$COUNTRY'.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
-
+if [[ "$ENV" = "development" ]]; then
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.'$COUNTRY'.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+else
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh /tmp/compose/docker-compose.deploy.yml /tmp/compose/docker-compose.prod-deploy.yml /tmp/compose/docker-compose.'$COUNTRY'.deploy.yml | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+fi
 # Setup configuration files and compose file for the deployment domain
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Deploy the OpenCRVS stack onto the swarm
+if [[ "$ENV" = "development" ]]; then
 ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
+else
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
+fi
 
 if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
     echo

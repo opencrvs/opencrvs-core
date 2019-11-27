@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [Set up Environment Variables](#set-up-environment-variables)
 - [Running the gateway](#running-the-gateway)
@@ -14,7 +15,7 @@ Create a .env file with the following settings
 
 ```
 PORT = 7070
-NODE_ENV = DEVELOPMENT
+NODE_ENV = development
 LOG_LEVEL = 1
 APP_NAME = OPENCRVS_API_GATEWAY
 ```
@@ -33,12 +34,23 @@ In this early stage two demonstrative graphQL queries exist that can be tried ou
 
 ```graphql
 mutation create {
-  createBirthRegistration(details: {
-    mother: {gender: "female", name: [{firstNames: "Jane", familyName: "Doe"}]},
-    father: {gender: "male",name: [{firstNames: "Jack", familyName: "Doe"}]},
-    child: {gender: "male",name: [{firstNames: "Baby", familyName: "Doe"}]},
-    createdAt: "2018-05-23T14:44:58+02:00"
-  })
+  createBirthRegistration(
+    details: {
+      mother: {
+        gender: "female"
+        name: [{ firstNames: "Jane", familyName: "Doe" }]
+      }
+      father: {
+        gender: "male"
+        name: [{ firstNames: "Jack", familyName: "Doe" }]
+      }
+      child: {
+        gender: "male"
+        name: [{ firstNames: "Baby", familyName: "Doe" }]
+      }
+      createdAt: "2018-05-23T14:44:58+02:00"
+    }
+  )
 }
 
 query list {
