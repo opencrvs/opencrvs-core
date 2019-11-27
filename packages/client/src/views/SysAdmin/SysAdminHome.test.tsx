@@ -56,9 +56,9 @@ storage.setItem = jest.fn()
 describe('SysAdminHome tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(sysadminToken)
-    store.dispatch(checkAuth({ '?token': sysadminToken }))
+    await store.dispatch(checkAuth({ '?token': sysadminToken }))
   })
 
   it('renders page with top-bar', async () => {

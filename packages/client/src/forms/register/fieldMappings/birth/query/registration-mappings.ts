@@ -36,10 +36,12 @@ export function transformStatusData(
   if (!registrationStatus) {
     return transformedData
   }
+
   transformedData[sectionId] = {
     ...transformedData[sectionId],
     regStatus: {
       type: registrationStatus.type || '',
+      statusDate: registrationStatus.timestamp,
       officeName:
         (registrationStatus.office && registrationStatus.office.name) || '',
       officeAlias:

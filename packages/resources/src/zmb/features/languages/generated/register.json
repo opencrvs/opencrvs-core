@@ -106,6 +106,7 @@
         "constants.districtRegistrar": "District Registrar",
         "constants.dob": "D.o.B.",
         "constants.dod": "D.o.D.",
+        "constants.downloading": "Downloading...",
         "constants.entrepeneur": "Entrepeneur",
         "constants.eventDate": "Date of event",
         "constants.extendedFamily": "Extended family",

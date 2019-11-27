@@ -57,7 +57,7 @@ const DropDownWrapper = styled.ul`
   cursor: pointer;
 `
 
-export const IconRingButton = styled(CircleButton)`
+export const IconRingButton = styled(props => <CircleButton {...props} />)`
   background: transparent;
   border: none;
   height: 24px;
@@ -133,7 +133,7 @@ const DropDown = styled.div`
     margin-left: auto;
   }
 `
-const ClearTextIcon = styled(ClearText)`
+const ClearTextIcon = styled(props => <ClearText {...props} />)`
   margin: 0 5px;
 `
 export interface ISearchType {
