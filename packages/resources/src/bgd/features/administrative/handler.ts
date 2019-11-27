@@ -10,10 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
+import * as Joi from 'joi'
 import {
   ILocationDataResponse,
-  getLocations
+  getLocations,
+  verifyAndFetchNidInfo
 } from '@resources/bgd/features/administrative/service/service'
+
+export interface INidVerification {
+  dob: string
+  nid: string
+}
 
 export async function locationsHandler(
   request: Hapi.Request,
@@ -27,3 +34,35 @@ export async function locationsHandler(
   }
   return result
 }
+
+export async function nidVerificationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as INidVerification
+  return verifyAndFetchNidInfo(payload.nid, payload.dob)
+}
+
+export const nidVerificationReqSchema = Joi.object({
+  dob: Joi.string(),
+  nid: Joi.string()
+})
+
+export const nidResponseSchema = Joi.object({
+  data: Joi.object({
+    name: Joi.array().items(
+      Joi.object({
+        use: Joi.string(),
+        family: Joi.string()
+      })
+    ),
+    gender: Joi.string()
+  }),
+  operationResult: Joi.object({
+    success: Joi.boolean(),
+    error: Joi.object({
+      errorMessage: Joi.string(),
+      errorCode: Joi.number()
+    })
+  })
+})

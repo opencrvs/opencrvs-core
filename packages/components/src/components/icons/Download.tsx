@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 
-const Download = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={24} height={24} fill="none" {...props}>
+export const Download = (props: React.HTMLAttributes<SVGElement>) => (
+  <svg width={20} height={22} fill="none" {...props}>
     <path
-      d="M3 17v3a2 2 0 002 2h14a2 2 0 002-2v-3M8 12l4 4 4-4M12 2v14"
+      d="M1 16v3a2 2 0 002 2h14a2 2 0 002-2v-3M6 11l4 4 4-4M10 1v14"
       stroke="#4C68C1"
       strokeWidth={2}
       strokeLinecap="round"
@@ -22,5 +22,3 @@ const Download = (props: React.HTMLAttributes<SVGElement>) => (
     />
   </svg>
 )
-
-export default Download

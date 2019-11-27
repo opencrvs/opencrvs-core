@@ -17,7 +17,7 @@ export const VerticalThreeDots = (props: React.HTMLAttributes<SVGElement>) => (
       fillRule="evenodd"
       clipRule="evenodd"
       d="M21 14a1 1 0 1 0-2 0 1 1 0 0 0 2 0zM21 20a1 1 0 1 0-2 0 1 1 0 0 0 2 0zM21 26a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"
-      stroke="#4C68C1"
+      stroke="currentColor"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

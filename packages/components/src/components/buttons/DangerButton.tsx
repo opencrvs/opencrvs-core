@@ -15,7 +15,18 @@ import { PrimaryButton } from './PrimaryButton'
 export const DangerButton = styled(PrimaryButton)`
   background-color: ${({ theme }) => theme.colors.error};
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.error};
+    background: ${({ theme }) => theme.colors.errorHover};
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background-color: ${({ theme }) => theme.colors.error};
+    color: ${({ theme }) => theme.colors.white};
   }
   &:active:enabled {
     background: ${({ theme }) => theme.colors.error};

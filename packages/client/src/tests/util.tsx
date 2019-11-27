@@ -1844,12 +1844,14 @@ export const userDetails = {
   primaryOffice: {
     id: '6327dbd9-e118-4dbe-9246-cb0f7649a666',
     name: 'Kaliganj Union Sub Center',
+    alias: ['কালিগাঞ্জ ইউনিয়ন পরিষদ'],
     status: 'active'
   },
   catchmentArea: [
     {
       id: '850f50f3-2ed4-4ae6-b427-2d894d4a3329',
       name: 'Dhaka',
+      alias: ['ঢাকা'],
       status: 'active',
       identifier: [
         {
@@ -1866,6 +1868,7 @@ export const userDetails = {
     {
       id: '812ed387-f8d5-4d55-ad05-936292385990',
       name: 'GAZIPUR',
+      alias: ['গাজীপুর'],
       status: 'active',
       identifier: [
         {
@@ -1882,6 +1885,7 @@ export const userDetails = {
     {
       id: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
       name: 'KALIGANJ',
+      alias: ['কালিগাঞ্জ'],
       status: 'active',
       identifier: [
         {
@@ -1898,6 +1902,7 @@ export const userDetails = {
     {
       id: '43c17986-62cf-4551-877c-be095fb6e5d0',
       name: 'BAKTARPUR',
+      alias: ['বক্তারপুর'],
       status: 'active',
       identifier: [
         {
@@ -2151,21 +2156,21 @@ export const mockApplicationData = {
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
     countryPermanent: 'BGD',
-    statePermanent: 'state2',
-    districtPermanent: 'district2',
-    addressLine1Permanent: 'some road',
-    addressLine2Permanent: 'some more',
-    addressLine3Permanent: 'some more',
-    addressLine4Permanent: 'upazila1',
-    postalCodePermanent: '',
+    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2Permanent: '',
+    addressLine1Permanent: '193 Kalibari Road',
+    postCodePermanent: '2200',
     country: 'BGD',
-    state: 'state2',
-    district: 'district2',
-    addressLine1: '',
+    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2: '',
-    addressLine3: '',
-    addressLine4: 'upazila2',
-    postalCode: '',
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200',
     currentAddressSameAsPermanent: true
   },
   father: {
@@ -2182,21 +2187,21 @@ export const mockApplicationData = {
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
     countryPermanent: 'BGD',
-    statePermanent: 'state2',
-    districtPermanent: 'district2',
-    addressLine1Permanent: '',
+    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2Permanent: '',
-    addressLine3Permanent: '',
-    addressLine4Permanent: 'upazila1',
-    postalCodePermanent: '',
+    addressLine1Permanent: '193 Kalibari Road',
+    postCodePermanent: '2200',
     country: 'BGD',
-    state: 'state2',
-    district: 'district2',
-    addressLine1: '',
+    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2: '',
-    addressLine3: '',
-    addressLine4: 'upazila2',
-    postalCode: '',
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200',
     permanentAddressSameAsMother: true,
     addressSameAsMother: true
   },
@@ -2239,23 +2244,23 @@ export const mockDeathApplicationData = {
     birthDate: '1987-02-16',
     permanentAddress: '',
     countryPermanent: 'BGD',
-    statePermanent: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
-    districtPermanent: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
-    addressLine4Permanent: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
     addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Permanent: '193 Kalibari Road',
+    addressLine2Permanent: '',
     addressLine1Permanent: '193 Kalibari Road',
     postCodePermanent: '2200',
     currentAddress: '',
     currentAddressSameAsPermanent: true,
     country: 'BGD',
-    state: '',
-    district: '',
-    addressLine4: '',
-    addressLine3: '',
+    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
+    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
+    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
     addressLine2: '',
-    addressLine1: '',
-    postCode: ''
+    addressLine1: '193 Kalibari Road',
+    postCode: '2200'
   },
   informant: {
     applicantIdType: 'NATIONAL_ID',

@@ -18,7 +18,12 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
-import { IApplication, IPayload, SUBMISSION_STATUS } from '@client/applications'
+import {
+  IApplication,
+  IPayload,
+  SUBMISSION_STATUS,
+  DOWNLOAD_STATUS
+} from '@client/applications'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
@@ -38,7 +43,8 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     application: IApplication,
     submissionStatus: string,
     action: string,
-    payload?: IPayload
+    payload?: IPayload,
+    downloadStatus?: string
   ) => void
   rejectApplicationAction?: () => void
 }
@@ -392,7 +398,7 @@ class ReviewActionComponent extends React.Component<
               <DangerButton
                 id="rejectApplicationBtn"
                 align={ICON_ALIGNMENT.LEFT}
-                icon={() => <Cross color="white" />}
+                icon={() => <Cross color="currentColor" />}
                 onClick={rejectApplicationAction}
               >
                 {intl.formatMessage(buttonMessages.reject)}
@@ -428,7 +434,9 @@ class ReviewActionComponent extends React.Component<
                     ? submitApplicationAction(
                         application,
                         SUBMISSION_STATUS.READY_TO_SUBMIT,
-                        Action.SUBMIT_FOR_REVIEW
+                        Action.SUBMIT_FOR_REVIEW,
+                        undefined,
+                        DOWNLOAD_STATUS.DOWNLOADED
                       )
                     : applicationToBeRegistered
                     ? submitApplicationAction(

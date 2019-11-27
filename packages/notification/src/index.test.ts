@@ -17,7 +17,7 @@ import { createServerWithEnvironment } from '@notification/tests/util'
 describe('Route authorization', () => {
   it('helth check', async () => {
     const server = await createServerWithEnvironment({
-      NODE_ENV: 'DEVELOPMENT'
+      NODE_ENV: 'development'
     })
     const res = await server.server.inject({
       method: 'GET',

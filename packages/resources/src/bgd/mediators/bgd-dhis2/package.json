@@ -1,11 +1,11 @@
 {
   "name": "@opencrvs/bgd-dhis2-mediator",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "Bangaldesh DHIS2 integration mediator",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "node build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",

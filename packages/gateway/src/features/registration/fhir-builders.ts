@@ -47,7 +47,9 @@ import {
   PRIMARY_CAREGIVER,
   PRIMARY_CAREGIVER_CODE,
   PRIMARY_CAREGIVER_TITLE,
-  PARENT_DETAILS
+  PARENT_DETAILS,
+  SPOUSE_CODE,
+  SPOUSE_TITLE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -1059,6 +1061,9 @@ const builders: IFieldBuilders = {
       )
       return createEducationalAttainmentBuilder(person, fieldValue)
     }
+  },
+  spouse: {
+    name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE)
   },
   child: {
     _fhirID: (fhirBundle, fieldValue, context) => {

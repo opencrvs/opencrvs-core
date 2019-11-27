@@ -132,6 +132,7 @@ Cypress.Commands.add('rejectApplication', () => {
   cy.tick(20000)
   cy.get('#Spinner').should('not.exist')
 })
+
 Cypress.Commands.add('registerApplication', () => {
   cy.get('#registerApplicationBtn').click()
   // MODAL
@@ -139,11 +140,22 @@ Cypress.Commands.add('registerApplication', () => {
   cy.log('Waiting for application to sync...')
   cy.tick(20000)
   cy.get('#Spinner').should('not.exist')
+  cy.get('#tab_review').contains('Ready for review (0)')
 })
+
 Cypress.Commands.add('verifyLandingPageVisible', () => {
   cy.get('#header_new_event', { timeout: 30000 }).should('be.visible')
   cy.get('#header_new_event').click()
 })
 Cypress.Commands.add('initializeFakeTimers', () => {
   cy.clock(1573557567230)
+})
+Cypress.Commands.add('downloadFirstApplication', () => {
+  cy.get('#ListItemAction-0-icon').should('exist')
+  cy.get('#ListItemAction-0-icon')
+    .first()
+    .click()
+  cy.log('Waiting for application to sync...')
+  cy.tick(20000)
+  cy.get('#action-loading-ListItemAction-0').should('not.exist')
 })

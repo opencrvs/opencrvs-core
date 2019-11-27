@@ -33,7 +33,10 @@ import {
 import {
   IApplication,
   SUBMISSION_STATUS,
-  filterProcessingApplicationsFromQuery
+  filterProcessingApplicationsFromQuery,
+  storeApplication,
+  makeApplicationReadyToDownload,
+  downloadApplication
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
@@ -66,6 +69,9 @@ import { errorMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import { Event, Action } from '@client/forms'
+import { withApollo } from 'react-apollo'
+import ApolloClient from 'apollo-client'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -109,7 +115,14 @@ export const IconTab = styled(Button)<IProps>`
     margin-right: 8px;
   }
   &:focus {
-    outline: 0;
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 export const StyledSpinner = styled(Spinner)`
@@ -139,12 +152,14 @@ interface IBaseRegistrationHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  downloadApplication: typeof downloadApplication
   tabId: string
   selectorId: string
   drafts: IApplication[]
   applications: IApplication[]
   goToEvents: typeof goToEventsAction
   storedApplications: IApplication[]
+  client: ApolloClient<{}>
 }
 
 interface IRegistrationHomeState {
@@ -237,6 +252,19 @@ export class RegistrationHomeView extends React.Component<
     }
   }
 
+  downloadApplication = (
+    event: string,
+    compositionId: string,
+    action: Action
+  ) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      event.toLowerCase() as Event,
+      compositionId,
+      action
+    )
+    this.props.downloadApplication(downloadableApplication, this.props.client)
+  }
+
   render() {
     const {
       theme,
@@ -294,7 +322,7 @@ export class RegistrationHomeView extends React.Component<
                 />
               )
             }
-            if (error) {
+            if (!data && error) {
               return (
                 <ErrorText id="search-result-error-text-count">
                   {intl.formatMessage(errorMessages.queryError)}
@@ -396,6 +424,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.readyForReview && (
@@ -406,6 +435,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={reviewCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.sentForUpdates && (
@@ -416,6 +446,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={updatesCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
                 {tabId === TAB_ID.sentForApproval && (
@@ -436,6 +467,7 @@ export class RegistrationHomeView extends React.Component<
                     }}
                     page={printCurrentPage}
                     onPageChange={this.onPageChange}
+                    onDownloadApplication={this.downloadApplication}
                   />
                 )}
               </>
@@ -473,6 +505,7 @@ function mapStateToProps(
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
 ) {
   const { match } = props
+
   return {
     applications: state.applicationsState.applications,
     language: state.i18n.language,
@@ -499,6 +532,7 @@ export const RegistrationHome = connect(
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction
+    goToPrintCertificate: goToPrintCertificateAction,
+    downloadApplication
   }
-)(injectIntl(withTheme(RegistrationHomeView)))
+)(injectIntl(withTheme(withApollo(RegistrationHomeView))))

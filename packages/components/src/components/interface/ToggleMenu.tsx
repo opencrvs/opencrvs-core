@@ -12,9 +12,10 @@
 import styled from 'styled-components'
 
 import React = require('react')
-
+import { CircleButton } from '../buttons'
 const ToggleMenuContainer = styled.div`
   position: relative;
+  height: 40px;
   display: flex;
   button {
     padding: 0;
@@ -81,11 +82,14 @@ interface IProps {
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
+  hasFocusRing?: boolean
 }
 
 interface IState {
   showSubmenu: boolean
 }
+
+type ToggleButtonProps = Pick<IProps, 'hasFocusRing'>
 
 export class ToggleMenu extends React.Component<IProps, IState> {
   constructor(props: IProps & IState) {
@@ -116,12 +120,16 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { id, toggleButton, menuHeader, menuItems } = this.props
+    const { id, toggleButton, menuHeader, menuItems, hasFocusRing } = this.props
 
     return (
       <>
         <ToggleMenuContainer>
-          <Button id={`${id}ToggleButton`} onClick={this.showMenu}>
+          <Button
+            id={`${id}ToggleButton`}
+            onClick={this.showMenu}
+            hasFocusRing={hasFocusRing}
+          >
             {toggleButton}
           </Button>
           {this.state.showSubmenu && (
@@ -145,6 +153,27 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 }
 
-const Button = styled.span`
-  cursor: pointer;
+const Button = styled(props => <CircleButton {...props} />)<ToggleButtonProps>`
+  height: 40px;
+  width: 40px;
+  &:hover {
+    background-color: transparent;
+  }
+  &:hover:not([data-focus-visible-added]):not(:active) {
+    background-color: transparent;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: ${({ theme, hasFocusRing }) =>
+      hasFocusRing ? `0 0 0 2pt ${theme.colors.focus}` : 'none'};
+  }
+  &:focus:not([data-focus-visible-added]) {
+    outline: none;
+    box-shadow: none;
+  }
+  &:active:not([data-focus-visible-added]) {
+    outline: none;
+    box-shadow: ${({ theme, hasFocusRing }) =>
+      hasFocusRing ? `0 0 0 2pt ${theme.colors.focus}` : 'none'};
+  }
 `

@@ -45,12 +45,13 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
-      - NODE_ENV=DEVELOPMENT
+      - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - AUTH_URL=http://auth:4040
+      - RESOURCES_URL=http://resources:3040
 
   # User facing services
   workflow:
@@ -60,13 +61,13 @@ services:
       dockerfile: ./packages/workflow/Dockerfile
     restart: unless-stopped
     environment:
-      - NODE_ENV=DEVELOPMENT
+      - NODE_ENV=development
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - RESOURCE_SERVICE_URL=http://resources:3040/${COUNTRY:-bgd}/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
-      - COUNTRY=${COUNTRY:-bgd}
+      - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
 
@@ -77,7 +78,7 @@ services:
       dockerfile: ./packages/search/Dockerfile
     restart: unless-stopped
     environment:
-      - NODE_ENV=DEVELOPMENT
+      - NODE_ENV=development
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
@@ -146,6 +147,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
       - TEST_USER_PASSWORD=test
-      - NODE_ENV=DEVELOPMENT
+      - NODE_ENV=development
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
+      - OPENHIM_URL=http://openhim-core:5001

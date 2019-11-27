@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { App } from '@client/App'
@@ -34,11 +35,14 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
+    release: process.env.REACT_APP_VERSION,
     dsn: window.config.SENTRY
   })
 
   // setup log rocket to ship log messages and record user errors
-  LogRocket.init(window.config.LOGROCKET)
+  LogRocket.init(window.config.LOGROCKET, {
+    release: process.env.REACT_APP_VERSION
+  })
 
   // Integrate the two
   Sentry.configureScope(scope => {
@@ -86,4 +90,3 @@ ReactDOM.render(
 
 registerServiceWorker(onNewContentAvailable)
 new SubmissionController(store).start()
-new InboxController(store).start()

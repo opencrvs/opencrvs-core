@@ -1,0 +1,60 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+version: '3.3'
+
+services:
+  notification:
+    secrets:
+      - clickatell-user
+      - clickatell-password
+      - clickatell-api-id
+    environment:
+      - LANGUAGES=en
+      - SMS_PROVIDER=clickatell
+      - CLICKATELL_USER_PATH=/run/secrets/clickatell-user
+      - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
+      - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
+
+  workflow:
+    environment:
+      - LANGUAGES=en
+
+  bgd-dhis2-mediator:
+    image: jembi/ocrvs-bgd-dhis2-mediator
+    secrets:
+      - jwt-public-key.{{ts}}
+      - openhim-user
+      - openhim-password
+    environment:
+      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - AUTH_URL=http://auth:4040
+      - FHIR_URL=http://openhim-core:5001/fhir
+      - OPENHIM_USER_PATH=/run/secrets/openhim-user
+      - OPENHIM_PASSWORD_PATH=/run/secrets/openhim-password
+      - OPENHIM_URL=https://openhim-core:8080
+      - TRUST_SELF_SIGNED=true
+    deploy:
+      replicas: 1
+    networks:
+      - overlay_net
+
+secrets:
+  clickatell-user:
+    external: true
+  clickatell-password:
+    external: true
+  clickatell-api-id:
+    external: true
+  jwt-public-key.{{ts}}:
+    external: true
+  openhim-user:
+    external: true
+  openhim-password:
+    external: true

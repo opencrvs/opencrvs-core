@@ -25,6 +25,17 @@ const Item = styled(Button)<IMenuItemContainerProps>`
   color: ${({ theme, selected }) =>
     selected ? theme.colors.white : theme.colors.disabled};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+  &:not([data-focus-visible-added]) {
+    background: transparent;
+    outline: none;
+    color: ${({ theme, selected }) =>
+      selected ? theme.colors.white : theme.colors.disabled};
+  }
 `
 
 const ItemContainer = styled.div`
@@ -33,7 +44,7 @@ const ItemContainer = styled.div`
   margin-right: 8px;
 `
 
-const ItemSelector = styled(Selector)`
+const ItemSelector = styled(props => <Selector {...props} />)`
   position: absolute;
   bottom: -8px;
   left: 50%;

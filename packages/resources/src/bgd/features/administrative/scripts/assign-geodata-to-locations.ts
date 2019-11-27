@@ -106,6 +106,7 @@ async function matchAndAssignGeoData(
           throw Error('Map contains no geometry')
         }
         return (
+          parentLocationName &&
           geoProps.ADM2_EN.trim().toLowerCase() ===
             parentLocationName.toLowerCase() &&
           geoProps.Name.trim().toLowerCase() ===

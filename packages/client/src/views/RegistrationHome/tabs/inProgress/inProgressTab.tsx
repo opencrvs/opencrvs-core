@@ -12,7 +12,8 @@
 import { Button } from '@opencrvs/components/lib/buttons'
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  IAction
 } from '@opencrvs/components/lib/interface/GridTable'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
@@ -21,7 +22,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IApplication } from '@client/applications'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
@@ -54,6 +55,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import { Download } from '@opencrvs/components/lib/icons'
+import { Action, Event } from '@client/forms'
 import { get } from 'lodash'
 
 const BlueButton = styled(Button)`
@@ -63,6 +66,17 @@ const BlueButton = styled(Button)`
   ${({ theme }) => theme.fonts.smallButtonStyle};
   border-radius: 4px;
   ${({ theme }) => theme.shadows.mistyShadow};
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.white};
+  }
 `
 const WhiteButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
@@ -72,6 +86,17 @@ const WhiteButton = styled(Button)`
   ${({ theme }) => theme.shadows.mistyShadow};
   &:hover {
     background: ${({ theme }) => theme.colors.dropdownHover};
+  }
+  &:focus {
+    outline: none;
+    background: ${({ theme }) => theme.colors.focus};
+    color: ${({ theme }) => theme.colors.copy};
+  }
+
+  &:not([data-focus-visible-added]) {
+    outline: none;
+    background: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 const TabGroup = styled.div`
@@ -103,9 +128,15 @@ interface IBaseRegistrarHomeProps {
   selectorId: string
   registrarLocationId: string | null
   drafts: IApplication[]
+  outboxApplications: IApplication[]
   queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
+  onDownloadApplication: (
+    event: Event,
+    compositionId: string,
+    action: Action
+  ) => void
 }
 
 interface IRegistrarHomeState {
@@ -181,21 +212,36 @@ export class InProgressTabComponent extends React.Component<
         name = namesMap[locale] || namesMap[LANG_EN]
       }
 
-      const updateAction = [
-        {
-          label: intl.formatMessage(buttonMessages.update),
-          handler: () =>
-            this.props.goToPage(
-              pageRoute,
-              regId,
-              'review',
-              (event && event.toLowerCase()) || ''
-            )
-        }
-      ]
+      const actions: IAction[] = []
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
 
-      const downloadAction = [
-        {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          label: '',
+          icon: () => <Download />,
+          handler: () => {
+            this.props.onDownloadApplication(
+              (event as unknown) as Event,
+              reg.id,
+              Action.LOAD_REVIEW_APPLICATION
+            )
+          },
+          loading:
+            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+          error:
+            downloadStatus === DOWNLOAD_STATUS.FAILED ||
+            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
+          loadingLabel: this.props.intl.formatMessage(
+            constantsMessages.downloading
+          )
+        })
+      } else {
+        actions.push({
           label: intl.formatMessage(buttonMessages.update),
           handler: () =>
             this.props.goToPage(
@@ -204,8 +250,8 @@ export class InProgressTabComponent extends React.Component<
               'review',
               (event && event.toLowerCase()) || ''
             )
-        }
-      ]
+        })
+      }
 
       moment.locale(locale)
       return {
@@ -223,8 +269,7 @@ export class InProgressTabComponent extends React.Component<
           (lastModificationDate &&
             moment(parseInt(lastModificationDate)).fromNow()) ||
           '',
-        updateAction,
-        downloadAction,
+        actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
@@ -675,10 +720,15 @@ export class InProgressTabComponent extends React.Component<
   }
 }
 
-export const InProgressTab = connect(
-  (state: IStoreState) => ({
+function mapStateToProps(state: IStoreState) {
+  return {
+    outboxApplications: state.applicationsState.applications,
     resources: getOfflineData(state)
-  }),
+  }
+}
+
+export const InProgressTab = connect(
+  mapStateToProps,
   {
     goToPage: goToPageAction,
     goToRegistrarHomeTab: goToRegistrarHomeTabAction,

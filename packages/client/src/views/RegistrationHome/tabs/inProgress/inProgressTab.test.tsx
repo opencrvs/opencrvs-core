@@ -14,9 +14,12 @@ import {
   createApplication,
   IApplication,
   storeApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  makeApplicationReadyToDownload,
+  DOWNLOAD_STATUS,
+  modifyApplication
 } from '@client/applications'
-import { Event } from '@client/forms'
+import { Event, Action } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
@@ -71,9 +74,9 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 const { store, history } = createStore()
-beforeAll(() => {
+beforeAll(async () => {
   getItem.mockReturnValue(registerScopeToken)
-  store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 })
 
 describe('In Progress tab', () => {
@@ -697,71 +700,130 @@ describe('In Progress tab', () => {
       ).toBe(1)
     })
 
-    it('redirects user to draft preview page on update click', async () => {
-      jest.clearAllMocks()
+    describe('handles download status', () => {
       const TIME_STAMP = '1562912635549'
-      const drafts: IApplication[] = []
-      drafts.push(createApplication(Event.BIRTH))
       const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
-          drafts={drafts}
-          selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
-          queryData={{
-            inProgressData: {
-              totalItems: 1,
-              results: [
-                {
-                  id: applicationId,
-                  type: 'Birth',
-                  registration: {
-                    trackingId: 'BQ2IDOP',
-                    modifiedAt: TIME_STAMP
-                  },
-                  childName: [
-                    {
-                      use: 'en',
-                      firstNames: 'Anik',
-                      familyName: 'Hoque'
-                    }
-                  ]
-                } as GQLBirthEventSearchSet
-              ]
-            },
-            notificationData: {}
-          }}
-        />,
-        store
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
-      expect(
-        testComponent.component.find('#ListItemAction-0-Update').hostNodes()
-      ).toHaveLength(1)
-      testComponent.component
-        .find('#ListItemAction-0-Update')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
-
-      expect(history.location.pathname).toContain(
-        formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+      const inprogressProps = {
+        drafts: [],
+        selectorId: SELECTOR_ID.fieldAgentDrafts,
+        registrarLocationId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
+        queryData: {
+          data: {
+            totalItems: 1,
+            results: [
+              {
+                id: applicationId,
+                type: 'Birth',
+                registration: {
+                  trackingId: 'BQ2IDOP',
+                  modifiedAt: TIME_STAMP
+                },
+                childName: [
+                  {
+                    use: 'en',
+                    firstNames: 'Anik',
+                    familyName: 'Hoque'
+                  }
+                ]
+              } as GQLBirthEventSearchSet
+            ]
+          }
+        }
+      }
+      it('renders download button when not downloaded', async () => {
+        const downloadableApplication = makeApplicationReadyToDownload(
+          Event.BIRTH,
           applicationId,
-          pageId: 'review',
-          event: 'birth'
+          Action.LOAD_REVIEW_APPLICATION
+        )
+        downloadableApplication.downloadStatus = undefined
+        store.dispatch(modifyApplication(downloadableApplication))
+        const testComponent = await createTestComponent(
+          // @ts-ignore
+          <InProgressTab {...inprogressProps} />,
+          store
+        )
+
+        expect(
+          testComponent.component.find('#ListItemAction-0-icon').hostNodes()
+        ).toHaveLength(1)
+      })
+      it('renders loading indicator when application is being downloaded', async () => {
+        const downloadableApplication = makeApplicationReadyToDownload(
+          Event.BIRTH,
+          applicationId,
+          Action.LOAD_REVIEW_APPLICATION
+        )
+        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
+        store.dispatch(modifyApplication(downloadableApplication))
+        const testComponent = await createTestComponent(
+          // @ts-ignore
+          <InProgressTab {...inprogressProps} />,
+          store
+        )
+
+        expect(
+          testComponent.component
+            .find('#action-loading-ListItemAction-0')
+            .hostNodes()
+        ).toHaveLength(1)
+      })
+      it('renders update button when download succeeds', async () => {
+        const downloadableApplication = makeApplicationReadyToDownload(
+          Event.BIRTH,
+          applicationId,
+          Action.LOAD_REVIEW_APPLICATION
+        )
+        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+        store.dispatch(modifyApplication(downloadableApplication))
+        const testComponent = await createTestComponent(
+          // @ts-ignore
+          <InProgressTab {...inprogressProps} />,
+          store
+        )
+
+        expect(
+          testComponent.component.find('#ListItemAction-0-Update').hostNodes()
+        ).toHaveLength(1)
+
+        testComponent.component
+          .find('#ListItemAction-0-Update')
+          .hostNodes()
+          .simulate('click')
+
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
         })
-      )
+        testComponent.component.update()
+
+        expect(history.location.pathname).toContain(
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+            applicationId,
+            pageId: 'review',
+            event: 'birth'
+          })
+        )
+      })
+      it('renders error when download fails', async () => {
+        const downloadableApplication = makeApplicationReadyToDownload(
+          Event.BIRTH,
+          applicationId,
+          Action.LOAD_REVIEW_APPLICATION
+        )
+        downloadableApplication.downloadStatus = DOWNLOAD_STATUS.FAILED
+        store.dispatch(modifyApplication(downloadableApplication))
+        const testComponent = await createTestComponent(
+          // @ts-ignore
+          <InProgressTab {...inprogressProps} />,
+          store
+        )
+
+        expect(
+          testComponent.component
+            .find('#action-error-ListItemAction-0')
+            .hostNodes()
+        ).toHaveLength(1)
+      })
     })
   })
 
@@ -837,9 +899,9 @@ describe('In Progress tab', () => {
 describe('Tablet tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
     resizeWindow(800, 1280)
   })
 
@@ -889,7 +951,9 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': registerScopeToken })
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {

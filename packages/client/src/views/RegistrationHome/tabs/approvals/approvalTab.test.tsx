@@ -141,10 +141,10 @@ const getItem = window.localStorage.getItem as jest.Mock
 
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
-  beforeEach(() => {
+  beforeEach(async () => {
     store = createStore().store
     getItem.mockReturnValue(validateScopeToken)
-    store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
   })
 
   it('check sent for approval tab count', async () => {
@@ -311,7 +311,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       graphqlMock
     )
     getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': validateScopeToken })
+    )
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
       setTimeout(resolve, 500)
@@ -379,7 +381,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       graphqlMock
     )
 
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': validateScopeToken })
+    )
 
     const data = (await waitForElement(
       testComponent.component,
@@ -426,7 +430,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': validateScopeToken })
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -634,7 +640,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     getItem.mockReturnValue(validateScopeToken)
-    testComponent.store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await testComponent.store.dispatch(
+      checkAuth({ '?token': validateScopeToken })
+    )
 
     // wait for mocked data to load mockedProvider
     await new Promise(resolve => {
@@ -658,9 +666,9 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 describe('Tablet tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(validateScopeToken)
-    store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
     resizeWindow(800, 1280)
   })
 

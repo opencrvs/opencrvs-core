@@ -80,7 +80,7 @@ export function Button({
   }
 }
 const Wrapper = styled.div`
-  padding: 0 32px;
+  padding: 0 8px;
   align-items: center;
   justify-content: space-between;
   display: flex;

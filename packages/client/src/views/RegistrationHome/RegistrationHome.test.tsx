@@ -55,9 +55,9 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 const { store } = createStore()
-beforeAll(() => {
+beforeAll(async () => {
   getItem.mockReturnValue(registerScopeToken)
-  store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  await store.dispatch(checkAuth({ '?token': registerScopeToken }))
 })
 
 describe('RegistrationHome In Progress tab related tests', () => {

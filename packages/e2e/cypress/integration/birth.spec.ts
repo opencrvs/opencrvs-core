@@ -93,7 +93,8 @@ context('Birth Integration Test', () => {
     cy.createPin()
 
     // LANDING PAGE
-    cy.get('#ListItemAction-0-Review', { timeout: 30000 }).should('exist')
+    cy.downloadFirstApplication()
+    cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
       .click()
@@ -238,6 +239,7 @@ context('Birth Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -314,6 +316,7 @@ context('Birth Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -449,6 +452,7 @@ context('Birth Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()
@@ -671,6 +675,7 @@ context('Birth Integration Test', () => {
     // CREATE PIN
     cy.createPin()
     // LANDING PAGE
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
     cy.get('#ListItemAction-0-Review')
       .first()

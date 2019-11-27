@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { getLocations } from '@resources/bgd/features/administrative/service/service'
+import {
+  getLocations,
+  fetchFromOpenHim,
+  verifyAndFetchNidInfo
+} from '@resources/bgd/features/administrative/service/service'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -415,6 +419,35 @@ describe('admin service', () => {
     it('throw an error when the fetch fails', async () => {
       fetch.mockRejectOnce(new Error('boom'))
       expect(getLocations()).rejects.toThrowError('boom')
+    })
+  })
+
+  it('fetchFromOpenHim()', async () => {
+    const res = {
+      validity: 86400,
+      token: 'Lsd92sak42AS4Th1MWGIMs1as1PJOMh'
+    }
+    fetch.mockResponses([JSON.stringify(res)])
+    const data = await fetchFromOpenHim('/token/create', 'POST', {
+      Authorization: `Secret 'SE3RET!'`
+    })
+
+    expect(data).toBeDefined()
+    expect(data).toEqual(res)
+  })
+
+  it('error in verifyAndFetchNidInfo()', async () => {
+    fetch.mockResponses([undefined])
+    const data = await verifyAndFetchNidInfo('1992-12-30', '1234567891234')
+
+    expect(data).toEqual({
+      operationResult: {
+        error: {
+          errorCode: 500,
+          errorMessage: 'An internal server error occurred'
+        },
+        success: false
+      }
     })
   })
 })

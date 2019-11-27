@@ -24,7 +24,7 @@ export async function generateRegistrationNumber(
 ): Promise<string> {
   /* adding current year */
   let brn = new Date().getFullYear().toString()
-  /* appending BBS code for district & upozila & union */
+  /* appending BBS code for district & upazila & union */
   brn = brn.concat((await getLocationBBSCode(practionerId)) as string)
 
   /* appending six digit location wise sequence number */
@@ -54,7 +54,7 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
       if (jurisdictionalLocation.bbsCode || !location.identifier) {
         return
       }
-      const jurisDictionIdentifier = location.identifier.find(
+      const jurisdictionIdentifier = location.identifier.find(
         identifier =>
           identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/jurisdiction-type` &&
@@ -64,7 +64,7 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
           )
       )
       const bbsCodeIdentifier =
-        jurisDictionIdentifier &&
+        jurisdictionIdentifier &&
         location.identifier.find(
           identifier =>
             identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/bbs-code`
