@@ -76,26 +76,6 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1rem;
-  text-transform: none;
-  span:last-child {
-    display: none;
-  }
-  :hover {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
-      display: inline;
-    }
-  }
-`
-
 export class App extends React.Component<IAppProps> {
   public render() {
     return (
@@ -307,12 +287,6 @@ export class App extends React.Component<IAppProps> {
                                 }}
                               />
                             </ProtectedPage>
-                            <Version>
-                              <span>OpenCRVS v1.1.0</span>
-                              <span>
-                                {process.env.REACT_APP_VERSION || 'development'}
-                              </span>
-                            </Version>
                           </MainSection>
                         </Page>
                       </NotificationComponent>

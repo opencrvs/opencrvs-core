@@ -76,6 +76,11 @@ printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
 ```
 
+```sh
+# For Bangladesh NID API integration
+printf "<oisf-secret>" | docker secret create oisf-secret -
+```
+
 ssh into the leader manager and run the following, replacing the following values with the actual secrets for your SMS provider of choice:
 
 ```sh

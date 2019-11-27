@@ -18,7 +18,7 @@ test('should build a minimal FHIR registration document without error', async ()
       deceased: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb39',
         identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
-        gender: 'female',
+        gender: 'male',
         birthDate: '2000-01-28',
         maritalStatus: 'MARRIED',
         name: [{ firstNames: 'Jane', familyName: 'Doe', use: 'en' }],
@@ -30,6 +30,15 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
+      },
+      mother: {
+        name: [{ firstNames: 'Jessica', familyName: 'Alba', use: 'en' }]
+      },
+      father: {
+        name: [{ firstNames: 'Cash', familyName: 'Warren', use: 'en' }]
+      },
+      spouse: {
+        name: [{ firstNames: 'Megan', familyName: 'Fox', use: 'en' }]
       },
       informant: {
         individual: {
@@ -176,24 +185,29 @@ test('should build a minimal FHIR registration document without error', async ()
     'DEATH' as EVENT_TYPE
   )
   expect(fhir).toBeDefined()
-  expect(fhir.entry[0].resource.section.length).toBe(5)
+  expect(fhir.entry[0].resource.section.length).toBe(8)
   expect(fhir.entry[0].resource.date).toBeDefined()
   expect(fhir.entry[0].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebcedsd'
   )
 
   // deceased
-  expect(fhir.entry[1].resource.gender).toBe('female')
+  expect(fhir.entry[1].resource.gender).toBe('male')
   expect(fhir.entry[1].resource.name[0].given[0]).toEqual('Jane')
   expect(fhir.entry[1].resource.deceasedDateTime).toEqual('2014-01-28')
-
+  // mother
+  expect(fhir.entry[2].resource.name[0].given[0]).toEqual('Jessica')
+  // father
+  expect(fhir.entry[3].resource.name[0].given[0]).toEqual('Cash')
+  // spouse
+  expect(fhir.entry[4].resource.name[0].given[0]).toEqual('Megan')
   // informant
-  expect(fhir.entry[2].resource.resourceType).toEqual('RelatedPerson')
+  expect(fhir.entry[5].resource.resourceType).toEqual('RelatedPerson')
   // informant relationship
-  expect(fhir.entry[2].resource.relationship.coding[0].code).toEqual('OTHER')
-  expect(fhir.entry[2].resource.relationship.text).toEqual('Nephew')
-  expect(fhir.entry[2].resource.patient.reference).toEqual(
-    fhir.entry[3].fullUrl
+  expect(fhir.entry[5].resource.relationship.coding[0].code).toEqual('OTHER')
+  expect(fhir.entry[5].resource.relationship.text).toEqual('Nephew')
+  expect(fhir.entry[5].resource.patient.reference).toEqual(
+    fhir.entry[6].fullUrl
   )
 })
 
