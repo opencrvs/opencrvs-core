@@ -23,7 +23,9 @@ export const deathDocumentForWhomFhirMapping = {
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
   "Proof of Applicant's ID": 'APPLICANT_ID_PROOF',
-  "Proof of applicant's authority to apply": 'APPLICANT_ATHORITY_TO_APPLY_PROOF'
+  "Proof of applicant's authority to apply":
+    'APPLICANT_ATHORITY_TO_APPLY_PROOF',
+  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF'
 }
 
 export const deathSectionMapping = {
@@ -31,7 +33,8 @@ export const deathSectionMapping = {
     deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
     deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
     deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
-    deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']
+    deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased'],
+    deathDocumentForWhomFhirMapping['Letter from ward councillor']
   ],
   [DeathSection.Applicants]: [
     deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
@@ -59,6 +62,7 @@ export const deathDocumentTypeFhirMapping = {
   'Coroners Report': 'CORONERS_REPORT',
   'Signed Affidavit': 'SIGNED_AFFIDAVIT',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF_PAPER',
+  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF',
   Other: 'OTHER'
 }
 
