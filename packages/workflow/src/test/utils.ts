@@ -623,6 +623,10 @@ export const taskResouceMock = JSON.stringify({
       valueString: 'MOTHER'
     },
     {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '+8801818181818'
+    },
+    {
       url: 'http://opencrvs.org/specs/extension/regLastUser',
       valueReference: { reference: 'DUMMY' }
     }
@@ -1607,3 +1611,47 @@ export const testInProgressDeathFhirBundle = {
   ],
   meta: { lastUpdated: '2019-02-11' }
 }
+
+export const deathTaskMock = JSON.stringify({
+  resourceType: 'Task',
+  status: 'requested',
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'DEATH'
+      }
+    ]
+  },
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/paper-form-id',
+      value: '12345678'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+      value: 'B5WGYJE'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    }
+  ],
+  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+})
+
+export const relatedPersonMock = JSON.stringify({
+  resourceType: 'RelatedPerson',
+  relationship: {
+    coding: [
+      {
+        system: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+        code: 'OTHER'
+      }
+    ],
+    text: 'Nephew'
+  },
+  patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
+})

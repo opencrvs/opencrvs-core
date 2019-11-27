@@ -29,7 +29,9 @@ import {
   deathCompositionMock,
   testInProgressFhirBundle,
   testInProgressDeathFhirBundle,
-  taskResouceMock
+  taskResouceMock,
+  deathTaskMock,
+  relatedPersonMock
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -1261,6 +1263,111 @@ describe('markEventAsRegisteredHandler handler', () => {
       method: 'POST',
       url: '/fhir',
       payload: taskBundle,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+})
+
+describe('markEventAsRegisteredCallbackHandler', () => {
+  let server: any
+  let token: any
+  beforeEach(async () => {
+    token = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    fetch.resetMocks()
+    server = await createServer()
+  })
+
+  it('returns error', async () => {
+    fetch.mockResponses(
+      [officeMock, { status: 200 }],
+      [relatedPersonMock, { status: 200 }],
+      [motherMock, { status: 200 }]
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/confirm/registration',
+      payload: { trackingId: 'B1mW7jA', registrationNumber: '12345678' },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('returns OK with birth registration', async () => {
+    fetch.mockResponses(
+      [taskResouceMock, { status: 200 }],
+      [compositionMock, { status: 200 }],
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [motherMock, { status: 200 }]
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/confirm/registration',
+      payload: {
+        trackingId: 'B1mW7jA',
+        registrationNumber: '12345678'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns OK with death registration', async () => {
+    fetch.mockResponses(
+      [deathTaskMock, { status: 200 }],
+      [deathCompositionMock, { status: 200 }],
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [JSON.stringify({}), { status: 200 }],
+      [relatedPersonMock, { status: 200 }],
+      [motherMock, { status: 200 }],
+      [motherMock, { status: 200 }]
+    )
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/confirm/registration',
+      payload: {
+        trackingId: 'B1mW7jA',
+        registrationNumber: '12345678'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }

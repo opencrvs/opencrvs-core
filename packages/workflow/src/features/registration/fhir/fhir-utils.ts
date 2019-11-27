@@ -28,10 +28,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
-import {
-  getEventType,
-  getTaskEventType
-} from '@workflow/features/registration/utils'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
@@ -256,8 +253,11 @@ export async function postToHearth(payload: any) {
   return res.json()
 }
 
-export async function getPhoneNo(taskResource: fhir.Task) {
-  const eventType = getTaskEventType(taskResource)
+export async function getPhoneNo(
+  composition: fhir.Composition,
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
   let phoneNumber
   if (eventType === EVENT_TYPE.BIRTH) {
     const phoneExtension =
@@ -271,9 +271,6 @@ export async function getPhoneNo(taskResource: fhir.Task) {
       })
     phoneNumber = phoneExtension && phoneExtension.valueString
   } else {
-    const composition: fhir.Composition = await getFromFhir(
-      `/${taskResource.focus}`
-    )
     const informantSection = getSectionEntryBySectionCode(
       composition,
       INFORMANT_CODE
@@ -298,12 +295,9 @@ export async function getPhoneNo(taskResource: fhir.Task) {
 }
 
 export async function getEventInformantName(
-  taskResource: fhir.Task,
+  composition: fhir.Composition,
   eventType: EVENT_TYPE
 ) {
-  const composition: fhir.Composition = await getFromFhir(
-    `/${taskResource.focus}`
-  )
   let informantSection
   if (eventType === EVENT_TYPE.BIRTH) {
     informantSection = getSectionEntryBySectionCode(
@@ -319,7 +313,6 @@ export async function getEventInformantName(
 
   const informant =
     informantSection && (await getFromFhir(`/${informantSection.reference}`))
-
   const language = getDefaultLanguage()
   if (!informant || !informant.name) {
     throw new Error("Didn't find informant's name information")

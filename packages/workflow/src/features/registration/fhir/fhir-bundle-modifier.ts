@@ -15,8 +15,7 @@ import {
   getEventType,
   isInProgressApplication,
   isEventNotification,
-  getRegistrationNumber,
-  getTaskEventType
+  getRegistrationNumber
 } from '@workflow/features/registration/utils'
 import {
   getFromFhir,
@@ -156,12 +155,11 @@ export async function markBundleAsRegistered(
 export async function markEventAsRegistered(
   taskResource: fhir.Task,
   registrationNumber: string,
+  eventType: EVENT_TYPE,
   token: string
 ): Promise<fhir.Task> {
   const practitioner = await getLoggedInPractitionerResource(token)
-
   /* Setting registration number here */
-  const eventType = getTaskEventType(taskResource)
   let identifierName
   if (eventType === EVENT_TYPE.BIRTH) {
     identifierName = 'birth-registration-number'

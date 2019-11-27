@@ -167,18 +167,21 @@ export async function markEventAsRegisteredCallbackHandler(
     trackingId,
     registrationNumber
   } = request.payload as IEventRegistrationCallbackPayload
-
   const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
-
+  const composition: fhir.Composition = await getFromFhir(`/${task.focus}`)
   const event = getTaskEventType(task)
 
   try {
-    await markEventAsRegistered(task, registrationNumber, getToken(request))
+    await markEventAsRegistered(
+      task,
+      registrationNumber,
+      event,
+      getToken(request)
+    )
     const resBundle = await postToHearth(task)
 
-    const phoneNo = await getPhoneNo(task)
-    const informantName = await getEventInformantName(task, event)
-
+    const phoneNo = await getPhoneNo(composition, task, event)
+    const informantName = await getEventInformantName(composition, event)
     /* sending notification to the contact */
     if (phoneNo && informantName) {
       logger.info(
