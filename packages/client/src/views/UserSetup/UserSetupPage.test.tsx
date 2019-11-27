@@ -89,7 +89,7 @@ describe('UserSetupPage tests', () => {
     expect(app.find('#NewPassword')).toBeDefined()
   })
   it('go to password page without userDetails', async () => {
-    store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth({ '?token': validToken }))
     store.dispatch(getStorageUserDetailsSuccess('null'))
     const testComponent = await createTestComponent(
       // @ts-ignore

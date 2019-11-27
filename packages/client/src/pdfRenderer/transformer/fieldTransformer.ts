@@ -25,7 +25,8 @@ import {
   IFunctionTransformer,
   TemplateTransformerData,
   TransformerPayload,
-  IFormattedFeildValuePayload
+  IFormattedFeildValuePayload,
+  IPersonIdentifierValuePayload
 } from '@client/pdfRenderer/transformer/types'
 import moment from 'moment'
 import { IFormSectionData } from '@client/forms'
@@ -100,7 +101,8 @@ export const fieldTransformers: IFunctionTransformer = {
     ].forEach(field => {
       applicantName = applicantName.concat(`${applicantObj[field] || ''} `)
     })
-    return applicantName.substr(0, applicantName.length - 1)
+    const fullName = applicantName.substr(0, applicantName.length - 1)
+    return formatPayload.allCapital ? fullName.toUpperCase() : fullName
   },
 
   /*
@@ -141,6 +143,7 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
     }
+
     const dateValue = formatPayload.key
       ? getValueFromApplicationDataByKey(
           templateData.application.data,
@@ -153,7 +156,7 @@ export const fieldTransformers: IFunctionTransformer = {
       require(`moment/${formatPayload.momentLocale[locale]}`)
     }
     moment.locale(locale)
-    return moment(dateValue).format(formatPayload.format)
+    return (dateValue && moment(dateValue).format(formatPayload.format)) || ''
   },
 
   /*
@@ -249,16 +252,41 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!params) {
       throw new Error('No payload found for this transformer')
     }
-    let value = getValueFromApplicationDataByKey(
+    let value = (getValueFromApplicationDataByKey(
       templateData.application.data,
       params.valueKey
-    ) as string
-    Object.keys(params.conversionMap).forEach(number => {
+    ) as string).toString()
+
+    Object.keys(params.conversionMap).forEach(numberKey => {
       value = value.replace(
-        new RegExp(number, 'g'),
-        params.conversionMap[number]
+        new RegExp(numberKey, 'g'),
+        params.conversionMap[numberKey]
       )
     })
     return value
+  },
+
+  IdentifierValue: (
+    templateData: TemplateTransformerData,
+    intl: IntlShape,
+    payload?: TransformerPayload
+  ) => {
+    const key = payload && (payload as IPersonIdentifierValuePayload)
+    if (!key) {
+      throw new Error('No payload found for this transformer')
+    }
+    const idType = getValueFromApplicationDataByKey(
+      templateData.application.data,
+      key.idTypeKey
+    ) as string
+    if (!idType || idType !== key.idTypeValue) {
+      return ' '
+    }
+    return (
+      (getValueFromApplicationDataByKey(
+        templateData.application.data,
+        key.idValueKey
+      ) as string) || ' '
+    )
   }
 }

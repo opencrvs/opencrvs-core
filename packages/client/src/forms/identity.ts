@@ -55,12 +55,7 @@ export const deathIdentityOptions = [
 ]
 
 export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
-  switch (key) {
-    case NATIONAL_ID:
-      return NUMBER
-    default:
-      return TEXT
-  }
+  return TEXT
 }
 
 export function identityTooltipMapper(code: string): MessageDescriptor {

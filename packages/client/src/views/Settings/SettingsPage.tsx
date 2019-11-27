@@ -42,7 +42,6 @@ import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 
 const Container = styled.div`
-  ${({ theme }) => theme.fonts.regularFont};
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
@@ -67,6 +66,7 @@ const SettingsTitle = styled.div`
     display: none;
   }
 `
+
 const Content = styled.div`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -98,7 +98,23 @@ const Right = styled.div`
     }
   }
 `
-
+const Version = styled.div`
+  color: ${({ theme }) => theme.colors.disabled};
+  ${({ theme }) => theme.fonts.smallButtonStyle};
+  text-transform: none;
+  margin-top: 2rem;
+  span:last-child {
+    display: none;
+  }
+  :hover {
+    span:first-child {
+      display: none;
+    }
+    span:last-child {
+      display: inline;
+    }
+  }
+`
 const Message = styled.div`
   margin-bottom: 16px;
 `
@@ -266,7 +282,7 @@ class SettingsView extends React.Component<IProps, IState> {
         items: [
           {
             label: intl.formatMessage(constantsMessages.labelPassword),
-            placeHolder: 'Last change 4 days ago',
+            placeHolder: '********',
             action: {
               id: 'BtnChangePassword',
               label: intl.formatMessage(buttonMessages.change),
@@ -275,7 +291,7 @@ class SettingsView extends React.Component<IProps, IState> {
           },
           {
             label: intl.formatMessage(constantsMessages.labelPin),
-            placeHolder: 'Last change 4 days ago',
+            placeHolder: '****',
             action: {
               label: intl.formatMessage(buttonMessages.change),
               disabled: true
@@ -310,6 +326,10 @@ class SettingsView extends React.Component<IProps, IState> {
               {sections.map((sec, index: number) => (
                 <DataSection key={index} {...sec} />
               ))}
+              <Version>
+                <span>OpenCRVS v1.1.0</span>
+                <span>{process.env.REACT_APP_VERSION || 'development'}</span>
+              </Version>
             </Left>
             <Right>
               <Avatar className="tablet" />

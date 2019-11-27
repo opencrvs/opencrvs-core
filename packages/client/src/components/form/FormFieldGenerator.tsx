@@ -890,9 +890,7 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionData
 >({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
-  handleSubmit: values => {
-    console.log(values)
-  },
+  handleSubmit: values => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
       props.fields,

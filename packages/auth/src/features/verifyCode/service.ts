@@ -74,7 +74,7 @@ export async function sendVerificationCode(
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      Authorization: `Bearer ${createToken(
+      Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
         ['opencrvs:notification-user'],

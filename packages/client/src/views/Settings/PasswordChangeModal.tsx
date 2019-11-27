@@ -337,7 +337,13 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                     <span>
                       {intl.formatMessage(
                         messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                        { min: 8 }
+                        {
+                          min: intl.formatMessage({
+                            defaultMessage: '8',
+                            description: 'Minimum length password',
+                            id: 'number.eight'
+                          })
+                        }
                       )}
                     </span>
                   </div>
@@ -400,7 +406,13 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
                 <span>
                   {intl.formatMessage(
                     messages.passwordLengthCharacteristicsForPasswordUpdateForm,
-                    { min: 8 }
+                    {
+                      min: intl.formatMessage({
+                        defaultMessage: '8',
+                        description: 'Minimum length password',
+                        id: 'number.eight'
+                      })
+                    }
                   )}
                 </span>
               </div>

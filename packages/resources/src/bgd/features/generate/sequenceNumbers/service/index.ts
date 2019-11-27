@@ -44,7 +44,7 @@ export async function getNextLocationWiseSeqNumber(locationId: string) {
   )
   if (!sequenceNumber) {
     throw new Error(
-      `No starting sequece number found for generating registration number in location: ${locationId}`
+      `No starting sequence number found for generating registration number in location: ${locationId}`
     )
   }
   //When sequence number reaches to max

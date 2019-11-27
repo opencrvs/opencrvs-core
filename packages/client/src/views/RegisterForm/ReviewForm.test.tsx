@@ -75,7 +75,7 @@ describe('ReviewForm tests', () => {
 
     form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
   it('it returns error while fetching', async () => {
@@ -663,7 +663,8 @@ describe('ReviewForm tests', () => {
                         comment: 'This is a note'
                       }
                     ],
-                    type: 'DECLARED'
+                    type: 'DECLARED',
+                    timestamp: null
                   }
                 ],
                 trackingId: 'B123456',
@@ -1319,7 +1320,8 @@ describe('ReviewForm tests', () => {
                   attachments: null,
                   status: [
                     {
-                      type: 'DECLARED'
+                      type: 'DECLARED',
+                      timestamp: null
                     }
                   ],
                   type: 'DEATH',
@@ -1587,7 +1589,8 @@ describe('ReviewForm tests', () => {
                   attachments: null,
                   status: [
                     {
-                      type: 'DECLARED'
+                      type: 'DECLARED',
+                      timestamp: null
                     }
                   ],
                   type: 'DEATH',
@@ -1659,9 +1662,9 @@ describe('ReviewForm tests', () => {
     })
   })
   describe('ReviewForm tests for register scope', () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       getItem.mockReturnValue(declareScope)
-      store.dispatch(checkAuth({ '?token': declareScope }))
+      await store.dispatch(checkAuth({ '?token': declareScope }))
     })
 
     it('shows error message for user with declare scope', async () => {

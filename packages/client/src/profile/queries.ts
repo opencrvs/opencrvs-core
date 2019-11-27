@@ -29,6 +29,7 @@ export const FETCH_USER = gql`
       catchmentArea {
         id
         name
+        alias
         status
         identifier {
           system
@@ -38,6 +39,7 @@ export const FETCH_USER = gql`
       primaryOffice {
         id
         name
+        alias
         status
       }
       localRegistrar {

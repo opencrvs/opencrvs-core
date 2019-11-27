@@ -49,9 +49,9 @@ queries.fetchUserDetails = mockFetchUserDetails
 describe('SearchResult expansion related tests', () => {
   const { store } = createStore()
 
-  beforeAll(() => {
+  beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
   describe('SearchResult tests for different application activity', () => {

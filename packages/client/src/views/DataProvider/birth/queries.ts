@@ -159,6 +159,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             comment
           }
           type
+          timestamp
         }
         type
         trackingId
@@ -323,6 +324,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             comment
           }
           type
+          timestamp
           location {
             name
             alias

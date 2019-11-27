@@ -12,7 +12,7 @@
 // Copied from the @opencrvs/commons module
 //
 // It would be better to import these but this mediator isn't part of the
-// core OpenCRVS services n the mono repo so it is proving difficult. We
+// core OpenCRVS services in the mono repo so it is proving difficult. We
 // also expect this to be moved to its own repository making the linking
 // of modules even more difficult unless we publish to npm.
 

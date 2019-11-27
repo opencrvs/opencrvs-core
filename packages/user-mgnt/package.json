@@ -1,11 +1,11 @@
 {
   "name": "@opencrvs/user-mgnt",
-  "version": "1.0.0-alpha.1.1",
+  "version": "1.0.0-alpha.1.2",
   "description": "OpenCRVS user management service",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=DEVELOPMENT nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "node build/dist/src/index.js",
     "test": "jest  --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
@@ -17,7 +17,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.1",
+    "@opencrvs/commons": "^1.0.0-alpha.1.2",
     "@types/hapi-pino": "^6.3.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",

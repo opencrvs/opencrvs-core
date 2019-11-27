@@ -517,13 +517,15 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
   value = (value && value.toString()) || ''
   switch (typeOfID) {
     case NATIONAL_ID:
-      return hasValidLength(value, validNationalIDLength) &&
-        isNumber(value.toString())
-        ? undefined
-        : {
-            message: messages.validNationalId,
-            props: { validLength: validNationalIDLength }
-          }
+      const containsOnlyNumbers = value.match(/^[0-9]+$/)
+
+      if (hasValidLength(value, validNationalIDLength) && containsOnlyNumbers) {
+        return undefined
+      }
+      return {
+        message: messages.validNationalId,
+        props: { validLength: validNationalIDLength }
+      }
 
     case BIRTH_REGISTRATION_NUMBER:
       return isLengthWithinRange(

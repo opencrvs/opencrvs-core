@@ -19,6 +19,7 @@ export interface GQLQuery {
   fetchDeathRegistration?: GQLDeathRegistration
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
+  queryPersonByNidIdentifier?: GQLPerson
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   getUser?: GQLUser
@@ -519,6 +520,9 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   registration?: GQLRegistration
   deceased?: GQLPerson
   informant?: GQLRelatedPerson
+  mother?: GQLPerson
+  father?: GQLPerson
+  spouse?: GQLPerson
   eventLocation?: GQLLocation
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
@@ -867,6 +871,9 @@ export interface GQLDeathRegistrationInput {
   registration?: GQLRegistrationInput
   deceased?: GQLPersonInput
   informant?: GQLRelatedPersonInput
+  mother?: GQLPersonInput
+  father?: GQLPersonInput
+  spouse?: GQLPersonInput
   eventLocation?: GQLLocationInput
   mannerOfDeath?: GQLMannerOfDeath
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
@@ -972,6 +979,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchDeathRegistration?: QueryToFetchDeathRegistrationResolver<TParent>
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
+  queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
+    TParent
+  >
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
@@ -1108,6 +1118,23 @@ export interface QueryToFetchRegistrationResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToQueryPersonByNidIdentifierArgs {
+  dob?: string
+  nid?: string
+  country?: string
+}
+export interface QueryToQueryPersonByNidIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToQueryPersonByNidIdentifierArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2289,6 +2316,9 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   registration?: DeathRegistrationToRegistrationResolver<TParent>
   deceased?: DeathRegistrationToDeceasedResolver<TParent>
   informant?: DeathRegistrationToInformantResolver<TParent>
+  mother?: DeathRegistrationToMotherResolver<TParent>
+  father?: DeathRegistrationToFatherResolver<TParent>
+  spouse?: DeathRegistrationToSpouseResolver<TParent>
   eventLocation?: DeathRegistrationToEventLocationResolver<TParent>
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
@@ -2323,6 +2353,27 @@ export interface DeathRegistrationToDeceasedResolver<
 }
 
 export interface DeathRegistrationToInformantResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToMotherResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToFatherResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToSpouseResolver<
   TParent = any,
   TResult = any
 > {
