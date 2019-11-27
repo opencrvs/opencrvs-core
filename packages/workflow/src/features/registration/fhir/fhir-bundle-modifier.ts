@@ -158,7 +158,6 @@ export async function markEventAsRegistered(
   eventType: EVENT_TYPE,
   token: string
 ): Promise<fhir.Task> {
-  const practitioner = await getLoggedInPractitionerResource(token)
   /* Setting registration number here */
   let identifierName
   if (eventType === EVENT_TYPE.BIRTH) {
@@ -180,12 +179,6 @@ export async function markEventAsRegistered(
     getTokenPayload(token),
     REG_STATUS_REGISTERED
   )
-
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(taskResource, practitioner)
-
-  /* setting lastRegUser here */
-  setupLastRegUser(taskResource, practitioner)
 
   return taskResource
 }
