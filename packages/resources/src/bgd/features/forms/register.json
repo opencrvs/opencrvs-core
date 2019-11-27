@@ -8074,7 +8074,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType ===  \"NONE\" ))"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -8133,6 +8133,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "values.addressSameAsMother"
                     }
                   ],
@@ -8176,6 +8180,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
                     },
                     {
                       "action": "hide",
@@ -8932,7 +8940,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType ===  \"NONE\" ))"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -9048,6 +9056,10 @@
                     {
                       "action": "hide",
                       "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
                     },
                     {
                       "action": "hide",
