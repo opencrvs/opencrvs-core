@@ -22,18 +22,24 @@ import {
 import {
   getSharedContactMsisdn,
   postToHearth,
-  getFromFhir
+  getFromFhir,
+  getPhoneNo,
+  getEventInformantName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
-  getTaskEventType
+  getTaskEventType,
+  sendRegisteredNotification
 } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { createFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
 
+interface IEventRegistrationCallbackPayload {
+  trackingId: string
+  registrationNumber: string
+}
 async function sendBundleToHearth(
   payload: fhir.Bundle,
   count = 1
@@ -155,26 +161,30 @@ export async function markEventAsValidatedHandler(
 
 export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
-  trackingId: string,
-  registrationNumber: string
+  h: Hapi.ResponseToolkit
 ) {
+  const {
+    trackingId,
+    registrationNumber
+  } = request.payload as IEventRegistrationCallbackPayload
+
   const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
 
   const event = getTaskEventType(task)
-  const fhirBundle = await createFhirBundle(task, event)
 
   try {
     await markEventAsRegistered(task, registrationNumber, getToken(request))
-    const resBundle = await postToHearth(fhirBundle)
+    const resBundle = await postToHearth(task)
 
-    const msisdn = await getSharedContactMsisdn(fhirBundle)
+    const phoneNo = await getPhoneNo(task)
+    const informantName = await getEventInformantName(task, event)
 
     /* sending notification to the contact */
-    if (msisdn) {
+    if (phoneNo && informantName) {
       logger.info(
         'markEventAsRegisteredCallbackHandler sending event notification'
       )
-      sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, msisdn, {
+      sendRegisteredNotification(phoneNo, informantName, event, {
         Authorization: request.headers.authorization
       })
     } else {
@@ -182,7 +192,6 @@ export async function markEventAsRegisteredCallbackHandler(
         'markEventAsRegisteredCallbackHandler could not send event notification'
       )
     }
-
     return resBundle
   } catch (error) {
     logger.error(

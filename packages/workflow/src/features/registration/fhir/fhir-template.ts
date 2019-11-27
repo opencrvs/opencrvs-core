@@ -12,11 +12,7 @@
 import { v4 as uuid } from 'uuid'
 import {
   OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE,
-  CHILD_SECTION_CODE,
-  MOTHER_SECTION_CODE,
-  FATHER_SECTION_CODE,
-  DECEASED_SECTION_CODE
+  EVENT_TYPE
 } from '@workflow/features/registration/fhir/constants'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import { getEventType } from '@workflow/features/registration/utils'
@@ -171,7 +167,7 @@ export async function findPersonEntryByTask(
   return await getFromFhir(`/${personSectionEntry.reference}`)
 }
 
-function getSectionEntryBySectionCode(
+export function getSectionEntryBySectionCode(
   composition: fhir.Composition | undefined,
   sectionCode: string
 ): fhir.Reference {
@@ -233,57 +229,4 @@ export function selectInformantResource(
     )
 
   return informantEntry && (informantEntry.resource as fhir.Patient)
-}
-
-export async function createFhirBundle(
-  taskEntry: fhir.Task,
-  eventType: EVENT_TYPE
-) {
-  const composition: fhir.Composition = await getFromFhir(`/${taskEntry.focus}`)
-
-  const fhirBundle: fhir.Bundle = {
-    resourceType: 'Bundle',
-    type: 'document'
-  }
-
-  fhirBundle.entry = [] as fhir.BundleEntry[]
-  fhirBundle.entry.push({
-    resource: composition
-  })
-
-  fhirBundle.entry.push({
-    resource: taskEntry
-  })
-
-  if (eventType === EVENT_TYPE.BIRTH) {
-    await addPersonInBundle(fhirBundle, composition, CHILD_SECTION_CODE)
-    await addPersonInBundle(fhirBundle, composition, MOTHER_SECTION_CODE)
-    await addPersonInBundle(fhirBundle, composition, FATHER_SECTION_CODE)
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    await addPersonInBundle(fhirBundle, composition, DECEASED_SECTION_CODE)
-    await addPersonInBundle(fhirBundle, composition, INFORMANT_CODE)
-  }
-  return fhirBundle
-}
-
-async function addPersonInBundle(
-  bundle: fhir.Bundle,
-  composition: fhir.Composition,
-  sectionCode: string
-) {
-  const personSectionEntry = getSectionEntryBySectionCode(
-    composition,
-    sectionCode
-  )
-  const person: fhir.Patient = await getFromFhir(
-    `/${personSectionEntry.reference}`
-  )
-  return (
-    bundle &&
-    bundle.entry &&
-    bundle.entry.push({
-      fullUrl: personSectionEntry.reference,
-      resource: person
-    })
-  )
 }
