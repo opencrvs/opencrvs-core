@@ -154,6 +154,9 @@ export async function createServer() {
     path: '/bgd/bdris-queue/trigger',
     handler: bgdBDRISQueueTriggerHandler,
     options: {
+      auth: false, // Unprotected so that it may be called by the OpenHIM without a token
+      // This is safe as only services in the docker swarm can access this endpoint and
+      // even if it was compromised all that could be done was to trigger extra queue checks
       tags: ['api'],
       description:
         'Triggers the queue to try send outstanding registration for BDRIS validation'
