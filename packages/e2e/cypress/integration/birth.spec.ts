@@ -62,7 +62,7 @@ context('Birth Integration Test', () => {
 
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('6684176876871')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#familyName').type('বেগম')
     cy.get('#familyNameEng').type('Begum')
@@ -154,7 +154,7 @@ context('Birth Integration Test', () => {
 
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1234567898765')
+    cy.get('#iD').type('19922613235317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হাবিবা')
     cy.get('#familyName').type('আক্তার')
@@ -190,7 +190,7 @@ context('Birth Integration Test', () => {
     // FATHER DETAILS
     // cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1234567898765')
+    cy.get('#iD').type('19988273235317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('বোরহান')
     cy.get('#familyName').type('উদ্দিন')
@@ -288,7 +288,7 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('6684176876871')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#familyName').type('আক্তার')
     cy.get('#familyNameEng').type('Aktar')
@@ -372,7 +372,7 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1234567898765')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('নমিসা')
     cy.get('#familyName').type('বেগম')
@@ -407,7 +407,7 @@ context('Birth Integration Test', () => {
     // FATHER DETAILS
     cy.get('#fathersDetailsExist_true').click()
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1234567898765')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হামিদুর')
     cy.get('#familyName').type('রহমান')
@@ -508,7 +508,7 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1994789456123')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('হাবিবা')
     cy.get('#familyName').type('আক্তার')
@@ -543,7 +543,7 @@ context('Birth Integration Test', () => {
 
     // FATHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('1994789456123')
+    cy.get('#iD').type('19988010143317495')
     cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
     cy.get('#firstNames').type('বোরহান')
     cy.get('#familyName').type('উদ্দিন')
@@ -626,7 +626,7 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // APPLICANT'S DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#applicantID').type('6684176876871')
+    cy.get('#applicantID').type('19988010143317495')
     cy.get('#applicantFamilyName').type('বেগম')
     cy.get('#applicantFamilyNameEng').type('Begum')
     cy.get('#applicantBirthDate-dd').type('01')
@@ -649,7 +649,7 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // MOTHER DETAILS
     cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('6684176876871')
+    cy.get('#iD').type('19988010143317495')
     cy.get('#familyName').type('বেগম')
     cy.get('#familyNameEng').type('Begum')
     cy.get('#motherBirthDate-dd').type('01')

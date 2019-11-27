@@ -50,7 +50,7 @@ import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
 import { FETCH_REGISTRATION } from '@opencrvs/client/src/forms/register/queries/registration'
-import { FETCH_PERSON } from '@opencrvs/client/src/forms/register/queries/person'
+import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/person'
 import { storage } from '@client/storage'
 import { IUserDetails } from '@client/utils/userUtils'
 
@@ -374,7 +374,7 @@ describe('when user is in the register form for death event', () => {
       )
       component = testComponent.component
       selectOption(component, '#iDType', 'Birth Registration Number')
-      expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
+      expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
 
@@ -509,13 +509,6 @@ describe('when user is in the register form for death event', () => {
       await new Promise(resolve => {
         setTimeout(resolve, 200)
       })
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
 
       await new Promise(resolve => {
         setTimeout(resolve, 200)
@@ -523,7 +516,7 @@ describe('when user is in the register form for death event', () => {
       component.update()
 
       expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
-        1
+        0
       )
     })
 
@@ -531,15 +524,16 @@ describe('when user is in the register form for death event', () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_PERSON,
+            query: FETCH_PERSON_NID,
             variables: {
-              identifier: '1234567898765'
+              nid: '1234567898',
+              dob: '1992-10-10',
+              country: 'bgd'
             }
           },
           result: {
             data: {
-              queryPersonByIdentifier: {
-                id: '26499e5c-72a2-42f6-b8e6-1ffc99b5311e',
+              queryPersonByNidIdentifier: {
                 name: [
                   {
                     use: 'bn',
@@ -552,42 +546,7 @@ describe('when user is in the register form for death event', () => {
                     familyName: 'Spivak'
                   }
                 ],
-                birthDate: '2018-08-01',
-                gender: 'female',
-                address: [
-                  {
-                    line: [
-                      '40',
-                      '',
-                      'My street',
-                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
-                      '',
-                      '3f65c407-e249-4096-9291-404f9e682897'
-                    ],
-                    type: 'PERMANENT',
-                    city: null,
-                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
-                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
-                    postalCode: '10024',
-                    country: 'BGD'
-                  },
-                  {
-                    line: [
-                      '40',
-                      '',
-                      'My street',
-                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
-                      '',
-                      '3f65c407-e249-4096-9291-404f9e682897'
-                    ],
-                    type: 'CURRENT',
-                    city: null,
-                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
-                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
-                    postalCode: '10024',
-                    country: 'BGD'
-                  }
-                ]
+                gender: 'female'
               }
             }
           }
@@ -621,7 +580,19 @@ describe('when user is in the register form for death event', () => {
       selectOption(component, '#iDType', 'National ID')
 
       component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '1234567898765' }
+        target: { id: 'iD', value: '1234567898' }
+      })
+
+      component.find('input#birthDate-dd').simulate('change', {
+        target: { id: 'birthDate-dd', value: '10' }
+      })
+
+      component.find('input#birthDate-mm').simulate('change', {
+        target: { id: 'birthDate-mm', value: '10' }
+      })
+
+      component.find('input#birthDate-yyyy').simulate('change', {
+        target: { id: 'birthDate-yyyy', value: '1992' }
       })
 
       component.update()
@@ -650,15 +621,16 @@ describe('when user is in the register form for death event', () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_PERSON,
+            query: FETCH_PERSON_NID,
             variables: {
-              identifier: '1234567898765'
+              nid: '1234567898',
+              dob: '1992-10-10',
+              country: 'bgd'
             }
           },
           result: {
             data: {
-              queryPersonByIdentifier: {
-                id: '26499e5c-72a2-42f6-b8e6-1ffc99b5311e',
+              queryPersonByNidIdentifier: {
                 name: [
                   {
                     use: 'bn',
@@ -671,42 +643,7 @@ describe('when user is in the register form for death event', () => {
                     familyName: 'Spivak'
                   }
                 ],
-                birthDate: '2018-08-01',
-                gender: 'female',
-                address: [
-                  {
-                    line: [
-                      '40',
-                      '',
-                      'My street',
-                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
-                      '',
-                      '3f65c407-e249-4096-9291-404f9e682897'
-                    ],
-                    type: 'PERMANENT',
-                    city: null,
-                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
-                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
-                    postalCode: '10024',
-                    country: 'BGD'
-                  },
-                  {
-                    line: [
-                      '40',
-                      '',
-                      'My street',
-                      '0df3c0f7-9166-4b7a-809d-b2524d322d1f',
-                      '',
-                      '3f65c407-e249-4096-9291-404f9e682897'
-                    ],
-                    type: 'CURRENT',
-                    city: null,
-                    district: 'dc00ae85-5457-4db4-8fe5-79f1d063f0f7',
-                    state: 'ed1492b2-5f2f-4356-aa43-371508d6b69c',
-                    postalCode: '10024',
-                    country: 'BGD'
-                  }
-                ]
+                gender: 'female'
               }
             }
           }
@@ -740,7 +677,19 @@ describe('when user is in the register form for death event', () => {
       selectOption(component, '#iDType', 'National ID')
 
       component.find('input#applicantID').simulate('change', {
-        target: { id: 'applicantID', value: '1234567898765' }
+        target: { id: 'applicantID', value: '1234567898' }
+      })
+
+      component.find('input#applicantBirthDate-dd').simulate('change', {
+        target: { id: 'applicantBirthDate-dd', value: '10' }
+      })
+
+      component.find('input#applicantBirthDate-mm').simulate('change', {
+        target: { id: 'applicantBirthDate-mm', value: '10' }
+      })
+
+      component.find('input#applicantBirthDate-yyyy').simulate('change', {
+        target: { id: 'applicantBirthDate-yyyy', value: '1992' }
       })
 
       component.update()
@@ -819,25 +768,20 @@ describe('when user is in the register form for death event', () => {
         })
       component.update()
 
-      component
-        .find('#fetchButton')
-        .hostNodes()
-        .childAt(0)
-        .childAt(0)
-        .childAt(0)
-        .simulate('click')
-
-      const element = await waitForElement(component, '#loader-button-error')
-      expect(element.hostNodes()).toHaveLength(1)
+      expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
+        0
+      )
     })
 
     it('displays error message if no registration found by NID', async () => {
       const graphqlMock = [
         {
           request: {
-            query: FETCH_PERSON,
+            query: FETCH_PERSON_NID,
             variables: {
-              identifier: '1234567898765'
+              nid: '1234567898',
+              dob: '1992-10-10',
+              country: 'bgd'
             }
           },
           error: new Error('boom')
@@ -873,8 +817,20 @@ describe('when user is in the register form for death event', () => {
       input.hostNodes().props().onChange!({
         target: {
           id: 'iD',
-          value: '1234567898765'
+          value: '1234567897'
         }
+      })
+
+      component.find('input#birthDate-dd').simulate('change', {
+        target: { id: 'birthDate-dd', value: '10' }
+      })
+
+      component.find('input#birthDate-mm').simulate('change', {
+        target: { id: 'birthDate-mm', value: '10' }
+      })
+
+      component.find('input#birthDate-yyyy').simulate('change', {
+        target: { id: 'birthDate-yyyy', value: '1992' }
       })
 
       component.update()
