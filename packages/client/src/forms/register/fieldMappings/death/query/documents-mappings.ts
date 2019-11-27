@@ -30,7 +30,9 @@ const fieldNameMapping = {
   [deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']]:
     'uploadDocForDeceasedDOB',
   [deathDocumentForWhomFhirMapping['Proof of Death of Deceased']]:
-    'uploadDocForDeceasedDeath'
+    'uploadDocForDeceasedDeath',
+  [deathDocumentForWhomFhirMapping['Letter from ward councillor']]:
+    'uploadDocFromCounsilor'
 }
 
 export function deathAttachmentToFieldTransformer(
