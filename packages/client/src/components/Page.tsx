@@ -37,7 +37,8 @@ const languageFromProps = ({ language }: IPageProps) => language
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
-  margin-bottom: 80px;
+  box-sizing: border-box;
+  padding-bottom: 80px;
   justify-content: space-between;
   display: flex;
   flex-direction: column;

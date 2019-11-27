@@ -18,7 +18,7 @@ import { CreatePin } from '@client/views/PIN/CreatePin'
 const SecurePageContainer = styled.div`
   ${({ theme }) => theme.fonts.bigBodyStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
-  height: calc(100vh + 80px);
+  height: 100vh;
   text-align: center;
   width: 100%;
   position: absolute;
