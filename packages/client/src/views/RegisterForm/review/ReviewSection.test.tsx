@@ -115,12 +115,13 @@ describe('when user is in the review page', () => {
   })
 
   describe('when user clicks on change link', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       reviewSectionComponent
         .find('#btn_change_child_familyNameEng')
         .hostNodes()
         .simulate('click')
       reviewSectionComponent.update()
+      await flushPromises()
     })
 
     it('edit dialog should not show up', () => {
@@ -138,6 +139,58 @@ describe('when user is in the review page', () => {
       await flushPromises()
       expect(history.location.pathname).toContain('reviews')
     })
+
+    //   it('redirect to home when pressed save and exit button', async () => {
+    //     reviewSectionComponent
+    //       .find('#btn_change_child_familyNameEng')
+    //       .hostNodes()
+    //       .simulate('click')
+    //     await flushPromises()
+    //     reviewSectionComponent.update()
+
+    //     reviewSectionComponent
+    //       .find('#edit_confirm')
+    //       .hostNodes()
+    //       .simulate('click')
+    //     await flushPromises()
+    //     reviewSectionComponent.update()
+
+    //     // console.log(reviewSectionComponent.debug())
+
+    //     reviewSectionComponent
+    //       .find('#save_draft')
+    //       .hostNodes()
+    //       .simulate('click')
+    //     await flushPromises()
+    //     reviewSectionComponent.update()
+    //     // expect(window.location.href).toContain('/')
+
+    //     expect(
+    //       history.location.pathname.includes('/registration-home/review')
+    //     ).toBeTruthy()
+    //   })
+
+    //   it('check toggle menu item handler', async () => {
+    //     reviewSectionComponent
+    //       .find('#eventToggleMenuToggleButton')
+    //       .hostNodes()
+    //       .simulate('click')
+    //     await flushPromises()
+    //     reviewSectionComponent.update()
+
+    //     reviewSectionComponent
+    //       .find('#eventToggleMenuItem0')
+    //       .hostNodes()
+    //       .simulate('click')
+    //     await flushPromises()
+    //     reviewSectionComponent.update()
+
+    //     // expect(window.location.href).toContain('/')
+
+    //     expect(
+    //       history.location.pathname.includes('/registration-home/review')
+    //     ).toBeTruthy()
+    //   })
   })
 
   it('renders header component', () => {
