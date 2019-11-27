@@ -602,7 +602,7 @@ export class InProgressTabComponent extends React.Component<
         },
         {
           width: 20,
-          key: 'updateAction',
+          key: 'actions',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
         }
@@ -654,7 +654,7 @@ export class InProgressTabComponent extends React.Component<
         },
         {
           width: 20,
-          key: 'downloadAction',
+          key: 'actions',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
         }
