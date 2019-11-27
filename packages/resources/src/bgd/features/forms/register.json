@@ -2170,12 +2170,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "applicantBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "applicantID"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -5426,12 +5435,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "motherBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -7627,12 +7645,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "fatherBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -10944,12 +10971,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "birthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -14950,12 +14986,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "applicantBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "applicantID"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {

@@ -713,6 +713,7 @@ class FormSectionComponent extends React.Component<Props> {
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
+                    console.log(response)
                     const section = {
                       id: this.props.id,
                       groups: [

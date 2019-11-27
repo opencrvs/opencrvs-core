@@ -166,6 +166,7 @@ export interface IStaticFieldType {
 export interface IFieldInput {
   name: string
   valueField: string
+  type?: string
 }
 
 export type IFormFieldValue =

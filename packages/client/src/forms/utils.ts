@@ -353,7 +353,12 @@ export function getInputValues(
 ): IDynamicValues {
   const variables: IVars = {}
   inputs.forEach((input: IFieldInput) => {
-    variables[input.name] = values[input.valueField]
+    if (input.type && input.type === 'ENVIRONMENT') {
+      variables[input.name] =
+        window.config[input.valueField as keyof typeof window.config]
+    } else {
+      variables[input.name] = values[input.valueField]
+    }
   })
   return variables
 }
