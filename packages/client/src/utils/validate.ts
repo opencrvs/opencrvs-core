@@ -506,7 +506,7 @@ const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
 export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
-  const validNationalIDLength = 17
+  const validNationalIDLengths = [10, 17]
   const validBirthRegistrationNumberLength = {
     min: 17,
     max: 18
@@ -519,12 +519,21 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
     case NATIONAL_ID:
       const containsOnlyNumbers = value.match(/^[0-9]+$/)
 
-      if (hasValidLength(value, validNationalIDLength) && containsOnlyNumbers) {
+      if (
+        validNationalIDLengths.filter(e => value && value.length === e).length >
+          0 &&
+        containsOnlyNumbers
+      ) {
         return undefined
       }
       return {
         message: messages.validNationalId,
-        props: { validLength: validNationalIDLength }
+        props: {
+          validLength: validNationalIDLengths
+            .toString()
+            .split(',')
+            .join(' or ')
+        }
       }
 
     case BIRTH_REGISTRATION_NUMBER:

@@ -625,7 +625,7 @@
         "form.field.label.fetchIdentifierModalTitle": "Checking",
         "form.field.label.fetchInformantDetails": "VERIFY NATIONAL ID",
         "form.field.label.fetchMotherDetails": "VERIFY NATIONAL ID",
-        "form.field.label.fetchPersonByNIDModalErrorText": "No person found for provided NID",
+        "form.field.label.fetchPersonByNIDModalErrorText": "National ID not found.  Please enter valid National ID",
         "form.field.label.fetchPersonByNIDModalInfo": "National ID",
         "form.field.label.fetchRegistrationModalErrorText": "No registration found for provided BRN",
         "form.field.label.fetchRegistrationModalInfo": "Birth Registration Number",
@@ -1080,7 +1080,7 @@
         "certificate.receipt.service.5year": "{event} registration after 5 years of event",
         "certificate.receipt.service.45day.amount": "\u09F3 25.00",
         "certificate.receipt.service..5year.amount": "\u09F3 50.00",
-        "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID."
+        "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000."
       }
     },
     {
@@ -1712,7 +1712,7 @@
         "form.field.label.fetchModalSuccessTitle": "আইডি বৈধ",
         "form.field.label.fetchModalTitle": "পরীক্ষা করা হচ্ছে",
         "form.field.label.fetchMotherDetails": "জাতীয় পরিচয় পত্র যাচাই করুন",
-        "form.field.label.fetchPersonByNIDModalErrorText": "প্রদত্ত NID এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি",
+        "form.field.label.fetchPersonByNIDModalErrorText": "জাতীয় পরিচয় পাওয়া যায় নি। বৈধ জাতীয় আইডি প্রবেশ করুন",
         "form.field.label.fetchPersonByNIDModalInfo": "জাতীয় পরিচয়পত্র",
         "form.field.label.fetchRegistrationModalErrorText": "প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ",
         "form.field.label.fetchRegistrationModalInfo": "জন্ম নিবন্ধন নম্বর",
@@ -2167,7 +2167,7 @@
         "certificate.receipt.service.5year": "{event} তারিখের ৫ বছর পরে জন্ম নিবন্ধন",
         "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
         "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০",
-        "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000। যদি জাতীয় আইডি নম্বরটি 10 ​​ডিজিটের দীর্ঘ আইডি হয় তবে দয়া করে একটি পুরানো আইডি ব্যবহার করুন।"
+        "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000।"
       }
     }
   ]

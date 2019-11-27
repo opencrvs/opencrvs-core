@@ -1134,7 +1134,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fetchMotherDetails'
   },
   fetchPersonByNIDModalErrorText: {
-    defaultMessage: 'No person found for provided NID',
+    defaultMessage: 'National ID not found. Please enter valid National ID',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalErrorText'
   },
