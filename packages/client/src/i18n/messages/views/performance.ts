@@ -21,6 +21,12 @@ const messagesToDefine = {
     id: 'performance.body.header.weekly.reports',
     defaultMessage: 'Weekly reports',
     description: 'Header used for the body of weekly reports page'
+  },
+  noResultForLocation: {
+    id: 'performance.reports.noResultForLocation',
+    defaultMessage:
+      'No data for {searchedLocation}. We are currently piloting for two upazillas:',
+    description: 'Message to show if no data is found for a location'
   }
 }
 
