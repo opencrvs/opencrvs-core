@@ -161,7 +161,6 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
         query,
         variables
       })
-      console.log(JSON.stringify(response))
       this.setState({ success: true, loading: false, error: false })
       if (responseTransformer && this.props.onFetch) {
         const transformedResponse = responseTransformer(response)

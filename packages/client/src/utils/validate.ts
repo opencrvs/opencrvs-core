@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
+import { MessageDescriptor, IntlShape } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
@@ -520,8 +520,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       const containsOnlyNumbers = value.match(/^[0-9]+$/)
 
       if (
-        validNationalIDLengths.filter(e => value && value.length === e).length >
-          0 &&
+        validNationalIDLengths.includes(value.length) &&
         containsOnlyNumbers
       ) {
         return undefined

@@ -48,7 +48,7 @@ const InputDescription = styled.p<{
 export interface IInputFieldProps {
   id: string
   label?: string
-  toolTip?: string
+  tooltip?: string
   description?: string
   required?: boolean
   disabled?: boolean
@@ -75,7 +75,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     const {
       id,
       label,
-      toolTip,
+      tooltip,
       required = true,
       description,
       error,
@@ -116,7 +116,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
                 color={color}
                 required={required}
                 hideAsterisk={hideAsterisk}
-                toolTip={toolTip}
+                tooltip={tooltip}
               >
                 {label}
               </InputLabel>

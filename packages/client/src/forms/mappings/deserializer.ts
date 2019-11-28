@@ -222,9 +222,9 @@ function deserializeDynamicDefinitions(
       dependency: descriptor.label.dependency,
       labelMapper: labels[descriptor.label.labelMapper.operation]
     },
-    toolTip: descriptor.toolTip && {
-      dependency: descriptor.toolTip.dependency,
-      toolTipMapper: labels[descriptor.toolTip.toolTipMapper.operation]
+    tooltip: descriptor.tooltip && {
+      dependency: descriptor.tooltip.dependency,
+      tooltipMapper: labels[descriptor.tooltip.tooltipMapper.operation]
     },
     type:
       descriptor.type &&

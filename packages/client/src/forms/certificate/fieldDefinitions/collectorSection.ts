@@ -110,7 +110,7 @@ export const collectBirthCertificateFormSection: IFormSection = {
           name: 'iDTypeOther',
           type: TEXT,
           label: formMessages.iDTypeOtherLabel,
-          toolTip: formMessages.tooltipNationalID,
+          tooltip: formMessages.tooltipNationalID,
           required: true,
           initialValue: '',
           validate: [],
@@ -124,9 +124,9 @@ export const collectBirthCertificateFormSection: IFormSection = {
               dependency: 'iDType',
               labelMapper: identityNameMapper
             },
-            toolTip: {
+            tooltip: {
               dependency: 'iDType',
-              toolTipMapper: identityTooltipMapper
+              tooltipMapper: identityTooltipMapper
             },
             type: {
               kind: 'dynamic',

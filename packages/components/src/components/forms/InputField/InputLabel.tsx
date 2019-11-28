@@ -19,7 +19,7 @@ export type IInputLabel = {
   color?: string
   required?: boolean
   hideAsterisk?: boolean
-  toolTip?: string
+  tooltip?: string
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
@@ -54,10 +54,10 @@ const ToolTipContainer = styled.span`
 
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
-    const { required, hideAsterisk, children, toolTip } = this.props
+    const { required, hideAsterisk, children, tooltip } = this.props
     return (
-      <StyledInputLabel data-tip={toolTip} {...this.props}>
-        {toolTip && <ReactTooltip />}
+      <StyledInputLabel data-tip={tooltip} {...this.props}>
+        {tooltip && <ReactTooltip />}
         {children}
         {required && !hideAsterisk && (
           <Required disabled={this.props.disabled}>&nbsp;*</Required>

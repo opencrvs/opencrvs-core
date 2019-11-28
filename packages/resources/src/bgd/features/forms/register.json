@@ -2068,9 +2068,9 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "toolTip": {
+                    "tooltip": {
                       "dependency": "iDType",
-                      "toolTipMapper": {
+                      "tooltipMapper": {
                         "operation": "identityTooltipMapper"
                       }
                     },
@@ -2096,7 +2096,7 @@
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
                   },
-                  "toolTip": {
+                  "tooltip": {
                     "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
                     "description": "Tooltip for form field: ID Number",
                     "id": "form.field.tooltip.tooltipNationalID"
@@ -5345,9 +5345,9 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "toolTip": {
+                    "tooltip": {
                       "dependency": "iDType",
-                      "toolTipMapper": {
+                      "tooltipMapper": {
                         "operation": "identityTooltipMapper"
                       }
                     },
@@ -5373,7 +5373,7 @@
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
                   },
-                  "toolTip": {
+                  "tooltip": {
                     "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
                     "description": "Tooltip for form field: ID Number",
                     "id": "form.field.tooltip.tooltipNationalID"
@@ -7551,9 +7551,9 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "toolTip": {
+                    "tooltip": {
                       "dependency": "iDType",
-                      "toolTipMapper": {
+                      "tooltipMapper": {
                         "operation": "identityTooltipMapper"
                       }
                     },
@@ -7579,7 +7579,7 @@
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
                   },
-                  "toolTip": {
+                  "tooltip": {
                     "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
                     "description": "Tooltip for form field: ID Number",
                     "id": "form.field.tooltip.tooltipNationalID"
@@ -10881,9 +10881,9 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "toolTip": {
+                    "tooltip": {
                       "dependency": "iDType",
-                      "toolTipMapper": {
+                      "tooltipMapper": {
                         "operation": "identityTooltipMapper"
                       }
                     },
@@ -10909,7 +10909,7 @@
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
                   },
-                  "toolTip": {
+                  "tooltip": {
                     "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
                     "description": "Tooltip for form field: ID Number",
                     "id": "form.field.tooltip.tooltipNationalID"
@@ -14884,9 +14884,9 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "toolTip": {
+                    "tooltip": {
                       "dependency": "iDType",
-                      "toolTipMapper": {
+                      "tooltipMapper": {
                         "operation": "identityTooltipMapper"
                       }
                     },
@@ -14912,7 +14912,7 @@
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
                   },
-                  "toolTip": {
+                  "tooltip": {
                     "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
                     "description": "Tooltip for form field: ID Number",
                     "id": "form.field.tooltip.tooltipNationalID"

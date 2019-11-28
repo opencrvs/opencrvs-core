@@ -161,7 +161,7 @@ function GeneratedInputField({
   const inputFieldProps = {
     id: fieldDefinition.name,
     label: fieldDefinition.label,
-    toolTip: fieldDefinition.toolTip,
+    tooltip: fieldDefinition.tooltip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
     disabled: fieldDefinition.disabled,
@@ -660,10 +660,6 @@ class FormSectionComponent extends React.Component<Props> {
             return null
           }
 
-          if (conditionalActions.includes('disable')) {
-            field.disabled = true
-          }
-
           if (
             field.type === DATE &&
             touched[`${field.name}-dd`] !== undefined &&
@@ -692,7 +688,7 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   type: getFieldType(field as IDynamicFormField, values),
                   label: getFieldLabel(field as IDynamicFormField, values),
-                  toolTip: getFieldLabelToolTip(
+                  tooltip: getFieldLabelToolTip(
                     field as IDynamicFormField,
                     values
                   )
@@ -713,7 +709,6 @@ class FormSectionComponent extends React.Component<Props> {
                   queryData: getQueryData(field as ILoaderButton, values),
                   draftData: draftData as IFormData,
                   onFetch: response => {
-                    console.log(response)
                     const section = {
                       id: this.props.id,
                       groups: [
