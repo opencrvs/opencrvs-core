@@ -69,9 +69,17 @@ export default async function saveSequenceNumberData() {
   const unions = JSON.parse(
     fs.readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/unions.json`).toString()
   )
+  const municipalities = JSON.parse(
+    fs
+      .readFileSync(`${ADMIN_STRUCTURE_SOURCE}locations/municipalities.json`)
+      .toString()
+  )
+  const fhirLocations: fhir.Location[] = []
+  fhirLocations.push(...unions.unions)
+  fhirLocations.push(...municipalities.municipalities)
   // Preparing union wise sequence numbers
   const sequenceNumberModels = await prepareAndSaveLocationSequenceNumber(
-    unions.unions,
+    fhirLocations,
     unionsNumbers
   )
 

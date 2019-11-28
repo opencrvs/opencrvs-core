@@ -10,6 +10,10 @@
         {
           "system": "http://opencrvs.org/specs/id/jurisdiction-type",
           "value": "MUNICIPALITY"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-reference",
+          "value": "division=3&district=29&upazila=229&municipality=OpenCRVS_1"
         }
       ],
       "name": "Madhabdi Paurasabha",
@@ -55,6 +59,10 @@
         {
           "system": "http://opencrvs.org/specs/id/jurisdiction-type",
           "value": "MUNICIPALITY"
+        },
+        {
+          "system": "http://opencrvs.org/specs/id/a2i-internal-reference",
+          "value": "division=3&district=29&upazila=229&municipality=OpenCRVS_2"
         }
       ],
       "name": "Narsingdi Paurasabha",
