@@ -49,6 +49,7 @@ import {
   responseSchema as zmbGeneratorResponseSchema
 } from '@resources/zmb/features/generate/handler'
 import { bgdValidateRegistrationHandler } from '@resources/bgd/features/validate/handler'
+import { bgdBDRISQueueTriggerHandler } from '@resources/bgd/features/bdris-queue/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -145,6 +146,20 @@ export async function createServer() {
       tags: ['api'],
       description:
         'Validates a registration and if successful returns a BRN for that record'
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/bgd/bdris-queue/trigger',
+    handler: bgdBDRISQueueTriggerHandler,
+    options: {
+      auth: false, // Unprotected so that it may be called by the OpenHIM without a token
+      // This is safe as only services in the docker swarm can access this endpoint and
+      // even if it was compromised all that could be done was to trigger extra queue checks
+      tags: ['api'],
+      description:
+        'Triggers the queue to try send outstanding registration for BDRIS validation'
     }
   })
 
