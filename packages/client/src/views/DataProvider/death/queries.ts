@@ -80,7 +80,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
-      mother {
+      father {
         id
         name {
           use
@@ -88,7 +88,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           familyName
         }
       }
-      father {
+      mother {
         id
         name {
           use
@@ -210,7 +210,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           }
         }
       }
-      mother {
+      father {
         id
         name {
           use
@@ -218,7 +218,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           familyName
         }
       }
-      father {
+      mother {
         id
         name {
           use
