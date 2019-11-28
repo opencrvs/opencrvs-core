@@ -39,6 +39,8 @@ interface IConstantsMessages {
   dod: MessageDescriptor
   downloading: MessageDescriptor
   eventDate: MessageDescriptor
+  lastUpdated: MessageDescriptor
+  startedBy: MessageDescriptor
   export: MessageDescriptor
   failedToSend: MessageDescriptor
   gender: MessageDescriptor
@@ -218,6 +220,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Date of event',
     description: 'Label for event date in list item',
     id: 'constants.eventDate'
+  },
+  lastUpdated: {
+    defaultMessage: 'Last updated',
+    description: 'Label for Last updated in list item',
+    id: 'constants.lastUpdated'
+  },
+  startedBy: {
+    defaultMessage: 'Started by',
+    description: 'Label for Started by in list item',
+    id: 'constants.startedBy'
   },
   export: {
     defaultMessage: 'Export',
