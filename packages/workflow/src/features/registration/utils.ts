@@ -116,6 +116,29 @@ export async function sendEventNotification(
   }
 }
 
+export async function sendRegisteredNotification(
+  msisdn: string,
+  informantName: string,
+  eventType: EVENT_TYPE,
+  authHeader: { Authorization: string }
+) {
+  if (eventType === EVENT_TYPE.BIRTH) {
+    await sendNotification(
+      'birthRegistrationSMS',
+      msisdn,
+      informantName,
+      authHeader
+    )
+  } else {
+    await sendNotification(
+      'deathRegistrationSMS',
+      msisdn,
+      informantName,
+      authHeader
+    )
+  }
+}
+
 async function sendNotification(
   smsType: string,
   msisdn: string,

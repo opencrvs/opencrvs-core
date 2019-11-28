@@ -154,6 +154,7 @@ const mockReviewTabData = {
         contactNumber: '01622688231',
         trackingId: 'BW0UTHR',
         registrationNumber: null,
+        eventLocationId: null,
         registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
         duplicates: null,
         createdAt: '1544188309380',
@@ -182,6 +183,7 @@ const mockReviewTabData = {
         status: 'VALIDATED',
         trackingId: 'DW0UTHR',
         registrationNumber: null,
+        eventLocationId: null,
         contactNumber: null,
         duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
         registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -240,6 +242,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 12, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -290,6 +293,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: mockReviewTabData,
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -357,6 +361,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 12, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -412,6 +417,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 14, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -467,6 +473,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: {
               totalItems: 2,
               results: [
@@ -478,6 +485,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -507,6 +515,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     status: 'VALIDATED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     contactNumber: null,
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
@@ -672,6 +681,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: {
               totalItems: 2,
               results: [
@@ -683,6 +693,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -712,6 +723,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     status: 'VALIDATED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     contactNumber: null,
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
@@ -877,6 +889,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: mockReviewTabData,
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
@@ -1095,6 +1108,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: mockReviewTabData,
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
@@ -1201,6 +1215,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: {
               totalItems: 2,
               results: [
@@ -1212,6 +1227,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -1241,6 +1257,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     contactNumber: null,
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
@@ -1326,6 +1343,7 @@ describe('Tablet tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: {
               totalItems: 2,
               results: [
@@ -1337,6 +1355,7 @@ describe('Tablet tests', () => {
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -1366,6 +1385,7 @@ describe('Tablet tests', () => {
                     status: 'DECLARED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
+                    eventLocationId: null,
                     contactNumber: null,
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:

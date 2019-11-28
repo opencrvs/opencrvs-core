@@ -13,21 +13,33 @@ import { HEARTH_URL } from '@workflow/constants'
 import { Events } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
-  markBundleAsRegistered,
   markBundleAsValidated,
   modifyRegistrationBundle,
-  setTrackingId
+  setTrackingId,
+  markEventAsRegistered,
+  markBundleAsRegistered
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getSharedContactMsisdn,
-  postToHearth
+  postToHearth,
+  getFromFhir,
+  getPhoneNo,
+  getEventInformantName
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { sendEventNotification } from '@workflow/features/registration/utils'
+import {
+  sendEventNotification,
+  getTaskEventType,
+  sendRegisteredNotification
+} from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
 
+interface IEventRegistrationCallbackPayload {
+  trackingId: string
+  registrationNumber: string
+}
 async function sendBundleToHearth(
   payload: fhir.Bundle,
   count = 1
@@ -143,6 +155,51 @@ export async function markEventAsValidatedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markAsValidatedHandler[${event}]: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsRegisteredCallbackHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const {
+    trackingId,
+    registrationNumber
+  } = request.payload as IEventRegistrationCallbackPayload
+  const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
+  const composition: fhir.Composition = await getFromFhir(`/${task.focus}`)
+  const event = getTaskEventType(task)
+
+  try {
+    await markEventAsRegistered(
+      task,
+      registrationNumber,
+      event,
+      getToken(request)
+    )
+    const resBundle = await postToHearth(task)
+
+    const phoneNo = await getPhoneNo(composition, task, event)
+    const informantName = await getEventInformantName(composition, event)
+    /* sending notification to the contact */
+    if (phoneNo && informantName) {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler sending event notification'
+      )
+      sendRegisteredNotification(phoneNo, informantName, event, {
+        Authorization: request.headers.authorization
+      })
+    } else {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler could not send event notification'
+      )
+    }
+    return resBundle
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
+    )
     throw new Error(error)
   }
 }

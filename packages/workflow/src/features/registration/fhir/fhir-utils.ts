@@ -15,13 +15,16 @@ import {
   REG_STATUS_DECLARED,
   REG_STATUS_REGISTERED,
   EVENT_TYPE,
-  REG_STATUS_VALIDATED
+  REG_STATUS_VALIDATED,
+  DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
-  findInformantEntry
+  findInformantEntry,
+  getSectionEntryBySectionCode,
+  INFORMANT_CODE
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
@@ -248,4 +251,81 @@ export async function postToHearth(payload: any) {
     )
   }
   return res.json()
+}
+
+export async function getPhoneNo(
+  composition: fhir.Composition,
+  taskResource: fhir.Task,
+  eventType: EVENT_TYPE
+) {
+  let phoneNumber
+  if (eventType === EVENT_TYPE.BIRTH) {
+    const phoneExtension =
+      taskResource &&
+      taskResource.extension &&
+      taskResource.extension.find(extension => {
+        return (
+          extension.url ===
+          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
+        )
+      })
+    phoneNumber = phoneExtension && phoneExtension.valueString
+  } else {
+    const informantSection = getSectionEntryBySectionCode(
+      composition,
+      INFORMANT_CODE
+    )
+    const relatedPerson =
+      informantSection && (await getFromFhir(`/${informantSection.reference}`))
+    const contact: fhir.Patient =
+      relatedPerson &&
+      (await getFromFhir(`/${relatedPerson.patient.reference}`))
+    const phoneEntry =
+      contact &&
+      contact.telecom &&
+      contact.telecom.find((contactPoint: fhir.ContactPoint) => {
+        return contactPoint.system === 'phone'
+      })
+    phoneNumber = phoneEntry && phoneEntry.value
+  }
+  if (!phoneNumber) {
+    return false
+  }
+  return phoneNumber
+}
+
+export async function getEventInformantName(
+  composition: fhir.Composition,
+  eventType: EVENT_TYPE
+) {
+  let informantSection
+  if (eventType === EVENT_TYPE.BIRTH) {
+    informantSection = getSectionEntryBySectionCode(
+      composition,
+      CHILD_SECTION_CODE
+    )
+  } else {
+    informantSection = getSectionEntryBySectionCode(
+      composition,
+      DECEASED_SECTION_CODE
+    )
+  }
+
+  const informant =
+    informantSection && (await getFromFhir(`/${informantSection.reference}`))
+  const language = getDefaultLanguage()
+  if (!informant || !informant.name) {
+    throw new Error("Didn't find informant's name information")
+  }
+
+  const name = informant.name.find((humanName: fhir.HumanName) => {
+    return humanName.use === language
+  })
+  if (!name || !name.family) {
+    throw new Error(`Didn't found informant's ${language} name`)
+  }
+  return ''
+    .concat(name.given ? name.given.join(' ') : '')
+    .concat(' ')
+    .concat(name.family)
 }

@@ -84,6 +84,13 @@ function findPreviousTask(
 export type Task = fhir.Task & { id: string }
 export type Composition = fhir.Composition & { id: string }
 
+export function getPaymentReconciliation(bundle: fhir.Bundle) {
+  return getResourceByType<fhir.PaymentReconciliation>(
+    bundle,
+    FHIR_RESOURCE_TYPE.PAYMENT_RECONCILIATION
+  )
+}
+
 export function getTask(bundle: fhir.Bundle) {
   return getResourceByType<Task>(bundle, FHIR_RESOURCE_TYPE.TASK)
 }
@@ -170,7 +177,8 @@ export function getResourceByType<T = fhir.Resource>(
 
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
-  TASK = 'Task'
+  TASK = 'Task',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation'
 }
 
 export function getTimeLoggedFromTask(task: fhir.Task) {

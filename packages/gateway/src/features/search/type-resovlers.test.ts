@@ -311,6 +311,22 @@ describe('Search type resolvers', () => {
       )
       expect(locationid).toEqual('112345')
     })
+    it('returns eventLocationId from search set', () => {
+      const eventLocationId = searchTypeResolvers.RegistrationSearchSet.eventLocationId(
+        {
+          event: 'Death',
+          type: 'DECLARED',
+          deceasedFirstNames: 'Anik',
+          deceasedFamilyName: 'Hoque',
+          deceasedFirstNamesLocal: 'অনিক',
+          deceasedFamilyNameLocal: 'হক',
+          deathDate: '01-01-2019',
+          applicationLocationId: '112345',
+          eventLocationId: '12564-54687'
+        }
+      )
+      expect(eventLocationId).toEqual('12564-54687')
+    })
     it('returns duplicates from search set', () => {
       const duplicates = searchTypeResolvers.RegistrationSearchSet.duplicates({
         event: 'Death',

@@ -93,9 +93,12 @@ export function getBirthRegistrationSectionTransformer(
 
 const convertToLocal = (mobileWithCountryCode: string, countryCode: string) => {
   countryCode = countryCode.toUpperCase()
-  return mobileWithCountryCode.replace(
-    callingCountries[countryCode].countryCallingCodes[0],
-    '0'
+  return (
+    mobileWithCountryCode &&
+    mobileWithCountryCode.replace(
+      callingCountries[countryCode].countryCallingCodes[0],
+      '0'
+    )
   )
 }
 
