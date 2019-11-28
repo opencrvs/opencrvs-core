@@ -1175,6 +1175,27 @@ describe('When an existing application is marked certified', () => {
       expect(applicationEventPoint).toMatchSnapshot()
     })
   })
+  describe('a birth application', () => {
+    it('writes the payment total to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/mark-certified-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/mark-certified',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'certification_payment'
+      )
+
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
+  })
 })
 
 describe('When an in-progress application is received', () => {
