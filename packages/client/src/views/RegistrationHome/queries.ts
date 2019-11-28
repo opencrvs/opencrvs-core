@@ -18,14 +18,15 @@ const allSearchFields = `
       status
       contactNumber
       trackingId
+      eventLocationId
       registrationNumber
-      registeredLocationId
+      registeredLocationId      
       duplicates
       createdAt
       modifiedAt
     }
     ... on BirthEventSearchSet {
-      dateOfBirth
+      dateOfBirth      
       childName {
         firstNames
         familyName
@@ -33,7 +34,7 @@ const allSearchFields = `
       }
     }
     ... on DeathEventSearchSet {
-      dateOfDeath
+      dateOfDeath      
       deceasedName {
         firstNames
         familyName
@@ -57,6 +58,18 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
       type: ["birth-application", "death-application"]
+      count: $count
+      skip: $inProgressSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
+    notificationTab: searchEvents(
+      locationIds: $locationIds
+      status: ["IN_PROGRESS"]
+      type: ["birth-notification", "death-notification"]
       count: $count
       skip: $inProgressSkip
     ) {

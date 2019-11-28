@@ -154,6 +154,7 @@ const mockPrintTabData = {
         contactNumber: null,
         trackingId: 'DG6PECX',
         registrationNumber: '20196816020000113',
+        eventLocationId: null,
         registeredLocationId: 'd8cfd240-4b5a-4557-9df7-b1591a11d843',
         duplicates: null,
         createdAt: '1574696143372',
@@ -182,6 +183,7 @@ const mockPrintTabData = {
         status: 'REGISTERED',
         trackingId: 'DW0UTHR',
         registrationNumber: '2019333494B8I0NEB9',
+        eventLocationId: null,
         contactNumber: '01622688231',
         duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
         registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
@@ -237,6 +239,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -287,6 +290,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -301,6 +305,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                     contactNumber: '01622688231',
                     trackingId: 'BW0UTHR',
                     registrationNumber: '2019333494BBONT7U7',
+                    eventLocationId: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
@@ -330,6 +335,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                     status: 'REGISTERED',
                     trackingId: 'DW0UTHR',
                     registrationNumber: '2019333494B8I0NEB9',
+                    eventLocationId: null,
                     contactNumber: '01622688231',
                     duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
                     registeredLocationId:
@@ -407,6 +413,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -466,6 +473,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -521,6 +529,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: { totalItems: 0, results: [] },
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
@@ -665,6 +674,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
@@ -737,6 +747,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           result: {
             data: {
               inProgressTab: { totalItems: 0, results: [] },
+              notificationTab: { totalItems: 0, results: [] },
               reviewTab: { totalItems: 0, results: [] },
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
@@ -1061,6 +1072,7 @@ describe('Tablet tests', () => {
         result: {
           data: {
             inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },

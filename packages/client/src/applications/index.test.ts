@@ -55,6 +55,16 @@ describe('query result filtering tests', () => {
           ],
           totalItems: 5
         },
+        notificationTab: {
+          results: [
+            { id: 'DRAFT' },
+            { id: 'READY_TO_SUBMIT' },
+            { id: 'SUBMITTING' },
+            { id: 'SUBMITTED' },
+            { id: 'DRAFT' }
+          ],
+          totalItems: 5
+        },
         reviewTab: {
           results: [
             { id: 'READY_TO_REGISTER' },
@@ -180,6 +190,10 @@ describe('query result filtering tests', () => {
 
       expect(filteredResult).toEqual({
         inProgressTab: {
+          results: [{ id: 'DRAFT' }, { id: 'SUBMITTED' }, { id: 'DRAFT' }],
+          totalItems: 3
+        },
+        notificationTab: {
           results: [{ id: 'DRAFT' }, { id: 'SUBMITTED' }, { id: 'DRAFT' }],
           totalItems: 3
         },
