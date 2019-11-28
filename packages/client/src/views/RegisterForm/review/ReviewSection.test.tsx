@@ -115,13 +115,12 @@ describe('when user is in the review page', () => {
   })
 
   describe('when user clicks on change link', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       reviewSectionComponent
         .find('#btn_change_child_familyNameEng')
         .hostNodes()
         .simulate('click')
       reviewSectionComponent.update()
-      await flushPromises()
     })
 
     it('edit dialog should not show up', () => {
