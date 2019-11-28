@@ -58,7 +58,7 @@ export interface IDeathNotification {
   permanent_address: IIncomingAddress
   phone_number: string
   death_date: string
-  cause_death_a_immediate?: string
+  underlying_cause_of_death?: string
   place_of_death?: {
     id: string
     name: string

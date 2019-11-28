@@ -55,7 +55,7 @@
   },
   "phone_number": "01928263185", // Required!
   "death_date": "1565097042000", // Required!
-  "cause_death_a_immediate": "I64",
+  "underlying_cause_of_death": "I64",
   "place_of_death": {
     "id": "1", // These ids must match Central HRIS MoHFW APU Facility List ids for institution
     "name": "Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar"
