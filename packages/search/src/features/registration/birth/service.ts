@@ -18,7 +18,10 @@ import {
   EVENT,
   IBirthCompositionBody,
   ICompositionBody,
-  getCreatedBy
+  getCreatedBy,
+  IStatus,
+  getStatus,
+  createStatusHistory
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -80,7 +83,9 @@ async function updateEvent(task: fhir.Task) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
-  const body: ICompositionBody = {}
+  const body: ICompositionBody = {
+    status: (await getStatus(compositionId)) as IStatus[]
+  }
   body.type =
     task &&
     task.businessStatus &&
@@ -97,6 +102,7 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  await createStatusHistory(body)
   await updateComposition(compositionId, body)
 }
 
@@ -107,7 +113,8 @@ async function indexAndSearchComposition(
 ) {
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
-    createdAt: Date.now().toString()
+    createdAt: Date.now().toString(),
+    status: (await getStatus(compositionId)) as IStatus[]
   }
 
   await createIndexBody(body, composition, bundleEntries)
@@ -125,6 +132,7 @@ async function createIndexBody(
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
+  await createStatusHistory(body)
 }
 
 function createChildIndex(
