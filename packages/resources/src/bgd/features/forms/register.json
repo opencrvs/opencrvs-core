@@ -4931,7 +4931,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -4948,7 +4947,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -4982,7 +4980,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -4999,7 +4996,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -5029,7 +5025,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
@@ -5043,7 +5038,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "reasonsNotApplyingToFieldValueTransformer",
                                 "parameters": [
@@ -5075,7 +5069,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -5092,7 +5085,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -5126,7 +5118,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -5143,7 +5134,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -5173,7 +5163,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
@@ -5187,7 +5176,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "reasonsNotApplyingToFieldValueTransformer",
                                 "parameters": [
@@ -5207,7 +5195,6 @@
                     "mutation": {
                       "operation": "nestedRadioFieldTransformer",
                       "parameters": [
-                        "",
                         {
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
@@ -5223,7 +5210,6 @@
                     "query": {
                       "operation": "valueToNestedRadioFieldTransformer",
                       "parameters": [
-                        "",
                         {
                           "operation": "reasonsNotApplyingToFieldValueTransformer",
                           "parameters": [
@@ -17378,6 +17364,462 @@
               "operation": "getInformantSectionTransformer"
             }
           }
+        },
+        {
+          "id": "father",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "What is the deceased's father name?",
+            "description": "Form section name for father section",
+            "id": "form.section.deceased.father.name"
+          },
+          "title": {
+            "defaultMessage": "What is the deceased's father name?",
+            "description": "Form section name for father section",
+            "id": "form.section.deceased.father.title"
+          },
+          "groups": [
+            {
+              "id": "father-view-group",
+              "fields": [
+                {
+                  "name": "fatherFirstNames",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in Bengali",
+                    "description": "Label for form field: Given names",
+                    "id": "form.field.label.deceasedFathersGivenNames"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "bengaliOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["bn", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["bn", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "fatherFamilyName",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in Bengali",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.deceasedFathersFamilyName"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "bengaliOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["bn", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["bn", "familyName"]
+                    }
+                  }
+                },
+                {
+                  "name": "fatherFirstNamesEng",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in English",
+                    "description": "Label for form field: Given names in english",
+                    "id": "form.field.label.deceasedFathersGivenNamesEng"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "fatherFamilyNameEng",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in English",
+                    "description": "Label for form field: Family name in english",
+                    "id": "form.field.label.deceasedFathersFamilyNameEng"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "familyName"]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mother",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "What is the deceased's mother name?",
+            "description": "Form section name for mother section",
+            "id": "form.section.deceased.mother.name"
+          },
+          "title": {
+            "defaultMessage": "What is the deceased's mother name?",
+            "description": "Form section name for mother section",
+            "id": "form.section.deceased.mother.title"
+          },
+          "groups": [
+            {
+              "id": "mother-view-group",
+              "fields": [
+                {
+                  "name": "motherFirstNames",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in Bengali",
+                    "description": "Label for form field: Given names",
+                    "id": "form.field.label.deceasedMothersGivenNames"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "bengaliOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["bn", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["bn", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "motherFamilyName",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in Bengali",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.deceasedMothersFamilyName"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "bengaliOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["bn", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["bn", "familyName"]
+                    }
+                  }
+                },
+                {
+                  "name": "motherFirstNamesEng",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in English",
+                    "description": "Label for form field: Given names in english",
+                    "id": "form.field.label.deceasedMothersGivenNamesEng"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "motherFamilyNameEng",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in English",
+                    "description": "Label for form field: Family name in english",
+                    "id": "form.field.label.deceasedMothersFamilyNameEng"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "familyName"]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "spouse",
+          "viewType": "form",
+          "title": {
+            "defaultMessage": "Does the deceased have a spouse?",
+            "description": "Form section name for spouse section",
+            "id": "form.section.deceased.spouse.title"
+          },
+          "groups": [
+            {
+              "id": "spouse-view-group",
+              "fields": [
+                {
+                  "name": "hasDetails",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "label": {
+                    "defaultMessage": "Does the deceased have a spouse?",
+                    "description": "Form section title for spouse section",
+                    "id": "form.section.deceased.spouse.name"
+                  },
+                  "hideHeader": true,
+                  "size": "large",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Yes",
+                      "label": {
+                        "defaultMessage": "Yes",
+                        "description": "Option for form field: Deceased has spouse",
+                        "id": "form.section.deceased.hasSpouse"
+                      }
+                    },
+                    {
+                      "value": "No",
+                      "label": {
+                        "defaultMessage": "No / Unknown",
+                        "description": "Option for form field: Deceased doesn't have spouse",
+                        "id": "form.section.deceased.noSpouse"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "Yes": [
+                      {
+                        "name": "spouseFirstNames",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "First Name(s) in Bengali",
+                          "description": "Label for form field: Given names",
+                          "id": "form.field.label.deceasedSpouseGivenNames"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "bengaliOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["bn", "firstNames"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["bn", "firstNames"]
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "spouseFamilyName",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Last Name(s) in Bengali",
+                          "description": "Label for form field: Family name",
+                          "id": "form.field.label.deceasedSpousesFamilyName"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "bengaliOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["bn", "familyName"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["bn", "familyName"]
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "spouseFirstNamesEng",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "First Name(s) in English",
+                          "description": "Label for form field: Given names in english",
+                          "id": "form.field.label.deceasedSpousesGivenNamesEng"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "firstNames"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["en", "firstNames"]
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "spouseFamilyNameEng",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Last Name(s) in English",
+                          "description": "Label for form field: Family name in english",
+                          "id": "form.field.label.deceasedSpousesFamilyNameEng"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "No": []
+                  },
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "ignoreFieldTransformer"
+                    },
+                    "query": {
+                      "operation": "hasSpouseDetailsTransformer"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "documents",
