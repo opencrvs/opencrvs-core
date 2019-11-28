@@ -17374,7 +17374,7 @@
             "id": "form.section.deceased.father.name"
           },
           "title": {
-            "defaultMessage": "What is the deceased's father name?",
+            "defaultMessage": "Father's details",
             "description": "Form section name for father section",
             "id": "form.section.deceased.father.title"
           },
@@ -17505,7 +17505,7 @@
             "id": "form.section.deceased.mother.name"
           },
           "title": {
-            "defaultMessage": "What is the deceased's mother name?",
+            "defaultMessage": "Mother's details",
             "description": "Form section name for mother section",
             "id": "form.section.deceased.mother.title"
           },
@@ -17631,8 +17631,8 @@
           "id": "spouse",
           "viewType": "form",
           "title": {
-            "defaultMessage": "Does the deceased have a spouse?",
-            "description": "Form section name for spouse section",
+            "defaultMessage": "Spouse's details",
+            "description": "Form section title for spouse section",
             "id": "form.section.deceased.spouse.title"
           },
           "groups": [
@@ -17825,6 +17825,7 @@
                     ],
                     "No": []
                   },
+                  "ignoreNestedFieldWrappingInPreview": true,
                   "conditionals": [],
                   "mapping": {
                     "mutation": {

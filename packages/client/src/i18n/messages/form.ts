@@ -1996,7 +1996,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.father.name'
   },
   deceasedFatherSectionTitle: {
-    defaultMessage: "What is the deceased's father name?",
+    defaultMessage: "Father's details",
     description: 'Form section name for father section',
     id: 'form.section.deceased.father.title'
   },
@@ -2026,7 +2026,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.mother.name'
   },
   deceasedMotherSectionTitle: {
-    defaultMessage: "What is the deceased's mother name?",
+    defaultMessage: "Mother's details",
     description: 'Form section name for mother section',
     id: 'form.section.deceased.mother.title'
   },
@@ -2056,7 +2056,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.spouse.name'
   },
   deceasedSpouseSectionTitle: {
-    defaultMessage: 'Does the deceased have a spouse?',
+    defaultMessage: "Spouse's details",
     description: 'Form section name for spouse section',
     id: 'form.section.deceased.spouse.title'
   },
