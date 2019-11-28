@@ -17381,6 +17381,12 @@
           "groups": [
             {
               "id": "father-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"FATHER\")"
+                }
+              ],
               "fields": [
                 {
                   "name": "fatherFirstNames",
@@ -17506,6 +17512,12 @@
           "groups": [
             {
               "id": "mother-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"MOTHER\")"
+                }
+              ],
               "fields": [
                 {
                   "name": "motherFirstNames",
@@ -17626,6 +17638,12 @@
           "groups": [
             {
               "id": "spouse-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"SPOUSE\")"
+                }
+              ],
               "fields": [
                 {
                   "name": "hasDetails",
