@@ -1083,7 +1083,7 @@ describe('ReviewForm tests', () => {
     expect(window.location.href).toContain('/progress')
   })
 
-  it('should redirect to review tab when close application button is clicked', async () => {
+  it('should redirect to progress tab when close application button is clicked', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
