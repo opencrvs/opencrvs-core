@@ -11,7 +11,11 @@
  */
 import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
-import { sendToFhir, ILocation } from '@resources/bgd/features/utils'
+import {
+  sendToFhir,
+  ILocation,
+  getFromFhir
+} from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 import { findBestMatch, BestMatch } from 'string-similarity'
 
@@ -230,7 +234,7 @@ export async function mapAndSaveCRVSFacilities(
         console.log(
           chalk.red(
             // tslint:disable-next-line:max-line-length
-            `PILOT WARNING: A2I District not found or matched for facility ,${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
+            `PILOT WARNING: A2I District not found or matched for facility, ${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
           )
         )
       } else {
@@ -238,7 +242,7 @@ export async function mapAndSaveCRVSFacilities(
         console.log(
           chalk.yellow(
             // tslint:disable-next-line:max-line-length
-            `WARNING: A2I District not found or matched for facility ,${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
+            `WARNING: A2I District not found or matched for facility, ${facility.facilityNameEnglish} in division: ${facility.division} with parent division FHIR id:${division.id}`
           )
         )
       }
@@ -258,7 +262,7 @@ export async function mapAndSaveCRVSFacilities(
         console.log(
           chalk.red(
             // tslint:disable-next-line:max-line-length
-            `PILOT WARNING: A2I Upazila not found or matched for facility ,${facility.facilityNameEnglish}` +
+            `PILOT WARNING: A2I Upazila not found or matched for facility, ${facility.facilityNameEnglish}` +
               ` in district: ${facility.district} and division: ${facility.division} with parent district FHIR id: ${district.id}`
           )
         )
@@ -267,7 +271,7 @@ export async function mapAndSaveCRVSFacilities(
         console.log(
           chalk.yellow(
             // tslint:disable-next-line:max-line-length
-            `WARNING: A2I Upazila not found or matched for facility ,${facility.facilityNameEnglish}` +
+            `WARNING: A2I Upazila not found or matched for facility, ${facility.facilityNameEnglish}` +
               ` in district: ${facility.district} and division: ${facility.division} with parent district FHIR id: ${district.id}`
           )
         )
@@ -284,48 +288,82 @@ export async function mapAndSaveCRVSFacilities(
 
     if (!union) {
       if (pilotLocations.includes(facility.upazila)) {
-        // tslint:disable-next-line:no-console
-        console.log(
-          chalk.red(
-            // tslint:disable-next-line:max-line-length
-            `PILOT WARNING: A2I Union not found or matched for facility ,${facility.facilityNameEnglish},` +
-              ` in upazila: ,${facility.upazila}, district: ,${facility.district}, and division:` +
-              ` ,${facility.division}, with parent upazila FHIR id: ${upazila.id}`
+        if (facility.facilityNameEnglish.includes('Paurasabha')) {
+          // tslint:disable-next-line:no-console
+          const municipalityResponse = await getFromFhir(
+            `/Location?name=${encodeURIComponent(facility.facilityNameEnglish)}`
           )
-        )
+          const municipalityResource: fhir.Location =
+            municipalityResponse.entry[0].resource
+          const municipalityLocation: fhir.Location = createFhirLocationFromORGJson(
+            facility,
+            `Location/${municipalityResource.id}`
+          )
+          // tslint:disable-next-line:no-console
+          console.log(
+            chalk.blue(
+              // tslint:disable-next-line:max-line-length
+              `PILOT WARNING: Setting municipality as partOf for, ${facility.facilityNameEnglish}, ` +
+                `to: ${municipalityResource.id}`
+            )
+          )
+          const savedMunicipalityResponse = (await sendToFhir(
+            municipalityLocation,
+            '/Location',
+            'POST'
+          ).catch(err => {
+            throw Error('Cannot save location to FHIR')
+          })) as Response
+          const municipalityLocationHeader = savedMunicipalityResponse.headers.get(
+            'location'
+          ) as string
+          municipalityLocation.id = municipalityLocationHeader.split('/')[3]
+          locations.push(municipalityLocation)
+        } else {
+          // tslint:disable-next-line:no-console
+          console.log(
+            chalk.red(
+              // tslint:disable-next-line:max-line-length
+              `PILOT WARNING: A2I Union not found or matched for facility, ${facility.facilityNameEnglish}, ` +
+                ` in upazila: ,${facility.upazila}, district: ,${facility.district}, and division:` +
+                ` ,${facility.division}, with parent upazila FHIR id: ${upazila.id}`
+            )
+          )
+        }
       } else {
         // tslint:disable-next-line:no-console
         console.log(
           chalk.yellow(
             // tslint:disable-next-line:max-line-length
-            `WARNING: A2I Union not found or matched for facility ,${facility.facilityNameEnglish}, in upazila: ,` +
+            `WARNING: A2I Union not found or matched for facility, ${facility.facilityNameEnglish}, in upazila: , ` +
               `${facility.upazila}, district: ,${facility.district}, and division: ,${facility.division}, ` +
               `with parent upazila FHIR id: ${upazila.id}`
           )
         )
       }
       continue
-    }
-    const newLocation: fhir.Location = createFhirLocationFromORGJson(
-      facility,
-      `Location/${union.id}`
-    )
-    // tslint:disable-next-line:no-console
-    /*console.log(
+    } else {
+      const newLocation: fhir.Location = createFhirLocationFromORGJson(
+        facility,
+        `Location/${union.id}`
+      )
+
+      /*console.log(
       `Saving facility ... type: ${facility.facilityTypeEnglish}, name: ${facility.facilityNameEnglish}`
     )*/
-    const savedLocationResponse = (await sendToFhir(
-      newLocation,
-      '/Location',
-      'POST'
-    ).catch(err => {
-      throw Error('Cannot save location to FHIR')
-    })) as Response
-    const locationHeader = savedLocationResponse.headers.get(
-      'location'
-    ) as string
-    newLocation.id = locationHeader.split('/')[3]
-    locations.push(newLocation)
+      const savedLocationResponse = (await sendToFhir(
+        newLocation,
+        '/Location',
+        'POST'
+      ).catch(err => {
+        throw Error('Cannot save location to FHIR')
+      })) as Response
+      const locationHeader = savedLocationResponse.headers.get(
+        'location'
+      ) as string
+      newLocation.id = locationHeader.split('/')[3]
+      locations.push(newLocation)
+    }
   }
   return locations
 }

@@ -112,8 +112,11 @@ export default async function importFacilities() {
       )}`
     )
 
-    // setting some locations covered in the pilot implementation to use to highlight any warnings if we cannot map an office to A2I
-    const deploymentUpazilas = ['Kaliganj', 'Narsingdi Sadar', 'Bhurungamari']
+    // setting some locations covered in the pilot implementation to use to highlight any warnings
+    // if we cannot map an office to A2I location
+    // A2I data has many formatting issues in the English name.  "Narsingdi " needs a space at the end.
+    // Using these to also set pilot municipalities which are not included in A2I data
+    const deploymentUpazilas = ['Narsingdi ', 'Bhurungamari']
 
     crvsOfficeLocations = await mapAndSaveCRVSFacilities(
       crvsOffices,
