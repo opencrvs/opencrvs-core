@@ -1083,7 +1083,7 @@ describe('ReviewForm tests', () => {
     expect(window.location.href).toContain('/progress')
   })
 
-  it('redirect to review tab when close application button is clicked', async () => {
+  it('should redirect to review tab when close application button is clicked', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     const graphqlMock = [
       {
@@ -1224,7 +1224,7 @@ describe('ReviewForm tests', () => {
         match={{
           params: {
             applicationId: application.id,
-            pageId: 'review',
+            pageId: 'child',
             event: application.event.toLowerCase()
           },
           isExact: true,
@@ -1243,22 +1243,6 @@ describe('ReviewForm tests', () => {
 
     testComponent.component.update()
 
-    // console.log(testComponent.component.debug())
-
-    const changeButton = await waitForElement(
-      testComponent.component,
-      '#btn_change_child_firstNames'
-    )
-    changeButton.hostNodes().simulate('click')
-    testComponent.component.update()
-
-    const editConfirmButton = await waitForElement(
-      testComponent.component,
-      '#edit_confirm'
-    )
-    editConfirmButton.hostNodes().simulate('click')
-    testComponent.component.update()
-
     const menuButton = await waitForElement(
       testComponent.component,
       '#eventToggleMenuToggleButton'
@@ -1273,7 +1257,7 @@ describe('ReviewForm tests', () => {
     closeApplicationButton.hostNodes().simulate('click')
     testComponent.component.update()
 
-    expect(window.location.href).toContain('/review')
+    expect(window.location.href).toContain('/progress')
   })
 
   it('it checked if review form is already in store and avoid loading from backend', async () => {
