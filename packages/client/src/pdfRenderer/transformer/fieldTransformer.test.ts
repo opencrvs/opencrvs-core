@@ -71,12 +71,16 @@ describe('PDF template field transformer tests', () => {
       })
 
       const transformedValue = fieldTransformers.ApplicantName(data, intl, {
-        key: {
-          birth: 'child'
-        },
-        format: {
-          bn: ['firstNames', 'familyName']
-        }
+        conditions: [
+          {
+            key: {
+              birth: 'child'
+            },
+            format: {
+              bn: ['firstNames', 'familyName']
+            }
+          }
+        ]
       })
       expect(transformedValue).toEqual('গায়ত্রী স্পিভক')
     })
@@ -96,12 +100,16 @@ describe('PDF template field transformer tests', () => {
 
       expect(() =>
         fieldTransformers.ApplicantName(data, intl, {
-          key: {
-            death: 'child'
-          },
-          format: {
-            bn: ['firstNames', 'familyName']
-          }
+          conditions: [
+            {
+              key: {
+                death: 'child'
+              },
+              format: {
+                bn: ['firstNames', 'familyName']
+              }
+            }
+          ]
         })
       ).toThrowError('No data key defined on payload for event: birth')
     })

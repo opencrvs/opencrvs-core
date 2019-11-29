@@ -1108,6 +1108,7 @@ describe('ReviewForm tests', () => {
               },
               child: {
                 id: '16025284-bae2-4b37-ae80-e16745b7a6b9',
+                multipleBirth: 1,
                 name: [
                   {
                     use: 'bn',
@@ -1145,7 +1146,6 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                multipleBirth: 1,
                 address: [
                   {
                     type: 'PERMANENT',

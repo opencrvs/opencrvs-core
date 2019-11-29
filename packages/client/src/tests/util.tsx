@@ -2293,6 +2293,23 @@ export const mockDeathApplicationData = {
     addressLine1Permanent: '',
     postCodePermanent: ''
   },
+  father: {
+    fatherFirstNames: 'মোক্তার',
+    fatherFamilyName: 'আলী',
+    fatherFirstNamesEng: 'Moktar',
+    fatherFamilyNameEng: 'Ali'
+  },
+  spouse: {
+    hasDetails: {
+      value: 'Yes',
+      nestedFields: {
+        spouseFirstNames: 'রেহানা',
+        spouseFamilyName: 'আলী',
+        spouseFirstNamesEng: 'Rehana',
+        spouseFamilyNameEng: 'Ali'
+      }
+    }
+  },
   deathEvent: {
     deathDate: '1987-02-16',
     manner: 'ACCIDENT',
