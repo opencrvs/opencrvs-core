@@ -16,7 +16,8 @@ import {
   markBundleAsValidated,
   markEventAsRegistered,
   modifyRegistrationBundle,
-  setTrackingId
+  setTrackingId,
+  markBundleAsWaitingValidation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -28,7 +29,8 @@ import {
 import {
   getTaskEventType,
   sendEventNotification,
-  sendRegisteredNotification
+  sendRegisteredNotification,
+  isEventNonNotifiable
 } from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
