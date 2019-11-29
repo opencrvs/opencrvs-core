@@ -174,8 +174,12 @@ function createMotherIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const motherName = mother && findName(NAME_EN, mother)
-  const motherNameLocal = mother && findName(NAME_BN, mother)
+  if (!mother) {
+    return
+  }
+
+  const motherName = findName(NAME_EN, mother)
+  const motherNameLocal = findName(NAME_BN, mother)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')

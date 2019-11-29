@@ -19,6 +19,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       id
       child {
         id
+        multipleBirth
         name {
           use
           firstNames
@@ -87,7 +88,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         dateOfMarriage
         educationalAttainment
         nationality
-        multipleBirth
         identifier {
           id
           type

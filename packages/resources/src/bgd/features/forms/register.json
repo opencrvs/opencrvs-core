@@ -1011,17 +1011,7 @@
                       "operation": "maxLength",
                       "parameters": [2]
                     }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueSectionExchangeTransformer",
-                      "parameters": ["mother"]
-                    },
-                    "query": {
-                      "operation": "sectionFieldExchangeTransformer",
-                      "parameters": ["mother"]
-                    }
-                  }
+                  ]
                 },
                 {
                   "name": "weightAtBirth",
@@ -5251,6 +5241,12 @@
           "groups": [
             {
               "id": "mother-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType ===  \"NONE\" ))"
+                }
+              ],
               "fields": [
                 {
                   "name": "iDType",
@@ -7385,6 +7381,12 @@
           "groups": [
             {
               "id": "father-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  \"MOTHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType ===  \"NONE\" ))"
+                }
+              ],
               "fields": [
                 {
                   "name": "fathersDetailsExist",
@@ -8031,7 +8033,7 @@
                     "id": "form.field.label.addressSameAsMother"
                   },
                   "required": true,
-                  "initialValue": true,
+                  "initialValue": false,
                   "validate": [],
                   "options": [
                     {
@@ -8055,6 +8057,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -8113,6 +8119,10 @@
                   "conditionals": [
                     {
                       "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
                       "expression": "values.addressSameAsMother"
                     }
                   ],
@@ -8156,6 +8166,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.country"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
                     },
                     {
                       "action": "hide",
@@ -8885,7 +8899,7 @@
                     "id": "form.field.label.permanentAddressSameAsMother"
                   },
                   "required": true,
-                  "initialValue": true,
+                  "initialValue": false,
                   "validate": [],
                   "options": [
                     {
@@ -8909,6 +8923,10 @@
                     {
                       "action": "hide",
                       "expression": "!values.fathersDetailsExist"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -9024,6 +9042,10 @@
                     {
                       "action": "hide",
                       "expression": "values.permanentAddressSameAsMother"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
                     },
                     {
                       "action": "hide",
