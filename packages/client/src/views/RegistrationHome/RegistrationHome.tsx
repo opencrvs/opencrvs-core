@@ -81,6 +81,7 @@ export interface IProps extends IButtonProps {
 
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet
+  notificationTab: GQLEventSearchResultSet
   reviewTab: GQLEventSearchResultSet
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
@@ -352,7 +353,9 @@ export class RegistrationHomeView extends React.Component<
                       draft =>
                         draft.submissionStatus ===
                         SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                    ).length + (filteredData.inProgressTab.totalItems || 0)}
+                    ).length +
+                      (filteredData.inProgressTab.totalItems || 0) +
+                      (filteredData.notificationTab.totalItems || 0)}
                     )
                   </IconTab>
                   <IconTab
@@ -416,7 +419,8 @@ export class RegistrationHomeView extends React.Component<
                     selectorId={selectorId}
                     registrarLocationId={registrarLocationId}
                     queryData={{
-                      data: filteredData.inProgressTab
+                      inProgressData: filteredData.inProgressTab,
+                      notificationData: filteredData.notificationTab
                     }}
                     page={progressCurrentPage}
                     onPageChange={this.onPageChange}

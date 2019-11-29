@@ -167,7 +167,7 @@ export async function findPersonEntryByTask(
   return await getFromFhir(`/${personSectionEntry.reference}`)
 }
 
-function getSectionEntryBySectionCode(
+export function getSectionEntryBySectionCode(
   composition: fhir.Composition | undefined,
   sectionCode: string
 ): fhir.Reference {

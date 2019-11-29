@@ -26,7 +26,8 @@ import {
   mockCompositionEntry,
   mockCompositionResponse,
   mockSearchResponse,
-  mockSearchResponseWithoutCreatedBy
+  mockSearchResponseWithoutCreatedBy,
+  mockBirthFhirBundleWithoutParents
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -196,6 +197,25 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/birth/new-declaration',
         payload: mockBirthFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return status code 200 while father and mother sections is not present', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/new-declaration',
+        payload: mockBirthFhirBundleWithoutParents,
         headers: {
           Authorization: `Bearer ${token}`
         }

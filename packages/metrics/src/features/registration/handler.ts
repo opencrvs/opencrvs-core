@@ -15,6 +15,7 @@ import {
   generateInCompleteFieldPoints,
   generateBirthRegPoint,
   generateEventDurationPoint,
+  generatePaymentPoint,
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
@@ -138,6 +139,7 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
+      generatePaymentPoint(request.payload as fhir.Bundle),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],

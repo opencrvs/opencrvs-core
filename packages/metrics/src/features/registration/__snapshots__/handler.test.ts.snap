@@ -1,5 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`When an existing application is marked certified a birth application writes the payment total to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "application_id": "1744fc19-95be-434b-8bc9-a76d6b81551b",
+    "total": 50,
+  },
+  "measurement": "certification_payment",
+  "tags": Object {},
+}
+`;
+
 exports[`When an existing application is marked certified a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {

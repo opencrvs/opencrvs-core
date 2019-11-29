@@ -59,7 +59,7 @@ async function getLatestTag(token: string, repository: string) {
   )
 }
 
-const IMAGE_NAME_TO_DIRECTORY = {
+const IMAGE_NAME_TO_PACKAGE_NAME = {
   styleguide: 'components'
 }
 
@@ -73,8 +73,18 @@ async function ignoreFromBuild(packages: string[]) {
   pkg.scripts['build'] =
     pkg.scripts['build'] +
     ' ' +
-    packages.map(directory => `--ignore ${directory}`).join(' ')
+    packages.map(directory => `--ignore @opencrvs/${directory}`).join(' ')
   writeFileSync('./package.json', JSON.stringify(pkg))
+}
+async function isDependencyOf(dependency: string, packageName: string) {
+  const pkg = JSON.parse(
+    readFileSync(`./packages/${packageName}/package.json`, 'utf8')
+  )
+
+  return (
+    pkg.dependencies[`@opencrvs/${dependency}`] ||
+    pkg.devDependencies[`@opencrvs/${dependency}`]
+  )
 }
 
 async function run() {
@@ -85,24 +95,35 @@ async function run() {
   // Not sure why but docker hub's API sometimes fails if you query it right after getting a token
   await new Promise(resolve => setTimeout(resolve, 1000))
 
+  const toPackageName = serviceName => {
+    const service = compose.services[serviceName]
+    const { image } = service
+    const repository = image.split(':')[0]
+    const imageName = repository.replace('jembi/ocrvs-', '')
+    return IMAGE_NAME_TO_PACKAGE_NAME[imageName] || imageName
+  }
   const serviceNames = Object.keys(compose.services)
-
-  const packagesThatAreUpToDate = []
+  const allPackages = serviceNames.map(toPackageName)
+  const packagesThatDontNeedRebuilding = []
 
   for (const serviceName of serviceNames) {
     const service = compose.services[serviceName]
     const { image } = service
     const repository = image.split(':')[0]
-    const imageName = repository.replace('jembi/ocrvs-', '')
-    const directory = IMAGE_NAME_TO_DIRECTORY[imageName] || imageName
+    const packageName = toPackageName(serviceName)
 
     const latestGitHash = (await exec(
-      `git --no-pager log -n 1 --format="%h" -- "packages/${directory}"`
+      `git --no-pager log -n 1 --format="%h" -- "packages/${packageName}"`
     )).trim()
 
     const latestTag = await getLatestTag(token, repository)
     if (!latestTag) {
-      console.log('⚠️ ', serviceName, ': no tags found!')
+      console.log(
+        '⚠️ ',
+        serviceName,
+        ': no tags found for repository',
+        repository
+      )
       continue
     }
 
@@ -114,19 +135,36 @@ async function run() {
       console.log('✅ ', serviceName, ': no rebuild needed')
       service.image = `${repository}:latest`
       delete service.build
-      packagesThatAreUpToDate.push(directory)
+      packagesThatDontNeedRebuilding.push(packageName)
     } catch {
       console.log('♻️ ', serviceName, ': rebuilding...')
     }
   }
   writeFileSync('./docker-compose.yml', yaml.safeDump(compose))
 
-  // All services can be fetched from docker hub
-  if (packagesThatAreUpToDate.length === serviceNames.length) {
+  const packagesThatNeedRebuilding = allPackages.filter(
+    packageName => !packagesThatDontNeedRebuilding.includes(packageName)
+  )
+  if (packagesThatNeedRebuilding.length === 0) {
     console.log('No packages to rebuild. Removing build image creation step.')
     await preventBuildImageFromBeingBuilt()
   } else {
-    await ignoreFromBuild(packagesThatAreUpToDate)
+    /*
+     * Rebuild also packages that other rebuilt packages are dependant of
+     * For example if client needs to be rebuilt, then components also needs to be part of the build image
+     */
+    const packagesThatRebuiltPackagesArentDependendOn = packagesThatDontNeedRebuilding.filter(
+      packageName =>
+        packagesThatNeedRebuilding.some(rebuiltPackage =>
+          isDependencyOf(packageName, rebuiltPackage)
+        )
+    )
+    console.log(
+      'Following packages ignored from build image building',
+      packagesThatRebuiltPackagesArentDependendOn
+    )
+
+    await ignoreFromBuild(packagesThatRebuiltPackagesArentDependendOn)
   }
 }
 

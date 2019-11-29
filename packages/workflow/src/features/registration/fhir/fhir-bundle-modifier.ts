@@ -152,6 +152,37 @@ export async function markBundleAsRegistered(
   return bundle
 }
 
+export async function markEventAsRegistered(
+  taskResource: fhir.Task,
+  registrationNumber: string,
+  eventType: EVENT_TYPE,
+  token: string
+): Promise<fhir.Task> {
+  /* Setting registration number here */
+  let identifierName
+  if (eventType === EVENT_TYPE.BIRTH) {
+    identifierName = 'birth-registration-number'
+  } else if (eventType === EVENT_TYPE.DEATH) {
+    identifierName = 'death-registration-number'
+  }
+
+  if (taskResource && taskResource.identifier) {
+    taskResource.identifier.push({
+      system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
+      value: registrationNumber
+    })
+  }
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    REG_STATUS_REGISTERED
+  )
+
+  return taskResource
+}
+
 export async function markBundleAsCertified(
   bundle: fhir.Bundle,
   token: string
