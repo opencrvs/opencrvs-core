@@ -10,11 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import {
-  regByAge,
-  regWithin45d,
-  fetchKeyFigures
-} from '@metrics/features/registration/metrics/metricsGenerator'
+import { fetchRegWithinTimeFrames } from '@metrics/features/registration/metrics/metricsGenerator'
 import { logger } from '@metrics/logger'
 import { internal } from 'boom'
 import {
@@ -22,11 +18,11 @@ import {
   TIME_TO,
   LOCATION_ID
 } from '@metrics/features/registration/metrics/constants'
-import { IAuthHeader } from '@metrics/features/registration/'
-import {
-  getDistrictLocation,
-  Location
-} from '@metrics/features/registration/metrics/utils'
+// import { IAuthHeader } from '@metrics/features/registration/'
+// import {
+//   getDistrictLocation,
+//   Location
+// } from '@metrics/features/registration/metrics/utils'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -36,17 +32,17 @@ export async function metricsHandler(
     const timeStart = request.query[TIME_FROM] + '000000'
     const timeEnd = request.query[TIME_TO] + '000000'
     const locationId = request.query[LOCATION_ID]
-    const authHeader: IAuthHeader = {
-      Authorization: request.headers.authorization
-    }
+    // const authHeader: IAuthHeader = {
+    //   Authorization: request.headers.authorization
+    // }
 
-    const location: Location = await getDistrictLocation(locationId, authHeader)
-
-    return {
-      keyFigures: await fetchKeyFigures(timeStart, timeEnd, location),
-      regByAge: await regByAge(timeStart, timeEnd),
-      regWithin45d: await regWithin45d(timeStart, timeEnd)
-    }
+    // const location: Location = await getDistrictLocation(locationId, authHeader)
+    const timeFrames = await fetchRegWithinTimeFrames(
+      timeStart,
+      timeEnd,
+      locationId
+    )
+    return { timeFrames }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)
     return internal(error)

@@ -547,33 +547,15 @@ export interface GQLSearchUserResult {
 }
 
 export interface GQLBirthRegistrationMetrics {
-  keyFigures?: Array<GQLBirthKeyFigures | null>
-  regByAge?: Array<GQLBirthRegistrationByAgeMetrics | null>
-  regWithin45d?: Array<GQLBirthRegistrationWithIn45D | null>
+  timeFrames?: Array<GQLBirthRegistraionTimeFrameMetrics | null>
 }
 
-export interface GQLBirthKeyFigures {
-  label?: string
-  value?: number
+export interface GQLBirthRegistraionTimeFrameMetrics {
+  regWithin45d?: number
+  regWithin45dTo1yr?: number
+  regWithin1yrTo5yr?: number
+  regOver5yr?: number
   total?: number
-  estimate?: number
-  categoricalData?: Array<GQLBirthKeyFiguresData | null>
-}
-
-export interface GQLBirthKeyFiguresData {
-  name?: string
-  value?: number
-}
-
-export interface GQLBirthRegistrationByAgeMetrics {
-  label?: string
-  value?: number
-}
-
-export interface GQLBirthRegistrationWithIn45D {
-  label?: string
-  value?: number
-  totalEstimate?: number
 }
 
 export interface GQLEventSearchResultSet {
@@ -945,10 +927,7 @@ export interface GQLResolver {
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
-  BirthKeyFigures?: GQLBirthKeyFiguresTypeResolver
-  BirthKeyFiguresData?: GQLBirthKeyFiguresDataTypeResolver
-  BirthRegistrationByAgeMetrics?: GQLBirthRegistrationByAgeMetricsTypeResolver
-  BirthRegistrationWithIn45D?: GQLBirthRegistrationWithIn45DTypeResolver
+  BirthRegistraionTimeFrameMetrics?: GQLBirthRegistraionTimeFrameMetricsTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -2412,125 +2391,59 @@ export interface SearchUserResultToTotalItemsResolver<
 }
 
 export interface GQLBirthRegistrationMetricsTypeResolver<TParent = any> {
-  keyFigures?: BirthRegistrationMetricsToKeyFiguresResolver<TParent>
-  regByAge?: BirthRegistrationMetricsToRegByAgeResolver<TParent>
-  regWithin45d?: BirthRegistrationMetricsToRegWithin45dResolver<TParent>
+  timeFrames?: BirthRegistrationMetricsToTimeFramesResolver<TParent>
 }
 
-export interface BirthRegistrationMetricsToKeyFiguresResolver<
+export interface BirthRegistrationMetricsToTimeFramesResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationMetricsToRegByAgeResolver<
+export interface GQLBirthRegistraionTimeFrameMetricsTypeResolver<
+  TParent = any
+> {
+  regWithin45d?: BirthRegistraionTimeFrameMetricsToRegWithin45dResolver<TParent>
+  regWithin45dTo1yr?: BirthRegistraionTimeFrameMetricsToRegWithin45dTo1yrResolver<
+    TParent
+  >
+  regWithin1yrTo5yr?: BirthRegistraionTimeFrameMetricsToRegWithin1yrTo5yrResolver<
+    TParent
+  >
+  regOver5yr?: BirthRegistraionTimeFrameMetricsToRegOver5yrResolver<TParent>
+  total?: BirthRegistraionTimeFrameMetricsToTotalResolver<TParent>
+}
+
+export interface BirthRegistraionTimeFrameMetricsToRegWithin45dResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationMetricsToRegWithin45dResolver<
+export interface BirthRegistraionTimeFrameMetricsToRegWithin45dTo1yrResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthKeyFiguresTypeResolver<TParent = any> {
-  label?: BirthKeyFiguresToLabelResolver<TParent>
-  value?: BirthKeyFiguresToValueResolver<TParent>
-  total?: BirthKeyFiguresToTotalResolver<TParent>
-  estimate?: BirthKeyFiguresToEstimateResolver<TParent>
-  categoricalData?: BirthKeyFiguresToCategoricalDataResolver<TParent>
-}
-
-export interface BirthKeyFiguresToLabelResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthKeyFiguresToValueResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthKeyFiguresToTotalResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthKeyFiguresToEstimateResolver<
+export interface BirthRegistraionTimeFrameMetricsToRegWithin1yrTo5yrResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthKeyFiguresToCategoricalDataResolver<
+export interface BirthRegistraionTimeFrameMetricsToRegOver5yrResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthKeyFiguresDataTypeResolver<TParent = any> {
-  name?: BirthKeyFiguresDataToNameResolver<TParent>
-  value?: BirthKeyFiguresDataToValueResolver<TParent>
-}
-
-export interface BirthKeyFiguresDataToNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthKeyFiguresDataToValueResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLBirthRegistrationByAgeMetricsTypeResolver<TParent = any> {
-  label?: BirthRegistrationByAgeMetricsToLabelResolver<TParent>
-  value?: BirthRegistrationByAgeMetricsToValueResolver<TParent>
-}
-
-export interface BirthRegistrationByAgeMetricsToLabelResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationByAgeMetricsToValueResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLBirthRegistrationWithIn45DTypeResolver<TParent = any> {
-  label?: BirthRegistrationWithIn45DToLabelResolver<TParent>
-  value?: BirthRegistrationWithIn45DToValueResolver<TParent>
-  totalEstimate?: BirthRegistrationWithIn45DToTotalEstimateResolver<TParent>
-}
-
-export interface BirthRegistrationWithIn45DToLabelResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationWithIn45DToValueResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegistrationWithIn45DToTotalEstimateResolver<
+export interface BirthRegistraionTimeFrameMetricsToTotalResolver<
   TParent = any,
   TResult = any
 > {

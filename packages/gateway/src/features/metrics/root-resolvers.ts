@@ -30,11 +30,7 @@ export const resolvers: GQLResolver = {
       }
       const metricsData = await getMetrics(authHeader, timeRange, locationId)
 
-      return {
-        keyFigures: (metricsData && metricsData.keyFigures) || [],
-        regByAge: (metricsData && metricsData.regByAge) || [],
-        regWithin45d: (metricsData && metricsData.regWithin45d) || []
-      }
+      return { timeFrames: [metricsData.timeFrames] }
     }
   }
 }

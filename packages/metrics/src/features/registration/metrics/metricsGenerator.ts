@@ -68,7 +68,69 @@ export async function regByAge(timeStart: string, timeEnd: string) {
   return metricsData
 }
 
-export const regWithin45d = async (timeStart: string, timeEnd: string) => {
+export async function fetchRegWithinTimeFrames(
+  timeStart: string,
+  timeEnd: string,
+  locationId: string
+) {
+  const queryLocationId = `Location/${locationId}`
+  const pointsWithin45Days = await readPoints(
+    // tslint:disable-next-line:max-line-length
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > -1 AND age_in_days <= 45 AND locationLevel5 = '${queryLocationId}'`
+  )
+
+  const points45DaysTo1Year = await readPoints(
+    // tslint:disable-next-line:max-line-length
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > 46 AND age_in_days <= 365 AND locationLevel5 = '${queryLocationId}'`
+  )
+
+  const points1YearTo5Years = await readPoints(
+    // tslint:disable-next-line:max-line-length
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > 366 AND age_in_days <= 1825 AND locationLevel5 = '${queryLocationId}'`
+  )
+
+  const pointsOver5Years = await readPoints(
+    // tslint:disable-next-line:max-line-length
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > 1826 AND locationLevel5 = '${queryLocationId}'`
+  )
+
+  const regWithin45d: number =
+    (pointsWithin45Days &&
+      pointsWithin45Days.length > 0 &&
+      pointsWithin45Days[0].count) ||
+    0
+
+  const regWithin45dTo1yr: number =
+    (points45DaysTo1Year &&
+      points45DaysTo1Year.length > 0 &&
+      points45DaysTo1Year[0].count) ||
+    0
+
+  const regWithin1yrTo5yr: number =
+    (points1YearTo5Years &&
+      points1YearTo5Years.length > 0 &&
+      points1YearTo5Years[0].count) ||
+    0
+
+  const regOver5yr: number =
+    (pointsOver5Years &&
+      pointsOver5Years.length > 0 &&
+      pointsOver5Years[0].count) ||
+    0
+
+  const total: number =
+    regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+
+  return {
+    regWithin45d,
+    regWithin45dTo1yr,
+    regWithin1yrTo5yr,
+    regOver5yr,
+    total
+  }
+}
+
+export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
   const interval = calculateInterval(timeStart, timeEnd)
   const points = await readPoints(
     `
