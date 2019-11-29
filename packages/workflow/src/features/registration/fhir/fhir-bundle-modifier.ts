@@ -16,7 +16,8 @@ import {
   REG_STATUS_DECLARED,
   REG_STATUS_IN_PROGRESS,
   REG_STATUS_VALIDATED,
-  REG_STATUS_WAITING_VALIDATION
+  REG_STATUS_WAITING_VALIDATION,
+  REG_STATUS_REGISTERED
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
