@@ -13,7 +13,8 @@ import { IntlShape } from 'react-intl'
 import {
   getValueFromApplicationDataByKey,
   getEventMessageDescription,
-  getExecutorFieldValue
+  getExecutorFieldValue,
+  getMatchedCondition
 } from '@client/pdfRenderer/transformer/utils'
 import {
   IIntLabelPayload,
@@ -26,7 +27,8 @@ import {
   TemplateTransformerData,
   TransformerPayload,
   IFormattedFeildValuePayload,
-  IPersonIdentifierValuePayload
+  IPersonIdentifierValuePayload,
+  IApplicantNameCondition
 } from '@client/pdfRenderer/transformer/types'
 import moment from 'moment'
 import { IFormSectionData } from '@client/forms'
@@ -86,17 +88,28 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!formatPayload) {
       throw new Error('No payload found for this transformer')
     }
-    if (!formatPayload.key[templateData.application.event]) {
+
+    const matchedCondition = getMatchedCondition(
+      formatPayload.conditions,
+      templateData.application.data
+    ) as IApplicantNameCondition
+
+    if (!matchedCondition) {
+      throw new Error('No condition has matched for ApplicantName transformer')
+    }
+
+    if (!matchedCondition.key[templateData.application.event]) {
       throw new Error(
         `No data key defined on payload for event: ${templateData.application.event}`
       )
     }
+    console.log(templateData.application.data)
     const applicantObj: IFormSectionData = getValueFromApplicationDataByKey(
       templateData.application.data,
-      formatPayload.key[templateData.application.event]
+      matchedCondition.key[templateData.application.event]
     )
     let applicantName = ''
-    formatPayload.format[
+    matchedCondition.format[
       formatPayload.language ? formatPayload.language : intl.locale
     ].forEach(field => {
       applicantName = applicantName.concat(`${applicantObj[field] || ''} `)

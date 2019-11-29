@@ -470,12 +470,10 @@ describe('when user is previewing the form data', () => {
       hasDetails: {
         value: 'Yes',
         nestedFields: {
-          Yes: {
-            spouseFirstNames: 'রেহানা',
-            spouseFamilyName: 'আলী',
-            spouseFirstNamesEng: 'Rehana',
-            spouseFamilyNameEng: 'Ali'
-          }
+          spouseFirstNames: 'রেহানা',
+          spouseFamilyName: 'আলী',
+          spouseFirstNamesEng: 'Rehana',
+          spouseFamilyNameEng: 'Ali'
         }
       }
     }
