@@ -103,7 +103,7 @@ export const fieldTransformers: IFunctionTransformer = {
         `No data key defined on payload for event: ${templateData.application.event}`
       )
     }
-    console.log(templateData.application.data)
+
     const applicantObj: IFormSectionData = getValueFromApplicationDataByKey(
       templateData.application.data,
       matchedCondition.key[templateData.application.event]
