@@ -2366,3 +2366,502 @@ export const mockSearchResult = {
     ]
   }
 }
+
+export const mockBirthFhirBundleWithoutParents = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:bcf4e631-ba4f-447b-b630-993709a38d71',
+      resource: {
+        identifier: {
+          system: 'urn:ietf:rfc:3986',
+          value: 'BDQNYZH'
+        },
+        resourceType: 'Composition',
+        status: 'preliminary',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-types',
+              code: 'birth-application'
+            }
+          ],
+          text: 'Birth Application'
+        },
+        class: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/doc-classes',
+              code: 'crvs-document'
+            }
+          ],
+          text: 'CRVS Document'
+        },
+        title: 'Birth Declaration',
+        section: [
+          {
+            title: 'Child details',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'child-details'
+                }
+              ],
+              text: 'Child details'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:e74ed25d-8c9c-49aa-9abc-d2a659078b22'
+              }
+            ]
+          },
+          {
+            title: 'Birth encounter',
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/sections',
+                  code: 'birth-encounter'
+                }
+              ],
+              text: 'Birth encounter'
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+              }
+            ]
+          }
+        ],
+        subject: {},
+        date: '2019-04-03T08:56:10.718Z',
+        author: [],
+        id: 'b7a1743e-1431-41ed-87a8-3606ec7f6671'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:791afdc5-2d8b-4e05-bd99-4aeea0b0480c',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        focus: {
+          reference: 'urn:uuid:bcf4e631-ba4f-447b-b630-993709a38d71'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'FATHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111111'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: {
+              reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastLocation',
+            valueReference: {
+              reference: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
+            }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: {
+              reference: 'Location/b49503bf-531d-4642-ae1b-13f647b88ec6'
+            }
+          }
+        ],
+        lastModified: '2019-04-03T08:56:12.031Z',
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'BDQNYZH'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:e74ed25d-8c9c-49aa-9abc-d2a659078b22',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'bn',
+            given: ['রফিক'],
+            family: ['ইসলাম']
+          },
+          {
+            use: 'en',
+            given: ['Rafiq'],
+            family: ['Islam']
+          }
+        ],
+        gender: 'male',
+        birthDate: '2010-01-01'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:dcca6eb2-b608-4bb3-b17e-31ae9caa74dc',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '12341234123412341',
+            type: 'BIRTH_REGISTRATION_NUMBER'
+          }
+        ],
+        name: [
+          {
+            use: 'bn',
+            given: ['বেগম'],
+            family: ['রোকেয়া']
+          },
+          {
+            use: 'en',
+            given: ['Begum'],
+            family: ['Rokeya']
+          }
+        ],
+        birthDate: '1980-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/date-of-marriage',
+            valueDateTime: '2008-01-01'
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/educational-attainment',
+            valueString: 'PRIMARY_ISCED_1'
+          }
+        ],
+        multipleBirthInteger: 1,
+        address: [
+          {
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
+            district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
+            state: '2414fc3f-7670-4d22-a053-5694858d72a2',
+            country: 'BGD'
+          },
+          {
+            type: 'CURRENT',
+            line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
+            district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
+            state: '2414fc3f-7670-4d22-a053-5694858d72a2',
+            country: 'BGD'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:63e5ea6d-6dc7-4df7-b908-328872e770e3',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        identifier: [
+          {
+            value: '17238230233223321',
+            type: 'BIRTH_REGISTRATION_NUMBER'
+          }
+        ],
+        name: [
+          {
+            use: 'bn',
+            given: ['ফারুক'],
+            family: ['ইসলাম']
+          },
+          {
+            use: 'en',
+            given: ['Faruq'],
+            family: ['Islam']
+          }
+        ],
+        birthDate: '1970-01-01',
+        maritalStatus: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/StructureDefinition/marital-status',
+              code: 'M'
+            }
+          ],
+          text: 'MARRIED'
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/date-of-marriage',
+            valueDateTime: '2008-01-01'
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+            extension: [
+              {
+                url: 'code',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'urn:iso:std:iso:3166',
+                      code: 'BGD'
+                    }
+                  ]
+                }
+              },
+              {
+                url: 'period',
+                valuePeriod: {
+                  start: '',
+                  end: ''
+                }
+              }
+            ]
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/educational-attainment',
+            valueString: 'LOWER_SECONDARY_ISCED_2'
+          }
+        ],
+        address: [
+          {
+            type: 'CURRENT',
+            line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
+            district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
+            state: '2414fc3f-7670-4d22-a053-5694858d72a2',
+            country: 'BGD'
+          },
+          {
+            type: 'PERMANENT',
+            line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
+            district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
+            state: '2414fc3f-7670-4d22-a053-5694858d72a2',
+            country: 'BGD'
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'urn:uuid:3e199a21-3f71-41eb-b8ba-215e547d0d05'
+            }
+          }
+        ]
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:3e199a21-3f71-41eb-b8ba-215e547d0d05',
+      resource: {
+        resourceType: 'Location',
+        mode: 'instance',
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/location-type',
+              code: 'HOSPITAL'
+            }
+          ]
+        },
+        address: {
+          line: ['', '', '', '', '', ''],
+          district: '',
+          state: '',
+          postalCode: '',
+          country: ''
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:e7249ecd-fb11-42cd-aa3b-d48e2288f504',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '57722-1',
+              display: 'Birth plurality of Pregnancy'
+            }
+          ]
+        },
+        valueQuantity: {
+          value: 'SINGLE'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:3a7eb860-2bdd-4a44-846b-74d6ce8a65cb',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'vital-signs',
+                display: 'Vital Signs'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '3141-9',
+              display: 'Body weight Measured'
+            }
+          ]
+        },
+        valueQuantity: {
+          value: 2,
+          unit: 'kg',
+          system: 'http://unitsofmeasure.org',
+          code: 'kg'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:372abcdc-7b1d-4671-92dc-4a0353916cbe',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '73764-3',
+              display: 'Birth attendant title'
+            }
+          ]
+        },
+        valueString: 'PHYSICIAN'
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:99315e6d-bcb6-4e9a-ba85-a41cff4f3b08',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'present-at-birth-reg',
+              display: 'Present at birth registration'
+            }
+          ]
+        },
+        valueString: 'BOTH_PARENTS'
+      }
+    }
+  ],
+  meta: {
+    lastUpdated: '2019-04-03T08:56:10.718Z'
+  }
+}
