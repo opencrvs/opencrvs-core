@@ -4,7 +4,7 @@ exports[`When an existing application is marked certified a birth application wr
 Object {
   "fields": Object {
     "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
-    "total": undefined,
+    "total": 50,
   },
   "measurement": "certification_payment",
   "tags": Object {

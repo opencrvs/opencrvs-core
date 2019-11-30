@@ -9,8 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { generateBirthRegPoint } from '@metrics/features/registration/pointGenerator'
-import { testPayload } from '@metrics/features/registration/testUtils'
+import {
+  generateBirthRegPoint,
+  generateDeathRegPoint,
+  generatePaymentPoint
+} from '@metrics/features/registration/pointGenerator'
+import {
+  testPayload,
+  testDeathPayload,
+  testDeathCertPayload
+} from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
 
 import * as api from '@metrics/api'
@@ -126,5 +134,74 @@ describe('Verify point generation', () => {
         Authorization: 'Bearer mock-token'
       })
     ).rejects.toThrowError('No child found!')
+  })
+  it('Return valid death registration point to insert in influx', async () => {
+    Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateDeathRegPoint(
+      cloneDeep(testDeathPayload),
+      'mark-existing-application-registered',
+      {
+        Authorization: 'Bearer mock-token'
+      }
+    )
+    expect(point).toEqual({
+      measurement: 'death_reg',
+      tags: {
+        regStatus: 'mark-existing-application-registered',
+        gender: 'male',
+        causeOfDeath: 'Old age',
+        mannerOfDeath: 'NATURAL_CAUSES'
+      },
+      fields: {
+        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        ageInYears: 43
+      }
+    })
+  })
+  it('Throw error when no deceased found', () => {
+    const payload = cloneDeep(testDeathPayload)
+    // @ts-ignore
+    payload.entry[0] = {}
+    expect(
+      generateDeathRegPoint(payload, 'mark-existing-application-registered', {
+        Authorization: 'Bearer mock-token'
+      })
+    ).rejects.toThrowError('No section found for given code: deceased-details')
+  })
+  it('returns payment point', async () => {
+    const point = await generatePaymentPoint(cloneDeep(testDeathCertPayload))
+    expect(point).toEqual({
+      measurement: 'certification_payment',
+      tags: {
+        eventType: 'DEATH'
+      },
+      fields: {
+        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
+        total: 25
+      }
+    })
+  })
+  it('Throw error when no task found to attribute to event for payment point', () => {
+    const payload = cloneDeep(testDeathCertPayload)
+    // @ts-ignore
+    payload.entry[1] = {}
+    expect(generatePaymentPoint(payload)).rejects.toThrowError('Task not found')
+  })
+  it('Throw error when no reconciliation found for payment point', () => {
+    const payload = cloneDeep(testDeathCertPayload)
+    // @ts-ignore
+    payload.entry[4] = {}
+    expect(generatePaymentPoint(payload)).rejects.toThrowError(
+      'Payment reconciliation not found'
+    )
   })
 })

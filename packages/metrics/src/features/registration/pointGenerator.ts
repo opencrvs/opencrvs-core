@@ -138,9 +138,6 @@ export const generateDeathRegPoint = async (
     payload,
     'deceased-details'
   )
-  if (!deceased) {
-    throw new Error('No deceased found!')
-  }
 
   const composition = getComposition(payload)
   if (!composition) {
@@ -211,7 +208,7 @@ export async function generatePaymentPoint(
     throw new Error('Payment reconciliation not found')
   }
 
-  const total = (reconciliation.total && reconciliation.total.value) as number
+  const total = reconciliation.total as number
 
   const fields: IPaymentFields = {
     total,

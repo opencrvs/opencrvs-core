@@ -217,18 +217,14 @@ export function getObservationValueByCode(
     return 'UNKNOWN'
   }
   const selectedObservationEntry = observationBundle.find(entry => {
-    if (!entry.resource) {
-      return false
-    } else {
-      const observationEntry = entry.resource as fhir.Observation
-      return (
-        (observationEntry.code &&
-          observationEntry.code.coding &&
-          observationEntry.code.coding[0] &&
-          observationEntry.code.coding[0].code === observationCode) ||
-        null
-      )
-    }
+    const observationEntry = entry.resource as fhir.Observation
+    return (
+      (observationEntry.code &&
+        observationEntry.code.coding &&
+        observationEntry.code.coding[0] &&
+        observationEntry.code.coding[0].code === observationCode) ||
+      null
+    )
   })
   if (!selectedObservationEntry) {
     return 'UNKNOWN'
