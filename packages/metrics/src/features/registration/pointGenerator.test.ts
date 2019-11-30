@@ -35,16 +35,16 @@ describe('Verify point generation', () => {
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
-        reg_status: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-application-registered',
         gender: 'male'
       },
       fields: {
-        current_status: 'registered',
+        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
-        age_in_days: 435
+        ageInDays: 435
       }
     })
   })
@@ -78,13 +78,13 @@ describe('Verify point generation', () => {
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
-        reg_status: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-application-registered',
         gender: 'male'
       },
       fields: {
-        current_status: 'registered',
+        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
-        age_in_days: undefined
+        ageInDays: undefined
       }
     })
   })
@@ -104,14 +104,14 @@ describe('Verify point generation', () => {
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
-        reg_status: 'mark-existing-application-registered',
+        regStatus: 'mark-existing-application-registered',
         gender: 'male'
       },
       fields: {
-        current_status: 'registered',
+        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
-        age_in_days: 435
+        ageInDays: 435
       }
     })
   })
