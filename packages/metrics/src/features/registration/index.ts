@@ -50,6 +50,8 @@ export interface IBirthRegistrationTags {
 export interface IDeathRegistrationTags {
   regStatus: string
   gender: string | undefined
+  mannerOfDeath: string
+  causeOfDeath: string
 }
 
 export interface IInProgressApplicationFields {

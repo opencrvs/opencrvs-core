@@ -47,7 +47,7 @@ export const influx = new Influx.InfluxDB({
         currentStatus: Influx.FieldType.STRING,
         ageInYears: Influx.FieldType.INTEGER
       },
-      tags: ['regStatus', 'gender']
+      tags: ['regStatus', 'gender', 'mannerOfDeath', 'causeOfDeath']
     },
     {
       measurement: 'in_complete_fields',

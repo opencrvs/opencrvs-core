@@ -17,7 +17,8 @@ import {
   markCertifiedHandler,
   markValidatedHandler,
   baseHandler,
-  markDeathRegisteredHandler
+  markDeathRegisteredHandler,
+  newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
@@ -71,7 +72,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-registration',
-      handler: baseHandler,
+      handler: newDeathRegistrationHandler,
       config: {
         tags: ['api']
       }

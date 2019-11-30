@@ -36,7 +36,10 @@ import {
   getApplicationStatus,
   getTimeLoggedFromTask,
   getApplicationType,
-  getPaymentReconciliation
+  getPaymentReconciliation,
+  getObservationValueByCode,
+  MANNER_OF_DEATH_CODE,
+  CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -154,7 +157,9 @@ export const generateDeathRegPoint = async (
 
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
-    gender: deceased.gender
+    gender: deceased.gender,
+    mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
+    causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE)
   }
 
   const point = {

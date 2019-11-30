@@ -110,6 +110,29 @@ export async function markBirthRegisteredHandler(
 
   return h.response().code(200)
 }
+export async function newDeathRegistrationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    points.push(
+      await generateDeathRegPoint(
+        request.payload as fhir.Bundle,
+        'register-new-application',
+        {
+          Authorization: request.headers.authorization
+        }
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+    )
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
 export async function markDeathRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
