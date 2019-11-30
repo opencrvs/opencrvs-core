@@ -11,7 +11,7 @@
  */
 import * as Joi from 'joi'
 import {
-  inProgressBirthRegistrationHandler,
+  inProgressHandler,
   markBirthRegisteredHandler,
   newBirthRegistrationHandler,
   markCertifiedHandler,
@@ -27,7 +27,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/in-progress-declaration',
-      handler: inProgressBirthRegistrationHandler,
+      handler: inProgressHandler,
       config: {
         tags: ['api']
       }
@@ -35,7 +35,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/in-progress-declaration',
-      handler: baseHandler,
+      handler: inProgressHandler,
       config: {
         tags: ['api']
       }

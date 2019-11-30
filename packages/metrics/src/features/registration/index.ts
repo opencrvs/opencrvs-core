@@ -9,9 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IBirthRegistrationPoint extends IPoint {
-  current_status: string
-  age_in_days: number | undefined
+export interface IBirthRegistrationFields extends IPoint {
+  compositionId: string
+  ageInDays: number | undefined
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+}
+
+export interface IDeathRegistrationFields extends IPoint {
+  compositionId: string
+  ageInYears: number | undefined
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -34,6 +43,102 @@ export interface IAuthHeader {
 }
 
 export interface IBirthRegistrationTags {
-  reg_status: string
+  regStatus: string
   gender: string | undefined
 }
+
+export interface IDeathRegistrationTags {
+  regStatus: string
+  gender: string | undefined
+}
+
+export interface IInProgressApplicationFields {
+  compositionId: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+}
+
+export interface IInProgressApplicationTags {
+  regStatus: string
+  missingFieldSectionId: string
+  missingFieldGroupId: string
+  missingFieldId: string
+  eventType: string
+}
+
+export interface IPaymentFields {
+  total: number
+  compositionId: string
+}
+
+export interface IPaymentTags {
+  eventType: string
+}
+
+export interface ITimeLoggedFields {
+  timeSpentEditing: number
+  compositionId: string
+}
+
+export interface ITimeLoggedTags {
+  currentStatus: string
+  eventType: string
+}
+
+export interface IDurationFields {
+  durationInSeconds: number
+  compositionId: string
+  currentTaskId: string
+  previousTaskId: string
+}
+export interface IDurationTags {
+  currentStatus: string
+  previousStatus: string
+  eventType: string
+}
+
+export interface IDurationPoints {
+  measurement: string
+  tags: IDurationTags
+  fields: IDurationFields
+}
+
+export interface ITimeLoggedPoints {
+  measurement: string
+  tags: ITimeLoggedTags
+  fields: ITimeLoggedFields
+}
+
+export interface IInProgressApplicationPoints {
+  measurement: string
+  tags: IInProgressApplicationTags
+  fields: IInProgressApplicationFields
+}
+
+export interface IDeathRegistrationPoints {
+  measurement: string
+  tags: IDeathRegistrationTags
+  fields: IDeathRegistrationFields
+}
+
+export interface IBirthRegistrationPoints {
+  measurement: string
+  tags: IBirthRegistrationTags
+  fields: IBirthRegistrationFields
+}
+
+export interface IPaymentPoints {
+  measurement: string
+  tags: IPaymentTags
+  fields: IPaymentFields
+}
+
+export type IPoints =
+  | IDurationPoints
+  | ITimeLoggedPoints
+  | IInProgressApplicationPoints
+  | IPaymentPoints
+  | IBirthRegistrationPoints
+  | IDeathRegistrationPoints
