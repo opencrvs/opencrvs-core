@@ -73,7 +73,7 @@ async function ignoreFromBuild(packages: string[]) {
   pkg.scripts['build'] =
     pkg.scripts['build'] +
     ' ' +
-    packages.map(directory => `--ignore ${directory}`).join(' ')
+    packages.map(directory => `--ignore @opencrvs/${directory}`).join(' ')
   writeFileSync('./package.json', JSON.stringify(pkg))
 }
 async function isDependencyOf(dependency: string, packageName: string) {

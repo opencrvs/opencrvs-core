@@ -20,6 +20,8 @@ import {
 } from './test-data'
 import * as fetchMock from 'jest-fetch-mock'
 import * as generateService from '@resources/bgd/features/generate/service'
+import * as queueItemModel from '@resources/bgd/features/bdris-queue/model'
+import * as constants from '@resources/constants'
 
 let fetch: fetchMock.FetchMock
 
@@ -132,6 +134,39 @@ describe('administrative handler receives a request', () => {
           headers: expect.anything()
         }
       ])
+    })
+
+    it('add application to queue when config set to validate with BDRIS', async () => {
+      // @ts-ignore
+      constants.VALIDATE_IN_BDRIS2 = 'true'
+
+      const saveMock = jest.fn()
+      // @ts-ignore
+      jest.spyOn(queueItemModel, 'default').mockImplementation(() => ({
+        save: saveMock
+      }))
+
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:resources-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/bgd/validate/registration',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload: testFhirBundleNoTaskExtension
+      })
+
+      expect(res.statusCode).toBe(202)
+      expect(saveMock).toBeCalled()
+
+      // reset constant
+      // @ts-ignore
+      constants.VALIDATE_IN_BDRIS2 = 'false'
     })
   })
 })

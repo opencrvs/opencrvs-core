@@ -24,7 +24,8 @@ import {
   APPLICATION_STATUS,
   getApplicationStatus,
   getTimeLoggedFromTask,
-  getApplicationType
+  getApplicationType,
+  getPaymentReconciliation
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -128,6 +129,30 @@ const generatePointLocations = async (
   return locations
 }
 
+export async function generatePaymentPoint(payload: fhir.Bundle) {
+  const reconciliation = getPaymentReconciliation(payload)
+  const composition = getComposition(payload)
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+  if (!reconciliation) {
+    throw new Error('Payment reconciliation not found')
+  }
+
+  const fields = {
+    total: reconciliation.total,
+    application_id: composition.id
+  }
+
+  const tags = {}
+
+  return {
+    measurement: 'certification_payment',
+    tags,
+    fields
+  }
+}
+
 export async function generateEventDurationPoint(
   payload: fhir.Bundle,
   allowedPreviousStates: APPLICATION_STATUS[],
@@ -183,7 +208,6 @@ export function generateTimeLoggedPoint(payload: fhir.Bundle) {
   if (!composition) {
     throw new Error('Composition not found')
   }
-
   if (!currentTask) {
     throw new Error('Current task not found')
   }
