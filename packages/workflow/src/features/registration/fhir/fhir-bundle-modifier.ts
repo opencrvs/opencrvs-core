@@ -10,39 +10,40 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  generateBirthTrackingId,
-  generateDeathTrackingId,
-  getEventType,
-  isInProgressApplication,
-  isEventNotification,
-  getRegistrationNumber
-} from '@workflow/features/registration/utils'
+  EVENT_TYPE,
+  OPENCRVS_SPECIFICATION_URL,
+  REG_STATUS_CERTIFIED,
+  REG_STATUS_DECLARED,
+  REG_STATUS_IN_PROGRESS,
+  REG_STATUS_VALIDATED,
+  REG_STATUS_WAITING_VALIDATION,
+  REG_STATUS_REGISTERED
+} from '@workflow/features/registration/fhir/constants'
+import {
+  getTaskResource,
+  selectOrCreateTaskRefResource
+} from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
   getRegStatusCode,
   getTrackingIdFromTaskResource
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
+  generateBirthTrackingId,
+  generateDeathTrackingId,
+  getEventType,
+  getRegistrationNumber,
+  isEventNotification,
+  isInProgressApplication
+} from '@workflow/features/registration/utils'
+import {
   getLoggedInPractitionerResource,
-  getPractitionerPrimaryLocation,
   getPractitionerOffice,
+  getPractitionerPrimaryLocation,
   getPractitionerRef
 } from '@workflow/features/user/utils'
-import {
-  selectOrCreateTaskRefResource,
-  getTaskResource
-} from '@workflow/features/registration/fhir/fhir-template'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  EVENT_TYPE,
-  REG_STATUS_IN_PROGRESS,
-  REG_STATUS_DECLARED,
-  REG_STATUS_REGISTERED,
-  REG_STATUS_CERTIFIED,
-  REG_STATUS_VALIDATED
-} from '@workflow/features/registration/fhir/constants'
-import { ITokenPayload, getTokenPayload } from '@workflow/utils/authUtils.ts'
 import { logger } from '@workflow/logger'
+import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils.ts'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -113,7 +114,7 @@ export async function markBundleAsValidated(
   return bundle
 }
 
-export async function markBundleAsRegistered(
+export async function markBundleAsWaitingValidation(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
@@ -123,22 +124,15 @@ export async function markBundleAsRegistered(
 
   // TODO move the setting of the registration number below
   /* Setting registration number here */
-  const eventType = getEventType(bundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    await pushRN(taskResource, practitioner, 'birth-registration-number', {
-      Authorization: `Bearer ${token}`
-    })
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    await pushRN(taskResource, practitioner, 'death-registration-number', {
-      Authorization: `Bearer ${token}`
-    })
-  }
+  pushRN(taskResource, practitioner, {
+    Authorization: `Bearer ${token}`
+  })
 
   /* setting registration workflow status here */
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REGISTERED
+    REG_STATUS_WAITING_VALIDATION
   )
 
   /* setting lastRegLocation here */
@@ -210,39 +204,17 @@ export async function markBundleAsCertified(
 export async function pushRN(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner,
-  identifierName: string,
   authHeader: { Authorization: string }
-): Promise<fhir.Task> {
+) {
   if (!taskResource) {
     throw new Error('Invalid Task resource found for registration')
   }
 
-  const generatedOutput = await getRegistrationNumber(
+  getRegistrationNumber(
     getTrackingIdFromTaskResource(taskResource) as string,
     practitioner.id || '',
     authHeader
   )
-  if (!taskResource.identifier) {
-    taskResource.identifier = []
-  }
-  const rnIdentifier =
-    taskResource &&
-    taskResource.identifier &&
-    taskResource.identifier.find(identifier => {
-      return (
-        identifier.system ===
-        `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`
-      )
-    })
-  if (!rnIdentifier) {
-    taskResource.identifier.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}id/${identifierName}`,
-      value: generatedOutput.registrationNumber
-    })
-  } else {
-    rnIdentifier.value = generatedOutput.registrationNumber
-  }
-  return taskResource
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {

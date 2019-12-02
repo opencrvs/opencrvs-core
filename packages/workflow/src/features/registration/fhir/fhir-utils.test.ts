@@ -9,25 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { testFhirBundle, testFhirTaskBundle } from '@workflow/test/utils'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
+import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
-  getSharedContactMsisdn,
-  getInformantName,
-  getTrackingId,
-  getEntryId,
   getBirthRegistrationNumber,
+  getEntryId,
+  getInformantName,
+  getPaperFormID,
   getRegStatusCode,
-  getPaperFormID
+  getSharedContactMsisdn,
+  getTrackingId
 } from '@workflow/features/registration/fhir/fhir-utils'
-import {
-  setTrackingId,
-  pushRN
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { testFhirBundle, testFhirTaskBundle } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
-
-import * as fetchAny from 'jest-fetch-mock'
-
-const fetch = fetchAny as any
 
 describe('Verify getSharedContactMsisdn', () => {
   it('Returned shared contact number properly', async () => {
@@ -118,49 +112,20 @@ describe('Verify getTrackingId', () => {
 
 describe('Verify getBirthRegistrationNumber', () => {
   it('Returned birth registration number properly', async () => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
-      telecom: [{ system: 'phone', value: '01711111111' }],
-      name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
+    const taskResource: fhir.Task = {
+      identifier: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`,
+          value: '2019333436B5WGYJE8'
+        }
       ],
-      gender: 'male',
-      meta: {
-        lastUpdated: '2018-11-25T17:31:08.062+00:00',
-        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+      status: '',
+      intent: ''
     }
-    fetch.mockResponses([
-      JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' }),
-      { status: 200 }
-    ])
-    const birthTrackingId = 'B5WGYJE'
-    if (
-      testFhirBundle &&
-      testFhirBundle.entry &&
-      testFhirBundle.entry[1] &&
-      testFhirBundle.entry[1].resource &&
-      testFhirBundle.entry[1].resource.identifier &&
-      testFhirBundle.entry[1].resource.identifier[1] &&
-      testFhirBundle.entry[1].resource.identifier[1].value
-    ) {
-      testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-      const taskResource = await pushRN(
-        testFhirBundle.entry[1].resource as fhir.Task,
-        practitioner,
-        'birth-registration-number',
-        { Authorization: `sample token` }
-      )
-      const brn = getBirthRegistrationNumber(taskResource)
+    const brn = getBirthRegistrationNumber(taskResource)
 
-      expect(brn).toBeDefined()
-      expect(brn).toEqual('2019333436B5WGYJE8')
-    } else {
-      throw new Error('Failed')
-    }
+    expect(brn).toBeDefined()
+    expect(brn).toEqual('2019333436B5WGYJE8')
   })
 
   it('Throws error when invalid fhir bundle is sent', () => {

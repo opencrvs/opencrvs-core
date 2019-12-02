@@ -63,6 +63,38 @@ export const getRoutes = () => {
     // New registration
     {
       method: 'POST',
+      path: '/events/birth/waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/new-waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/new-registration',
       handler: newBirthRegistrationHandler,
       config: {
