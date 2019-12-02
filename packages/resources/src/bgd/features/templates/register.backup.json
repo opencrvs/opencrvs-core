@@ -137,14 +137,18 @@
         "field": "registrantName",
         "operation": "ApplicantName",
         "parameters": {
-          "key": {
-            "birth": "child",
-            "death": "deceased"
-          },
-          "format": {
-            "bn": ["firstNames", "familyName"],
-            "en": ["firstNamesEng", "familyNameEng"]
-          }
+          "conditions": [
+            {
+              "key": {
+                "birth": "child",
+                "death": "deceased"
+              },
+              "format": {
+                "bn": ["firstNames", "familyName"],
+                "en": ["firstNamesEng", "familyNameEng"]
+              }
+            }
+          ]
         }
       },
       {
@@ -717,12 +721,16 @@
           "field": "applicantName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "birth": "child"
-            },
-            "format": {
-              "en": ["firstNamesEng", "familyNameEng"]
-            },
+            "conditions": [
+              {
+                "key": {
+                  "birth": "child"
+                },
+                "format": {
+                  "en": ["firstNamesEng", "familyNameEng"]
+                }
+              }
+            ],
             "language": "en"
           }
         },
@@ -730,12 +738,16 @@
           "field": "applicantBnName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "birth": "child"
-            },
-            "format": {
-              "bn": ["firstNames", "familyName"]
-            },
+            "conditions": [
+              {
+                "key": {
+                  "birth": "child"
+                },
+                "format": {
+                  "bn": ["firstNames", "familyName"]
+                }
+              }
+            ],
             "language": "bn"
           }
         },
@@ -772,11 +784,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -788,7 +800,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -806,11 +818,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "bn",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "alias",
@@ -822,7 +834,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
@@ -1264,12 +1276,16 @@
           "field": "applicantName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "death": "deceased"
-            },
-            "format": {
-              "en": ["firstNamesEng", "familyNameEng"]
-            },
+            "conditions": [
+              {
+                "key": {
+                  "death": "deceased"
+                },
+                "format": {
+                  "en": ["firstNamesEng", "familyNameEng"]
+                }
+              }
+            ],
             "language": "en"
           }
         },
@@ -1277,12 +1293,16 @@
           "field": "applicantBnName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": {
-              "death": "deceased"
-            },
-            "format": {
-              "bn": ["firstNames", "familyName"]
-            },
+            "conditions": [
+              {
+                "key": {
+                  "death": "deceased"
+                },
+                "format": {
+                  "bn": ["firstNames", "familyName"]
+                }
+              }
+            ],
             "language": "bn"
           }
         },
@@ -1319,11 +1339,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PERMANENT"]
+                  "values": ["PERMANENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -1336,7 +1356,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["CURRENT"]
+                  "values": ["CURRENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -1349,7 +1369,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -1362,7 +1382,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -1379,11 +1399,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "bn",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PERMANENT"]
+                  "values": ["PERMANENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
@@ -1396,7 +1416,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["CURRENT"]
+                  "values": ["CURRENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
@@ -1409,7 +1429,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "alias",
@@ -1422,7 +1442,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "alias",

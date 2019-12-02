@@ -676,13 +676,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getValueOrError = (
     section: IFormSection,
     field: IFormField,
-    sectionErrors: IErrorsBySection
+    sectionErrors: IErrorsBySection,
+    ignoreNestedFieldWrapping?: boolean
   ) => {
     const { intl, draft, offlineResources, language } = this.props
     const errorsOnField = sectionErrors[section.id][field.name].errors
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
-      : field.nestedFields
+      : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
       ? (
           (draft.data[section.id] &&
             draft.data[section.id][field.name] &&
@@ -732,6 +733,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           offlineResources,
           language
         )
+  }
+
+  getNestedFieldValueOrError = (
+    section: IFormSection,
+    nestSectionData: IFormData,
+    nestedField: IFormField,
+    parentFieldErrors: IFieldErrors
+  ) => {
+    const { intl, offlineResources, language } = this.props
+    const errorsOnNestedField =
+      parentFieldErrors.nestedFields[nestedField.name] || []
+
+    return (
+      <>
+        {errorsOnNestedField.length > 0
+          ? this.getFieldValueWithErrorMessage(
+              section,
+              nestedField,
+              errorsOnNestedField[0]
+            )
+          : renderValue(
+              nestSectionData,
+              'nestedFields',
+              nestedField,
+              intl,
+              offlineResources,
+              language
+            )}
+      </>
+    )
   }
 
   getPreviewGroupsField(
@@ -790,9 +821,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     section: IFormSection,
     group: IFormSectionGroup,
     field: IFormField,
-    sectionErrors: IErrorsBySection
+    sectionErrors: IErrorsBySection,
+    ignoreNestedFieldWrapping?: boolean
   ) {
-    const value = this.getValueOrError(section, field, sectionErrors)
+    const value = this.getValueOrError(
+      section,
+      field,
+      sectionErrors,
+      ignoreNestedFieldWrapping
+    )
 
     return this.getRenderableField(
       section,
@@ -802,6 +839,48 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       value,
       field.readonly
     )
+  }
+
+  getNestedPreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ) {
+    const { draft } = this.props
+    const nestedItems: any[] = []
+    // parent field
+    nestedItems.push(
+      this.getSinglePreviewField(section, group, field, sectionErrors, true)
+    )
+    ;(
+      (field.nestedFields &&
+        (draft.data[section.id] &&
+          draft.data[section.id][field.name] &&
+          (draft.data[section.id][field.name] as IFormSectionData).value &&
+          field.nestedFields[
+            (draft.data[section.id][field.name] as IFormSectionData)
+              .value as string
+          ])) ||
+      []
+    ).forEach(nestedField => {
+      nestedItems.push(
+        this.getRenderableField(
+          section,
+          group,
+          nestedField.label,
+          nestedField.name,
+          this.getNestedFieldValueOrError(
+            section,
+            draft.data[section.id][field.name] as IFormData,
+            nestedField,
+            sectionErrors[section.id][field.name]
+          ),
+          nestedField.readonly
+        )
+      )
+    })
+    return nestedItems
   }
 
   transformSectionData = (
@@ -818,37 +897,42 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       ).forEach(group => {
-        items = items
-          .concat(
-            group.fields
-              .filter(
-                field =>
-                  this.isVisibleField(field, section) && !this.isViewOnly(field)
-              )
-              .filter(field => !Boolean(field.hideInPreview))
-              .map(field => {
-                return field.previewGroup
-                  ? this.getPreviewGroupsField(
-                      section,
-                      group,
-                      field,
-                      visitedTags,
-                      errorsOnFields
-                    )
-                  : this.getSinglePreviewField(
-                      section,
-                      group,
-                      field,
-                      errorsOnFields
-                    )
-              })
+        group.fields
+          .filter(
+            field =>
+              this.isVisibleField(field, section) && !this.isViewOnly(field)
           )
-          .filter(item => item)
+          .filter(field => !Boolean(field.hideInPreview))
+          .forEach(field => {
+            items = items.concat(
+              field.previewGroup
+                ? this.getPreviewGroupsField(
+                    section,
+                    group,
+                    field,
+                    visitedTags,
+                    errorsOnFields
+                  )
+                : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
+                ? this.getNestedPreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields
+                  )
+                : this.getSinglePreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields
+                  )
+            )
+          })
       })
       return {
         id: section.id,
         title: intl.formatMessage(section.title),
-        items
+        items: items.filter(item => item)
       }
     })
   }

@@ -1063,6 +1063,14 @@ const builders: IFieldBuilders = {
     }
   },
   spouse: {
+    _fhirID: (fhirBundle, fieldValue, context) => {
+      const spouse = selectOrCreatePersonResource(
+        SPOUSE_CODE,
+        SPOUSE_TITLE,
+        fhirBundle
+      )
+      spouse.id = fieldValue as string
+    },
     name: createNameBuilder(SPOUSE_CODE, SPOUSE_TITLE)
   },
   child: {

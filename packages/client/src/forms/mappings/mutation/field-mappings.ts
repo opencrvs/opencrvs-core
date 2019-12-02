@@ -421,8 +421,7 @@ export const fieldToIdentifierWithTypeTransformer = (
 }
 
 export const nestedRadioFieldTransformer = (
-  transformedFieldName?: string,
-  nestedTransformer?: IFormFieldMutationMapFunction
+  nestedTransformer: IFormFieldMutationMapFunction
 ) => (
   transformedData: TransformedData,
   draftData: IFormData,
@@ -437,7 +436,7 @@ export const nestedRadioFieldTransformer = (
     const parentData: IFormSectionData = {}
     parentData[field.name] = fieldValueObj.value as IFormSectionData
     partialDraftData[sectionId] = parentData
-  } else if (nestedField) {
+  } else {
     if (
       nestedField.extraValue &&
       nestedField.extraValue !== fieldValueObj.value
@@ -446,26 +445,12 @@ export const nestedRadioFieldTransformer = (
     }
     partialDraftData[sectionId] = fieldValueObj.nestedFields as IFormSectionData
   }
-
-  if (nestedTransformer) {
-    nestedTransformer(
-      transformedData,
-      partialDraftData,
-      sectionId,
-      nestedField || field
-    )
-  } else {
-    const transFieldName = transformedFieldName
-      ? transformedFieldName
-      : nestedField
-      ? nestedField.name
-      : field.name
-    const fieldValue = !nestedField
-      ? fieldValueObj.value
-      : (fieldValueObj.nestedFields as IFormSectionData)[nestedField.name]
-
-    transformedData[sectionId][transFieldName] = fieldValue
-  }
+  nestedTransformer(
+    transformedData,
+    partialDraftData,
+    sectionId,
+    nestedField || field
+  )
 }
 
 export const fieldToReasonsNotApplyingTransformer = (

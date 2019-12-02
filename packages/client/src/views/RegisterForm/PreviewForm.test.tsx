@@ -452,6 +452,32 @@ describe('when user is previewing the form data', () => {
       }
     }
 
+    const fatherDetails = {
+      fatherFirstNames: 'মোক্তার',
+      fatherFamilyName: 'আলী',
+      fatherFirstNamesEng: 'Moktar',
+      fatherFamilyNameEng: 'Ali'
+    }
+
+    const motherDetails = {
+      motherFirstNames: 'মরিউম',
+      motherFamilyName: 'আলী',
+      motherFirstNamesEng: 'Morium',
+      motherFamilyNameEng: 'Ali'
+    }
+
+    const spouseDetails = {
+      hasDetails: {
+        value: 'Yes',
+        nestedFields: {
+          spouseFirstNames: 'রেহানা',
+          spouseFamilyName: 'আলী',
+          spouseFirstNamesEng: 'Rehana',
+          spouseFamilyNameEng: 'Ali'
+        }
+      }
+    }
+
     const deathEventDetails = {
       deathDate: '2019-01-01',
       manner: 'ACCIDENT',
@@ -501,6 +527,9 @@ describe('when user is previewing the form data', () => {
         },
         deceased: deceasedDetails,
         informant: informantDetails,
+        father: fatherDetails,
+        mother: motherDetails,
+        spouse: spouseDetails,
         deathEvent: deathEventDetails,
         causeOfDeath: causeOfDeathDetails,
         registration: registrationDetails,

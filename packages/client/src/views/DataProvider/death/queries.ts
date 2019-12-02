@@ -80,6 +80,30 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
+      father {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      mother {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      spouse {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
       registration {
         id
         contact
@@ -184,6 +208,30 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             postalCode
             country
           }
+        }
+      }
+      father {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      mother {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      spouse {
+        id
+        name {
+          use
+          firstNames
+          familyName
         }
       }
       registration {

@@ -2735,7 +2735,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -2752,7 +2751,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -2786,7 +2784,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -2803,7 +2800,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -2833,7 +2829,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
@@ -2847,7 +2842,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "reasonsNotApplyingToFieldValueTransformer",
                                 "parameters": [
@@ -2879,7 +2873,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -2896,7 +2889,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -2930,7 +2922,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldValueNestingTransformer",
                                 "parameters": [
@@ -2947,7 +2938,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "nestedValueToFieldTransformer",
                                 "parameters": [
@@ -2977,7 +2967,6 @@
                           "mutation": {
                             "operation": "nestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "fieldToReasonsNotApplyingTransformer",
                                 "parameters": [
@@ -2991,7 +2980,6 @@
                           "query": {
                             "operation": "valueToNestedRadioFieldTransformer",
                             "parameters": [
-                              "",
                               {
                                 "operation": "reasonsNotApplyingToFieldValueTransformer",
                                 "parameters": [
@@ -3011,7 +2999,6 @@
                     "mutation": {
                       "operation": "nestedRadioFieldTransformer",
                       "parameters": [
-                        "",
                         {
                           "operation": "fieldToReasonsNotApplyingTransformer",
                           "parameters": [
@@ -3027,7 +3014,6 @@
                     "query": {
                       "operation": "valueToNestedRadioFieldTransformer",
                       "parameters": [
-                        "",
                         {
                           "operation": "reasonsNotApplyingToFieldValueTransformer",
                           "parameters": [

@@ -184,9 +184,10 @@ export async function getPractitionerLocationId(
       return false
     }
     return (
-      // TODO: Once we receive api update from OISF,
-      // Need to add MUNICIPALITY || CITY_CORPORATION type here
-      jurisdictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase()
+      // TODO: Need to add CITY_CORPORATION ward here when API exists - Refer to CCDS Guidelines
+      jurisdictionIdentifier.value === JURISDICTION_TYPE_UNION.toUpperCase() ||
+      jurisdictionIdentifier.value ===
+        JURISDICTION_TYPE_MUNICIPALITY.toUpperCase()
     )
   })
 
