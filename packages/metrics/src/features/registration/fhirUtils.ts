@@ -12,6 +12,9 @@
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchTaskHistory } from '@metrics/api'
 
+export const CAUSE_OF_DEATH_CODE = 'ICD10'
+export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
+
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
   sectionCode: string
@@ -197,4 +200,42 @@ export function getTimeLoggedFromTask(task: fhir.Task) {
   }
 
   return timeLoggedExt.valueInteger
+}
+
+export function getObservationValueByCode(
+  bundle: fhir.Bundle,
+  observationCode: string
+): string {
+  const observationBundle =
+    bundle.entry &&
+    bundle.entry.filter(item => {
+      return (
+        item && item.resource && item.resource.resourceType === 'Observation'
+      )
+    })
+  if (!Array.isArray(observationBundle) || !observationBundle.length) {
+    return 'UNKNOWN'
+  }
+  const selectedObservationEntry = observationBundle.find(entry => {
+    const observationEntry = entry.resource as fhir.Observation
+    return (
+      (observationEntry.code &&
+        observationEntry.code.coding &&
+        observationEntry.code.coding[0] &&
+        observationEntry.code.coding[0].code === observationCode) ||
+      null
+    )
+  })
+  if (!selectedObservationEntry) {
+    return 'UNKNOWN'
+  }
+  const observationResource = selectedObservationEntry.resource as fhir.Observation
+  const value =
+    (observationResource.valueCodeableConcept &&
+      observationResource.valueCodeableConcept.coding &&
+      observationResource.valueCodeableConcept.coding[0] &&
+      observationResource.valueCodeableConcept.coding[0].code) ||
+    'UNKNOWN'
+
+  return value
 }

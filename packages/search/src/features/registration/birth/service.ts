@@ -119,8 +119,9 @@ async function indexAndSearchComposition(
 
   await createIndexBody(body, composition, bundleEntries)
   await indexComposition(compositionId, body)
-
-  await detectAndUpdateDuplicates(compositionId, composition, body)
+  if (body.type !== 'IN_PROGRESS') {
+    await detectAndUpdateDuplicates(compositionId, composition, body)
+  }
 }
 
 async function createIndexBody(
