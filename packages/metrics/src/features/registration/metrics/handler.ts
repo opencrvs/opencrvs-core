@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import { fetchRegWithinTimeFrames } from '@metrics/features/registration/metrics/metricsGenerator'
+import {
+  fetchRegWithinTimeFrames,
+  getLowerLocationLevel
+} from '@metrics/features/registration/metrics/metricsGenerator'
 import { logger } from '@metrics/logger'
 import { internal } from 'boom'
 import {
@@ -37,11 +40,9 @@ export async function metricsHandler(
     // }
 
     // const location: Location = await getDistrictLocation(locationId, authHeader)
-    const timeFrames = await fetchRegWithinTimeFrames(
-      timeStart,
-      timeEnd,
-      locationId
-    )
+    const level = await getLowerLocationLevel(timeStart, timeEnd, locationId)
+
+    const timeFrames = await fetchRegWithinTimeFrames(timeStart, timeEnd, level)
     return { timeFrames }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)
