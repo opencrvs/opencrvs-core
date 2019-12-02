@@ -21,6 +21,15 @@ export const enum EVENT {
   DEATH = 'Death'
 }
 
+export interface IStatus {
+  type: string
+  createdAt: string
+  createdBy: string
+  updatedBy?: string
+  rejectReason?: string
+  rejectComment?: string
+}
+
 export interface ICompositionBody {
   compositionId?: string
   compositionType?: string
@@ -42,6 +51,7 @@ export interface ICompositionBody {
   updatedBy?: string
   createdAt?: string
   modifiedAt?: string
+  status?: IStatus[]
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {
@@ -90,6 +100,29 @@ export async function getCreatedBy(compositionId: string) {
     (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
 
   return result && result.createdBy
+}
+
+export const getStatus = async (compositionId: string) => {
+  const results = await searchByCompositionId(compositionId)
+  const result =
+    results &&
+    results.hits.hits &&
+    (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
+
+  return (result && result.status) as IStatus[]
+}
+
+export const createStatusHistory = async (body: ICompositionBody) => {
+  const singleTask = {
+    type: body.type,
+    createdAt: Date.now().toString(),
+    rejectReason: body.rejectReason,
+    rejectComment: body.rejectComment,
+    createdBy: body.createdBy,
+    updatedBy: body.updatedBy
+  } as IStatus
+  body.status = body.status || []
+  body.status.push(singleTask)
 }
 
 function findDuplicateIds(
