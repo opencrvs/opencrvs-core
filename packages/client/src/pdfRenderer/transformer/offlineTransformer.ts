@@ -14,9 +14,13 @@ import {
   IFunctionTransformer,
   TemplateTransformerData,
   TransformerPayload,
-  IOfflineAddressPayload
+  IOfflineAddressPayload,
+  IOfflineAddressCondition
 } from '@client/pdfRenderer/transformer/types'
-import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
+import {
+  getValueFromApplicationDataByKey,
+  getMatchedCondition
+} from '@client/pdfRenderer/transformer/utils'
 import {
   IAvailableCountries,
   ICountry
@@ -109,8 +113,8 @@ export const offlineTransformers: IFunctionTransformer = {
   /*
     OfflineAddress allows you to get coditional address fields from offline data
     @params:
-      -  conditionalKeys []: it expects an array of conditional blocks.
-         - codition: holds the actual condition. Right now it's only equal matches
+      -  conditions []: it expects an array of conditional blocks.
+         - codition(optional): holds the actual condition. Right now it's only equal matches
          - addressType: offline address type. Ex: facilities | locations
          - addressKey: field name of the address object. Ex: name | alias
          - adddresses: Mendatory object. It is an object containing a countryCode and formatted keyes to determine how to parse local and international addresses and be able to traverse through the object structure
@@ -132,28 +136,13 @@ export const offlineTransformers: IFunctionTransformer = {
       throw new Error('No countries found for this transformer')
     }
 
-    const matchedCondition = params.conditionalKeys.find(conditionalKey => {
-      try {
-        if (conditionalKey.condition.default) {
-          return true
-        }
-        return (
-          (conditionalKey.condition.matchValues &&
-            conditionalKey.condition.matchValues.includes(
-              // Will throw an exception when value is not found for given key
-              getValueFromApplicationDataByKey(
-                templateData.application.data,
-                conditionalKey.condition.key || ''
-              )
-            )) ||
-          false
-        )
-      } catch (error) {
-        return false
-      }
-    })
+    const matchedCondition = getMatchedCondition(
+      params.conditions,
+      templateData.application.data
+    ) as IOfflineAddressCondition
+
     if (!matchedCondition) {
-      throw new Error('No condition has matched for this transformer')
+      throw new Error('No condition has matched for OfflineAddress transformer')
     }
 
     const countryValue = getCountryValue(

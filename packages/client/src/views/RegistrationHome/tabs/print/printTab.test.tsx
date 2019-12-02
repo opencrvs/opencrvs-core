@@ -894,6 +894,51 @@ describe('RegistrarHome ready to print tab related tests', () => {
                     ]
                   }
                 },
+                father: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মোক্তার',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Moktar',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                mother: {
+                  id: '7ac8d0a6-a391-42f9-add4-decds589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মরিউম',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Morium',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                spouse: {
+                  id: '7ac8d0a6-a391-42f9-add4-sssdec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'রেহানা',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Rehana',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
                 registration: {
                   id: 'ba1cb210-b98f-46e1-a185-4c8df2971064',
                   contact: 'OTHER',

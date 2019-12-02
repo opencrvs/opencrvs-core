@@ -32,12 +32,15 @@ test('should build a minimal FHIR registration document without error', async ()
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3'
       },
       mother: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7sdasadf',
         name: [{ firstNames: 'Jessica', familyName: 'Alba', use: 'en' }]
       },
       father: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-458dksls',
         name: [{ firstNames: 'Cash', familyName: 'Warren', use: 'en' }]
       },
       spouse: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-38372jdjuw',
         name: [{ firstNames: 'Megan', familyName: 'Fox', use: 'en' }]
       },
       informant: {

@@ -1108,6 +1108,7 @@ describe('ReviewForm tests', () => {
               },
               child: {
                 id: '16025284-bae2-4b37-ae80-e16745b7a6b9',
+                multipleBirth: 1,
                 name: [
                   {
                     use: 'bn',
@@ -1145,7 +1146,6 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                multipleBirth: 1,
                 address: [
                   {
                     type: 'PERMANENT',
@@ -1493,6 +1493,51 @@ describe('ReviewForm tests', () => {
                     ]
                   }
                 },
+                father: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec272asaa',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মোক্তার',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Moktar',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                mother: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec2727asdf',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মরিউম',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Morium',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                spouse: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'রেহানা',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Rehana',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
                   attachments: null,
@@ -1761,6 +1806,51 @@ describe('ReviewForm tests', () => {
                       }
                     ]
                   }
+                },
+                father: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মোক্তার',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Moktar',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                mother: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec272asfdasdf',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মরিউম',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Morium',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                spouse: {
+                  id: '7ac8d0a6-a391-42f9-add4-decasdfasfd89',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'রেহানা',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Rehana',
+                      familyName: 'Ali'
+                    }
+                  ]
                 },
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
