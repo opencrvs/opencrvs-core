@@ -12,7 +12,7 @@
 import * as Hapi from 'hapi'
 import {
   fetchRegWithinTimeFrames,
-  getLowerLocationLevel
+  getCurrentAndLowerLocationLevels
 } from '@metrics/features/registration/metrics/metricsGenerator'
 import { logger } from '@metrics/logger'
 import { internal } from 'boom'
@@ -40,9 +40,18 @@ export async function metricsHandler(
     // }
 
     // const location: Location = await getDistrictLocation(locationId, authHeader)
-    const level = await getLowerLocationLevel(timeStart, timeEnd, locationId)
+    const {
+      currentLocationLevel,
+      lowerLocationLevel
+    } = await getCurrentAndLowerLocationLevels(timeStart, timeEnd, locationId)
 
-    const timeFrames = await fetchRegWithinTimeFrames(timeStart, timeEnd, level)
+    const timeFrames = await fetchRegWithinTimeFrames(
+      timeStart,
+      timeEnd,
+      locationId,
+      currentLocationLevel,
+      lowerLocationLevel
+    )
     return { timeFrames }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)

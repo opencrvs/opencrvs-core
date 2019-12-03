@@ -51,6 +51,11 @@ export interface IEstimation {
   locationId: string
 }
 
+interface ICurrentAndLowerLocationLevels {
+  currentLocationLevel: string
+  lowerLocationLevel: string
+}
+
 export async function regByAge(timeStart: string, timeEnd: string) {
   const metricsData: any[] = []
   for (const ageInterval of ageIntervals) {
@@ -71,30 +76,33 @@ export async function regByAge(timeStart: string, timeEnd: string) {
 export async function fetchRegWithinTimeFrames(
   timeStart: string,
   timeEnd: string,
-  locationLevel: string
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
 ) {
+  const queryLocationId = `Location/${locationId}`
   const pointsWithin45Days = await readPoints(
     `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND age_in_days > -1 AND age_in_days <= 45
-      GROUP BY ${locationLevel}`
+      AND age_in_days > -1 AND age_in_days <= 45 AND ${currentLocationLevel}='${queryLocationId}'
+      GROUP BY ${lowerLocationLevel}`
   )
 
   const points45DaysTo1Year = await readPoints(
     `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
-      AND age_in_days > 46 AND age_in_days <= 365 
-      GROUP BY ${locationLevel}`
+      AND age_in_days > 46 AND age_in_days <= 365 AND ${currentLocationLevel}='${queryLocationId}'
+      GROUP BY ${lowerLocationLevel}`
   )
 
   const points1YearTo5Years = await readPoints(
     `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
-      AND age_in_days > 366 AND age_in_days <= 1825 
-      GROUP BY ${locationLevel}`
+      AND age_in_days > 366 AND age_in_days <= 1825 AND ${currentLocationLevel}='${queryLocationId}'
+      GROUP BY ${lowerLocationLevel}`
   )
 
   const pointsOver5Years = await readPoints(
     `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
-      AND age_in_days > 1826 
-      GROUP BY ${locationLevel}`
+      AND age_in_days > 1826 AND ${currentLocationLevel}='${queryLocationId}'
+      GROUP BY ${lowerLocationLevel}`
   )
 
   const regWithin45d: number =
@@ -133,11 +141,11 @@ export async function fetchRegWithinTimeFrames(
   }
 }
 
-export async function getLowerLocationLevel(
+export async function getCurrentAndLowerLocationLevels(
   timeStart: string,
   timeEnd: string,
   locationId: string
-) {
+): Promise<ICurrentAndLowerLocationLevels> {
   const queryLocationId = `Location/${locationId}`
 
   const allPointsContainingLocationId = await readPoints(
@@ -148,9 +156,10 @@ export async function getLowerLocationLevel(
         OR locationLevel5 = '${queryLocationId}' )`
   )
 
-  const locationLevelOfQueryId = Object.keys(
-    allPointsContainingLocationId[0]
-  ).find(key => allPointsContainingLocationId[0][key] === queryLocationId)
+  const locationLevelOfQueryId =
+    Object.keys(allPointsContainingLocationId[0]).find(
+      key => allPointsContainingLocationId[0][key] === queryLocationId
+    ) || ''
 
   const oneLevelLowerLocationColumn =
     (locationLevelOfQueryId &&
@@ -159,7 +168,10 @@ export async function getLowerLocationLevel(
       )) ||
     ''
 
-  return oneLevelLowerLocationColumn
+  return {
+    currentLocationLevel: locationLevelOfQueryId,
+    lowerLocationLevel: oneLevelLowerLocationColumn
+  }
 }
 
 export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
