@@ -70,15 +70,6 @@ export interface IInProgressApplicationTags {
   eventType: string
 }
 
-export interface IPaymentFields {
-  total: number
-  compositionId: string
-}
-
-export interface IPaymentTags {
-  eventType: string
-}
-
 export interface ITimeLoggedFields {
   timeSpentEditing: number
   compositionId: string
@@ -133,8 +124,13 @@ export interface IBirthRegistrationPoints {
 
 export interface IPaymentPoints {
   measurement: string
-  tags: IPaymentTags
+  tags: IPointLocation
   fields: IPaymentFields
+}
+
+export interface IPaymentFields {
+  total: number
+  compositionId: string
 }
 
 export type IPoints =
@@ -144,3 +140,4 @@ export type IPoints =
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
+  | IPaymentPoints

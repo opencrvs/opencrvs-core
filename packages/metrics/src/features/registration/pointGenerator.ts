@@ -23,7 +23,8 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
-  IPoints
+  IPoints,
+  IPaymentPoints
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -194,7 +195,7 @@ const generatePointLocations = async (
 export async function generatePaymentPoint(
   payload: fhir.Bundle,
   authHeader: IAuthHeader
-) {
+): Promise<IPaymentPoints> {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
   const task = getTask(payload)
