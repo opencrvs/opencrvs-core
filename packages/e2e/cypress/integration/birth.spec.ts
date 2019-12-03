@@ -583,7 +583,7 @@ context('Birth Integration Test', () => {
     cy.registerApplication() // Wait for application to be sync'd
   })
 
-  it('Test Someone else journey using minimum input', () => {
+  it.only('Test Someone else journey using minimum input', () => {
     cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')
@@ -646,22 +646,6 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     //  Who is looking after the child?
     cy.get('#primaryCaregiverType_INFORMANT').click()
-    cy.goToNextFormSection()
-    // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('19988010143317495')
-    cy.get('#familyName').type('বেগম')
-    cy.get('#familyNameEng').type('Begum')
-    cy.get('#motherBirthDate-dd').type('01')
-    cy.get('#motherBirthDate-mm').type('08')
-    cy.get('#motherBirthDate-yyyy').type('1971')
-    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
-    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.goToNextFormSection()
-    // FATHER DETAILS
-    cy.get('#fathersDetailsExist_false').click()
     cy.goToNextFormSection()
     // DOCUMENTS
     cy.goToNextFormSection()
