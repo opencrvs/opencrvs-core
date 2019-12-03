@@ -11,7 +11,7 @@
  */
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { checkServiceHealth } from '@gateway/features/healthCheck/service'
+import { internal } from 'boom'
 import {
   AUTH_URL,
   SEARCH_URL,
@@ -21,6 +21,21 @@ import {
   RESOURCES_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
+import fetch from 'node-fetch'
+
+export async function checkServiceHealth(url: string) {
+  const res = await fetch(url, {
+    method: 'GET'
+  })
+
+  const body = await res.json()
+
+  if (body.success === true) {
+    return true
+  }
+
+  return false
+}
 
 enum Services {
   AUTH = 'auth',
@@ -37,11 +52,11 @@ export default async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const service = request.query['service'][0]
-  if (!service) {
-    return {
-      success: false
-    }
+  let service
+  if (request.query['service'] && request.query['service'][0]) {
+    service = request.query['service'][0]
+  } else {
+    throw internal('Received no service to check')
   }
 
   let response
@@ -53,47 +68,37 @@ export default async function healthCheckHandler(
       }
       break
     case Services.AUTH:
-      response = {
-        success: await checkServiceHealth(`${AUTH_URL}/ping`)
-      }
+      response = await checkServiceHealth(`${AUTH_URL}/ping`)
       break
     case Services.SEARCH:
-      response = {
-        success: await checkServiceHealth(`${SEARCH_URL}ping`)
-      }
+      response = await checkServiceHealth(`${SEARCH_URL}ping`)
       break
     case Services.USER_MGNT:
-      response = {
-        success: await checkServiceHealth(`${USER_MANAGEMENT_URL}ping`)
-      }
+      response = await checkServiceHealth(`${USER_MANAGEMENT_URL}ping`)
       break
     case Services.METRICS:
-      response = {
-        success: await checkServiceHealth(`${METRICS_URL}/ping`)
-      }
+      response = await checkServiceHealth(`${METRICS_URL}/ping`)
       break
     case Services.NOTIFICATION:
-      response = {
-        success: await checkServiceHealth(`${NOTIFICATION_URL}ping`)
-      }
+      response = await checkServiceHealth(`${NOTIFICATION_URL}ping`)
       break
     case Services.RESOURCES:
-      response = {
-        success: await checkServiceHealth(`${RESOURCES_URL}/ping`)
-      }
+      response = await checkServiceHealth(`${RESOURCES_URL}/ping`)
       break
     case Services.WORKFLOW:
-      response = {
-        success: await checkServiceHealth(`${WORKFLOW_URL}ping`)
-      }
+      response = await checkServiceHealth(`${WORKFLOW_URL}ping`)
       break
     default:
-      return {
-        success: false
-      }
+      response = false
   }
 
-  return response
+  if (!response) {
+    throw internal('Service health check failed for: ', service)
+  } else {
+    return {
+      success: response
+    }
+  }
 }
 
 export const querySchema = Joi.object({

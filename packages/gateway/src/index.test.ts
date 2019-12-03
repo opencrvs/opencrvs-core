@@ -12,22 +12,28 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@gateway/index'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as fetchAny.FetchMock
 
 describe('Route authorization', () => {
+  let server: any
+  beforeEach(async () => {
+    server = await createServer()
+    fetch.resetMocks()
+  })
   it('blocks requests without a token', async () => {
-    const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping'
+      url: '/tokenTest'
     })
     expect(res.statusCode).toBe(401)
   })
 
   it('blocks requests with an invalid token', async () => {
-    const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: 'Bearer abc'
       }
@@ -36,7 +42,6 @@ describe('Route authorization', () => {
   })
 
   it('accepts requests with a valid token', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
@@ -44,7 +49,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -53,7 +58,6 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with a token with invalid signature', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert-invalid.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
@@ -61,7 +65,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -70,7 +74,6 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with expired token', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
@@ -84,7 +87,7 @@ describe('Route authorization', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -93,7 +96,6 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong algorithm (HS512)', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'HS512',
       issuer: 'opencrvs:auth-service',
@@ -101,7 +103,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -111,7 +113,6 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong audience', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
@@ -119,7 +120,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -129,7 +130,6 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests signed with wrong issuer', async () => {
-    const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:NOT_VALID',
@@ -137,12 +137,70 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
 
     expect(res.statusCode).toBe(401)
+  })
+  it('Tests the health check with a valid parameter', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        success: true
+      })
+    )
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping?service=search'
+    })
+    expect(res.result).toEqual({
+      success: true
+    })
+  })
+  it('Fails the health check with a missing parameter', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        success: true
+      })
+    )
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping'
+    })
+    expect(res.statusCode).toBe(500)
+  })
+  it('Rejects the health check with an invalid parameter', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        success: true
+      })
+    )
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping?service=nonsense'
+    })
+    expect(res.result.message).toEqual('Invalid request query input')
+  })
+  it('Fails the health check for a failed health check on a running service', async () => {
+    fetch.mockResponse(
+      JSON.stringify({
+        success: false
+      })
+    )
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping?service=auth'
+    })
+    expect(res.result.message).toEqual('An internal server error occurred')
+  })
+  it('Fails the health check for a failed and not running service', async () => {
+    fetch.mockReject(new Error('An internal server error occurred'))
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping?service=auth'
+    })
+    expect(res.result.message).toEqual('An internal server error occurred')
   })
 })

@@ -14,6 +14,17 @@ import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registr
 
 export const getRoutes = () => {
   const routes = [
+    // used for tests to check JWT auth
+    {
+      method: 'GET',
+      path: '/tokenTest',
+      handler: (request: any, h: any) => {
+        return 'success'
+      },
+      config: {
+        tags: ['api']
+      }
+    },
     // add ping route by default for health check
     {
       method: 'GET',
@@ -24,7 +35,7 @@ export const getRoutes = () => {
           success: true
         }
       },
-      options: {
+      config: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'

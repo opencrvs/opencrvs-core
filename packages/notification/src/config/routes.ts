@@ -50,7 +50,7 @@ export default function getRoutes() {
           success: true
         }
       },
-      options: {
+      config: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'

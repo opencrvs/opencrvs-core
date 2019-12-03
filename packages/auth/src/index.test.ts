@@ -9,18 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
+import { createServer } from '@auth/index'
 
-export async function checkServiceHealth(url: string) {
-  const res = await fetch(url, {
-    method: 'GET'
+describe('Route authorization', () => {
+  it('helth check', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping'
+    })
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toBe(JSON.stringify({ success: true }))
   })
-
-  const body = await res.json()
-
-  if (body.success === true) {
-    return true
-  }
-
-  return false
-}
+})

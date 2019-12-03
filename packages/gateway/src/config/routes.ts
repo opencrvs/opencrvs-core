@@ -17,17 +17,28 @@ import healthCheckHandler, {
 } from '@gateway/features/healthCheck/handler'
 
 export const getRoutes = () => {
-  // add ping route by default for health check
   const routes = [
+    // used for tests to check JWT auth
+    {
+      method: 'GET',
+      path: '/tokenTest',
+      handler: (request: any, h: any) => {
+        return 'success'
+      },
+      config: {
+        tags: ['api']
+      }
+    },
+    // health check endpoint for all services
     {
       method: 'GET',
       path: '/ping',
       handler: healthCheckHandler,
-      options: {
+      config: {
         tags: ['api'],
         auth: false,
         description: 'Checks the health of all services.',
-        notes: 'Pass the service as a querey param: name',
+        notes: 'Pass the service as a query param: service',
         validate: {
           query: healthCheckQuerySchema
         },
