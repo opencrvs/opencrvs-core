@@ -137,14 +137,18 @@
         "field": "registrantName",
         "operation": "ApplicantName",
         "parameters": {
-          "key": {
-            "birth": "child",
-            "death": "deceased"
-          },
-          "format": {
-            "bn": ["firstNames", "familyName"],
-            "en": ["firstNamesEng", "familyNameEng"]
-          }
+          "conditions": [
+            {
+              "key": {
+                "birth": "child",
+                "death": "deceased"
+              },
+              "format": {
+                "bn": ["firstNames", "familyName"],
+                "en": ["firstNamesEng", "familyNameEng"]
+              }
+            }
+          ]
         }
       },
       {
@@ -1571,8 +1575,12 @@
           "field": "childBnFullName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "birth": "child" },
-            "format": { "bn": ["firstNames", "familyName"] },
+            "conditions": [
+              {
+                "key": { "birth": "child" },
+                "format": { "bn": ["firstNames", "familyName"] }
+              }
+            ],
             "language": "bn"
           }
         },
@@ -1580,8 +1588,12 @@
           "field": "childFullNameInCapital",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "birth": "child" },
-            "format": { "en": ["firstNamesEng", "familyNameEng"] },
+            "conditions": [
+              {
+                "key": { "birth": "child" },
+                "format": { "en": ["firstNamesEng", "familyNameEng"] }
+              }
+            ],
             "allCapital": true,
             "language": "en"
           }
@@ -1740,11 +1752,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -1756,7 +1768,7 @@
               {
                 "condition": {
                   "key": "child.placeOfBirth",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -1774,9 +1786,8 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
-                "condition": { "default": true },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
@@ -1792,8 +1803,12 @@
           "field": "fatherFullNameInCapital",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "birth": "father" },
-            "format": { "en": ["firstNamesEng", "familyNameEng"] },
+            "conditions": [
+              {
+                "key": { "birth": "father" },
+                "format": { "en": ["firstNamesEng", "familyNameEng"] }
+              }
+            ],
             "allCapital": true,
             "language": "en"
           }
@@ -2143,9 +2158,8 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
-                "condition": { "default": true },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
@@ -2161,8 +2175,12 @@
           "field": "motherFullNameInCapital",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "birth": "mother" },
-            "format": { "en": ["firstNamesEng", "familyNameEng"] },
+            "conditions": [
+              {
+                "key": { "birth": "mother" },
+                "format": { "en": ["firstNamesEng", "familyNameEng"] }
+              }
+            ],
             "allCapital": true,
             "language": "en"
           }
@@ -2512,9 +2530,8 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
-                "condition": { "default": true },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
@@ -3125,7 +3142,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": " ",
+                                "text": "{deceasedFatherNameInCapital}",
                                 "style": "boldText"
                               }
                             ]
@@ -3147,7 +3164,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": " ",
+                                "text": "{deceasedMotherNameInCapital}",
                                 "style": "boldText"
                               }
                             ]
@@ -3173,7 +3190,7 @@
                               },
                               {
                                 "border": [false, false, false, false],
-                                "text": " ",
+                                "text": "{deceasedSpouseNameInCapital}",
                                 "style": "boldText"
                               }
                             ]
@@ -3498,8 +3515,12 @@
           "field": "deacesedBnFullName",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "death": "deceased" },
-            "format": { "bn": ["firstNames", "familyName"] },
+            "conditions": [
+              {
+                "key": { "death": "deceased" },
+                "format": { "bn": ["firstNames", "familyName"] }
+              }
+            ],
             "language": "bn"
           }
         },
@@ -3507,8 +3528,12 @@
           "field": "deacesedFullNameInCapital",
           "operation": "ApplicantName",
           "parameters": {
-            "key": { "death": "deceased" },
-            "format": { "en": ["firstNamesEng", "familyNameEng"] },
+            "conditions": [
+              {
+                "key": { "death": "deceased" },
+                "format": { "en": ["firstNamesEng", "familyNameEng"] }
+              }
+            ],
             "allCapital": true,
             "language": "en"
           }
@@ -3723,11 +3748,11 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PERMANENT"]
+                  "values": ["PERMANENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -3740,7 +3765,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["CURRENT"]
+                  "values": ["CURRENT"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -3753,7 +3778,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["PRIVATE_HOME", "OTHER"]
+                  "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -3766,7 +3791,7 @@
               {
                 "condition": {
                   "key": "deathEvent.deathPlaceAddress",
-                  "matchValues": ["HEALTH_FACILITY"]
+                  "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
                 "addressKey": "name",
@@ -3783,9 +3808,8 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
-                "condition": { "default": true },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
@@ -3802,9 +3826,8 @@
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
-            "conditionalKeys": [
+            "conditions": [
               {
-                "condition": { "default": true },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
@@ -3820,6 +3843,99 @@
           "field": "icdCauseOfDeath",
           "operation": "FieldValue",
           "parameters": { "valueKey": "causeOfDeath.causeOfDeathCode" }
+        },
+        {
+          "field": "deceasedFatherNameInCapital",
+          "operation": "ApplicantName",
+          "parameters": {
+            "conditions": [
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "values": ["FATHER"]
+                },
+                "key": { "death": "informant" },
+                "format": {
+                  "en": ["applicantFirstNamesEng", "applicantFamilyNameEng"]
+                }
+              },
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "operation": "DOES_NOT_MATCH",
+                  "values": ["FATHER"]
+                },
+                "key": { "death": "father" },
+                "format": {
+                  "en": ["fatherFirstNamesEng", "fatherFamilyNameEng"]
+                }
+              }
+            ],
+            "allCapital": true,
+            "language": "en"
+          }
+        },
+        {
+          "field": "deceasedMotherNameInCapital",
+          "operation": "ApplicantName",
+          "parameters": {
+            "conditions": [
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "values": ["MOTHER"]
+                },
+                "key": { "death": "informant" },
+                "format": {
+                  "en": ["applicantFirstNamesEng", "applicantFamilyNameEng"]
+                }
+              },
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "operation": "DOES_NOT_MATCH",
+                  "values": ["MOTHER"]
+                },
+                "key": { "death": "mother" },
+                "format": {
+                  "en": ["motherFirstNamesEng", "motherFamilyNameEng"]
+                }
+              }
+            ],
+            "allCapital": true,
+            "language": "en"
+          }
+        },
+        {
+          "field": "deceasedSpouseNameInCapital",
+          "operation": "ApplicantName",
+          "parameters": {
+            "conditions": [
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "values": ["SPOUSE"]
+                },
+                "key": { "death": "informant" },
+                "format": {
+                  "en": ["applicantFirstNamesEng", "applicantFamilyNameEng"]
+                }
+              },
+              {
+                "condition": {
+                  "key": "informant.relationship",
+                  "operation": "DOES_NOT_MATCH",
+                  "values": ["SPOUSE"]
+                },
+                "key": { "death": "spouse.hasDetails.nestedFields" },
+                "format": {
+                  "en": ["spouseFirstNamesEng", "spouseFamilyNameEng"]
+                }
+              }
+            ],
+            "allCapital": true,
+            "language": "en"
+          }
         }
       ],
       "fonts": {

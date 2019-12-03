@@ -11,13 +11,14 @@
  */
 import * as Joi from 'joi'
 import {
-  inProgressBirthRegistrationHandler,
+  inProgressHandler,
   markBirthRegisteredHandler,
   newBirthRegistrationHandler,
   markCertifiedHandler,
   markValidatedHandler,
   baseHandler,
-  markDeathRegisteredHandler
+  markDeathRegisteredHandler,
+  newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/registration/metrics/handler'
 
@@ -27,7 +28,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/in-progress-declaration',
-      handler: inProgressBirthRegistrationHandler,
+      handler: inProgressHandler,
       config: {
         tags: ['api']
       }
@@ -35,7 +36,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/in-progress-declaration',
-      handler: baseHandler,
+      handler: inProgressHandler,
       config: {
         tags: ['api']
       }
@@ -62,6 +63,38 @@ export const getRoutes = () => {
     // New registration
     {
       method: 'POST',
+      path: '/events/birth/waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/new-waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-waiting-validation',
+      handler: baseHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
       path: '/events/birth/new-registration',
       handler: newBirthRegistrationHandler,
       config: {
@@ -71,7 +104,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-registration',
-      handler: baseHandler,
+      handler: newDeathRegistrationHandler,
       config: {
         tags: ['api']
       }

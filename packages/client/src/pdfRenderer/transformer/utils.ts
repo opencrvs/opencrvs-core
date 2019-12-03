@@ -11,7 +11,9 @@
  */
 import {
   ExecutorKey,
-  IEventWiseKey
+  IEventWiseKey,
+  Condition,
+  ConditionOperation
 } from '@client/pdfRenderer/transformer/types'
 import {
   Event,
@@ -83,4 +85,49 @@ export function getExecutorFieldValue(
     )
   }
   return value
+}
+
+function executeConditionalOperation(
+  operation: ConditionOperation,
+  conditionInputs: string[],
+  value: string
+) {
+  switch (operation) {
+    case ConditionOperation.DOES_NOT_MATCH:
+      return !conditionInputs.includes(value)
+    default:
+      return conditionInputs.includes(value)
+  }
+}
+
+function getConditionalOperationEnumByValue(value: string | undefined) {
+  if (!value) {
+    return ConditionOperation.MATCH
+  }
+  return ConditionOperation[value as keyof typeof ConditionOperation]
+}
+
+export function getMatchedCondition(
+  conditions: Condition[],
+  applicationData: IFormData
+) {
+  return conditions.find(conditionObj => {
+    try {
+      if (!conditionObj.condition) {
+        return true
+      }
+      return executeConditionalOperation(
+        getConditionalOperationEnumByValue(conditionObj.condition.operation),
+        conditionObj.condition.values,
+        // Will throw an exception when value is not found for given key
+        getValueFromApplicationDataByKey(
+          applicationData,
+          conditionObj.condition.key || ''
+        )
+      )
+    } catch (error) {
+      console.info(`FOR_INFO_ONLY: ${error}`)
+      return false
+    }
+  })
 }

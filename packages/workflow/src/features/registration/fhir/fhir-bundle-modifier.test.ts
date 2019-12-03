@@ -455,146 +455,15 @@ describe('Verify fhir bundle modifier functions', () => {
       },
       id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
     }
-    beforeEach(() => {
-      fetch.mockResponses([
-        JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' }),
-        { status: 200 }
-      ])
-    })
-    it('Successfully modified the provided fhirBundle with birth registration number', async () => {
-      const birthTrackingId = 'B5WGYJE'
-
-      if (
-        testFhirBundle &&
-        testFhirBundle.entry &&
-        testFhirBundle.entry[1] &&
-        testFhirBundle.entry[1].resource &&
-        testFhirBundle.entry[1].resource.identifier &&
-        testFhirBundle.entry[1].resource.identifier[1] &&
-        testFhirBundle.entry[1].resource.identifier[1].value
-      ) {
-        testFhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-
-        const task = await pushRN(
-          testFhirBundle.entry[1].resource as fhir.Task,
-          practitioner,
-          'birth-registration-number',
-          { Authorization: `sample token` }
-        )
-        if (
-          task &&
-          task.identifier &&
-          task.identifier[2] &&
-          task.identifier[2].value &&
-          task.identifier[2].system
-        ) {
-          expect(task.identifier[2].system).toEqual(
-            `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
-          )
-          expect(task.identifier[2].value).toBeDefined()
-          expect(task.identifier[2].value).toEqual('2019333436B5WGYJE8')
-        }
-      }
-    })
-
-    it('Successfully modified the provided fhirBundle with death registration number', async () => {
-      const deathTrackingId = 'D5WGYJE'
-      if (
-        testDeathFhirBundle &&
-        testDeathFhirBundle.entry &&
-        testDeathFhirBundle.entry[10] &&
-        testDeathFhirBundle.entry[10].resource &&
-        testDeathFhirBundle.entry[10].resource.identifier &&
-        testDeathFhirBundle.entry[10].resource.identifier[0] &&
-        testDeathFhirBundle.entry[10].resource.identifier[0].value
-      ) {
-        testDeathFhirBundle.entry[10].resource.identifier[0].value = deathTrackingId
-        const taskConversion = testDeathFhirBundle.entry[10].resource as unknown
-        const task = await pushRN(
-          taskConversion as fhir.Task,
-          practitioner,
-          'death-registration-number',
-          { Authorization: `sample token` }
-        )
-
-        if (
-          task &&
-          task.identifier &&
-          task.identifier[1] &&
-          task.identifier[1].value &&
-          task.identifier[1].system
-        ) {
-          expect(task.identifier[1].system).toEqual(
-            `${OPENCRVS_SPECIFICATION_URL}id/death-registration-number`
-          )
-          expect(task.identifier[1].value).toBeDefined()
-          expect(task.identifier[1].value).toMatch('2019333436B5WGYJE8')
-        }
-      }
-    })
 
     it('Throws error if invalid fhir bundle is provided', async () => {
       const invalidDataConversion = undefined as unknown
       const invalidData = invalidDataConversion as fhir.Task
       expect(
-        pushRN(invalidData, practitioner, 'birth-registration-number', {
+        pushRN(invalidData, practitioner, {
           Authorization: `sample token`
         })
       ).rejects.toThrowError('Invalid Task resource found for registration')
-    })
-    it('If fhirBundle already have a brn then it will update the exiting one instead of creating a new one', async () => {
-      if (
-        testFhirBundle &&
-        testFhirBundle.entry &&
-        testFhirBundle.entry[1] &&
-        testFhirBundle.entry[1].resource
-      ) {
-        const oldTask = testFhirBundle.entry[1].resource as fhir.Task
-
-        if (
-          oldTask &&
-          oldTask.identifier &&
-          oldTask.identifier[2] &&
-          oldTask.identifier[2].value
-        ) {
-          oldTask.identifier[2].value = 'DUMMYBRN'
-          const indentifierLength = oldTask.identifier.length
-
-          const fhirBundle = cloneDeep(testFhirBundle)
-
-          const birthTrackingId = 'B5WGYJE'
-          if (
-            fhirBundle.entry[1].resource.identifier &&
-            fhirBundle.entry[1].resource.identifier[1] &&
-            fhirBundle.entry[1].resource.identifier[1].value
-          ) {
-            fhirBundle.entry[1].resource.identifier[1].value = birthTrackingId
-            const newTask = await pushRN(
-              fhirBundle.entry[1].resource as fhir.Task,
-              practitioner,
-              'birth-registration-number',
-              { Authorization: `sample token` }
-            )
-            if (
-              newTask &&
-              newTask.identifier &&
-              newTask.identifier[2] &&
-              newTask.identifier[2].system &&
-              newTask.identifier[2].value
-            ) {
-              expect(newTask.identifier.length).toBe(indentifierLength)
-              expect(newTask.identifier[2].system).toEqual(
-                `${OPENCRVS_SPECIFICATION_URL}id/birth-registration-number`
-              )
-              expect(newTask.identifier[2].value).toBeDefined()
-              expect(newTask.identifier[2].value).toEqual('2019333436B5WGYJE8')
-              expect(newTask.identifier[2].value).not.toEqual(
-                oldTask.identifier[2].value
-              )
-            }
-          }
-        }
-      }
     })
   })
 })
