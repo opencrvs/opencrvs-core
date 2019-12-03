@@ -129,7 +129,10 @@ const generatePointLocations = async (
   return locations
 }
 
-export async function generatePaymentPoint(payload: fhir.Bundle) {
+export async function generatePaymentPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
   if (!composition) {
@@ -144,7 +147,7 @@ export async function generatePaymentPoint(payload: fhir.Bundle) {
     application_id: composition.id
   }
 
-  const tags = {}
+  const tags = await generatePointLocations(payload, authHeader)
 
   return {
     measurement: 'certification_payment',

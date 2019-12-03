@@ -12,7 +12,8 @@
 import * as Hapi from 'hapi'
 import {
   fetchRegWithinTimeFrames,
-  getCurrentAndLowerLocationLevels
+  getCurrentAndLowerLocationLevels,
+  fetchCertificationPayments
 } from '@metrics/features/registration/metrics/metricsGenerator'
 import { logger } from '@metrics/logger'
 import { internal } from 'boom'
@@ -32,8 +33,8 @@ export async function metricsHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const timeStart = request.query[TIME_FROM] + '000000'
-    const timeEnd = request.query[TIME_TO] + '000000'
+    const timeStart = request.query[TIME_FROM]
+    const timeEnd = request.query[TIME_TO]
     const locationId = request.query[LOCATION_ID]
     // const authHeader: IAuthHeader = {
     //   Authorization: request.headers.authorization
@@ -52,7 +53,15 @@ export async function metricsHandler(
       currentLocationLevel,
       lowerLocationLevel
     )
-    return { timeFrames }
+    const payments = await fetchCertificationPayments(
+      timeStart,
+      timeEnd,
+      locationId,
+      currentLocationLevel,
+      lowerLocationLevel
+    )
+
+    return { timeFrames, payments }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)
     return internal(error)

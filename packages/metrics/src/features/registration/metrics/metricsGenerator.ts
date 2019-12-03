@@ -73,6 +73,30 @@ export async function regByAge(timeStart: string, timeEnd: string) {
   return metricsData
 }
 
+type Payment = {
+  total: number
+}
+
+export async function fetchCertificationPayments(
+  timeStart: string,
+  timeEnd: string,
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
+) {
+  const queryLocationId = `Location/${locationId}`
+  const payments = await readPoints(
+    `SELECT SUM(total) as total FROM certification_payment WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+      AND ${currentLocationLevel}='${queryLocationId}'
+      GROUP BY ${lowerLocationLevel}`
+  )
+
+  return payments.map((payment: Payment) => ({
+    total: payment.total,
+    locationId: payment[lowerLocationLevel]
+  }))
+}
+
 export async function fetchRegWithinTimeFrames(
   timeStart: string,
   timeEnd: string,
@@ -81,26 +105,27 @@ export async function fetchRegWithinTimeFrames(
   lowerLocationLevel: string
 ) {
   const queryLocationId = `Location/${locationId}`
+
   const pointsWithin45Days = await readPoints(
-    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND age_in_days > -1 AND age_in_days <= 45 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
   const points45DaysTo1Year = await readPoints(
-    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND age_in_days > 46 AND age_in_days <= 365 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
   const points1YearTo5Years = await readPoints(
-    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND age_in_days > 366 AND age_in_days <= 1825 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
   const pointsOver5Years = await readPoints(
-    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND age_in_days > 1826 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
@@ -149,11 +174,11 @@ export async function getCurrentAndLowerLocationLevels(
   const queryLocationId = `Location/${locationId}`
 
   const allPointsContainingLocationId = await readPoints(
-    `SELECT * FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
-      AND ( locationLevel2 = '${queryLocationId}' 
+    `SELECT * FROM "ocrvs"."autogen"."certification_payment" WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+      AND ( locationLevel2 = '${queryLocationId}'
         OR locationLevel3 = '${queryLocationId}'
-        OR locationLevel4 = '${queryLocationId}' 
-        OR locationLevel5 = '${queryLocationId}' )`
+        OR locationLevel4 = '${queryLocationId}'
+        OR locationLevel5 = '${queryLocationId}')`
   )
 
   const locationLevelOfQueryId =
@@ -223,10 +248,10 @@ export async function fetchKeyFigures(
     `SELECT COUNT(age_in_days) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}      
-      AND ( locationLevel2 = '${queryLocationId}' 
+      AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
-          OR locationLevel4 = '${queryLocationId}' 
+          OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
       AND age_in_days <= 45
     GROUP BY gender`
@@ -243,11 +268,11 @@ export async function fetchKeyFigures(
     `SELECT COUNT(age_in_days) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}      
-      AND ( locationLevel2 = '${queryLocationId}' 
+      AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
-          OR locationLevel4 = '${queryLocationId}' 
-          OR locationLevel5 = '${queryLocationId}' )      
+          OR locationLevel4 = '${queryLocationId}'
+          OR locationLevel5 = '${queryLocationId}' )
       AND age_in_days > 45
       AND age_in_days <= 365
     GROUP BY gender`
