@@ -190,9 +190,12 @@ export async function getCurrentAndLowerLocationLevels(
   )
 
   const locationLevelOfQueryId =
-    Object.keys(allPointsContainingLocationId[0]).find(
-      key => allPointsContainingLocationId[0][key] === queryLocationId
-    ) || ''
+    (allPointsContainingLocationId &&
+      allPointsContainingLocationId.length > 0 &&
+      Object.keys(allPointsContainingLocationId[0]).find(
+        key => allPointsContainingLocationId[0][key] === queryLocationId
+      )) ||
+    ''
 
   const oneLevelLowerLocationColumn =
     (locationLevelOfQueryId &&

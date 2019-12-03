@@ -42,33 +42,41 @@ export async function metricsHandler(
     // }
 
     // const location: Location = await getDistrictLocation(locationId, authHeader)
+
     const {
       currentLocationLevel,
       lowerLocationLevel
     } = await getCurrentAndLowerLocationLevels(timeStart, timeEnd, locationId)
 
-    const timeFrames = await fetchRegWithinTimeFrames(
-      timeStart,
-      timeEnd,
-      locationId,
-      currentLocationLevel,
-      lowerLocationLevel
-    )
-    const payments = await fetchCertificationPayments(
-      timeStart,
-      timeEnd,
-      locationId,
-      currentLocationLevel,
-      lowerLocationLevel
-    )
+    if (currentLocationLevel) {
+      const timeFrames = await fetchRegWithinTimeFrames(
+        timeStart,
+        timeEnd,
+        locationId,
+        currentLocationLevel,
+        lowerLocationLevel
+      )
+      const payments = await fetchCertificationPayments(
+        timeStart,
+        timeEnd,
+        locationId,
+        currentLocationLevel,
+        lowerLocationLevel
+      )
 
-    const genderBasisMetrics = await fetchGenderBasisMetrics(
-      locationId,
-      currentLocationLevel,
-      lowerLocationLevel
-    )
-
-    return { timeFrames, payments, genderBasisMetrics }
+      const genderBasisMetrics = await fetchGenderBasisMetrics(
+        locationId,
+        currentLocationLevel,
+        lowerLocationLevel
+      )
+      return { timeFrames, payments, genderBasisMetrics }
+    } else {
+      return {
+        timeFrames: [],
+        payments: [],
+        genderBasisMetrics: []
+      }
+    }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)
     return internal(error)

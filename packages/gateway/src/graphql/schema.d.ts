@@ -566,6 +566,7 @@ export interface GQLBirthRegistrationGenderBasisMetrics {
 }
 
 export interface GQLBirthRegistrationTimeFrameMetrics {
+  locationId?: string
   regWithin45d?: number
   regWithin45dTo1yr?: number
   regWithin1yrTo5yr?: number
@@ -2530,6 +2531,7 @@ export interface BirthRegistrationGenderBasisMetricsToTotalResolver<
 export interface GQLBirthRegistrationTimeFrameMetricsTypeResolver<
   TParent = any
 > {
+  locationId?: BirthRegistrationTimeFrameMetricsToLocationIdResolver<TParent>
   regWithin45d?: BirthRegistrationTimeFrameMetricsToRegWithin45dResolver<
     TParent
   >
@@ -2541,6 +2543,13 @@ export interface GQLBirthRegistrationTimeFrameMetricsTypeResolver<
   >
   regOver5yr?: BirthRegistrationTimeFrameMetricsToRegOver5yrResolver<TParent>
   total?: BirthRegistrationTimeFrameMetricsToTotalResolver<TParent>
+}
+
+export interface BirthRegistrationTimeFrameMetricsToLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface BirthRegistrationTimeFrameMetricsToRegWithin45dResolver<
