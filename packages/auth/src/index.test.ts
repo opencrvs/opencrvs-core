@@ -12,7 +12,7 @@
 import { createServer } from '@auth/index'
 
 describe('Route authorization', () => {
-  it('helth check', async () => {
+  it('health check', async () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',

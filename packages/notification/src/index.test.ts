@@ -15,7 +15,7 @@ import { createServer } from '@notification/index'
 import { createServerWithEnvironment } from '@notification/tests/util'
 
 describe('Route authorization', () => {
-  it('helth check', async () => {
+  it('health check', async () => {
     const server = await createServerWithEnvironment({
       NODE_ENV: 'development'
     })
