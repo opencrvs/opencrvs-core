@@ -528,10 +528,8 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       return {
         message: messages.validNationalId,
         props: {
-          validLength: validNationalIDLengths
-            .toString()
-            .split(',')
-            .join(' or ')
+          min: validNationalIDLengths[0],
+          max: validNationalIDLengths[1]
         }
       }
 
