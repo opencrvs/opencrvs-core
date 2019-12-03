@@ -42,7 +42,6 @@ export async function metricsHandler(
     // }
 
     // const location: Location = await getDistrictLocation(locationId, authHeader)
-
     const {
       currentLocationLevel,
       lowerLocationLevel

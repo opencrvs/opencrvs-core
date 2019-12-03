@@ -111,13 +111,13 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined,
-    ...(await generatePointLocations(payload, authHeader))
+    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined
   }
 
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
-    gender: child.gender
+    gender: child.gender,
+    ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
@@ -148,15 +148,15 @@ export const generateDeathRegPoint = async (
     compositionId: composition.id,
     ageInYears: deceased.birthDate
       ? getAgeInYears(deceased.birthDate)
-      : undefined,
-    ...(await generatePointLocations(payload, authHeader))
+      : undefined
   }
 
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
-    causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE)
+    causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
+    ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
