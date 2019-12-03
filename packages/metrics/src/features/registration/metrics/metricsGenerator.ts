@@ -55,6 +55,14 @@ interface ICurrentAndLowerLocationLevels {
   currentLocationLevel: string
   lowerLocationLevel: string
 }
+interface IGenderBasisData {
+  locationId: string
+  maleUnder18: number
+  femaleUnder18: number
+  maleOver18: number
+  femaleOver18: number
+  total: number
+}
 
 export async function regByAge(timeStart: string, timeEnd: string) {
   const metricsData: any[] = []
@@ -345,4 +353,92 @@ const populateBirthKeyFigurePoint = (
       }
     ]
   }
+}
+
+export async function fetchGenderBasisMetrics(
+  currLocationId: string,
+  currLocationLevel: string,
+  locationLevel: string
+) {
+  const pointData = await readPoints(`
+  SELECT 
+    SUM(under18) AS under18, 
+    SUM(over18) AS over18 
+  FROM (
+    SELECT under18, over18, gender, ${locationLevel} FROM (
+      SELECT 
+        COUNT(ageInDays) AS under18 
+      FROM birth_reg 
+      WHERE ageInDays < 6574 
+       AND ${currLocationLevel}='${currLocationId}'
+      GROUP BY gender, ${locationLevel}
+    ), (
+      SELECT 
+        COUNT(ageInDays) AS over18 
+      FROM birth_reg 
+      WHERE ageInDays >= 6574 
+       AND ${currLocationLevel}='${currLocationId}'
+      GROUP BY gender, ${locationLevel}
+    ) FILL(0)
+  ) 
+  GROUP BY gender, ${locationLevel}
+  `)
+
+  const metricsArray: IGenderBasisData[] = []
+
+  pointData.forEach((point: any) => {
+    const metrics = metricsArray.find(
+      element => element.locationId === point[locationLevel]
+    )
+    const femaleOver18 =
+      point['gender'] === 'female'
+        ? point['over18']
+        : metrics
+        ? metrics.femaleOver18
+        : 0
+    const maleOver18 =
+      point['gender'] === 'male'
+        ? point['over18']
+        : metrics
+        ? metrics.maleOver18
+        : 0
+    const femaleUnder18 =
+      point['gender'] === 'female'
+        ? point['under18']
+        : metrics
+        ? metrics.femaleUnder18
+        : 0
+    const maleUnder18 =
+      point['gender'] === 'male'
+        ? point['under18']
+        : metrics
+        ? metrics.maleUnder18
+        : 0
+
+    const total = maleOver18 + femaleOver18 + maleUnder18 + femaleUnder18
+
+    if (!metrics) {
+      metricsArray.push({
+        locationId: point[locationLevel],
+        femaleOver18: femaleOver18,
+        maleOver18: maleOver18,
+        maleUnder18: maleUnder18,
+        femaleUnder18: femaleUnder18,
+        total: total
+      })
+    } else {
+      const index = metricsArray.indexOf(metrics)
+
+      metricsArray.splice(index, 1, {
+        locationId: metrics.locationId,
+        femaleOver18: femaleOver18,
+        maleOver18: maleOver18,
+        maleUnder18: maleUnder18,
+        femaleUnder18: femaleUnder18,
+        total: total
+      })
+    }
+  })
+
+  return metricsArray
 }

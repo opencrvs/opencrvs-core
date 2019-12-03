@@ -13,7 +13,8 @@ import * as Hapi from 'hapi'
 import {
   fetchRegWithinTimeFrames,
   getCurrentAndLowerLocationLevels,
-  fetchCertificationPayments
+  fetchCertificationPayments,
+  fetchGenderBasisMetrics
 } from '@metrics/features/registration/metrics/metricsGenerator'
 import { logger } from '@metrics/logger'
 import { internal } from 'boom'
@@ -61,7 +62,13 @@ export async function metricsHandler(
       lowerLocationLevel
     )
 
-    return { timeFrames, payments }
+    const genderBasisMetrics = await fetchGenderBasisMetrics(
+      locationId,
+      currentLocationLevel,
+      lowerLocationLevel
+    )
+
+    return { timeFrames, payments, genderBasisMetrics }
   } catch (error) {
     logger.error(`Metrics:metricsHandler: error: ${error}`)
     return internal(error)
