@@ -359,6 +359,7 @@ enum RegistrationType {
 
 enum RegStatus {
   DECLARED
+  WAITING_VALIDATION
   VERIFIED
   REGISTERED
   CERTIFIED

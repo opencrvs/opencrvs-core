@@ -42,6 +42,8 @@ export type TransformerPayload =
   | ILocationPayload
   | IPersonIdentifierValuePayload
 
+export type Condition = IApplicantNameCondition | IOfflineAddressCondition
+
 export interface IFieldTransformer {
   field: string
   operation: string
@@ -68,13 +70,28 @@ export interface IIntLabelPayload {
   messageValues?: { [valueKey: string]: string }
 }
 
-export interface IApplicantNamePayload {
+export enum ConditionOperation {
+  MATCH = 'MATCH',
+  DOES_NOT_MATCH = 'DOES_NOT_MATCH'
+}
+export interface ICondition {
+  key: string
+  operation?: ConditionOperation
+  values: string[]
+}
+
+export interface IApplicantNameCondition {
+  condition?: ICondition
   key: {
-    [event: string]: string // data key: data.child || data.deceased
+    [event: string]: string // data key: child || deceased
   }
   format: {
     [language: string]: string[] // corresponding field names
   }
+}
+
+export interface IApplicantNamePayload {
+  conditions: IApplicantNameCondition[]
   language?: string
   allCapital?: boolean
 }
@@ -103,22 +120,20 @@ export interface INumberFeildConversionPayload {
   conversionMap: { [key: string]: string } // { 0: '০', 1: '১'}
 }
 
+export interface IOfflineAddressCondition {
+  condition?: ICondition
+  addressType: string
+  addressKey: string
+  addresses: {
+    countryCode: string
+    localAddress: string
+    internationalAddress?: string
+  }
+}
+
 export interface IOfflineAddressPayload {
   language: string
-  conditionalKeys: {
-    condition: {
-      default?: boolean
-      key?: string
-      matchValues?: string[]
-    }
-    addressType: string
-    addressKey: string
-    addresses: {
-      countryCode: string
-      localAddress: string
-      internationalAddress?: string
-    }
-  }[]
+  conditions: IOfflineAddressCondition[]
 }
 
 export interface ILanguagePayload {

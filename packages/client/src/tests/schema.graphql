@@ -737,6 +737,7 @@ enum RegistrationType {
 enum RegStatus {
   IN_PROGRESS
   DECLARED
+  WAITING_VALIDATION
   REGISTERED
   CERTIFIED
   REJECTED

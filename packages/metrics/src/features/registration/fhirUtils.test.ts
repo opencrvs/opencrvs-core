@@ -13,7 +13,10 @@ import {
   getSectionBySectionCode,
   getRegLastLocation,
   getResourceByType,
-  FHIR_RESOURCE_TYPE
+  getObservationValueByCode,
+  getTimeLoggedFromTask,
+  FHIR_RESOURCE_TYPE,
+  CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
 
 describe('fhirUtils', () => {
@@ -421,5 +424,575 @@ describe('fhirUtils', () => {
     }
 
     expect(getResourceByType(bundle, FHIR_RESOURCE_TYPE.TASK)).toBeFalsy()
+  })
+  it('returns cause of death from the observations in a composition', () => {
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82',
+          resource: {
+            identifier: { system: 'urn:ietf:rfc:3986', value: 'DWMWZ9X' },
+            resourceType: 'Composition',
+            status: 'preliminary',
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-types',
+                  code: 'death-application'
+                }
+              ],
+              text: 'Death Application'
+            },
+            class: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-classes',
+                  code: 'crvs-document'
+                }
+              ],
+              text: 'CRVS Document'
+            },
+            title: 'Death Application',
+            section: [
+              {
+                title: 'Deceased details',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'deceased-details'
+                    }
+                  ],
+                  text: 'Deceased details'
+                },
+                entry: [
+                  { reference: 'urn:uuid:42c8acf3-dcd9-45b1-9390-12f6b289be38' }
+                ]
+              },
+              {
+                title: "Informant's details",
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'informant-details'
+                    }
+                  ],
+                  text: "Informant's details"
+                },
+                entry: [
+                  { reference: 'urn:uuid:f2945611-5af6-4946-bd67-16f571cbc979' }
+                ]
+              },
+              {
+                title: 'Death encounter',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/sections',
+                      code: 'death-encounter'
+                    }
+                  ],
+                  text: 'Death encounter'
+                },
+                entry: [
+                  { reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d' }
+                ]
+              }
+            ],
+            subject: {},
+            date: '2019-11-30T13:01:33.651Z',
+            author: [],
+            id: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433'
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:33ae7ca1-0fb8-4685-bcd3-80ced7dde3cc',
+          resource: {
+            resourceType: 'Observation',
+            status: 'final',
+            context: {
+              reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d'
+            },
+            category: [
+              {
+                coding: [
+                  {
+                    system: 'http://hl7.org/fhir/observation-category',
+                    code: 'vital-signs',
+                    display: 'Vital Signs'
+                  }
+                ]
+              }
+            ],
+            code: {
+              coding: [
+                {
+                  system: 'http://loinc.org',
+                  code: 'uncertified-manner-of-death',
+                  display: 'Uncertified manner of death'
+                }
+              ]
+            },
+            valueCodeableConcept: {
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/ValueSet/icd-10',
+                  code: 'NATURAL_CAUSES'
+                }
+              ]
+            }
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:02e69cae-e68e-4264-99d2-2e0bd44d090e',
+          resource: {
+            resourceType: 'Observation',
+            status: 'final',
+            context: {
+              reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d'
+            },
+            category: [
+              {
+                coding: [
+                  {
+                    system: 'http://hl7.org/fhir/observation-category',
+                    code: 'vital-signs',
+                    display: 'Vital Signs'
+                  }
+                ]
+              }
+            ],
+            code: {
+              coding: [
+                {
+                  system: 'http://loinc.org',
+                  code: 'ICD10',
+                  display: 'Cause of death'
+                }
+              ]
+            },
+            valueCodeableConcept: {
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/ValueSet/icd-10',
+                  code: 'Old age'
+                }
+              ]
+            }
+          }
+        }
+      ],
+      meta: {
+        lastUpdated: '2019-03-05T11:38:06.846Z'
+      }
+    }
+
+    expect(getObservationValueByCode(bundle, CAUSE_OF_DEATH_CODE)).toEqual(
+      'Old age'
+    )
+  })
+  it('returns UNKNOWN if no observations exist in a composition', () => {
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82',
+          resource: {
+            identifier: { system: 'urn:ietf:rfc:3986', value: 'DWMWZ9X' },
+            resourceType: 'Composition',
+            status: 'preliminary',
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-types',
+                  code: 'death-application'
+                }
+              ],
+              text: 'Death Application'
+            },
+            class: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-classes',
+                  code: 'crvs-document'
+                }
+              ],
+              text: 'CRVS Document'
+            },
+            title: 'Death Application',
+            section: [
+              {
+                title: 'Deceased details',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'deceased-details'
+                    }
+                  ],
+                  text: 'Deceased details'
+                },
+                entry: [
+                  { reference: 'urn:uuid:42c8acf3-dcd9-45b1-9390-12f6b289be38' }
+                ]
+              },
+              {
+                title: "Informant's details",
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'informant-details'
+                    }
+                  ],
+                  text: "Informant's details"
+                },
+                entry: [
+                  { reference: 'urn:uuid:f2945611-5af6-4946-bd67-16f571cbc979' }
+                ]
+              },
+              {
+                title: 'Death encounter',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/sections',
+                      code: 'death-encounter'
+                    }
+                  ],
+                  text: 'Death encounter'
+                },
+                entry: [
+                  { reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d' }
+                ]
+              }
+            ],
+            subject: {},
+            date: '2019-11-30T13:01:33.651Z',
+            author: [],
+            id: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433'
+          }
+        }
+      ],
+      meta: {
+        lastUpdated: '2019-03-05T11:38:06.846Z'
+      }
+    }
+
+    expect(getObservationValueByCode(bundle, CAUSE_OF_DEATH_CODE)).toEqual(
+      'UNKNOWN'
+    )
+  })
+  it('returns UNKNOWN if no observation can be found for a given code in a composition', () => {
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          fullUrl: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82',
+          resource: {
+            identifier: { system: 'urn:ietf:rfc:3986', value: 'DWMWZ9X' },
+            resourceType: 'Composition',
+            status: 'preliminary',
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-types',
+                  code: 'death-application'
+                }
+              ],
+              text: 'Death Application'
+            },
+            class: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-classes',
+                  code: 'crvs-document'
+                }
+              ],
+              text: 'CRVS Document'
+            },
+            title: 'Death Application',
+            section: [
+              {
+                title: 'Deceased details',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'deceased-details'
+                    }
+                  ],
+                  text: 'Deceased details'
+                },
+                entry: [
+                  { reference: 'urn:uuid:42c8acf3-dcd9-45b1-9390-12f6b289be38' }
+                ]
+              },
+              {
+                title: "Informant's details",
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/doc-sections',
+                      code: 'informant-details'
+                    }
+                  ],
+                  text: "Informant's details"
+                },
+                entry: [
+                  { reference: 'urn:uuid:f2945611-5af6-4946-bd67-16f571cbc979' }
+                ]
+              },
+              {
+                title: 'Death encounter',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/sections',
+                      code: 'death-encounter'
+                    }
+                  ],
+                  text: 'Death encounter'
+                },
+                entry: [
+                  { reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d' }
+                ]
+              }
+            ],
+            subject: {},
+            date: '2019-11-30T13:01:33.651Z',
+            author: [],
+            id: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433'
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:33ae7ca1-0fb8-4685-bcd3-80ced7dde3cc',
+          resource: {
+            resourceType: 'Observation',
+            status: 'final',
+            context: {
+              reference: 'urn:uuid:644fc036-88a1-4213-bf4e-3a7b970bf10d'
+            },
+            category: [
+              {
+                coding: [
+                  {
+                    system: 'http://hl7.org/fhir/observation-category',
+                    code: 'vital-signs',
+                    display: 'Vital Signs'
+                  }
+                ]
+              }
+            ],
+            code: {
+              coding: [
+                {
+                  system: 'http://loinc.org',
+                  code: 'uncertified-manner-of-death',
+                  display: 'Uncertified manner of death'
+                }
+              ]
+            },
+            valueCodeableConcept: {
+              coding: [
+                {
+                  system: 'http://hl7.org/fhir/ValueSet/icd-10',
+                  code: 'NATURAL_CAUSES'
+                }
+              ]
+            }
+          }
+        }
+      ],
+      meta: {
+        lastUpdated: '2019-03-05T11:38:06.846Z'
+      }
+    }
+
+    expect(getObservationValueByCode(bundle, CAUSE_OF_DEATH_CODE)).toEqual(
+      'UNKNOWN'
+    )
+  })
+  it('returns time taken to complete task', () => {
+    const task = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      code: {
+        coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
+      },
+      focus: {
+        reference: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82'
+      },
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/draft-id',
+          value: '914d7ad6-addb-430d-a08d-b225635e9860'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-tracking-id',
+          value: 'DWMWZ9X'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-registration-number',
+          value: '20196816020000113'
+        }
+      ],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'APPLICANT'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-relationship',
+          valueString: ''
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '+8801916543214'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+          valueInteger: 63445
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastUser',
+          valueReference: {
+            reference: 'Practitioner/ec1f4476-182f-408f-9da2-aff0c9bd1f26'
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastLocation',
+          valueReference: {
+            reference: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastOffice',
+          valueReference: {
+            reference: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
+          }
+        }
+      ],
+      lastModified: '2019-11-30T13:01:34.559Z',
+      businessStatus: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/reg-status',
+            code: 'REGISTERED'
+          }
+        ]
+      }
+    }
+
+    expect(getTimeLoggedFromTask(task)).toEqual(63445)
+  })
+  it('Throws error if task has no extension', () => {
+    const task = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      code: {
+        coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
+      },
+      focus: {
+        reference: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82'
+      },
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/draft-id',
+          value: '914d7ad6-addb-430d-a08d-b225635e9860'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-tracking-id',
+          value: 'DWMWZ9X'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-registration-number',
+          value: '20196816020000113'
+        }
+      ]
+    }
+    expect(() => getTimeLoggedFromTask(task)).toThrowError(
+      'Task has no extensions defined, task ID: undefined'
+    )
+  })
+  it('Throws error if task has no time logged', () => {
+    const task = {
+      resourceType: 'Task',
+      status: 'requested',
+      intent: '',
+      code: {
+        coding: [{ system: 'http://opencrvs.org/specs/types', code: 'DEATH' }]
+      },
+      focus: {
+        reference: 'urn:uuid:4dfc9a53-0ecd-4f6e-9a53-915f60d73f82'
+      },
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/draft-id',
+          value: '914d7ad6-addb-430d-a08d-b225635e9860'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-tracking-id',
+          value: 'DWMWZ9X'
+        },
+        {
+          system: 'http://opencrvs.org/specs/id/death-registration-number',
+          value: '20196816020000113'
+        }
+      ],
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-person',
+          valueString: 'APPLICANT'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/contact-relationship',
+          valueString: ''
+        },
+        {
+          url:
+            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          valueString: '+8801916543214'
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastUser',
+          valueReference: {
+            reference: 'Practitioner/ec1f4476-182f-408f-9da2-aff0c9bd1f26'
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastLocation',
+          valueReference: {
+            reference: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+          }
+        },
+        {
+          url: 'http://opencrvs.org/specs/extension/regLastOffice',
+          valueReference: {
+            reference: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3'
+          }
+        }
+      ],
+      lastModified: '2019-11-30T13:01:34.559Z',
+      businessStatus: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/reg-status',
+            code: 'REGISTERED'
+          }
+        ]
+      }
+    }
+    expect(() => getTimeLoggedFromTask(task)).toThrowError(
+      'No time logged extension found in task, task ID: undefined'
+    )
   })
 })

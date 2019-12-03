@@ -40,11 +40,11 @@ describe('PDF template offline data related field transformer tests', () => {
         intl,
         {
           language: 'en',
-          conditionalKeys: [
+          conditions: [
             {
               condition: {
                 key: 'child.placeOfBirth',
-                matchValues: ['HEALTH_FACILITY']
+                values: ['HEALTH_FACILITY']
               },
               addressType: 'facilities',
               addressKey: 'name',
@@ -56,7 +56,7 @@ describe('PDF template offline data related field transformer tests', () => {
             {
               condition: {
                 key: 'child.placeOfBirth',
-                matchValues: ['PRIVATE_HOME', 'OTHER']
+                values: ['PRIVATE_HOME', 'OTHER']
               },
               addressType: 'locations',
               addressKey: 'name',
@@ -94,11 +94,8 @@ describe('PDF template offline data related field transformer tests', () => {
         intl,
         {
           language: 'en',
-          conditionalKeys: [
+          conditions: [
             {
-              condition: {
-                default: true
-              },
               addressType: 'facilities',
               addressKey: 'name',
               addresses: {
@@ -133,45 +130,6 @@ describe('PDF template offline data related field transformer tests', () => {
         'No payload found for this transformer'
       )
     })
-    it('Throws exception if parameter is missing for wrong payload', () => {
-      const intl = createIntl({
-        locale: 'en'
-      })
-
-      expect(() =>
-        offlineTransformers.OfflineAddress(
-          data,
-          intl,
-          {
-            language: 'en',
-            conditionalKeys: [
-              {
-                condition: {
-                  default: false
-                },
-                addressType: 'facilities',
-                addressKey: 'name',
-                addresses: {
-                  countryCode: 'BGD',
-                  localAddress: '{child.birthLocation}'
-                }
-              }
-            ]
-          },
-          [
-            {
-              language: 'en',
-              countries: [
-                {
-                  value: 'BGD',
-                  name: 'Bangladesh'
-                }
-              ]
-            }
-          ]
-        )
-      ).toThrowError('No condition has matched for this transformer')
-    })
     it('Throws exception if no condition matches', () => {
       const intl = createIntl({
         locale: 'en'
@@ -183,11 +141,11 @@ describe('PDF template offline data related field transformer tests', () => {
           intl,
           {
             language: 'en',
-            conditionalKeys: [
+            conditions: [
               {
                 condition: {
                   key: 'child.placeOfBirth',
-                  matchValues: ['INVALID']
+                  values: ['INVALID']
                 },
                 addressType: 'locations',
                 addressKey: 'name',
@@ -200,7 +158,7 @@ describe('PDF template offline data related field transformer tests', () => {
               {
                 condition: {
                   key: 'child.invalid',
-                  matchValues: ['INVALID']
+                  values: ['INVALID']
                 },
                 addressType: 'facilities',
                 addressKey: 'name',
@@ -223,7 +181,7 @@ describe('PDF template offline data related field transformer tests', () => {
             }
           ]
         )
-      ).toThrowError('No condition has matched for this transformer')
+      ).toThrowError('No condition has matched for OfflineAddress transformer')
     })
     it('Returns the expected output when no key is defined to replace as param', () => {
       const intl = createIntl({
@@ -235,11 +193,11 @@ describe('PDF template offline data related field transformer tests', () => {
         intl,
         {
           language: 'en',
-          conditionalKeys: [
+          conditions: [
             {
               condition: {
                 key: 'child.placeOfBirth',
-                matchValues: ['HEALTH_FACILITY']
+                values: ['HEALTH_FACILITY']
               },
               addressType: 'facilities',
               addressKey: 'name',
@@ -282,11 +240,11 @@ describe('PDF template offline data related field transformer tests', () => {
       intl,
       {
         language: 'en',
-        conditionalKeys: [
+        conditions: [
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['HEALTH_FACILITY']
+              values: ['HEALTH_FACILITY']
             },
             addressType: 'facilities',
             addressKey: 'name',
@@ -298,7 +256,7 @@ describe('PDF template offline data related field transformer tests', () => {
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['PRIVATE_HOME', 'OTHER']
+              values: ['PRIVATE_HOME', 'OTHER']
             },
             addressType: 'locations',
             addressKey: 'name',
@@ -346,11 +304,11 @@ describe('PDF template offline data related field transformer tests', () => {
       intl,
       {
         language: 'en',
-        conditionalKeys: [
+        conditions: [
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['HEALTH_FACILITY']
+              values: ['HEALTH_FACILITY']
             },
             addressType: 'facilities',
             addressKey: 'name',
@@ -362,7 +320,7 @@ describe('PDF template offline data related field transformer tests', () => {
           {
             condition: {
               key: 'child.placeOfBirth',
-              matchValues: ['PRIVATE_HOME', 'OTHER']
+              values: ['PRIVATE_HOME', 'OTHER']
             },
             addressType: 'locations',
             addressKey: 'name',

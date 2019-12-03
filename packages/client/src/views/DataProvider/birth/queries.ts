@@ -212,7 +212,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         dateOfMarriage
         educationalAttainment
         nationality
-        multipleBirth
         identifier {
           id
           type

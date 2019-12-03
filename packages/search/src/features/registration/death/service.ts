@@ -17,7 +17,10 @@ import {
   EVENT,
   ICompositionBody,
   IDeathCompositionBody,
-  getCreatedBy
+  getCreatedBy,
+  getStatus,
+  IStatus,
+  createStatusHistory
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -76,7 +79,9 @@ async function updateEvent(task: fhir.Task) {
     'http://opencrvs.org/specs/extension/regLastUser'
   )
 
-  const body: ICompositionBody = {}
+  const body: ICompositionBody = {
+    status: (await getStatus(compositionId)) as IStatus[]
+  }
 
   body.type =
     task &&
@@ -94,6 +99,7 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
 
+  await createStatusHistory(body)
   await updateComposition(compositionId, body)
 }
 
@@ -104,7 +110,8 @@ async function indexDeclaration(
 ) {
   const body: ICompositionBody = {
     event: EVENT.DEATH,
-    createdAt: Date.now().toString()
+    createdAt: Date.now().toString(),
+    status: (await getStatus(compositionId)) as IStatus[]
   }
 
   await createIndexBody(body, composition, bundleEntries)
@@ -118,6 +125,7 @@ async function createIndexBody(
 ) {
   createDeceasedIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
+  await createStatusHistory(body)
 }
 
 function createDeceasedIndex(

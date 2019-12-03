@@ -458,33 +458,27 @@ export const reasonsNotApplyingToFieldValueTransformer = (
 }
 
 export const valueToNestedRadioFieldTransformer = (
-  transformFieldName?: string,
-  transformMethod?: IFormFieldQueryMapFunction
+  transformMethod: IFormFieldQueryMapFunction
 ) => (
   transformedData: IFormData,
   queryData: TransformedData,
   sectionId: string,
   field: IFormField,
-  nestedField: IFormField
+  nestedField?: IFormField
 ) => {
-  const tempDraftData = {} as IFormData
-  const fieldName = nestedField ? nestedField.name : field.name
-  let fieldValue
-  tempDraftData[sectionId] = {}
-
-  if (transformMethod) {
-    transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
-    fieldValue = tempDraftData[sectionId][fieldName]
-  } else {
-    fieldValue = queryData[sectionId][transformFieldName || fieldName]
-  }
+  const tempDraftData = {
+    [sectionId]: {}
+  } as IFormData
+  transformMethod(tempDraftData, queryData, sectionId, nestedField || field)
+  const fieldValue =
+    tempDraftData[sectionId][nestedField ? nestedField.name : field.name]
 
   if (!fieldValue) {
     return
   }
-
-  let transformedFieldData = transformedData[sectionId][field.name] as IFormData
-
+  const transformedFieldData = transformedData[sectionId][
+    field.name
+  ] as IFormData
   if (!transformedFieldData) {
     transformedData[sectionId][field.name] = {
       value: fieldValue,

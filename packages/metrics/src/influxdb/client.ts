@@ -16,6 +16,7 @@ import {
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
 import { logger } from '@metrics/logger'
+import { IPoints } from '@metrics/features/registration'
 
 export const influx = new Influx.InfluxDB({
   host: INFLUX_HOST,
@@ -25,22 +26,84 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'birth_reg',
       fields: {
-        current_status: Influx.FieldType.STRING,
-        age_in_days: Influx.FieldType.INTEGER
+        compositionId: Influx.FieldType.STRING,
+        currentStatus: Influx.FieldType.STRING,
+        ageInDays: Influx.FieldType.INTEGER
       },
       tags: [
-        'reg_status',
+        'regStatus',
         'gender',
-        'locationLevel2',
-        'locationLevel3',
+        'locationLevel5',
         'locationLevel4',
-        'locationLevel5'
+        'locationLevel3',
+        'locationLevel2'
       ]
+    },
+    {
+      measurement: 'death_reg',
+      fields: {
+        compositionId: Influx.FieldType.STRING,
+        currentStatus: Influx.FieldType.STRING,
+        ageInYears: Influx.FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'gender',
+        'mannerOfDeath',
+        'causeOfDeath',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'in_complete_fields',
+      fields: {
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'regStatus',
+        'missingFieldSectionId',
+        'missingFieldGroupId',
+        'missingFieldId',
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'application_time_logged',
+      fields: {
+        timeSpentEditing: Influx.FieldType.INTEGER,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: ['currentStatus', 'eventType']
+    },
+    {
+      measurement: 'application_event_duration',
+      fields: {
+        durationInSeconds: Influx.FieldType.INTEGER,
+        compositionId: Influx.FieldType.STRING,
+        currentTaskId: Influx.FieldType.STRING,
+        previousTaskId: Influx.FieldType.STRING
+      },
+      tags: ['currentStatus', 'previousStatus', 'eventType']
+    },
+    {
+      measurement: 'certification_payment',
+      fields: {
+        total: Influx.FieldType.FLOAT,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: []
     }
   ]
 })
 
-export const writePoints = (points: any[]) => {
+export const writePoints = (points: IPoints[]) => {
   return influx.writePoints(points).catch((err: Error) => {
     logger.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err
