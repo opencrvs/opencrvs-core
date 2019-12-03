@@ -73,8 +73,7 @@ describe('verify metrics handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736',
+      url: `/metrics/birth?timeStart=${new Date().toISOString()}&timeEnd=${new Date().toISOString()}&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736`,
       headers: {
         Authorization: `Bearer ${token}`
       }

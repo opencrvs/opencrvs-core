@@ -7,7 +7,9 @@ Object {
     "total": 50,
   },
   "measurement": "certification_payment",
-  "tags": Object {},
+  "tags": Object {
+    "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
+  },
 }
 `;
 
