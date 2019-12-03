@@ -40,16 +40,20 @@ const enum RouteScope {
 
 export default function getRoutes() {
   return [
-    /* add ping route by default for health check */
+    // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
       handler: (request: any, h: any) => {
-        return 'pong'
+        // Perform any health checks and return true or false for success prop
+        return {
+          success: true
+        }
       },
-      config: {
+      options: {
+        auth: false,
         tags: ['api'],
-        auth: false
+        description: 'Health check endpoint'
       }
     },
     /* curl -H 'Content-Type: application/json' -d '{"msisdn": "+27855555555", "message": "Test"}' http://localhost:2020/sms */

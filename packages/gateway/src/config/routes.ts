@@ -11,6 +11,10 @@
  */
 import * as glob from 'glob'
 import * as path from 'path'
+import healthCheckHandler, {
+  querySchema as healthCheckQuerySchema,
+  responseSchema as healthCheckResponseSchema
+} from '@gateway/features/healthCheck/handler'
 
 export const getRoutes = () => {
   // add ping route by default for health check
@@ -18,11 +22,18 @@ export const getRoutes = () => {
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
-        return 'pong'
-      },
-      config: {
-        tags: ['api']
+      handler: healthCheckHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Checks the health of all services.',
+        notes: 'Pass the service as a querey param: name',
+        validate: {
+          query: healthCheckQuerySchema
+        },
+        response: {
+          schema: healthCheckResponseSchema
+        }
       }
     }
   ]

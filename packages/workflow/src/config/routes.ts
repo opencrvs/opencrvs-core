@@ -19,10 +19,15 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/ping',
       handler: (request: any, h: any) => {
-        return 'pong'
+        // Perform any health checks and return true or false for success prop
+        return {
+          success: true
+        }
       },
-      config: {
-        tags: ['api']
+      options: {
+        auth: false,
+        tags: ['api'],
+        description: 'Health check endpoint'
       }
     },
     {
