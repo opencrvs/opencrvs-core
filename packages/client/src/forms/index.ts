@@ -137,7 +137,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
 
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
-  tooltip?: IDynamicFieldToolTip
+  tooltip?: IDynamicFieldTooltip
   type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
 }
@@ -147,7 +147,7 @@ export interface IDynamicFieldLabel {
   labelMapper: IDynamicFormFieldLabelMapper
 }
 
-export interface IDynamicFieldToolTip {
+export interface IDynamicFieldTooltip {
   dependency: string
   tooltipMapper: IDynamicFormFieldToolTipMapper
 }
