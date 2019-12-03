@@ -157,14 +157,7 @@ describe('Verify utility functions', () => {
     fetch.mockImplementationOnce(() => {
       throw new Error('Mock Error')
     })
-    getRegistrationNumber(
-      'BEFSW3S',
-      JSON.parse(fieldAgentPractitionerMock).id,
-      {
-        Authorization: 'bearer acd '
-      }
-    )
-    expect(
+    expect(() =>
       getRegistrationNumber(
         'BEFSW3S',
         JSON.parse(fieldAgentPractitionerMock).id,
@@ -172,6 +165,8 @@ describe('Verify utility functions', () => {
           Authorization: 'bearer acd '
         }
       )
-    ).rejects.toThrowError()
+    ).toThrowError(
+      'Unable to get registration number for error : Error: Mock Error'
+    )
   })
 })

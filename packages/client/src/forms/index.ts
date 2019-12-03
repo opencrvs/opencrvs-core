@@ -351,6 +351,7 @@ export interface IFormFieldBase {
   // Default false
   readonly?: boolean
   hideInPreview?: boolean
+  ignoreNestedFieldWrappingInPreview?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {

@@ -165,6 +165,7 @@ describe('ReviewForm tests', () => {
                     familyName: 'Akash'
                   }
                 ],
+                multipleBirth: 1,
                 birthDate: '2001-01-01',
                 gender: 'male'
               },
@@ -190,7 +191,6 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                multipleBirth: 1,
                 address: [
                   {
                     type: 'PERMANENT',
@@ -1082,6 +1082,57 @@ describe('ReviewForm tests', () => {
     testComponent.component.update()
     expect(window.location.href).toContain('/progress')
   })
+
+  it('should redirect to progress tab when close application button is clicked', async () => {
+    const application = createReviewApplication(uuid(), {}, Event.BIRTH)
+    store.dispatch(storeApplication(application))
+    const testComponent = await createTestComponent(
+      <ReviewForm
+        location={mock}
+        history={history}
+        scope={scope}
+        staticContext={mock}
+        event={application.event}
+        registerForm={form}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'child',
+            event: application.event.toLowerCase()
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        applicationId={application.id}
+      />,
+      store
+    )
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 0)
+    })
+
+    testComponent.component.update()
+
+    const menuButton = await waitForElement(
+      testComponent.component,
+      '#eventToggleMenuToggleButton'
+    )
+    menuButton.hostNodes().simulate('click')
+    testComponent.component.update()
+
+    const closeApplicationButton = await waitForElement(
+      testComponent.component,
+      '#eventToggleMenuItem0'
+    )
+    closeApplicationButton.hostNodes().simulate('click')
+    testComponent.component.update()
+
+    expect(window.location.href).toContain('/progress')
+  })
+
   it('it checked if review form is already in store and avoid loading from backend', async () => {
     const application = createReviewApplication(uuid(), {}, Event.BIRTH)
     application.data = {
@@ -1314,6 +1365,51 @@ describe('ReviewForm tests', () => {
                       }
                     ]
                   }
+                },
+                father: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec272asaa',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মোক্তার',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Moktar',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                mother: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec2727asdf',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মরিউম',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Morium',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                spouse: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'রেহানা',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Rehana',
+                      familyName: 'Ali'
+                    }
+                  ]
                 },
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
@@ -1583,6 +1679,51 @@ describe('ReviewForm tests', () => {
                       }
                     ]
                   }
+                },
+                father: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মোক্তার',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Moktar',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                mother: {
+                  id: '7ac8d0a6-a391-42f9-add4-dec272asfdasdf',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'মরিউম',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Morium',
+                      familyName: 'Ali'
+                    }
+                  ]
+                },
+                spouse: {
+                  id: '7ac8d0a6-a391-42f9-add4-decasdfasfd89',
+                  name: [
+                    {
+                      use: 'bn',
+                      firstNames: 'রেহানা',
+                      familyName: 'আলী'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'Rehana',
+                      familyName: 'Ali'
+                    }
+                  ]
                 },
                 registration: {
                   id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',

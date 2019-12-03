@@ -1,18 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`When an existing application is marked certified a birth application writes the payment total to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
+    "total": 50,
+  },
+  "measurement": "certification_payment",
+  "tags": Object {
+    "eventType": "BIRTH",
+  },
+}
+`;
+
 exports[`When an existing application is marked certified a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
-    "application_id": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
-    "current_task_id": "75ba4bd8-009e-4a02-896c-148979dde09a",
-    "duration_in_seconds": 3564388,
-    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+    "compositionId": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
+    "currentTaskId": "75ba4bd8-009e-4a02-896c-148979dde09a",
+    "durationInSeconds": 3564388,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
   "measurement": "application_event_duration",
   "tags": Object {
-    "current_status": "CERTIFIED",
-    "event_type": "DEATH",
-    "previous_status": "REGISTERED",
+    "currentStatus": "CERTIFIED",
+    "eventType": "DEATH",
+    "previousStatus": "REGISTERED",
   },
 }
 `;
@@ -20,16 +33,16 @@ Object {
 exports[`When an existing application is marked certified writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
-    "application_id": "1744fc19-95be-434b-8bc9-a76d6b81551b",
-    "current_task_id": "dcf1644e-362d-414f-b0cc-2b240eea8591",
-    "duration_in_seconds": 94381,
-    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+    "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
+    "currentTaskId": "dcf1644e-362d-414f-b0cc-2b240eea8591",
+    "durationInSeconds": 94381,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
   "measurement": "application_event_duration",
   "tags": Object {
-    "current_status": "CERTIFIED",
-    "event_type": "BIRTH",
-    "previous_status": "REGISTERED",
+    "currentStatus": "CERTIFIED",
+    "eventType": "BIRTH",
+    "previousStatus": "REGISTERED",
   },
 }
 `;
@@ -37,16 +50,16 @@ Object {
 exports[`When an existing application is marked registered a death application writes the delta between REGISTERED and CERTIFIED states to influxdb 1`] = `
 Object {
   "fields": Object {
-    "application_id": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
-    "current_task_id": "75ba4bd8-009e-4a02-896c-148979dde09a",
-    "duration_in_seconds": 3727875,
-    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+    "compositionId": "62168b7e-7f80-4e2a-a7b0-1d33759c9d71",
+    "currentTaskId": "75ba4bd8-009e-4a02-896c-148979dde09a",
+    "durationInSeconds": 3727875,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
   "measurement": "application_event_duration",
   "tags": Object {
-    "current_status": "REGISTERED",
-    "event_type": "DEATH",
-    "previous_status": "DECLARED",
+    "currentStatus": "REGISTERED",
+    "eventType": "DEATH",
+    "previousStatus": "DECLARED",
   },
 }
 `;
@@ -54,16 +67,16 @@ Object {
 exports[`When an existing application is marked registered writes the delta between DECLARED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
-    "application_id": "80433e78-7042-4837-b888-a79c0181bf4e",
-    "current_task_id": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
-    "duration_in_seconds": 170630,
-    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+    "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
+    "currentTaskId": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+    "durationInSeconds": 170630,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
   "measurement": "application_event_duration",
   "tags": Object {
-    "current_status": "REGISTERED",
-    "event_type": "BIRTH",
-    "previous_status": "DECLARED",
+    "currentStatus": "REGISTERED",
+    "eventType": "BIRTH",
+    "previousStatus": "DECLARED",
   },
 }
 `;
@@ -71,16 +84,16 @@ Object {
 exports[`When an existing application is marked registered writes the delta between VALIDATED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
-    "application_id": "80433e78-7042-4837-b888-a79c0181bf4e",
-    "current_task_id": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
-    "duration_in_seconds": 170630,
-    "previous_task_id": "e172627c-8490-44da-a702-80a082f978f5",
+    "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
+    "currentTaskId": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+    "durationInSeconds": 170630,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
   },
   "measurement": "application_event_duration",
   "tags": Object {
-    "current_status": "REGISTERED",
-    "event_type": "BIRTH",
-    "previous_status": "VALIDATED",
+    "currentStatus": "REGISTERED",
+    "eventType": "BIRTH",
+    "previousStatus": "VALIDATED",
   },
 }
 `;
@@ -88,15 +101,16 @@ Object {
 exports[`When an in-progress application is received writes the in complete field points to influxdb 1`] = `
 Object {
   "fields": Object {
-    "missing_field_group_id": "child-view-group",
-    "missing_field_id": "placeOfBirth",
-    "missing_field_section_id": "child",
+    "compositionId": "b2fbb82c-a68d-4793-98e1-87484fc785c4",
+    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
   },
   "measurement": "in_complete_fields",
   "tags": Object {
-    "compositionId": "b2fbb82c-a68d-4793-98e1-87484fc785c4",
-    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
-    "reg_status": "IN_PROGESS",
+    "eventType": "BIRTH",
+    "missingFieldGroupId": "child-view-group",
+    "missingFieldId": "placeOfBirth",
+    "missingFieldSectionId": "child",
+    "regStatus": "IN_PROGESS",
   },
 }
 `;

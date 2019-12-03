@@ -24,7 +24,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-
+import { NoResultMessage } from './NoResultMessage'
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
 `
@@ -54,6 +54,7 @@ class ReportComponent extends React.Component<Props, State> {
           {intl.formatMessage(buttonMessages.back)}
         </BackButton>
         <Header>{title}</Header>
+        <NoResultMessage searchedLocation="Dhaka" />
       </PerformanceContentWrapper>
     )
   }

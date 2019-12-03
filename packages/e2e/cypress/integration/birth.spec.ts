@@ -665,7 +665,6 @@ context('Birth Integration Test', () => {
     cy.goToNextFormSection()
     // DOCUMENTS
     cy.goToNextFormSection()
-
     cy.submitApplication()
     // LOG OUT
     cy.get('#ProfileMenuToggleButton').click()

@@ -28,7 +28,7 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_SPOUSE').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_APPLICANT').click()
@@ -76,6 +76,14 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
+    cy.goToNextFormSection()
+    // FATHER DETAILS
+    cy.get('#fatherFamilyName').type('উদ্দিন')
+    cy.get('#fatherFamilyNameEng').type('Uddin')
+    cy.goToNextFormSection()
+    // MOTHER DETAILS
+    cy.get('#motherFamilyName').type('উদ্দিন')
+    cy.get('#motherFamilyNameEng').type('Uddin')
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
@@ -209,6 +217,25 @@ context('Death Integration Test', () => {
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
     cy.goToNextFormSection()
+    // FATHER DETAILS
+    cy.get('#fatherFirstNames').type('মোক্তার')
+    cy.get('#fatherFamilyName').type('খান')
+    cy.get('#fatherFirstNamesEng').type('Mokhtar')
+    cy.get('#fatherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // MOTHER DETAILS
+    cy.get('#motherFirstNames').type('রাবেয়া')
+    cy.get('#motherFamilyName').type('খান')
+    cy.get('#motherFirstNamesEng').type('Rabeya')
+    cy.get('#motherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // SPOUSE DETAILS
+    cy.get('#hasDetails_Yes').click()
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNames').type('রোকেয়া')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyName').type('খান')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNamesEng').type('Rokeya')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
     // PREVIEW
@@ -243,7 +270,7 @@ context('Death Integration Test', () => {
     cy.get('#select_death_event').click()
     cy.get('#continue').click()
     // SELECT INFORMANT
-    cy.get('#select_informant_SON').click()
+    cy.get('#select_informant_SPOUSE').click()
     cy.get('#continue').click()
     // SELECT MAIN CONTACT POINT
     cy.get('#contactPoint_APPLICANT').click()
@@ -296,7 +323,14 @@ context('Death Integration Test', () => {
     cy.selectOption('#district', 'Gazipur', 'Gazipur')
     cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
     cy.get('#applicantPermanentAddressSameAsCurrent_true').click()
-
+    cy.goToNextFormSection()
+    // FATHER DETAILS
+    cy.get('#fatherFamilyName').type('উদ্দিন')
+    cy.get('#fatherFamilyNameEng').type('Uddin')
+    cy.goToNextFormSection()
+    // MOTHER DETAILS
+    cy.get('#motherFamilyName').type('উদ্দিন')
+    cy.get('#motherFamilyNameEng').type('Uddin')
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
@@ -433,7 +467,25 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-
+    cy.goToNextFormSection()
+    // FATHER DETAILS
+    cy.get('#fatherFirstNames').type('মোক্তার')
+    cy.get('#fatherFamilyName').type('খান')
+    cy.get('#fatherFirstNamesEng').type('Mokhtar')
+    cy.get('#fatherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // MOTHER DETAILS
+    cy.get('#motherFirstNames').type('রাবেয়া')
+    cy.get('#motherFamilyName').type('খান')
+    cy.get('#motherFirstNamesEng').type('Rabeya')
+    cy.get('#motherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // SPOUSE DETAILS
+    cy.get('#hasDetails_Yes').click()
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNames').type('রোকেয়া')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyName').type('খান')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNamesEng').type('Rokeya')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyNameEng').type('Khan')
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()
@@ -572,7 +624,25 @@ context('Death Integration Test', () => {
     cy.get('#addressLine2Permanent').type('Bahadur street')
     cy.get('#addressLine1Permanent').type('40 Ward')
     cy.get('#postCodePermanent').type('1024')
-
+    cy.goToNextFormSection()
+    // FATHER DETAILS
+    cy.get('#fatherFirstNames').type('মোক্তার')
+    cy.get('#fatherFamilyName').type('খান')
+    cy.get('#fatherFirstNamesEng').type('Mokhtar')
+    cy.get('#fatherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // MOTHER DETAILS
+    cy.get('#motherFirstNames').type('রাবেয়া')
+    cy.get('#motherFamilyName').type('খান')
+    cy.get('#motherFirstNamesEng').type('Rabeya')
+    cy.get('#motherFamilyNameEng').type('Khan')
+    cy.goToNextFormSection()
+    // SPOUSE DETAILS
+    cy.get('#hasDetails_Yes').click()
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNames').type('রোকেয়া')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyName').type('খান')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFirstNamesEng').type('Rokeya')
+    cy.get('#hasDetails\\.nestedFields\\.spouseFamilyNameEng').type('Khan')
     cy.goToNextFormSection()
     // DOCUMENT DETAILS
     cy.goToNextFormSection()

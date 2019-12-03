@@ -334,6 +334,26 @@ interface IFormMessages {
   reasonMotherNotApplyingPreview: MessageDescriptor
   reasonFatherNotApplyingPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
+  deceasedFatherSectionName: MessageDescriptor
+  deceasedFatherSectionTitle: MessageDescriptor
+  deceasedFathersFamilyName: MessageDescriptor
+  deceasedFathersFamilyNameEng: MessageDescriptor
+  deceasedFathersGivenNames: MessageDescriptor
+  deceasedFathersGivenNamesEng: MessageDescriptor
+  deceasedMotherSectionName: MessageDescriptor
+  deceasedMotherSectionTitle: MessageDescriptor
+  deceasedMothersFamilyName: MessageDescriptor
+  deceasedMothersFamilyNameEng: MessageDescriptor
+  deceasedMothersGivenNames: MessageDescriptor
+  deceasedMothersGivenNamesEng: MessageDescriptor
+  deceasedSpouseSectionName: MessageDescriptor
+  deceasedSpouseSectionTitle: MessageDescriptor
+  deceasedHasSpouseDetails: MessageDescriptor
+  deceasedHasNoSpouseDetails: MessageDescriptor
+  deceasedSpousesFamilyName: MessageDescriptor
+  deceasedSpousesFamilyNameEng: MessageDescriptor
+  deceasedSpousesGivenNames: MessageDescriptor
+  deceasedSpousesGivenNamesEng: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1976,6 +1996,106 @@ const messagesToDefine: IFormMessages = {
       'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
     description: 'Tooltip for form field: iD number',
     id: 'form.field.tooltip.tooltipNationalID'
+  },
+  deceasedFatherSectionName: {
+    defaultMessage: "What is the deceased's father name?",
+    description: 'Form section name for father section',
+    id: 'form.section.deceased.father.name'
+  },
+  deceasedFatherSectionTitle: {
+    defaultMessage: "Father's details",
+    description: 'Form section name for father section',
+    id: 'form.section.deceased.father.title'
+  },
+  deceasedFathersFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.deceasedFathersFamilyName'
+  },
+  deceasedFathersFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.deceasedFathersFamilyNameEng'
+  },
+  deceasedFathersGivenNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: Given names',
+    id: 'form.field.label.deceasedFathersGivenNames'
+  },
+  deceasedFathersGivenNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: Given names in english',
+    id: 'form.field.label.deceasedFathersGivenNamesEng'
+  },
+  deceasedMotherSectionName: {
+    defaultMessage: "What is the deceased's mother name?",
+    description: 'Form section name for mother section',
+    id: 'form.section.deceased.mother.name'
+  },
+  deceasedMotherSectionTitle: {
+    defaultMessage: "Mother's details",
+    description: 'Form section name for mother section',
+    id: 'form.section.deceased.mother.title'
+  },
+  deceasedMothersFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.deceasedMothersFamilyName'
+  },
+  deceasedMothersFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.deceasedMothersFamilyNameEng'
+  },
+  deceasedMothersGivenNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: Given names',
+    id: 'form.field.label.deceasedMothersGivenNames'
+  },
+  deceasedMothersGivenNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: Given names in english',
+    id: 'form.field.label.deceasedMothersGivenNamesEng'
+  },
+  deceasedSpouseSectionName: {
+    defaultMessage: 'Does the deceased have a spouse?',
+    description: 'Form section name for spouse section',
+    id: 'form.section.deceased.spouse.name'
+  },
+  deceasedSpouseSectionTitle: {
+    defaultMessage: "Spouse's details",
+    description: 'Form section name for spouse section',
+    id: 'form.section.deceased.spouse.title'
+  },
+  deceasedHasSpouseDetails: {
+    defaultMessage: 'Yes',
+    description: 'Option for form field: Deceased has spouse',
+    id: 'form.section.deceased.hasSpouse'
+  },
+  deceasedHasNoSpouseDetails: {
+    defaultMessage: 'No / Unknown',
+    description: "Option for form field: Deceased doesn't have spouse",
+    id: 'form.section.deceased.noSpouse'
+  },
+  deceasedSpousesFamilyName: {
+    defaultMessage: 'Last Name(s) in Bengali',
+    description: 'Label for form field: Family name',
+    id: 'form.field.label.deceasedSpousesFamilyName'
+  },
+  deceasedSpousesFamilyNameEng: {
+    defaultMessage: 'Last Name(s) in English',
+    description: 'Label for form field: Family name in english',
+    id: 'form.field.label.deceasedSpousesFamilyNameEng'
+  },
+  deceasedSpousesGivenNames: {
+    defaultMessage: 'First Name(s) in Bengali',
+    description: 'Label for form field: Given names',
+    id: 'form.field.label.deceasedSpouseGivenNames'
+  },
+  deceasedSpousesGivenNamesEng: {
+    defaultMessage: 'First Name(s) in English',
+    description: 'Label for form field: Given names in english',
+    id: 'form.field.label.deceasedSpousesGivenNamesEng'
   }
 }
 

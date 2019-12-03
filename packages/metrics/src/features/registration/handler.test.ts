@@ -14,6 +14,8 @@ import * as api from '@metrics/api'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchAny from 'jest-fetch-mock'
+import { testDeclaration } from '@metrics/features/registration/testUtils'
+import { cloneDeep } from 'lodash'
 
 const fetch = fetchAny as any
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
@@ -59,6 +61,35 @@ describe('When a new registration event is received', () => {
         })
       ]
     )
+  })
+
+  it('returns ok for valid new birth declaration', async () => {
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/new-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload: testDeclaration
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns 500 for invalid payload in new birth registration', async () => {
+    const payload = cloneDeep(testDeclaration)
+    // @ts-ignore
+    payload.entry[0] = {}
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/new-declaration',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+
+    expect(res.statusCode).toBe(500)
   })
 
   it('returns ok for valid new birth registration', async () => {
@@ -1175,6 +1206,27 @@ describe('When an existing application is marked certified', () => {
       expect(applicationEventPoint).toMatchSnapshot()
     })
   })
+  describe('a birth application', () => {
+    it('writes the payment total to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/mark-certified-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/mark-certified',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'certification_payment'
+      )
+
+      expect(applicationEventPoint).toMatchSnapshot()
+    })
+  })
 })
 
 describe('When an in-progress application is received', () => {
@@ -1195,7 +1247,7 @@ describe('When an in-progress application is received', () => {
       },
       payload
     })
-    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0][0].find(
+    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
       ({ measurement }: { measurement: string }) =>
         measurement === 'in_complete_fields'
     )

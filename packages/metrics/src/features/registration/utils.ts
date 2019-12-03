@@ -18,6 +18,10 @@ export function getAgeInDays(dateOfBirth: YYYY_MM_DD) {
   return getDurationInDays(dateOfBirth, new Date().toISOString())
 }
 
+export function getAgeInYears(dateOfBirth: YYYY_MM_DD) {
+  return getDurationInYears(dateOfBirth, new Date().toISOString())
+}
+
 export function getDurationInDays(from: ISO_DATE, to: ISO_DATE) {
   const toDate = moment(to)
   const fromDate = moment(from)
@@ -28,4 +32,10 @@ export function getDurationInSeconds(from: ISO_DATE, to: ISO_DATE) {
   const toDate = moment(to)
   const fromDate = moment(from)
   return toDate.diff(fromDate, 'seconds')
+}
+
+export function getDurationInYears(from: ISO_DATE, to: ISO_DATE) {
+  const toDate = moment(to)
+  const fromDate = moment(from)
+  return toDate.diff(fromDate, 'years')
 }

@@ -1051,6 +1051,67 @@ describe('when user is in the register form review section', () => {
   })
 })
 
+describe('when user is in the register form from review edit', () => {
+  let component: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    const { store, history } = await createTestStore()
+    // @ts-ignore
+    const application = createReviewApplication(
+      uuid(),
+      mockApplicationData,
+      Event.BIRTH
+    )
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(application))
+    const mock: any = jest.fn()
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+
+    const form = await getReviewFormFromStore(store, Event.BIRTH)
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <RegisterForm
+        location={mock}
+        scope={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        application={application}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'mother'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    component = testComponent.component
+  })
+
+  it('should redirect to progress tab when close application button is clicked', async () => {
+    const menuButton = await waitForElement(
+      component,
+      '#eventToggleMenuToggleButton'
+    )
+    menuButton.hostNodes().simulate('click')
+    component.update()
+
+    const closeApplicationButton = await waitForElement(
+      component,
+      '#eventToggleMenuItem0'
+    )
+    closeApplicationButton.hostNodes().simulate('click')
+    component.update()
+
+    expect(window.location.href).toContain('/progress')
+  })
+})
+
 describe('When user is in Preview section death event', () => {
   let store: AppStore
   let history: History

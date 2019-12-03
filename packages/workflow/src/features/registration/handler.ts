@@ -13,21 +13,34 @@ import { HEARTH_URL } from '@workflow/constants'
 import { Events } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
-  markBundleAsRegistered,
   markBundleAsValidated,
+  markEventAsRegistered,
   modifyRegistrationBundle,
-  setTrackingId
+  setTrackingId,
+  markBundleAsWaitingValidation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
+  getEventInformantName,
+  getFromFhir,
+  getPhoneNo,
   getSharedContactMsisdn,
   postToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { sendEventNotification } from '@workflow/features/registration/utils'
+import {
+  getTaskEventType,
+  sendEventNotification,
+  sendRegisteredNotification,
+  isEventNonNotifiable
+} from '@workflow/features/registration/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
 
+interface IEventRegistrationCallbackPayload {
+  trackingId: string
+  registrationNumber: string
+}
 async function sendBundleToHearth(
   payload: fhir.Bundle,
   count = 1
@@ -84,8 +97,11 @@ export async function createRegistrationHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-    if (event === Events.BIRTH_NEW_REG || event === Events.DEATH_NEW_REG) {
-      payload = await markBundleAsRegistered(
+    if (
+      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
+      event === Events.DEATH_NEW_WAITING_VALIDATION
+    ) {
+      payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
         getToken(request)
       )
@@ -101,12 +117,7 @@ export async function createRegistrationHandler(
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
 
-    if (
-      event === Events.BIRTH_IN_PROGRESS_DEC ||
-      event === Events.DEATH_IN_PROGRESS_DEC ||
-      event === Events.BIRTH_NEW_VALIDATE ||
-      event === Events.DEATH_NEW_VALIDATE
-    ) {
+    if (isEventNonNotifiable(event)) {
       return resBundle
     }
 
@@ -147,34 +158,68 @@ export async function markEventAsValidatedHandler(
   }
 }
 
-export async function markEventAsRegisteredHandler(
+export async function markEventAsRegisteredCallbackHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const {
+    trackingId,
+    registrationNumber
+  } = request.payload as IEventRegistrationCallbackPayload
+  const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
+  const composition: fhir.Composition = await getFromFhir(`/${task.focus}`)
+  const event = getTaskEventType(task)
+
+  try {
+    await markEventAsRegistered(
+      task,
+      registrationNumber,
+      event,
+      getToken(request)
+    )
+    const resBundle = await postToHearth(task)
+
+    const phoneNo = await getPhoneNo(composition, task, event)
+    const informantName = await getEventInformantName(composition, event)
+    /* sending notification to the contact */
+    if (phoneNo && informantName) {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler sending event notification'
+      )
+      sendRegisteredNotification(phoneNo, informantName, event, {
+        Authorization: request.headers.authorization
+      })
+    } else {
+      logger.info(
+        'markEventAsRegisteredCallbackHandler could not send event notification'
+      )
+    }
+    return resBundle
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
+    )
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsWaitingValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit,
   event: Events
 ) {
   try {
-    const payload = await markBundleAsRegistered(
+    const payload = await markBundleAsWaitingValidation(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
     const resBundle = await postToHearth(payload)
 
-    const msisdn = await getSharedContactMsisdn(payload)
-    /* sending notification to the contact */
-    if (msisdn) {
-      logger.info('markEventAsRegisteredHandler sending event notification')
-      sendEventNotification(payload, event, msisdn, {
-        Authorization: request.headers.authorization
-      })
-    } else {
-      logger.info(
-        'markEventAsRegisteredHandler could not send event notification'
-      )
-    }
-
     return resBundle
   } catch (error) {
-    logger.error(`Workflow/markAsRegisteredHandler[${event}]: error: ${error}`)
+    logger.error(
+      `Workflow/markAsWaitingValidationHandler[${event}]: error: ${error}`
+    )
     throw new Error(error)
   }
 }

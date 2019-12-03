@@ -116,6 +116,29 @@ export async function sendEventNotification(
   }
 }
 
+export async function sendRegisteredNotification(
+  msisdn: string,
+  informantName: string,
+  eventType: EVENT_TYPE,
+  authHeader: { Authorization: string }
+) {
+  if (eventType === EVENT_TYPE.BIRTH) {
+    await sendNotification(
+      'birthRegistrationSMS',
+      msisdn,
+      informantName,
+      authHeader
+    )
+  } else {
+    await sendNotification(
+      'deathRegistrationSMS',
+      msisdn,
+      informantName,
+      authHeader
+    )
+  }
+}
+
 async function sendNotification(
   smsType: string,
   msisdn: string,
@@ -225,27 +248,38 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
   )
 }
 
-export async function getRegistrationNumber(
+export function isEventNonNotifiable(event: Events) {
+  return (
+    [
+      Events.BIRTH_IN_PROGRESS_DEC,
+      Events.DEATH_IN_PROGRESS_DEC,
+      Events.BIRTH_NEW_VALIDATE,
+      Events.DEATH_NEW_VALIDATE,
+      Events.BIRTH_WAITING_VALIDATION,
+      Events.DEATH_WAITING_VALIDATION,
+      Events.BIRTH_NEW_WAITING_VALIDATION,
+      Events.DEATH_NEW_WAITING_VALIDATION
+    ].indexOf(event) >= 0
+  )
+}
+
+export function getRegistrationNumber(
   trackingId: string,
   practitionerId: string,
   authHeader: { Authorization: string }
-): Promise<{ registrationNumber: string }> {
+) {
   try {
-    const response = await fetch(
-      `${RESOURCE_SERVICE_URL}generate/registrationNumber`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          trackingId,
-          practitionerId
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
+    fetch(`${RESOURCE_SERVICE_URL}generate/registrationNumber`, {
+      method: 'POST',
+      body: JSON.stringify({
+        trackingId,
+        practitionerId
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
       }
-    )
-    return response.json()
+    })
   } catch (err) {
     throw new Error(`Unable to get registration number for error : ${err}`)
   }
