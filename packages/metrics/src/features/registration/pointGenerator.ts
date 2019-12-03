@@ -23,7 +23,6 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
-  IPaymentTags,
   IPoints
 } from '@metrics/features/registration'
 import {
@@ -193,8 +192,9 @@ const generatePointLocations = async (
 }
 
 export async function generatePaymentPoint(
-  payload: fhir.Bundle
-): Promise<IPoints> {
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
   const task = getTask(payload)
@@ -215,9 +215,7 @@ export async function generatePaymentPoint(
     compositionId: composition.id
   }
 
-  const tags: IPaymentTags = {
-    eventType: getApplicationType(task) as string
-  }
+  const tags = await generatePointLocations(payload, authHeader)
 
   return {
     measurement: 'certification_payment',

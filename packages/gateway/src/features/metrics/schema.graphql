@@ -8,10 +8,16 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 type BirthRegistrationMetrics {
-  timeFrames: [BirthRegistraionTimeFrameMetrics]
+  timeFrames: [BirthRegistrationTimeFrameMetrics]
+  payments: [CertificationPaymentMetrics]
 }
 
-type BirthRegistraionTimeFrameMetrics {
+type CertificationPaymentMetrics {
+  total: Int!
+  locationId: String!
+}
+
+type BirthRegistrationTimeFrameMetrics {
   regWithin45d: Int
   regWithin45dTo1yr: Int
   regWithin1yrTo5yr: Int
