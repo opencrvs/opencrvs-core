@@ -91,6 +91,9 @@ fi
 # Setup configuration files and compose file for the deployment domain
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
+# Setup log rotation for OpenCRVS logs
+ssh $SSH_USER@$SSH_HOST 'mv /tmp/compose/infrastructure/logrotate.conf /etc/'
+
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
 ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'

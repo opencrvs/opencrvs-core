@@ -56,10 +56,10 @@ job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ss
 
 Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
 
-Run the Ansible playbook configuration script from your client computer (You must have Ansible installed):
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Loggly account - remove Loggly config from playbook if you do not wish to use the service. We recommend you use an external Logging service to have access to logs):
 
 ```
-ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
+ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password loggly_domain=your_loggly_domain loggly_token=your_loggly_token loggly_username=your_loggly_username loggly_password=your_loggly_password"
 ```
 
 Replace <inventory_file> with the correct inventory file and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
