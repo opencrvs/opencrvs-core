@@ -74,20 +74,20 @@ const Label = styled.span`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
-export interface ILocationItem {
+export interface ISearchLocation {
   id: string
   searchableText: string
   displayLabel: string
 }
 interface IState {
   dropDownIsVisible: boolean
-  filteredList: ILocationItem[]
+  filteredList: ISearchLocation[]
   selectedText: string | null
-  selectedItem: ILocationItem | null
+  selectedItem: ISearchLocation | null
 }
 interface IProps {
-  locationList: ILocationItem[]
-  searchHandler?: (id: string) => void
+  locationList: ISearchLocation[]
+  searchHandler?: (location: ISearchLocation) => void
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -113,7 +113,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   search = (searchText: string) => {
-    const searchResult = [] as ILocationItem[]
+    const searchResult = [] as ISearchLocation[]
     if (searchText.length > 0) {
       for (const location of this.props.locationList) {
         if (searchResult.length === 10) {
@@ -149,9 +149,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
     }
   }
 
-  dropDownItemSelect = (item: ILocationItem) => {
+  dropDownItemSelect = (item: ISearchLocation) => {
     if (this.props.searchHandler) {
-      this.props.searchHandler(item.id)
+      this.props.searchHandler(item)
     }
 
     this.setState(_ => ({

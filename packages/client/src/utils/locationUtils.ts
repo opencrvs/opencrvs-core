@@ -12,7 +12,7 @@
 import { ILocation } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
 import { SYS_ADMIN_ROLES, JURISDICTION_TYPE } from './constants'
-import { ILocationItem } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
+import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -59,7 +59,7 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
 }
 
 export function generateLocations(locations: { [key: string]: ILocation }) {
-  const generated: ILocationItem[] = []
+  const generated: ISearchLocation[] = []
 
   Object.values(locations).forEach((location: ILocation) => {
     let locationName = location.name
