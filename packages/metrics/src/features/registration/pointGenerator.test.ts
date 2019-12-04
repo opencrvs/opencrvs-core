@@ -46,14 +46,14 @@ describe('Verify point generation', () => {
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
-      },
-      fields: {
-        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
+        gender: 'male',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
+        locationLevel2: 'Location/2'
+      },
+      fields: {
+        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
         ageInDays: 435
       }
     })
@@ -87,11 +87,11 @@ describe('Verify point generation', () => {
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
+        gender: 'male',
+        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         ageInDays: undefined
       }
     })
@@ -111,12 +111,12 @@ describe('Verify point generation', () => {
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
+        gender: 'male',
+        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
+        locationLevel4: 'Location/4'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
-        locationLevel4: 'Location/4',
         ageInDays: 435
       }
     })
@@ -153,14 +153,14 @@ describe('Verify point generation', () => {
         regStatus: 'mark-existing-application-registered',
         gender: 'male',
         causeOfDeath: 'Old age',
-        mannerOfDeath: 'NATURAL_CAUSES'
-      },
-      fields: {
-        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
+        mannerOfDeath: 'NATURAL_CAUSES',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
+        locationLevel2: 'Location/2'
+      },
+      fields: {
+        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
         ageInYears: 43
       }
     })
