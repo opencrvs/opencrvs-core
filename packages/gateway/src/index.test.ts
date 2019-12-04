@@ -169,7 +169,7 @@ describe('Route authorization', () => {
       method: 'GET',
       url: '/ping'
     })
-    expect(res.statusCode).toBe(500)
+    expect(res.statusCode).toBe(400)
   })
   it('Rejects the health check with an invalid parameter', async () => {
     fetch.mockResponse(

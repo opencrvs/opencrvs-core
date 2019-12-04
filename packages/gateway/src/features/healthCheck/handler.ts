@@ -11,7 +11,7 @@
  */
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { internal } from 'boom'
+import { badRequest, internal } from 'boom'
 import {
   AUTH_URL,
   SEARCH_URL,
@@ -56,7 +56,7 @@ export default async function healthCheckHandler(
   if (request.query['service'] && request.query['service'][0]) {
     service = request.query['service'][0]
   } else {
-    throw internal('Received no service to check')
+    throw badRequest('Received no service to check')
   }
 
   let response
