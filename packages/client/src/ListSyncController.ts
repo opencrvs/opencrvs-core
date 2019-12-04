@@ -9,88 +9,74 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { client } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
 import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
 import ApolloClient, { ApolloError } from 'apollo-client'
-import { AppStore, createStore } from './store'
-import { updateRegistrarWorkQueue, IWorkqueue } from './applications'
 import { Dispatch } from 'redux'
+import { updateRegistrarWorkQueue } from './applications'
 
-const COUNT = 10
+const onSuccess = (dispatch: Dispatch, result: IQueryData) => {
+  dispatch(updateRegistrarWorkQueue(false, false, result))
+}
 
-export class ListSyncController {
-  private dispatch: Dispatch
-  private workqueueLoading: boolean
-  private client: ApolloClient<{}>
-  private locationId: string = ''
-  private reviewStatuses: string[] = []
-  private inProgressSkip: number = 0
-  private reviewSkip: number = 0
-  private rejectSkip: number = 0
-  private approvalSkip: number = 0
-  private printSkip: number = 0
-
-  constructor(
-    dispatch: Dispatch,
-    workqueueLoading: boolean,
-    locationId: string,
-    reviewStatuses: string[],
-    inProgressSkip: number,
-    reviewSkip: number,
-    rejectSkip: number,
-    approvalSkip: number,
-    printSkip: number
-  ) {
-    this.dispatch = dispatch
-    this.workqueueLoading = workqueueLoading
-    this.client = client
-    this.locationId = locationId
-    this.reviewStatuses = reviewStatuses
-    this.inProgressSkip = inProgressSkip
-    this.reviewSkip = reviewSkip
-    this.rejectSkip = rejectSkip
-    this.approvalSkip = approvalSkip
-    this.printSkip = printSkip
+const onError = (dispatch: Dispatch, error: ApolloError) => {
+  dispatch(updateRegistrarWorkQueue(false, true))
+}
+const queryData = async (
+  dispatch: Dispatch,
+  locationId: string,
+  reviewStatuses: string[],
+  inProgressSkip: number,
+  reviewSkip: number,
+  rejectSkip: number,
+  approvalSkip: number,
+  printSkip: number,
+  client: ApolloClient<{}>
+) => {
+  try {
+    const queryResult = await client.query({
+      query: REGISTRATION_HOME_QUERY,
+      variables: {
+        locationIds: [locationId],
+        count: 10,
+        reviewStatuses: reviewStatuses,
+        inProgressSkip: inProgressSkip,
+        reviewSkip: reviewSkip,
+        rejectSkip: rejectSkip,
+        approvalSkip: approvalSkip,
+        printSkip: printSkip
+      },
+      fetchPolicy: 'no-cache'
+    })
+    onSuccess(dispatch, queryResult.data)
+  } catch (exception) {
+    onError(dispatch, exception)
   }
-
-  public start = () => {
-    if (this.workqueueLoading) {
-      this.dispatch(updateRegistrarWorkQueue(true, false))
-      this.sync()
-    }
-  }
-
-  private sync = async () => {
-    this.queryData()
-  }
-
-  public queryData = async () => {
-    try {
-      const queryResult = await this.client.query({
-        query: REGISTRATION_HOME_QUERY,
-        variables: {
-          locationIds: [this.locationId],
-          count: 10,
-          reviewStatuses: this.reviewStatuses,
-          inProgressSkip: this.inProgressSkip,
-          reviewSkip: this.reviewSkip,
-          rejectSkip: this.rejectSkip,
-          approvalSkip: this.approvalSkip,
-          printSkip: this.printSkip
-        }
-      })
-      this.onSuccess(queryResult.data)
-    } catch (exception) {
-      this.onError(exception)
-    }
-  }
-
-  private onSuccess = (result: IQueryData) => {
-    this.dispatch(updateRegistrarWorkQueue(false, false, result))
-  }
-
-  private onError = (error: ApolloError) => {
-    this.dispatch(updateRegistrarWorkQueue(false, true))
+}
+export const syncRegistrarWorkqueue = (
+  dispatch: Dispatch,
+  requireLoading: boolean = false,
+  locationId: string,
+  reviewStatuses: string[],
+  client: ApolloClient<{}>,
+  inProgressSkip: number = 0,
+  reviewSkip: number = 0,
+  rejectSkip: number = 0,
+  approvalSkip: number = 0,
+  printSkip: number = 0
+) => {
+  if (requireLoading) {
+    dispatch(updateRegistrarWorkQueue(true, false))
+    queryData(
+      dispatch,
+      locationId,
+      reviewStatuses,
+      inProgressSkip,
+      reviewSkip,
+      rejectSkip,
+      approvalSkip,
+      printSkip,
+      client
+    )
   }
 }
