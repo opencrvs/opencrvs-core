@@ -318,33 +318,7 @@ export interface WorkqueueState {
 const workqueueInitialState = {
   workqueue: {
     loading: false,
-    error: false,
-    data: {
-      inProgressTab: {
-        totalItems: 0,
-        results: []
-      },
-      reviewTab: {
-        totalItems: 0,
-        results: []
-      },
-      rejectTab: {
-        totalItems: 0,
-        results: []
-      },
-      approvalTab: {
-        totalItems: 0,
-        results: []
-      },
-      printTab: {
-        totalItems: 0,
-        results: []
-      },
-      notificationTab: {
-        totalItems: 0,
-        results: []
-      }
-    }
+    error: false
   }
 }
 
