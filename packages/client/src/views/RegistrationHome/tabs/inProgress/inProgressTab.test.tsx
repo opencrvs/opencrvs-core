@@ -43,6 +43,7 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
@@ -686,18 +687,17 @@ describe('In Progress tab', () => {
       })
       testComponent.component.update()
 
-      const instance = testComponent.component.find(GridTable).instance() as any
+      const instance = (await waitForElement(
+        testComponent.component,
+        GridTable
+      )).instance()
 
       instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.component.update()
-      expect(
-        testComponent.component.find('#IN_PROGRESS-0').hostNodes().length
-      ).toBe(1)
+      const element = await waitForElement(
+        testComponent.component,
+        '#IN_PROGRESS-0'
+      )
+      expect(element.hostNodes().length).toBe(1)
     })
 
     describe('handles download status', () => {
