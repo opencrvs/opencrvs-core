@@ -253,6 +253,28 @@ export async function postToHearth(payload: any) {
   return res.json()
 }
 
+export async function updateResourceInHearth(resource: fhir.ResourceBase) {
+  const res = await fetch(
+    `${HEARTH_URL}/${resource.resourceType}/${resource.id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(resource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `FHIR update to ${resource.resourceType} failed with [${
+        res.status
+      }] body: ${await res.text()}`
+    )
+  }
+
+  return res.text()
+}
+
 export async function getPhoneNo(
   composition: fhir.Composition,
   taskResource: fhir.Task,

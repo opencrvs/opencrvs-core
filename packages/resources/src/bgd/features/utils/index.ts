@@ -129,7 +129,7 @@ export function getA2iInternalRefIndentifierOfLocation(
   )
 }
 export const getFromFhir = (suffix: string) => {
-  return fetch(`${FHIR_URL}${suffix}`, {
+  return fetch(`${FHIR_URL}${suffix.startsWith('/') ? '' : '/'}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
     }

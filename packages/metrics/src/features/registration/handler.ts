@@ -20,6 +20,7 @@ import {
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
+import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 
 export async function baseHandler(
   request: Hapi.Request,
@@ -85,22 +86,23 @@ export async function markBirthRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
     const points = await Promise.all([
       generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['DECLARED', 'VALIDATED'],
+        bundle,
+        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'], // TODO add this for other event duration points?
         {
           Authorization: request.headers.authorization
         }
       ),
-      generateBirthRegPoint(
-        request.payload as fhir.Bundle,
-        'mark-existing-application-registered',
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(bundle)
     ])
 
     await writePoints(points)
