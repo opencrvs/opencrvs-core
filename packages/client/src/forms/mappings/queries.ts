@@ -10,4 +10,5 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export { FETCH_PERSON } from '@client/forms/register/queries/person'
+export { FETCH_PERSON_NID } from '@client/forms/register/queries/person'
 export { FETCH_REGISTRATION } from '@client/forms/register/queries/registration'

@@ -11,6 +11,8 @@
  */
 export { identityNameMapper } from '@client/forms/identity'
 
+export { identityTooltipMapper } from '@client/forms/identity'
+
 export {
   getDateOfMarriageLabel,
   getMotherDateOfBirthLabel,

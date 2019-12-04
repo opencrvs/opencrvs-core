@@ -2058,6 +2058,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "tooltip": {
+                      "dependency": "iDType",
+                      "tooltipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -2079,6 +2085,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "tooltip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -2116,7 +2127,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Informant's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchInformantDetails"
                   },
@@ -2149,12 +2160,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "applicantBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "applicantID"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -2180,7 +2200,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.applicantBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -5303,6 +5327,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "tooltip": {
+                      "dependency": "iDType",
+                      "tooltipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -5324,6 +5354,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "tooltip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -5349,7 +5384,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Mother's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchMotherDetails"
                   },
@@ -5382,12 +5417,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "motherBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -5413,7 +5457,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.motherBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -7491,6 +7539,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "tooltip": {
+                      "dependency": "iDType",
+                      "tooltipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -7512,6 +7566,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "tooltip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -7541,7 +7600,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Father's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchFatherDetails"
                   },
@@ -7574,12 +7633,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "fatherBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -7609,7 +7677,11 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.fatherBirthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -10817,6 +10889,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "tooltip": {
+                      "dependency": "iDType",
+                      "tooltipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -10838,6 +10916,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "tooltip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -10863,7 +10946,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Deceased's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchDeceasedDetails"
                   },
@@ -10896,12 +10979,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "birthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "iD"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -10927,7 +11019,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.birthDate)"
                     }
                   ],
                   "modalTitle": {
@@ -14796,6 +14892,12 @@
                         "operation": "identityNameMapper"
                       }
                     },
+                    "tooltip": {
+                      "dependency": "iDType",
+                      "tooltipMapper": {
+                        "operation": "identityTooltipMapper"
+                      }
+                    },
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -14817,6 +14919,11 @@
                     "defaultMessage": "ID Number",
                     "description": "Label for form field: ID Number",
                     "id": "form.field.label.iD"
+                  },
+                  "tooltip": {
+                    "defaultMessage": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.",
+                    "description": "Tooltip for form field: ID Number",
+                    "id": "form.field.tooltip.tooltipNationalID"
                   },
                   "required": true,
                   "initialValue": "",
@@ -14854,7 +14961,7 @@
                   "name": "fetchButton",
                   "type": "FETCH_BUTTON",
                   "label": {
-                    "defaultMessage": "Retrieve Informant's Details",
+                    "defaultMessage": "VERIFY NATIONAL ID",
                     "description": "Label for loader button",
                     "id": "form.field.label.fetchInformantDetails"
                   },
@@ -14887,12 +14994,21 @@
                     },
                     "NATIONAL_ID": {
                       "query": {
-                        "operation": "FETCH_PERSON"
+                        "operation": "FETCH_PERSON_NID"
                       },
                       "inputs": [
                         {
-                          "name": "identifier",
+                          "name": "dob",
+                          "valueField": "applicantBirthDate"
+                        },
+                        {
+                          "name": "nid",
                           "valueField": "applicantID"
+                        },
+                        {
+                          "name": "country",
+                          "valueField": "COUNTRY",
+                          "type": "ENVIRONMENT"
                         }
                       ],
                       "responseTransformer": {
@@ -14918,7 +15034,11 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "(!values.iDType || (values.iDType !== \"BIRTH_REGISTRATION_NUMBER\" && values.iDType !== \"NATIONAL_ID\"))"
+                      "expression": "(!values.iDType || (values.iDType !== \"NATIONAL_ID\"))"
+                    },
+                    {
+                      "action": "disable",
+                      "expression": "(!values.applicantBirthDate)"
                     }
                   ],
                   "modalTitle": {

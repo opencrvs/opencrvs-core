@@ -88,6 +88,7 @@ export const internationaliseFieldObject = (
     ...field,
     label:
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
+    tooltip: field.tooltip && intl.formatMessage(field.tooltip),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
   }
@@ -182,6 +183,18 @@ export const getFieldLabel = (
   }
   return field.dynamicDefinitions.label.labelMapper(values[
     field.dynamicDefinitions.label.dependency
+  ] as string)
+}
+
+export const getFieldLabelToolTip = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.tooltip) {
+    return undefined
+  }
+  return field.dynamicDefinitions.tooltip.tooltipMapper(values[
+    field.dynamicDefinitions.tooltip.dependency
   ] as string)
 }
 
@@ -340,7 +353,12 @@ export function getInputValues(
 ): IDynamicValues {
   const variables: IVars = {}
   inputs.forEach((input: IFieldInput) => {
-    variables[input.name] = values[input.valueField]
+    if (input.type && input.type === 'ENVIRONMENT') {
+      variables[input.name] =
+        window.config[input.valueField as keyof typeof window.config]
+    } else {
+      variables[input.name] = values[input.valueField]
+    }
   })
   return variables
 }
