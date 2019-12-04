@@ -85,7 +85,9 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
         {this.state.isOnline && loading && (
           <>
             <Loading id="Spinner" baseColor="#4C68C1" />
-            <Text>{intl.formatMessage(errorMessages.loadingApplications)}</Text>
+            <Text id="loading-text">
+              {intl.formatMessage(errorMessages.loadingApplications)}
+            </Text>
           </>
         )}
         {this.state.isOnline && hasError && (
@@ -94,12 +96,14 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
           </ErrorText>
         )}
         {this.state.isOnline && noApplication && (
-          <Text>{intl.formatMessage(errorMessages.noApplication)}</Text>
+          <Text id="no-application-text">
+            {intl.formatMessage(errorMessages.noApplication)}
+          </Text>
         )}
         {!this.state.isOnline && (
           <>
             <NoConnectivity />
-            <Text>
+            <Text id="wait-connection-text">
               {intl.formatMessage(errorMessages.waitingForConnection)}
             </Text>
           </>
