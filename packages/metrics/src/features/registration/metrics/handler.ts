@@ -16,68 +16,59 @@ import {
   fetchCertificationPayments,
   fetchGenderBasisMetrics
 } from '@metrics/features/registration/metrics/metricsGenerator'
-import { logger } from '@metrics/logger'
-import { internal } from 'boom'
+
 import {
   TIME_FROM,
   TIME_TO,
   LOCATION_ID
 } from '@metrics/features/registration/metrics/constants'
-// import { IAuthHeader } from '@metrics/features/registration/'
-// import {
-//   getDistrictLocation,
-//   Location
-// } from '@metrics/features/registration/metrics/utils'
 
 export async function metricsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const timeStart = request.query[TIME_FROM]
+  const timeEnd = request.query[TIME_TO]
+  const locationId = request.query[LOCATION_ID]
+
+  let currentLocationLevel
+  let lowerLocationLevel
+
   try {
-    const timeStart = request.query[TIME_FROM]
-    const timeEnd = request.query[TIME_TO]
-    const locationId = request.query[LOCATION_ID]
-    // const authHeader: IAuthHeader = {
-    //   Authorization: request.headers.authorization
-    // }
-
-    // const location: Location = await getDistrictLocation(locationId, authHeader)
-    const {
-      currentLocationLevel,
-      lowerLocationLevel
-    } = await getCurrentAndLowerLocationLevels(timeStart, timeEnd, locationId)
-
-    if (currentLocationLevel) {
-      const timeFrames = await fetchRegWithinTimeFrames(
-        timeStart,
-        timeEnd,
-        locationId,
-        currentLocationLevel,
-        lowerLocationLevel
-      )
-      const payments = await fetchCertificationPayments(
-        timeStart,
-        timeEnd,
-        locationId,
-        currentLocationLevel,
-        lowerLocationLevel
-      )
-
-      const genderBasisMetrics = await fetchGenderBasisMetrics(
-        locationId,
-        currentLocationLevel,
-        lowerLocationLevel
-      )
-      return { timeFrames, payments, genderBasisMetrics }
-    } else {
-      return {
-        timeFrames: [],
-        payments: [],
-        genderBasisMetrics: []
-      }
+    const levels = await getCurrentAndLowerLocationLevels(
+      timeStart,
+      timeEnd,
+      locationId
+    )
+    currentLocationLevel = levels.currentLocationLevel
+    lowerLocationLevel = levels.lowerLocationLevel
+  } catch (err) {
+    return {
+      timeFrames: [],
+      payments: [],
+      genderBasisMetrics: []
     }
-  } catch (error) {
-    logger.error(`Metrics:metricsHandler: error: ${error}`)
-    return internal(error)
   }
+
+  const timeFrames = await fetchRegWithinTimeFrames(
+    timeStart,
+    timeEnd,
+    locationId,
+    currentLocationLevel,
+    lowerLocationLevel
+  )
+  const payments = await fetchCertificationPayments(
+    timeStart,
+    timeEnd,
+    locationId,
+    currentLocationLevel,
+    lowerLocationLevel
+  )
+
+  const genderBasisMetrics = await fetchGenderBasisMetrics(
+    locationId,
+    currentLocationLevel,
+    lowerLocationLevel
+  )
+  return { timeFrames, payments, genderBasisMetrics }
 }

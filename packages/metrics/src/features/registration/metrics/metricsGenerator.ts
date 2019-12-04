@@ -121,19 +121,19 @@ export async function fetchRegWithinTimeFrames(
   )
 
   const points45DaysTo1Year = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
   const points1YearTo5Years = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
   const pointsOver5Years = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
+    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 1826 AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
@@ -182,27 +182,28 @@ export async function getCurrentAndLowerLocationLevels(
   const queryLocationId = `Location/${locationId}`
 
   const allPointsContainingLocationId = await readPoints(
-    `SELECT LAST(*) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} 
-      AND ( locationLevel2 = '${queryLocationId}' 
+    `SELECT LAST(*) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${queryLocationId}'
         OR locationLevel3 = '${queryLocationId}'
         OR locationLevel4 = '${queryLocationId}'
         OR locationLevel5 = '${queryLocationId}')`
   )
 
   const locationLevelOfQueryId =
-    (allPointsContainingLocationId &&
-      allPointsContainingLocationId.length > 0 &&
-      Object.keys(allPointsContainingLocationId[0]).find(
-        key => allPointsContainingLocationId[0][key] === queryLocationId
-      )) ||
-    ''
-
+    allPointsContainingLocationId &&
+    allPointsContainingLocationId.length > 0 &&
+    Object.keys(allPointsContainingLocationId[0]).find(
+      key => allPointsContainingLocationId[0][key] === queryLocationId
+    )
   const oneLevelLowerLocationColumn =
-    (locationLevelOfQueryId &&
-      locationLevelOfQueryId.replace(/\d/, level =>
-        level === '5' ? level : String(Number(level) + 1)
-      )) ||
-    ''
+    locationLevelOfQueryId &&
+    locationLevelOfQueryId.replace(/\d/, level =>
+      level === '5' ? level : String(Number(level) + 1)
+    )
+
+  if (!locationLevelOfQueryId || !oneLevelLowerLocationColumn) {
+    throw new Error(`Location level not found for location ${locationId}`)
+  }
 
   return {
     currentLocationLevel: locationLevelOfQueryId,
@@ -282,8 +283,8 @@ export async function fetchKeyFigures(
       AND time <= ${timeEnd}
       AND ( locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
-          OR locationLevel4 = '${queryLocationId}' 
-          OR locationLevel5 = '${queryLocationId}' )      
+          OR locationLevel4 = '${queryLocationId}'
+          OR locationLevel5 = '${queryLocationId}' )
       AND ageInDays > 45
       AND ageInDays <= 365
     GROUP BY gender`
@@ -364,26 +365,26 @@ export async function fetchGenderBasisMetrics(
   locationLevel: string
 ) {
   const pointData = await readPoints(`
-  SELECT 
-    SUM(under18) AS under18, 
-    SUM(over18) AS over18 
+  SELECT
+    SUM(under18) AS under18,
+    SUM(over18) AS over18
   FROM (
     SELECT under18, over18, gender, ${locationLevel} FROM (
-      SELECT 
-        COUNT(ageInDays) AS under18 
-      FROM birth_reg 
-      WHERE ageInDays < 6574 
+      SELECT
+        COUNT(ageInDays) AS under18
+      FROM birth_reg
+      WHERE ageInDays < 6574
        AND ${currLocationLevel}='${currLocationId}'
       GROUP BY gender, ${locationLevel}
     ), (
-      SELECT 
-        COUNT(ageInDays) AS over18 
-      FROM birth_reg 
-      WHERE ageInDays >= 6574 
+      SELECT
+        COUNT(ageInDays) AS over18
+      FROM birth_reg
+      WHERE ageInDays >= 6574
        AND ${currLocationLevel}='${currLocationId}'
       GROUP BY gender, ${locationLevel}
     ) FILL(0)
-  ) 
+  )
   GROUP BY gender, ${locationLevel}
   `)
 
