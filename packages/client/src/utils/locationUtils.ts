@@ -59,24 +59,24 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
 }
 
 export function generateLocations(locations: { [key: string]: ILocation }) {
-  const generated: ISearchLocation[] = []
+  const generated: ISearchLocation[] = Object.values(locations).map(
+    (location: ILocation) => {
+      let locationName = location.name
+      location.jurisdictionType &&
+        (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
 
-  Object.values(locations).forEach((location: ILocation) => {
-    let locationName = location.name
-    location.jurisdictionType &&
-      (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
+      if (location.partOf && location.partOf !== 'Location/0') {
+        const locRef = location.partOf.split('/')[1]
+        const parent = locations[locRef].name
+        locationName += `, ${parent}`
+      }
 
-    if (location.partOf && location.partOf !== 'Location/0') {
-      const locRef = location.partOf.split('/')[1]
-      const parent = locations[locRef].name
-      locationName += `, ${parent}`
+      return {
+        id: location.id,
+        searchableText: location.name,
+        displayLabel: locationName
+      }
     }
-
-    generated.push({
-      id: location.id,
-      searchableText: location.name,
-      displayLabel: locationName
-    })
-  })
+  )
   return generated
 }
