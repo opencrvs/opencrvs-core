@@ -122,7 +122,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
         if (
           location.searchableText
             .toLowerCase()
-            .includes(searchText.toLowerCase())
+            .startsWith(searchText.toLowerCase())
         ) {
           searchResult.push(location)
         }
@@ -144,7 +144,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select()
-    if (this.state.selectedItem) {
+    if (this.state.selectedItem && event.target.value.length > 0) {
       this.search(this.state.selectedItem.searchableText)
     }
   }
