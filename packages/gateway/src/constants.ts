@@ -18,7 +18,7 @@ export const CERT_PUBLIC_KEY_PATH =
 
 // Services
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
-export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:5001'
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
