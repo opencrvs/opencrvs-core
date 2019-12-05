@@ -113,4 +113,4 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
   }
 }
 
-export const LoadingIndicator = connect()(injectIntl(LoadingIndicatorComp))
+export const LoadingIndicator = injectIntl(LoadingIndicatorComp)
