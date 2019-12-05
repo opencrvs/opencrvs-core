@@ -78,6 +78,13 @@ interface IConstantsMessages {
   username: MessageDescriptor
   waitingToSend: MessageDescriptor
   week: MessageDescriptor
+  location: MessageDescriptor
+  maleUnder18: MessageDescriptor
+  femaleUnder18: MessageDescriptor
+  maleOver18: MessageDescriptor
+  femaleOver18: MessageDescriptor
+  total: MessageDescriptor
+  birthRegistrationTitle: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -416,6 +423,41 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Week',
     description: 'Label for week',
     id: 'constants.week'
+  },
+  maleUnder18: {
+    defaultMessage: 'Male Under 18',
+    description: 'Label for maleUnder18',
+    id: 'constants.maleUnder18'
+  },
+  femaleUnder18: {
+    defaultMessage: 'Female Under 18',
+    description: 'Label for femaleUnder18',
+    id: 'constants.maleUnder18'
+  },
+  maleOver18: {
+    defaultMessage: 'Male Over 18',
+    description: 'Label for maleOver18',
+    id: 'constants.maleOver18'
+  },
+  femaleOver18: {
+    defaultMessage: 'Female Over 18',
+    description: 'Label for femaleOver18',
+    id: 'constants.femaleOver18'
+  },
+  total: {
+    defaultMessage: 'Total',
+    description: 'Label for total',
+    id: 'constants.total'
+  },
+  location: {
+    defaultMessage: 'Location',
+    description: 'Label for location',
+    id: 'constants.location'
+  },
+  birthRegistrationTitle: {
+    defaultMessage: 'Births Registered',
+    description: 'Label for birthRegistrationTitle',
+    id: 'constants.birthRegistrationTitle'
   }
 }
 

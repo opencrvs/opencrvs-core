@@ -56,7 +56,7 @@ interface ICurrentAndLowerLocationLevels {
   lowerLocationLevel: string
 }
 interface IGenderBasisData {
-  locationId: string
+  location: string
   maleUnder18: number
   femaleUnder18: number
   maleOver18: number
@@ -360,7 +360,7 @@ const populateBirthKeyFigurePoint = (
 }
 
 export async function fetchGenderBasisMetrics(
-  currLocationId: string,
+  currLocation: string,
   currLocationLevel: string,
   locationLevel: string
 ) {
@@ -370,18 +370,18 @@ export async function fetchGenderBasisMetrics(
     SUM(over18) AS over18
   FROM (
     SELECT under18, over18, gender, ${locationLevel} FROM (
-      SELECT
-        COUNT(ageInDays) AS under18
-      FROM birth_reg
-      WHERE ageInDays < 6574
-       AND ${currLocationLevel}='${currLocationId}'
+      SELECT 
+        COUNT(ageInDays) AS under18 
+      FROM birth_reg 
+      WHERE ageInDays < 6574 
+       AND ${currLocationLevel}='${currLocation}'
       GROUP BY gender, ${locationLevel}
     ), (
-      SELECT
-        COUNT(ageInDays) AS over18
-      FROM birth_reg
-      WHERE ageInDays >= 6574
-       AND ${currLocationLevel}='${currLocationId}'
+      SELECT 
+        COUNT(ageInDays) AS over18 
+      FROM birth_reg 
+      WHERE ageInDays >= 6574 
+       AND ${currLocationLevel}='${currLocation}'
       GROUP BY gender, ${locationLevel}
     ) FILL(0)
   )
@@ -392,7 +392,7 @@ export async function fetchGenderBasisMetrics(
 
   pointData.forEach((point: any) => {
     const metrics = metricsArray.find(
-      element => element.locationId === point[locationLevel]
+      element => element.location === point[locationLevel]
     )
     const femaleOver18 =
       point['gender'] === 'female'
@@ -423,7 +423,7 @@ export async function fetchGenderBasisMetrics(
 
     if (!metrics) {
       metricsArray.push({
-        locationId: point[locationLevel],
+        location: point[locationLevel],
         femaleOver18: femaleOver18,
         maleOver18: maleOver18,
         maleUnder18: maleUnder18,
@@ -434,7 +434,7 @@ export async function fetchGenderBasisMetrics(
       const index = metricsArray.indexOf(metrics)
 
       metricsArray.splice(index, 1, {
-        locationId: metrics.locationId,
+        location: metrics.location,
         femaleOver18: femaleOver18,
         maleOver18: maleOver18,
         maleUnder18: maleUnder18,

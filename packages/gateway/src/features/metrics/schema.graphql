@@ -14,12 +14,12 @@ type BirthRegistrationMetrics {
 }
 
 type BirthRegistrationGenderBasisMetrics {
-  locationId: String
-  maleUnder18: Int
-  femaleUnder18: Int
-  maleOver18: Int
-  femaleOver18: Int
-  total: Int
+  location: ID!
+  maleUnder18: Int!
+  femaleUnder18: Int!
+  maleOver18: Int!
+  femaleOver18: Int!
+  total: Int!
 }
 
 type CertificationPaymentMetrics {

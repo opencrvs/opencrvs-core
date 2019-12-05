@@ -557,12 +557,12 @@ export interface GQLBirthRegistrationMetrics {
 }
 
 export interface GQLBirthRegistrationGenderBasisMetrics {
-  locationId?: string
-  maleUnder18?: number
-  femaleUnder18?: number
-  maleOver18?: number
-  femaleOver18?: number
-  total?: number
+  location: string
+  maleUnder18: number
+  femaleUnder18: number
+  maleOver18: number
+  femaleOver18: number
+  total: number
 }
 
 export interface GQLBirthRegistrationTimeFrameMetrics {
@@ -2472,7 +2472,7 @@ export interface BirthRegistrationMetricsToPaymentsResolver<
 export interface GQLBirthRegistrationGenderBasisMetricsTypeResolver<
   TParent = any
 > {
-  locationId?: BirthRegistrationGenderBasisMetricsToLocationIdResolver<TParent>
+  location?: BirthRegistrationGenderBasisMetricsToLocationResolver<TParent>
   maleUnder18?: BirthRegistrationGenderBasisMetricsToMaleUnder18Resolver<
     TParent
   >
@@ -2486,7 +2486,7 @@ export interface GQLBirthRegistrationGenderBasisMetricsTypeResolver<
   total?: BirthRegistrationGenderBasisMetricsToTotalResolver<TParent>
 }
 
-export interface BirthRegistrationGenderBasisMetricsToLocationIdResolver<
+export interface BirthRegistrationGenderBasisMetricsToLocationResolver<
   TParent = any,
   TResult = any
 > {
