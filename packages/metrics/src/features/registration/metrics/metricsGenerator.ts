@@ -55,13 +55,25 @@ interface ICurrentAndLowerLocationLevels {
   currentLocationLevel: string
   lowerLocationLevel: string
 }
-interface IGenderBasisData {
+interface IGenderBasisMetrics {
   location: string
   maleUnder18: number
   femaleUnder18: number
   maleOver18: number
   femaleOver18: number
   total: number
+}
+
+interface IGenderBasisPoint {
+  gender: string
+  over18: number
+  under18: number
+  total: number
+  location:
+    | 'locationLevel2'
+    | 'locationLevel3'
+    | 'locationLevel4'
+    | 'locationLevel5'
 }
 
 export async function regByAge(timeStart: string, timeEnd: string) {
@@ -360,11 +372,13 @@ const populateBirthKeyFigurePoint = (
 }
 
 export async function fetchGenderBasisMetrics(
+  timeFrom: string,
+  timeTo: string,
   currLocation: string,
   currLocationLevel: string,
   locationLevel: string
 ) {
-  const pointData = await readPoints(`
+  const points = await readPoints(`
   SELECT
     SUM(under18) AS under18,
     SUM(over18) AS over18
@@ -374,6 +388,8 @@ export async function fetchGenderBasisMetrics(
         COUNT(ageInDays) AS under18 
       FROM birth_reg 
       WHERE ageInDays < 6574 
+       AND time > ${timeFrom}
+       AND time <= ${timeTo}
        AND ${currLocationLevel}='${currLocation}'
       GROUP BY gender, ${locationLevel}
     ), (
@@ -381,6 +397,8 @@ export async function fetchGenderBasisMetrics(
         COUNT(ageInDays) AS over18 
       FROM birth_reg 
       WHERE ageInDays >= 6574 
+       AND time > ${timeFrom}
+       AND time <= ${timeTo}
        AND ${currLocationLevel}='${currLocation}'
       GROUP BY gender, ${locationLevel}
     ) FILL(0)
@@ -388,33 +406,36 @@ export async function fetchGenderBasisMetrics(
   GROUP BY gender, ${locationLevel}
   `)
 
-  const metricsArray: IGenderBasisData[] = []
+  return populateGenderBasisMetrics(points, locationLevel)
+}
 
-  pointData.forEach((point: any) => {
+function populateGenderBasisMetrics(
+  points: IGenderBasisPoint[],
+  locationLevel: string
+): IGenderBasisMetrics[] {
+  const metricsArray: IGenderBasisMetrics[] = []
+
+  points.forEach((point: IGenderBasisPoint) => {
     const metrics = metricsArray.find(
       element => element.location === point[locationLevel]
     )
     const femaleOver18 =
-      point['gender'] === 'female'
-        ? point['over18']
+      point.gender === 'female'
+        ? point.over18
         : metrics
         ? metrics.femaleOver18
         : 0
     const maleOver18 =
-      point['gender'] === 'male'
-        ? point['over18']
-        : metrics
-        ? metrics.maleOver18
-        : 0
+      point.gender === 'male' ? point.over18 : metrics ? metrics.maleOver18 : 0
     const femaleUnder18 =
-      point['gender'] === 'female'
-        ? point['under18']
+      point.gender === 'female'
+        ? point.under18
         : metrics
         ? metrics.femaleUnder18
         : 0
     const maleUnder18 =
-      point['gender'] === 'male'
-        ? point['under18']
+      point.gender === 'male'
+        ? point.under18
         : metrics
         ? metrics.maleUnder18
         : 0

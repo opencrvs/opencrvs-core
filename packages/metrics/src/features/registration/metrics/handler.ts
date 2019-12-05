@@ -66,6 +66,8 @@ export async function metricsHandler(
   )
 
   const genderBasisMetrics = await fetchGenderBasisMetrics(
+    timeStart,
+    timeEnd,
     locationId,
     currentLocationLevel,
     lowerLocationLevel
