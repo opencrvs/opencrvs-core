@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import ReactTooltip = require('react-tooltip')
 
 export type IInputLabel = {
   disabled?: boolean
@@ -18,6 +19,7 @@ export type IInputLabel = {
   color?: string
   required?: boolean
   hideAsterisk?: boolean
+  tooltip?: string
 } & React.LabelHTMLAttributes<HTMLLabelElement>
 
 const StyledInputLabel = styled.label<IInputLabel>`
@@ -46,11 +48,16 @@ const Required = styled.span<
   flex-grow: 0;
 `
 
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
+
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
-    const { required, hideAsterisk, children } = this.props
+    const { required, hideAsterisk, children, tooltip } = this.props
     return (
-      <StyledInputLabel {...this.props}>
+      <StyledInputLabel data-tip={tooltip} {...this.props}>
+        {tooltip && <ReactTooltip />}
         {children}
         {required && !hideAsterisk && (
           <Required disabled={this.props.disabled}>&nbsp;*</Required>

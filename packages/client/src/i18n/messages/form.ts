@@ -333,6 +333,7 @@ interface IFormMessages {
   reasonNotApplyingFieldLabel: MessageDescriptor
   reasonMotherNotApplyingPreview: MessageDescriptor
   reasonFatherNotApplyingPreview: MessageDescriptor
+  tooltipNationalID: MessageDescriptor
   deceasedFatherSectionName: MessageDescriptor
   deceasedFatherSectionTitle: MessageDescriptor
   deceasedFathersFamilyName: MessageDescriptor
@@ -1148,12 +1149,12 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fetchInformantDetails'
   },
   fetchMotherDetails: {
-    defaultMessage: "Retrieve Mother's Details",
+    defaultMessage: 'VERIFY NATIONAL ID',
     description: 'Label for loader button',
     id: 'form.field.label.fetchMotherDetails'
   },
   fetchPersonByNIDModalErrorText: {
-    defaultMessage: 'No person found for provided NID',
+    defaultMessage: 'National ID not found. Please enter valid National ID',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalErrorText'
   },
@@ -1989,6 +1990,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Reason not applying',
     description: 'Label for form field: ReasonNotApplying',
     id: 'form.field.label.ReasonNotApplying'
+  },
+  tooltipNationalID: {
+    defaultMessage:
+      'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
+    description: 'Tooltip for form field: iD number',
+    id: 'form.field.tooltip.tooltipNationalID'
   },
   deceasedFatherSectionName: {
     defaultMessage: "What is the deceased's father name?",
