@@ -42,13 +42,19 @@ export async function bgdValidateRegistrationHandler(
     fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
       body: JSON.stringify(webHookResponse),
-      headers: { Authorization: request.headers.authorization }
+      headers: {
+        Authorization: request.headers.authorization,
+        'Content-Type': 'application/json'
+      }
     })
   } catch (err) {
     fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
       body: JSON.stringify({ error: err.message }),
-      headers: { Authorization: request.headers.authorization }
+      headers: {
+        Authorization: request.headers.authorization,
+        'Content-Type': 'application/json'
+      }
     })
 
     logger.error(err)

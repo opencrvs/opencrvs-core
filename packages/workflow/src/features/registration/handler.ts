@@ -165,9 +165,11 @@ export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { trackingId, registrationNumber, error } = JSON.parse(
-    request.payload as string
-  ) as IEventRegistrationCallbackPayload
+  const {
+    trackingId,
+    registrationNumber,
+    error
+  } = request.payload as IEventRegistrationCallbackPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
