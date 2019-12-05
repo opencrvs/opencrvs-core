@@ -196,6 +196,7 @@ export class RegistrationHomeView extends React.Component<
   IRegistrationHomeState
 > {
   pageSize = 10
+  usePagination = false
   constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
@@ -233,18 +234,68 @@ export class RegistrationHomeView extends React.Component<
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
       case TAB_ID.inProgress:
+        if (!this.usePagination) {
+          this.setState({
+            progressCurrentPage: newPageNumber,
+            reviewCurrentPage: 10,
+            updatesCurrentPage: 10,
+            approvalCurrentPage: 10,
+            printCurrentPage: 10
+          })
+          break
+        }
         this.setState({ progressCurrentPage: newPageNumber })
         break
       case TAB_ID.readyForReview:
+        if (!this.usePagination) {
+          this.setState({
+            progressCurrentPage: 10,
+            reviewCurrentPage: newPageNumber,
+            updatesCurrentPage: 10,
+            approvalCurrentPage: 10,
+            printCurrentPage: 10
+          })
+          break
+        }
         this.setState({ reviewCurrentPage: newPageNumber })
         break
       case TAB_ID.sentForUpdates:
+        if (!this.usePagination) {
+          this.setState({
+            progressCurrentPage: 10,
+            reviewCurrentPage: 10,
+            updatesCurrentPage: newPageNumber,
+            approvalCurrentPage: 10,
+            printCurrentPage: 10
+          })
+          break
+        }
         this.setState({ updatesCurrentPage: newPageNumber })
         break
       case TAB_ID.sentForApproval:
+        if (!this.usePagination) {
+          this.setState({
+            progressCurrentPage: 10,
+            reviewCurrentPage: 10,
+            updatesCurrentPage: 10,
+            approvalCurrentPage: newPageNumber,
+            printCurrentPage: 10
+          })
+          break
+        }
         this.setState({ approvalCurrentPage: newPageNumber })
         break
       case TAB_ID.readyForPrint:
+        if (!this.usePagination) {
+          this.setState({
+            progressCurrentPage: 10,
+            reviewCurrentPage: 10,
+            updatesCurrentPage: 10,
+            approvalCurrentPage: 10,
+            printCurrentPage: newPageNumber
+          })
+          break
+        }
         this.setState({ printCurrentPage: newPageNumber })
         break
       default:
@@ -295,13 +346,18 @@ export class RegistrationHomeView extends React.Component<
           query={REGISTRATION_HOME_QUERY}
           variables={{
             locationIds: [registrarLocationId],
-            count: 10,
+            count: 1,
             reviewStatuses: reviewStatuses,
-            inProgressSkip: (progressCurrentPage - 1) * 10,
-            reviewSkip: (reviewCurrentPage - 1) * 10,
-            rejectSkip: (updatesCurrentPage - 1) * 10,
-            approvalSkip: (approvalCurrentPage - 1) * 10,
-            printSkip: (printCurrentPage - 1) * 10
+            inProgressSkip: (progressCurrentPage - 1) * 1,
+            reviewSkip: (reviewCurrentPage - 1) * 1,
+            rejectSkip: (updatesCurrentPage - 1) * 1,
+            approvalSkip: (approvalCurrentPage - 1) * 1,
+            printSkip: (printCurrentPage - 1) * 1,
+            inProgressCount: progressCurrentPage * this.pageSize,
+            reviewCount: reviewCurrentPage * this.pageSize,
+            rejectCount: updatesCurrentPage * this.pageSize,
+            approvalCount: approvalCurrentPage * this.pageSize,
+            printCount: printCurrentPage * this.pageSize
           }}
           pollInterval={window.config.UI_POLLING_INTERVAL}
         >
