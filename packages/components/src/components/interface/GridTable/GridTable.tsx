@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Pagination } from '..'
+import { LoadMore } from './LoadMore'
 import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { Box } from '../../interface'
@@ -113,6 +114,7 @@ interface IGridTableProps {
   currentPage?: number
   expandable?: boolean
   clickable?: boolean
+  usePagination?: boolean
 }
 
 interface IGridTableState {
@@ -209,7 +211,7 @@ export class GridTable extends React.Component<
     pageSize: number,
     allItems: IDynamicValues[]
   ) => {
-    if (allItems.length <= pageSize) {
+    if (this.props.usePagination !== true || allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
       return allItems
     }
@@ -238,7 +240,8 @@ export class GridTable extends React.Component<
       noResultText,
       hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
-      currentPage = defaultConfiguration.currentPage
+      currentPage = defaultConfiguration.currentPage,
+      usePagination = false
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -328,13 +331,17 @@ export class GridTable extends React.Component<
           }
         )}
 
-        {totalItems > pageSize && (
+        {usePagination && totalItems > pageSize && (
           <Pagination
             initialPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}
+        {!usePagination && totalItems > 0 && (
+          <LoadMore initialPage={currentPage} onLoadMore={this.onPageChange} />
+        )}
+
         {content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}
