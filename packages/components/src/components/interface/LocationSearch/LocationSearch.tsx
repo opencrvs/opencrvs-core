@@ -144,8 +144,13 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     event.target.select()
-    if (this.state.selectedItem && event.target.value.length > 0) {
+    if (
+      this.state.selectedItem &&
+      this.state.selectedText === this.state.selectedItem.displayLabel
+    ) {
       this.search(this.state.selectedItem.searchableText)
+    } else {
+      this.search(this.state.selectedText || '')
     }
   }
 
