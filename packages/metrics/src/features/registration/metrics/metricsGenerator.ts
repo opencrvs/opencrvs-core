@@ -126,64 +126,53 @@ export async function fetchRegWithinTimeFrames(
 ) {
   const queryLocationId = `Location/${locationId}`
 
-  const pointsWithin45Days = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+  const timeFramePoints = await readPoints(
+    `SELECT 
+      SUM(within45Days) AS regWithin45d,
+      SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+      SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+      SUM(over5Yr) AS regOver5yr
+     FROM (
+       SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel} 
+       FROM (
+        SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${queryLocationId}'
-      GROUP BY ${lowerLocationLevel}`
-  )
-
-  const points45DaysTo1Year = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+        GROUP BY ${lowerLocationLevel}
+       ), (
+        SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${queryLocationId}'
-      GROUP BY ${lowerLocationLevel}`
-  )
-
-  const points1YearTo5Years = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+        GROUP BY ${lowerLocationLevel} 
+       ), (
+        SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${queryLocationId}'
-      GROUP BY ${lowerLocationLevel}`
-  )
-
-  const pointsOver5Years = await readPoints(
-    `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+        GROUP BY ${lowerLocationLevel}
+       ), (
+        SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ageInDays > 1826 AND ${currentLocationLevel}='${queryLocationId}'
-      GROUP BY ${lowerLocationLevel}`
+        GROUP BY ${lowerLocationLevel}
+       ) FILL(0) 
+     ) GROUP BY ${lowerLocationLevel}
+     `
   )
 
-  const regWithin45d: number =
-    (pointsWithin45Days &&
-      pointsWithin45Days.length > 0 &&
-      pointsWithin45Days[0].count) ||
-    0
-
-  const regWithin45dTo1yr: number =
-    (points45DaysTo1Year &&
-      points45DaysTo1Year.length > 0 &&
-      points45DaysTo1Year[0].count) ||
-    0
-
-  const regWithin1yrTo5yr: number =
-    (points1YearTo5Years &&
-      points1YearTo5Years.length > 0 &&
-      points1YearTo5Years[0].count) ||
-    0
-
-  const regOver5yr: number =
-    (pointsOver5Years &&
-      pointsOver5Years.length > 0 &&
-      pointsOver5Years[0].count) ||
-    0
-
-  const total: number =
-    regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
-
-  return {
-    regWithin45d,
-    regWithin45dTo1yr,
-    regWithin1yrTo5yr,
-    regOver5yr,
-    total
-  }
+  return timeFramePoints.map((point: any) => {
+    const {
+      regWithin45d,
+      regWithin45dTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr
+    } = point
+    const total =
+      regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+    return {
+      locationId: point[lowerLocationLevel],
+      regWithin45d,
+      regWithin45dTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr,
+      total
+    }
+  })
 }
 
 export async function getCurrentAndLowerLocationLevels(
