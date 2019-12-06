@@ -17,6 +17,7 @@ import {
   createBundle,
   createDeathComposition,
   createTaskEntry,
+  createDeathObservation,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
@@ -58,7 +59,7 @@ export interface IDeathNotification {
   permanent_address: IIncomingAddress
   phone_number: string
   death_date: string
-  cause_death_a_immediate?: string
+  underlying_cause_of_death?: string
   place_of_death?: {
     id: string
     name: string
@@ -147,6 +148,15 @@ export async function deathNotificationHandler(
     request.headers.authorization
   )
 
+  const causeOfDeathObservation =
+    notification.underlying_cause_of_death &&
+    (await createDeathObservation(
+      encounter.fullUrl,
+      notification.underlying_cause_of_death,
+      deceased.fullUrl,
+      notification.death_date
+    ))
+
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
   entries.push(task)
@@ -154,6 +164,7 @@ export async function deathNotificationHandler(
   entries.push(relatedPerson)
   entries.push(informant)
   entries.push(encounter)
+  causeOfDeathObservation && entries.push(causeOfDeathObservation)
 
   const bundle = createBundle(entries)
 
