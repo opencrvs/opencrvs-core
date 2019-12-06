@@ -96,7 +96,6 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
         )
       }
     } catch (err) {
-      console.log(err.response)
       this.setState({
         error: true,
         errorMessage: this.props.intl.formatMessage(
