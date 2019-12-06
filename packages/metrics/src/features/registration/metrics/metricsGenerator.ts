@@ -106,7 +106,7 @@ export async function fetchCertificationPayments(
 ) {
   const queryLocationId = `Location/${locationId}`
   const payments = await readPoints(
-    `SELECT SUM(total) as total FROM certification_payment WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    `SELECT SUM(total) as total FROM certification_payment WHERE time > ${timeStart} AND time <= ${timeEnd}
       AND ${currentLocationLevel}='${queryLocationId}'
       GROUP BY ${lowerLocationLevel}`
   )
@@ -187,7 +187,8 @@ export async function getCurrentAndLowerLocationLevels(
       AND ( locationLevel2 = '${queryLocationId}'
         OR locationLevel3 = '${queryLocationId}'
         OR locationLevel4 = '${queryLocationId}'
-        OR locationLevel5 = '${queryLocationId}')`
+        OR locationLevel5 = '${queryLocationId}') 
+      GROUP BY locationLevel2,locationLevel3,locationLevel4,locationLevel5`
   )
 
   const locationLevelOfQueryId =
