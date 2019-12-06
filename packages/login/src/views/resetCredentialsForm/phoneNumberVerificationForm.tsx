@@ -45,6 +45,7 @@ interface State {
   phone: string
   touched: boolean
   error: boolean
+  errorMessage: string
 }
 
 type Props = BaseProps &
@@ -57,7 +58,8 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
     this.state = {
       phone: '',
       touched: false,
-      error: false
+      error: false,
+      errorMessage: ''
     }
   }
 
@@ -94,16 +96,21 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
         )
       }
     } catch (err) {
-      console.log(err)
-
-      // @todo this needs a better error handling
-      this.setState({ error: true })
+      console.log(err.response)
+      this.setState({
+        error: true,
+        errorMessage: this.props.intl.formatMessage(
+          messages.errorPhoneNumberNotFound
+        )
+      })
     }
   }
 
   render() {
+    const { error: responseError, errorMessage } = this.state
     const { intl, goToForgottenItemForm } = this.props
-    const error = this.state.error && phoneNumberFormat(this.state.phone)
+    const validationError =
+      this.state.error && phoneNumberFormat(this.state.phone)
 
     return (
       <>
@@ -136,8 +143,13 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                 )}
                 touched={this.state.touched}
                 error={
-                  error
-                    ? this.props.intl.formatMessage(error.message, error.props)
+                  validationError
+                    ? this.props.intl.formatMessage(
+                        validationError.message,
+                        validationError.props
+                      )
+                    : responseError
+                    ? errorMessage
                     : ''
                 }
                 hideAsterisk={true}
@@ -151,7 +163,7 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                   value={this.state.phone}
                   onChange={e => this.handleChange(e.target.value)}
                   touched={this.state.touched}
-                  error={this.state.error}
+                  error={responseError}
                 />
               </InputField>
             </Actions>
