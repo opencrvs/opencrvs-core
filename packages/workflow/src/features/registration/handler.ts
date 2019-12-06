@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { HEARTH_URL } from '@workflow/constants'
-import { Events } from '@workflow/features/events/handler'
+import { Events, triggerEvent } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
   markBundleAsValidated,
@@ -24,7 +24,8 @@ import {
   getFromFhir,
   getPhoneNo,
   getSharedContactMsisdn,
-  postToHearth
+  postToHearth,
+  updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getTaskEventType,
@@ -36,10 +37,12 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
+import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
   registrationNumber: string
+  error: string
 }
 async function sendBundleToHearth(
   payload: fhir.Bundle,
@@ -164,10 +167,35 @@ export async function markEventAsRegisteredCallbackHandler(
 ) {
   const {
     trackingId,
-    registrationNumber
+    registrationNumber,
+    error
   } = request.payload as IEventRegistrationCallbackPayload
-  const task: fhir.Task = await getFromFhir(`/Task/identifier=${trackingId}`)
-  const composition: fhir.Composition = await getFromFhir(`/${task.focus}`)
+
+  if (error) {
+    throw new Error(`Callback triggered with an error: ${error}`)
+  }
+
+  const taskBundle: fhir.Bundle = await getFromFhir(
+    `/Task?identifier=${trackingId}`
+  )
+  if (
+    !taskBundle ||
+    !taskBundle.entry ||
+    !taskBundle.entry[0] ||
+    !taskBundle.entry[0].resource
+  ) {
+    throw new Error(
+      `Task for tracking id ${trackingId} could not be found during markEventAsRegisteredCallbackHandler`
+    )
+  }
+
+  const task = taskBundle.entry[0].resource as fhir.Task
+  if (!task.focus || !task.focus.reference) {
+    throw new Error(`Task ${task.id} doesn't have a focus reference`)
+  }
+  const composition: fhir.Composition = await getFromFhir(
+    `/${task.focus.reference}`
+  )
   const event = getTaskEventType(task)
 
   try {
@@ -177,7 +205,7 @@ export async function markEventAsRegisteredCallbackHandler(
       event,
       getToken(request)
     )
-    const resBundle = await postToHearth(task)
+    await updateResourceInHearth(task)
 
     const phoneNo = await getPhoneNo(composition, task, event)
     const informantName = await getEventInformantName(composition, event)
@@ -194,13 +222,22 @@ export async function markEventAsRegisteredCallbackHandler(
         'markEventAsRegisteredCallbackHandler could not send event notification'
       )
     }
-    return resBundle
+    // Trigger an event for the registration
+    await triggerEvent(
+      event === EVENT_TYPE.BIRTH
+        ? Events.BIRTH_MARK_REG
+        : Events.DEATH_MARK_REG,
+      { resourceType: 'Bundle', entry: [{ resource: task }] },
+      request.headers.authorization
+    )
   } catch (error) {
     logger.error(
       `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
     )
     throw new Error(error)
   }
+
+  return h.response().code(200)
 }
 
 export async function markEventAsWaitingValidationHandler(

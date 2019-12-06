@@ -53,7 +53,11 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
 
-export type APPLICATION_STATUS = 'DECLARED' | 'REGISTERED' | 'VALIDATED'
+export type APPLICATION_STATUS =
+  | 'DECLARED'
+  | 'REGISTERED'
+  | 'VALIDATED'
+  | 'WAITING_VALIDATION'
 
 export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
 

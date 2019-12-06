@@ -208,75 +208,147 @@ export async function fhirWorkflowEventHandler(
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_IN_PROGRESS_DEC, request)
+      await triggerEvent(
+        Events.BIRTH_IN_PROGRESS_DEC,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_NEW_DEC, request)
+      await triggerEvent(
+        Events.BIRTH_NEW_DEC,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_NEW_VALIDATE, request)
+      await triggerEvent(
+        Events.BIRTH_NEW_VALIDATE,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_WAITING_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_WAITING_VALIDATION, request)
+      await triggerEvent(
+        Events.BIRTH_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_WAITING_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_WAITING_VALIDATION, request)
+      await triggerEvent(
+        Events.DEATH_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_NEW_VALIDATE:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_NEW_VALIDATE, request)
+      await triggerEvent(
+        Events.DEATH_NEW_VALIDATE,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_NEW_WAITING_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_NEW_WAITING_VALIDATION, request)
+      await triggerEvent(
+        Events.BIRTH_NEW_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_IN_PROGRESS_DEC, request)
+      await triggerEvent(
+        Events.DEATH_IN_PROGRESS_DEC,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_NEW_DEC, request)
+      await triggerEvent(
+        Events.DEATH_NEW_DEC,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_NEW_WAITING_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_NEW_WAITING_VALIDATION, request)
+      await triggerEvent(
+        Events.DEATH_NEW_WAITING_VALIDATION,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_MARK_VALID, request)
+      await triggerEvent(
+        Events.BIRTH_MARK_VALID,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_MARK_VALID:
       response = await markEventAsValidatedHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_MARK_VALID, request)
+      await triggerEvent(
+        Events.DEATH_MARK_VALID,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_MARK_REG:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_MARK_REG, request)
+      await triggerEvent(
+        Events.BIRTH_MARK_REG,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_MARK_REG:
       response = await markEventAsWaitingValidationHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_MARK_REG, request)
+      await triggerEvent(
+        Events.DEATH_MARK_REG,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
-      await forwardToOpenHim(Events.BIRTH_MARK_CERT, request)
+      await triggerEvent(
+        Events.BIRTH_MARK_CERT,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_MARK_CERT:
       response = await markEventAsCertifiedHandler(request, h)
-      await forwardToOpenHim(Events.DEATH_MARK_CERT, request)
+      await triggerEvent(
+        Events.DEATH_MARK_CERT,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.BIRTH_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
-      await forwardToOpenHim(Events.BIRTH_MARK_VOID, request)
+      await triggerEvent(
+        Events.BIRTH_MARK_VOID,
+        request.payload,
+        request.headers.authorization
+      )
       break
     case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
-      await forwardToOpenHim(Events.DEATH_MARK_VOID, request)
+      await triggerEvent(
+        Events.DEATH_MARK_VOID,
+        request.payload,
+        request.headers.authorization
+      )
       break
     default:
       // forward as-is to hearth
@@ -286,15 +358,18 @@ export async function fhirWorkflowEventHandler(
   return response
 }
 
-async function forwardToOpenHim(event: Events, request: Hapi.Request) {
-  const fhirBundle = request.payload as fhir.Bundle
+export async function triggerEvent(
+  event: Events,
+  payload: string | object,
+  authHeader: string
+) {
   try {
     await fetch(`${OPENHIM_URL}${event}`, {
       method: 'POST',
-      body: JSON.stringify(fhirBundle),
+      body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: request.headers.authorization
+        Authorization: authHeader
       }
     })
   } catch (err) {
