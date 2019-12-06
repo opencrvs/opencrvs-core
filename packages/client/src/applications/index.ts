@@ -18,10 +18,13 @@ import {
 } from '@client/forms'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
 import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
+import {
+  IQueryData,
+  EVENT_STATUS
+} from '@client/views/RegistrationHome/RegistrationHome'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -32,6 +35,8 @@ import {
   USER_DETAILS_AVAILABLE,
   UserDetailsAvailable
 } from '@client/profile/profileActions'
+import { syncRegistrarWorkqueue } from '@client/ListSyncController'
+import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -137,6 +142,20 @@ export interface IWorkqueue {
   loading?: boolean
   error?: boolean
   data?: IQueryData
+}
+
+interface IWorkqueuePaginationParams {
+  inProgressCount: number
+  reviewCount: number
+  rejectCount: number
+  approvalCount: number
+  printCount: number
+
+  inProgressSkip: number
+  reviewSkip: number
+  rejectSkip: number
+  approvalSkip: number
+  printSkip: number
 }
 
 type Relation =
@@ -271,9 +290,17 @@ interface IDownloadApplicationFail {
 interface UpdateRegistrarWorkqueueAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE
   payload: {
-    loading: boolean
-    error: boolean
-    data: IQueryData
+    inProgressCount: number
+    reviewCount: number
+    rejectCount: number
+    approvalCount: number
+    printCount: number
+
+    inProgressSkip: number
+    reviewSkip: number
+    rejectSkip: number
+    approvalSkip: number
+    printSkip: number
   }
 }
 
@@ -317,7 +344,7 @@ export interface WorkqueueState {
 
 const workqueueInitialState = {
   workqueue: {
-    loading: false,
+    loading: true,
     error: false
   }
 }
@@ -499,9 +526,65 @@ export async function writeApplicationByUser(
 }
 
 export async function writeRegistrarWorkqueueByUser(
-  workqueue: IWorkqueue
+  getState: () => IStoreState,
+  workqueuePaginationParams: IWorkqueuePaginationParams
 ): Promise<string> {
-  const uID = await getCurrentUserID()
+  const state = getState()
+
+  const userDetails = getUserDetails(state)
+  const registrationLocationId =
+    (userDetails && getUserLocation(userDetails).id) || ''
+
+  const scope = getScope(state)
+  const reviewStatuses =
+    scope && scope.includes('register')
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
+
+  const {
+    inProgressCount,
+    reviewCount,
+    rejectCount,
+    approvalCount,
+    printCount,
+    inProgressSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    printSkip
+  } = workqueuePaginationParams
+
+  const result = await syncRegistrarWorkqueue(
+    registrationLocationId,
+    reviewStatuses,
+    inProgressCount,
+    reviewCount,
+    rejectCount,
+    approvalCount,
+    printCount,
+    inProgressSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    printSkip
+  )
+
+  let workqueue
+  if (result) {
+    workqueue = {
+      loading: false,
+      error: false,
+      data: result
+    }
+  } else {
+    workqueue = {
+      loading: false,
+      error: true,
+      data: state.workqueueState.workqueue.data
+    }
+  }
+
+  const uID = (userDetails as IUserDetails).userMgntUserID || ''
   const userData = await storage.getItem('USER_DATA')
   if (!userData) {
     // No storage option found
@@ -568,17 +651,33 @@ export function downloadApplication(
   }
 }
 
-export function updateRegistrarWorkQueue(
-  loading: boolean,
-  error: boolean,
-  data?: IQueryData
+export function updateRegistrarWorkqueue(
+  inProgressCount: number = 10,
+  reviewCount: number = 10,
+  rejectCount: number = 10,
+  approvalCount: number = 10,
+  printCount: number = 10,
+
+  inProgressSkip: number = 0,
+  reviewSkip: number = 0,
+  rejectSkip: number = 0,
+  approvalSkip: number = 0,
+  printSkip: number = 0
 ) {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
-      loading,
-      error,
-      data
+      inProgressCount,
+      reviewCount,
+      rejectCount,
+      approvalCount,
+      printCount,
+
+      inProgressSkip,
+      reviewSkip,
+      rejectSkip,
+      approvalSkip,
+      printSkip
     }
   }
 }
@@ -1050,12 +1149,15 @@ export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
     case UPDATE_REGISTRAR_WORKQUEUE:
       return loop(
         {
-          ...state
+          workqueue: {
+            ...state.workqueue,
+            loading: true
+          }
         },
         Cmd.run(writeRegistrarWorkqueueByUser, {
           successActionCreator: updateRegistrarWorkqueueSuccessActionCreator,
           failActionCreator: updateRegistrarWorkqueueFailActionCreator,
-          args: [action.payload]
+          args: [Cmd.getState, action.payload]
         })
       )
 
