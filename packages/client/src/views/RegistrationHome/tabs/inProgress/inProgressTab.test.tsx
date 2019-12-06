@@ -636,6 +636,7 @@ describe('In Progress tab', () => {
                       familyName: 'Hoque'
                     }
                   ],
+                  multipleBirth: null,
                   birthDate: '01-01-1984'
                 },
                 deceased: null,
