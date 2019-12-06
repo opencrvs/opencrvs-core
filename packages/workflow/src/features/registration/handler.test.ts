@@ -1333,8 +1333,6 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [relatedPersonMock, { status: 200 }],
-      [motherMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({

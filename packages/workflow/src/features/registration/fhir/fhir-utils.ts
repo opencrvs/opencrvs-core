@@ -23,8 +23,7 @@ import {
   getTaskResource,
   findPersonEntry,
   findInformantEntry,
-  getSectionEntryBySectionCode,
-  INFORMANT_CODE
+  getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
@@ -281,7 +280,7 @@ export async function getPhoneNo(
   eventType: EVENT_TYPE
 ) {
   let phoneNumber
-  if (eventType === EVENT_TYPE.BIRTH) {
+  if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
     const phoneExtension =
       taskResource &&
       taskResource.extension &&
@@ -292,23 +291,6 @@ export async function getPhoneNo(
         )
       })
     phoneNumber = phoneExtension && phoneExtension.valueString
-  } else {
-    const informantSection = getSectionEntryBySectionCode(
-      composition,
-      INFORMANT_CODE
-    )
-    const relatedPerson =
-      informantSection && (await getFromFhir(`/${informantSection.reference}`))
-    const contact: fhir.Patient =
-      relatedPerson &&
-      (await getFromFhir(`/${relatedPerson.patient.reference}`))
-    const phoneEntry =
-      contact &&
-      contact.telecom &&
-      contact.telecom.find((contactPoint: fhir.ContactPoint) => {
-        return contactPoint.system === 'phone'
-      })
-    phoneNumber = phoneEntry && phoneEntry.value
   }
   if (!phoneNumber) {
     return false
