@@ -19,12 +19,14 @@ import { IntlMessages } from '@login/i18n/reducer'
 type StateProps = {
   locale: string
   messages: IntlMessages
+  key: string
 }
 
 const mapStateToProps = (store: IStoreState): StateProps => {
   return {
     locale: getLanguage(store),
-    messages: getMessages(store)
+    messages: getMessages(store),
+    key: getLanguage(store)
   }
 }
 

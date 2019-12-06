@@ -21,6 +21,7 @@ import 'moment/locale/bn'
 type StateProps = {
   locale: string
   messages: IntlMessages
+  key: string
 }
 
 const mapStateToProps = (state: IStoreState): StateProps => {
@@ -28,7 +29,8 @@ const mapStateToProps = (state: IStoreState): StateProps => {
 
   return {
     locale,
-    messages: getMessages(state)
+    messages: getMessages(state),
+    key: getLanguage(state)
   }
 }
 
