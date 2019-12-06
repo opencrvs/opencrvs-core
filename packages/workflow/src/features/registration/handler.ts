@@ -217,20 +217,19 @@ export async function markEventAsRegisteredCallbackHandler(
       sendRegisteredNotification(phoneNo, informantName, event, {
         Authorization: request.headers.authorization
       })
-
-      // Then, trigger an event for the registration
-      await triggerEvent(
-        event === EVENT_TYPE.BIRTH
-          ? Events.BIRTH_MARK_REG
-          : Events.DEATH_MARK_REG,
-        { resourceType: 'Bundle', entry: [{ resource: task }] },
-        request.headers.authorization
-      )
     } else {
       logger.info(
         'markEventAsRegisteredCallbackHandler could not send event notification'
       )
     }
+    // Trigger an event for the registration
+    await triggerEvent(
+      event === EVENT_TYPE.BIRTH
+        ? Events.BIRTH_MARK_REG
+        : Events.DEATH_MARK_REG,
+      { resourceType: 'Bundle', entry: [{ resource: task }] },
+      request.headers.authorization
+    )
   } catch (error) {
     logger.error(
       `Workflow/markEventAsRegisteredCallbackHandler[${event}]: error: ${error}`
