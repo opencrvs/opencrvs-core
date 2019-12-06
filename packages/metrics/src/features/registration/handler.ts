@@ -140,22 +140,23 @@ export async function markDeathRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
     const points = await Promise.all([
       generateEventDurationPoint(
-        request.payload as fhir.Bundle,
+        bundle,
         ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
       ),
-      generateDeathRegPoint(
-        request.payload as fhir.Bundle,
-        'mark-existing-application-registered',
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(bundle)
     ])
 
     await writePoints(points)
