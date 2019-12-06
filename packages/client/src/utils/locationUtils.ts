@@ -11,7 +11,8 @@
  */
 import { ILocation } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
-import { SYS_ADMIN_ROLES } from './constants'
+import { SYS_ADMIN_ROLES, JURISDICTION_TYPE } from './constants'
+import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -55,4 +56,27 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
     }
   )
   return filteredArea[0] ? filteredArea[0].id : ''
+}
+
+export function generateLocations(locations: { [key: string]: ILocation }) {
+  const generated: ISearchLocation[] = Object.values(locations).map(
+    (location: ILocation) => {
+      let locationName = location.name
+      location.jurisdictionType &&
+        (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
+
+      if (location.partOf && location.partOf !== 'Location/0') {
+        const locRef = location.partOf.split('/')[1]
+        const parent = locations[locRef].name
+        locationName += `, ${parent}`
+      }
+
+      return {
+        id: location.id,
+        searchableText: location.name,
+        displayLabel: locationName
+      }
+    }
+  )
+  return generated
 }
