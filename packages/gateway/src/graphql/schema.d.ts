@@ -566,12 +566,12 @@ export interface GQLBirthRegistrationGenderBasisMetrics {
 }
 
 export interface GQLBirthRegistrationTimeFrameMetrics {
-  locationId?: string
-  regWithin45d?: number
-  regWithin45dTo1yr?: number
-  regWithin1yrTo5yr?: number
-  regOver5yr?: number
-  total?: number
+  locationId: string
+  regWithin45d: number
+  regWithin45dTo1yr: number
+  regWithin1yrTo5yr: number
+  regOver5yr: number
+  total: number
 }
 
 export interface GQLCertificationPaymentMetrics {

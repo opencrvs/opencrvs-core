@@ -70,6 +70,7 @@ interface IConstantsMessages {
   sentOn: MessageDescriptor
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
+  timeFramesTitle: MessageDescriptor
   to: MessageDescriptor
   trackingId: MessageDescriptor
   type: MessageDescriptor
@@ -85,6 +86,10 @@ interface IConstantsMessages {
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
   birthRegistrationTitle: MessageDescriptor
+  within45Days: MessageDescriptor
+  within45DaysTo1Year: MessageDescriptor
+  within1YearTo5Years: MessageDescriptor
+  over5Years: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -319,6 +324,11 @@ const messagesToDefine: IConstantsMessages = {
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
   },
+  over5Years: {
+    defaultMessage: 'Over 5 years',
+    description: 'Label for registrations over 5 years',
+    id: 'constants.over5Years'
+  },
   pendingConnection: {
     defaultMessage: 'Pending connection',
     description: 'Label for application status Pending Connection',
@@ -383,6 +393,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Submission status',
     description: 'Label for table header of column Submission status',
     id: 'constants.submissionStatus'
+  },
+  timeFramesTitle: {
+    defaultMessage:
+      '{event, select, birth{Birth} death{Death} other{Birth}} registered by time period, from date of occurrence',
+    description: 'Header for tabel performance timeframs',
+    id: 'constants.timeFramesTitle'
   },
   to: {
     defaultMessage: 'to',
@@ -458,6 +474,21 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Births Registered',
     description: 'Label for birthRegistrationTitle',
     id: 'constants.birthRegistrationTitle'
+  },
+  within45Days: {
+    defaultMessage: 'Within 45 days',
+    description: 'Label for registrations within 45 days',
+    id: 'constants.within45Days'
+  },
+  within45DaysTo1Year: {
+    defaultMessage: '45 days - 1 year',
+    description: 'Label for registrations within 45 days to 1 year',
+    id: 'constants.within45DaysTo1Year'
+  },
+  within1YearTo5Years: {
+    defaultMessage: '1 year to 5 years',
+    description: 'Label for registrations within 1 year to 5 years',
+    id: 'constants.within1YearTo5Years'
   }
 }
 

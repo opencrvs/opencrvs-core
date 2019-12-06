@@ -28,12 +28,12 @@ type CertificationPaymentMetrics {
 }
 
 type BirthRegistrationTimeFrameMetrics {
-  locationId: String
-  regWithin45d: Int
-  regWithin45dTo1yr: Int
-  regWithin1yrTo5yr: Int
-  regOver5yr: Int
-  total: Int
+  locationId: String!
+  regWithin45d: Int!
+  regWithin45dTo1yr: Int!
+  regWithin1yrTo5yr: Int!
+  regOver5yr: Int!
+  total: Int!
 }
 
 type BirthRegistrationByAgeMetrics {
