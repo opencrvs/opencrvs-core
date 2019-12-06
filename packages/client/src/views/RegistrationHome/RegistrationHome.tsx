@@ -15,7 +15,8 @@ import {
   IApplication,
   IWorkqueue,
   makeApplicationReadyToDownload,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  updateRegistrarWorkqueue
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
@@ -23,14 +24,12 @@ import { Action, Event } from '@client/forms'
 import { errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
   goToEvents,
   goToPage,
   goToPrintCertificate,
   goToRegistrarHomeTab,
-  goToReviewDuplicate,
-  IDynamicValues
+  goToReviewDuplicate
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
@@ -153,13 +152,14 @@ interface IBaseRegistrationHomeProps {
   goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   downloadApplication: typeof downloadApplication
+  goToEvents: typeof goToEvents
+  updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   registrarLocationId: string
   tabId: string
   selectorId: string
   drafts: IApplication[]
   applications: IApplication[]
   workqueue: IWorkqueue
-  goToEvents: typeof goToEvents
   storedApplications: IApplication[]
   client: ApolloClient<{}>
   dispatch: Dispatch
@@ -218,39 +218,14 @@ export class RegistrationHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    const {
-      dispatch,
-      workqueue,
-      registrarLocationId,
-      reviewStatuses,
-      client
-    } = this.props
-    const {
-      progressCurrentPage,
-      reviewCurrentPage,
-      updatesCurrentPage,
-      approvalCurrentPage,
-      printCurrentPage
-    } = this.state
-    syncRegistrarWorkqueue(
-      dispatch,
-      !workqueue.loading,
-      registrarLocationId,
-      reviewStatuses,
-      client,
-      (progressCurrentPage - 1) * 10,
-      (reviewCurrentPage - 1) * 10,
-      (updatesCurrentPage - 1) * 10,
-      (approvalCurrentPage - 1) * 10,
-      (printCurrentPage - 1) * 10
-    )
+    this.props.updateRegistrarWorkqueue()
   }
 
   componentDidMount() {
     this.syncWorkqueue()
     this.interval = setInterval(() => {
       this.syncWorkqueue()
-    }, 300000)
+    }, 30000)
   }
 
   componentWillUnmount() {
@@ -338,7 +313,7 @@ export class RegistrationHomeView extends React.Component<
       storedApplications
     } = this.props
     const { loading, error, data } = workqueue
-    if (loading || !data) {
+    if (loading) {
       return (
         <StyledSpinner
           id="search-result-spinner"
@@ -346,7 +321,7 @@ export class RegistrationHomeView extends React.Component<
         />
       )
     }
-    if (!data || error) {
+    if (error || !data) {
       return (
         <ErrorText id="search-result-error-text-count">
           {intl.formatMessage(errorMessages.queryError)}
@@ -552,10 +527,6 @@ function mapStateToProps(
   const registrarLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
-  const reviewStatuses =
-    scope && scope.includes('register')
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
-      : [EVENT_STATUS.DECLARED]
 
   return {
     applications: state.applicationsState.applications,
@@ -563,7 +534,6 @@ function mapStateToProps(
     language: state.i18n.language,
     scope,
     registrarLocationId,
-    reviewStatuses,
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
     storedApplications: state.applicationsState.applications,
@@ -580,39 +550,13 @@ function mapStateToProps(
 
 export const RegistrationHome = connect(
   mapStateToProps,
-  (dispatch: Dispatch) => ({
-    dispatch,
-    goToEvents: () => dispatch(goToEvents()),
-    goToPage: (
-      pageRoute: string,
-      applicationId: string,
-      pageId: string,
-      event: string,
-      fieldNameHash?: string,
-      historyState?: IDynamicValues
-    ) =>
-      dispatch(
-        goToPage(
-          pageRoute,
-          applicationId,
-          pageId,
-          event,
-          fieldNameHash,
-          historyState
-        )
-      ),
-    goToRegistrarHomeTab: (tabId: string, selectorId?: string) =>
-      dispatch(goToRegistrarHomeTab(tabId, selectorId)),
-    goToReviewDuplicate: (applicationId: string) =>
-      dispatch(goToReviewDuplicate(applicationId)),
-    goToPrintCertificate: (
-      registrationId: string,
-      event: string,
-      groupId?: string
-    ) => dispatch(goToPrintCertificate(registrationId, event, groupId)),
-    downloadApplication: (
-      application: IApplication,
-      client: ApolloClient<{}>
-    ) => dispatch(downloadApplication(application, client))
-  })
+  {
+    goToEvents,
+    goToPage,
+    goToRegistrarHomeTab,
+    goToReviewDuplicate,
+    goToPrintCertificate,
+    downloadApplication,
+    updateRegistrarWorkqueue
+  }
 )(injectIntl(withTheme(withApollo(RegistrationHomeView))))
