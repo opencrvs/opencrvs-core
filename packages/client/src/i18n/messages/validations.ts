@@ -33,6 +33,7 @@ interface IValidationMessages {
   validBirthRegistrationNumber: MessageDescriptor
   validDeathRegistrationNumber: MessageDescriptor
   validNationalId: MessageDescriptor
+  validNationalIDLengths: MessageDescriptor
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
@@ -167,10 +168,15 @@ const messagesToDefine: IValidationMessages = {
   },
   validNationalId: {
     defaultMessage:
-      'The National ID can only be numeric and must be {validLength} digits long',
+      'The National ID can only be numeric and must be {min} or {max} digits long',
     description:
       'The error message that appears when an invalid value is used as nid',
     id: 'validations.validNationalId'
+  },
+  validNationalIDLengths: {
+    defaultMessage: '10 or 17',
+    description: 'Nid valid lengths',
+    id: 'validations.validNationalIDLengths'
   },
   validPassportNumber: {
     defaultMessage:

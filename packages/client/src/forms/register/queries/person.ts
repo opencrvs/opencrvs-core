@@ -36,13 +36,27 @@ export const FETCH_PERSON = gql`
     }
   }
 `
+
+export const FETCH_PERSON_NID = gql`
+  query fetchPersonByNID($dob: String!, $nid: String!, $country: String) {
+    queryPersonByNidIdentifier(dob: $dob, nid: $nid, country: $country) {
+      name {
+        use
+        firstNames
+        familyName
+      }
+      gender
+    }
+  }
+`
+
 export const transformPersonData = (response: ApolloQueryResult<GQLQuery>) => {
-  const responseData = response.data.queryPersonByIdentifier as GQLPerson
+  const responseData = response.data.queryPersonByNidIdentifier as GQLPerson
   return responseData
 }
 export const transformInformantData = (
   response: ApolloQueryResult<GQLQuery>
 ) => {
-  const responseData = response.data.queryPersonByIdentifier as GQLPerson
+  const responseData = response.data.queryPersonByNidIdentifier as GQLPerson
   return { individual: responseData }
 }

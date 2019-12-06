@@ -415,6 +415,43 @@ export async function createTaskEntry(
   }
 }
 
+export async function createDeathObservation(
+  encounterRef: string,
+  causeOfDeath: string,
+  subjectRef: string,
+  deathDate: string
+) {
+  return {
+    fullUrl: `urn:uuid:${uuid()}`,
+    resource: {
+      resourceType: 'Observation',
+      status: 'final',
+      context: {
+        reference: encounterRef
+      },
+      code: {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/ValueSet/icd-10',
+            code: 'ICD10',
+            display: 'Cause of death'
+          }
+        ]
+      },
+      subject: {
+        reference: subjectRef
+      },
+      effectiveDateTime: deathDate,
+      valueCodeableConcept: {
+        coding: {
+          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          code: causeOfDeath
+        }
+      }
+    }
+  }
+}
+
 export async function convertAddressObjToFHIRPermanentAddress(
   addressObject: IIncomingAddress,
   authHeader: string

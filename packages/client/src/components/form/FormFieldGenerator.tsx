@@ -27,6 +27,7 @@ import {
   getConditionalActionsForField,
   getFieldOptions,
   getFieldLabel,
+  getFieldLabelToolTip,
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData,
@@ -140,6 +141,7 @@ type GeneratedInputFieldProps = {
   touched: boolean
   error: string
   draftData?: IFormData
+  disabled?: boolean
 }
 
 function GeneratedInputField({
@@ -153,11 +155,13 @@ function GeneratedInputField({
   touched,
   value,
   nestedFields,
-  draftData
+  draftData,
+  disabled
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
     label: fieldDefinition.label,
+    tooltip: fieldDefinition.tooltip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
     disabled: fieldDefinition.disabled,
@@ -427,6 +431,7 @@ function GeneratedInputField({
         successTitle={fieldDefinition.successTitle}
         errorTitle={fieldDefinition.errorTitle}
         onFetch={fieldDefinition.onFetch}
+        isDisabled={disabled}
       />
     )
   }
@@ -682,7 +687,11 @@ class FormSectionComponent extends React.Component<Props> {
               ? ({
                   ...field,
                   type: getFieldType(field as IDynamicFormField, values),
-                  label: getFieldLabel(field as IDynamicFormField, values)
+                  label: getFieldLabel(field as IDynamicFormField, values),
+                  tooltip: getFieldLabelToolTip(
+                    field as IDynamicFormField,
+                    values
+                  )
                 } as ITextFormField)
               : field.type === DYNAMIC_LIST
               ? ({
@@ -754,6 +763,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
+                      disabled={conditionalActions.includes('disable')}
                     />
                   )}
                 </Field>

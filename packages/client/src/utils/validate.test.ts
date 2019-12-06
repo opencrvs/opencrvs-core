@@ -200,12 +200,13 @@ describe('validate', () => {
         message: {
           id: 'validations.validNationalId',
           defaultMessage:
-            'The National ID can only be numeric and must be {validLength} digits long',
+            'The National ID can only be numeric and must be {min} or {max} digits long',
           description:
             'The error message that appears when an invalid value is used as nid'
         },
         props: {
-          validLength: 13
+          min: 10,
+          max: 17
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
@@ -217,18 +218,19 @@ describe('validate', () => {
         message: {
           id: 'validations.validNationalId',
           defaultMessage:
-            'The National ID can only be numeric and must be {validLength} digits long',
+            'The National ID can only be numeric and must be {min} or {max} digits long',
           description:
             'The error message that appears when an invalid value is used as nid'
         },
         props: {
-          validLength: 13
+          min: 10,
+          max: 17
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
     it('Should pass when supplied a good value as National ID.', () => {
-      const goodValue = '2019783948945'
+      const goodValue = '20197839489459632'
       const typeOfID = 'NATIONAL_ID'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
