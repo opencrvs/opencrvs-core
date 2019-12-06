@@ -94,7 +94,7 @@ export async function markBirthRegisteredHandler(
     const points = await Promise.all([
       generateEventDurationPoint(
         bundle,
-        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'], // TODO add this for other event duration points?
+        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
@@ -143,7 +143,7 @@ export async function markDeathRegisteredHandler(
     const points = await Promise.all([
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
-        ['DECLARED', 'VALIDATED'],
+        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
