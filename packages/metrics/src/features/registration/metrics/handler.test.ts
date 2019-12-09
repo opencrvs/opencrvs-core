@@ -33,21 +33,38 @@ describe('verify metrics handler', () => {
   })
 
   it('returns ok for valid request', async () => {
-    readPoints.mockResolvedValue([
+    readPoints.mockResolvedValueOnce([
       {
-        total: 28334,
-        gender: 'male'
-      },
-      {
-        total: 28124,
-        gender: 'female'
+        locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
       }
     ])
+
+    readPoints.mockResolvedValueOnce([
+      {
+        gender: 'male',
+        over18: 5,
+        under18: 2,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
+
+    readPoints.mockResolvedValueOnce([
+      {
+        regWithin45d: 1,
+        regWithin45dTo1yr: 3,
+        regWithin1yrTo5yr: 0,
+        regOver5yr: 3,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
+
+    readPoints.mockResolvedValueOnce([])
 
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736',
+        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -66,20 +83,5 @@ describe('verify metrics handler', () => {
     })
 
     expect(res.statusCode).toBe(400)
-  })
-
-  it('returns empty keyfigure if no matching data found', async () => {
-    readPoints.mockResolvedValue(null)
-
-    const res = await server.server.inject({
-      method: 'GET',
-      // tslint:disable-next-line:max-line-length
-      url: `/metrics/birth?timeStart=${new Date().toISOString()}&timeEnd=${new Date().toISOString()}&locationId=Location/b21ce04e-7ccd-4d65-929f-453bc193a736`,
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(200)
   })
 })

@@ -29,7 +29,7 @@ export async function metricsHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = request.query[LOCATION_ID]
+  const locationId = 'Location/' + request.query[LOCATION_ID]
 
   let currentLocationLevel
   let lowerLocationLevel

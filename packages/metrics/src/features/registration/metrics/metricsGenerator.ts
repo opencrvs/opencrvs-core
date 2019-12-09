@@ -68,12 +68,10 @@ interface IGenderBasisPoint {
   gender: string
   over18: number
   under18: number
-  total: number
-  location:
-    | 'locationLevel2'
-    | 'locationLevel3'
-    | 'locationLevel4'
-    | 'locationLevel5'
+  locationLevel2?: string
+  locationLevel3?: string
+  locationLevel4?: string
+  locationLevel5?: string
 }
 
 export async function regByAge(timeStart: string, timeEnd: string) {
@@ -104,10 +102,9 @@ export async function fetchCertificationPayments(
   currentLocationLevel: string,
   lowerLocationLevel: string
 ) {
-  const queryLocationId = `Location/${locationId}`
   const payments = await readPoints(
     `SELECT SUM(total) as total FROM certification_payment WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ${currentLocationLevel}='${queryLocationId}'
+      AND ${currentLocationLevel}='${locationId}'
       GROUP BY ${lowerLocationLevel}`
   )
 
@@ -124,8 +121,6 @@ export async function fetchRegWithinTimeFrames(
   currentLocationLevel: string,
   lowerLocationLevel: string
 ) {
-  const queryLocationId = `Location/${locationId}`
-
   const timeFramePoints = await readPoints(
     `SELECT 
       SUM(within45Days) AS regWithin45d,
@@ -136,19 +131,19 @@ export async function fetchRegWithinTimeFrames(
        SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel} 
        FROM (
         SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${queryLocationId}'
+      AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
         GROUP BY ${lowerLocationLevel}
        ), (
         SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${queryLocationId}'
+      AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
         GROUP BY ${lowerLocationLevel} 
        ), (
         SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${queryLocationId}'
+      AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
         GROUP BY ${lowerLocationLevel}
        ), (
         SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ageInDays > 1826 AND ${currentLocationLevel}='${queryLocationId}'
+      AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
         GROUP BY ${lowerLocationLevel}
        ) FILL(0) 
      ) GROUP BY ${lowerLocationLevel}
@@ -180,14 +175,12 @@ export async function getCurrentAndLowerLocationLevels(
   timeEnd: string,
   locationId: string
 ): Promise<ICurrentAndLowerLocationLevels> {
-  const queryLocationId = `Location/${locationId}`
-
   const allPointsContainingLocationId = await readPoints(
     `SELECT LAST(*) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
-      AND ( locationLevel2 = '${queryLocationId}'
-        OR locationLevel3 = '${queryLocationId}'
-        OR locationLevel4 = '${queryLocationId}'
-        OR locationLevel5 = '${queryLocationId}') 
+      AND ( locationLevel2 = '${locationId}'
+        OR locationLevel3 = '${locationId}'
+        OR locationLevel4 = '${locationId}'
+        OR locationLevel5 = '${locationId}') 
       GROUP BY locationLevel2,locationLevel3,locationLevel4,locationLevel5`
   )
 
@@ -195,7 +188,7 @@ export async function getCurrentAndLowerLocationLevels(
     allPointsContainingLocationId &&
     allPointsContainingLocationId.length > 0 &&
     Object.keys(allPointsContainingLocationId[0]).find(
-      key => allPointsContainingLocationId[0][key] === queryLocationId
+      key => allPointsContainingLocationId[0][key] === locationId
     )
   const oneLevelLowerLocationColumn =
     locationLevelOfQueryId &&
