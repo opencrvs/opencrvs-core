@@ -14,11 +14,19 @@ import * as jwt from 'jsonwebtoken'
 import { createServer } from '@metrics/index'
 
 describe('Route authorization', () => {
-  it('blocks requests without a token', async () => {
+  it('tests the health check', async () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
       url: '/ping'
+    })
+    expect(res.result).toEqual({ success: true })
+  })
+  it('blocks requests without a token', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/tokenTest'
     })
     expect(res.statusCode).toBe(401)
   })
@@ -27,7 +35,7 @@ describe('Route authorization', () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: 'Bearer abc'
       }
@@ -44,7 +52,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -61,7 +69,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -84,7 +92,7 @@ describe('Route authorization', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -101,7 +109,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -119,7 +127,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -137,7 +145,7 @@ describe('Route authorization', () => {
     })
     const res = await server.server.inject({
       method: 'GET',
-      url: '/ping',
+      url: '/tokenTest',
       headers: {
         Authorization: `Bearer ${token}`
       }

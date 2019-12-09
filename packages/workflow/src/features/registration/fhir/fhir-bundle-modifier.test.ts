@@ -11,7 +11,6 @@
  */
 import {
   setTrackingId,
-  pushRN,
   setupRegistrationType,
   setupRegistrationWorkflow,
   setupLastRegUser,
@@ -437,33 +436,6 @@ describe('Verify fhir bundle modifier functions', () => {
           practitioner
         )
       ).rejects.toThrowError('Invalid practitioner data found')
-    })
-  })
-  describe('pushRN', () => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      identifier: [{ use: 'official', system: 'mobile', value: '01711111111' }],
-      telecom: [{ system: 'phone', value: '01711111111' }],
-      name: [
-        { use: 'en', family: 'Al Hasan', given: ['Shakib'] },
-        { use: 'bn', family: '', given: [''] }
-      ],
-      gender: 'male',
-      meta: {
-        lastUpdated: '2018-11-25T17:31:08.062+00:00',
-        versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-      },
-      id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-    }
-
-    it('Throws error if invalid fhir bundle is provided', async () => {
-      const invalidDataConversion = undefined as unknown
-      const invalidData = invalidDataConversion as fhir.Task
-      expect(
-        pushRN(invalidData, practitioner, {
-          Authorization: `sample token`
-        })
-      ).rejects.toThrowError('Invalid Task resource found for registration')
     })
   })
 })
