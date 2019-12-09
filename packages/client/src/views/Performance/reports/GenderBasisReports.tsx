@@ -37,6 +37,7 @@ interface IGenderBasisMetrics {
 
 type FullProps = {
   genderBasisMetrics: IGenderBasisMetrics[]
+  loading: boolean
 } & IStateProps &
   WrappedComponentProps
 
@@ -70,14 +71,14 @@ class GenderBasisComponent extends React.Component<FullProps> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, loading } = this.props
 
     return (
       <ListTable
         tableTitle={intl.formatMessage(
           constantsMessages.birthRegistrationTitle
         )}
-        isLoading={false}
+        isLoading={loading}
         content={this.getContent()}
         columns={[
           {
