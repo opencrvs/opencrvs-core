@@ -134,24 +134,28 @@
 
     - name: "Save kern log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/kern.log -l {{ ansible_hostname }}-kern.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     - name: "Save auth log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/auth.log -l {{ ansible_hostname }}-auth.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     - name: "Save btmp log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/btmp -l {{ ansible_hostname }}-btmp >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     - name: "Save ufw log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/ufw.log -l {{ ansible_hostname }}-ufw.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
@@ -233,18 +237,21 @@
 
     - name: "Save opencrvs-backup log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/opencrvs-backup.log -l {{ ansible_hostname }}-opencrvs-backup.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     - name: "Save setup-deploy-config log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/setup-deploy-config.log -l {{ ansible_hostname }}-setup-deploy-config.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     - name: "Save rotate-secrets log to Loggly"
       expect:
+        chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/rotate-secrets.log -l {{ ansible_hostname }}-rotate-secrets.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
