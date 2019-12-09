@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MessageDescriptor } from 'react-intl'
+import { MessageDescriptor, IntlShape } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
 import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
 import {
@@ -506,7 +506,7 @@ const hasValidLength = (value: string, length: number): boolean =>
   !value || value.length === length
 
 export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
-  const validNationalIDLength = 13
+  const validNationalIDLengths = [10, 17]
   const validBirthRegistrationNumberLength = {
     min: 17,
     max: 18
@@ -519,12 +519,18 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
     case NATIONAL_ID:
       const containsOnlyNumbers = value.match(/^[0-9]+$/)
 
-      if (hasValidLength(value, validNationalIDLength) && containsOnlyNumbers) {
+      if (
+        validNationalIDLengths.includes(value.length) &&
+        containsOnlyNumbers
+      ) {
         return undefined
       }
       return {
         message: messages.validNationalId,
-        props: { validLength: validNationalIDLength }
+        props: {
+          min: validNationalIDLengths[0],
+          max: validNationalIDLengths[1]
+        }
       }
 
     case BIRTH_REGISTRATION_NUMBER:

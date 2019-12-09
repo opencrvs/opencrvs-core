@@ -130,7 +130,7 @@
 "form.section.accountDetails","Account details","Account details section"
 "form.field.label.addressLine1","Street and house number","Title for the address line 1"
 "form.field.label.addressLine2","Area / Ward / Mouja / Village","Title for the address line 2"
-"form.field.label.addressLine3","Union / Municipality / Cantonement","Title for the address line 3 option 1"
+"form.field.label.addressLine3","Union / Municipality / Cantonment","Title for the address line 3 option 1"
 "form.field.label.addressLine3CityOption","Ward","Title for the address line 3 option 2"
 "form.field.label.addressLine4","Upazila (Thana) / City","Title for the address line 4"
 "form.field.label.addressSameAsMother","Is his current address the same as the mother's?","Title for the radio button to select that the father's current address is the same as the mother's address"

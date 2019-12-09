@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export { identityNameMapper } from '@client/forms/identity'
+import { createServer } from '@auth/index'
 
-export { identityTooltipMapper } from '@client/forms/identity'
-
-export {
-  getDateOfMarriageLabel,
-  getMotherDateOfBirthLabel,
-  getFatherDateOfBirthLabel
-} from '@client/forms/register/fieldMappings/birth/staticLabel'
+describe('Route authorization', () => {
+  it('health check', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping'
+    })
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toBe(JSON.stringify({ success: true }))
+  })
+})

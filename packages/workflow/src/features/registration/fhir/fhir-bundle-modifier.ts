@@ -25,14 +25,12 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
-  getRegStatusCode,
-  getTrackingIdFromTaskResource
+  getRegStatusCode
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType,
-  getRegistrationNumber,
   isEventNotification,
   isInProgressApplication
 } from '@workflow/features/registration/utils'
@@ -44,6 +42,8 @@ import {
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils.ts'
+import { RESOURCE_SERVICE_URL } from '@workflow/constants'
+import fetch from 'node-fetch'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -114,6 +114,21 @@ export async function markBundleAsValidated(
   return bundle
 }
 
+async function validateRegistration(bundle: fhir.Bundle, token: string) {
+  try {
+    fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    })
+  } catch (err) {
+    throw new Error(`Unable to send registration for validation: ${err}`)
+  }
+}
+
 export async function markBundleAsWaitingValidation(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
@@ -121,12 +136,6 @@ export async function markBundleAsWaitingValidation(
   const taskResource = getTaskResource(bundle) as fhir.Task
 
   const practitioner = await getLoggedInPractitionerResource(token)
-
-  // TODO move the setting of the registration number below
-  /* Setting registration number here */
-  pushRN(taskResource, practitioner, {
-    Authorization: `Bearer ${token}`
-  })
 
   /* setting registration workflow status here */
   await setupRegistrationWorkflow(
@@ -141,7 +150,8 @@ export async function markBundleAsWaitingValidation(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  // TODO validate registration with resource service and set resulting registration number
+  // validate registration with resource service and set resulting registration number
+  validateRegistration(bundle, token)
 
   return bundle
 }
@@ -199,22 +209,6 @@ export async function markBundleAsCertified(
   setupLastRegUser(taskResource, practitioner)
 
   return bundle
-}
-
-export async function pushRN(
-  taskResource: fhir.Task,
-  practitioner: fhir.Practitioner,
-  authHeader: { Authorization: string }
-) {
-  if (!taskResource) {
-    throw new Error('Invalid Task resource found for registration')
-  }
-
-  getRegistrationNumber(
-    getTrackingIdFromTaskResource(taskResource) as string,
-    practitioner.id || '',
-    authHeader
-  )
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {

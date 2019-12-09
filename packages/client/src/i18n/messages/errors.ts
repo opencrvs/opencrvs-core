@@ -26,6 +26,9 @@ interface IErrorMessages {
   registrationQueryError: MessageDescriptor
   unauthorized: MessageDescriptor
   userQueryError: MessageDescriptor
+  loadingApplications: MessageDescriptor
+  noApplication: MessageDescriptor
+  waitingForConnection: MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
@@ -101,6 +104,21 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: 'An error occured while loading system users',
     description: 'The text when error ocurred loading system users',
     id: 'system.user.queryError'
+  },
+  loadingApplications: {
+    defaultMessage: 'Loading applications...',
+    description: 'The text when loading application',
+    id: 'search.loadingApplications'
+  },
+  noApplication: {
+    defaultMessage: 'No applications to review',
+    description: 'The text when there is no application to review',
+    id: 'search.noApplications'
+  },
+  waitingForConnection: {
+    defaultMessage: 'Reconnect to load applications',
+    description: 'The text when there is no connectivity',
+    id: 'search.waitingForConnection'
   }
 }
 
