@@ -40,6 +40,10 @@
         name: python3-pip
         state: present
 
+    - name: "Install pexpect python module for ansible expect commands"
+      pip:
+        name: pexpect
+
     - name: "Install docker python module for ansible docker commands"
       pip:
         name: docker
@@ -122,16 +126,35 @@
         rule: allow
         name: OpenSSH
 
-    - name: "Save default logs to Loggly"
-      shell: |
-        curl -O https://www.loggly.com/install/configure-file-monitoring.sh 
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/kern.log -l {{ ansible_hostname }}-kern.log
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/auth.log -l {{ ansible_hostname }}-auth.log
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/btmp -l {{ ansible_hostname }}-btmp
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/ufw.log -l {{ ansible_hostname }}-ufw.log
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/opencrvs-backup.log -l {{ ansible_hostname }}-opencrvs-backup.log
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/setup-deploy-config.log -l {{ ansible_hostname }}-setup-deploy-config.log
-        bash configure-file-monitoring.sh -a {{ loggly_domain }} -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/rotate-secrets.log -l {{ ansible_hostname }}-rotate-secrets.log
+    - name: "Copy loggly script and set permissions"
+      copy:
+        src: ../configure-file-monitoring.sh
+        dest: /configure-file-monitoring.sh
+        mode: +x
+
+    - name: "Save kern log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/kern.log -l {{ ansible_hostname }}-kern.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+
+    - name: "Save auth log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/auth.log -l {{ ansible_hostname }}-auth.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+
+    - name: "Save btmp log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/btmp -l {{ ansible_hostname }}-btmp >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+
+    - name: "Save ufw log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/ufw.log -l {{ ansible_hostname }}-ufw.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
     # Docker swarm ports - Note: all published docker container port will override UFW rules!
     - name: "Allow secure docker client communication"
@@ -207,6 +230,24 @@
         path: /data/traefik/acme.json
         state: touch
         mode: "600"
+
+    - name: "Save opencrvs-backup log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/opencrvs-backup.log -l {{ ansible_hostname }}-opencrvs-backup.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+
+    - name: "Save setup-deploy-config log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/setup-deploy-config.log -l {{ ansible_hostname }}-setup-deploy-config.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+
+    - name: "Save rotate-secrets log to Loggly"
+      expect:
+        command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/rotate-secrets.log -l {{ ansible_hostname }}-rotate-secrets.log >> /var/log/loggly.log 2>&1
+        responses:
+          (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
 
 - hosts: docker-workers
   become: yes
