@@ -25,6 +25,11 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { NoResultMessage } from './NoResultMessage'
+import { generateLocations } from '@client/utils/locationUtils'
+import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { IStoreState } from '@client/store'
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
 `
@@ -33,6 +38,7 @@ interface ReportProps {
   title: string
   reportType: string
   goBack: typeof goBack
+  offlineResources: IOfflineData
 }
 
 type Props = ReportProps &
@@ -54,18 +60,24 @@ class ReportComponent extends React.Component<Props, State> {
           {intl.formatMessage(buttonMessages.back)}
         </BackButton>
         <Header>{title}</Header>
+        <LocationSearch
+          locationList={generateLocations(
+            this.props.offlineResources.locations
+          )}
+        />
         <NoResultMessage searchedLocation="Dhaka" />
       </PerformanceContentWrapper>
     )
   }
 }
 
-function mapStateToProps(state: State, props: Props) {
+function mapStateToProps(state: IStoreState, props: Props) {
   return {
     reportType:
       (props.location.state && props.location.state.reportType) ||
       PERFORMANCE_REPORT_TYPE_WEEKY,
-    title: (props.location.state && props.location.state.title) || ''
+    title: (props.location.state && props.location.state.title) || '',
+    offlineResources: getOfflineData(state)
   }
 }
 

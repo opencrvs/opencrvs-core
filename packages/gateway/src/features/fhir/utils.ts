@@ -842,7 +842,7 @@ export const getMetrics = (
   locationId: string
 ) => {
   const params = new URLSearchParams({ ...timeRange, locationId })
-  return fetch(`${METRICS_URL}/birth?` + params, {
+  return fetch(`${METRICS_URL}/metrics/birth?` + params, {
     method: 'GET',
     headers: {
       ...authHeader

@@ -70,7 +70,7 @@ async function validateWithBDRIS(item: IQueueItemModel) {
     await fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
       body: JSON.stringify({ error: errMsg }),
-      headers: { Authorization: item.token }
+      headers: { Authorization: item.token, 'Content-Type': 'application/json' }
     })
 
     item.set('status', State.ERROR)
@@ -85,7 +85,7 @@ async function validateWithBDRIS(item: IQueueItemModel) {
     await fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
       body: JSON.stringify(webHookResponse),
-      headers: { Authorization: item.token }
+      headers: { Authorization: item.token, 'Content-Type': 'application/json' }
     })
   } catch (err) {
     item.set('status', State.ERROR)

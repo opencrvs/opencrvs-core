@@ -34,11 +34,6 @@ import {
 import { facilitiesHandler as bgdFacilitiesHandler } from '@resources/bgd/features/facilities/handler'
 import { definitionsHandler as bgdDefinitionsHandler } from '@resources/bgd/features/definitions/handler'
 import { assetHandler as bgdAssetHandler } from '@resources/bgd/features/assets/handler'
-import {
-  generatorHandler as bgdGeneratorHandler,
-  requestSchema as bgdGeneratorRequestSchema,
-  responseSchema as bgdGeneratorResponseSchema
-} from '@resources/bgd/features/generate/handler'
 import { locationsHandler as zmbLocationsHandler } from '@resources/zmb/features/administrative/handler'
 import { facilitiesHandler as zmbFacilitiesHandler } from '@resources/zmb/features/facilities/handler'
 import { definitionsHandler as zmbDefinitionsHandler } from '@resources/zmb/features/definitions/handler'
@@ -76,6 +71,24 @@ export async function createServer() {
   })
 
   server.auth.default('jwt')
+
+  // add ping route by default for health check
+
+  server.route({
+    method: 'GET',
+    path: '/ping',
+    handler: (request: any, h: any) => {
+      // Perform any health checks and return true or false for success prop
+      return {
+        success: true
+      }
+    },
+    options: {
+      auth: false,
+      tags: ['api'],
+      description: 'Health check endpoint'
+    }
+  })
 
   // Bangladesh
 
@@ -117,24 +130,6 @@ export async function createServer() {
       tags: ['api'],
       description:
         'Serves definitional metadata like form definitions, language files and pdf templates'
-    }
-  })
-
-  server.route({
-    // TODO this route can be removed once the validate route is fully functional
-    method: 'POST',
-    path: '/bgd/generate/{type}',
-    handler: bgdGeneratorHandler,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: bgdGeneratorRequestSchema
-      },
-      response: {
-        schema: bgdGeneratorResponseSchema
-      },
-      description:
-        'Generates registration numbers based on country specific implementation logic'
     }
   })
 

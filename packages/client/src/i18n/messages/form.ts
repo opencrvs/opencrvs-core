@@ -373,7 +373,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.addressLine2'
   },
   addressLine3: {
-    defaultMessage: 'Union / Municipality / Cantonement',
+    defaultMessage: 'Union / Municipality / Cantonment',
     description: 'Title for the address line 3 option 1',
     id: 'form.field.label.addressLine3'
   },

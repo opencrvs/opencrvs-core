@@ -462,7 +462,7 @@
         "fieldAgentHome.zeroUpdatesText": "No applications require updates",
         "form.field.label.addressLine1": "Street and house number",
         "form.field.label.addressLine2": "Area / Ward / Mouja / Village",
-        "form.field.label.addressLine3": "Union / Municipality / Cantonement",
+        "form.field.label.addressLine3": "Union / Municipality / Cantonment",
         "form.field.label.addressLine3CityOption": "Ward",
         "form.field.label.addressLine4": "Upazila (Thana) / City",
         "form.field.label.addressSameAsMother": "Is his current address the same as the mother's?",
