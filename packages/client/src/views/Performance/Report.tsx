@@ -26,7 +26,10 @@ import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { NoResultMessage } from './NoResultMessage'
 import { generateLocations } from '@client/utils/locationUtils'
-import { LocationSearch } from '@opencrvs/components/lib/interface'
+import {
+  LocationSearch,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
@@ -45,30 +48,32 @@ type Props = ReportProps &
   WrappedComponentProps &
   RouteComponentProps<{}, {}, { reportType: string; title: string }>
 
-type State = {}
+function ReportComponent(props: Props) {
+  const [
+    selectedLocation,
+    setSelectedLocation
+  ] = React.useState<ISearchLocation | null>(null)
+  const { reportType, title, intl } = props
 
-class ReportComponent extends React.Component<Props, State> {
-  render() {
-    const { reportType, title, intl } = this.props
-    return (
-      <PerformanceContentWrapper tabId={reportType}>
-        <BackButton
-          align={ICON_ALIGNMENT.LEFT}
-          icon={() => <BackArrow />}
-          onClick={this.props.goBack}
-        >
-          {intl.formatMessage(buttonMessages.back)}
-        </BackButton>
-        <Header>{title}</Header>
-        <LocationSearch
-          locationList={generateLocations(
-            this.props.offlineResources.locations
-          )}
-        />
-        <NoResultMessage searchedLocation="Dhaka" />
-      </PerformanceContentWrapper>
-    )
-  }
+  return (
+    <PerformanceContentWrapper tabId={reportType}>
+      <BackButton
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <BackArrow />}
+        onClick={props.goBack}
+      >
+        {intl.formatMessage(buttonMessages.back)}
+      </BackButton>
+      <Header>{title}</Header>
+      <LocationSearch
+        locationList={generateLocations(props.offlineResources.locations)}
+        searchHandler={item => {
+          setSelectedLocation(item)
+        }}
+      />
+      <NoResultMessage searchedLocation="Dhaka" />
+    </PerformanceContentWrapper>
+  )
 }
 
 function mapStateToProps(state: IStoreState, props: Props) {
