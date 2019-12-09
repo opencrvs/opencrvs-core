@@ -42,15 +42,6 @@ describe('verify metrics handler', () => {
 
     readPoints.mockResolvedValueOnce([
       {
-        gender: 'male',
-        over18: 5,
-        under18: 2,
-        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
-      }
-    ])
-
-    readPoints.mockResolvedValueOnce([
-      {
         regWithin45d: 1,
         regWithin45dTo1yr: 3,
         regWithin1yrTo5yr: 0,
@@ -60,6 +51,21 @@ describe('verify metrics handler', () => {
     ])
 
     readPoints.mockResolvedValueOnce([])
+
+    readPoints.mockResolvedValueOnce([
+      {
+        gender: 'male',
+        over18: 5,
+        under18: 2,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      },
+      {
+        gender: 'female',
+        over18: 3,
+        under18: 2,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
 
     const res = await server.server.inject({
       method: 'GET',
