@@ -28,7 +28,8 @@ import {
   StatsBlue,
   SystemBlack,
   SystemBlue,
-  TrackingID
+  TrackingID,
+  User
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -58,7 +59,8 @@ import {
   BRN_DRN_TEXT,
   PHONE_TEXT,
   SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT
+  TRACKING_ID_TEXT,
+  NAME_TEXT
 } from '@client/utils/constants'
 import styled from 'styled-components'
 import { messages } from '@client/i18n/messages/views/header'
@@ -284,6 +286,13 @@ class HeaderComp extends React.Component<IProps, IState> {
         icon: <Phone />,
         invertIcon: <Phone color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
+      },
+      {
+        label: intl.formatMessage(messages.typeName),
+        value: NAME_TEXT,
+        icon: <User />,
+        invertIcon: <User color="invert" />,
+        placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
 
