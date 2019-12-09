@@ -17,6 +17,10 @@ import { connect } from 'react-redux'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
+import {
+  getValueWithPercentageString,
+  getLocationFromPartOfLocationId
+} from './utils'
 
 interface IStateProps {
   offlineResources: IOfflineData
@@ -37,40 +41,29 @@ type FullProps = {
   WrappedComponentProps
 
 class GenderBasisComponent extends React.Component<FullProps> {
-  getLocationByLocationId(locationId: string) {
-    return (
-      Object.values(this.props.offlineResources.locations).find(
-        location => location.id === locationId
-      ) || {
-        name: ''
-      }
-    )
-  }
-
   getContent() {
     return this.props.genderBasisMetrics.map(content => {
       return {
-        location: this.getLocationByLocationId(content.location).name,
-        femaleOver18:
-          content.femaleOver18 +
-          ' (' +
-          (content.femaleOver18 / content.total) * 100 +
-          '%)',
-        maleOver18:
-          content.femaleOver18 +
-          ' (' +
-          (content.maleOver18 / content.total) * 100 +
-          '%)',
-        maleUnder18:
-          content.femaleOver18 +
-          ' (' +
-          (content.maleUnder18 / content.total) * 100 +
-          '%)',
-        femaleUnder18:
-          content.femaleOver18 +
-          ' (' +
-          (content.maleOver18 / content.total) * 100 +
-          '%)',
+        location: getLocationFromPartOfLocationId(
+          content.location,
+          this.props.offlineResources
+        ).name,
+        femaleOver18: getValueWithPercentageString(
+          content.femaleOver18,
+          content.total
+        ),
+        maleOver18: getValueWithPercentageString(
+          content.maleOver18,
+          content.total
+        ),
+        maleUnder18: getValueWithPercentageString(
+          content.maleUnder18,
+          content.total
+        ),
+        femaleUnder18: getValueWithPercentageString(
+          content.femaleUnder18,
+          content.total
+        ),
         total: String(content.total)
       }
     })

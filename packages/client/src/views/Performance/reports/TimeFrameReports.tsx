@@ -19,6 +19,10 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { GQLBirthRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
+import {
+  getValueWithPercentageString,
+  getLocationFromPartOfLocationId
+} from './utils'
 
 interface IStateProps {
   offlineResources: IOfflineData
@@ -30,10 +34,6 @@ type FullProps = {
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
-
-function getValueWithPercentageString(value: number, total: number) {
-  return value + ' (' + Math.floor((value / total) * 100) + '%)'
-}
 
 class TimeFrameComponent extends React.Component<FullProps> {
   getLocationByLocationId = (locationId: string) => {
@@ -49,7 +49,10 @@ class TimeFrameComponent extends React.Component<FullProps> {
 
   getContent = () => {
     return this.props.data.map(timeFrame => ({
-      location: this.getLocationByLocationId(timeFrame.locationId).name,
+      location: getLocationFromPartOfLocationId(
+        timeFrame.locationId,
+        this.props.offlineResources
+      ).name,
       regWithin45d: getValueWithPercentageString(
         timeFrame.regWithin45d,
         timeFrame.total
