@@ -173,7 +173,9 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle),
+      generatePaymentPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],

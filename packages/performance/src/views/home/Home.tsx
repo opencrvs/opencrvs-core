@@ -21,10 +21,7 @@ import {
 } from 'react-intl'
 import { Box, Spinner } from '@opencrvs/components/lib/interface'
 import styled, { withTheme, ITheme } from '@performance/styledComponents'
-import {
-  GQLHumanName,
-  GQLBirthKeyFigures
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { getUserDetails } from '@performance/profile/selectors'
 import { getUserLocation, IUserDetails } from '@performance/utils/userUtils'
 import { getLanguage } from '@performance/i18n/selectors'
@@ -262,10 +259,7 @@ const getKeyFigureLabel = (type: string, intl: IntlShape): string => {
       return intl.formatHTMLMessage(messages.totalLiveBirthsLabel)
   }
 }
-const getData = (
-  keyFigures: GQLBirthKeyFigures[],
-  intl: IntlShape
-): IData[] => {
+const getData = (keyFigures: any[], intl: IntlShape): IData[] => {
   return (
     (keyFigures &&
       keyFigures.map((keyFigureData, index) => {
@@ -289,7 +283,7 @@ const getData = (
             false,
           categoricalData:
             keyFigureData.categoricalData &&
-            keyFigureData.categoricalData.map(category => {
+            keyFigureData.categoricalData.map((category: any) => {
               return {
                 name: (category && category.name) || '',
                 label: intl.formatMessage(
