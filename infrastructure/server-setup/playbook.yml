@@ -133,32 +133,48 @@
         mode: +x
 
     - name: "Save kern log to Loggly"
+      register: logglyResultKern
+      failed_when:
+        - "'FAIL' in logglyResultKern.stdout or 'ERROR' in logglyResultKern.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/kern.log -l {{ ansible_hostname }}-kern.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
 
     - name: "Save auth log to Loggly"
+      register: logglyResultAuth
+      failed_when:
+        - "'FAIL' in logglyResultAuth.stdout or 'ERROR' in logglyResultAuth.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/auth.log -l {{ ansible_hostname }}-auth.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
 
     - name: "Save btmp log to Loggly"
+      register: logglyResultBtmp
+      failed_when:
+        - "'FAIL' in logglyResultBtmp.stdout or 'ERROR' in logglyResultBtmp.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/btmp -l {{ ansible_hostname }}-btmp >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
 
     - name: "Save ufw log to Loggly"
+      register: logglyResultUfw
+      failed_when:
+        - "'FAIL' in logglyResultUfw.stdout or 'ERROR' in logglyResultUfw.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/ufw.log -l {{ ansible_hostname }}-ufw.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
 
     # Docker swarm ports - Note: all published docker container port will override UFW rules!
     - name: "Allow secure docker client communication"
@@ -235,26 +251,65 @@
         state: touch
         mode: "600"
 
+    - name: "Ensure log file exists: opencrvs-backup"
+      copy:
+        content: ""
+        dest: /var/log/opencrvs-backup.log
+        force: no
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
     - name: "Save opencrvs-backup log to Loggly"
+      register: logglyResultBackup
+      failed_when:
+        - "'FAIL' in logglyResultBackup.stdout or 'ERROR' in logglyResultBackup.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/opencrvs-backup.log -l {{ ansible_hostname }}-opencrvs-backup.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
+
+    - name: "Ensure log file exists: setup-deploy-config"
+      copy:
+        content: ""
+        dest: /var/log/setup-deploy-config.log
+        force: no
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
     - name: "Save setup-deploy-config log to Loggly"
+      register: logglyResultDeploy
+      failed_when:
+        - "'FAIL' in logglyResultDeploy.stdout or 'ERROR' in logglyResultDeploy.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/setup-deploy-config.log -l {{ ansible_hostname }}-setup-deploy-config.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
+
+    - name: "Ensure log file exists: rotate-secrets"
+      copy:
+        content: ""
+        dest: /var/log/rotate-secrets.log
+        force: no
+        group: 1000
+        owner: 1000
+        mode: g+rwx
 
     - name: "Save rotate-secrets log to Loggly"
+      register: logglyResultSecrets
+      failed_when:
+        - "'FAIL' in logglyResultSecrets.stdout or 'ERROR' in logglyResultSecrets.stdout"
       expect:
         chdir: /
         command: bash configure-file-monitoring.sh -a opencrvs -t {{ loggly_token }} -u {{ loggly_username }} -p {{ loggly_password }} -f /var/log/rotate-secrets.log -l {{ ansible_hostname }}-rotate-secrets.log >> /var/log/loggly.log 2>&1
         responses:
           (.*)Would you like to overwrite the configuration for this file alias (yes/no)?(.*): "Yes"
+        timeout: 300
 
 - hosts: docker-workers
   become: yes
