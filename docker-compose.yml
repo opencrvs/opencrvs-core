@@ -153,3 +153,4 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
       - OPENHIM_URL=http://openhim-core:5001
+      - CONFIRM_REGISTRATION_URL=http://workflow:5050/confirm/registration
