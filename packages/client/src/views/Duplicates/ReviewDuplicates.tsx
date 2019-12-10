@@ -14,7 +14,8 @@ import {
   ActionPage,
   Box,
   Modal,
-  Spinner
+  Spinner,
+  EventTopBar
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Duplicate } from '@opencrvs/components/lib/icons'
@@ -59,6 +60,10 @@ import {
 import { messages } from '@client/i18n/messages/views/duplicates'
 import { Query } from '@client/components/Query'
 
+import { goToHome } from '@client/navigation'
+
+import { Container } from '@opencrvs/components/lib/layout'
+
 interface IMatchParams {
   applicationId: string
 }
@@ -67,8 +72,8 @@ const StyledSpinner = styled(Spinner)`
   margin: 50% auto;
 `
 
-const Container = styled.div`
-  margin: 35px 250px 0px 250px;
+const Wrapper = styled.div`
+  margin: 85px 250px 0px 250px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 20px;
@@ -92,6 +97,7 @@ const HeaderText = styled.span`
 
 const Grid = styled.div`
   margin-top: 24px;
+  margin-bottom: 24px;
   display: grid;
   grid-gap: 20px;
   grid-template-columns: auto auto;
@@ -218,7 +224,10 @@ interface IState {
   showNotDuplicateModal: boolean
 }
 type Props = IntlShapeProps &
-  RouteComponentProps<IMatchParams> & { language: string }
+  RouteComponentProps<IMatchParams> & {
+    language: string
+    goToHome: typeof goToHome
+  }
 class ReviewDuplicatesClass extends React.Component<Props, IState> {
   constructor(props: Props) {
     super(props)
@@ -380,13 +389,12 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     const applicationId = match.params.applicationId
 
     return (
-      <ActionPage
-        goBack={() => {
-          window.location.assign(SEARCH_RESULT)
-        }}
-        backLabel={intl.formatMessage(buttonMessages.back)}
-        title={intl.formatMessage(messages.possibleDuplicateFound)}
-      >
+      <Container>
+        <EventTopBar
+          title={intl.formatMessage(messages.duplicateReview)}
+          goHome={this.props.goToHome}
+          pageIcon={<Duplicate />}
+        />
         <Query
           query={FETCH_DUPLICATES}
           variables={{
@@ -470,7 +478,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                   }
 
                   return (
-                    <Container>
+                    <Wrapper>
                       <TitleBox>
                         <Header id="review-duplicates-header">
                           <Duplicate />
@@ -506,7 +514,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
                           />
                         ))}
                       </Grid>
-                    </Container>
+                    </Wrapper>
                   )
                 }}
               </Query>
@@ -574,11 +582,18 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
             )
           }}
         </Mutation>
-      </ActionPage>
+      </Container>
     )
   }
 }
 
-export const ReviewDuplicates = connect((state: IStoreState) => ({
+const mapStateToProps = (state: IStoreState) => ({
   language: state.i18n.language
-}))(injectIntl(ReviewDuplicatesClass))
+})
+const mapDispatchToProps = {
+  goToHome
+}
+export const ReviewDuplicates = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(injectIntl(ReviewDuplicatesClass))

@@ -40,6 +40,7 @@ const Item = styled.span`
 interface IProps {
   id?: string
   title: string
+  pageIcon?: JSX.Element
   goHome?: () => void
   saveAction?: IAction
   exitAction?: IAction
@@ -57,11 +58,20 @@ interface IToggleMenuItem {
 }
 
 export const EventTopBar = (props: IProps) => {
-  const { goHome, title, saveAction, exitAction, menuItems, iconColor } = props
+  const {
+    goHome,
+    title,
+    saveAction,
+    exitAction,
+    menuItems,
+    iconColor,
+    pageIcon
+  } = props
   return (
     <TopBar>
       <Item>
-        <ApplicationIcon color={iconColor} /> <TopBarTitle>{title}</TopBarTitle>
+        {pageIcon || <ApplicationIcon color={iconColor} />}{' '}
+        <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
         {goHome && (

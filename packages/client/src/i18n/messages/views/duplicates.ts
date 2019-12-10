@@ -18,6 +18,9 @@ interface IDuplicatesMessages {
   duplicateFoundTitle: MessageDescriptor
   duplicateFoundDescription: MessageDescriptor
   possibleDuplicateFound: MessageDescriptor
+  duplicateReview: MessageDescriptor
+  keep: MessageDescriptor
+  duplicate: MessageDescriptor
 }
 
 const messagesToDefine: IDuplicatesMessages = {
@@ -29,7 +32,7 @@ const messagesToDefine: IDuplicatesMessages = {
   },
   duplicateFoundTitle: {
     id: 'duplicates.duplicateFoundTitle',
-    defaultMessage: 'Possible duplicates found',
+    defaultMessage: 'Possible duplicate found',
     description: 'The title of the text box in the duplicates page'
   },
   duplicateFoundDescription: {
@@ -52,6 +55,21 @@ const messagesToDefine: IDuplicatesMessages = {
     id: 'duplicates.notDuplicate.modal.confirmationText',
     defaultMessage: 'Are you sure this is not a duplicate application?',
     description: 'Not a duplicate modal confirmation text'
+  },
+  duplicateReview: {
+    id: 'duplicates.details.duplicateReview',
+    defaultMessage: 'Duplicate review',
+    description: 'Duplicate review Page header'
+  },
+  keep: {
+    id: 'duplicates.details.keep',
+    defaultMessage: 'Keep',
+    description: 'Button text for non duplicate'
+  },
+  duplicate: {
+    id: 'duplicates.details.duplicate',
+    defaultMessage: 'Duplicate',
+    description: 'Button text for Duplicate'
   }
 }
 
