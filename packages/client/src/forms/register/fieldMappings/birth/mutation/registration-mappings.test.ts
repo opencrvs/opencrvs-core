@@ -21,28 +21,6 @@ import { TransformedData, IFormField } from '@client/forms'
 import { cloneDeep } from 'lodash'
 
 describe('Birth registration mutation mapping related tests', () => {
-  it('Test certificate mapping with minimum data', () => {
-    const transformedData: TransformedData = {
-      registration: {}
-    }
-    setBirthRegistrationSectionTransformer(
-      transformedData,
-      mockApplicationData,
-      'registration'
-    )
-    expect(transformedData.registration).toBeDefined()
-    expect(transformedData.registration.registrationNumber).toEqual(
-      '201908122365BDSS0SE1'
-    )
-    expect(transformedData.registration.certificates).toEqual([
-      {
-        collector: {
-          relationship: 'MOTHER'
-        },
-        hasShowedVerifiedDocument: true
-      }
-    ])
-  })
   it('Test certificate mapping with other collector data', () => {
     const transformedData: TransformedData = {
       registration: {}
@@ -75,11 +53,32 @@ describe('Birth registration mutation mapping related tests', () => {
                 type: 'PASSPORT'
               }
             ]
-          }
+          },
+          affidavit: [
+            {
+              contentType: 'abc',
+              data: 'BASE64 data'
+            }
+          ]
         },
         hasShowedVerifiedDocument: true
       }
     ])
+  })
+  it('Test certificate mapping without any data', () => {
+    const transformedData: TransformedData = {
+      registration: {}
+    }
+    setBirthRegistrationSectionTransformer(
+      transformedData,
+      mockApplicationData,
+      'registration'
+    )
+    expect(transformedData.registration).toBeDefined()
+    expect(transformedData.registration.registrationNumber).toEqual(
+      '201908122365BDSS0SE1'
+    )
+    expect(transformedData.registration.certificates).toEqual([{}])
   })
 
   it('changeHierarchyMutation transformer test', () => {
