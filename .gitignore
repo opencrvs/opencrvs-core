@@ -21,3 +21,4 @@ build
 data
 
 .vscode/launch.json
+.history
