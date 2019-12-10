@@ -31,12 +31,14 @@ import {
   findTaskExtension,
   findTaskIdentifier,
   getCompositionById,
-  updateInHearth
+  updateInHearth,
+  findEntryResourceByUrl
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
+const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 const NAME_EN = 'en'
@@ -132,6 +134,7 @@ async function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
+  createInformantIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
   await createStatusHistory(body)
 }
@@ -232,6 +235,43 @@ function createFatherIndex(
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
     father.identifier && father.identifier[0] && father.identifier[0].value
+}
+
+function createInformantIndex(
+  body: IBirthCompositionBody,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const informantRef = findEntry(
+    INFORMANT_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.RelatedPerson
+
+  if (!informantRef) {
+    return
+  }
+
+  const informant = findEntryResourceByUrl(
+    informantRef.patient.reference,
+    bundleEntries
+  ) as fhir.Patient
+
+  const informantName = informant && findName(NAME_EN, informant)
+  const informantNameLocal = informant && findName(NAME_BN, informant)
+
+  body.informantFirstNames =
+    informantName && informantName.given && informantName.given.join(' ')
+  body.informantFamilyName =
+    informantName && informantName.family && informantName.family[0]
+  body.informantFirstNamesLocal =
+    informantNameLocal &&
+    informantNameLocal.given &&
+    informantNameLocal.given.join(' ')
+  body.informantFamilyNameLocal =
+    informantNameLocal &&
+    informantNameLocal.family &&
+    informantNameLocal.family[0]
 }
 
 async function createApplicationIndex(
