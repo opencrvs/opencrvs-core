@@ -266,7 +266,7 @@ export const resolvers: GQLResolver = {
         await fetchFHIR(
           `/Composition/${id}`,
           authHeader,
-          'PUT',
+          'POST',
           JSON.stringify(composition)
         )
         return composition.id

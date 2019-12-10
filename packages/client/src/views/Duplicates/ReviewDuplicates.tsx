@@ -69,7 +69,7 @@ interface IMatchParams {
 }
 
 const StyledSpinner = styled(Spinner)`
-  margin: 50% auto;
+  margin: 25% auto;
 `
 
 const Wrapper = styled.div`

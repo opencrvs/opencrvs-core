@@ -206,7 +206,6 @@ class DuplicateDetailsClass extends React.Component<
 
     const application = find(outboxApplications, { id: data.id })
     const downloadStatus = get(application, 'downloadStatus')
-    console.log(application)
 
     if (
       downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
@@ -370,27 +369,32 @@ class DuplicateDetailsClass extends React.Component<
             </ListItem>
           ))}
         </ListContainer>
-        <Separator />
         {currentStatus === Action.DECLARED && (
-          <ButtonContainer>
-            {notDuplicateHandler && (
-              <SuccessButton id="notDuplicateBtn" onClick={notDuplicateHandler}>
-                <TickLarge />
-                &nbsp;
-                {intl.formatMessage(messages.keep)}
-              </SuccessButton>
-            )}
+          <>
+            <Separator />
+            <ButtonContainer>
+              {notDuplicateHandler && (
+                <SuccessButton
+                  id="notDuplicateBtn"
+                  onClick={notDuplicateHandler}
+                >
+                  <TickLarge />
+                  &nbsp;
+                  {intl.formatMessage(messages.keep)}
+                </SuccessButton>
+              )}
 
-            {rejectHandler && (
-              <DangerButton
-                id={`reject_link_${data.id}`}
-                onClick={rejectHandler}
-              >
-                <Cross color="white" /> &nbsp;
-                {intl.formatMessage(messages.duplicate)}
-              </DangerButton>
-            )}
-          </ButtonContainer>
+              {rejectHandler && (
+                <DangerButton
+                  id={`reject_link_${data.id}`}
+                  onClick={rejectHandler}
+                >
+                  <Cross color="white" /> &nbsp;
+                  {intl.formatMessage(messages.duplicate)}
+                </DangerButton>
+              )}
+            </ButtonContainer>
+          </>
         )}
       </DetailsBox>
     )
