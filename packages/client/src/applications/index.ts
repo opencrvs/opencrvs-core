@@ -747,16 +747,24 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         newApplicationsAfterDownload[downloadingApplicationIndex]
 
       const dataKey = getDataKey(downloadingApplication)
-      const transData = gqlToDraftTransformer(
+      const eventData = queryData.data[dataKey as string]
+      const transData: IFormData = gqlToDraftTransformer(
         form[downloadingApplication.event],
-        queryData.data[dataKey as string]
+        eventData
       )
+      const downloadedAppStatus: string =
+        (eventData &&
+          eventData.registration &&
+          eventData.registration.status &&
+          eventData.registration.status[0].type) ||
+        ''
       newApplicationsAfterDownload[
         downloadingApplicationIndex
       ] = createReviewApplication(
         downloadingApplication.id,
         transData,
-        downloadingApplication.event
+        downloadingApplication.event,
+        downloadedAppStatus
       )
       newApplicationsAfterDownload[downloadingApplicationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
