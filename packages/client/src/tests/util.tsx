@@ -2424,10 +2424,6 @@ export const mockDeathRegistrationSectionData = {
   ]
 }
 
-export const mockPrintInAdvanceCertificateWithPayment = {
-  payments: {}
-}
-
 export const mockOfflineData = {
   forms: JSON.parse(
     readFileSync('../resources/src/bgd/features/forms/register.json').toString()
