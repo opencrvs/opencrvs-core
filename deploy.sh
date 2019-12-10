@@ -92,7 +92,7 @@ fi
 ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HOST' | tee -a '$LOG_LOCATION'/setup-deploy-config.log'
 
 # Setup log rotation for OpenCRVS logs
-ssh $SSH_USER@$SSH_HOST 'mv /tmp/compose/infrastructure/logrotate.conf /etc/'
+ssh $SSH_USER@$SSH_HOST 'cp /tmp/compose/infrastructure/logrotate.conf /etc/'
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
