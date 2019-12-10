@@ -70,6 +70,7 @@ interface IConstantsMessages {
   sentOn: MessageDescriptor
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
+  timeFramesTitle: MessageDescriptor
   to: MessageDescriptor
   trackingId: MessageDescriptor
   type: MessageDescriptor
@@ -78,6 +79,17 @@ interface IConstantsMessages {
   username: MessageDescriptor
   waitingToSend: MessageDescriptor
   week: MessageDescriptor
+  location: MessageDescriptor
+  maleUnder18: MessageDescriptor
+  femaleUnder18: MessageDescriptor
+  maleOver18: MessageDescriptor
+  femaleOver18: MessageDescriptor
+  total: MessageDescriptor
+  birthRegistrationTitle: MessageDescriptor
+  within45Days: MessageDescriptor
+  within45DaysTo1Year: MessageDescriptor
+  within1YearTo5Years: MessageDescriptor
+  over5Years: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -312,6 +324,11 @@ const messagesToDefine: IConstantsMessages = {
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
   },
+  over5Years: {
+    defaultMessage: 'Over 5 years',
+    description: 'Label for registrations over 5 years',
+    id: 'constants.over5Years'
+  },
   pendingConnection: {
     defaultMessage: 'Pending connection',
     description: 'Label for application status Pending Connection',
@@ -377,6 +394,12 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for table header of column Submission status',
     id: 'constants.submissionStatus'
   },
+  timeFramesTitle: {
+    defaultMessage:
+      '{event, select, birth{Birth} death{Death} other{Birth}} registered by time period, from date of occurrence',
+    description: 'Header for tabel performance timeframs',
+    id: 'constants.timeFramesTitle'
+  },
   to: {
     defaultMessage: 'to',
     description: 'Used in sentence',
@@ -416,6 +439,56 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Week',
     description: 'Label for week',
     id: 'constants.week'
+  },
+  maleUnder18: {
+    defaultMessage: 'Male Under 18',
+    description: 'Label for maleUnder18',
+    id: 'constants.maleUnder18'
+  },
+  femaleUnder18: {
+    defaultMessage: 'Female Under 18',
+    description: 'Label for femaleUnder18',
+    id: 'constants.maleUnder18'
+  },
+  maleOver18: {
+    defaultMessage: 'Male Over 18',
+    description: 'Label for maleOver18',
+    id: 'constants.maleOver18'
+  },
+  femaleOver18: {
+    defaultMessage: 'Female Over 18',
+    description: 'Label for femaleOver18',
+    id: 'constants.femaleOver18'
+  },
+  total: {
+    defaultMessage: 'Total',
+    description: 'Label for total',
+    id: 'constants.total'
+  },
+  location: {
+    defaultMessage: 'Location',
+    description: 'Label for location',
+    id: 'constants.location'
+  },
+  birthRegistrationTitle: {
+    defaultMessage: 'Births Registered',
+    description: 'Label for birthRegistrationTitle',
+    id: 'constants.birthRegistrationTitle'
+  },
+  within45Days: {
+    defaultMessage: 'Within 45 days',
+    description: 'Label for registrations within 45 days',
+    id: 'constants.within45Days'
+  },
+  within45DaysTo1Year: {
+    defaultMessage: '45 days - 1 year',
+    description: 'Label for registrations within 45 days to 1 year',
+    id: 'constants.within45DaysTo1Year'
+  },
+  within1YearTo5Years: {
+    defaultMessage: '1 year to 5 years',
+    description: 'Label for registrations within 1 year to 5 years',
+    id: 'constants.within1YearTo5Years'
   }
 }
 

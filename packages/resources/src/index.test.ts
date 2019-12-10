@@ -21,6 +21,15 @@ describe('Route authorization', () => {
       .mockReturnValue(Promise.resolve({ data: [] }))
   })
 
+  it('tests the health check', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/ping'
+    })
+    expect(res.result).toEqual({ success: true })
+  })
+
   it('blocks requests without a token', async () => {
     const server = await createServer()
     const res = await server.server.inject({

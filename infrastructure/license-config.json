@@ -5,6 +5,7 @@
     "**/patches",
     ".secrets",
     ".vscode",
+    ".history",
     "data",
     "backups",
     "**/coverage",

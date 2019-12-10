@@ -145,44 +145,50 @@ export const offlineTransformers: IFunctionTransformer = {
       throw new Error('No condition has matched for OfflineAddress transformer')
     }
 
-    const countryValue = getCountryValue(
-      matchedCondition.addresses.countryCode,
-      templateData
-    )
+    try {
+      const countryValue = getCountryValue(
+        matchedCondition.addresses.countryCode,
+        templateData
+      )
 
-    const countryMessage = getCountryMessage(
-      optionalData,
-      countryValue,
-      params.language
-    )
-
-    let addressToParse = ''
-    if (isDefaultCountry(countryValue)) {
-      addressToParse = matchedCondition.addresses.localAddress
-    } else {
-      addressToParse = matchedCondition.addresses.internationalAddress as string
-    }
-    const keyValues: KeyValues = getKeyValues(
-      addressToParse.match(/\{.*?\}/g),
-      templateData
-    )
-
-    let value = ''
-    if (addressToParse.match(/\{.*?\}/g) === null) {
-      // return default localAddress without transformation if addressToParse is badly formatted
-      value = matchedCondition.addresses.localAddress
-    } else {
-      value = getTransformedAddress(
-        keyValues,
-        templateData,
-        addressToParse,
-        matchedCondition.addressKey, // either name or alias depending on params.language
-        matchedCondition.addressType, // either facilities or locations
-        countryMessage,
+      const countryMessage = getCountryMessage(
+        optionalData,
         countryValue,
         params.language
       )
+
+      let addressToParse = ''
+      if (isDefaultCountry(countryValue)) {
+        addressToParse = matchedCondition.addresses.localAddress
+      } else {
+        addressToParse = matchedCondition.addresses
+          .internationalAddress as string
+      }
+      const keyValues: KeyValues = getKeyValues(
+        addressToParse.match(/\{.*?\}/g),
+        templateData
+      )
+
+      let value = ''
+      if (addressToParse.match(/\{.*?\}/g) === null) {
+        // return default localAddress without transformation if addressToParse is badly formatted
+        value = matchedCondition.addresses.localAddress
+      } else {
+        value = getTransformedAddress(
+          keyValues,
+          templateData,
+          addressToParse,
+          matchedCondition.addressKey, // either name or alias depending on params.language
+          matchedCondition.addressType, // either facilities or locations
+          countryMessage,
+          countryValue,
+          params.language
+        )
+      }
+      return value
+    } catch (error) {
+      console.error(error)
+      return ''
     }
-    return value
   }
 }

@@ -128,6 +128,48 @@ describe('Test phone number verification form', () => {
     })
   })
 
+  describe('Valid phone number, invalid submission', () => {
+    beforeEach(() => {
+      moxios.install(client)
+    })
+    afterEach(() => {
+      moxios.uninstall(client)
+    })
+
+    it('should show error message', done => {
+      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
+        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+      })
+      app.update()
+      app
+        .find('#phone-number-input')
+        .hostNodes()
+        .simulate('change', { target: { value: '01712345679' } })
+      app
+        .find('#continue')
+        .hostNodes()
+        .simulate('submit')
+      app.update()
+
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        request
+          .respondWith({
+            err: {
+              response: {
+                status: 401
+              }
+            }
+          })
+          .then(() => {
+            app.update()
+            expect(app.find('#phone-number_error').hostNodes()).toHaveLength(1)
+            done()
+          })
+      })
+    })
+  })
+
   describe('Form redirection', () => {
     beforeEach(() => {
       moxios.install(client)

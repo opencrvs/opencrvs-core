@@ -11,18 +11,40 @@
  */
 import * as glob from 'glob'
 import * as path from 'path'
+import healthCheckHandler, {
+  querySchema as healthCheckQuerySchema,
+  responseSchema as healthCheckResponseSchema
+} from '@gateway/features/healthCheck/handler'
 
 export const getRoutes = () => {
-  // add ping route by default for health check
   const routes = [
+    // used for tests to check JWT auth
     {
       method: 'GET',
-      path: '/ping',
+      path: '/tokenTest',
       handler: (request: any, h: any) => {
-        return 'pong'
+        return 'success'
       },
       config: {
         tags: ['api']
+      }
+    },
+    // health check endpoint for all services
+    {
+      method: 'GET',
+      path: '/ping',
+      handler: healthCheckHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Checks the health of all services.',
+        notes: 'Pass the service as a query param: service',
+        validate: {
+          query: healthCheckQuerySchema
+        },
+        response: {
+          schema: healthCheckResponseSchema
+        }
       }
     }
   ]

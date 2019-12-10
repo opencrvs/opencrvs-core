@@ -12,19 +12,11 @@
 export interface IBirthRegistrationFields extends IPoint {
   compositionId: string
   ageInDays: number | undefined
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface IDeathRegistrationFields extends IPoint {
   compositionId: string
   ageInYears: number | undefined
-  locationLevel5?: string
-  locationLevel4?: string
-  locationLevel3?: string
-  locationLevel2?: string
 }
 
 export interface IPoint {
@@ -45,6 +37,10 @@ export interface IAuthHeader {
 export interface IBirthRegistrationTags {
   regStatus: string
   gender: string | undefined
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
 }
 
 export interface IDeathRegistrationTags {
@@ -52,14 +48,14 @@ export interface IDeathRegistrationTags {
   gender: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
-}
-
-export interface IInProgressApplicationFields {
-  compositionId: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
   locationLevel2?: string
+}
+
+export interface IInProgressApplicationFields {
+  compositionId: string
 }
 
 export interface IInProgressApplicationTags {
@@ -68,15 +64,10 @@ export interface IInProgressApplicationTags {
   missingFieldGroupId: string
   missingFieldId: string
   eventType: string
-}
-
-export interface IPaymentFields {
-  total: number
-  compositionId: string
-}
-
-export interface IPaymentTags {
-  eventType: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
 }
 
 export interface ITimeLoggedFields {
@@ -133,8 +124,13 @@ export interface IBirthRegistrationPoints {
 
 export interface IPaymentPoints {
   measurement: string
-  tags: IPaymentTags
+  tags: IPointLocation
   fields: IPaymentFields
+}
+
+export interface IPaymentFields {
+  total: number
+  compositionId: string
 }
 
 export type IPoints =
@@ -144,3 +140,4 @@ export type IPoints =
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
+  | IPaymentPoints

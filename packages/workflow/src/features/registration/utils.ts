@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as ShortUIDGen from 'short-uid'
-import {
-  NOTIFICATION_SERVICE_URL,
-  RESOURCE_SERVICE_URL
-} from '@workflow/constants'
+import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
@@ -261,26 +258,4 @@ export function isEventNonNotifiable(event: Events) {
       Events.DEATH_NEW_WAITING_VALIDATION
     ].indexOf(event) >= 0
   )
-}
-
-export function getRegistrationNumber(
-  trackingId: string,
-  practitionerId: string,
-  authHeader: { Authorization: string }
-) {
-  try {
-    fetch(`${RESOURCE_SERVICE_URL}generate/registrationNumber`, {
-      method: 'POST',
-      body: JSON.stringify({
-        trackingId,
-        practitionerId
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    })
-  } catch (err) {
-    throw new Error(`Unable to get registration number for error : ${err}`)
-  }
 }

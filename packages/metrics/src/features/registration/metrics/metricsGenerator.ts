@@ -51,12 +51,35 @@ export interface IEstimation {
   locationId: string
 }
 
+interface ICurrentAndLowerLocationLevels {
+  currentLocationLevel: string
+  lowerLocationLevel: string
+}
+interface IGenderBasisMetrics {
+  location: string
+  maleUnder18: number
+  femaleUnder18: number
+  maleOver18: number
+  femaleOver18: number
+  total: number
+}
+
+interface IGenderBasisPoint {
+  gender: string
+  over18: number
+  under18: number
+  locationLevel2?: string
+  locationLevel3?: string
+  locationLevel4?: string
+  locationLevel5?: string
+}
+
 export async function regByAge(timeStart: string, timeEnd: string) {
   const metricsData: any[] = []
   for (const ageInterval of ageIntervals) {
     const points = await readPoints(
       // tslint:disable-next-line
-      `SELECT COUNT(age_in_days) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND age_in_days > ${ageInterval.minAgeInDays} AND age_in_days <= ${ageInterval.maxAgeInDays}`
+      `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND ageInDays > ${ageInterval.minAgeInDays} AND ageInDays <= ${ageInterval.maxAgeInDays}`
     )
 
     metricsData.push({
@@ -68,11 +91,126 @@ export async function regByAge(timeStart: string, timeEnd: string) {
   return metricsData
 }
 
-export const regWithin45d = async (timeStart: string, timeEnd: string) => {
+type Payment = {
+  total: number
+}
+
+export async function fetchCertificationPayments(
+  timeStart: string,
+  timeEnd: string,
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
+) {
+  const payments = await readPoints(
+    `SELECT SUM(total) as total FROM certification_payment WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ${currentLocationLevel}='${locationId}'
+      GROUP BY ${lowerLocationLevel}`
+  )
+
+  return payments.map((payment: Payment) => ({
+    total: payment.total,
+    locationId: payment[lowerLocationLevel]
+  }))
+}
+
+export async function fetchRegWithinTimeFrames(
+  timeStart: string,
+  timeEnd: string,
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
+) {
+  const timeFramePoints = await readPoints(
+    `SELECT 
+      SUM(within45Days) AS regWithin45d,
+      SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+      SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+      SUM(over5Yr) AS regOver5yr
+     FROM (
+       SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel} 
+       FROM (
+        SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
+        GROUP BY ${lowerLocationLevel}
+       ), (
+        SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
+        GROUP BY ${lowerLocationLevel} 
+       ), (
+        SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
+        GROUP BY ${lowerLocationLevel}
+       ), (
+        SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
+        GROUP BY ${lowerLocationLevel}
+       ) FILL(0) 
+     ) GROUP BY ${lowerLocationLevel}
+     `
+  )
+
+  return timeFramePoints.map((point: any) => {
+    const {
+      regWithin45d,
+      regWithin45dTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr
+    } = point
+    const total =
+      regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+    return {
+      locationId: point[lowerLocationLevel],
+      regWithin45d,
+      regWithin45dTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr,
+      total
+    }
+  })
+}
+
+export async function getCurrentAndLowerLocationLevels(
+  timeStart: string,
+  timeEnd: string,
+  locationId: string
+): Promise<ICurrentAndLowerLocationLevels> {
+  const allPointsContainingLocationId = await readPoints(
+    `SELECT LAST(*) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${locationId}'
+        OR locationLevel3 = '${locationId}'
+        OR locationLevel4 = '${locationId}'
+        OR locationLevel5 = '${locationId}') 
+      GROUP BY locationLevel2,locationLevel3,locationLevel4,locationLevel5`
+  )
+
+  const locationLevelOfQueryId =
+    allPointsContainingLocationId &&
+    allPointsContainingLocationId.length > 0 &&
+    Object.keys(allPointsContainingLocationId[0]).find(
+      key => allPointsContainingLocationId[0][key] === locationId
+    )
+  const oneLevelLowerLocationColumn =
+    locationLevelOfQueryId &&
+    locationLevelOfQueryId.replace(/\d/, level =>
+      level === '5' ? level : String(Number(level) + 1)
+    )
+
+  if (!locationLevelOfQueryId || !oneLevelLowerLocationColumn) {
+    throw new Error(`Location level not found for location ${locationId}`)
+  }
+
+  return {
+    currentLocationLevel: locationLevelOfQueryId,
+    lowerLocationLevel: oneLevelLowerLocationColumn
+  }
+}
+
+export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
   const interval = calculateInterval(timeStart, timeEnd)
   const points = await readPoints(
     `
-      SELECT COUNT(age_in_days) AS count
+      SELECT COUNT(ageInDays) AS count
         FROM birth_reg
       WHERE time >= ${timeStart} AND time <= ${timeEnd}
         GROUP BY time(${interval})
@@ -114,15 +252,15 @@ export async function fetchKeyFigures(
 
   /* Populating < 45D data */
   const within45DaysData: IGroupedByGender[] = await readPoints(
-    `SELECT COUNT(age_in_days) AS total
+    `SELECT COUNT(ageInDays) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}      
-      AND ( locationLevel2 = '${queryLocationId}' 
+      AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
-          OR locationLevel4 = '${queryLocationId}' 
+          OR locationLevel4 = '${queryLocationId}'
           OR locationLevel5 = '${queryLocationId}' )
-      AND age_in_days <= 45
+      AND ageInDays <= 45
     GROUP BY gender`
   )
   keyFigures.push(
@@ -134,16 +272,16 @@ export async function fetchKeyFigures(
   )
   /* Populating > 45D and < 365D data */
   const within1YearData: IGroupedByGender[] = await readPoints(
-    `SELECT COUNT(age_in_days) AS total
+    `SELECT COUNT(ageInDays) AS total
       FROM birth_reg
     WHERE time >= ${timeStart}
-      AND time <= ${timeEnd}      
-      AND ( locationLevel2 = '${queryLocationId}' 
+      AND time <= ${timeEnd}
+      AND ( locationLevel2 = '${queryLocationId}'
           OR locationLevel3 = '${queryLocationId}'
-          OR locationLevel4 = '${queryLocationId}' 
-          OR locationLevel5 = '${queryLocationId}' )      
-      AND age_in_days > 45
-      AND age_in_days <= 365
+          OR locationLevel4 = '${queryLocationId}'
+          OR locationLevel5 = '${queryLocationId}' )
+      AND ageInDays > 45
+      AND ageInDays <= 365
     GROUP BY gender`
   )
   keyFigures.push(
@@ -214,4 +352,101 @@ const populateBirthKeyFigurePoint = (
       }
     ]
   }
+}
+
+export async function fetchGenderBasisMetrics(
+  timeFrom: string,
+  timeTo: string,
+  currLocation: string,
+  currLocationLevel: string,
+  locationLevel: string
+) {
+  const points = await readPoints(`
+  SELECT
+    SUM(under18) AS under18,
+    SUM(over18) AS over18
+  FROM (
+    SELECT under18, over18, gender, ${locationLevel} FROM (
+      SELECT 
+        COUNT(ageInDays) AS under18 
+      FROM birth_reg 
+      WHERE ageInDays < 6574 
+       AND time > ${timeFrom}
+       AND time <= ${timeTo}
+       AND ${currLocationLevel}='${currLocation}'
+      GROUP BY gender, ${locationLevel}
+    ), (
+      SELECT 
+        COUNT(ageInDays) AS over18 
+      FROM birth_reg 
+      WHERE ageInDays >= 6574 
+       AND time > ${timeFrom}
+       AND time <= ${timeTo}
+       AND ${currLocationLevel}='${currLocation}'
+      GROUP BY gender, ${locationLevel}
+    ) FILL(0)
+  )
+  GROUP BY gender, ${locationLevel}
+  `)
+
+  return populateGenderBasisMetrics(points, locationLevel)
+}
+
+function populateGenderBasisMetrics(
+  points: IGenderBasisPoint[],
+  locationLevel: string
+): IGenderBasisMetrics[] {
+  const metricsArray: IGenderBasisMetrics[] = []
+
+  points.forEach((point: IGenderBasisPoint) => {
+    const metrics = metricsArray.find(
+      element => element.location === point[locationLevel]
+    )
+    const femaleOver18 =
+      point.gender === 'female'
+        ? point.over18
+        : metrics
+        ? metrics.femaleOver18
+        : 0
+    const maleOver18 =
+      point.gender === 'male' ? point.over18 : metrics ? metrics.maleOver18 : 0
+    const femaleUnder18 =
+      point.gender === 'female'
+        ? point.under18
+        : metrics
+        ? metrics.femaleUnder18
+        : 0
+    const maleUnder18 =
+      point.gender === 'male'
+        ? point.under18
+        : metrics
+        ? metrics.maleUnder18
+        : 0
+
+    const total = maleOver18 + femaleOver18 + maleUnder18 + femaleUnder18
+
+    if (!metrics) {
+      metricsArray.push({
+        location: point[locationLevel],
+        femaleOver18: femaleOver18,
+        maleOver18: maleOver18,
+        maleUnder18: maleUnder18,
+        femaleUnder18: femaleUnder18,
+        total: total
+      })
+    } else {
+      const index = metricsArray.indexOf(metrics)
+
+      metricsArray.splice(index, 1, {
+        location: metrics.location,
+        femaleOver18: femaleOver18,
+        maleOver18: maleOver18,
+        maleUnder18: maleUnder18,
+        femaleUnder18: femaleUnder18,
+        total: total
+      })
+    }
+  })
+
+  return metricsArray
 }

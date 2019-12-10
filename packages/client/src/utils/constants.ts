@@ -76,3 +76,12 @@ export const PAGE_TRANSITIONS_CLASSNAME = 'page-transition'
 export const PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE = 'ease-in-out both'
 export const PAGE_TRANSITIONS_ENTER_TIME = 500
 export const PAGE_TRANSITIONS_EXIT_TIME = PAGE_TRANSITIONS_ENTER_TIME - 10
+
+export const JURISDICTION_TYPE: { [key: string]: string } = {
+  UNION: 'Union Parishad',
+  MUNICIPALITY: 'Municipality',
+  CITY_CORPORATION: 'City Corporation',
+  UPAZILA: 'Upazila',
+  DISTRICT: 'District',
+  DIVISION: 'Division'
+}
