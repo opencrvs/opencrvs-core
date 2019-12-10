@@ -21,6 +21,8 @@ import { USER_DETAILS, IUserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/applications'
 import * as LogRocket from 'logrocket'
+import { refreshToken } from '@client/utils/authUtils'
+import { REFRESH_TOKEN_CHECK_MILLIS } from '@client/utils/constants'
 export const SCREEN_LOCK = 'screenLock'
 
 interface IProtectedPageProps {
@@ -70,6 +72,10 @@ class ProtectedPageComponent extends React.Component<
       LogRocket.identify(userDetails.practitionerId)
     }
     this.setState(newState)
+
+    setInterval(() => {
+      refreshToken()
+    }, REFRESH_TOKEN_CHECK_MILLIS)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
