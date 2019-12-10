@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "node build/dist/src/index.js | pino-tee warn ./logs/opencrvs-bgd-metrics-warn.log > ./logs/opencrvs-bgd-metrics-all.log",
     "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "hapi": "^17.5.1",
@@ -30,8 +31,8 @@
     "jwt-decode": "^2.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "typescript": "^3.7.2",
-    "winston": "^3.0.0"
+    "pino": "^5.14.0",
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
