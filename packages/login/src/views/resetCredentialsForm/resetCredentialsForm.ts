@@ -191,6 +191,11 @@ const messagesToDefine = {
     defaultMessage: 'Invalid input',
     description: 'Generic error message for invalid form nput'
   },
+  errorPhoneNumberNotFound: {
+    id: 'error.errorPhoneNumberNotFound',
+    defaultMessage: 'Mobile phone number not found.',
+    description: 'Error message for phone number not found'
+  },
   resend: {
     id: 'resend.sms',
     defaultMessage: 'Resend SMS',

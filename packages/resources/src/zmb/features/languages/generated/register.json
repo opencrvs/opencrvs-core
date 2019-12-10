@@ -447,7 +447,7 @@
         "form.field.label.addressLine1": "Village",
         "form.field.label.addressLine2CityOption": "Street / Plot Number",
         "form.field.label.addressLine2": "Area / Ward / Mouja / Village",
-        "form.field.label.addressLine3": "Union / Municipality / Cantonement",
+        "form.field.label.addressLine3": "Union / Municipality / Cantonment",
         "form.field.label.addressLine3CityOption": "Residential Area",
         "form.field.label.addressLine4CityOption": "Town",
         "form.field.label.addressSameAsMother": "Is his current address the same as the mother's?",

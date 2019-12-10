@@ -10,6 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as moment from 'moment'
+import {
+  getTask,
+  getComposition
+} from '@metrics/features/registration/fhirUtils'
+import { fetchFHIR } from '@metrics/api'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string
@@ -38,4 +43,86 @@ export function getDurationInYears(from: ISO_DATE, to: ISO_DATE) {
   const toDate = moment(to)
   const fromDate = moment(from)
   return toDate.diff(fromDate, 'years')
+}
+
+/* Populates a bundle with necessary parts for processing metrics
+ * if the payload is a task it is converted to a bundle, if it's
+ * already a bundle then we check if it has the parts we need
+ * missing parts are queried from the FHIR store.
+ *
+ * The parts queried and added include:
+ *  * The composition
+ *  * The sections resources referenced in the composition
+ *
+ * The encounter and observations are not populated at this time.
+ */
+export async function populateBundleFromPayload(
+  payload: fhir.Bundle | fhir.Task,
+  authHeader: string
+) {
+  let bundle: fhir.Bundle | null = null
+  if (payload.resourceType === 'Bundle') {
+    bundle = payload as fhir.Bundle
+
+    if (bundle.entry && bundle.entry.length > 1) {
+      // assume that if there are more than one entries then the bundle is already populated
+      return bundle
+    }
+  }
+
+  if (payload.resourceType === 'Task') {
+    bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [{ resource: payload }]
+    }
+  }
+
+  if (!bundle || !bundle.entry) {
+    throw new Error('Bundle not properly formed')
+  }
+
+  const task = getTask(bundle)
+
+  if (!task) {
+    throw new Error('No task resource available')
+  }
+
+  let composition = getComposition(bundle)
+  if (!composition) {
+    if (!task.focus || !task.focus.reference) {
+      throw new Error(
+        "Could not fetch composition as the task didn't have a focus reference"
+      )
+    }
+    composition = await fetchFHIR(task.focus.reference, {
+      Authorization: authHeader
+    })
+
+    if (!composition) {
+      throw new Error(
+        `Composition ${task.focus.reference} not found on FHIR store`
+      )
+    }
+
+    bundle.entry.unshift({
+      fullUrl: task.focus.reference,
+      resource: composition
+    }) // we expect the composition to be in position 0
+  }
+
+  for (const section of composition.section || []) {
+    if (section.entry && section.entry[0] && section.entry[0].reference) {
+      const referencedResource = await fetchFHIR(section.entry[0].reference, {
+        Authorization: authHeader
+      })
+
+      bundle.entry.push({
+        fullUrl: section.entry[0].reference,
+        resource: referencedResource
+      })
+    }
+  }
+
+  return bundle
 }

@@ -31,7 +31,8 @@ import {
   testInProgressDeathFhirBundle,
   taskResouceMock,
   deathTaskMock,
-  relatedPersonMock
+  relatedPersonMock,
+  wrapInBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
 
@@ -388,7 +389,6 @@ describe('Verify handler', () => {
       fetch.mockResponses(
         [userMock, { status: 200 }],
         [fieldAgentPractitionerMock, { status: 200 }],
-        [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
         [fieldAgentPractitionerRoleMock, { status: 200 }],
         [districtMock, { status: 200 }],
         [upazilaMock, { status: 200 }],
@@ -946,7 +946,6 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
@@ -1093,7 +1092,6 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
@@ -1185,7 +1183,6 @@ describe('markEventAsRegisteredHandler handler', () => {
     fetch.mockResponses(
       [userMock, { status: 200 }],
       [fieldAgentPractitionerMock, { status: 200 }],
-      [JSON.stringify({ registrationNumber: '2019333436B5WGYJE8' })],
       [taskResouceMock, { status: 200 }],
       [fieldAgentPractitionerRoleMock, { status: 200 }],
       [districtMock, { status: 200 }],
@@ -1297,7 +1294,10 @@ describe('markEventAsRegisteredCallbackHandler', () => {
     const res = await server.server.inject({
       method: 'POST',
       url: '/confirm/registration',
-      payload: { trackingId: 'B1mW7jA', registrationNumber: '12345678' },
+      payload: {
+        trackingId: 'B1mW7jA',
+        registrationNumber: '12345678'
+      },
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -1307,7 +1307,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with birth registration', async () => {
     fetch.mockResponses(
-      [taskResouceMock, { status: 200 }],
+      [wrapInBundle(taskResouceMock), { status: 200 }],
       [compositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
@@ -1329,12 +1329,10 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with death registration', async () => {
     fetch.mockResponses(
-      [deathTaskMock, { status: 200 }],
+      [wrapInBundle(deathTaskMock), { status: 200 }],
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
-      [relatedPersonMock, { status: 200 }],
-      [motherMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({

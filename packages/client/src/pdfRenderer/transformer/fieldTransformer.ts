@@ -112,7 +112,9 @@ export const fieldTransformers: IFunctionTransformer = {
     matchedCondition.format[
       formatPayload.language ? formatPayload.language : intl.locale
     ].forEach(field => {
-      applicantName = applicantName.concat(`${applicantObj[field] || ''} `)
+      applicantName = applicantName.concat(
+        `${(applicantObj && applicantObj[field]) || ''} `
+      )
     })
     const fullName = applicantName.substr(0, applicantName.length - 1)
     return formatPayload.allCapital ? fullName.toUpperCase() : fullName
@@ -288,18 +290,27 @@ export const fieldTransformers: IFunctionTransformer = {
     if (!key) {
       throw new Error('No payload found for this transformer')
     }
-    const idType = getValueFromApplicationDataByKey(
-      templateData.application.data,
-      key.idTypeKey
-    ) as string
+    let idType = null
+    try {
+      idType = getValueFromApplicationDataByKey(
+        templateData.application.data,
+        key.idTypeKey
+      ) as string
+    } catch (error) {
+      console.error(error)
+    }
     if (!idType || idType !== key.idTypeValue) {
       return ' '
     }
-    return (
-      (getValueFromApplicationDataByKey(
+    let idValue = null
+    try {
+      idValue = getValueFromApplicationDataByKey(
         templateData.application.data,
         key.idValueKey
-      ) as string) || ' '
-    )
+      ) as string
+    } catch (error) {
+      console.error(error)
+    }
+    return idValue || ' '
   }
 }

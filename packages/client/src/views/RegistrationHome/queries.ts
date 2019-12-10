@@ -20,13 +20,13 @@ const allSearchFields = `
       trackingId
       eventLocationId
       registrationNumber
-      registeredLocationId      
+      registeredLocationId
       duplicates
       createdAt
       modifiedAt
     }
     ... on BirthEventSearchSet {
-      dateOfBirth      
+      dateOfBirth
       childName {
         firstNames
         familyName
@@ -34,7 +34,7 @@ const allSearchFields = `
       }
     }
     ... on DeathEventSearchSet {
-      dateOfDeath      
+      dateOfDeath
       deceasedName {
         firstNames
         familyName
@@ -197,6 +197,7 @@ export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
       ... on BirthRegistration {
         child {
           id
+          multipleBirth
           name {
             use
             firstNames

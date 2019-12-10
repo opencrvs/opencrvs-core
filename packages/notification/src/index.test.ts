@@ -15,7 +15,7 @@ import { createServer } from '@notification/index'
 import { createServerWithEnvironment } from '@notification/tests/util'
 
 describe('Route authorization', () => {
-  it('helth check', async () => {
+  it('health check', async () => {
     const server = await createServerWithEnvironment({
       NODE_ENV: 'development'
     })
@@ -24,7 +24,7 @@ describe('Route authorization', () => {
       url: '/ping'
     })
     expect(res.statusCode).toBe(200)
-    expect(res.payload).toBe('pong')
+    expect(res.payload).toBe(JSON.stringify({ success: true }))
   })
 
   it('blocks requests without a token', async () => {

@@ -27,43 +27,51 @@ export const influx = new Influx.InfluxDB({
       measurement: 'birth_reg',
       fields: {
         compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
         ageInDays: Influx.FieldType.INTEGER
       },
-      tags: ['regStatus', 'gender']
+      tags: [
+        'regStatus',
+        'gender',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     },
     {
       measurement: 'death_reg',
       fields: {
         compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
         ageInYears: Influx.FieldType.INTEGER
       },
-      tags: ['regStatus', 'gender', 'mannerOfDeath', 'causeOfDeath']
+      tags: [
+        'regStatus',
+        'gender',
+        'mannerOfDeath',
+        'causeOfDeath',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     },
     {
       measurement: 'in_complete_fields',
       fields: {
-        compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
         'missingFieldSectionId',
         'missingFieldGroupId',
         'missingFieldId',
-        'eventType'
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
       ]
     },
     {

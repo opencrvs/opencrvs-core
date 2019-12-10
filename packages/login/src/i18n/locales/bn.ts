@@ -17,6 +17,7 @@ export const BENGALI_STATE = {
     'buttons.login': 'লগইন',
     'constants.phoneNumber': 'ফোন নম্বর',
     'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়',
+    'error.errorPhoneNumberNotFound': 'মোবাইল ফোন নম্বর পাওয়া যায় নি।',
     'label.error': 'অবৈধ ইনপুট',
     'login.stepOneInstruction':
       'অনুগ্রহপূর্বক আপনার ব্যবহারকারীর নাম  এবং পাসওয়ার্ড টাইপ করুন',
