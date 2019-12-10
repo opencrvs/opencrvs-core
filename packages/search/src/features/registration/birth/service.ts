@@ -27,6 +27,7 @@ import {
   addDuplicatesToComposition,
   findEntry,
   findName,
+  findNameLocal,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
@@ -42,7 +43,6 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 const NAME_EN = 'en'
-const NAME_BN = 'bn'
 
 export async function upsertEvent(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
@@ -157,7 +157,7 @@ function createChildIndex(
   ) as fhir.Encounter
 
   const childName = child && findName(NAME_EN, child)
-  const childNameLocal = child && findName(NAME_BN, child)
+  const childNameLocal = child && findNameLocal(child)
 
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
@@ -191,7 +191,7 @@ function createMotherIndex(
   }
 
   const motherName = findName(NAME_EN, mother)
-  const motherNameLocal = findName(NAME_BN, mother)
+  const motherNameLocal = findNameLocal(mother)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')
@@ -221,8 +221,8 @@ function createFatherIndex(
     return
   }
 
-  const fatherName = father && findName(NAME_EN, father)
-  const fatherNameLocal = father && findName(NAME_BN, father)
+  const fatherName = findName(NAME_EN, father)
+  const fatherNameLocal = findNameLocal(father)
 
   body.fatherFirstNames =
     fatherName && fatherName.given && fatherName.given.join(' ')
@@ -257,8 +257,12 @@ function createInformantIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const informantName = informant && findName(NAME_EN, informant)
-  const informantNameLocal = informant && findName(NAME_BN, informant)
+  if (!informant) {
+    return
+  }
+
+  const informantName = findName(NAME_EN, informant)
+  const informantNameLocal = findNameLocal(informant)
 
   body.informantFirstNames =
     informantName && informantName.given && informantName.given.join(' ')

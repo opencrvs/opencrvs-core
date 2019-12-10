@@ -95,6 +95,13 @@ export function findName(code: string, patient: fhir.Patient) {
   )
 }
 
+export function findNameLocal(patient: fhir.Patient) {
+  return (
+    patient.name &&
+    patient.name.find((name: fhir.HumanName) => name.use !== 'en')
+  )
+}
+
 export async function getCompositionById(id: string) {
   try {
     return await getFromFhir(`/Composition/${id}`)

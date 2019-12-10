@@ -26,6 +26,7 @@ import {
   findEntry,
   findEntryResourceByUrl,
   findName,
+  findNameLocal,
   findTask,
   findTaskExtension,
   findTaskIdentifier
@@ -38,7 +39,6 @@ const FATHER_CODE = 'father-details'
 const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
 const NAME_EN = 'en'
-const NAME_BN = 'bn'
 
 export async function upsertEvent(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
@@ -153,7 +153,7 @@ function createDeceasedIndex(
   ) as fhir.Encounter
 
   const deceasedName = deceased && findName(NAME_EN, deceased)
-  const deceasedNameLocal = deceased && findName(NAME_BN, deceased)
+  const deceasedNameLocal = deceased && findNameLocal(deceased)
 
   body.deceasedFirstNames =
     deceasedName && deceasedName.given && deceasedName.given.join(' ')
@@ -189,7 +189,7 @@ function createMotherIndex(
   }
 
   const motherName = findName(NAME_EN, mother)
-  const motherNameLocal = findName(NAME_BN, mother)
+  const motherNameLocal = findNameLocal(mother)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')
@@ -216,8 +216,8 @@ function createFatherIndex(
     return
   }
 
-  const fatherName = father && findName(NAME_EN, father)
-  const fatherNameLocal = father && findName(NAME_BN, father)
+  const fatherName = findName(NAME_EN, father)
+  const fatherNameLocal = findNameLocal(father)
 
   body.fatherFirstNames =
     fatherName && fatherName.given && fatherName.given.join(' ')
@@ -245,7 +245,7 @@ function createSpouseIndex(
   }
 
   const spouseName = findName(NAME_EN, spouse)
-  const spouseNameLocal = findName(NAME_BN, spouse)
+  const spouseNameLocal = findNameLocal(spouse)
 
   body.spouseFirstNames =
     spouseName && spouseName.given && spouseName.given.join(' ')
@@ -277,8 +277,12 @@ function createInformantIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const informantName = informant && findName(NAME_EN, informant)
-  const informantNameLocal = informant && findName(NAME_BN, informant)
+  if (!informant) {
+    return
+  }
+
+  const informantName = findName(NAME_EN, informant)
+  const informantNameLocal = findNameLocal(informant)
 
   body.informantFirstNames =
     informantName && informantName.given && informantName.given.join(' ')
