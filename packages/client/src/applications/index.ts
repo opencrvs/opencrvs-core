@@ -137,6 +137,7 @@ type Relation =
   | 'EXTENDED_FAMILY'
   | 'OTHER'
   | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
 
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>

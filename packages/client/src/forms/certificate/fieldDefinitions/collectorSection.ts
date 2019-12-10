@@ -49,7 +49,11 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
       validate: [],
       options: [
         { value: 'MOTHER', label: formMessages.contactDetailsMother },
-        { value: 'OTHER', label: formMessages.someoneElse }
+        { value: 'OTHER', label: formMessages.someoneElse },
+        {
+          value: 'PRINT_IN_ADVANCE',
+          label: formMessages.certificatePrintInAdvance
+        }
       ]
     }
   ]
@@ -70,7 +74,11 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
       validate: [],
       options: [
         { value: 'FATHER', label: formMessages.contactDetailsFather },
-        { value: 'OTHER', label: formMessages.someoneElse }
+        { value: 'OTHER', label: formMessages.someoneElse },
+        {
+          value: 'PRINT_IN_ADVANCE',
+          label: formMessages.certificatePrintInAdvance
+        }
       ]
     }
   ]
@@ -92,7 +100,11 @@ export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
       options: [
         { value: 'MOTHER', label: formMessages.contactDetailsMother },
         { value: 'FATHER', label: formMessages.contactDetailsFather },
-        { value: 'OTHER', label: formMessages.someoneElse }
+        { value: 'OTHER', label: formMessages.someoneElse },
+        {
+          value: 'PRINT_IN_ADVANCE',
+          label: formMessages.certificatePrintInAdvance
+        }
       ]
     }
   ]
@@ -111,7 +123,13 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
       required: true,
       initialValue: '',
       validate: [],
-      options: [{ value: 'OTHER', label: formMessages.someoneElse }]
+      options: [
+        { value: 'OTHER', label: formMessages.someoneElse },
+        {
+          value: 'PRINT_IN_ADVANCE',
+          label: formMessages.certificatePrintInAdvance
+        }
+      ]
     }
   ]
 }
@@ -273,7 +291,11 @@ export const collectDeathCertificateFormSection: IFormSection = {
           validate: [],
           options: [
             { value: 'INFORMANT', label: formMessages.applicantName },
-            { value: 'OTHER', label: formMessages.someoneElse }
+            { value: 'OTHER', label: formMessages.someoneElse },
+            {
+              value: 'PRINT_IN_ADVANCE',
+              label: formMessages.certificatePrintInAdvance
+            }
           ]
         }
       ]

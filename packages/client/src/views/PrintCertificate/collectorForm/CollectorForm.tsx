@@ -206,7 +206,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     currentGroup: string,
     nextGroup: string | undefined,
     event: Event,
-
     sectionId: keyof IPrintableApplication['data'],
     fields: IFormField[],
     draft: IPrintableApplication | undefined
@@ -267,11 +266,21 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     })
     if (!nextGroup) {
       this.props.writeApplication(draft)
-      this.props.goToVerifyCollector(
-        applicationId,
-        event,
-        collector.type as string
-      )
+      const collectorType =
+        draft.data.registration.certificates &&
+        draft.data.registration.certificates[0] &&
+        draft.data.registration.certificates[0].collector &&
+        draft.data.registration.certificates[0].collector.type
+
+      if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
+        this.props.goToReviewCertificate(applicationId, event)
+      } else {
+        this.props.goToVerifyCollector(
+          applicationId,
+          event,
+          collector.type as string
+        )
+      }
     } else {
       this.props.goToPrintCertificate(applicationId, event, nextGroup)
     }
@@ -410,7 +419,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
                 formGroup.id,
                 nextSectionGroup ? nextSectionGroup.groupId : undefined,
                 event,
-
                 formSection.id,
                 formGroup.fields,
                 applicationToBeCertified

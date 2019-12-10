@@ -354,6 +354,7 @@ interface IFormMessages {
   deceasedSpousesFamilyNameEng: MessageDescriptor
   deceasedSpousesGivenNames: MessageDescriptor
   deceasedSpousesGivenNamesEng: MessageDescriptor
+  certificatePrintInAdvance: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -2096,6 +2097,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: Given names in english',
     id: 'form.field.label.deceasedSpousesGivenNamesEng'
+  },
+  certificatePrintInAdvance: {
+    defaultMessage: 'Print in advance for signatures and collection',
+    description: 'Label for certificate collection option',
+    id: 'form.field.label.certificatePrintInAdvance'
   }
 }
 
