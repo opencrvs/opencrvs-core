@@ -59,7 +59,8 @@ import {
 import {
   getEvent,
   getEventDate,
-  isFreeOfCost
+  isFreeOfCost,
+  isCertificateForPrintInAdvance
 } from '@client/views/PrintCertificate/utils'
 import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
@@ -266,13 +267,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     })
     if (!nextGroup) {
       this.props.writeApplication(draft)
-      const collectorType =
-        draft.data.registration.certificates &&
-        draft.data.registration.certificates[0] &&
-        draft.data.registration.certificates[0].collector &&
-        draft.data.registration.certificates[0].collector.type
 
-      if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
+      if (isCertificateForPrintInAdvance(draft)) {
         this.props.goToReviewCertificate(applicationId, event)
       } else {
         this.props.goToVerifyCollector(
