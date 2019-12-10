@@ -1196,6 +1196,15 @@ export const mockDeathFhirBundle = {
         },
         extension: [
           {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
+          {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
@@ -1586,6 +1595,15 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           ]
         },
         extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {

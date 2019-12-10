@@ -113,7 +113,12 @@ export const getStatus = async (compositionId: string) => {
 }
 
 export const createStatusHistory = async (body: ICompositionBody) => {
-  const singleTask = {
+  // Need to avoid consecutive same status update for async flow
+  const lastStatus = body.status && body.status[body.status.length - 1]
+  if (lastStatus && lastStatus.type === body.type) {
+    return
+  }
+  const currentStatus = {
     type: body.type,
     createdAt: Date.now().toString(),
     rejectReason: body.rejectReason,
@@ -122,7 +127,7 @@ export const createStatusHistory = async (body: ICompositionBody) => {
     updatedBy: body.updatedBy
   } as IStatus
   body.status = body.status || []
-  body.status.push(singleTask)
+  body.status.push(currentStatus)
 }
 
 function findDuplicateIds(
