@@ -30,7 +30,7 @@ interface IStateProps {
 
 type FullProps = {
   data: GQLBirthRegistrationTimeFrameMetrics[]
-  eventType: Event
+  eventType?: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
@@ -99,7 +99,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
           {
             label: intl.formatMessage(constantsMessages.within45DaysTo1Year),
             width: 15,
-            key: 'regWithin45dTo1y',
+            key: 'regWithin45dTo1yr',
             isSortable: false
           },
           {
