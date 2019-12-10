@@ -30,6 +30,7 @@ export function queryBuilder(
   trackingId: string,
   contactNumber: string,
   registrationNumber: string,
+  name: string,
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -42,6 +43,16 @@ export function queryBuilder(
       multi_match: {
         query: `${query}`,
         fields: SEARCHABLE_FIELDS,
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (name !== EMPTY_STRING) {
+    must.push({
+      multi_match: {
+        query: name,
+        fields: ['*Name*'],
         fuzziness: 'AUTO'
       }
     })
