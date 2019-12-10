@@ -23,8 +23,8 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
-  IPaymentTags,
-  IPoints
+  IPoints,
+  IPaymentPoints
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -111,13 +111,13 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined,
-    ...(await generatePointLocations(payload, authHeader))
+    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined
   }
 
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
-    gender: child.gender
+    gender: child.gender,
+    ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
@@ -148,15 +148,15 @@ export const generateDeathRegPoint = async (
     compositionId: composition.id,
     ageInYears: deceased.birthDate
       ? getAgeInYears(deceased.birthDate)
-      : undefined,
-    ...(await generatePointLocations(payload, authHeader))
+      : undefined
   }
 
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
-    causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE)
+    causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
+    ...(await generatePointLocations(payload, authHeader))
   }
 
   const point = {
@@ -193,8 +193,9 @@ const generatePointLocations = async (
 }
 
 export async function generatePaymentPoint(
-  payload: fhir.Bundle
-): Promise<IPoints> {
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+): Promise<IPaymentPoints> {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
   const task = getTask(payload)
@@ -215,9 +216,7 @@ export async function generatePaymentPoint(
     compositionId: composition.id
   }
 
-  const tags: IPaymentTags = {
-    eventType: getApplicationType(task) as string
-  }
+  const tags = await generatePointLocations(payload, authHeader)
 
   return {
     measurement: 'certification_payment',
