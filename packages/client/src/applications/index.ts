@@ -10,33 +10,33 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  Event,
-  IFormData,
-  IFormFieldValue,
   Action as ApplicationAction,
-  IForm
+  Event,
+  IForm,
+  IFormData,
+  IFormFieldValue
 } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
-import { storage } from '@client/storage'
-import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { v4 as uuid } from 'uuid'
 import {
-  IQueryData,
-  EVENT_STATUS
+  UserDetailsAvailable,
+  USER_DETAILS_AVAILABLE
+} from '@client/profile/profileActions'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { IStoreState } from '@client/store'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
+import {
+  EVENT_STATUS,
+  IQueryData
 } from '@client/views/RegistrationHome/RegistrationHome'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
-import { IStoreState } from '@client/store'
-import ApolloClient, { ApolloQueryResult, ApolloError } from 'apollo-client'
-import {
-  USER_DETAILS_AVAILABLE,
-  UserDetailsAvailable
-} from '@client/profile/profileActions'
-import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { getUserDetails, getScope } from '@client/profile/profileSelectors'
+import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { v4 as uuid } from 'uuid'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -487,20 +487,22 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   return JSON.stringify(payload)
 }
 
+async function getUserData(userId: string) {
+  const userData = await storage.getItem('USER_DATA')
+  const allUserData: IUserData[] = !userData
+    ? []
+    : (JSON.parse(userData) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === userId)
+
+  return { allUserData, currentUserData }
+}
+
 export async function writeApplicationByUser(
   userId: string,
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  let currentUserData = allUserData.find(uData => uData.userID === uID)
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   const existingApplicationId = currentUserData
     ? currentUserData.applications.findIndex(app => app.id === application.id)
@@ -525,13 +527,11 @@ export async function writeApplicationByUser(
   return JSON.stringify(currentUserData)
 }
 
-export async function writeRegistrarWorkqueueByUser(
-  getState: () => IStoreState,
+async function getWorkqueueData(
+  state: IStoreState,
+  userDetails: IUserDetails,
   workqueuePaginationParams: IWorkqueuePaginationParams
-): Promise<string> {
-  const state = getState()
-
-  const userDetails = getUserDetails(state)
+) {
   const registrationLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
 
@@ -584,12 +584,24 @@ export async function writeRegistrarWorkqueueByUser(
     }
   }
 
-  const uID = (userDetails as IUserDetails).userMgntUserID || ''
-  const userData = await storage.getItem('USER_DATA')
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  let currentUserData = allUserData.find(uData => uData.userID === uID)
+  return workqueue
+}
+
+export async function writeRegistrarWorkqueueByUser(
+  getState: () => IStoreState,
+  workqueuePaginationParams: IWorkqueuePaginationParams
+): Promise<string> {
+  const state = getState()
+  const userDetails = getUserDetails(state) as IUserDetails
+
+  const workqueue = await getWorkqueueData(
+    state,
+    userDetails,
+    workqueuePaginationParams
+  )
+
+  const uID = userDetails.userMgntUserID || ''
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   if (currentUserData) {
     currentUserData.workqueue = workqueue
@@ -611,15 +623,7 @@ export async function deleteApplicationByUser(
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === uID)
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   const deletedApplicationId = currentUserData
     ? currentUserData.applications.findIndex(app => app.id === application.id)
