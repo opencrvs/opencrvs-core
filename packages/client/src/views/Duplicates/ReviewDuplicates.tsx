@@ -26,7 +26,7 @@ import {
   WrappedComponentProps as IntlShapeProps,
   IntlShape
 } from 'react-intl'
-import { SEARCH_RESULT } from '@client/navigation/routes'
+import { REGISTRAR_HOME } from '@client/navigation/routes'
 import { DuplicateDetails, Action } from '@client/components/DuplicateDetails'
 import { Event } from '@client/forms'
 import { NotDuplicateConfirmation } from '@client/views/Duplicates/NotDuplicateConfirmation'
@@ -377,7 +377,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
     this.toggleNotDuplicateModal()
 
     if (response === this.state.selectedCompositionID) {
-      window.location.assign(SEARCH_RESULT)
+      window.location.assign(REGISTRAR_HOME)
     } else {
       window.location.reload()
     }
@@ -432,7 +432,7 @@ class ReviewDuplicatesClass extends React.Component<Props, IState> {
               !data.fetchBirthRegistration.registration.duplicates ||
               data.fetchBirthRegistration.registration.duplicates.length <= 0
             ) {
-              window.location.assign(SEARCH_RESULT)
+              window.location.assign(REGISTRAR_HOME)
             }
 
             let duplicateIds = [applicationId]

@@ -375,7 +375,7 @@ class DuplicateDetailsClass extends React.Component<
             <ButtonContainer>
               {notDuplicateHandler && (
                 <SuccessButton
-                  id="notDuplicateBtn"
+                  id={`not_duplicate_link_${data.id}`}
                   onClick={notDuplicateHandler}
                 >
                   <TickLarge />
