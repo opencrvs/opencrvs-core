@@ -68,7 +68,7 @@ export function getCurrentUserScope() {
   return (payload && payload.scope) || []
 }
 
-export function checkTokenLife(token: string) {
+export function isTokenAboutToExpire(token: string) {
   const payload = token && getTokenPayload(token)
   const payloadExpMillis = Number(payload && payload.exp) * 1000
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
@@ -76,7 +76,7 @@ export function checkTokenLife(token: string) {
 
 export function refreshToken() {
   const token = getToken()
-  if (checkTokenLife(token)) {
+  if (isTokenAboutToExpire(token)) {
     fetch(`${window.config.AUTH_URL}/refreshToken`, {
       method: 'POST',
       headers: {
