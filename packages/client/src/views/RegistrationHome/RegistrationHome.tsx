@@ -225,7 +225,7 @@ export class RegistrationHomeView extends React.Component<
     this.syncWorkqueue()
     this.interval = setInterval(() => {
       this.syncWorkqueue()
-    }, 30000)
+    }, 300000)
   }
 
   componentWillUnmount() {
