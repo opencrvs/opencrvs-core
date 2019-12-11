@@ -735,6 +735,7 @@ describe('ReviewForm tests', () => {
       contactPoint: {
         value: 'MOTHER',
         nestedFields: {
+          contactRelationshipOther: 'Contact Relation',
           registrationPhone: '01733333333'
         }
       },
