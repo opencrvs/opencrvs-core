@@ -498,13 +498,11 @@ function createRequestForApplication(
     query: null
   }
 
-  return {
-    request: client.query({
-      query,
-      variables: { id: application.id },
-      fetchPolicy: 'no-cache'
-    })
-  }
+  return client.query({
+    query,
+    variables: { id: application.id },
+    fetchPolicy: 'no-cache'
+  })
 }
 
 function requestWithStateWrapper(
@@ -714,7 +712,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         applications: newApplicationsAfterStartingDownload
       }
 
-      const { request } = createRequestForApplication(application, client)
+      const request = createRequestForApplication(application, client)
 
       return loop(
         newState,
@@ -801,7 +799,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       const applicationToDownload = downloadQueueInprogress[0]
       applicationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-      const { request: nextRequest } = createRequestForApplication(
+      const nextRequest = createRequestForApplication(
         applicationToDownload,
         clientFromSuccess
       )
@@ -845,7 +843,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       erroredApplication.downloadRetryAttempt =
         (erroredApplication.downloadRetryAttempt || 0) + 1
 
-      const { request: retryRequest } = createRequestForApplication(
+      const retryRequest = createRequestForApplication(
         erroredApplication,
         clientFromFail
       )
@@ -910,7 +908,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       // If there are more to download in queue, start the next request
       const nextApplication = downloadQueueFollowing[0]
-      const { request: nextApplicationRequest } = createRequestForApplication(
+      const nextApplicationRequest = createRequestForApplication(
         nextApplication,
         clientFromFail
       )
