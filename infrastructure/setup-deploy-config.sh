@@ -8,6 +8,7 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
+echo
 echo "Setting up deployment config for $1 - `date --iso-8601=ns`"
 
 # Set hostname in traefik config
