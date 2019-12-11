@@ -13,7 +13,7 @@ import {
   calculateInterval,
   fetchEstimateByLocation,
   getDistrictLocation
-} from '@metrics/features/registration/metrics/utils'
+} from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 
 const fetchLocation = api.fetchLocation as jest.Mock

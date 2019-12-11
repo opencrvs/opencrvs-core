@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import moment from 'moment'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { ListTable } from '@opencrvs/components/lib/interface'
@@ -17,13 +21,34 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
 import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
 import { Header } from '@client/views/Performance/utils'
-import moment from 'moment'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { getToken } from '@client/utils/authUtils'
+import styled from '@client/styledComponents'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
+}
+
+const Actions = styled.div`
+  padding: 1em 0;
+`
+
+function downloadAllData() {
+  fetch(window.config.API_GATEWAY_URL + 'metrics/export', {
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+    .then(resp => resp.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      // a.style.display = 'none'
+      a.href = url
+      a.download = 'export.zip'
+      // document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+    })
 }
 
 type Props = ReportProps & WrappedComponentProps
@@ -117,6 +142,11 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
         />
+        <Actions>
+          <LinkButton onClick={downloadAllData}>
+            {intl.formatMessage(messages.exportAll)}
+          </LinkButton>
+        </Actions>
       </>
     )
   }
