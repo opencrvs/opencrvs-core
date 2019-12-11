@@ -498,11 +498,13 @@ function createRequestForApplication(
     query: null
   }
 
-  return client.query({
-    query,
-    variables: { id: application.id },
-    fetchPolicy: 'no-cache'
-  })
+  return {
+    request: client.query,
+    requestArgs: {
+      query,
+      variables: { id: application.id }
+    }
+  }
 }
 
 function requestWithStateWrapper(
@@ -712,14 +714,21 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         applications: newApplicationsAfterStartingDownload
       }
 
-      const request = createRequestForApplication(application, client)
+      const { request, requestArgs } = createRequestForApplication(
+        application,
+        client
+      )
 
       return loop(
         newState,
         Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
           requestWithStateWrapper,
           {
-            args: [request, Cmd.getState, client],
+            args: [
+              request({ ...requestArgs, fetchPolicy: 'no-cache' }),
+              Cmd.getState,
+              client
+            ],
             successActionCreator: downloadApplicationSuccess,
             failActionCreator: err =>
               downloadApplicationFail(
@@ -799,10 +808,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       const applicationToDownload = downloadQueueInprogress[0]
       applicationToDownload.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-      const nextRequest = createRequestForApplication(
-        applicationToDownload,
-        clientFromSuccess
-      )
+      const {
+        request: nextRequest,
+        requestArgs: nextRequestArgs
+      } = createRequestForApplication(applicationToDownload, clientFromSuccess)
 
       // Return state, write to indexedDB and download the next ready to download application, all in sequence
       return loop(
@@ -819,7 +828,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
               requestWithStateWrapper,
               {
-                args: [nextRequest, Cmd.getState, clientFromSuccess],
+                args: [
+                  nextRequest({ ...nextRequestArgs, fetchPolicy: 'no-cache' }),
+                  Cmd.getState,
+                  clientFromSuccess
+                ],
                 successActionCreator: downloadApplicationSuccess,
                 failActionCreator: err =>
                   downloadApplicationFail(
@@ -843,10 +856,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
       erroredApplication.downloadRetryAttempt =
         (erroredApplication.downloadRetryAttempt || 0) + 1
 
-      const retryRequest = createRequestForApplication(
-        erroredApplication,
-        clientFromFail
-      )
+      const {
+        request: retryRequest,
+        requestArgs: retryRequestArgs
+      } = createRequestForApplication(erroredApplication, clientFromFail)
 
       const applicationsAfterError = Array.from(state.applications)
       const erroredApplicationIndex = applicationsAfterError.findIndex(
@@ -868,7 +881,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
             requestWithStateWrapper,
             {
-              args: [retryRequest, Cmd.getState, clientFromFail],
+              args: [
+                retryRequest({ ...retryRequestArgs, fetchPolicy: 'no-cache' }),
+                Cmd.getState,
+                clientFromFail
+              ],
               successActionCreator: downloadApplicationSuccess,
               failActionCreator: err =>
                 downloadApplicationFail(err, erroredApplication, clientFromFail)
@@ -908,10 +925,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
 
       // If there are more to download in queue, start the next request
       const nextApplication = downloadQueueFollowing[0]
-      const nextApplicationRequest = createRequestForApplication(
-        nextApplication,
-        clientFromFail
-      )
+      const {
+        request: nextApplicationRequest,
+        requestArgs: nextApplicationRequestArgs
+      } = createRequestForApplication(nextApplication, clientFromFail)
       return loop(
         {
           ...state,
@@ -923,7 +940,14 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
               writeApplicationByUser(state.userID, erroredApplication)
             ),
             Cmd.run(requestWithStateWrapper, {
-              args: [nextApplicationRequest, Cmd.getState, clientFromFail],
+              args: [
+                nextApplicationRequest({
+                  ...nextApplicationRequestArgs,
+                  fetchPolicy: 'no-cache'
+                }),
+                Cmd.getState,
+                clientFromFail
+              ],
               successActionCreator: downloadApplicationSuccess,
               failActionCreator: err =>
                 downloadApplicationFail(err, nextApplication, clientFromFail)
