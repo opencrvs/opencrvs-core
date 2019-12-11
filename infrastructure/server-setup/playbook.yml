@@ -132,6 +132,11 @@
         dest: /configure-file-monitoring.sh
         mode: +x
 
+    - name: 'Copy logrotate script'
+      copy:
+        src: ../logrotate.conf
+        dest: /etc/
+
     - name: 'Save kern log to Loggly'
       register: logglyResultKern
       failed_when:
