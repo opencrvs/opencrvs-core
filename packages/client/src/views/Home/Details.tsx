@@ -31,6 +31,7 @@ import {
   StatusProgress,
   StatusOrange,
   StatusGreen,
+  StatusGray,
   StatusCollected,
   StatusRejected,
   StatusFailed,
@@ -245,6 +246,10 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         return messages.applicationFailedOn
       case 'DECLARED':
         return messages.applicationSubmittedOn
+      case 'VALIDATED':
+        return messages.applicationValidatedOn
+      case 'WAITING_VALIDATION':
+        return messages.applicationWaitingForValidationOn
       case 'REGISTERED':
         return messages.applicationRegisteredOn
       case 'REJECTED':
@@ -271,6 +276,18 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         return (
           <StatusIcon>
             <StatusOrange />
+          </StatusIcon>
+        )
+      case 'VALIDATED':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
+      case 'WAITING_VALIDATION':
+        return (
+          <StatusIcon>
+            <StatusGray />
           </StatusIcon>
         )
       case 'REGISTERED':
