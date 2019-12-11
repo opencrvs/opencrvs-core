@@ -586,10 +586,6 @@ export async function writeRegistrarWorkqueueByUser(
 
   const uID = (userDetails as IUserDetails).userMgntUserID || ''
   const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
   const allUserData: IUserData[] = !userData
     ? []
     : (JSON.parse(userData) as IUserData[])
