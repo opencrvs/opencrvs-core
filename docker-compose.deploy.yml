@@ -57,7 +57,7 @@ services:
       labels:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: monitor.{{hostname}}'
-        - 'traefik.frontend.auth.basic=monitor:$$apr1$$ubqR.4Cx$$xazi2PXJvRoHvoiRYVzjf0'
+        - 'traefik.frontend.auth.basic={{netdata_user}}'
         - 'traefik.port=19999'
         - 'traefik.docker.network=opencrvs_overlay_net'
     networks:

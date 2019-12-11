@@ -119,12 +119,15 @@ performance.<your_domain>
 register.<your_domain>
 resources.<your_domain>
 styleguide.<your_domain>
+monitor.<your_domain>
 
 Now, in the package.json file in the root folder of the repository, amend the deployment script appropriately:
 
 ```
 "deploy": "SSH_USER=<<your_ssh_username>> SSH_HOST=<<your_swarm_manager_node_ip>> bash deploy.sh",
 ```
+
+You may also add the following variables to the above that will change the username and password for monitoring service, Netdata, away from the default of monitor:monitor-password. `NETDATA_USER=<username> NETDATA_PASSWORD=<password>`
 
 Then, run the deployment like so:
 
@@ -136,7 +139,7 @@ Version can be any git commit hash, git tag, dockerhub tag or 'latest'
 
 ## Enabling encryption
 
-For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an ecrypted folder. It is useful to set this up from the beginning.
+For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an encrypted folder. It is useful to set this up from the beginning.
 
 ```
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
@@ -153,7 +156,7 @@ docker service scale opencrvs_mongo-rs-init=1
 
 ## Emergency Backup & Restore
 
-Every day OpenCRVS automatically backs up all databases to the following directories on the manager node.  
+Every day OpenCRVS automatically backs up all databases to the following directories on the manager node.
 Every 7 days the data is overwritten to save disk space.
 
 Servers can be stolen, so we highly recommend that once a week, these files should be saved to a
