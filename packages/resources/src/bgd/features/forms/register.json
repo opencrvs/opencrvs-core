@@ -571,7 +571,17 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          }
+                        }
                       },
                       {
                         "name": "registrationPhone",
