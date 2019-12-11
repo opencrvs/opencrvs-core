@@ -15,10 +15,7 @@ import { query, getCSV } from '@metrics/influxdb/client'
 import * as archiver from 'archiver'
 
 async function getMeasurementNames() {
-  const points = await query<Array<{ key: string }>>(
-    // tslint:disable-next-line
-    `SHOW SERIES`
-  )
+  const points = await query<Array<{ key: string }>>('SHOW SERIES')
   return points.map(({ key }) => key.split(',')[0])
 }
 
@@ -34,7 +31,8 @@ export async function exportHandler(
   }
 
   const archive = archiver('zip', {
-    zlib: { level: 9 } // Sets the compression level.
+    // Sets the compression level.
+    zlib: { level: 9 }
   })
 
   csvStreams.forEach(([name, stream]) =>
