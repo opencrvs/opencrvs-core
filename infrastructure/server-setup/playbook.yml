@@ -67,6 +67,14 @@
         hour: '0'
         job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 172.16.17.54 /mnt/crypthome >> /var/log/opencrvs-backup.log 2>&1'
 
+    - name: 'Setup crontab to backup the service logs'
+      cron:
+        name: 'backup service logs'
+        weekday: '1'
+        minute: '0'
+        hour: '0'
+        job: 'cd ~/ && bash /tmp/compose/infrastructure/backup-service-logs.sh {{ loggly_token }} {{ loggly_username }} {{ loggly_password }} >> /var/log/opencrvs-backup-service.log 2>&1'
+
     - name: 'Check file for encrypted file system exists'
       stat:
         path: /cryptfs_file_sparse.img
