@@ -38,12 +38,14 @@ import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import {
   GQLBirthRegistrationMetrics,
   GQLBirthRegistrationTimeFrameMetrics,
-  GQLBirthRegistrationGenderBasisMetrics
+  GQLBirthRegistrationGenderBasisMetrics,
+  GQLCertificationPaymentMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import {
   TimeFrameReports,
-  GenderBasisReports
+  GenderBasisReports,
+  CertificationPaymentReports
 } from '@client/views/Performance/reports'
 import moment from 'moment'
 
@@ -162,6 +164,16 @@ function ReportComponent(props: Props) {
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
                           .timeFrames as GQLBirthRegistrationTimeFrameMetrics[]))) ||
+                    []
+                  }
+                />
+                <CertificationPaymentReports
+                  loading={loading}
+                  data={
+                    (data &&
+                      (data.fetchBirthRegistrationMetrics &&
+                        (data.fetchBirthRegistrationMetrics
+                          .timeFrames as GQLCertificationPaymentMetrics[]))) ||
                     []
                   }
                 />
