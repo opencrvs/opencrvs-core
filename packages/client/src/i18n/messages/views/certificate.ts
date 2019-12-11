@@ -122,13 +122,13 @@ const messagesToDefine: ICertificateMessages = {
     id: 'certificate.parent.details.label.dateOfBirth'
   },
   familyName: {
-    defaultMessage: 'Family Name',
-    description: 'Parent family name',
+    defaultMessage: 'Last Name',
+    description: 'Parent last name',
     id: 'certificate.parent.details.label.familyName'
   },
   familyNameInEng: {
-    defaultMessage: 'Family Name(in english)',
-    description: 'Parent family name',
+    defaultMessage: 'Last Name(in english)',
+    description: 'Parent last name',
     id: 'certificate.parent.details.label.familyNameInEng'
   },
   father: {
