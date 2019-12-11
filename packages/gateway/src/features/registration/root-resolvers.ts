@@ -27,7 +27,7 @@ import {
 import { hasScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { RESOURCES_URL } from '@gateway/constants'
+import { RESOURCES_URL, FHIR_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -263,12 +263,18 @@ export const resolvers: GQLResolver = {
           'GET'
         )
         removeDuplicatesFromComposition(composition, id, duplicateId)
-        await fetchFHIR(
-          `/Composition/${id}`,
-          authHeader,
-          'POST',
-          JSON.stringify(composition)
-        )
+        await fetch(`${FHIR_URL}/Composition/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/fhir+json',
+            ...authHeader
+          },
+          body: JSON.stringify(composition)
+        }).catch(error => {
+          return Promise.reject(
+            new Error(`FHIR request failed: ${error.message}`)
+          )
+        })
         return composition.id
       } else {
         return await Promise.reject(
