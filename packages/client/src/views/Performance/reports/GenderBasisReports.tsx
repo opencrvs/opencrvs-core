@@ -80,6 +80,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
         )}
         isLoading={loading}
         content={this.getContent()}
+        hideBoxShadow={true}
         columns={[
           {
             label: intl.formatMessage(constantsMessages.location),

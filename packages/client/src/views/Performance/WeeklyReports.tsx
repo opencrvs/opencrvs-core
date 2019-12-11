@@ -80,6 +80,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.birth)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),
@@ -102,6 +103,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),

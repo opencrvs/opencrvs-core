@@ -51,6 +51,12 @@ const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
 `
 
+const ReportWrapper = styled.div`
+  margin-top: 16px;
+  ${({ theme }) =>
+    `border-top: 1px solid ${theme.colors.chartAreaGradientStart};`}
+`
+
 interface ReportProps {
   timeRange: { start: Date; end: Date }
   reportType: string
@@ -138,7 +144,7 @@ function ReportComponent(props: Props) {
                 />
               )
             return (
-              <>
+              <ReportWrapper>
                 <GenderBasisReports
                   loading={loading}
                   genderBasisMetrics={
@@ -159,7 +165,7 @@ function ReportComponent(props: Props) {
                     []
                   }
                 />
-              </>
+              </ReportWrapper>
             )
           }}
         </Query>
