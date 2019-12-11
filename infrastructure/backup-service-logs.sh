@@ -39,17 +39,13 @@ LOGGLY_TOKEN=$1
 LOGGLY_USERNAME=$2
 LOGGLY_PASSWORD=$3
 
-# Log location
-#-----------------------------------
-FILES=/opencrvs-logs/*
-
 # Today's date is used for aliases
 #-----------------------------------
 BACKUP_DATE=$(date +%Y-%m-%d)
 
-for f in $FILES
-do
+for f in ./opencrvs-logs/*.log; do
+  FILE=$(basename $f .log)
+  FILENAME=${FILE%.*}
   echo "Syncing $f file to Loggly with the following alias: $FILENAME-$BACKUP_DATE.log"
-  FILENAME=${$f%.*}
-  /bin/bash /configure-file-monitoring.sh -a opencrvs -t $1 -u $2 -p $1 -f $f -l $FILENAME-$BACKUP_DATE.log >> /var/log/loggly.log 2>&1
+  /bin/bash /configure-file-monitoring.sh -a opencrvs -t $1 -u $2 -p $3 -f $f -l $FILENAME-$BACKUP_DATE.log >> /var/log/loggly.log 2>&1
 done
