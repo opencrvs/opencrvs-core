@@ -47,13 +47,19 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
     const { files } = event.target
     return files && this.props.handleFileChange(files[0])
   }
-  clickOnFileUploader = () => {
-    this.fileUploader.current!.click()
-  }
+
   render() {
-    const { icon, title, ...otherProps } = this.props
+    const { icon, title, onClick, ...otherProps } = this.props
     return (
-      <ImageBase {...otherProps} onClick={this.clickOnFileUploader}>
+      <ImageBase
+        {...otherProps}
+        onClick={event => {
+          if (onClick !== undefined) {
+            this.fileUploader.current!.click()
+            onClick(event)
+          }
+        }}
+      >
         {title}
         {icon && <Icon>{icon()}</Icon>}
         <HiddenInput
