@@ -49,6 +49,8 @@ services:
     configs:
       - source: netdata-master-stream.{{ts}}
         target: /etc/netdata/stream.conf
+    environment:
+      - PGID=999
     deploy:
       replicas: 1
       placement:
@@ -82,6 +84,8 @@ services:
         target: /etc/netdata/netdata.conf
       - source: netdata-slave-stream.{{ts}}
         target: /etc/netdata/stream.conf
+    environment:
+      - PGID=999
     deploy:
       mode: global
     networks:
