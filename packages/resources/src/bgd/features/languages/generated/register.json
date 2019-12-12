@@ -1985,7 +1985,7 @@
         "password.validation.msg": "পাসওয়ার্ড-এ যে বিষয়গুলো অবশ্যই থাকতে হবে:",
         "performance.body.header.weekly.reports": "সাপ্তাহিক প্রতিবেদন",
         "performance.topbar.tab.title.weekly": "সাপ্তাহিক",
-        "performance.reports.exportAll": "Export all performance data",
+        "performance.reports.exportAll": "সমস্ত সম্পাদিত কার্য তথ্য এক্সপোর্ট করুন",
         "performance.reports.noResultForLocation": "{searchedLocation} এর জন্য কোনও ডেটা নেই। আমরা বর্তমানে দুইটি উপজিলার জন্য পাইলট করছি:",
         "print.certificate.button.confirmPrint": "নিশ্চিত এবং মুদ্রণ করুন",
         "print.certificate.review.title": "{event} সনদের সমস্ত বিবরণ কি সঠিক?",

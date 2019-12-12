@@ -141,7 +141,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           noResultText={intl.formatMessage(constantsMessages.noResults)}
         />
         <Actions>
-          <LinkButton onClick={downloadAllData}>
+          <LinkButton onClick={downloadAllData} id="export-all-button">
             {intl.formatMessage(messages.exportAll)}
           </LinkButton>
         </Actions>
