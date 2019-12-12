@@ -203,3 +203,25 @@ export async function updateInHearth(payload: any, id?: string) {
   const text = await res.text()
   return typeof text === 'string' ? text : JSON.parse(text)
 }
+
+export function selectObservationBundle(
+  observationCode: string,
+  bundleEntries?: fhir.BundleEntry[]
+): fhir.BundleEntry | undefined {
+  return bundleEntries
+    ? bundleEntries.find(entry => {
+        if (entry.resource && entry.resource.resourceType === 'Observation') {
+          const observationEntry = entry.resource as fhir.Observation
+          const obCoding =
+            observationEntry.code &&
+            observationEntry.code.coding &&
+            observationEntry.code.coding.find(
+              obCode => obCode.code === observationCode
+            )
+          return obCoding ? true : false
+        } else {
+          return false
+        }
+      })
+    : undefined
+}

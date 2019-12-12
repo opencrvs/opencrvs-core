@@ -23,6 +23,38 @@ const SEARCHABLE_FIELDS = [
   'registrationNumber',
   'contactNumber'
 ]
+
+const allNameFields = [
+  'childFirstNames',
+  'childFamilyName',
+  'childFirstNamesLocal',
+  'childFamilyNameLocal',
+  'motherFirstNames',
+  'motherFamilyName',
+  'motherFirstNamesLocal',
+  'motherFamilyNameLocal',
+  'fatherFirstNames',
+  'fatherFamilyName',
+  'fatherFirstNamesLocal',
+  'fatherFamilyNameLocal',
+  'informantFirstNames',
+  'informantFamilyName',
+  'informantFirstNamesLocal',
+  'informantFamilyNameLocal',
+  'primaryCaregiverFirstNames',
+  'primaryCaregiverFamilyName',
+  'primaryCaregiverFirstNamesLocal',
+  'primaryCaregiverFamilyNameLocal',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedFirstNamesLocal',
+  'deceasedFamilyNameLocal',
+  'spouseFirstNames',
+  'spouseFamilyName',
+  'spouseFirstNamesLocal',
+  'spouseFamilyNameLocal'
+]
+
 export const EMPTY_STRING = ''
 
 export function queryBuilder(
@@ -52,7 +84,7 @@ export function queryBuilder(
     must.push({
       multi_match: {
         query: name,
-        fields: ['*Name*'],
+        fields: allNameFields,
         fuzziness: 'AUTO'
       }
     })
