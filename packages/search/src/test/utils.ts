@@ -111,6 +111,23 @@ export const mockBirthFhirBundle = {
             ]
           },
           {
+            title: "Primary caregiver's details",
+            code: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/doc-sections',
+                  code: 'primary-caregiver-details'
+                }
+              ],
+              text: "Primary caregiver's details"
+            },
+            entry: [
+              {
+                reference: 'urn:uuid:63e5ea6d-6dc7-4df7-b908-328872e770e3'
+              }
+            ]
+          },
+          {
             title: 'Birth encounter',
             code: {
               coding: [
@@ -470,6 +487,40 @@ export const mockBirthFhirBundle = {
         },
         valueQuantity: {
           value: 'SINGLE'
+        }
+      }
+    },
+    {
+      fullUrl: 'urn:uuid:e7249ecd-fb11-42cd-aa3b-d48e2288f599',
+      resource: {
+        resourceType: 'Observation',
+        status: 'final',
+        context: {
+          reference: 'urn:uuid:ca8f8989-1a26-4494-a4d3-a777a620b1df'
+        },
+        category: [
+          {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/observation-category',
+                code: 'procedure',
+                display: 'Procedure'
+              }
+            ]
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'primary-caregiver',
+              display: 'Primary caregiver'
+            }
+          ]
+        },
+        valueString: 'FATHER',
+        subject: {
+          reference: 'urn:uuid:63e5ea6d-6dc7-4df7-b908-328872e770e3'
         }
       }
     },
