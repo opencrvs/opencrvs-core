@@ -663,7 +663,7 @@
         "form.field.label.postCode": "Number",
         "form.field.label.print.confirmMotherInformation": "Does their proof of ID document match the following details?",
         "form.field.label.print.documentNumber": "Document number",
-        "form.field.label.print.otherPersonFamilyName": "Family name",
+        "form.field.label.print.otherPersonFamilyName": "Last name",
         "form.field.label.print.otherPersonGivenNames": "Given name",
         "form.field.label.print.otherPersonPrompt": "Because there are no details of this person on record, we need to capture their details:",
         "form.field.label.print.signedAffidavit": "Do they have a signed affidavit?",

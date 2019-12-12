@@ -262,7 +262,7 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   renderSearchInput(props: IProps, isMobile?: boolean) {
-    const { intl, searchText, selectedSearchType } = props
+    const { intl, searchText, selectedSearchType, language } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -299,6 +299,7 @@ class HeaderComp extends React.Component<IProps, IState> {
     return (
       <SearchTool
         key="searchMenu"
+        language={language}
         searchText={searchText}
         selectedSearchType={selectedSearchType}
         searchTypeList={searchTypeList}

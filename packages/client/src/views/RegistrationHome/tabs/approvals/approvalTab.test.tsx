@@ -9,29 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { checkAuth } from '@client/profile/profileActions'
+import { AppStore, createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
   resizeWindow
 } from '@client/tests/util'
-
-import { merge } from 'lodash'
-import { createStore, AppStore } from '@client/store'
-import {
-  RegistrationHome,
-  EVENT_STATUS
-} from '@client/views/RegistrationHome/RegistrationHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
-import {
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  REGISTRATION_HOME_QUERY
-} from '@client/views/RegistrationHome/queries'
-import { checkAuth } from '@client/profile/profileActions'
-import moment from 'moment'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
+import { GridTable } from '@opencrvs/components/lib/interface'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
+import { merge } from 'lodash'
+import moment from 'moment'
+import * as React from 'react'
+import { ApprovalTab } from './approvalTab'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
 
 const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
@@ -147,177 +144,81 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     await store.dispatch(checkAuth({ '?token': validateScopeToken }))
   })
 
-  it('check sent for approval tab count', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 2, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    const app = testComponent.component
-    const tab = await waitForElement(app, '#tab_approvals')
-    expect(tab.hostNodes().text()).toContain('Sent for approval (2)')
-  })
-
   it('renders all items returned from graphql query in sent for approval', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
 
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'VALIDATED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    contactNumber: null,
-                    eventLocationId: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: null
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
-
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+      <ApprovalTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'VALIDATED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'VALIDATED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  contactNumber: undefined,
+                  eventLocationId: undefined,
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: TIME_STAMP,
+                  modifiedAt: undefined
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
         }}
       />,
-      store,
-      graphqlMock
+      store
     )
-    getItem.mockReturnValue(validateScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': validateScopeToken })
-    )
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
+
     testComponent.component.update()
     const data = testComponent.component.find(GridTable).prop('content')
     const EXPECTED_DATE_OF_APPLICATION = moment(
@@ -335,54 +236,18 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 2, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
-
-    getItem.mockReturnValue(validateScopeToken)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+      <ApprovalTab
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: []
+          }
         }}
       />,
-      store,
-      graphqlMock
-    )
-
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': validateScopeToken })
+      store
     )
 
     const data = (await waitForElement(
@@ -394,51 +259,20 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
   it('should show pagination bar if items more than 11 in Approval Tab', async () => {
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: { totalItems: 14, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
-      store,
-      graphqlMock
+      <ApprovalTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+      />,
+      store
     )
-
-    getItem.mockReturnValue(validateScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': validateScopeToken })
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-    testComponent.component.update()
 
     expect(
       testComponent.component.find('#pagination').hostNodes()
@@ -454,97 +288,6 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('renders expanded area for validated status', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    eventLocationId: null,
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'VALIDATED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: '2007-01-01',
-                    modifiedAt: '2007-01-01'
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      },
       {
         request: {
           query: FETCH_REGISTRATION_BY_COMPOSITION,
@@ -634,14 +377,73 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'approvals' } }} />,
+      <ApprovalTab
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'VALIDATED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  eventLocationId: undefined,
+                  registrationNumber: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'VALIDATED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: undefined,
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: '2007-01-01',
+                  modifiedAt: '2007-01-01'
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
+        }}
+      />,
       store,
       graphqlMock
-    )
-
-    getItem.mockReturnValue(validateScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': validateScopeToken })
     )
 
     // wait for mocked data to load mockedProvider
@@ -680,114 +482,75 @@ describe('Tablet tests', () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 0, results: [] },
-            approvalTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'VALIDATED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    eventLocationId: null,
-                    registrationNumber: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'VALIDATED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    contactNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: null
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'approvals'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+      <ApprovalTab
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'VALIDATED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  eventLocationId: undefined,
+                  registrationNumber: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'VALIDATED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: undefined,
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: TIME_STAMP,
+                  modifiedAt: undefined
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
         }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     testComponent.component.update()
