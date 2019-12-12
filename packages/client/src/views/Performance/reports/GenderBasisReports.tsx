@@ -75,6 +75,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
 
     return (
       <ListTable
+        id="genderBasisMetrics"
         tableTitle={intl.formatMessage(
           constantsMessages.birthRegistrationTitle
         )}

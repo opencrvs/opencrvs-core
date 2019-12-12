@@ -78,6 +78,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
 
     return (
       <ListTable
+        id="timeFrames"
         tableTitle={intl.formatMessage(constantsMessages.timeFramesTitle, {
           event: eventType
         })}

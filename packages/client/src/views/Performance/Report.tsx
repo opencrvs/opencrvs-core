@@ -142,9 +142,11 @@ function ReportComponent(props: Props) {
             )
               return (
                 <NoResultMessage
+                  id="reports"
                   searchedLocation={selectedLocation.displayLabel}
                 />
               )
+
             return (
               <ReportWrapper>
                 <GenderBasisReports
@@ -173,7 +175,7 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLCertificationPaymentMetrics[]))) ||
+                          .payments as GQLCertificationPaymentMetrics[]))) ||
                     []
                   }
                 />

@@ -41,7 +41,7 @@ describe('Time frame report tests', () => {
     const columnValueOfRegOver5Year = testComponent.component
       .find('#row_0')
       .find('span')
-      .at(6)
+      .at(5)
 
     expect(columnValueOfRegOver5Year.text()).toBe('2 (100%)')
   })

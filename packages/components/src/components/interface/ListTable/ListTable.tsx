@@ -145,6 +145,7 @@ const defaultConfiguration = {
 }
 
 interface IListTableProps {
+  id?: string
   content: IDynamicValues[]
   columns: IColumn[]
   noResultText: string
@@ -221,6 +222,7 @@ export class ListTable extends React.Component<
 
   render() {
     const {
+      id,
       columns,
       content,
       noResultText,
@@ -236,7 +238,7 @@ export class ListTable extends React.Component<
 
     return (
       <>
-        <Wrapper hideBoxShadow={hideBoxShadow}>
+        <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
           {!isLoading && tableTitle && <H3>{tableTitle}</H3>}
           {isLoading && (
             <>
