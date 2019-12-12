@@ -19,7 +19,11 @@ import { sentenceCase } from '@client/utils/data-formatting'
 import moment from 'moment'
 import { goToApplicationDetails } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { constantsMessages as messages } from '@client/i18n/messages'
+import {
+  constantsMessages as messages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { LANG_EN } from '@client/utils/constants'
 
 interface IInProgressProps {
   theme: ITheme
@@ -56,9 +60,11 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     }
 
     return this.props.draftApplications.map((draft: IApplication) => {
-      let name
+      let name, englishFullName, localeFullName
+      const { intl } = this.props
+      const { locale } = intl
       if (draft.event && draft.event.toString() === 'birth') {
-        name =
+        englishFullName =
           (draft.data &&
             draft.data.child &&
             draft.data.child.familyNameEng &&
@@ -66,6 +72,8 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               ? ''
               : draft.data.child.firstNamesEng + ' ') +
               draft.data.child.familyNameEng) ||
+          ''
+        localeFullName =
           (draft.data &&
             draft.data.child &&
             draft.data.child.familyName &&
@@ -74,8 +82,9 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               : draft.data.child.firstNames + ' ') +
               draft.data.child.familyName) ||
           ''
+        name = locale === LANG_EN ? englishFullName : localeFullName
       } else if (draft.event && draft.event.toString() === 'death') {
-        name =
+        englishFullName =
           (draft.data &&
             draft.data.deceased &&
             draft.data.deceased.familyNameEng &&
@@ -83,6 +92,8 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               ? ''
               : draft.data.deceased.firstNamesEng + ' ') +
               draft.data.deceased.familyNameEng) ||
+          ''
+        localeFullName =
           (draft.data &&
             draft.data.deceased &&
             draft.data.deceased.familyName &&
@@ -91,15 +102,22 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
               : draft.data.deceased.firstNames + ' ') +
               draft.data.deceased.familyName) ||
           ''
+        name = locale === LANG_EN ? englishFullName : localeFullName
       }
       const lastModificationDate = draft.modifiedOn || draft.savedOn
-
+      moment.locale(locale)
+      const event =
+        (draft.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[draft.event.toLowerCase()]
+          )) ||
+        ''
       return {
         id: draft.id,
-        event: (draft.event && sentenceCase(draft.event)) || '',
+        event: event,
         name: name || '',
         dateOfModification:
-          `Last updated ${lastModificationDate &&
+          `${intl.formatMessage(messages.lastUpdated)} ${lastModificationDate &&
             moment(lastModificationDate).fromNow()}` || '',
         rowClickHandler: [
           {
