@@ -3,5 +3,5 @@
 ```
 
 ```js
-<User color="invert" />
+<User isInvert={true} />
 ```
