@@ -1,0 +1,48 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { client } from '@client/utils/apolloClient'
+import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
+
+export async function syncRegistrarWorkqueue(
+  locationId: string,
+  reviewStatuses: string[],
+  inProgressCount: number,
+  reviewCount: number,
+  rejectCount: number,
+  approvalCount: number,
+  printCount: number,
+  inProgressSkip: number,
+  reviewSkip: number,
+  rejectSkip: number,
+  approvalSkip: number,
+  printSkip: number
+) {
+  try {
+    const queryResult = await client.query({
+      query: REGISTRATION_HOME_QUERY,
+      variables: {
+        locationIds: [locationId],
+        count: 10,
+        reviewStatuses: reviewStatuses,
+        inProgressSkip: inProgressSkip,
+        reviewSkip: reviewSkip,
+        rejectSkip: rejectSkip,
+        approvalSkip: approvalSkip,
+        printSkip: printSkip
+      },
+      fetchPolicy: 'no-cache'
+    })
+    return queryResult.data
+  } catch (exception) {
+    return undefined
+  }
+}

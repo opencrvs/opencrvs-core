@@ -145,6 +145,11 @@
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
                         "validate": [],
@@ -172,6 +177,11 @@
                           "defaultMessage": "Relationship to child",
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
+                        },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
                         },
                         "required": true,
                         "initialValue": "",
@@ -566,6 +576,11 @@
                           "defaultMessage": "Relationship to child",
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
+                        },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
                         },
                         "required": true,
                         "initialValue": "",
@@ -7376,6 +7391,11 @@
                           "id": "register.selectInformant.relationshipLabel",
                           "description": "Label for input Relationship to deceased"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
                         "validate": [],
@@ -7510,6 +7530,11 @@
                           "defaultMessage": "Relationship to deceased",
                           "id": "register.selectInformant.relationshipLabel",
                           "description": "Label for input Relationship to deceased"
+                        },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
                         },
                         "required": true,
                         "initialValue": "",

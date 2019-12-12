@@ -145,6 +145,11 @@
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
                         "validate": [],
@@ -172,6 +177,11 @@
                           "defaultMessage": "Relationship to child",
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
+                        },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
                         },
                         "required": true,
                         "initialValue": "",
@@ -569,9 +579,24 @@
                           "id": "form.field.label.applicantsRelationWithChild",
                           "description": "Label for input Relationship to child"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          }
+                        }
                       },
                       {
                         "name": "registrationPhone",
@@ -1992,6 +2017,47 @@
               ],
               "fields": [
                 {
+                  "name": "applicantBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of Birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.applicantsDateOfBirth"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "isValidBirthDate"
+                    },
+                    {
+                      "operation": "isDateInPast"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "longDateTransformer",
+                          "parameters": ["birthDate"]
+                        }
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldValueTransformer",
+                          "parameters": ["birthDate"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
                   "name": "iDType",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
@@ -2414,47 +2480,6 @@
                         {
                           "operation": "nameToFieldTransformer",
                           "parameters": ["en", "familyName"]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantBirthDate",
-                  "type": "DATE",
-                  "label": {
-                    "defaultMessage": "Date of Birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.applicantsDateOfBirth"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "isValidBirthDate"
-                    },
-                    {
-                      "operation": "isDateInPast"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "longDateTransformer",
-                          "parameters": ["birthDate"]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldValueTransformer",
-                          "parameters": ["birthDate"]
                         }
                       ]
                     }
@@ -5273,6 +5298,41 @@
               ],
               "fields": [
                 {
+                  "name": "motherBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.motherDateOfBirth"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [5]
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": ["birthDate"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["birthDate"]
+                    }
+                  }
+                },
+                {
                   "name": "iDType",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
@@ -5609,41 +5669,6 @@
                     "query": {
                       "operation": "nameToFieldTransformer",
                       "parameters": ["en", "familyName"]
-                    }
-                  }
-                },
-                {
-                  "name": "motherBirthDate",
-                  "type": "DATE",
-                  "label": {
-                    "defaultMessage": "Date of birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.motherDateOfBirth"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "dateFormatIsCorrect",
-                      "parameters": []
-                    },
-                    {
-                      "operation": "dateInPast",
-                      "parameters": []
-                    },
-                    {
-                      "operation": "isValidParentsBirthDate",
-                      "parameters": [5]
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": ["birthDate"]
                     }
                   }
                 },
@@ -7479,6 +7504,47 @@
                   }
                 },
                 {
+                  "name": "fatherBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.fatherDateOfBirth"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "dateFormatIsCorrect",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "dateInPast",
+                      "parameters": []
+                    },
+                    {
+                      "operation": "isValidParentsBirthDate",
+                      "parameters": [5]
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "!values.fathersDetailsExist"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": ["birthDate"]
+                    },
+                    "query": {
+                      "operation": "fieldValueTransformer",
+                      "parameters": ["birthDate"]
+                    }
+                  }
+                },
+                {
                   "name": "iDType",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
@@ -7859,47 +7925,6 @@
                     "query": {
                       "operation": "nameToFieldTransformer",
                       "parameters": ["en", "familyName"]
-                    }
-                  }
-                },
-                {
-                  "name": "fatherBirthDate",
-                  "type": "DATE",
-                  "label": {
-                    "defaultMessage": "Date of birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.fatherDateOfBirth"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "dateFormatIsCorrect",
-                      "parameters": []
-                    },
-                    {
-                      "operation": "dateInPast",
-                      "parameters": []
-                    },
-                    {
-                      "operation": "isValidParentsBirthDate",
-                      "parameters": [5]
-                    }
-                  ],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
-                    },
-                    "query": {
-                      "operation": "fieldValueTransformer",
-                      "parameters": ["birthDate"]
                     }
                   }
                 },
@@ -10600,6 +10625,11 @@
                           "id": "register.selectInformant.relationshipLabel",
                           "description": "Label for input Relationship to deceased"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
                         "validate": [],
@@ -10735,6 +10765,11 @@
                           "id": "register.selectInformant.relationshipLabel",
                           "description": "Label for input Relationship to deceased"
                         },
+                        "placeholder": {
+                          "defaultMessage": "eg. Grandmother",
+                          "description": "Placeholder for example of relationship",
+                          "id": "form.field.label.relationshipPlaceHolder"
+                        },
                         "required": true,
                         "initialValue": "",
                         "validate": [],
@@ -10834,6 +10869,28 @@
             {
               "id": "deceased-view-group",
               "fields": [
+                {
+                  "name": "birthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of Birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.deceasedDateOfBirth"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "isValidBirthDate"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "longDateTransformer",
+                      "parameters": []
+                    }
+                  }
+                },
                 {
                   "name": "iDType",
                   "type": "SELECT_WITH_OPTIONS",
@@ -11219,28 +11276,6 @@
                       }
                     }
                   ]
-                },
-                {
-                  "name": "birthDate",
-                  "type": "DATE",
-                  "label": {
-                    "defaultMessage": "Date of Birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.deceasedDateOfBirth"
-                  },
-                  "required": true,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "isValidBirthDate"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "longDateTransformer",
-                      "parameters": []
-                    }
-                  }
                 },
                 {
                   "name": "maritalStatus",
@@ -14826,6 +14861,47 @@
               "id": "informant-view-group",
               "fields": [
                 {
+                  "name": "applicantBirthDate",
+                  "type": "DATE",
+                  "label": {
+                    "defaultMessage": "Date of Birth",
+                    "description": "Label for form field: Date of birth",
+                    "id": "form.field.label.applicantsDateOfBirth"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "isValidBirthDate"
+                    },
+                    {
+                      "operation": "isDateInPast"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldNameTransformer",
+                          "parameters": ["birthDate"]
+                        }
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldValueTransformer",
+                          "parameters": ["birthDate"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
                   "name": "iDType",
                   "type": "SELECT_WITH_OPTIONS",
                   "label": {
@@ -15248,47 +15324,6 @@
                         {
                           "operation": "nameToFieldTransformer",
                           "parameters": ["en", "familyName"]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "applicantBirthDate",
-                  "type": "DATE",
-                  "label": {
-                    "defaultMessage": "Date of Birth",
-                    "description": "Label for form field: Date of birth",
-                    "id": "form.field.label.applicantsDateOfBirth"
-                  },
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "isValidBirthDate"
-                    },
-                    {
-                      "operation": "isDateInPast"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "fieldValueNestingTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldNameTransformer",
-                          "parameters": ["birthDate"]
-                        }
-                      ]
-                    },
-                    "query": {
-                      "operation": "nestedValueToFieldTransformer",
-                      "parameters": [
-                        "individual",
-                        {
-                          "operation": "fieldValueTransformer",
-                          "parameters": ["birthDate"]
                         }
                       ]
                     }
