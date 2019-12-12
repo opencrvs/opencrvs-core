@@ -10,28 +10,33 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  Event,
-  IFormData,
-  IFormFieldValue,
   Action as ApplicationAction,
-  IForm
+  Event,
+  IForm,
+  IFormData,
+  IFormFieldValue
 } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
+import {
+  UserDetailsAvailable,
+  USER_DETAILS_AVAILABLE
+} from '@client/profile/profileActions'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
-import { IUserDetails } from '@client/utils/userUtils'
+import { IStoreState } from '@client/store'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
+import {
+  EVENT_STATUS,
+  IQueryData
+} from '@client/views/RegistrationHome/RegistrationHome'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
-import { IQueryData } from '@client/views/RegistrationHome/RegistrationHome'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
-import { IStoreState } from '@client/store'
-import ApolloClient, { ApolloQueryResult, ApolloError } from 'apollo-client'
-import {
-  USER_DETAILS_AVAILABLE,
-  UserDetailsAvailable
-} from '@client/profile/profileActions'
 
 const SET_INITIAL_APPLICATION = 'APPLICATION/SET_INITIAL_APPLICATION'
 const STORE_APPLICATION = 'APPLICATION/STORE_APPLICATION'
@@ -40,9 +45,14 @@ const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
+const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
+  'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
+const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
+  'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_FAIL'
 const ENQUEUE_DOWNLOAD_APPLICATION = 'APPLICATION/ENQUEUE_DOWNLOAD_APPLICATION'
 const DOWNLOAD_APPLICATION_SUCCESS = 'APPLICATION/DOWNLOAD_APPLICATION_SUCCESS'
 const DOWNLOAD_APPLICATION_FAIL = 'APPLICATION/DOWNLOAD_APPLICATION_FAIL'
+const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -126,6 +136,26 @@ export interface IApplication {
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
+}
+
+export interface IWorkqueue {
+  loading?: boolean
+  error?: boolean
+  data?: IQueryData
+}
+
+interface IWorkqueuePaginationParams {
+  inProgressCount: number
+  reviewCount: number
+  rejectCount: number
+  approvalCount: number
+  printCount: number
+
+  inProgressSkip: number
+  reviewSkip: number
+  rejectSkip: number
+  approvalSkip: number
+  printSkip: number
 }
 
 type Relation =
@@ -220,6 +250,15 @@ interface IGetStorageApplicationsFailedAction {
   type: typeof GET_APPLICATIONS_FAILED
 }
 
+interface UpdateRegistrarWorkQueueSuccessAction {
+  type: typeof UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
+  payload: string
+}
+
+interface UpdateRegistrarWorkQueueFailAction {
+  type: typeof UPDATE_REGISTRAR_WORKQUEUE_FAIL
+}
+
 interface IDownloadApplication {
   type: typeof ENQUEUE_DOWNLOAD_APPLICATION
   payload: {
@@ -248,6 +287,23 @@ interface IDownloadApplicationFail {
   }
 }
 
+interface UpdateRegistrarWorkqueueAction {
+  type: typeof UPDATE_REGISTRAR_WORKQUEUE
+  payload: {
+    inProgressCount: number
+    reviewCount: number
+    rejectCount: number
+    approvalCount: number
+    printCount: number
+
+    inProgressSkip: number
+    reviewSkip: number
+    rejectSkip: number
+    approvalSkip: number
+    printSkip: number
+  }
+}
+
 interface IApplicationRequestQueue {
   id: string
   action: Action
@@ -265,17 +321,32 @@ export type Action =
   | IDownloadApplicationSuccess
   | IDownloadApplicationFail
   | UserDetailsAvailable
+  | UpdateRegistrarWorkqueueAction
+  | UpdateRegistrarWorkQueueSuccessAction
+  | UpdateRegistrarWorkQueueFailAction
 
 export interface IUserData {
   userID: string
   userPIN?: string
   applications: IApplication[]
+  workqueue?: IWorkqueue
 }
 
 export interface IApplicationsState {
   userID: string
   applications: IApplication[]
   initialApplicationsLoaded: boolean
+}
+
+export interface WorkqueueState {
+  workqueue: IWorkqueue
+}
+
+const workqueueInitialState = {
+  workqueue: {
+    loading: true,
+    error: false
+  }
 }
 
 const initialState = {
@@ -351,6 +422,17 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
   type: GET_APPLICATIONS_FAILED
 })
 
+export const updateRegistrarWorkqueueSuccessActionCreator = (
+  response: string
+): UpdateRegistrarWorkQueueSuccessAction => ({
+  type: UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
+  payload: response
+})
+
+export const updateRegistrarWorkqueueFailActionCreator = (): UpdateRegistrarWorkQueueFailAction => ({
+  type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
+})
+
 export function deleteApplication(
   application: IApplication | IPrintableApplication
 ): IDeleteApplicationAction {
@@ -405,20 +487,22 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   return JSON.stringify(payload)
 }
 
+async function getUserData(userId: string) {
+  const userData = await storage.getItem('USER_DATA')
+  const allUserData: IUserData[] = !userData
+    ? []
+    : (JSON.parse(userData) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === userId)
+
+  return { allUserData, currentUserData }
+}
+
 export async function writeApplicationByUser(
   userId: string,
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  let currentUserData = allUserData.find(uData => uData.userID === uID)
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   const existingApplicationId = currentUserData
     ? currentUserData.applications.findIndex(app => app.id === application.id)
@@ -443,20 +527,103 @@ export async function writeApplicationByUser(
   return JSON.stringify(currentUserData)
 }
 
+async function getWorkqueueData(
+  state: IStoreState,
+  userDetails: IUserDetails,
+  workqueuePaginationParams: IWorkqueuePaginationParams
+) {
+  const registrationLocationId =
+    (userDetails && getUserLocation(userDetails).id) || ''
+
+  const scope = getScope(state)
+  const reviewStatuses =
+    scope && scope.includes('register')
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
+
+  const {
+    inProgressCount,
+    reviewCount,
+    rejectCount,
+    approvalCount,
+    printCount,
+    inProgressSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    printSkip
+  } = workqueuePaginationParams
+
+  const result = await syncRegistrarWorkqueue(
+    registrationLocationId,
+    reviewStatuses,
+    inProgressCount,
+    reviewCount,
+    rejectCount,
+    approvalCount,
+    printCount,
+    inProgressSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    printSkip
+  )
+
+  let workqueue
+  if (result) {
+    workqueue = {
+      loading: false,
+      error: false,
+      data: result
+    }
+  } else {
+    workqueue = {
+      loading: false,
+      error: true,
+      data: state.workqueueState.workqueue.data
+    }
+  }
+
+  return workqueue
+}
+
+export async function writeRegistrarWorkqueueByUser(
+  getState: () => IStoreState,
+  workqueuePaginationParams: IWorkqueuePaginationParams
+): Promise<string> {
+  const state = getState()
+  const userDetails = getUserDetails(state) as IUserDetails
+
+  const workqueue = await getWorkqueueData(
+    state,
+    userDetails,
+    workqueuePaginationParams
+  )
+
+  const uID = userDetails.userMgntUserID || ''
+  let { allUserData, currentUserData } = await getUserData(uID)
+
+  if (currentUserData) {
+    currentUserData.workqueue = workqueue
+  } else {
+    currentUserData = {
+      userID: uID,
+      applications: [],
+      workqueue: workqueue
+    }
+    allUserData.push(currentUserData)
+  }
+  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+
+  return JSON.stringify(currentUserData.workqueue)
+}
+
 export async function deleteApplicationByUser(
   userId: string,
   application: IApplication
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
-  const userData = await storage.getItem('USER_DATA')
-  if (!userData) {
-    // No storage option found
-    storage.configStorage('OpenCRVS')
-  }
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === uID)
+  let { allUserData, currentUserData } = await getUserData(uID)
 
   const deletedApplicationId = currentUserData
     ? currentUserData.applications.findIndex(app => app.id === application.id)
@@ -480,6 +647,37 @@ export function downloadApplication(
     payload: {
       application,
       client
+    }
+  }
+}
+
+export function updateRegistrarWorkqueue(
+  inProgressCount: number = 10,
+  reviewCount: number = 10,
+  rejectCount: number = 10,
+  approvalCount: number = 10,
+  printCount: number = 10,
+
+  inProgressSkip: number = 0,
+  reviewSkip: number = 0,
+  rejectSkip: number = 0,
+  approvalSkip: number = 0,
+  printSkip: number = 0
+) {
+  return {
+    type: UPDATE_REGISTRAR_WORKQUEUE,
+    payload: {
+      inProgressCount,
+      reviewCount,
+      rejectCount,
+      approvalCount,
+      printCount,
+
+      inProgressSkip,
+      reviewSkip,
+      rejectSkip,
+      approvalSkip,
+      printSkip
     }
   }
 }
@@ -937,6 +1135,41 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           { sequence: true }
         )
       )
+
+    default:
+      return state
+  }
+}
+
+export const registrarWorkqueueReducer: LoopReducer<WorkqueueState, Action> = (
+  state: WorkqueueState = workqueueInitialState,
+  action: Action
+): WorkqueueState | Loop<WorkqueueState, Action> => {
+  switch (action.type) {
+    case UPDATE_REGISTRAR_WORKQUEUE:
+      return loop(
+        {
+          workqueue: {
+            ...state.workqueue,
+            loading: true
+          }
+        },
+        Cmd.run(writeRegistrarWorkqueueByUser, {
+          successActionCreator: updateRegistrarWorkqueueSuccessActionCreator,
+          failActionCreator: updateRegistrarWorkqueueFailActionCreator,
+          args: [Cmd.getState, action.payload]
+        })
+      )
+
+    case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
+      if (action.payload) {
+        const workqueue = JSON.parse(action.payload) as IWorkqueue
+
+        return {
+          workqueue
+        }
+      }
+      return state
 
     default:
       return state

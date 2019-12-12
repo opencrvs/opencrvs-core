@@ -10,6 +10,35 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  downloadApplication,
+  filterProcessingApplicationsFromQuery,
+  IApplication,
+  IWorkqueue,
+  makeApplicationReadyToDownload,
+  SUBMISSION_STATUS,
+  updateRegistrarWorkqueue
+} from '@client/applications'
+import { Header } from '@client/components/interface/Header/Header'
+import { IViewHeadingProps } from '@client/components/ViewHeading'
+import { Action, Event } from '@client/forms'
+import { errorMessages } from '@client/i18n/messages'
+import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import {
+  goToEvents,
+  goToPage,
+  goToPrintCertificate,
+  goToRegistrarHomeTab,
+  goToReviewDuplicate
+} from '@client/navigation'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { Scope } from '@client/utils/authUtils'
+import { getUserLocation } from '@client/utils/userUtils'
+import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
+import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import {
   Button,
   FloatingActionButton,
   IButtonProps,
@@ -17,61 +46,32 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import {
   PlusTransparentWhite,
-  StatusGreen,
   StatusGray,
+  StatusGreen,
   StatusOrange,
   StatusProgress,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
-  ISearchInputProps,
-  Spinner,
-  TopBar,
   FloatingNotification,
-  NOTIFICATION_TYPE
+  ISearchInputProps,
+  NOTIFICATION_TYPE,
+  Spinner,
+  TopBar
 } from '@opencrvs/components/lib/interface'
-import {
-  IApplication,
-  SUBMISSION_STATUS,
-  filterProcessingApplicationsFromQuery,
-  storeApplication,
-  makeApplicationReadyToDownload,
-  downloadApplication
-} from '@client/applications'
-import { Header } from '@client/components/interface/Header/Header'
-import { IViewHeadingProps } from '@client/components/ViewHeading'
-import {
-  goToEvents as goToEventsAction,
-  goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
-} from '@client/navigation'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
-import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
-import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import ApolloClient from 'apollo-client'
 import * as React from 'react'
-import { Query } from '@client/components/Query'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { withApollo } from 'react-apollo'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { Dispatch } from 'redux'
+import { ApprovalTab } from './tabs/approvals/approvalTab'
 import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
-import { ApprovalTab } from './tabs/approvals/approvalTab'
-import { errorMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
-import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import { Event, Action } from '@client/forms'
-import { withApollo } from 'react-apollo'
-import ApolloClient from 'apollo-client'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -147,19 +147,23 @@ interface IBaseRegistrationHomeProps {
   theme: ITheme
   language: string
   scope: Scope | null
-  userDetails: IUserDetails | null
-  goToPage: typeof goToPageAction
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
-  goToReviewDuplicate: typeof goToReviewDuplicateAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
+  goToPage: typeof goToPage
+  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToReviewDuplicate: typeof goToReviewDuplicate
+  goToPrintCertificate: typeof goToPrintCertificate
   downloadApplication: typeof downloadApplication
+  goToEvents: typeof goToEvents
+  updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
+  registrarLocationId: string
   tabId: string
   selectorId: string
   drafts: IApplication[]
   applications: IApplication[]
-  goToEvents: typeof goToEventsAction
+  workqueue: IWorkqueue
   storedApplications: IApplication[]
   client: ApolloClient<{}>
+  dispatch: Dispatch
+  reviewStatuses: string[]
 }
 
 interface IRegistrationHomeState {
@@ -196,6 +200,7 @@ export class RegistrationHomeView extends React.Component<
   IRegistrationHomeState
 > {
   pageSize = 10
+  interval: any = undefined
   constructor(props: IRegistrationHomeProps) {
     super(props)
     this.state = {
@@ -212,9 +217,34 @@ export class RegistrationHomeView extends React.Component<
     }
   }
 
+  syncWorkqueue() {
+    this.props.updateRegistrarWorkqueue()
+  }
+
+  componentDidMount() {
+    this.syncWorkqueue()
+    this.interval = setInterval(() => {
+      this.syncWorkqueue()
+    }, 300000)
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  componentDidUpdate(
+    prevProps: IRegistrationHomeProps,
+    prevState: IRegistrationHomeState
+  ) {
+    if (prevProps.tabId !== this.props.tabId) {
+      this.syncWorkqueue()
+    }
+  }
+
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
+
   userHasValidateScope() {
     return this.props.scope && this.props.scope.includes('validate')
   }
@@ -265,16 +295,184 @@ export class RegistrationHomeView extends React.Component<
     this.props.downloadApplication(downloadableApplication, this.props.client)
   }
 
-  render() {
+  getData = (
+    progressCurrentPage: number,
+    reviewCurrentPage: number,
+    updatesCurrentPage: number,
+    approvalCurrentPage: number,
+    printCurrentPage: number
+  ) => {
     const {
+      workqueue,
       theme,
       intl,
-      userDetails,
       tabId,
-      selectorId,
       drafts,
+      selectorId,
+      registrarLocationId,
       storedApplications
     } = this.props
+    const { loading, error, data } = workqueue
+    if (loading) {
+      return (
+        <StyledSpinner
+          id="search-result-spinner"
+          baseColor={theme.colors.background}
+        />
+      )
+    }
+    if (error || !data) {
+      return (
+        <ErrorText id="search-result-error-text-count">
+          {intl.formatMessage(errorMessages.queryError)}
+        </ErrorText>
+      )
+    }
+
+    const filteredData = filterProcessingApplicationsFromQuery(
+      data,
+      storedApplications
+    )
+
+    return (
+      <>
+        <TopBar>
+          <IconTab
+            id={`tab_${TAB_ID.inProgress}`}
+            key={TAB_ID.inProgress}
+            active={tabId === TAB_ID.inProgress}
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <StatusProgress />}
+            onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
+          >
+            {intl.formatMessage(messages.inProgress)} (
+            {drafts.filter(
+              draft =>
+                draft.submissionStatus ===
+                SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+            ).length +
+              (filteredData.inProgressTab.totalItems || 0) +
+              (filteredData.notificationTab.totalItems || 0)}
+            )
+          </IconTab>
+          <IconTab
+            id={`tab_${TAB_ID.readyForReview}`}
+            key={TAB_ID.readyForReview}
+            active={tabId === TAB_ID.readyForReview}
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <StatusOrange />}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
+            }
+          >
+            {intl.formatMessage(messages.readyForReview)} (
+            {filteredData.reviewTab.totalItems})
+          </IconTab>
+          <IconTab
+            id={`tab_${TAB_ID.sentForUpdates}`}
+            key={TAB_ID.sentForUpdates}
+            active={tabId === TAB_ID.sentForUpdates}
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <StatusRejected />}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
+            }
+          >
+            {intl.formatMessage(messages.sentForUpdates)} (
+            {filteredData.rejectTab.totalItems})
+          </IconTab>
+          {this.userHasValidateScope() && (
+            <IconTab
+              id={`tab_${TAB_ID.sentForApproval}`}
+              key={TAB_ID.sentForApproval}
+              active={tabId === TAB_ID.sentForApproval}
+              align={ICON_ALIGNMENT.LEFT}
+              icon={() => <StatusGray />}
+              onClick={() =>
+                this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
+              }
+            >
+              {intl.formatMessage(messages.sentForApprovals)} (
+              {filteredData.approvalTab.totalItems})
+            </IconTab>
+          )}
+          <IconTab
+            id={`tab_${TAB_ID.readyForPrint}`}
+            key={TAB_ID.readyForPrint}
+            active={tabId === TAB_ID.readyForPrint}
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <StatusGreen />}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(TAB_ID.readyForPrint)
+            }
+          >
+            {intl.formatMessage(messages.readyToPrint)} (
+            {filteredData.printTab.totalItems})
+          </IconTab>
+        </TopBar>
+        {tabId === TAB_ID.inProgress && (
+          <InProgressTab
+            drafts={drafts}
+            selectorId={selectorId}
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              inProgressData: filteredData.inProgressTab,
+              notificationData: filteredData.notificationTab
+            }}
+            page={progressCurrentPage}
+            onPageChange={this.onPageChange}
+            onDownloadApplication={this.downloadApplication}
+          />
+        )}
+        {tabId === TAB_ID.readyForReview && (
+          <ReviewTab
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              data: filteredData.reviewTab
+            }}
+            page={reviewCurrentPage}
+            onPageChange={this.onPageChange}
+            onDownloadApplication={this.downloadApplication}
+          />
+        )}
+        {tabId === TAB_ID.sentForUpdates && (
+          <RejectTab
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              data: filteredData.rejectTab
+            }}
+            page={updatesCurrentPage}
+            onPageChange={this.onPageChange}
+            onDownloadApplication={this.downloadApplication}
+          />
+        )}
+        {tabId === TAB_ID.sentForApproval && (
+          <ApprovalTab
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              data: filteredData.approvalTab
+            }}
+            page={approvalCurrentPage}
+            onPageChange={this.onPageChange}
+          />
+        )}
+        {tabId === TAB_ID.readyForPrint && (
+          <PrintTab
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              data: filteredData.printTab
+            }}
+            page={printCurrentPage}
+            onPageChange={this.onPageChange}
+            onDownloadApplication={this.downloadApplication}
+          />
+        )}
+      </>
+    )
+  }
+
+  render() {
+    const { intl } = this.props
     const {
       progressCurrentPage,
       reviewCurrentPage,
@@ -282,198 +480,18 @@ export class RegistrationHomeView extends React.Component<
       approvalCurrentPage,
       printCurrentPage
     } = this.state
-    const registrarLocationId = userDetails && getUserLocation(userDetails).id
-
-    const reviewStatuses = this.userHasRegisterScope()
-      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
-      : [EVENT_STATUS.DECLARED]
 
     return (
       <>
         <Header />
-        <Query
-          query={REGISTRATION_HOME_QUERY}
-          variables={{
-            locationIds: [registrarLocationId],
-            count: 10,
-            reviewStatuses: reviewStatuses,
-            inProgressSkip: (progressCurrentPage - 1) * 10,
-            reviewSkip: (reviewCurrentPage - 1) * 10,
-            rejectSkip: (updatesCurrentPage - 1) * 10,
-            approvalSkip: (approvalCurrentPage - 1) * 10,
-            printSkip: (printCurrentPage - 1) * 10
-          }}
-          pollInterval={window.config.UI_POLLING_INTERVAL}
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: boolean
-            error?: Error
-            data: IQueryData
-          }) => {
-            if (loading) {
-              return (
-                <StyledSpinner
-                  id="search-result-spinner"
-                  baseColor={theme.colors.background}
-                />
-              )
-            }
-            if (!data && error) {
-              return (
-                <ErrorText id="search-result-error-text-count">
-                  {intl.formatMessage(errorMessages.queryError)}
-                </ErrorText>
-              )
-            }
 
-            const filteredData = filterProcessingApplicationsFromQuery(
-              data,
-              storedApplications
-            )
-
-            return (
-              <>
-                <TopBar>
-                  <IconTab
-                    id={`tab_${TAB_ID.inProgress}`}
-                    key={TAB_ID.inProgress}
-                    active={tabId === TAB_ID.inProgress}
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <StatusProgress />}
-                    onClick={() =>
-                      this.props.goToRegistrarHomeTab(TAB_ID.inProgress)
-                    }
-                  >
-                    {intl.formatMessage(messages.inProgress)} (
-                    {drafts.filter(
-                      draft =>
-                        draft.submissionStatus ===
-                        SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-                    ).length +
-                      (filteredData.inProgressTab.totalItems || 0) +
-                      (filteredData.notificationTab.totalItems || 0)}
-                    )
-                  </IconTab>
-                  <IconTab
-                    id={`tab_${TAB_ID.readyForReview}`}
-                    key={TAB_ID.readyForReview}
-                    active={tabId === TAB_ID.readyForReview}
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <StatusOrange />}
-                    onClick={() =>
-                      this.props.goToRegistrarHomeTab(TAB_ID.readyForReview)
-                    }
-                  >
-                    {intl.formatMessage(messages.readyForReview)} (
-                    {filteredData.reviewTab.totalItems})
-                  </IconTab>
-                  <IconTab
-                    id={`tab_${TAB_ID.sentForUpdates}`}
-                    key={TAB_ID.sentForUpdates}
-                    active={tabId === TAB_ID.sentForUpdates}
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <StatusRejected />}
-                    onClick={() =>
-                      this.props.goToRegistrarHomeTab(TAB_ID.sentForUpdates)
-                    }
-                  >
-                    {intl.formatMessage(messages.sentForUpdates)} (
-                    {filteredData.rejectTab.totalItems})
-                  </IconTab>
-                  {this.userHasValidateScope() && (
-                    <IconTab
-                      id={`tab_${TAB_ID.sentForApproval}`}
-                      key={TAB_ID.sentForApproval}
-                      active={tabId === TAB_ID.sentForApproval}
-                      align={ICON_ALIGNMENT.LEFT}
-                      icon={() => <StatusGray />}
-                      onClick={() =>
-                        this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
-                      }
-                    >
-                      {intl.formatMessage(messages.sentForApprovals)} (
-                      {filteredData.approvalTab.totalItems})
-                    </IconTab>
-                  )}
-                  <IconTab
-                    id={`tab_${TAB_ID.readyForPrint}`}
-                    key={TAB_ID.readyForPrint}
-                    active={tabId === TAB_ID.readyForPrint}
-                    align={ICON_ALIGNMENT.LEFT}
-                    icon={() => <StatusGreen />}
-                    onClick={() =>
-                      this.props.goToRegistrarHomeTab(TAB_ID.readyForPrint)
-                    }
-                  >
-                    {intl.formatMessage(messages.readyToPrint)} (
-                    {filteredData.printTab.totalItems})
-                  </IconTab>
-                </TopBar>
-                {tabId === TAB_ID.inProgress && (
-                  <InProgressTab
-                    drafts={drafts}
-                    selectorId={selectorId}
-                    registrarLocationId={registrarLocationId}
-                    queryData={{
-                      inProgressData: filteredData.inProgressTab,
-                      notificationData: filteredData.notificationTab
-                    }}
-                    page={progressCurrentPage}
-                    onPageChange={this.onPageChange}
-                    onDownloadApplication={this.downloadApplication}
-                  />
-                )}
-                {tabId === TAB_ID.readyForReview && (
-                  <ReviewTab
-                    registrarLocationId={registrarLocationId}
-                    queryData={{
-                      data: filteredData.reviewTab
-                    }}
-                    page={reviewCurrentPage}
-                    onPageChange={this.onPageChange}
-                    onDownloadApplication={this.downloadApplication}
-                  />
-                )}
-                {tabId === TAB_ID.sentForUpdates && (
-                  <RejectTab
-                    registrarLocationId={registrarLocationId}
-                    queryData={{
-                      data: filteredData.rejectTab
-                    }}
-                    page={updatesCurrentPage}
-                    onPageChange={this.onPageChange}
-                    onDownloadApplication={this.downloadApplication}
-                  />
-                )}
-                {tabId === TAB_ID.sentForApproval && (
-                  <ApprovalTab
-                    registrarLocationId={registrarLocationId}
-                    queryData={{
-                      data: filteredData.approvalTab
-                    }}
-                    page={approvalCurrentPage}
-                    onPageChange={this.onPageChange}
-                  />
-                )}
-                {tabId === TAB_ID.readyForPrint && (
-                  <PrintTab
-                    registrarLocationId={registrarLocationId}
-                    queryData={{
-                      data: filteredData.printTab
-                    }}
-                    page={printCurrentPage}
-                    onPageChange={this.onPageChange}
-                    onDownloadApplication={this.downloadApplication}
-                  />
-                )}
-              </>
-            )
-          }}
-        </Query>
+        {this.getData(
+          progressCurrentPage,
+          reviewCurrentPage,
+          updatesCurrentPage,
+          approvalCurrentPage,
+          printCurrentPage
+        )}
 
         <FABContainer>
           <FloatingActionButton
@@ -505,12 +523,17 @@ function mapStateToProps(
   props: RouteComponentProps<{ tabId: string; selectorId?: string }>
 ) {
   const { match } = props
+  const userDetails = getUserDetails(state)
+  const registrarLocationId =
+    (userDetails && getUserLocation(userDetails).id) || ''
+  const scope = getScope(state)
 
   return {
     applications: state.applicationsState.applications,
+    workqueue: state.workqueueState.workqueue,
     language: state.i18n.language,
-    scope: getScope(state),
-    userDetails: getUserDetails(state),
+    scope,
+    registrarLocationId,
     tabId: (match && match.params && match.params.tabId) || 'review',
     selectorId: (match && match.params && match.params.selectorId) || '',
     storedApplications: state.applicationsState.applications,
@@ -528,11 +551,12 @@ function mapStateToProps(
 export const RegistrationHome = connect(
   mapStateToProps,
   {
-    goToEvents: goToEventsAction,
-    goToPage: goToPageAction,
-    goToRegistrarHomeTab: goToRegistrarHomeTabAction,
-    goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    downloadApplication
+    goToEvents,
+    goToPage,
+    goToRegistrarHomeTab,
+    goToReviewDuplicate,
+    goToPrintCertificate,
+    downloadApplication,
+    updateRegistrarWorkqueue
   }
 )(injectIntl(withTheme(withApollo(RegistrationHomeView))))
