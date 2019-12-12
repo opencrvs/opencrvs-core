@@ -20,13 +20,16 @@ import { Spinner } from '../interface'
 import { Warning } from '../icons'
 
 const Container = styled.div`
+  background: ${({ theme }) => theme.colors.white};
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
   margin-left: 1px;
+  padding-left: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0px;
+    padding-left: 0px;
   }
 `
 const ListItemSingleAction = styled(PrimaryButton)<{

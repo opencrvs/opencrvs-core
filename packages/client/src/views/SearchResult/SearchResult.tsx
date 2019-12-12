@@ -17,7 +17,8 @@ import {
   StatusGray,
   StatusGreen,
   StatusOrange,
-  StatusRejected
+  StatusRejected,
+  Download
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -84,6 +85,15 @@ import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/SearchResult/queries'
 import { Header } from '@client/components/interface/Header/Header'
+import {
+  IApplication,
+  DOWNLOAD_STATUS,
+  makeApplicationReadyToDownload,
+  downloadApplication
+} from '@client/applications'
+import { Event, Action } from '@client/forms'
+import ApolloClient from 'apollo-client'
+import { withApollo } from 'react-apollo'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -243,9 +253,12 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
+  outboxApplications: IApplication[]
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  downloadApplication: typeof downloadApplication
+  client: ApolloClient<{}>
 }
 
 interface IMatchParams {
@@ -333,6 +346,20 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       default:
         return this.props.intl.formatMessage(constantsMessages.birth)
     }
+  }
+
+  downloadApplication = (
+    event: string,
+    compositionId: string,
+    action: Action
+  ) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      event.toLowerCase() as Event,
+      compositionId,
+      action
+    )
+
+    this.props.downloadApplication(downloadableApplication, this.props.client)
   }
 
   transformDataToTaskHistory = (data: GQLQuery) => {
@@ -540,6 +567,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
+    const foundApplication = this.props.outboxApplications.find(
+      application => application.id === item.id
+    )
+    const downloadStatus =
+      (foundApplication && foundApplication.downloadStatus) || undefined
     const info = []
     const status = []
     const icons = []
@@ -629,47 +661,72 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       }
     }
 
-    if (this.userHasRegisterScope()) {
+    if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+      listItemActions.push({
+        label: '',
+        icon: () => <Download />,
+        handler: () => {
+          this.downloadApplication(
+            item.event as Event,
+            item.id,
+            Action.LOAD_REVIEW_APPLICATION
+          )
+        },
+        loading:
+          downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+        error:
+          downloadStatus === DOWNLOAD_STATUS.FAILED ||
+          downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
+        loadingLabel: this.props.intl.formatMessage(
+          constantsMessages.downloading
+        )
+      })
+    }
+
+    if (downloadStatus && downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+      if (this.userHasRegisterScope()) {
+        if (
+          !(item.duplicates && item.duplicates.length > 0) &&
+          !applicationIsRegistered &&
+          !applicationIsRejected &&
+          !applicationIsCertified
+        ) {
+          listItemActions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                item.id,
+                'review',
+                item.event.toLowerCase()
+              )
+          })
+        } else if (applicationIsRejected) {
+          listItemActions.push({
+            label: this.props.intl.formatMessage(constantsMessages.update),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                item.id,
+                'review',
+                item.event.toLowerCase()
+              )
+          })
+        }
+      }
+
       if (
-        !(item.duplicates && item.duplicates.length > 0) &&
+        item.duplicates &&
+        item.duplicates.length > 0 &&
         !applicationIsRegistered &&
-        !applicationIsRejected &&
-        !applicationIsCertified
+        !applicationIsRejected
       ) {
         listItemActions.push({
           label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              item.id,
-              'review',
-              item.event.toLowerCase()
-            )
-        })
-      } else if (applicationIsRejected) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(constantsMessages.update),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              item.id,
-              'review',
-              item.event.toLowerCase()
-            )
+          handler: () => this.props.goToReviewDuplicate(item.id)
         })
       }
-    }
-
-    if (
-      item.duplicates &&
-      item.duplicates.length > 0 &&
-      !applicationIsRegistered &&
-      !applicationIsRejected
-    ) {
-      listItemActions.push({
-        label: this.props.intl.formatMessage(constantsMessages.review),
-        handler: () => this.props.goToReviewDuplicate(item.id)
-      })
     }
     if (applicationIsRegistered) {
       expansionActions.push(
@@ -811,12 +868,14 @@ export const SearchResult = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    outboxApplications: state.applicationsState.applications
   }),
   {
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction
+    goToPrintCertificate: goToPrintCertificateAction,
+    downloadApplication
   }
-)(injectIntl(withTheme(SearchResultView)))
+)(injectIntl(withTheme(withApollo(SearchResultView))))
