@@ -9,44 +9,44 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
-  createTestComponent,
-  mockUserResponse,
-  resizeWindow
-} from '@client/tests/util'
-import { queries } from '@client/profile/queries'
-import { merge } from 'lodash'
-import { storage } from '@client/storage'
-import { createStore } from '@client/store'
-import {
-  RegistrationHome,
-  EVENT_STATUS
-} from '@client/views/RegistrationHome/RegistrationHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
-import {
-  FETCH_REGISTRATION_BY_COMPOSITION,
-  REGISTRATION_HOME_QUERY
-} from '@client/views/RegistrationHome/queries'
-import { checkAuth } from '@client/profile/profileActions'
-import moment from 'moment'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { ReactWrapper } from 'enzyme'
-import { Store } from 'redux'
-import {
-  makeApplicationReadyToDownload,
   DOWNLOAD_STATUS,
-  modifyApplication,
+  makeApplicationReadyToDownload,
   storeApplication
 } from '@client/applications'
 import { Action, Event } from '@client/forms'
-import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
+import { checkAuth } from '@client/profile/profileActions'
+import { queries } from '@client/profile/queries'
+import { storage } from '@client/storage'
+import { createStore } from '@client/store'
+import {
+  createTestComponent,
+  createTestComponentWithApolloClient,
+  mockUserResponse,
+  resizeWindow
+} from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { createClient } from '@client/utils/apolloClient'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/RegistrationHome/queries'
+import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
+import { GridTable } from '@opencrvs/components/lib/interface'
+import { ReactWrapper } from 'enzyme'
+import { merge } from 'lodash'
+import moment from 'moment'
+import * as React from 'react'
+import { Store } from 'redux'
+import { RejectTab } from './rejectTab'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
+} from '@opencrvs/gateway/src/graphql/schema'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 const getItem = window.localStorage.getItem as jest.Mock
 
 const mockFetchUserDetails = jest.fn()
+const mockListSyncController = jest.fn()
 
 const nameObj = {
   data: {
@@ -149,169 +149,85 @@ storage.setItem = jest.fn()
 
 describe('RegistrationHome sent for update tab related tests', () => {
   const { store, history } = createStore()
+  const client = createClient(store)
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
-  it('check sent for update applications count', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 5, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    const tab = await waitForElement(testComponent.component, '#tab_updates')
-
-    expect(tab.hostNodes().text()).toContain('Sent for updates (5)')
-  })
-
   it('renders all items returned from graphql query in sent for update tab', async () => {
     const TIME_STAMP = '1544188309380'
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'REJECTED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'REJECTED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    contactNumber: '01622688231',
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'REJECTED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'REJECTED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: '01622688231',
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
+        }}
+      />,
+      store
     )
 
     const table = await waitForElement(testComponent.component, GridTable)
@@ -331,53 +247,19 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 2, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: []
+          }
         }}
       />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
+      store
     )
 
     const table = await waitForElement(testComponent.component, GridTable)
@@ -387,45 +269,20 @@ describe('RegistrationHome sent for update tab related tests', () => {
   })
 
   it('should show pagination bar in sent for update tab if items more than 11', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: { totalItems: 14, results: [] },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
-
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
-      store,
-      graphqlMock
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+      />,
+      store
     )
 
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
-    )
     await waitForElement(testComponent.component, '#pagination')
 
     testComponent.component
@@ -438,97 +295,6 @@ describe('RegistrationHome sent for update tab related tests', () => {
   it('renders expanded area for required updates', async () => {
     Date.now = jest.fn(() => 1554055200000)
     const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'REJECTED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'REJECTED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    contactNumber: '01622688231',
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: '2007-01-01',
-                    modifiedAt: '2007-01-01'
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      },
       {
         request: {
           query: FETCH_REGISTRATION_BY_COMPOSITION,
@@ -611,14 +377,74 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome match={{ params: { tabId: 'updates' } }} />,
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'REJECTED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'REJECTED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: '01622688231',
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: '2007-01-01',
+                  modifiedAt: '2007-01-01'
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
+        }}
+      />,
       store,
       graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
     )
 
     // wait for mocked data to load mockedProvider
@@ -646,225 +472,205 @@ describe('RegistrationHome sent for update tab related tests', () => {
     beforeEach(async () => {
       const TIME_STAMP = '1544188309380'
       Date.now = jest.fn(() => 1554055200000)
-      const graphqlMock = [
-        {
-          request: {
-            query: REGISTRATION_HOME_QUERY,
-            variables: {
-              locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-              count: 10,
-              reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-              inProgressSkip: 0,
-              reviewSkip: 0,
-              rejectSkip: 0,
-              approvalSkip: 0,
-              printSkip: 0
-            }
-          },
-          result: {
-            data: {
-              inProgressTab: { totalItems: 0, results: [] },
-              notificationTab: { totalItems: 0, results: [] },
-              reviewTab: { totalItems: 0, results: [] },
-              rejectTab: {
-                totalItems: 2,
-                results: [
-                  {
-                    id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                    type: 'Birth',
-                    registration: {
-                      status: 'REJECTED',
-                      contactNumber: '01622688231',
-                      trackingId: 'BW0UTHR',
-                      registrationNumber: null,
-                      eventLocationId: null,
-                      registeredLocationId:
-                        '308c35b4-04f8-4664-83f5-9790e790cde1',
-                      duplicates: null,
-                      createdAt: '2018-05-23T14:44:58+02:00',
-                      modifiedAt: '2018-05-23T14:44:58+02:00'
+
+      mockListSyncController
+        .mockReturnValueOnce({
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: {
+              totalItems: 2,
+              results: [
+                {
+                  id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                  type: 'Birth',
+                  registration: {
+                    status: 'REJECTED',
+                    contactNumber: '01622688231',
+                    trackingId: 'BW0UTHR',
+                    registrationNumber: null,
+                    eventLocationId: null,
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    duplicates: null,
+                    createdAt: '2018-05-23T14:44:58+02:00',
+                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                  },
+                  dateOfBirth: '2010-10-10',
+                  childName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
                     },
-                    dateOfBirth: '2010-10-10',
-                    childName: [
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ],
+                  dateOfDeath: null,
+                  deceasedName: null
+                },
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                  type: 'Death',
+                  registration: {
+                    status: 'REJECTED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    eventLocationId: null,
+                    contactNumber: '01622688231',
+                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP
+                  },
+                  dateOfBirth: null,
+                  childName: null,
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan',
+                      use: 'en'
+                    },
+                    {
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান',
+                      use: 'bn'
+                    }
+                  ]
+                }
+              ]
+            },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] }
+          }
+        })
+        .mockReturnValueOnce({
+          data: {
+            fetchBirthRegistration: {
+              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+              _fhirIDMap: {
+                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
+                observation: {
+                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
+                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
+                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
+                  presentAtBirthRegistration:
+                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
+                }
+              },
+              child: null,
+              informant: null,
+              primaryCaregiver: null,
+              mother: {
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'ময়না'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Moyna'
+                  }
+                ],
+                birthDate: '2001-01-01',
+                maritalStatus: 'MARRIED',
+                occupation: 'Mother Occupation',
+                dateOfMarriage: '2001-01-01',
+                educationalAttainment: 'PRIMARY_ISCED_1',
+                nationality: ['BGD'],
+                identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
+                multipleBirth: 1,
+                address: [
+                  {
+                    type: 'PERMANENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    city: '',
+                    postalCode: '',
+                    country: 'BGD'
+                  },
+                  {
+                    type: 'CURRENT',
+                    line: ['12', '', 'union1', 'upazila10'],
+                    district: 'district2',
+                    state: 'state2',
+                    city: '',
+                    postalCode: '',
+                    country: 'BGD'
+                  }
+                ],
+                telecom: [
+                  {
+                    system: 'phone',
+                    value: '01711111111'
+                  }
+                ],
+                id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
+              },
+              father: null,
+              registration: {
+                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
+                contact: 'MOTHER',
+                contactRelationship: 'Contact Relation',
+                contactPhoneNumber: '01733333333',
+                attachments: null,
+                status: [
+                  {
+                    comments: [
                       {
-                        firstNames: 'Iliyas',
-                        familyName: 'Khan',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: 'ইলিয়াস',
-                        familyName: 'খান',
-                        use: 'bn'
+                        comment: 'This is a note'
                       }
                     ],
-                    dateOfDeath: null,
-                    deceasedName: null
+                    type: 'REJECTED',
+                    timestamp: null
                   },
                   {
-                    id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                    type: 'Death',
-                    registration: {
-                      status: 'REJECTED',
-                      trackingId: 'DW0UTHR',
-                      registrationNumber: null,
-                      eventLocationId: null,
-                      contactNumber: '01622688231',
-                      duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                      registeredLocationId:
-                        '308c35b4-04f8-4664-83f5-9790e790cde1',
-                      createdAt: TIME_STAMP,
-                      modifiedAt: TIME_STAMP
-                    },
-                    dateOfBirth: null,
-                    childName: null,
-                    dateOfDeath: '2007-01-01',
-                    deceasedName: [
+                    comments: [
                       {
-                        firstNames: 'Iliyas',
-                        familyName: 'Khan',
-                        use: 'en'
-                      },
-                      {
-                        firstNames: 'ইলিয়াস',
-                        familyName: 'খান',
-                        use: 'bn'
+                        comment: 'This is a note'
                       }
-                    ]
+                    ],
+                    type: 'DECLARED',
+                    timestamp: null
                   }
-                ]
+                ],
+                trackingId: 'B123456',
+                registrationNumber: null,
+                type: 'BIRTH'
               },
-              approvalTab: { totalItems: 0, results: [] },
-              printTab: { totalItems: 0, results: [] }
+              attendantAtBirth: 'NURSE',
+              weightAtBirth: 2,
+              birthType: 'SINGLE',
+              eventLocation: {
+                address: {
+                  country: 'BGD',
+                  state: 'state4',
+                  city: '',
+                  district: 'district2',
+                  postalCode: '',
+                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
+                  postCode: '1020'
+                },
+                type: 'PRIVATE_HOME',
+                partOf: 'Location/upazila10'
+              },
+              presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
-        },
-        {
-          request: {
-            query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
-            variables: { id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269' }
-          },
-          result: {
-            data: {
-              fetchBirthRegistration: {
-                id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                _fhirIDMap: {
-                  composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                  encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
-                  observation: {
-                    birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
-                    weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
-                    attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                    presentAtBirthRegistration:
-                      'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
-                  }
-                },
-                child: null,
-                informant: null,
-                primaryCaregiver: null,
-                mother: {
-                  name: [
-                    {
-                      use: 'bn',
-                      firstNames: '',
-                      familyName: 'ময়না'
-                    },
-                    {
-                      use: 'en',
-                      firstNames: '',
-                      familyName: 'Moyna'
-                    }
-                  ],
-                  birthDate: '2001-01-01',
-                  maritalStatus: 'MARRIED',
-                  occupation: 'Mother Occupation',
-                  dateOfMarriage: '2001-01-01',
-                  educationalAttainment: 'PRIMARY_ISCED_1',
-                  nationality: ['BGD'],
-                  identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                  multipleBirth: 1,
-                  address: [
-                    {
-                      type: 'PERMANENT',
-                      line: ['12', '', 'union1', 'upazila10'],
-                      district: 'district2',
-                      state: 'state2',
-                      city: '',
-                      postalCode: '',
-                      country: 'BGD'
-                    },
-                    {
-                      type: 'CURRENT',
-                      line: ['12', '', 'union1', 'upazila10'],
-                      district: 'district2',
-                      state: 'state2',
-                      city: '',
-                      postalCode: '',
-                      country: 'BGD'
-                    }
-                  ],
-                  telecom: [
-                    {
-                      system: 'phone',
-                      value: '01711111111'
-                    }
-                  ],
-                  id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
-                },
-                father: null,
-                registration: {
-                  id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
-                  contact: 'MOTHER',
-                  contactRelationship: 'Contact Relation',
-                  contactPhoneNumber: '01733333333',
-                  attachments: null,
-                  status: [
-                    {
-                      comments: [
-                        {
-                          comment: 'This is a note'
-                        }
-                      ],
-                      type: 'REJECTED',
-                      timestamp: null
-                    },
-                    {
-                      comments: [
-                        {
-                          comment: 'This is a note'
-                        }
-                      ],
-                      type: 'DECLARED',
-                      timestamp: null
-                    }
-                  ],
-                  trackingId: 'B123456',
-                  registrationNumber: null,
-                  type: 'BIRTH'
-                },
-                attendantAtBirth: 'NURSE',
-                weightAtBirth: 2,
-                birthType: 'SINGLE',
-                eventLocation: {
-                  address: {
-                    country: 'BGD',
-                    state: 'state4',
-                    city: '',
-                    district: 'district2',
-                    postalCode: '',
-                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                    postCode: '1020'
-                  },
-                  type: 'PRIVATE_HOME',
-                  partOf: 'Location/upazila10'
-                },
-                presentAtBirthRegistration: 'MOTHER_ONLY'
-              }
-            }
-          }
-        }
-      ]
+        })
+      client.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(
+      createdTestComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
         <RegistrationHome
           match={{
@@ -877,7 +683,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
           }}
         />,
         store,
-        graphqlMock
+        client
       )
       testComponent = createdTestComponent.component
       getItem.mockReturnValue(registerScopeToken)
@@ -959,119 +765,76 @@ describe('Tablet tests', () => {
   it('redirects to detail page if item is clicked', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: REGISTRATION_HOME_QUERY,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            count: 10,
-            reviewStatuses: [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED],
-            inProgressSkip: 0,
-            reviewSkip: 0,
-            rejectSkip: 0,
-            approvalSkip: 0,
-            printSkip: 0
-          }
-        },
-        result: {
-          data: {
-            inProgressTab: { totalItems: 0, results: [] },
-            notificationTab: { totalItems: 0, results: [] },
-            reviewTab: { totalItems: 0, results: [] },
-            rejectTab: {
-              totalItems: 2,
-              results: [
-                {
-                  id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                  type: 'Birth',
-                  registration: {
-                    status: 'REJECTED',
-                    contactNumber: '01622688231',
-                    trackingId: 'BW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
-                  },
-                  dateOfBirth: '2010-10-10',
-                  childName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ],
-                  dateOfDeath: null,
-                  deceasedName: null
-                },
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
-                  registration: {
-                    status: 'REJECTED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    eventLocationId: null,
-                    contactNumber: '01622688231',
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId:
-                      '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    createdAt: TIME_STAMP,
-                    modifiedAt: TIME_STAMP
-                  },
-                  dateOfBirth: null,
-                  childName: null,
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan',
-                      use: 'en'
-                    },
-                    {
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান',
-                      use: 'bn'
-                    }
-                  ]
-                }
-              ]
-            },
-            approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RegistrationHome
-        match={{
-          params: {
-            tabId: 'updates'
-          },
-          isExact: true,
-          path: '',
-          url: ''
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 2,
+            results: [
+              {
+                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
+                type: 'Birth',
+                registration: {
+                  status: 'REJECTED',
+                  contactNumber: '01622688231',
+                  trackingId: 'BW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  duplicates: [null],
+                  createdAt: '2018-05-23T14:44:58+02:00',
+                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                },
+                dateOfBirth: '2010-10-10',
+                childName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLBirthEventSearchSet,
+              {
+                id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+                type: 'Death',
+                registration: {
+                  status: 'REJECTED',
+                  trackingId: 'DW0UTHR',
+                  registrationNumber: undefined,
+                  eventLocationId: undefined,
+                  contactNumber: '01622688231',
+                  duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+                  registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP
+                },
+                dateOfDeath: '2007-01-01',
+                deceasedName: [
+                  {
+                    firstNames: 'Iliyas',
+                    familyName: 'Khan',
+                    use: 'en'
+                  },
+                  {
+                    firstNames: 'ইলিয়াস',
+                    familyName: 'খান',
+                    use: 'bn'
+                  }
+                ]
+              } as GQLDeathEventSearchSet
+            ]
+          }
         }}
       />,
-      store,
-      graphqlMock
-    )
-
-    getItem.mockReturnValue(registerScopeToken)
-    await testComponent.store.dispatch(
-      checkAuth({ '?token': registerScopeToken })
+      store
     )
 
     const element = await waitForElement(testComponent.component, '#row_0')

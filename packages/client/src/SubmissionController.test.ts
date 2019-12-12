@@ -147,7 +147,7 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(subCon.client.mutate).toHaveBeenCalledTimes(2)
-    expect(store.dispatch).toHaveBeenCalledTimes(8)
+    expect(store.dispatch).toHaveBeenCalledTimes(10)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
@@ -186,7 +186,7 @@ describe('Submission Controller', () => {
     await subCon.sync()
 
     expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(4)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.APPROVED)

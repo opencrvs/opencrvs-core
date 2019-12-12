@@ -29,6 +29,7 @@ interface IConstantsMessages {
   applicationWaitingForValidationOn: MessageDescriptor
   birth: MessageDescriptor
   by: MessageDescriptor
+  certificationPaymentTitle: MessageDescriptor
   certified: MessageDescriptor
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
@@ -184,6 +185,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)',
     id: 'constants.by'
+  },
+  certificationPaymentTitle: {
+    defaultMessage:
+      'Payment collected for {event, select, birth{birth} death{death} other{birth}} certificates',
+    description: 'Label for certification payment performance reports',
+    id: 'constants.certificationPaymentTitle'
   },
   certified: {
     defaultMessage: 'certified',
