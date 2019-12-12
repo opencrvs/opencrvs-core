@@ -204,7 +204,7 @@ export async function updateInHearth(payload: any, id?: string) {
   return typeof text === 'string' ? text : JSON.parse(text)
 }
 
-export function selectObservationBundle(
+export function selectObservationEntry(
   observationCode: string,
   bundleEntries?: fhir.BundleEntry[]
 ): fhir.BundleEntry | undefined {

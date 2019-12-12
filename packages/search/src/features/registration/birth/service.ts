@@ -34,7 +34,7 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  selectObservationBundle
+  selectObservationEntry
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 
@@ -287,7 +287,7 @@ function createPrimaryCaregiverIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const observationEntry = selectObservationBundle(
+  const observationEntry = selectObservationEntry(
     PRIMARY_CAREGIVER_TYPE_CODE,
     bundleEntries
   )
