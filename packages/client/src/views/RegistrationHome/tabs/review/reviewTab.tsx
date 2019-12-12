@@ -36,7 +36,10 @@ import { withTheme } from 'styled-components'
 import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
-import { constantsMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Event, Action } from '@client/forms'
@@ -105,6 +108,7 @@ class ReviewTabComponent extends React.Component<
   }
 
   transformDeclaredContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -186,9 +190,15 @@ class ReviewTabComponent extends React.Component<
           })
         }
       }
-
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
       return {
         ...reg,
+        event,
         eventTimeElapsed:
           (reg.dateOfEvent &&
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||

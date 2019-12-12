@@ -28,7 +28,10 @@ import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
-import { constantsMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication } from '@client/applications'
 
@@ -141,6 +144,7 @@ class ApprovalTabComponent extends React.Component<
   }
 
   transformValidatedContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -150,8 +154,15 @@ class ApprovalTabComponent extends React.Component<
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
       return {
         ...reg,
+        event,
         eventTimeElapsed:
           (reg.dateOfEvent &&
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
