@@ -24,6 +24,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
+import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 
 interface IInProgressProps {
   theme: ITheme
@@ -60,50 +61,8 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     }
 
     return this.props.draftApplications.map((draft: IApplication) => {
-      let name, englishFullName, localeFullName
       const { intl } = this.props
       const { locale } = intl
-      if (draft.event && draft.event.toString() === 'birth') {
-        englishFullName =
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyNameEng &&
-            (!draft.data.child.firstNamesEng
-              ? ''
-              : draft.data.child.firstNamesEng + ' ') +
-              draft.data.child.familyNameEng) ||
-          ''
-        localeFullName =
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyName &&
-            (!draft.data.child.firstNames
-              ? ''
-              : draft.data.child.firstNames + ' ') +
-              draft.data.child.familyName) ||
-          ''
-        name = locale === LANG_EN ? englishFullName : localeFullName
-      } else if (draft.event && draft.event.toString() === 'death') {
-        englishFullName =
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyNameEng &&
-            (!draft.data.deceased.firstNamesEng
-              ? ''
-              : draft.data.deceased.firstNamesEng + ' ') +
-              draft.data.deceased.familyNameEng) ||
-          ''
-        localeFullName =
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyName &&
-            (!draft.data.deceased.firstNames
-              ? ''
-              : draft.data.deceased.firstNames + ' ') +
-              draft.data.deceased.familyName) ||
-          ''
-        name = locale === LANG_EN ? englishFullName : localeFullName
-      }
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       moment.locale(locale)
       const event =
@@ -112,6 +71,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
             dynamicConstantsMessages[draft.event.toLowerCase()]
           )) ||
         ''
+      const name = getDraftApplicantFullName(draft, locale)
       return {
         id: draft.id,
         event: event,
