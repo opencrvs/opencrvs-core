@@ -57,6 +57,7 @@ const BackButton = styled.button`
   background: transparent;
   border: none;
   cursor: pointer;
+  color: ${({ theme }) => theme.colors.white};
 `
 type IProps = {
   previewImage: IFileValue | IAttachmentValue
