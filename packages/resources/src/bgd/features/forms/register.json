@@ -7497,7 +7497,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType === \"MOTHER_AND_FATHER\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && (draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType === \"MOTHER_AND_FATHER\"))"
                     }
                   ],
                   "mapping": {
