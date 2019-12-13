@@ -320,6 +320,25 @@ export const mockBirthFhirBundle = {
       }
     },
     {
+      fullUrl: 'urn:uuid:e74ed25d-8c9c-49aa-9abc-d2a659078bp9',
+      resource: {
+        resourceType: 'Patient',
+        active: true,
+        name: [
+          {
+            use: 'bn',
+            given: ['রাসেল'],
+            family: ['ইসলাম']
+          },
+          {
+            use: 'en',
+            given: ['Rasel'],
+            family: ['Islam']
+          }
+        ]
+      }
+    },
+    {
       fullUrl: 'urn:uuid:63e5ea6d-6dc7-4df7-b908-328872e770e3',
       resource: {
         resourceType: 'Patient',
@@ -518,9 +537,9 @@ export const mockBirthFhirBundle = {
             }
           ]
         },
-        valueString: 'FATHER',
+        valueString: 'OTHER',
         subject: {
-          reference: 'urn:uuid:63e5ea6d-6dc7-4df7-b908-328872e770e3'
+          reference: 'urn:uuid:e74ed25d-8c9c-49aa-9abc-d2a659078bp9'
         }
       }
     },
