@@ -58,6 +58,7 @@ type Query {
     trackingId: String
     registrationNumber: String
     contactNumber: String
+    name: String
     count: Int
     skip: Int
     sort: String

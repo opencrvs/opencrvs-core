@@ -11,3 +11,4 @@
  */
 export * from '@client/views/Performance/reports/GenderBasisReports'
 export * from '@client/views/Performance/reports/TimeFrameReports'
+export * from '@client/views/Performance/reports/CertificationPaymentReports'

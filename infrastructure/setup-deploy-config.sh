@@ -25,5 +25,14 @@ sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/performance-config.js
 # Set hostname in compose file
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.deploy.yml
 
+# Set netdata user details in compose file
+USER_DETAILS=$(echo $2 | base64 -d | sed -e s/\\$/\\$\\$/g)
+sed -i "s#{{netdata_user}}#$USER_DETAILS#g" /tmp/compose/docker-compose.deploy.yml
+
+# Setup API key for netdata streaming
+NETDATA_API_KEY=`uuidgen`
+sed -i "s/{{NETDATA_API_KEY}}/$NETDATA_API_KEY/g" /tmp/compose/infrastructure/netdata-master-stream.conf
+sed -i "s/{{NETDATA_API_KEY}}/$NETDATA_API_KEY/g" /tmp/compose/infrastructure/netdata-slave-stream.conf
+
 echo "DONE - `date --iso-8601=ns`"
 echo

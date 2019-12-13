@@ -66,7 +66,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: 'DW0UTHR',
               registrationNumber: '',
-              contactNumber: ''
+              contactNumber: '',
+              name: ''
             }
           },
           result: {
@@ -248,7 +249,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: 'DW0UTHR',
               registrationNumber: '',
-              contactNumber: ''
+              contactNumber: '',
+              name: ''
             }
           },
           result: {
@@ -364,7 +366,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: 'DW0UTHR',
               registrationNumber: '',
-              contactNumber: ''
+              contactNumber: '',
+              name: ''
             }
           },
           result: {
@@ -545,7 +548,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: '',
               registrationNumber: '0FRTRSC111HHH',
-              contactNumber: ''
+              contactNumber: '',
+              name: ''
             }
           },
           result: {
@@ -714,7 +718,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: '',
               registrationNumber: '',
-              contactNumber: '017111111111'
+              contactNumber: '017111111111',
+              name: ''
             }
           },
           result: {
@@ -888,7 +893,8 @@ describe('SearchResult expansion related tests', () => {
               sort: 'DESC',
               trackingId: '',
               registrationNumber: '',
-              contactNumber: '017111111111'
+              contactNumber: '017111111111',
+              name: ''
             }
           },
           result: {
