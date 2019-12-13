@@ -302,7 +302,7 @@
                   "label": {
                     "defaultMessage": "Main Contact",
                     "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirths"
+                    "id": "form.field.label.application.mainContact"
                   },
                   "required": false,
                   "initialValue": "",
