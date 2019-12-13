@@ -320,15 +320,15 @@ function createPrimaryCaregiverIndex(
     primaryCaregiverName &&
     primaryCaregiverName.given &&
     primaryCaregiverName.given.join(' ')
-  body.informantFamilyName =
+  body.primaryCaregiverFamilyName =
     primaryCaregiverName &&
     primaryCaregiverName.family &&
     primaryCaregiverName.family[0]
-  body.informantFirstNamesLocal =
+  body.primaryCaregiverFirstNamesLocal =
     primaryCaregiverNameLocal &&
     primaryCaregiverNameLocal.given &&
     primaryCaregiverNameLocal.given.join(' ')
-  body.informantFamilyNameLocal =
+  body.primaryCaregiverFamilyNameLocal =
     primaryCaregiverNameLocal &&
     primaryCaregiverNameLocal.family &&
     primaryCaregiverNameLocal.family[0]
