@@ -55,6 +55,7 @@ export enum Events {
   DEATH_MARK_VOID = '/events/death/mark-voided',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation',
   DEATH_NEW_VALIDATE = '/events/death/new-validation',
+  EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   UNKNOWN = 'unknown'
 }
 
@@ -152,6 +153,10 @@ function detectEvent(request: Hapi.Request): Events {
     } else if (eventType === EVENT_TYPE.DEATH) {
       return Events.DEATH_MARK_VOID
     }
+  }
+
+  if (request.method === 'put' && request.path.includes('/fhir/Composition')) {
+    return Events.EVENT_NOT_DUPLICATE
   }
 
   return Events.UNKNOWN
@@ -277,6 +282,10 @@ export async function fhirWorkflowEventHandler(
     case Events.DEATH_MARK_VOID:
       response = await updateTaskHandler(request, h, event)
       await forwardToOpenHim(Events.DEATH_MARK_VOID, request)
+      break
+    case Events.EVENT_NOT_DUPLICATE:
+      response = await forwardToHearth(request, h)
+      await forwardToOpenHim(Events.EVENT_NOT_DUPLICATE, request)
       break
     default:
       // forward as-is to hearth

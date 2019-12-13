@@ -45,6 +45,12 @@ function getEventToScopeMap() {
       USER_SCOPE.VALIDATE,
       USER_SCOPE.REGISTER,
       USER_SCOPE.CERTIFY
+    ],
+    [Events.EVENT_NOT_DUPLICATE]: [
+      USER_SCOPE.DECLARE,
+      USER_SCOPE.VALIDATE,
+      USER_SCOPE.REGISTER,
+      USER_SCOPE.CERTIFY
     ]
   }
 }
