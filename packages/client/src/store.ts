@@ -28,7 +28,12 @@ import {
 import { profileReducer, ProfileState } from '@client/profile/profileReducer'
 import { offlineDataReducer, IOfflineDataState } from '@client/offline/reducer'
 import { intlReducer, IntlState } from '@client/i18n/reducer'
-import { applicationsReducer, IApplicationsState } from '@client/applications'
+import {
+  applicationsReducer,
+  IApplicationsState,
+  WorkqueueState,
+  registrarWorkqueueReducer
+} from '@client/applications'
 import {
   reviewReducer,
   IReviewFormState
@@ -68,6 +73,7 @@ export interface IStoreState {
   reject: IRejectState
   offline: IOfflineDataState
   userForm: IUserFormState
+  workqueueState: WorkqueueState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -88,7 +94,8 @@ export const createStore = (): { store: AppStore; history: History } => {
     reject: rejectReducer,
     printCertificateForm: printReducer,
     offline: offlineDataReducer,
-    userForm: userFormReducer
+    userForm: userFormReducer,
+    workqueueState: registrarWorkqueueReducer
   })
   const enhancer = compose(
     install(),
