@@ -158,8 +158,15 @@ export function goToPerformanceHome() {
   )
 }
 
-export function goToPerformanceReport(reportType: string, title: string) {
-  return push(PERFORMANCE_REPORT, { reportType, title })
+export function goToPerformanceReport(
+  reportType: string,
+  timeStart: Date,
+  timeEnd: Date
+) {
+  return push(PERFORMANCE_REPORT, {
+    reportType,
+    timeRange: { start: timeStart, end: timeEnd }
+  })
 }
 
 export function goToSearchResult(
