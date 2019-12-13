@@ -16,7 +16,8 @@ import {
   IApplication,
   modifyApplication,
   writeApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  updateRegistrarWorkqueue
 } from '@client/applications'
 import { Action } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
@@ -213,6 +214,7 @@ export class SubmissionController {
         application.trackingId = trackingId
       }
     }
+    this.store.dispatch(updateRegistrarWorkqueue())
     this.store.dispatch(modifyApplication(application))
     this.store.dispatch(writeApplication(application))
   }

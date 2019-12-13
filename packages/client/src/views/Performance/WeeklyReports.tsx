@@ -39,18 +39,19 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
     const endDayOfYear = moment([2019, 11]).endOf('month')
 
     while (startDayOfYear < endDayOfYear) {
-      const title = `${startDayOfYear.format(
-        'DD MMMM'
-      )} ${this.props.intl.formatMessage(
+      const start = startDayOfYear.clone()
+      const end = startDayOfYear.clone().add(7, 'days')
+      const title = `${start.format('DD MMMM')} ${this.props.intl.formatMessage(
         constantsMessages.to
-      )} ${startDayOfYear.add(7, 'days').format('DD MMMM YYYY')}`
+      )} ${end.format('DD MMMM YYYY')}`
       content.push({
         week: (
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
                 PERFORMANCE_REPORT_TYPE_WEEKY,
-                title
+                start.toDate(),
+                end.toDate()
               )
             }
           >
@@ -63,6 +64,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           </>
         )
       })
+      startDayOfYear.add(7, 'days')
     }
     return content
   }
@@ -78,6 +80,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.birth)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),
@@ -100,6 +103,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),

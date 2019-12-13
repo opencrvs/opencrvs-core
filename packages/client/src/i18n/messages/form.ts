@@ -1064,7 +1064,7 @@ const messagesToDefine: IFormMessages = {
     id: 'user.form.securityquestion.enterResponse'
   },
   familyName: {
-    defaultMessage: 'Family name',
+    defaultMessage: 'Last name',
     description: 'Label for family name text input',
     id: 'form.field.label.print.otherPersonFamilyName'
   },

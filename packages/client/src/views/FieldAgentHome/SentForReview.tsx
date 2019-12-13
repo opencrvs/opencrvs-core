@@ -236,15 +236,15 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           key: 'name'
         },
         {
-          label: this.props.intl.formatMessage(messages.submissionStatus),
-          width: 35,
+          label: this.props.intl.formatMessage(messages.trackingId),
+          width: 25,
           key: 'submissionStatus',
           color: getTheme(getDefaultLanguage()).colors.secondaryLabel
         },
         {
-          label: '',
-          width: 5,
-          alignment: ColumnContentAlignment.CENTER,
+          label: this.props.intl.formatMessage(messages.submissionStatus),
+          width: 15,
+          alignment: ColumnContentAlignment.RIGHT,
           key: 'statusIndicator'
         }
       ]

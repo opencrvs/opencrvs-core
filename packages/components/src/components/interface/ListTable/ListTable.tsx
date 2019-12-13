@@ -15,11 +15,16 @@ import { grid } from '../../grid'
 import { Pagination } from '../DataTable/Pagination'
 import { IColumn, IDynamicValues } from '../GridTable/types'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{
+  hideBoxShadow?: boolean
+}>`
   width: 100%;
-  padding: 25px;
   background: ${({ theme }) => theme.colors.white};
-  box-shadow: rgba(53, 67, 93, 0.32) 0px 2px 6px;
+  ${({ hideBoxShadow, theme }) =>
+    hideBoxShadow
+      ? `padding: 24px 0;`
+      : `padding: 24px;
+    ${theme.shadows.mistyShadow};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -140,6 +145,7 @@ const defaultConfiguration = {
 }
 
 interface IListTableProps {
+  id?: string
   content: IDynamicValues[]
   columns: IColumn[]
   noResultText: string
@@ -150,6 +156,7 @@ interface IListTableProps {
   currentPage?: number
   isLoading?: boolean
   tableTitle?: string
+  hideBoxShadow?: boolean
 }
 
 interface IListTableState {
@@ -215,6 +222,7 @@ export class ListTable extends React.Component<
 
   render() {
     const {
+      id,
       columns,
       content,
       noResultText,
@@ -222,14 +230,15 @@ export class ListTable extends React.Component<
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
       tableTitle,
-      tableHeight = 280
+      tableHeight,
+      hideBoxShadow
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
 
     return (
       <>
-        <Wrapper>
+        <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
           {!isLoading && tableTitle && <H3>{tableTitle}</H3>}
           {isLoading && (
             <>
