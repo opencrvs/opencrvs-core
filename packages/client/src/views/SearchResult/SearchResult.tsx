@@ -17,8 +17,7 @@ import {
   StatusGray,
   StatusGreen,
   StatusOrange,
-  StatusRejected,
-  Download
+  StatusRejected
 } from '@opencrvs/components/lib/icons'
 import {
   ISearchInputProps,
@@ -85,15 +84,9 @@ import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/SearchResult/queries'
 import { Header } from '@client/components/interface/Header/Header'
-import {
-  IApplication,
-  DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  downloadApplication
-} from '@client/applications'
-import { Event, Action } from '@client/forms'
-import ApolloClient from 'apollo-client'
-import { withApollo } from 'react-apollo'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -257,8 +250,6 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  downloadApplication: typeof downloadApplication
-  client: ApolloClient<{}>
 }
 
 interface IMatchParams {
@@ -346,20 +337,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       default:
         return this.props.intl.formatMessage(constantsMessages.birth)
     }
-  }
-
-  downloadApplication = (
-    event: string,
-    compositionId: string,
-    action: Action
-  ) => {
-    const downloadableApplication = makeApplicationReadyToDownload(
-      event.toLowerCase() as Event,
-      compositionId,
-      action
-    )
-
-    this.props.downloadApplication(downloadableApplication, this.props.client)
   }
 
   transformDataToTaskHistory = (data: GQLQuery) => {
@@ -663,23 +640,15 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
     if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
       listItemActions.push({
-        label: '',
-        icon: () => <Download />,
-        handler: () => {
-          this.downloadApplication(
-            item.event as Event,
-            item.id,
-            Action.LOAD_REVIEW_APPLICATION
-          )
-        },
-        loading:
-          downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-        error:
-          downloadStatus === DOWNLOAD_STATUS.FAILED ||
-          downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-        loadingLabel: this.props.intl.formatMessage(
-          constantsMessages.downloading
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: item.event,
+              compositionId: item.id,
+              action: Action.LOAD_REVIEW_APPLICATION
+            }}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
         )
       })
     }
@@ -875,7 +844,6 @@ export const SearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    downloadApplication
+    goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(withApollo(SearchResultView))))
+)(injectIntl(withTheme(SearchResultView)))

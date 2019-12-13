@@ -971,13 +971,13 @@ describe('Registrar tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-    const downloadButton = testComponent.component.find('#action-download')
+    const downloadButton = testComponent.component.find('#reviewDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
     testComponent.component.update()
     expect(
-      testComponent.component.find('#action-loading').hostNodes()
+      testComponent.component.find('#action-loading-reviewDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
@@ -991,7 +991,7 @@ describe('Registrar tests', () => {
     ).toHaveLength(1)
   })
 
-  it('Shows error icon if dowload fails', async () => {
+  it('Shows error icon if download fails', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <Details
@@ -1023,13 +1023,13 @@ describe('Registrar tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-    const downloadButton = testComponent.component.find('#action-download')
+    const downloadButton = testComponent.component.find('#reviewDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
     testComponent.component.update()
     expect(
-      testComponent.component.find('#action-loading').hostNodes()
+      testComponent.component.find('#action-loading-reviewDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider
@@ -1039,7 +1039,7 @@ describe('Registrar tests', () => {
     testComponent.component.update()
 
     expect(
-      testComponent.component.find('#download-error').hostNodes()
+      testComponent.component.find('#action-error-reviewDownload').hostNodes()
     ).toHaveLength(1)
   })
 
@@ -1457,13 +1457,13 @@ describe('Registrar tests', () => {
     })
 
     testComponent.component.update()
-    const downloadButton = testComponent.component.find('#action-download')
+    const downloadButton = testComponent.component.find('#printDownload-icon')
     expect(downloadButton.hostNodes()).toHaveLength(1)
     downloadButton.hostNodes().simulate('click')
 
     testComponent.component.update()
     expect(
-      testComponent.component.find('#action-loading').hostNodes()
+      testComponent.component.find('#action-loading-printDownload').hostNodes()
     ).toHaveLength(1)
 
     // wait for mocked data to load mockedProvider

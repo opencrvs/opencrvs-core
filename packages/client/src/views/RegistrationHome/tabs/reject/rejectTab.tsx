@@ -36,8 +36,8 @@ import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -52,11 +52,6 @@ interface IBaseRejectTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
-  onDownloadApplication: (
-    event: Event,
-    compositionId: string,
-    action: Action
-  ) => void
 }
 
 interface IRejectTabState {
@@ -163,23 +158,15 @@ class RejectTabComponent extends React.Component<
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
-          label: '',
-          icon: () => <Download />,
-          handler: () => {
-            this.props.onDownloadApplication(
-              (reg.event as unknown) as Event,
-              reg.id,
-              Action.LOAD_REVIEW_APPLICATION
-            )
-          },
-          loading:
-            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-          error:
-            downloadStatus === DOWNLOAD_STATUS.FAILED ||
-            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-          loadingLabel: this.props.intl.formatMessage(
-            constantsMessages.downloading
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
           )
         })
       } else {

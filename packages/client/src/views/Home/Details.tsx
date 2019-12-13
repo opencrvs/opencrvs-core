@@ -15,9 +15,7 @@ import { RouteComponentProps } from 'react-router'
 import {
   IApplication,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS,
-  makeApplicationReadyToDownload,
-  downloadApplication
+  DOWNLOAD_STATUS
 } from '@client/applications'
 import {
   goToPage as goToPageAction,
@@ -33,9 +31,7 @@ import {
   StatusGreen,
   StatusCollected,
   StatusRejected,
-  StatusFailed,
-  Download,
-  Warning
+  StatusFailed
 } from '@opencrvs/components/lib/icons'
 import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -53,7 +49,7 @@ import {
   GQLRegStatus,
   GQLComment
 } from '@opencrvs/gateway/src/graphql/schema.d'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Event, Action } from '@opencrvs/client/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -79,8 +75,7 @@ import {
   VALIDATED
 } from '@client/utils/constants'
 import { Scope } from '@client/utils/authUtils'
-import { withApollo } from 'react-apollo'
-import ApolloClient from 'apollo-client'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px 10px 10px;
@@ -117,14 +112,8 @@ const StatusContainer = styled.div`
 const ActionButton = styled(PrimaryButton)`
   margin: 6px 50px 30px;
 `
-const DownloadStatusIndicator = styled.div`
-  margin: 6px 50px 30px 40px;
-  display: flex;
-  align-items: center;
-
-  & > :first-child {
-    margin-right: 8px;
-  }
+const DownloadActionButton = styled(DownloadButton)`
+  margin: 6px 40px 30px;
 `
 const QuerySpinner = styled(Spinner)`
   width: 70px;
@@ -157,9 +146,7 @@ interface IDetailProps {
   goToPage: typeof goToPageAction
   goBack: typeof goBackAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  downloadApplication: typeof downloadApplication
   scope: Scope | null
-  client: ApolloClient<{}>
 }
 
 interface IStatus {
@@ -392,19 +379,6 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     }
   }
 
-  downloadApplication = (
-    event: string,
-    compositionId: string,
-    action: string
-  ) => {
-    const downloadableApplication = makeApplicationReadyToDownload(
-      event.toLowerCase() as Event,
-      compositionId,
-      action
-    )
-    this.props.downloadApplication(downloadableApplication, this.props.client)
-  }
-
   getActionForStateAndScope = (
     event: string | undefined,
     id: string | undefined,
@@ -425,30 +399,16 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       this.userHasRegisterOrValidateScope()
     ) {
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        return downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ? (
-          <DownloadStatusIndicator>
-            <span>{this.props.intl.formatMessage(messages.downloading)}</span>
-            <Spinner id="action-loading" size={24} />
-          </DownloadStatusIndicator>
-        ) : (
-          <DownloadStatusIndicator>
-            {(downloadStatus === DOWNLOAD_STATUS.FAILED ||
-              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK) && (
-              <Warning id="download-error" />
-            )}
-            <TertiaryButton
-              id="action-download"
-              icon={() => <Download />}
-              onClick={() => {
-                this.downloadApplication(
-                  event as string,
-                  id as string,
-                  Action.LOAD_CERTIFICATE_APPLICATION
-                )
-              }}
-            />
-          </DownloadStatusIndicator>
+        return (
+          <DownloadActionButton
+            id="printDownload"
+            downloadConfigs={{
+              event: event as string,
+              compositionId: id as string,
+              action: Action.LOAD_CERTIFICATE_APPLICATION
+            }}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
         )
       }
       return (
@@ -472,30 +432,16 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       this.userHasRegisterOrValidateScope()
     ) {
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        return downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-          downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ? (
-          <DownloadStatusIndicator>
-            <span>{this.props.intl.formatMessage(messages.downloading)}</span>
-            <Spinner id="action-loading" size={24} />
-          </DownloadStatusIndicator>
-        ) : (
-          <DownloadStatusIndicator>
-            {(downloadStatus === DOWNLOAD_STATUS.FAILED ||
-              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK) && (
-              <Warning id="download-error" />
-            )}
-            <TertiaryButton
-              id="action-download"
-              icon={() => <Download />}
-              onClick={() => {
-                this.downloadApplication(
-                  event as string,
-                  id as string,
-                  Action.LOAD_REVIEW_APPLICATION
-                )
-              }}
-            />
-          </DownloadStatusIndicator>
+        return (
+          <DownloadActionButton
+            id="reviewDownload"
+            downloadConfigs={{
+              event: event as string,
+              compositionId: id as string,
+              action: Action.LOAD_REVIEW_APPLICATION
+            }}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
         )
       }
 
@@ -769,7 +715,6 @@ export const Details = connect(
   {
     goToPage: goToPageAction,
     goBack: goBackAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    downloadApplication
+    goToPrintCertificate: goToPrintCertificateAction
   }
-)(injectIntl(withTheme(withApollo(DetailView))))
+)(injectIntl(withTheme(DetailView)))

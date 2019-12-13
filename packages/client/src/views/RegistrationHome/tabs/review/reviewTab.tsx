@@ -39,7 +39,8 @@ import ReactTooltip from 'react-tooltip'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -57,11 +58,6 @@ interface IBaseReviewTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
-  onDownloadApplication: (
-    event: Event,
-    compositionId: string,
-    action: Action
-  ) => void
 }
 
 interface IReviewTabState {
@@ -121,23 +117,15 @@ class ReviewTabComponent extends React.Component<
       if (reg.duplicates && reg.duplicates.length > 0) {
         if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
           actions.push({
-            label: '',
-            icon: () => <Download />,
-            handler: () => {
-              this.props.onDownloadApplication(
-                reg.event as Event,
-                reg.id,
-                Action.LOAD_REVIEW_APPLICATION
-              )
-            },
-            loading:
-              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-            error:
-              downloadStatus === DOWNLOAD_STATUS.FAILED ||
-              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-            loadingLabel: this.props.intl.formatMessage(
-              constantsMessages.downloading
+            actionComponent: (
+              <DownloadButton
+                downloadConfigs={{
+                  event: reg.event,
+                  compositionId: reg.id,
+                  action: Action.LOAD_REVIEW_APPLICATION
+                }}
+                status={downloadStatus as DOWNLOAD_STATUS}
+              />
             )
           })
         } else {
@@ -154,23 +142,15 @@ class ReviewTabComponent extends React.Component<
         }
         if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
           actions.push({
-            label: '',
-            icon: () => <Download />,
-            handler: () => {
-              this.props.onDownloadApplication(
-                reg.event as Event,
-                reg.id,
-                Action.LOAD_REVIEW_APPLICATION
-              )
-            },
-            loading:
-              downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-              downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-            error:
-              downloadStatus === DOWNLOAD_STATUS.FAILED ||
-              downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-            loadingLabel: this.props.intl.formatMessage(
-              constantsMessages.downloading
+            actionComponent: (
+              <DownloadButton
+                downloadConfigs={{
+                  event: reg.event,
+                  compositionId: reg.id,
+                  action: Action.LOAD_REVIEW_APPLICATION
+                }}
+                status={downloadStatus as DOWNLOAD_STATUS}
+              />
             )
           })
         } else {
