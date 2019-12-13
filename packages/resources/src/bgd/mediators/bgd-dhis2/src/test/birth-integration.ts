@@ -42,33 +42,33 @@ export const body = {
   },
   permanent_address: {
     division: {
-      id: '30', // These ids must match BBS codes
-      name: 'Dhaka'
+      id: '30', // These ids must match BBS codes in future
+      name: ''
     },
     district: {
-      id: '33', // These ids must match BBS codes
-      name: '?'
+      id: '33', // These ids must match BBS codes in future
+      name: ''
     },
     upazila: {
-      id: '34', // These ids must match BBS codes
-      name: '?'
+      id: '34', // These ids must match BBS codes in future
+      name: ''
     },
     union: {
       // Required!
-      id: '94', // These ids must match BBS codes
-      name: '?'
+      id: '94', // These ids must match BBS codes in future
+      name: ''
     }
   },
   phone_number: '+88071111111', // Required!
   date_birth: '1565097042000', // Required!
   place_of_birth: {
-    id: '1', // These ids must match Central HRIS MoHFW APU Facility List ids for institution
-    name: 'Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar'
+    id: '24480', // These ids must match Central HRIS MoHFW APU Facility List ids for institution
+    name: 'Dr. Nuruzzaman Khokon CC - Narsingdi Sadar'
   },
   union_birth_ocurred: {
     // Required!
-    id: '30333494', // These ids must match BBS codes
-    name: 'Alokbali'
+    id: '', // These ids must match BBS codes in future
+    name: ''
   }
 }
 

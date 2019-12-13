@@ -139,7 +139,15 @@ const createFhirLocationFromHRISJson = (
         value: String(location.id)
       },
       { system: `${ORG_URL}/specs/id/hris-uuid`, value: location.uuid },
-      { system: `${ORG_URL}/specs/id/hris-code`, value: location.code }
+      { system: `${ORG_URL}/specs/id/hris-code`, value: location.code },
+      {
+        system: `${ORG_URL}/specs/id/hris-union-name`,
+        value: location.union_name
+      },
+      {
+        system: `${ORG_URL}/specs/id/hris-paurasava-name`,
+        value: location.paurasava_name
+      }
     ],
     name: location.name, // English name
     alias: [location.name_BN ? location.name_BN : location.name], // Bangla name in element 0

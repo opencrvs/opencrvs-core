@@ -10,8 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import fetch from 'node-fetch'
-import { FHIR_URL } from '@bgd-dhis2-mediator/constants'
+import { FHIR_URL, ORG_URL } from '@bgd-dhis2-mediator/constants'
 import { IIncomingAddress } from '@bgd-dhis2-mediator/features/fhir/service'
+import {
+  pilotUnions,
+  pilotMunicipalities,
+  Ia2ILocationRefences
+} from '@bgd-dhis2-mediator/features/utils'
 
 interface IIdentifier {
   system: string
@@ -279,6 +284,22 @@ export async function fetchFacilityByHRISId(
   )
 }
 
+export async function fetchLocationByA2IReference(
+  a2iRef: string,
+  authHeader: string
+) {
+  return await fetchLocationByIdentifiers(
+    [
+      {
+        system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+        value: a2iRef
+      }
+    ],
+    'type=ADMIN_STRUCTURE',
+    authHeader
+  )
+}
+
 export async function fetchUnionByFullBBSCode(
   bbsCode: string,
   authHeader: string
@@ -342,4 +363,53 @@ export async function postBundle(bundle: fhir.Bundle, authHeader: string) {
   }
 
   return res.json()
+}
+
+export async function getLastRegLocationFromFacility(
+  eventLocation: fhir.Location,
+  hardcodedLocation: string,
+  authCode: string
+): Promise<fhir.Location | undefined> {
+  let lastRegLocation
+  const facilityUnion =
+    eventLocation.identifier &&
+    eventLocation.identifier.find(
+      identifier => identifier.system === `${ORG_URL}/specs/id/hris-union-name`
+    )
+
+  const facilityMunicipality =
+    eventLocation.identifier &&
+    eventLocation.identifier.find(
+      identifier =>
+        identifier.system === `${ORG_URL}/specs/id/hris-paurasava-name`
+    )
+  let matched: Ia2ILocationRefences | undefined
+  if (facilityUnion && facilityUnion.value) {
+    matched = pilotUnions.find(
+      location => location.name === facilityUnion.value
+    ) as Ia2ILocationRefences
+  } else if (facilityMunicipality && facilityMunicipality.value) {
+    matched = pilotMunicipalities.find(
+      location => location.name === facilityMunicipality.value
+    ) as Ia2ILocationRefences
+  } else {
+    matched = undefined
+  }
+  if (!matched && hardcodedLocation) {
+    // Upazila name will be used to attempt to match union or municipality
+    // The Upazila name field is the only field that is consistently available in the DHIS2 form
+    // for births and deaths in unions and municipalities permanent address
+    const allPilotAreas = pilotUnions.concat(pilotMunicipalities)
+    matched = allPilotAreas.find(
+      location => location.name === hardcodedLocation
+    ) as Ia2ILocationRefences
+  }
+
+  if (matched) {
+    lastRegLocation = await fetchLocationByA2IReference(
+      matched.a2iRef,
+      authCode
+    )
+  }
+  return lastRegLocation
 }

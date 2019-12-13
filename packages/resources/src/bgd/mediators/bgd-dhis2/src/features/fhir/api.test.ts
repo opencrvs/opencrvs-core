@@ -14,8 +14,16 @@ import {
   fetchLocationByIdentifiers,
   fetchHierarchicalBangladeshLocations,
   fetchAllAddressLocations,
+  getLastRegLocationFromFacility,
   postBundle
 } from '@bgd-dhis2-mediator/features/fhir/api'
+import {
+  mockUnion,
+  mockMunicipality,
+  mockUnionFacility,
+  mockMunicipalityFacility,
+  mockUnknownUnionFacility
+} from '@bgd-dhis2-mediator/test/locations'
 
 let fetch: fetchMock.FetchMock
 
@@ -187,6 +195,49 @@ describe('FHIR API module tests', () => {
       await expect(postBundle(bundle, 'bearer xyz')).rejects.toThrowError(
         'Error status code received in response, Unauthorized 401'
       )
+    })
+  })
+
+  describe('.getLastRegLocationFromFacility()', () => {
+    it('Retreives a union from a facility with a recognised union', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnionFacility.entry[0].resource,
+        '',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(mockUnion.entry[0].resource)
+    })
+    it('Retreives a municipality from a facility with a recognised municipality', async () => {
+      fetch.mockResponses([JSON.stringify(mockMunicipality), { status: 200 }])
+
+      const municipalityLocation = await getLastRegLocationFromFacility(
+        mockMunicipalityFacility.entry[0].resource,
+        '',
+        'bearer xyz'
+      )
+      expect(municipalityLocation).toEqual(mockMunicipality.entry[0].resource)
+    })
+    it('Retreives a union from a facility with a hardcoded union', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnknownUnionFacility.entry[0].resource,
+        'Mahishasura',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(mockUnion.entry[0].resource)
+    })
+    it('Returns undefined if union or municipality cannot be found, or hardcoded string is invalid', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnknownUnionFacility.entry[0].resource,
+        'sagaerg',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(undefined)
     })
   })
 })
