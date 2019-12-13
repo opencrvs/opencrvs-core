@@ -49,6 +49,7 @@ export const ALLOWED_IMAGE_TYPE = ['image/jpeg', 'image/jpg', 'image/png']
 export const TRACKING_ID_TEXT = 'tracking-id'
 export const BRN_DRN_TEXT = 'brn-drn'
 export const PHONE_TEXT = 'phone'
+export const NAME_TEXT = 'name'
 export const SEARCH_RESULT_SORT = 'DESC'
 export const FIELD_AGENT_ROLES = ['FIELD_AGENT']
 export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
