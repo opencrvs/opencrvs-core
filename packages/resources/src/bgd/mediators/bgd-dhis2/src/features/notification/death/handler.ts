@@ -119,7 +119,11 @@ export async function deathNotificationHandler(
     request.headers.authorization
   )
   if (!placeOfDeathFacilityLocation) {
-    throw new Error('Could not find facility by HRIS ID')
+    throw new Error(
+      `CANNOT FIND FACILITY LOCATION FOR DEATH NOTIFICATION: ${JSON.stringify(
+        notification
+      )}`
+    )
   }
 
   const encounter = createDeathEncounterEntry(
@@ -159,7 +163,7 @@ export async function deathNotificationHandler(
 
   if (!lastRegLocation) {
     throw new Error(
-      `CANNOT FIND LOCATION FOR DEATH NOTIFICATION: ${JSON.stringify(
+      `CANNOT FIND UNION OR MUNICIPALITY LOCATION FOR DEATH NOTIFICATION: ${JSON.stringify(
         notification
       )}`
     )

@@ -27,7 +27,7 @@ export async function fetchLocationByIdentifiers(
   identifiers: IIdentifier[],
   querySuffix: string,
   authHeader: string
-): Promise<fhir.Location> {
+): Promise<fhir.Location | undefined> {
   const identifierQueryStrings = identifiers.map(
     identifier => `identifier=${identifier.system}|${identifier.value}`
   )
@@ -44,19 +44,13 @@ export async function fetchLocationByIdentifiers(
   )
 
   if (!res.ok) {
-    throw new Error(
-      `Error status code received in response, ${res.statusText} ${res.status}`
-    )
+    return undefined
   }
 
   const bundle: fhir.Bundle = await res.json()
 
   if (!bundle.entry || !bundle.entry[0] || !bundle.entry[0].resource) {
-    throw new Error(
-      `Location not found, identifiers: ${JSON.stringify(
-        identifiers
-      )}, query suffix: ${querySuffix}`
-    )
+    return undefined
   }
 
   return bundle.entry[0].resource as fhir.Location
@@ -292,7 +286,7 @@ export async function fetchLocationByA2IReference(
     [
       {
         system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-        value: a2iRef
+        value: encodeURIComponent(a2iRef)
       }
     ],
     'type=ADMIN_STRUCTURE',

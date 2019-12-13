@@ -121,7 +121,11 @@ export async function birthNotificationHandler(
     request.headers.authorization
   )
   if (!placeOfBirthFacilityLocation) {
-    throw new Error('Could not find facility by HRIS ID')
+    throw new Error(
+      `CANNOT FIND LOCATION FOR BIRTH NOTIFICATION: ${JSON.stringify(
+        notification
+      )}`
+    )
   }
 
   const encounter = createBirthEncounterEntry(
