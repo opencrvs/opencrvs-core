@@ -18,7 +18,7 @@ import * as flatten from 'flat'
 
 export default {
   method: 'GET',
-  path: '/registrations/export',
+  path: '/registrations/birth/export',
   handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
     const query = request.query as {
       fromDate: string
@@ -212,7 +212,6 @@ export default {
     })
   },
   config: {
-    auth: false, // TODO
     tags: ['api'],
     validate: {
       query: Joi.object({

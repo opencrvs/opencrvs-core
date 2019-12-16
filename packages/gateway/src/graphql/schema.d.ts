@@ -14,6 +14,7 @@ export interface GQLQuery {
   listNotifications?: Array<GQLNotification | null>
   fetchBirthRegistration?: GQLBirthRegistration
   searchBirthRegistrations?: Array<GQLBirthRegistration | null>
+  searchDeathRegistrations?: Array<GQLDeathRegistration | null>
   queryRegistrationByIdentifier?: GQLBirthRegistration
   queryPersonByIdentifier?: GQLPerson
   listBirthRegistrations?: GQLBirthRegResultSet
@@ -511,11 +512,6 @@ export enum GQLParentDetailsType {
   NONE = 'NONE'
 }
 
-export interface GQLBirthRegResultSet {
-  results?: Array<GQLBirthRegistration | null>
-  totalItems?: number
-}
-
 export interface GQLDeathRegistration extends GQLEventRegistration {
   id: string
   _fhirIDMap?: GQLMap
@@ -544,6 +540,11 @@ export enum GQLMannerOfDeath {
 export enum GQLCauseOfDeathMethodType {
   VERBAL_AUTOPSY = 'VERBAL_AUTOPSY',
   MEDICALLY_CERTIFIED = 'MEDICALLY_CERTIFIED'
+}
+
+export interface GQLBirthRegResultSet {
+  results?: Array<GQLBirthRegistration | null>
+  totalItems?: number
 }
 
 export interface GQLSearchUserResult {
@@ -948,8 +949,8 @@ export interface GQLResolver {
   Map?: GraphQLScalarType
   PrimaryCaregiver?: GQLPrimaryCaregiverTypeResolver
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
-  BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
+  BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
   BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
   BirthRegistrationGenderBasisMetrics?: GQLBirthRegistrationGenderBasisMetricsTypeResolver
@@ -972,6 +973,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   searchBirthRegistrations?: QueryToSearchBirthRegistrationsResolver<TParent>
+  searchDeathRegistrations?: QueryToSearchDeathRegistrationsResolver<TParent>
   queryRegistrationByIdentifier?: QueryToQueryRegistrationByIdentifierResolver<
     TParent
   >
@@ -1039,6 +1041,22 @@ export interface QueryToSearchBirthRegistrationsResolver<
   (
     parent: TParent,
     args: QueryToSearchBirthRegistrationsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSearchDeathRegistrationsArgs {
+  fromDate?: GQLDate
+  toDate?: GQLDate
+}
+export interface QueryToSearchDeathRegistrationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToSearchDeathRegistrationsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2309,25 +2327,6 @@ export interface ReasonsNotApplyingToIsDeceasedResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthRegResultSetTypeResolver<TParent = any> {
-  results?: BirthRegResultSetToResultsResolver<TParent>
-  totalItems?: BirthRegResultSetToTotalItemsResolver<TParent>
-}
-
-export interface BirthRegResultSetToResultsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface BirthRegResultSetToTotalItemsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   id?: DeathRegistrationToIdResolver<TParent>
   _fhirIDMap?: DeathRegistrationTo_fhirIDMapResolver<TParent>
@@ -2434,6 +2433,25 @@ export interface DeathRegistrationToCreatedAtResolver<
 }
 
 export interface DeathRegistrationToUpdatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLBirthRegResultSetTypeResolver<TParent = any> {
+  results?: BirthRegResultSetToResultsResolver<TParent>
+  totalItems?: BirthRegResultSetToTotalItemsResolver<TParent>
+}
+
+export interface BirthRegResultSetToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface BirthRegResultSetToTotalItemsResolver<
   TParent = any,
   TResult = any
 > {
