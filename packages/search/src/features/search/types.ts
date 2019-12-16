@@ -18,6 +18,7 @@ export interface ISearchQuery {
   trackingId?: string
   contactNumber?: string
   registrationNumber?: string
+  name?: string
   event?: string
   type?: string[]
   status?: string[]

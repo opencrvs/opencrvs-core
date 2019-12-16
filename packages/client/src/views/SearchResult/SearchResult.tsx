@@ -73,7 +73,8 @@ import {
   TRACKING_ID_TEXT,
   BRN_DRN_TEXT,
   PHONE_TEXT,
-  SEARCH_RESULT_SORT
+  SEARCH_RESULT_SORT,
+  NAME_TEXT
 } from '@client/utils/constants'
 import {
   createNamesMap,
@@ -734,7 +735,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:
                     searchType === BRN_DRN_TEXT ? searchText : '',
-                  contactNumber: searchType === PHONE_TEXT ? searchText : ''
+                  contactNumber: searchType === PHONE_TEXT ? searchText : '',
+                  name: searchType === NAME_TEXT ? searchText : ''
                 }}
               >
                 {({

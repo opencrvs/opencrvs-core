@@ -169,6 +169,11 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
+export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
+export const refreshOfflineData = () => ({
+  type: REFRESH_OFFLINE_DATA
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -185,3 +190,4 @@ export type Action =
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
+  | ReturnType<typeof refreshOfflineData>

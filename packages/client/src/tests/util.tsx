@@ -9,33 +9,33 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as jwt from 'jsonwebtoken'
-import * as React from 'react'
-import { Provider } from 'react-redux'
-import { graphql, print } from 'graphql'
-import ApolloClient from 'apollo-client'
-import { MockedProvider } from 'react-apollo/test-utils'
-import { ApolloLink, Observable } from 'apollo-link'
-import { IStoreState, createStore, AppStore } from '@client/store'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { mount, configure, shallow, ReactWrapper } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
 import { App } from '@client/App'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { ThemeProvider } from '@client/styledComponents'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getDefaultLanguage } from '@client/i18n/utils'
-import { waitForElement } from './wait-for-element'
-import { readFileSync } from 'fs'
-
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
-import { ISerializedForm, Event } from '@client/forms'
-import { Store, AnyAction } from 'redux'
+import { Event, ISerializedForm } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
-import { IntlShape } from 'react-intl'
+import { getDefaultLanguage } from '@client/i18n/utils'
+import { offlineDataReady, setOfflineData } from '@client/offline/actions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { ThemeProvider } from '@client/styledComponents'
+import { getSchema } from '@client/tests/graphql-schema-mock'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import { InMemoryCache } from 'apollo-cache-inmemory'
+import ApolloClient from 'apollo-client'
+import { ApolloLink, Observable } from 'apollo-link'
+import { configure, mount, ReactWrapper, shallow } from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+import { readFileSync } from 'fs'
+import { graphql, print } from 'graphql'
+import * as jwt from 'jsonwebtoken'
+import * as React from 'react'
+import { ApolloProvider } from 'react-apollo'
+import { MockedProvider } from 'react-apollo/test-utils'
+import { IntlShape } from 'react-intl'
+import { Provider } from 'react-redux'
+import { AnyAction, Store } from 'redux'
+import { waitForElement } from './wait-for-element'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -2734,6 +2734,44 @@ export async function createTestComponent(
         </I18nContainer>
       </Provider>
     </MockedProvider>
+  )
+
+  return { component: component.update(), store }
+}
+
+export async function createTestComponentWithApolloClient(
+  node: React.ReactElement<ITestView>,
+  store: AppStore,
+  client: ApolloClient<{}>
+) {
+  /*
+   * Would it work to replace this fn with createTestApp()
+   * call send return only the component that requires testing..
+   *
+   * Feels odd the whole boilerplate has to be recreated
+   */
+
+  await store.dispatch(
+    offlineDataReady({
+      languages: mockOfflineData.languages,
+      forms: mockOfflineData.forms,
+      templates: mockOfflineData.templates,
+      locations: mockOfflineData.locations,
+      facilities: mockOfflineData.facilities,
+      assets: mockOfflineData.assets
+    })
+  )
+
+  const component = mount(
+    <ApolloProvider client={client}>
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+            {node}
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    </ApolloProvider>
   )
 
   return { component: component.update(), store }

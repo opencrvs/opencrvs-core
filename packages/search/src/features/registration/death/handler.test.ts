@@ -20,6 +20,7 @@ import { createServer } from '@search/index'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
+  mockMinimalDeathFhirBundle,
   mockDeathRejectionTaskBundle,
   mockDeathRejectionTaskBundleWithoutCompositionReference,
   mockSearchResponse,
@@ -91,6 +92,25 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/death/new-declaration',
         payload: mockDeathFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('should return status code 200 if the some sections is missing too', async () => {
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/new-declaration',
+        payload: mockMinimalDeathFhirBundle,
         headers: {
           Authorization: `Bearer ${token}`
         }

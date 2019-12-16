@@ -17,6 +17,7 @@ window.config = {
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'https://login.{{hostname}}',
+  AUTH_URL: 'https://auth.{{hostname}}',
   API_GATEWAY_URL: 'https://gateway.{{hostname}}/',
   PERFORMANCE_URL: 'https://performance.{{hostname}}',
   RESOURCES_URL: 'https://resources.{{hostname}}/bgd',

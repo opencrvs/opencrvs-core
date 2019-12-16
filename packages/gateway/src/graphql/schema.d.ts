@@ -1224,6 +1224,7 @@ export interface QueryToSearchEventsArgs {
   trackingId?: string
   registrationNumber?: string
   contactNumber?: string
+  name?: string
   count?: number
   skip?: number
   sort?: string

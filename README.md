@@ -62,7 +62,7 @@ Plan International is challenging the current gap in the market for a user-centr
 <p align="center">
 <img width="539" height="349" src="https://static.wixstatic.com/media/93440e_2f6fb54e63e7488d9b40f32cea7ca10c~mv2.png/v1/crop/x_0,y_36,w_960,h_622/fill/w_539,h_349,al_c,q_80,usm_0.66_1.00_0.01/Civil%20Registration%20and%20Linkages%20to%20Natio.webp">
 </p>
- 
+
 OpenCRVS has the potential to go well beyond the scope of traditional CRVS systems. We see OpenCRVS as a foundational identity and population data system which will support and maintain the integrity of many other service delivery, statistical and identity management functions. In particular, OpenCRVS will ensure that these functions are above all inclusive, providing a digital response to the global call to “Leave No One Behind”.
 
 We believe in the open source principle and its potential to achieve universal civil registration and advance children’s rights, and equality for girls.
@@ -315,6 +315,14 @@ Sometimes it's nice to have the option to restart all running build processes (w
 You can use **ctrl + b** and arrow keys to navigate between tmux windows.
 
 This will require installation of [tmux](https://github.com/tmux/tmux/wiki) which is `brew install tmux` on OSX and [tmuxinator](https://github.com/tmuxinator/tmuxinator) which is usually `gem install tmuxinator`.
+
+### Local PWA development setup
+
+To expose all services with an external domain and HTTPS:
+
+1. Go to `ngrok.conf` and add an auth token.
+2. Run `ngrok start -config infrastructure/ngrok.conf --all`
+3. Open `https://ocrvs-client.ngrok.io` on your device
 
 ## Docker scripts
 

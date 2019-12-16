@@ -32,6 +32,65 @@ services:
     networks:
       - overlay_net
 
+  netdata-master:
+    image: netdata/netdata:v1.19.0
+    hostname: 'master-{{.Node.Hostname}}'
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: netdata-master-stream.{{ts}}
+        target: /etc/netdata/stream.conf
+    environment:
+      - PGID=999
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: monitor.{{hostname}}'
+        - 'traefik.frontend.auth.basic={{netdata_user}}'
+        - 'traefik.port=19999'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+    networks:
+      - overlay_net
+
+  netdata-slave:
+    image: netdata/netdata:v1.19.0
+    hostname: 'slave-{{.Node.Hostname}}'
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: netdata-slave.{{ts}}
+        target: /etc/netdata/netdata.conf
+      - source: netdata-slave-stream.{{ts}}
+        target: /etc/netdata/stream.conf
+    environment:
+      - PGID=999
+    deploy:
+      mode: global
+    networks:
+      - overlay_net
+
   # Configure mongo nodes as a replica set
   mongo1:
     command: --replSet rs0
@@ -385,6 +444,12 @@ configs:
     file: ./infrastructure/performance-config.js
   login-config.{{ts}}:
     file: ./infrastructure/login-config.js
+  netdata-master-stream.{{ts}}:
+    file: ./infrastructure/netdata-master-stream.conf
+  netdata-slave.{{ts}}:
+    file: ./infrastructure/netdata-slave.conf
+  netdata-slave-stream.{{ts}}:
+    file: ./infrastructure/netdata-slave-stream.conf
 
 networks:
   overlay_net:
