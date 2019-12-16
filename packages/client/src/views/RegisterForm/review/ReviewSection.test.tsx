@@ -114,6 +114,11 @@ describe('when user is in the review page', () => {
     await waitForElement(reviewSectionComponent, '#document_section_child')
   })
 
+  it('shows zero document error if no document is uploaded', async () => {
+    window.dispatchEvent(new Event('scroll'))
+    await waitForElement(reviewSectionComponent, '#zero_document_child')
+  })
+
   describe('when user clicks on change link', () => {
     beforeEach(() => {
       reviewSectionComponent

@@ -1048,7 +1048,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   this.state.activeSection || this.docSections[0].id
                 )}
               >
-                <ZeroDocument>
+                <ZeroDocument id={`zero_document_${sectionName}`}>
                   {intl.formatMessage(messages.zeroDocumentsText, {
                     section: sectionName
                   })}
