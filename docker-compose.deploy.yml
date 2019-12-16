@@ -7,7 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: "3.3"
+version: '3.3'
 
 services:
   # Configure reverse proxy for public endpoints
@@ -16,8 +16,8 @@ services:
   traefik:
     image: traefik:1.7.16
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /data/traefik/acme.json:/acme.json
@@ -36,7 +36,7 @@ services:
   mongo1:
     command: --replSet rs0
     volumes:
-      - "/data/mongo:/data/db"
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
     command: --replSet rs0
     volumes:
-      - "/data/mongo:/data/db"
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
     command: --replSet rs0
     volumes:
-      - "/data/mongo:/data/db"
+      - '/data/mongo:/data/db'
     deploy:
       replicas: 1
       placement:
@@ -94,10 +94,10 @@ services:
   # Configure elasticsearch
   elasticsearch:
     volumes:
-      - "/data/elasticsearch:/usr/share/elasticsearch/data"
-      - "/backups/elasticsearch:/backups/elasticsearch"
-      - "/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml"
-      - "/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - '/data/elasticsearch:/usr/share/elasticsearch/data'
+      - '/backups/elasticsearch:/backups/elasticsearch'
+      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
@@ -109,8 +109,8 @@ services:
   # Configure influxdb
   influxdb:
     volumes:
-      - "/data/influxdb:/var/lib/influxdb"
-      - "/backups/influxdb:/backups/influxdb"
+      - '/data/influxdb:/var/lib/influxdb'
+      - '/backups/influxdb:/backups/influxdb'
     deploy:
       replicas: 1
       placement:
@@ -126,12 +126,12 @@ services:
         target: /usr/share/nginx/html/config.js
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}"
-        - "traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)"
-        - "traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}"
-        - "traefik.port=80"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}'
+        - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
+        - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
@@ -142,10 +142,10 @@ services:
         target: /usr/share/nginx/html/config.js
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: performance.{{hostname}}"
-        - "traefik.port=80"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: performance.{{hostname}}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
@@ -153,10 +153,10 @@ services:
   styleguide:
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: styleguide.{{hostname}}"
-        - "traefik.port=6060"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: styleguide.{{hostname}}'
+        - 'traefik.port=6060'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 1
     networks:
       - overlay_net
@@ -167,10 +167,10 @@ services:
         target: /usr/share/nginx/html/config.js
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: login.{{hostname}}"
-        - "traefik.port=80"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: login.{{hostname}}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
@@ -178,7 +178,7 @@ services:
   # Configure other service with deployment specifc details
   auth:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
       - jwt-private-key.{{ts}}
@@ -187,17 +187,17 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: auth.{{hostname}}"
-        - "traefik.port=4040"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: auth.{{hostname}}'
+        - 'traefik.port=4040'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
 
   user-mgnt:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -210,7 +210,7 @@ services:
 
   notification:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -222,24 +222,24 @@ services:
 
   gateway:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: gateway.{{hostname}}"
-        - "traefik.port=7070"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
+        - 'traefik.port=7070'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
 
   workflow:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -251,7 +251,7 @@ services:
 
   search:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -263,7 +263,7 @@ services:
 
   resources:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -272,17 +272,17 @@ services:
       - TEST_USER_PASSWORD=test
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: resources.{{hostname}}"
-        - "traefik.port=3040"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
+        - 'traefik.port=3040'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
 
   metrics:
     volumes:
-      - "./opencrvs-logs:/logs"
+      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -322,13 +322,13 @@ services:
       - mongo3
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=opencrvs_overlay_net"
-        - "traefik.openhim-api.frontend.rule=Host: openhim-api.{{hostname}}"
-        - "traefik.openhim-api.protocol=https"
-        - "traefik.openhim-api.port=8080"
-        - "traefik.router.frontend.rule=Host: api.{{hostname}}"
-        - "traefik.router.port=5001"
+        - 'traefik.enable=true'
+        - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.openhim-api.frontend.rule=Host: openhim-api.{{hostname}}'
+        - 'traefik.openhim-api.protocol=https'
+        - 'traefik.openhim-api.port=8080'
+        - 'traefik.router.frontend.rule=Host: api.{{hostname}}'
+        - 'traefik.router.port=5001'
       replicas: 2
     networks:
       - overlay_net
@@ -336,14 +336,31 @@ services:
   openhim-console:
     deploy:
       labels:
-        - "traefik.enable=true"
-        - "traefik.frontend.rule=Host: openhim.{{hostname}}"
-        - "traefik.port=80"
-        - "traefik.docker.network=opencrvs_overlay_net"
+        - 'traefik.enable=true'
+        - 'traefik.frontend.rule=Host: openhim.{{hostname}}'
+        - 'traefik.port=80'
+        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     configs:
       - source: openhim-console-conf.{{ts}}
         target: /usr/share/nginx/html/config/default.json
+    networks:
+      - overlay_net
+
+  logspout:
+    volumes:
+      - /etc/hostname:/etc/host_hostname:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: syslog://svt2-logger.am2.cloudra.local:514
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
     networks:
       - overlay_net
 

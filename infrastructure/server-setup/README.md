@@ -56,10 +56,10 @@ job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ss
 
 Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
 
-Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Loggly account - remove Loggly config from playbook if you do not wish to use the service. We recommend you use an external Logging service to have access to logs):
+Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - remove Papertrail config from playbook if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
 
 ```
-ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password loggly_domain=your_loggly_domain loggly_token=your_loggly_token loggly_username=your_loggly_username loggly_password=your_loggly_password"
+ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token"
 ```
 
 Replace <inventory_file> with the correct inventory file and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node that requires an SSH password). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
@@ -69,7 +69,7 @@ Replace <inventory_file> with the correct inventory file and use `-K` option if 
 For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an ecrypted folder. It is useful to set this up from the beginning.
 
 ```
-ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password loggly_domain=your_loggly_domain loggly_token=your_loggly_token loggly_username=your_loggly_username loggly_password=your_loggly_password encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
+ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
 ```
 
 Once this command is finished the servers are now prepared for an OpenCRVS deployment.

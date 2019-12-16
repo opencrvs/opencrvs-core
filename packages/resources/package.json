@@ -11,7 +11,7 @@
     "test:dhis2-mediator": "cd src/bgd/mediators/bgd-dhis2/ && yarn install && yarn test",
     "test:compilation": "tsc --noEmit",
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts | pino-tee warn ./logs/opencrvs-bgd-resources-warn.log > ./logs/opencrvs-bgd-resources-all.log",
+    "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
     "prep:employees:bgd": "ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/prepare-source-employees.ts",
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
     "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts",

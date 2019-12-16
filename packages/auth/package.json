@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js | pino-tee warn ./logs/opencrvs-bgd-auth-warn.log > ./logs/opencrvs-bgd-auth-all.log",
+    "start:prod": "node build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -33,7 +33,6 @@
     "lint-staged": "^7.1.0",
     "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
-    "pino-tee": "^0.3.0",
     "redis": "^2.8.0"
   },
   "devDependencies": {
