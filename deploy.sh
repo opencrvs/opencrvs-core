@@ -17,6 +17,7 @@ print_usage_and_exit () {
     echo '  HOST    is the server to deploy to'
     echo "  ENV can be 'production' or 'development'"
     echo "  VERSION can be any docker image tag or 'latest'"
+    echo "  PAPERTRAIL can be any papertrail destination URL"
     exit 1
 }
 
@@ -93,9 +94,9 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HO
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
 else
-ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
+ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
 fi
 
 if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
