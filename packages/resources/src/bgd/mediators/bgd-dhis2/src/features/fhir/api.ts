@@ -378,18 +378,7 @@ export async function getLastRegLocationFromFacility(
         identifier.system === `${ORG_URL}/specs/id/hris-paurasava-name`
     )
   let matched: Ia2ILocationRefences | undefined
-  if (facilityUnion && facilityUnion.value) {
-    matched = pilotUnions.find(
-      location => location.name === facilityUnion.value
-    ) as Ia2ILocationRefences
-  } else if (facilityMunicipality && facilityMunicipality.value) {
-    matched = pilotMunicipalities.find(
-      location => location.name === facilityMunicipality.value
-    ) as Ia2ILocationRefences
-  } else {
-    matched = undefined
-  }
-  if (!matched && hardcodedLocation) {
+  if (hardcodedLocation && hardcodedLocation.length !== 0) {
     // Upazila name will be used to attempt to match union or municipality
     // The Upazila name field is the only field that is consistently available in the DHIS2 form
     // for births and deaths in unions and municipalities permanent address
@@ -397,6 +386,18 @@ export async function getLastRegLocationFromFacility(
     matched = allPilotAreas.find(
       location => location.name === hardcodedLocation
     ) as Ia2ILocationRefences
+  } else {
+    if (facilityUnion && facilityUnion.value) {
+      matched = pilotUnions.find(
+        location => location.name === facilityUnion.value
+      ) as Ia2ILocationRefences
+    } else if (facilityMunicipality && facilityMunicipality.value) {
+      matched = pilotMunicipalities.find(
+        location => location.name === facilityMunicipality.value
+      ) as Ia2ILocationRefences
+    } else {
+      matched = undefined
+    }
   }
 
   if (matched) {

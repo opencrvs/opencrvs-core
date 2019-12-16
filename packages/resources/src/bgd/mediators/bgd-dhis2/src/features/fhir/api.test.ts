@@ -215,7 +215,7 @@ describe('FHIR API module tests', () => {
       )
       expect(municipalityLocation).toEqual(mockMunicipality.entry[0].resource)
     })
-    it('Retreives a union from a facility with a hardcoded union', async () => {
+    it('Retreives a union from a facility with a hardcoded value', async () => {
       fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
 
       const unionLocation = await getLastRegLocationFromFacility(
@@ -224,6 +224,16 @@ describe('FHIR API module tests', () => {
         'bearer xyz'
       )
       expect(unionLocation).toEqual(mockUnion.entry[0].resource)
+    })
+    it('Retreives a union with a hardcoded value even if an associated union exists, prioritising the hardcoded value', async () => {
+      fetch.mockResponses([JSON.stringify(mockMunicipality), { status: 200 }])
+
+      const municipalityLocation = await getLastRegLocationFromFacility(
+        mockUnionFacility.entry[0].resource,
+        'Narsingdi Paurashava',
+        'bearer xyz'
+      )
+      expect(municipalityLocation).toEqual(mockMunicipality.entry[0].resource)
     })
     it('Returns undefined if union or municipality cannot be found, or hardcoded string is invalid', async () => {
       fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
