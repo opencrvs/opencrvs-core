@@ -31,6 +31,23 @@ import { RESOURCES_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
+    async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const res = await fetchFHIR(
+          `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
+          authHeader
+        )
+
+        return res.entry.map(({ resource }: { resource: any }) => resource)
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
     async fetchBirthRegistration(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||

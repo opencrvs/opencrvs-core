@@ -23,8 +23,10 @@ import { userTypeResolvers } from '@gateway/features/user/type-resovlers'
 import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
 import { roleTypeResolvers } from '@gateway/features/role/type-resovlers'
 
-export const getExecutableSchema = (schemaPath: string) => {
-  const typeDefs = importSchema(schemaPath)
+const graphQLSchemaPath = `${__dirname}/index.graphql`
+
+export const getExecutableSchema = () => {
+  const typeDefs = importSchema(graphQLSchemaPath)
   return makeExecutableSchema({
     typeDefs,
     resolvers: [

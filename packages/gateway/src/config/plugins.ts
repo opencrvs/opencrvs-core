@@ -15,9 +15,9 @@ import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import { getExecutableSchema } from '@gateway/graphql/config'
 
-export const getPlugins = (env: string | undefined, schemaPath: string) => {
+export const getPlugins = () => {
   const plugins: any[] = []
-  const executableSchema = getExecutableSchema(schemaPath)
+  const executableSchema = getExecutableSchema()
 
   plugins.push(
     JWT,
