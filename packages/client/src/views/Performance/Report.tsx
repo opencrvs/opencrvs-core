@@ -14,7 +14,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
@@ -33,27 +33,62 @@ import {
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
+import { Query } from '@client/components/Query'
+import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
+import {
+  GQLBirthRegistrationMetrics,
+  GQLBirthRegistrationTimeFrameMetrics,
+  GQLBirthRegistrationGenderBasisMetrics,
+  GQLCertificationPaymentMetrics
+} from '@opencrvs/gateway/src/graphql/schema'
+import { ApolloError } from 'apollo-client'
+import {
+  TimeFrameReports,
+  GenderBasisReports,
+  CertificationPaymentReports
+} from '@client/views/Performance/reports'
+import moment from 'moment'
+
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
 `
 
+const ReportWrapper = styled.div`
+  margin-top: 16px;
+  ${({ theme }) =>
+    `border-top: 1px solid ${theme.colors.chartAreaGradientStart};`}
+`
+
 interface ReportProps {
-  title: string
+  timeRange: { start: Date; end: Date }
   reportType: string
   goBack: typeof goBack
   offlineResources: IOfflineData
 }
 
+interface IMetricsQueryResult {
+  fetchBirthRegistrationMetrics: GQLBirthRegistrationMetrics
+}
+
 type Props = ReportProps &
   WrappedComponentProps &
-  RouteComponentProps<{}, {}, { reportType: string; title: string }>
+  RouteComponentProps<
+    {},
+    {},
+    { reportType: string; timeRange: { start: Date; end: Date } }
+  >
 
 function ReportComponent(props: Props) {
   const [
     selectedLocation,
     setSelectedLocation
   ] = React.useState<ISearchLocation | null>(null)
-  const { reportType, title, intl } = props
+  const { reportType, timeRange, intl } = props
+  const { start, end } = timeRange
+
+  const title = `${moment(start).format('DD MMMM')}  ${props.intl.formatMessage(
+    constantsMessages.to
+  )} ${moment(end).format('DD MMMM YYYY')}`
 
   return (
     <PerformanceContentWrapper tabId={reportType}>
@@ -71,7 +106,84 @@ function ReportComponent(props: Props) {
           setSelectedLocation(item)
         }}
       />
-      <NoResultMessage searchedLocation="Dhaka" />
+      {selectedLocation && (
+        <Query
+          query={PERFORMANCE_METRICS}
+          variables={{
+            timeStart: start.toISOString(),
+            timeEnd: end.toISOString(),
+            locationId: selectedLocation.id
+          }}
+        >
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: boolean
+            error?: ApolloError
+            data?: IMetricsQueryResult
+          }) => {
+            if (
+              !loading &&
+              (data &&
+                data.fetchBirthRegistrationMetrics &&
+                data.fetchBirthRegistrationMetrics.timeFrames &&
+                data.fetchBirthRegistrationMetrics.timeFrames.length === 0) &&
+              (data &&
+                data.fetchBirthRegistrationMetrics &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics.length ===
+                  0) &&
+              (data &&
+                data.fetchBirthRegistrationMetrics &&
+                data.fetchBirthRegistrationMetrics.payments &&
+                data.fetchBirthRegistrationMetrics.payments.length === 0)
+            )
+              return (
+                <NoResultMessage
+                  id="reports"
+                  searchedLocation={selectedLocation.displayLabel}
+                />
+              )
+
+            return (
+              <ReportWrapper>
+                <GenderBasisReports
+                  loading={loading}
+                  genderBasisMetrics={
+                    (data &&
+                      (data.fetchBirthRegistrationMetrics &&
+                        (data.fetchBirthRegistrationMetrics
+                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics[]))) ||
+                    []
+                  }
+                />
+                <TimeFrameReports
+                  loading={loading}
+                  data={
+                    (data &&
+                      (data.fetchBirthRegistrationMetrics &&
+                        (data.fetchBirthRegistrationMetrics
+                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics[]))) ||
+                    []
+                  }
+                />
+                <CertificationPaymentReports
+                  loading={loading}
+                  data={
+                    (data &&
+                      (data.fetchBirthRegistrationMetrics &&
+                        (data.fetchBirthRegistrationMetrics
+                          .payments as GQLCertificationPaymentMetrics[]))) ||
+                    []
+                  }
+                />
+              </ReportWrapper>
+            )
+          }}
+        </Query>
+      )}
     </PerformanceContentWrapper>
   )
 }
@@ -81,7 +193,10 @@ function mapStateToProps(state: IStoreState, props: Props) {
     reportType:
       (props.location.state && props.location.state.reportType) ||
       PERFORMANCE_REPORT_TYPE_WEEKY,
-    title: (props.location.state && props.location.state.title) || '',
+    timeRange: (props.location.state && props.location.state.timeRange) || {
+      start: new Date(),
+      end: new Date()
+    },
     offlineResources: getOfflineData(state)
   }
 }

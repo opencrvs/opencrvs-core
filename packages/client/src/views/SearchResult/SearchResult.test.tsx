@@ -86,7 +86,8 @@ describe('SearchResult tests', () => {
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
-            contactNumber: ''
+            contactNumber: '',
+            name: ''
           }
         },
         result: {
