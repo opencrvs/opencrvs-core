@@ -775,6 +775,8 @@
         "home.header.systemTitle": "System",
         "home.header.typeBrnDrn": "BRN/DRN",
         "home.header.typePhone": "Phone No.",
+        "home.header.typeName": "Name",
+        "home.header.placeholderName": "Enter name",
         "imageUploadOption.upload.documentType": "Please select the type of document first",
         "imageUploadOption.upload.error": "File format not supported. Please attach a png, jpg or pdf (max 5mb)",
         "imageUploadOption.upload.overSized": "File is too large. Please attach file less than 5mb",
