@@ -11,6 +11,7 @@
  */
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
+import { logger } from '@workflow/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -19,7 +20,8 @@ export default function getPlugins() {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
       }
     }
   ]
