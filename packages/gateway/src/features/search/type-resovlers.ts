@@ -160,9 +160,6 @@ export const searchTypeResolvers: GQLResolver = {
   },
   OperationHistorySearchSet: {
     operatorName(searchData: ISearchDataTemplate) {
-      if (!searchData) {
-        return null
-      }
       return [
         {
           use: 'en',
