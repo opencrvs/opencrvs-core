@@ -11,6 +11,8 @@
  */
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
+import * as Sentry from 'hapi-sentry'
+import { SENTRY_DSN } from '@user-mgnt/constants'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -20,6 +22,16 @@ export default function getPlugins() {
       options: {
         prettyPrint: false,
         logPayload: false
+      }
+    },
+    {
+      plugin: Sentry,
+      options: {
+        client: {
+          environment: process.env.NODE_ENV,
+          dsn: SENTRY_DSN
+        },
+        catchLogErrors: true
       }
     }
   ]

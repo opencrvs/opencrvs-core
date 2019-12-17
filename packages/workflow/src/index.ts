@@ -57,8 +57,7 @@ export async function createServer() {
 
   server.ext({
     type: 'onRequest',
-    method(request: Hapi.Request, h) {
-      // @ts-ignore
+    method(request: Hapi.Request & { sentryScope: any }, h) {
       request.sentryScope.setExtra('payload', request.payload)
       return h.continue
     }
