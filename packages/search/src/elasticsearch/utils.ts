@@ -17,7 +17,8 @@ import {
 import {
   findName,
   findTaskExtension,
-  getFromFhir
+  getFromFhir,
+  findNameLocale
 } from '@search/features/fhir/fhir-utils'
 import { SearchResponse } from 'elasticsearch'
 import fetch from 'node-fetch'
@@ -28,7 +29,6 @@ export const enum EVENT {
 }
 
 export const NAME_EN = 'en'
-export const NAME_BN = 'bn'
 
 export interface IOperationHistory {
   operationType: string
@@ -163,7 +163,7 @@ export const createStatusHistory = async (
 ) => {
   const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
   const operatorName = user && findName(NAME_EN, user.name)
-  const operatorNameLocale = user && findName(NAME_BN, user.name)
+  const operatorNameLocale = user && findNameLocale(user.name)
 
   const operatorFirstNames =
     operatorName && operatorName.given && operatorName.given.join(' ')
