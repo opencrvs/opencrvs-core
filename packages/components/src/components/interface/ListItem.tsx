@@ -207,6 +207,7 @@ export class ListItem extends React.Component<IListItemProps, IListItemState> {
             </StatusDiv>
           </ListContentContainer>
           <ListItemAction
+            id={`ListItemAction-${index}`}
             isFullHeight={isItemFullHeight}
             actions={actions || []}
             expanded={expanded}

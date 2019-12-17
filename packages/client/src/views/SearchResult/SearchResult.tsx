@@ -628,10 +628,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const listItemActions = []
     const expansionActions: JSX.Element[] = []
 
-    if (downloadStatus && downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+    if (!downloadStatus || downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
       listItemActions.push({
         actionComponent: (
           <DownloadButton
+            key={item.id}
             downloadConfigs={{
               event: item.event,
               compositionId: item.id,

@@ -214,6 +214,7 @@ export class SearchTool extends React.Component<IProps, IState> {
           {this.props.searchTypeList.map(item => {
             return (
               <DropDownItem
+                id={item.value}
                 key={item.value}
                 onClick={() => this.dropDownItemSelect(item)}
               >
@@ -273,7 +274,7 @@ export class SearchTool extends React.Component<IProps, IState> {
         {this.state.searchParam && (
           <ClearTextIcon onClick={this.onClearTextHandler} />
         )}
-        <DropDown onClick={this.toggleDropdownDisplay}>
+        <DropDown id="searchType" onClick={this.toggleDropdownDisplay}>
           <SelectedSearchCriteria>
             <span className="selected-icon">
               {this.state.selectedSearchType.invertIcon}
