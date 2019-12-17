@@ -55,6 +55,15 @@ export async function createServer() {
   const routes = getRoutes()
   server.route(routes)
 
+  server.ext({
+    type: 'onRequest',
+    method(request: Hapi.Request, h) {
+      // @ts-ignore
+      request.sentryScope.setExtra('payload', request.payload)
+      return h.continue
+    }
+  })
+
   async function start() {
     await server.start()
     server.log('info', `Workflow server started on ${HOST}:${PORT}`)
