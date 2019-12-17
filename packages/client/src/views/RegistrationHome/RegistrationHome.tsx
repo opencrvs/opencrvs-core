@@ -37,7 +37,6 @@ import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   Button,
   FloatingActionButton,
@@ -247,10 +246,6 @@ export class RegistrationHomeView extends React.Component<
 
   userHasValidateScope() {
     return this.props.scope && this.props.scope.includes('validate')
-  }
-
-  renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
   }
 
   subtractApplicationsWithStatus(count: number, status: string[]) {
