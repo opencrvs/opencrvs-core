@@ -20,6 +20,7 @@
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.2",
     "app-module-path": "^2.2.0",
+    "archiver": "^3.1.1",
     "boom": "^7.2.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
+    "@types/archiver": "^3.0.0",
     "@types/boom": "^7.2.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",

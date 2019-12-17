@@ -15,13 +15,13 @@ import {
   getCurrentAndLowerLocationLevels,
   fetchCertificationPayments,
   fetchGenderBasisMetrics
-} from '@metrics/features/registration/metrics/metricsGenerator'
+} from '@metrics/features/metrics/metricsGenerator'
 
 import {
   TIME_FROM,
   TIME_TO,
   LOCATION_ID
-} from '@metrics/features/registration/metrics/constants'
+} from '@metrics/features/metrics/constants'
 
 export async function metricsHandler(
   request: Hapi.Request,
