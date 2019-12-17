@@ -15,11 +15,21 @@ import { graphql } from 'graphql'
 import { getExecutableSchema } from '@gateway/graphql/config'
 import * as stringify from 'csv-stringify'
 import * as flatten from 'flat'
+import * as archiver from 'archiver'
+import { unauthorized } from 'boom'
 
 export default {
   method: 'GET',
-  path: '/registrations/birth/export',
+  path: '/registrations/export',
   handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
+    const auth = request.auth as Hapi.RequestAuth & {
+      token: string
+    }
+
+    if (!auth.credentials.scope?.includes('api')) {
+      throw unauthorized()
+    }
+
     const query = request.query as {
       fromDate: string
       toDate: string
@@ -197,29 +207,171 @@ export default {
             }
             presentAtBirthRegistration
           }
+
+          searchDeathRegistrations(fromDate: $fromDate, toDate: $toDate) {
+            id
+            deceased {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              birthDate
+              gender
+              maritalStatus
+              nationality
+              identifier {
+                id
+                type
+                otherType
+              }
+              gender
+              deceased {
+                deathDate
+              }
+              address {
+                type
+                line
+                district
+                state
+                city
+                postalCode
+                country
+              }
+            }
+            informant {
+              relationship
+              otherRelationship
+              individual {
+                identifier {
+                  id
+                  type
+                  otherType
+                }
+                name {
+                  use
+                  firstNames
+                  familyName
+                }
+                nationality
+                birthDate
+                telecom {
+                  system
+                  value
+                }
+                address {
+                  type
+                  line
+                  district
+                  state
+                  city
+                  postalCode
+                  country
+                }
+              }
+            }
+            father {
+              name {
+                use
+                firstNames
+                familyName
+              }
+            }
+            mother {
+              name {
+                use
+                firstNames
+                familyName
+              }
+            }
+            spouse {
+              name {
+                use
+                firstNames
+                familyName
+              }
+            }
+            registration {
+              contact
+              contactRelationship
+              contactPhoneNumber
+              attachments {
+                data
+                type
+                contentType
+                subject
+              }
+              status {
+                type
+                timestamp
+              }
+              type
+              trackingId
+              registrationNumber
+            }
+            eventLocation {
+              type
+              address {
+                type
+                line
+                district
+                state
+                city
+                postalCode
+                country
+              }
+            }
+            mannerOfDeath
+            causeOfDeath
+          }
         }
       `,
       undefined,
-      { Authorization: request.headers.authorization },
+      { Authorization: `Bearer ${auth.token}` },
       {
         fromDate: query.fromDate,
         toDate: query.toDate
       }
     )
 
-    return stringify(response?.data?.searchBirthRegistrations?.map(flatten), {
+    if (response.errors?.length) {
+      throw response.errors[0]
+    }
+
+    const birthRows =
+      response?.data?.searchBirthRegistrations?.map(flatten) ?? []
+
+    const deathRows =
+      response?.data?.searchDeathRegistrations?.map(flatten) ?? []
+
+    const birthCSV = stringify(birthRows, {
       header: true
     })
+    const deathCSV = stringify(deathRows, {
+      header: true
+    })
+    const archive = archiver('zip', {
+      // Sets the compression level.
+      zlib: { level: 9 }
+    })
+
+    archive.append(birthCSV, { name: 'birth-registrations.csv' })
+    archive.append(deathCSV, { name: 'death-registrations.csv' })
+
+    archive.finalize()
+
+    return archive
   },
   config: {
     tags: ['api'],
     validate: {
       query: Joi.object({
         fromDate: Joi.date(),
-        toDate: Joi.date()
+        toDate: Joi.date(),
+        token: Joi.string()
       })
     },
     description:
-      'Exports all collected metrics data in a zip containing a CSV file for each measurement'
+      'Exports both birth and death registrations from the selected time period as a CSV'
   }
 }

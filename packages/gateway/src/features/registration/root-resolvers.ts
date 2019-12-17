@@ -34,7 +34,8 @@ export const resolvers: GQLResolver = {
     async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const res = await fetchFHIR(
           `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
@@ -51,7 +52,8 @@ export const resolvers: GQLResolver = {
     async searchDeathRegistrations(_, { fromDate, toDate }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const res = await fetchFHIR(
           `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
@@ -68,7 +70,8 @@ export const resolvers: GQLResolver = {
     async fetchBirthRegistration(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         return await fetchFHIR(`/Composition/${id}`, authHeader)
       } else {
@@ -80,7 +83,8 @@ export const resolvers: GQLResolver = {
     async fetchDeathRegistration(_, { id }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         return await fetchFHIR(`/Composition/${id}`, authHeader)
       } else {
@@ -92,7 +96,8 @@ export const resolvers: GQLResolver = {
     async queryRegistrationByIdentifier(_, { identifier }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const taskBundle = await fetchFHIR(
           `/Task?identifier=${identifier}`,
@@ -122,6 +127,7 @@ export const resolvers: GQLResolver = {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api') ||
         hasScope(authHeader, 'declare')
       ) {
         const personBundle = await fetchFHIR(
@@ -144,6 +150,7 @@ export const resolvers: GQLResolver = {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api') ||
         hasScope(authHeader, 'declare')
       ) {
         const response = await fetch(`${RESOURCES_URL}/verify/nid/${country}`, {
@@ -186,7 +193,8 @@ export const resolvers: GQLResolver = {
     async updateBirthRegistration(_, { details }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const doc = await buildFHIRBundle(details, EVENT_TYPE.BIRTH, authHeader)
 
@@ -239,7 +247,8 @@ export const resolvers: GQLResolver = {
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const taskBundle = await fetchFHIR(
           `/Task?focus=Composition/${id}`,
@@ -289,7 +298,8 @@ export const resolvers: GQLResolver = {
     async notADuplicate(_, { id, duplicateId }, authHeader) {
       if (
         hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'api')
       ) {
         const composition = await fetchFHIR(
           `/Composition/${id}`,
