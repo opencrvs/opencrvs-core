@@ -46,7 +46,7 @@ import {
   getAgeInYears,
   getDurationInSeconds
 } from '@metrics/features/registration/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/registration/metrics/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
 
 export const generateInCompleteFieldPoints = async (
