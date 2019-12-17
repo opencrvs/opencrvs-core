@@ -25,6 +25,7 @@ export interface ISearchCriteria {
   type?: string[]
   trackingId?: string
   contactNumber?: string
+  name?: string
   registrationNumber?: string
   sort?: string
   size?: number

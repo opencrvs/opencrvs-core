@@ -211,5 +211,22 @@ describe('Search root resolvers', () => {
       expect(result.results).toEqual([])
       expect(result.totalItems).toBe(0)
     })
+    it('returns an array of composition results for name', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+      const result = await resolvers.Query.searchEvents(
+        {},
+        {
+          name: 'Hasib'
+        }
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
   })
 })
