@@ -236,8 +236,6 @@ services:
 
   # Configure other service with deployment specifc details
   auth:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
       - jwt-private-key.{{ts}}
@@ -255,8 +253,6 @@ services:
       - overlay_net
 
   user-mgnt:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -268,8 +264,6 @@ services:
       - overlay_net
 
   notification:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -280,8 +274,6 @@ services:
       - overlay_net
 
   gateway:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -297,8 +289,6 @@ services:
       - overlay_net
 
   workflow:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -309,8 +299,6 @@ services:
       - overlay_net
 
   search:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -321,8 +309,6 @@ services:
       - overlay_net
 
   resources:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:
@@ -340,8 +326,6 @@ services:
       - overlay_net
 
   metrics:
-    volumes:
-      - './opencrvs-logs:/logs'
     secrets:
       - jwt-public-key.{{ts}}
     environment:

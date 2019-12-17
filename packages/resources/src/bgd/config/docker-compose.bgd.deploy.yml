@@ -33,8 +33,6 @@ services:
       - LANGUAGES=bn,en
 
   bgd-dhis2-mediator:
-    volumes:
-      - './opencrvs-logs:/logs'
     image: jembi/ocrvs-bgd-dhis2-mediator
     secrets:
       - jwt-public-key.{{ts}}

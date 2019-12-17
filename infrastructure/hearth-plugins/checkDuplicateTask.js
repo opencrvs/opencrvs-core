@@ -11,7 +11,7 @@
  */
 // @ts-check
 'use strict'
-const logger = require('pino')
+const logger = require('winston')
 
 module.exports = (mongo, fhirResources) => {
   const fhirCore = require('../fhir/core.js')(mongo, fhirResources)
