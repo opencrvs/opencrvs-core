@@ -60,6 +60,7 @@
     "hapi": "^17.8.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
+    "hapi-sentry": "^2.1.0",
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",
     "joi": "^14.3.1",
