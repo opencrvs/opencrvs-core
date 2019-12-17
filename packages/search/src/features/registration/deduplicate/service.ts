@@ -25,8 +25,15 @@ export const removeDuplicate = async (bundle: fhir.Bundle) => {
   }
   const composition = await searchByCompositionId(compositionId)
   const body = get(composition, 'hits.hits[0]._source') as ICompositionBody
-  const duplicateListFromHearth = get(bundle, 'relatesTo') || []
-  body.relatesTo = duplicateListFromHearth
-
+  body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body)
+}
+
+const extractRelatesToIDs = (bundle: fhir.Bundle) => {
+  const relatesToBundle = get(bundle, 'relatesTo') || []
+
+  return relatesToBundle.map(
+    (item: { targetReference: { reference: String } }) =>
+      item.targetReference.reference.replace('Composition/', '')
+  )
 }
