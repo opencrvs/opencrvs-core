@@ -20,7 +20,6 @@ sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/openhim-console-config.
 # Set hostname in webapp configs
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/client-config.js
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/login-config.js
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/performance-config.js
 
 # Set hostname in compose file
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.deploy.yml

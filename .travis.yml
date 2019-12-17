@@ -40,7 +40,6 @@ jobs:
         - yarn save:testData && cd ../..
         - cd packages/e2e && yarn start --record false
       env:
-        - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_CLIENT_URL=http://localhost:3000/
         - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
@@ -76,7 +75,6 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_CLIENT_URL=https://register.opencrvs-staging.jembi.org/
-        - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
 
 notifications:

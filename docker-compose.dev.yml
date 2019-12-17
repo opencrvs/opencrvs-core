@@ -81,9 +81,6 @@ services:
   client:
     ports:
       - '3000:80'
-  performance:
-    ports:
-      - '3001:80'
   login:
     ports:
       - '3020:80'

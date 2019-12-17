@@ -116,7 +116,6 @@ gateway.<your_domain>
 login.<your_domain>
 openhim.<your_domain>
 openhim-api.<your_domain>
-performance.<your_domain>
 register.<your_domain>
 resources.<your_domain>
 styleguide.<your_domain>

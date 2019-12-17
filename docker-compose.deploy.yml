@@ -195,20 +195,6 @@ services:
     networks:
       - overlay_net
 
-  performance:
-    configs:
-      - source: performance-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: performance.{{hostname}}'
-        - 'traefik.port=80'
-        - 'traefik.docker.network=opencrvs_overlay_net'
-      replicas: 2
-    networks:
-      - overlay_net
-
   styleguide:
     deploy:
       labels:
@@ -407,8 +393,6 @@ configs:
     file: ./infrastructure/hearth-queryparam-extensions.json
   client-config.{{ts}}:
     file: ./infrastructure/client-config.js
-  performance-config.{{ts}}:
-    file: ./infrastructure/performance-config.js
   login-config.{{ts}}:
     file: ./infrastructure/login-config.js
   netdata-master-stream.{{ts}}:
