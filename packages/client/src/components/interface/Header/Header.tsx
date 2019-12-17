@@ -291,7 +291,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <User />,
-        invertIcon: <User isInvert={true} />,
+        invertIcon: <User color="invert" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
     ]
