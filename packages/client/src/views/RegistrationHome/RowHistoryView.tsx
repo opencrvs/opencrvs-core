@@ -165,8 +165,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   transformer = () => {
     const eventDetails = this.props.eventDetails as GQLEventSearchSet
 
-    if (!eventDetails) return undefined
-
     const { locale } = this.props.intl
     const type = eventDetails.type || ''
     const contactNumber =
@@ -293,16 +291,9 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   }
 
   getRenderedData() {
-    const transformedData = this.transformer()
     const { intl } = this.props
+    const transformedData = this.transformer()
 
-    if (!transformedData) {
-      return (
-        <ErrorText id="search-result-error-text-expanded">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
     return (
       <>
         <BorderedPaddedContent>
