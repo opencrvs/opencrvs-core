@@ -545,6 +545,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
+    const isDuplicate = item.duplicates && item.duplicates.length > 0
     const foundApplication = this.props.outboxApplications.find(
       application => application.id === item.id
     )
@@ -628,53 +629,44 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     }
 
     const listItemActions = []
-
     const expansionActions: JSX.Element[] = []
-    if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered || applicationIsCertified) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () => this.props.goToPrintCertificate(item.id, item.event)
-        })
-      }
-    }
 
-    if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+    if (downloadStatus && downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
       listItemActions.push({
         actionComponent: (
           <DownloadButton
             downloadConfigs={{
               event: item.event,
               compositionId: item.id,
-              action: Action.LOAD_REVIEW_APPLICATION
+              action:
+                ((applicationIsRegistered || applicationIsCertified) &&
+                  Action.LOAD_CERTIFICATE_APPLICATION) ||
+                Action.LOAD_REVIEW_APPLICATION
             }}
             status={downloadStatus as DOWNLOAD_STATUS}
           />
         )
       })
-    }
+    } else {
+      if (this.userHasCertifyScope()) {
+        if (applicationIsRegistered || applicationIsCertified) {
+          listItemActions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: () => this.props.goToPrintCertificate(item.id, item.event)
+          })
+        }
+      }
 
-    if (downloadStatus && downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-      if (this.userHasRegisterScope()) {
+      if (this.userHasRegisterScope() || this.userHasValidateScope()) {
         if (
-          !(item.duplicates && item.duplicates.length > 0) &&
+          !isDuplicate &&
           !applicationIsRegistered &&
-          !applicationIsRejected &&
           !applicationIsCertified
         ) {
           listItemActions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                item.id,
-                'review',
-                item.event.toLowerCase()
-              )
-          })
-        } else if (applicationIsRejected) {
-          listItemActions.push({
-            label: this.props.intl.formatMessage(constantsMessages.update),
+            label: applicationIsRejected
+              ? this.props.intl.formatMessage(constantsMessages.update)
+              : this.props.intl.formatMessage(constantsMessages.review),
             handler: () =>
               this.props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -684,18 +676,12 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
               )
           })
         }
-      }
-
-      if (
-        item.duplicates &&
-        item.duplicates.length > 0 &&
-        !applicationIsRegistered &&
-        !applicationIsRejected
-      ) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () => this.props.goToReviewDuplicate(item.id)
-        })
+        if (isDuplicate) {
+          listItemActions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(item.id)
+          })
+        }
       }
     }
     if (applicationIsRegistered) {
@@ -731,6 +717,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
   }
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   userHasCertifyScope() {
@@ -794,7 +784,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   }
 
                   const transformedData = transformData(data.searchEvents, intl)
-
                   const total = transformedData.length
                   return (
                     <>

@@ -25,7 +25,7 @@ export interface IStatus {
   label: string
 }
 
-interface IActionObject {
+export interface IActionObject {
   label: string
   handler: () => void
   icon?: () => React.ReactNode
