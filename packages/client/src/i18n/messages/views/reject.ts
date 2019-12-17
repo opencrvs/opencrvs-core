@@ -27,8 +27,14 @@ interface IRejectMessages {
 const messagesToDefine: IRejectMessages = {
   rejectionFormTitle: {
     id: 'review.rejection.form.title',
-    defaultMessage: 'Reasons for rejection',
+    defaultMessage: 'What update does the application require?',
     description: 'Rejection form title'
+  },
+  rejectionFormInstruction: {
+    id: 'review.rejection.form.instruction',
+    defaultMessage:
+      'Please document specific details of required updates for follow up action.',
+    description: 'Rejection form instruction'
   },
   rejectionReasonSubmit: {
     id: 'review.rejection.form.submitButton',
@@ -68,14 +74,7 @@ const messagesToDefine: IRejectMessages = {
   rejectionCommentForHealthWorkerLabel: {
     id: 'review.rejection.form.commentLabel',
     defaultMessage:
-      'Comments or instructions for health worker to rectify application',
-    description: 'Label for rejection comment text area'
-  },
-  rejectionFormInstruction: {
-    id: 'review.rejection.form.commentInstruction',
-    defaultMessage:
-      'Please provide specific instructions of what needs to be updated by the health worker to correctly update the application',
-    description: 'Label for rejection comment instruction'
+      'Comments or instructions for health worker to rectify application'
   }
 }
 

@@ -49,8 +49,7 @@ export const rejectRegistration: IRejectRegistrationForm = {
       label: messages.rejectionCommentForHealthWorkerLabel,
       initialValue: '',
       validate: [],
-      required: true,
-      description: messages.rejectionFormInstruction
+      required: true
     }
   ]
 }
