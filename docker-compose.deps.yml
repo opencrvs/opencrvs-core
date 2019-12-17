@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   influxdb:
-    image: influxdb:1.7
+    image: influxdb:1.7.9
     restart: unless-stopped
 
   hearth:

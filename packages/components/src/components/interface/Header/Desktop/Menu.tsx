@@ -35,6 +35,7 @@ export class Menu extends React.Component<IProps> {
     const menuItems = this.props.menuItems.map((menuItem: IMenuItem) => {
       return (
         <MenuItem
+          id={'menu-' + menuItem.key}
           key={menuItem.key}
           selected={menuItem.selected ? menuItem.selected : false}
           onClick={menuItem.onClick}

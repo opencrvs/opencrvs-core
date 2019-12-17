@@ -42,13 +42,18 @@ const ItemSelector = styled(Selector)`
 interface IProps {
   selected: boolean
   onClick?: () => void
+  id?: string
 }
 
 export class MenuItem extends React.Component<IProps> {
   render() {
     return (
       <ItemContainer>
-        <Item selected={this.props.selected} onClick={this.props.onClick}>
+        <Item
+          id={this.props.id}
+          selected={this.props.selected}
+          onClick={this.props.onClick}
+        >
           {this.props.children}
         </Item>
         {this.props.selected ? <ItemSelector /> : <></>}
