@@ -387,7 +387,11 @@ export async function getLastRegLocationFromFacility(
       location => location.name === hardcodedLocation
     ) as Ia2ILocationRefences
   } else {
-    if (facilityUnion && facilityUnion.value) {
+    if (
+      facilityUnion &&
+      facilityUnion.value &&
+      facilityUnion.value !== 'Urban Ward No-01 (narsingdi)'
+    ) {
       matched = pilotUnions.find(
         location => location.name === facilityUnion.value
       ) as Ia2ILocationRefences
