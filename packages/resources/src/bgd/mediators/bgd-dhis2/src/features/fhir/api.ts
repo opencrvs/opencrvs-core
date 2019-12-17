@@ -384,7 +384,8 @@ export async function getLastRegLocationFromFacility(
     // for births and deaths in unions and municipalities permanent address
     const allPilotAreas = pilotUnions.concat(pilotMunicipalities)
     matched = allPilotAreas.find(
-      location => location.name === hardcodedLocation
+      location =>
+        location.name.toLowerCase() === hardcodedLocation.toLowerCase()
     ) as Ia2ILocationRefences
   } else {
     if (
