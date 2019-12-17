@@ -167,6 +167,7 @@ type Relation =
   | 'EXTENDED_FAMILY'
   | 'OTHER'
   | 'INFORMANT'
+  | 'PRINT_IN_ADVANCE'
 
 export type ICertificate = {
   collector?: Partial<{ type: Relation }>
@@ -697,7 +698,10 @@ function createRequestForApplication(
 
   return {
     request: client.query,
-    requestArgs: { query, variables: { id: application.id } }
+    requestArgs: {
+      query,
+      variables: { id: application.id }
+    }
   }
 }
 
@@ -918,7 +922,11 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         Cmd.run<IDownloadApplicationFail, IDownloadApplicationSuccess>(
           requestWithStateWrapper,
           {
-            args: [request(requestArgs), Cmd.getState, client],
+            args: [
+              request({ ...requestArgs, fetchPolicy: 'no-cache' }),
+              Cmd.getState,
+              client
+            ],
             successActionCreator: downloadApplicationSuccess,
             failActionCreator: err =>
               downloadApplicationFail(
@@ -944,16 +952,24 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         newApplicationsAfterDownload[downloadingApplicationIndex]
 
       const dataKey = getDataKey(downloadingApplication)
-      const transData = gqlToDraftTransformer(
+      const eventData = queryData.data[dataKey as string]
+      const transData: IFormData = gqlToDraftTransformer(
         form[downloadingApplication.event],
-        queryData.data[dataKey as string]
+        eventData
       )
+      const downloadedAppStatus: string =
+        (eventData &&
+          eventData.registration &&
+          eventData.registration.status &&
+          eventData.registration.status[0].type) ||
+        ''
       newApplicationsAfterDownload[
         downloadingApplicationIndex
       ] = createReviewApplication(
         downloadingApplication.id,
         transData,
-        downloadingApplication.event
+        downloadingApplication.event,
+        downloadedAppStatus
       )
       newApplicationsAfterDownload[downloadingApplicationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
@@ -1011,7 +1027,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
               requestWithStateWrapper,
               {
                 args: [
-                  nextRequest(nextRequestArgs),
+                  nextRequest({ ...nextRequestArgs, fetchPolicy: 'no-cache' }),
                   Cmd.getState,
                   clientFromSuccess
                 ],
@@ -1064,7 +1080,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             requestWithStateWrapper,
             {
               args: [
-                retryRequest(retryRequestArgs),
+                retryRequest({ ...retryRequestArgs, fetchPolicy: 'no-cache' }),
                 Cmd.getState,
                 clientFromFail
               ],
@@ -1123,7 +1139,10 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             ),
             Cmd.run(requestWithStateWrapper, {
               args: [
-                nextApplicationRequest(nextApplicationRequestArgs),
+                nextApplicationRequest({
+                  ...nextApplicationRequestArgs,
+                  fetchPolicy: 'no-cache'
+                }),
                 Cmd.getState,
                 clientFromFail
               ],

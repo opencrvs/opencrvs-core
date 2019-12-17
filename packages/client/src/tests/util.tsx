@@ -2219,14 +2219,7 @@ export const mockApplicationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [
-      {
-        collector: {
-          type: 'MOTHER'
-        },
-        hasShowedVerifiedDocument: true
-      }
-    ]
+    certificates: [{}]
   }
 }
 
@@ -2389,7 +2382,11 @@ export const mockBirthRegistrationSectionData = {
         firstName: 'Mushraful',
         lastName: 'Hoque',
         iDType: 'PASSPORT',
-        iD: '123456789'
+        iD: '123456789',
+        affidavitFile: {
+          type: 'abc',
+          data: 'BASE64 data'
+        }
       },
       hasShowedVerifiedDocument: true
     }

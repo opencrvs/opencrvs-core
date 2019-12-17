@@ -545,6 +545,14 @@ describe('Field Agnet tests', () => {
                     ...defaultStatus,
                     type: 'REGISTERED'
                   },
+                  {
+                    ...defaultStatus,
+                    type: 'WAITING_VALIDATION'
+                  },
+                  {
+                    ...defaultStatus,
+                    type: 'VALIDATED'
+                  },
                   defaultStatus
                 ]
               }
@@ -575,7 +583,15 @@ describe('Field Agnet tests', () => {
 
     testComponent.component.update()
     expect(
-      testComponent.component.find('#history_row_2_DECLARED').hostNodes()
+      testComponent.component.find('#history_row_4_DECLARED').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      testComponent.component.find('#history_row_3_VALIDATED').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      testComponent.component
+        .find('#history_row_2_WAITING_VALIDATION')
+        .hostNodes()
     ).toHaveLength(1)
     expect(
       testComponent.component.find('#history_row_1_REGISTERED').hostNodes()
