@@ -223,7 +223,7 @@ const messagesToDefine: IReviewMessages = {
   },
   zeroDocumentsText: {
     defaultMessage:
-      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant}}',
+      'No supporting documents for {section, select, child {child} mother {mother} father {father} deceased {deceased} informant {informant} primaryCaregiver {parents}}',
     description: 'Zero documents text',
     id: 'review.documents.zeroDocumentsText'
   },

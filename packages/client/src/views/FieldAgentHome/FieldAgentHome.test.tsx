@@ -21,7 +21,11 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
-import { storeApplication, SUBMISSION_STATUS } from '@client/applications'
+import {
+  storeApplication,
+  SUBMISSION_STATUS,
+  createApplication
+} from '@client/applications'
 import uuid from 'uuid'
 import { Event } from '@client/forms'
 import { queries } from '@client/profile/queries'
@@ -555,6 +559,13 @@ describe('FieldAgentHome tests', () => {
 
     it('renders no records text when no data in grid table', () => {
       expect(component.find('#no-record').hostNodes()).toHaveLength(1)
+    })
+
+    it('renders draft application', async () => {
+      const draftApplication = createApplication(Event.BIRTH)
+      store.dispatch(storeApplication(draftApplication))
+      const element = await waitForElement(component, '#row_0')
+      expect(element.hostNodes()).toHaveLength(1)
     })
   })
 })

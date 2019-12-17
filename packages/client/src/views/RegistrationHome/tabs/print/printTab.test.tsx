@@ -416,6 +416,47 @@ describe('RegistrarHome ready to print tab related tests', () => {
                           comment: 'reason=duplicate&comment=dup'
                         }
                       ]
+                    },
+                    {
+                      id:
+                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-417',
+                      timestamp: '2019-10-20T11:03:20.660Z',
+                      user: {
+                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
+                        name: [
+                          {
+                            use: 'en',
+                            firstNames: 'Mohammad',
+                            familyName: 'Ashraful'
+                          },
+                          {
+                            use: 'bn',
+                            firstNames: '',
+                            familyName: ''
+                          }
+                        ],
+                        role: 'LOCAL_REGISTRAR'
+                      },
+                      location: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: ['']
+                      },
+                      office: {
+                        id: '123',
+                        name: 'Kaliganj Union Sub Center',
+                        alias: [''],
+                        address: {
+                          district: '7876',
+                          state: 'iuyiuy'
+                        }
+                      },
+                      type: 'WAITING_VALIDATION',
+                      comments: [
+                        {
+                          comment: 'reason=duplicate&comment=dup'
+                        }
+                      ]
                     }
                   ],
                   contact: 'MOTHER',

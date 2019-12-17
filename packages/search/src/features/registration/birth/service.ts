@@ -88,6 +88,10 @@ async function updateEvent(task: fhir.Task) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-registration-number'
+  )
   const body: ICompositionBody = {
     status: (await getStatus(compositionId)) as IStatus[]
   }
@@ -106,6 +110,8 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
 
   await createStatusHistory(body)
   await updateComposition(compositionId, body)
