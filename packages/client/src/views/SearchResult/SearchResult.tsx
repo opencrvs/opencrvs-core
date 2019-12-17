@@ -466,10 +466,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                 } = status
                 const type = status.type as string
                 const officeName = status.officeName as string
-                const timestamp = moment(
-                  status.timestamp as string,
-                  LOCAL_DATE_FORMAT
-                ).format(CERTIFICATE_DATE_FORMAT)
+                const timestamp = status.timestamp as string
                 const collectorInfo = collectorName + ' (' + collectorType + ')'
 
                 return (
