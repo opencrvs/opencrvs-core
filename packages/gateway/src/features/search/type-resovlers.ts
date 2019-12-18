@@ -54,6 +54,9 @@ export const searchTypeResolvers: GQLResolver = {
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
     },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
+    },
     childName(resultSet: ISearchEventDataTemplate) {
       if (!resultSet._source) {
         return null
@@ -100,6 +103,9 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registration(resultSet: ISearchEventDataTemplate) {
       return resultSet._source
+    },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
       if (!resultSet._source) {
@@ -150,6 +156,38 @@ export const searchTypeResolvers: GQLResolver = {
     },
     duplicates(searchData: ISearchDataTemplate) {
       return searchData.relatesTo
+    }
+  },
+  OperationHistorySearchSet: {
+    operatorName(searchData: ISearchDataTemplate) {
+      return [
+        {
+          use: 'en',
+          given:
+            (searchData.operatorFirstNames && [
+              searchData.operatorFirstNames
+            ]) ||
+            null,
+          family:
+            (searchData.operatorFamilyName && [
+              searchData.operatorFamilyName
+            ]) ||
+            null
+        },
+        {
+          use: 'bn',
+          given:
+            (searchData.operatorFirstNamesLocale && [
+              searchData.operatorFirstNamesLocale
+            ]) ||
+            null,
+          family:
+            (searchData.operatorFamilyNameLocale && [
+              searchData.operatorFamilyNameLocale
+            ]) ||
+            null
+        }
+      ]
     }
   }
 }
