@@ -357,7 +357,11 @@ export async function fhirWorkflowEventHandler(
       break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)
-      await forwardToOpenHim(Events.EVENT_NOT_DUPLICATE, request)
+      await triggerEvent(
+        Events.EVENT_NOT_DUPLICATE,
+        request.payload,
+        request.headers.authorization
+      )
       break
     default:
       // forward as-is to hearth
