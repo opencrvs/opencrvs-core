@@ -25,6 +25,10 @@ import * as api from '@metrics/api'
 const fetchLocation = api.fetchLocation as jest.Mock
 const fetchParentLocationByLocationID = api.fetchParentLocationByLocationID as jest.Mock
 
+const AUTH_HEADER = {
+  Authorization: 'Bearer mock-token'
+}
+
 describe('Verify point generation', () => {
   it('Return valid birth registration point to insert in influx', async () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
@@ -36,22 +40,20 @@ describe('Verify point generation', () => {
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',
-      {
-        Authorization: 'Bearer mock-token'
-      }
+      AUTH_HEADER
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
-      },
-      fields: {
-        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
+        gender: 'male',
         locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
+        locationLevel2: 'Location/2'
+      },
+      fields: {
+        compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
         ageInDays: 435
       }
     })
@@ -79,19 +81,17 @@ describe('Verify point generation', () => {
     const point = await generateBirthRegPoint(
       payload,
       'mark-existing-application-registered',
-      {
-        Authorization: 'Bearer mock-token'
-      }
+      AUTH_HEADER
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
+        gender: 'male',
+        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
         ageInDays: undefined
       }
     })
@@ -105,20 +105,18 @@ describe('Verify point generation', () => {
     const point = await generateBirthRegPoint(
       cloneDeep(testPayload),
       'mark-existing-application-registered',
-      {
-        Authorization: 'Bearer mock-token'
-      }
+      AUTH_HEADER
     )
     expect(point).toEqual({
       measurement: 'birth_reg',
       tags: {
         regStatus: 'mark-existing-application-registered',
-        gender: 'male'
+        gender: 'male',
+        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
+        locationLevel4: 'Location/4'
       },
       fields: {
         compositionId: 'b2fbb82c-a68d-4793-98e1-87484fc785c4',
-        locationLevel5: 'Location/308c35b4-04f8-4664-83f5-9790e790cde1',
-        locationLevel4: 'Location/4',
         ageInDays: 435
       }
     })
@@ -130,9 +128,11 @@ describe('Verify point generation', () => {
       fullUrl: 'urn:uuid:048d3e42-40c3-4e46-81f0-e3869251b74a'
     }
     expect(
-      generateBirthRegPoint(payload, 'mark-existing-application-registered', {
-        Authorization: 'Bearer mock-token'
-      })
+      generateBirthRegPoint(
+        payload,
+        'mark-existing-application-registered',
+        AUTH_HEADER
+      )
     ).rejects.toThrowError('No child found!')
   })
   it('Return valid death registration point to insert in influx', async () => {
@@ -145,9 +145,7 @@ describe('Verify point generation', () => {
     const point = await generateDeathRegPoint(
       cloneDeep(testDeathPayload),
       'mark-existing-application-registered',
-      {
-        Authorization: 'Bearer mock-token'
-      }
+      AUTH_HEADER
     )
     expect(point).toEqual({
       measurement: 'death_reg',
@@ -155,14 +153,14 @@ describe('Verify point generation', () => {
         regStatus: 'mark-existing-application-registered',
         gender: 'male',
         causeOfDeath: 'Old age',
-        mannerOfDeath: 'NATURAL_CAUSES'
-      },
-      fields: {
-        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
+        mannerOfDeath: 'NATURAL_CAUSES',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
-        locationLevel2: 'Location/2',
+        locationLevel2: 'Location/2'
+      },
+      fields: {
+        compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
         ageInYears: 43
       }
     })
@@ -172,17 +170,22 @@ describe('Verify point generation', () => {
     // @ts-ignore
     payload.entry[0] = {}
     expect(
-      generateDeathRegPoint(payload, 'mark-existing-application-registered', {
-        Authorization: 'Bearer mock-token'
-      })
+      generateDeathRegPoint(
+        payload,
+        'mark-existing-application-registered',
+        AUTH_HEADER
+      )
     ).rejects.toThrowError('No section found for given code: deceased-details')
   })
   it('returns payment point', async () => {
-    const point = await generatePaymentPoint(cloneDeep(testDeathCertPayload))
+    const point = await generatePaymentPoint(
+      cloneDeep(testDeathCertPayload),
+      AUTH_HEADER
+    )
     expect(point).toEqual({
       measurement: 'certification_payment',
       tags: {
-        eventType: 'DEATH'
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
@@ -194,13 +197,15 @@ describe('Verify point generation', () => {
     const payload = cloneDeep(testDeathCertPayload)
     // @ts-ignore
     payload.entry[1] = {}
-    expect(generatePaymentPoint(payload)).rejects.toThrowError('Task not found')
+    expect(generatePaymentPoint(payload, AUTH_HEADER)).rejects.toThrowError(
+      'Task not found'
+    )
   })
   it('Throw error when no reconciliation found for payment point', () => {
     const payload = cloneDeep(testDeathCertPayload)
     // @ts-ignore
     payload.entry[4] = {}
-    expect(generatePaymentPoint(payload)).rejects.toThrowError(
+    expect(generatePaymentPoint(payload, AUTH_HEADER)).rejects.toThrowError(
       'Payment reconciliation not found'
     )
   })

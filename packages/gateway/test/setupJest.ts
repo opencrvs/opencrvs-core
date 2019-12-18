@@ -11,9 +11,6 @@
  */
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
-import { logger } from '../src/logger'
-
-logger.transports['silent'] = true
 
 jest.setMock('node-fetch', { default: fetch })
 

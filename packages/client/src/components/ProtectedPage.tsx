@@ -21,21 +21,30 @@ import { USER_DETAILS, IUserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { getCurrentUserID, IUserData } from '@client/applications'
 import * as LogRocket from 'logrocket'
+import { refreshToken } from '@client/utils/authUtils'
+import { REFRESH_TOKEN_CHECK_MILLIS } from '@client/utils/constants'
+import { connect } from 'react-redux'
+import { refreshOfflineData } from '@client/offline/actions'
+import { PropsWithChildren } from 'react'
 export const SCREEN_LOCK = 'screenLock'
 
-interface IProtectedPageProps {
+type OwnProps = PropsWithChildren<{
   unprotectedRouteElements: string[]
+}>
+
+type DispatchProps = {
+  onNumPadVisible: () => void
 }
 interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
 }
-class ProtectedPageComponent extends React.Component<
-  IProtectedPageProps & RouteComponentProps<{}>,
-  IProtectPageState
-> {
-  constructor(props: IProtectedPageProps & RouteComponentProps<{}>) {
+
+type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
+
+class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
+  constructor(props: Props) {
     super(props)
     this.state = {
       secured: true,
@@ -70,14 +79,21 @@ class ProtectedPageComponent extends React.Component<
       LogRocket.identify(userDetails.practitionerId)
     }
     this.setState(newState)
+
+    setInterval(() => {
+      refreshToken()
+    }, REFRESH_TOKEN_CHECK_MILLIS)
   }
 
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
+
     const onUnprotectedPage = this.props.unprotectedRouteElements.some(route =>
       this.props.location.pathname.includes(route)
     )
+
     const newState = { ...this.state }
+
     if (!alreadyLocked && !onUnprotectedPage) {
       newState.secured = false
       if (await this.getPIN()) {
@@ -87,6 +103,12 @@ class ProtectedPageComponent extends React.Component<
       }
       this.setState(newState)
       storage.setItem(SCREEN_LOCK, 'true')
+    }
+
+    // App was in the background and now we need to make sure
+    // both global configuration and resources data is up-to-date
+    if (isVisible) {
+      this.props.onNumPadVisible()
     }
   }
 
@@ -147,4 +169,9 @@ class ProtectedPageComponent extends React.Component<
     )
   }
 }
-export const ProtectedPage = withRouter(ProtectedPageComponent)
+export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(
+  null,
+  {
+    onNumPadVisible: refreshOfflineData
+  }
+)(withRouter(ProtectedPageComponent))

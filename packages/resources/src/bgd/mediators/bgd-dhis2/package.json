@@ -23,6 +23,7 @@
     "docker:push": "docker push jembi/ocrvs-bgd-dhis2-mediator"
   },
   "dependencies": {
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "hapi": "^17.5.1",
@@ -35,9 +36,9 @@
     "node-fetch": "^2.6.0",
     "node-verhoeff": "^0.0.11",
     "openhim-mediator-utils": "^0.2.3",
+    "pino": "^5.14.0",
     "short-uid": "^0.1.0",
-    "uuid": "^3.3.3",
-    "winston": "^3.0.0"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
@@ -51,7 +52,6 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/node-fetch": "^2.3.4",
     "@types/uuid": "^3.4.4",
-    "@types/winston": "^2.3.9",
     "cross-env": "^5.2.0",
     "jest": "24.7.1",
     "jest-fetch-mock": "^2.1.2",

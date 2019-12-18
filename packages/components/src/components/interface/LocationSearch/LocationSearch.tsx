@@ -173,6 +173,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
           {this.state.filteredList.map(item => {
             return (
               <DropDownItem
+                id={`locationOption${item.id}`}
                 key={item.id}
                 onClick={() => this.dropDownItemSelect(item)}
               >

@@ -27,7 +27,9 @@ import {
   mockCompositionResponse,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
-  mockBirthFhirBundleWithoutParents
+  mockBirthFhirBundleWithoutParents,
+  mockUserModelResponse,
+  mockLocationResponse
 } from '@search/test/utils'
 
 import * as fetchMock from 'jest-fetch-mock'
@@ -65,6 +67,11 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the event data is updated with task', async () => {
       ;(updateComposition as jest.Mock).mockReturnValue({})
+
+      fetch.mockResponses(
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
@@ -206,6 +213,11 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 while father and mother sections is not present', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',

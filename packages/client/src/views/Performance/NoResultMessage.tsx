@@ -31,6 +31,7 @@ const StyledText = styled.span`
 `
 
 interface NoResultMessageProps {
+  id?: string
   searchedLocation: string
 }
 
@@ -40,10 +41,10 @@ type State = {}
 
 class NoResultMessageComponent extends React.Component<Props, State> {
   render() {
-    const { intl, searchedLocation } = this.props
+    const { id, intl, searchedLocation } = this.props
     return (
       <MessageContainer>
-        <StyledHeader>
+        <StyledHeader id={`noResults-${id}`}>
           {intl.formatMessage(messages.noResultForLocation, {
             searchedLocation
           })}

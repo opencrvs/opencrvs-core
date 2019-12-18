@@ -16,6 +16,7 @@ interface EventSearchSet {
   id: ID!
   type: String
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type RegistrationSearchSet {
@@ -33,12 +34,24 @@ type RegistrationSearchSet {
   modifiedAt: String
 }
 
+type OperationHistorySearchSet {
+  operationType: String
+  operatedOn: Date
+  operatorRole: String
+  operatorName: [HumanName]
+  operatorOfficeName: String
+  operatorOfficeAlias: [String]
+  rejectReason: String
+  rejectComment: String
+}
+
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
   type: String
   childName: [HumanName]
   dateOfBirth: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type DeathEventSearchSet implements EventSearchSet {
@@ -47,6 +60,7 @@ type DeathEventSearchSet implements EventSearchSet {
   deceasedName: [HumanName]
   dateOfDeath: Date
   registration: RegistrationSearchSet
+  operationHistories: [OperationHistorySearchSet]
 }
 
 type Query {
@@ -58,6 +72,7 @@ type Query {
     trackingId: String
     registrationNumber: String
     contactNumber: String
+    name: String
     count: Int
     skip: Int
     sort: String

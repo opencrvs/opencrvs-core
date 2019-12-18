@@ -123,6 +123,44 @@ function checkIfDone(
   return loopWithState
 }
 
+function getDataLoadingCommands() {
+  return Cmd.list<actions.Action>([
+    Cmd.run(referenceApi.loadFacilities, {
+      successActionCreator: actions.facilitiesLoaded,
+      failActionCreator: actions.facilitiesFailed
+    }),
+    Cmd.run(referenceApi.loadLocations, {
+      successActionCreator: actions.locationsLoaded,
+      failActionCreator: actions.locationsFailed
+    }),
+    Cmd.run(referenceApi.loadDefinitions, {
+      successActionCreator: actions.definitionsLoaded,
+      failActionCreator: actions.definitionsFailed
+    }),
+    Cmd.run(referenceApi.loadAssets, {
+      successActionCreator: actions.assetsLoaded,
+      failActionCreator: actions.assetsFailed
+    })
+  ])
+}
+
+function updateGlobalConfig() {
+  return Cmd.run(() => {
+    // Replaces the script tag in site head with a fresh one
+    const currentConfigElement = Array.from(
+      document.querySelectorAll('script')
+    ).find(({ src }) => src.indexOf('config.js'))!
+    const head = document.getElementsByTagName('head')[0]
+    const newConfigElement = document.createElement('script')
+    newConfigElement.src = currentConfigElement.src.replace(
+      /\?.*/,
+      '?cachebuster=' + Date.now()
+    )
+    head.appendChild(newConfigElement)
+    head.removeChild(currentConfigElement)
+  })
+}
+
 function reducer(
   state: IOfflineDataState,
   action: actions.Action | profileActions.Action
@@ -140,30 +178,19 @@ function reducer(
         })
       )
     }
+    case actions.REFRESH_OFFLINE_DATA: {
+      return loop(
+        state,
+        Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
+      )
+    }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
       const offlineDataString = action.payload
       const offlineData: IOfflineData = JSON.parse(
         offlineDataString ? offlineDataString : '{}'
       )
 
-      const dataLoadingCmds = Cmd.list<actions.Action>([
-        Cmd.run(referenceApi.loadFacilities, {
-          successActionCreator: actions.facilitiesLoaded,
-          failActionCreator: actions.facilitiesFailed
-        }),
-        Cmd.run(referenceApi.loadLocations, {
-          successActionCreator: actions.locationsLoaded,
-          failActionCreator: actions.locationsFailed
-        }),
-        Cmd.run(referenceApi.loadDefinitions, {
-          successActionCreator: actions.definitionsLoaded,
-          failActionCreator: actions.definitionsFailed
-        }),
-        Cmd.run(referenceApi.loadAssets, {
-          successActionCreator: actions.assetsLoaded,
-          failActionCreator: actions.assetsFailed
-        })
-      ])
+      const dataLoadingCmds = getDataLoadingCommands()
       const offlineDataLoaded = isOfflineDataLoaded(offlineData)
       if (offlineDataLoaded) {
         return loop(

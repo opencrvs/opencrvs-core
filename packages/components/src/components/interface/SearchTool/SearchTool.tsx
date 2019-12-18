@@ -115,7 +115,7 @@ const SelectedSearchCriteria = styled.span`
   & .selected-icon {
     display: none;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 2px;
     & .selected-icon {
       display: flex;
@@ -147,22 +147,38 @@ export interface ISearchType {
 interface IState {
   dropDownIsVisible: boolean
   searchParam: string
+  language: string
   selectedSearchType: ISearchType
 }
 interface IProps {
   searchTypeList: ISearchType[]
   searchText?: string
   selectedSearchType?: string
+  language: string
   searchHandler: (searchText: string, searchType: string) => void
   onClearText?: () => void
 }
 export class SearchTool extends React.Component<IProps, IState> {
+  static getDerivedStateFromProps(nextProps: IProps, previousState: IState) {
+    if (nextProps.language !== previousState.language) {
+      return {
+        selectedSearchType: nextProps.searchTypeList.find(
+          (item: ISearchType) =>
+            item.value === previousState.selectedSearchType.value
+        ),
+        language: nextProps.language
+      }
+    }
+    return null
+  }
+
   constructor(props: IProps) {
     super(props)
 
     this.state = {
       dropDownIsVisible: false,
       searchParam: this.props.searchText ? this.props.searchText : '',
+      language: this.props.language,
       selectedSearchType: this.getDefaultSearchType()
     }
   }
@@ -175,7 +191,6 @@ export class SearchTool extends React.Component<IProps, IState> {
         ) || this.props.searchTypeList[0]
       )
     }
-
     return (
       this.props.searchTypeList.find(
         (item: ISearchType) => item.isDefault === true

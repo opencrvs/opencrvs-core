@@ -29,13 +29,11 @@ import {
   createNamesMap,
   extractCommentFragmentValue
 } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
 import {
   LANG_EN,
   REJECTED,
   REJECT_REASON,
   REJECT_COMMENTS,
-  LOCAL_DATE_FORMAT,
   CERTIFICATE_DATE_FORMAT,
   CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
 } from '@client/utils/constants'
@@ -274,6 +272,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             <StatusGray />
           </StatusIcon>
         )
+      case 'WAITING_VALIDATION':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
       case 'REGISTERED':
         return (
           <StatusIcon>
@@ -301,6 +305,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         return constantsMessages.applicationSubmittedOn
       case 'VALIDATED':
         return constantsMessages.applicationValidatedOn
+      case 'WAITING_VALIDATION':
+        return constantsMessages.applicationWaitingForValidationOn
       case 'REGISTERED':
         return constantsMessages.applicationRegisteredOn
       case 'REJECTED':

@@ -17,6 +17,7 @@ import {
 } from '@metrics/influxdb/constants'
 import { logger } from '@metrics/logger'
 import { IPoints } from '@metrics/features/registration'
+import fetch from 'node-fetch'
 
 export const influx = new Influx.InfluxDB({
   host: INFLUX_HOST,
@@ -27,43 +28,51 @@ export const influx = new Influx.InfluxDB({
       measurement: 'birth_reg',
       fields: {
         compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
         ageInDays: Influx.FieldType.INTEGER
       },
-      tags: ['regStatus', 'gender']
+      tags: [
+        'regStatus',
+        'gender',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     },
     {
       measurement: 'death_reg',
       fields: {
         compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
         ageInYears: Influx.FieldType.INTEGER
       },
-      tags: ['regStatus', 'gender', 'mannerOfDeath', 'causeOfDeath']
+      tags: [
+        'regStatus',
+        'gender',
+        'mannerOfDeath',
+        'causeOfDeath',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     },
     {
       measurement: 'in_complete_fields',
       fields: {
-        compositionId: Influx.FieldType.STRING,
-        locationLevel5: Influx.FieldType.STRING,
-        locationLevel4: Influx.FieldType.STRING,
-        locationLevel3: Influx.FieldType.STRING,
-        locationLevel2: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
         'missingFieldSectionId',
         'missingFieldGroupId',
         'missingFieldId',
-        'eventType'
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
       ]
     },
     {
@@ -102,11 +111,24 @@ export const writePoints = (points: IPoints[]) => {
   })
 }
 
-export const readPoints = (query: string) => {
+export const query = <T = any>(q: string): Promise<T> => {
   try {
-    return influx.query(query)
+    return influx.query(q)
   } catch (err) {
     logger.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw err
   }
+}
+
+export async function getCSV(measurement: string) {
+  // This is done with a plain HTTP request so the result can be streamed
+  const res = await fetch(
+    `http://${INFLUX_HOST}:${INFLUX_PORT}/query?db=${INFLUX_DB}&q=SELECT * FROM ${measurement}`,
+    {
+      headers: {
+        Accept: 'application/csv'
+      }
+    }
+  )
+  return res.body
 }

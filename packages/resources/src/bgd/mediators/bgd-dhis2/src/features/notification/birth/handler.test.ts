@@ -11,15 +11,20 @@
  */
 import { birthNotificationHandler } from '@bgd-dhis2-mediator/features/notification/birth/handler'
 import { body } from '@bgd-dhis2-mediator/test/birth-integration'
+import {
+  mockUnion,
+  mockUnionFacility
+} from '@bgd-dhis2-mediator/test/locations'
 import * as fetchMock from 'jest-fetch-mock'
 
 let fetch: fetchMock.FetchMock
-let locationTuple: [fetchMock.BodyOrFunction, fetchMock.MockParams]
+// When DHIS2 supports BBS codes, these tests will become valid
+// let locationTuple: [fetchMock.BodyOrFunction, fetchMock.MockParams]
 
 describe('Birth handler', () => {
   beforeAll(() => {
     fetch = fetchMock as fetchMock.FetchMock
-    locationTuple = [
+    /*locationTuple = [
       JSON.stringify({
         resourceType: 'Bundle',
         entry: [
@@ -33,7 +38,7 @@ describe('Birth handler', () => {
         ]
       }),
       {}
-    ]
+    ]*/
   })
 
   it('return a mediator response', async () => {
@@ -45,11 +50,14 @@ describe('Birth handler', () => {
     const code = jest.fn().mockReturnValue({ header })
     const h = { response: () => ({ code }) }
 
+    fetch.mockResponses([JSON.stringify(mockUnionFacility), { status: 200 }])
+    fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
     // 3 x create patient location fetches
-    fetch.mockResponses(...new Array(12).fill(locationTuple))
+    // fetch.mockResponses(...new Array(12).fill(locationTuple))
 
     // Resolve union
-    fetch.mockResponses(...new Array(4).fill(locationTuple))
+    // fetch.mockResponses(...new Array(4).fill(locationTuple))
 
     // post bundle
     fetch.mockResponse(
@@ -65,7 +73,6 @@ describe('Birth handler', () => {
 
     // @ts-ignore
     await birthNotificationHandler(request, h)
-
     expect(code).toBeCalledWith(201)
     expect(header).toBeCalledWith('Content-Type', 'application/json+openhim')
 

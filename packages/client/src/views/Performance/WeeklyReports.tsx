@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import moment from 'moment'
+import * as React from 'react'
+import { connect } from 'react-redux'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { ListTable } from '@opencrvs/components/lib/interface'
@@ -17,13 +21,32 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
 import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
 import { Header } from '@client/views/Performance/utils'
-import moment from 'moment'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { getToken } from '@client/utils/authUtils'
+import styled from '@client/styledComponents'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
+}
+
+const Actions = styled.div`
+  padding: 1em 0;
+`
+
+function downloadAllData() {
+  fetch(window.config.API_GATEWAY_URL + 'metrics/export', {
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+    .then(resp => resp.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'export.zip'
+      a.click()
+      window.URL.revokeObjectURL(url)
+    })
 }
 
 type Props = ReportProps & WrappedComponentProps
@@ -39,18 +62,19 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
     const endDayOfYear = moment([2019, 11]).endOf('month')
 
     while (startDayOfYear < endDayOfYear) {
-      const title = `${startDayOfYear.format(
-        'DD MMMM'
-      )} ${this.props.intl.formatMessage(
+      const start = startDayOfYear.clone()
+      const end = startDayOfYear.clone().add(7, 'days')
+      const title = `${start.format('DD MMMM')} ${this.props.intl.formatMessage(
         constantsMessages.to
-      )} ${startDayOfYear.add(7, 'days').format('DD MMMM YYYY')}`
+      )} ${end.format('DD MMMM YYYY')}`
       content.push({
         week: (
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
                 PERFORMANCE_REPORT_TYPE_WEEKY,
-                title
+                start.toDate(),
+                end.toDate()
               )
             }
           >
@@ -63,6 +87,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           </>
         )
       })
+      startDayOfYear.add(7, 'days')
     }
     return content
   }
@@ -78,6 +103,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.birth)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),
@@ -100,6 +126,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
           content={this.getContent()}
+          tableHeight={280}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),
@@ -117,6 +144,11 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
         />
+        <Actions>
+          <LinkButton onClick={downloadAllData} id="export-all-button">
+            {intl.formatMessage(messages.exportAll)}
+          </LinkButton>
+        </Actions>
       </>
     )
   }

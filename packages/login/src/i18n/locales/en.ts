@@ -17,6 +17,7 @@ export const ENGLISH_STATE = {
     'buttons.login': 'Login',
     'constants.phoneNumber': 'Phone number',
     'error.required.password': 'New password is not valid',
+    'error.errorPhoneNumberNotFound': 'Mobile phone number not found.',
     'label.error': 'Invalid input',
     'login.stepOneInstruction': 'Please enter your Username and password.',
     'login.username': 'Username',

@@ -13,6 +13,7 @@ import * as queryString from 'querystring'
 import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
+import { TOKEN_EXPIRE_MILLIS } from './constants'
 
 export interface IURLParams {
   [key: string]: string | string[] | undefined
@@ -65,4 +66,30 @@ export function getCurrentUserScope() {
   const token = getToken()
   const payload = token && getTokenPayload(token)
   return (payload && payload.scope) || []
+}
+
+export function isTokenAboutToExpire(token: string) {
+  const payload = token && getTokenPayload(token)
+  const payloadExpMillis = Number(payload && payload.exp) * 1000
+  return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
+}
+
+export function refreshToken() {
+  const token = getToken()
+  if (isTokenAboutToExpire(token)) {
+    fetch(`${window.config.AUTH_URL}/refreshToken`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        removeToken()
+        storeToken(data.token)
+      })
+  }
 }

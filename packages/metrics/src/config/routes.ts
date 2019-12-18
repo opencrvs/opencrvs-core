@@ -20,7 +20,8 @@ import {
   markDeathRegisteredHandler,
   newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
-import { metricsHandler } from '@metrics/features/registration/metrics/handler'
+import { metricsHandler } from '@metrics/features/metrics/handler'
+import { exportHandler } from '@metrics/features/export/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -181,6 +182,15 @@ export const getRoutes = () => {
       }
     },
 
+    // Export all data from InfluxDB to CSV
+    {
+      method: 'GET',
+      path: '/export',
+      handler: exportHandler,
+      config: {
+        tags: ['api']
+      }
+    },
     // used for tests to check JWT auth
     {
       method: 'GET',

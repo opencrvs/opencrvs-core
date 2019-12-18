@@ -22,7 +22,8 @@ import {
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
-  fetchUnionByFullBBSCode,
+  // fetchUnionByFullBBSCode,
+  getLastRegLocationFromFacility,
   fetchFacilityByHRISId
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
@@ -118,7 +119,11 @@ export async function deathNotificationHandler(
     request.headers.authorization
   )
   if (!placeOfDeathFacilityLocation) {
-    throw new Error('Could not find facility by HRIS ID')
+    throw new Error(
+      `CANNOT FIND FACILITY LOCATION FOR DEATH NOTIFICATION: ${JSON.stringify(
+        notification
+      )}`
+    )
   }
 
   const encounter = createDeathEncounterEntry(
@@ -131,14 +136,37 @@ export async function deathNotificationHandler(
     relatedPerson.fullUrl,
     encounter.fullUrl
   )
+
+  // While DHIS2 has no integration with A2I BBS codes, this process will be temporarily used
+  // It uses a hardcoded list of locations that are covered in the pilot to match to Facility api union / municipality name
+  // Upazila name will be used to attempt to match union or municipality as a last resort
+  // The Upazila name field is the only field that is consistently available in the DHIS2 form
+  // for births and deaths in unions and municipalities permanent address
+
+  const lastRegLocation = await getLastRegLocationFromFacility(
+    placeOfDeathFacilityLocation,
+    notification.permanent_address.upazila.name,
+    request.headers.authorization
+  )
+
+  /*
+
+  // When DHIS2 is integrated with A2I BBS codes, this process will be correct
+
   const lastRegLocId = notification.union_death_ocurred.id
   const lastRegLocation = await fetchUnionByFullBBSCode(
     lastRegLocId,
     request.headers.authorization
   )
+  
+  */
 
   if (!lastRegLocation) {
-    throw new Error('Could not find last registered union by full BBS code')
+    throw new Error(
+      `CANNOT FIND UNION OR MUNICIPALITY LOCATION FOR DEATH NOTIFICATION: ${JSON.stringify(
+        notification
+      )}`
+    )
   }
 
   const task = await createTaskEntry(

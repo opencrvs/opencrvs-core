@@ -40,3 +40,4 @@ export const EVENT_DATE_FORMAT = 'YYYY-MM-DD'
 
 // constants that shouldn't change
 export const MEDIATOR_URN = 'urn:opencrvs:dhis-mediator'
+export const ORG_URL = 'http://opencrvs.org'

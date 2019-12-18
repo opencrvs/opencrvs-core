@@ -14,6 +14,7 @@ import { graphqlHapi } from 'apollo-server-hapi'
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import { getExecutableSchema } from '@gateway/graphql/config'
+import { logger } from '@gateway/logger'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []
@@ -25,7 +26,8 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
       }
     },
     {
