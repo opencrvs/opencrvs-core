@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import fetch from 'node-fetch'
 import { HEARTH_URL } from '@search/constants'
 import { logger } from '@search/logger'
+import fetch from 'node-fetch'
 
 export interface ITemplatedComposition extends fhir.Composition {
   section?: fhir.CompositionSection[]
@@ -88,18 +88,12 @@ export function findEntryResourceByUrl(
   return bundleEntry && bundleEntry.resource
 }
 
-export function findName(code: string, patient: fhir.Patient) {
-  return (
-    patient.name &&
-    patient.name.find((name: fhir.HumanName) => name.use === code)
-  )
+export function findName(code: string, names: fhir.HumanName[] | undefined) {
+  return names && names.find((name: fhir.HumanName) => name.use === code)
 }
 
-export function findNameLocal(patient: fhir.Patient) {
-  return (
-    patient.name &&
-    patient.name.find((name: fhir.HumanName) => name.use !== 'en')
-  )
+export function findNameLocale(names: fhir.HumanName[] | undefined) {
+  return names && names.find((name: fhir.HumanName) => name.use !== 'en')
 }
 
 export async function getCompositionById(id: string) {
