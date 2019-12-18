@@ -12,7 +12,6 @@
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import {
   Duplicate,
-  Edit,
   StatusCertified,
   StatusGray,
   StatusGreen,
@@ -63,10 +62,8 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { Scope } from '@client/utils/authUtils'
 import {
-  CERTIFICATE_DATE_FORMAT,
   DECLARED,
   LANG_EN,
-  LOCAL_DATE_FORMAT,
   REJECTED,
   REJECT_REASON,
   REJECT_COMMENTS,
@@ -543,11 +540,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
     const isDuplicate = item.duplicates && item.duplicates.length > 0
-    const foundApplication = this.props.outboxApplications.find(
+    const application = this.props.outboxApplications.find(
       application => application.id === item.id
     )
     const downloadStatus =
-      (foundApplication && foundApplication.downloadStatus) || undefined
+      (application && application.downloadStatus) || undefined
     const info = []
     const status = []
     const icons = []
@@ -626,9 +623,8 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     }
 
     const listItemActions = []
-    const expansionActions: JSX.Element[] = []
 
-    if (!downloadStatus || downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+    if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
       listItemActions.push({
         actionComponent: (
           <DownloadButton
@@ -656,42 +652,23 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       }
 
       if (this.userHasRegisterScope() || this.userHasValidateScope()) {
-        if (
-          !isDuplicate &&
-          !applicationIsRegistered &&
-          !applicationIsCertified
-        ) {
+        if (!applicationIsRegistered && !applicationIsCertified) {
           listItemActions.push({
             label: applicationIsRejected
               ? this.props.intl.formatMessage(constantsMessages.update)
               : this.props.intl.formatMessage(constantsMessages.review),
             handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                item.id,
-                'review',
-                item.event.toLowerCase()
-              )
-          })
-        }
-        if (isDuplicate) {
-          listItemActions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(item.id)
+              !isDuplicate
+                ? this.props.goToPage(
+                    REVIEW_EVENT_PARENT_FORM_PAGE,
+                    item.id,
+                    'review',
+                    item.event.toLowerCase()
+                  )
+                : this.props.goToReviewDuplicate(item.id)
           })
         }
       }
-    }
-    if (applicationIsRegistered) {
-      expansionActions.push(
-        <StyledSecondaryButton
-          id={`editBtn_${item.trackingId}`}
-          disabled={true}
-        >
-          <Edit />
-          {this.props.intl.formatMessage(buttonMessages.edit)}
-        </StyledSecondaryButton>
-      )
     }
 
     return (
@@ -752,6 +729,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   contactNumber: searchType === PHONE_TEXT ? searchText : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
+                fetchPolicy="no-cache"
               >
                 {({
                   loading,
