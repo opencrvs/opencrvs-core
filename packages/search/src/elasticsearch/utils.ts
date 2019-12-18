@@ -166,15 +166,15 @@ export const createStatusHistory = async (
   const operatorNameLocale = user && findNameLocale(user.name)
 
   const operatorFirstNames =
-    operatorName && operatorName.given && operatorName.given.join(' ')
-  const operatorFamilyName =
-    operatorName && operatorName.family && operatorName.family
+    (operatorName && operatorName.given && operatorName.given.join(' ')) || ''
+  const operatorFamilyName = (operatorName && operatorName.family) || ''
   const operatorFirstNamesLocale =
-    operatorNameLocale &&
-    operatorNameLocale.given &&
-    operatorNameLocale.given.join(' ')
+    (operatorNameLocale &&
+      operatorNameLocale.given &&
+      operatorNameLocale.given.join(' ')) ||
+    ''
   const operatorFamilyNameLocale =
-    operatorNameLocale && operatorNameLocale.family && operatorNameLocale.family
+    (operatorNameLocale && operatorNameLocale.family) || ''
 
   const regLasOfficeExtension = findTaskExtension(
     task,
@@ -196,8 +196,8 @@ export const createStatusHistory = async (
     operatorFamilyName,
     operatorFirstNamesLocale,
     operatorFamilyNameLocale,
-    operatorOfficeName: office.name,
-    operatorOfficeAlias: office.alias
+    operatorOfficeName: (office && office.name) || '',
+    operatorOfficeAlias: (office && office.alias) || []
   } as IOperationHistory
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
