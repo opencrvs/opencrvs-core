@@ -19,7 +19,6 @@ import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
-  mockDeathRejectionTaskBundleWithoutCompositionReference,
   mockLocationResponse,
   mockMinimalDeathFhirBundle,
   mockSearchResponse,
@@ -181,27 +180,6 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/death/mark-voided',
         payload: mockDeathRejectionTaskBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(200)
-    })
-
-    it.skip('500 if the event data is updated with task where there is no focus reference for Composition', async () => {
-      ;(updateComposition as jest.Mock).mockReturnValue({})
-
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/mark-voided',
-        payload: mockDeathRejectionTaskBundleWithoutCompositionReference,
         headers: {
           Authorization: `Bearer ${token}`
         }
