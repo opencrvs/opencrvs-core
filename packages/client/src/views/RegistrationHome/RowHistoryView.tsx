@@ -384,7 +384,6 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
   }
 
   render() {
-    console.log('DATA:', JSON.stringify(this.props.eventDetails))
     return <ExpansionContent>{this.getRenderedData()}</ExpansionContent>
   }
 }
