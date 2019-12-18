@@ -14,8 +14,16 @@ import {
   fetchLocationByIdentifiers,
   fetchHierarchicalBangladeshLocations,
   fetchAllAddressLocations,
+  getLastRegLocationFromFacility,
   postBundle
 } from '@bgd-dhis2-mediator/features/fhir/api'
+import {
+  mockUnion,
+  mockMunicipality,
+  mockUnionFacility,
+  mockMunicipalityFacility,
+  mockUnknownUnionFacility
+} from '@bgd-dhis2-mediator/test/locations'
 
 let fetch: fetchMock.FetchMock
 
@@ -58,7 +66,7 @@ describe('FHIR API module tests', () => {
       )
     })
 
-    it('Throws an error when error response code returned', async () => {
+    it('Returns undefined when error response code returned so that notification can be logged on error', async () => {
       fetch.mockResponseOnce('', { status: 401 })
 
       await expect(
@@ -70,12 +78,10 @@ describe('FHIR API module tests', () => {
           'partof=Location/0',
           'bearer xyz'
         )
-      ).rejects.toThrowError(
-        'Error status code received in response, Unauthorized 401'
-      )
+      ).resolves.toEqual(undefined)
     })
 
-    it('Throws an error if no Location could be found in the returned bundle', async () => {
+    it('Returns undefined if no Location could be found in the returned bundle so that notification can be logged on error', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           resourceType: 'Bundle',
@@ -92,9 +98,7 @@ describe('FHIR API module tests', () => {
           'partof=Location/0',
           'bearer xyz'
         )
-      ).rejects.toThrowError(
-        'Location not found, identifiers: [{"system":"test1","value":"test1"},{"system":"test2","value":"test2"}], query suffix: partof=Location/0'
-      )
+      ).resolves.toEqual(undefined)
     })
   })
 
@@ -187,6 +191,59 @@ describe('FHIR API module tests', () => {
       await expect(postBundle(bundle, 'bearer xyz')).rejects.toThrowError(
         'Error status code received in response, Unauthorized 401'
       )
+    })
+  })
+
+  describe('.getLastRegLocationFromFacility()', () => {
+    it('Retreives a union from a facility with a recognised union', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnionFacility.entry[0].resource,
+        '',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(mockUnion.entry[0].resource)
+    })
+    it('Retreives a municipality from a facility with a recognised municipality', async () => {
+      fetch.mockResponses([JSON.stringify(mockMunicipality), { status: 200 }])
+
+      const municipalityLocation = await getLastRegLocationFromFacility(
+        mockMunicipalityFacility.entry[0].resource,
+        '',
+        'bearer xyz'
+      )
+      expect(municipalityLocation).toEqual(mockMunicipality.entry[0].resource)
+    })
+    it('Retreives a union from a facility with a hardcoded value', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnknownUnionFacility.entry[0].resource,
+        'Mahishasura',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(mockUnion.entry[0].resource)
+    })
+    it('Retreives a union with a hardcoded value even if an associated union exists, prioritising the hardcoded value', async () => {
+      fetch.mockResponses([JSON.stringify(mockMunicipality), { status: 200 }])
+
+      const municipalityLocation = await getLastRegLocationFromFacility(
+        mockUnionFacility.entry[0].resource,
+        'Narsingdi Paurashava',
+        'bearer xyz'
+      )
+      expect(municipalityLocation).toEqual(mockMunicipality.entry[0].resource)
+    })
+    it('Returns undefined if union or municipality cannot be found, or hardcoded string is invalid', async () => {
+      fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+
+      const unionLocation = await getLastRegLocationFromFacility(
+        mockUnknownUnionFacility.entry[0].resource,
+        'sagaerg',
+        'bearer xyz'
+      )
+      expect(unionLocation).toEqual(undefined)
     })
   })
 })
