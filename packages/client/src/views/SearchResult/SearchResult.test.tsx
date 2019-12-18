@@ -196,6 +196,68 @@ describe('SearchResult tests', () => {
                   deceasedName: []
                 },
                 {
+                  id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
+                  type: 'Birth',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'VALIDATED',
+                    trackingId: 'BQRZWDR',
+                    registrationNumber: '2019333494BQRZWDR2',
+                    duplicates: null,
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfBirth: '2010-01-01',
+                  childName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Fokrul',
+                      familyName: 'Islam'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ফকরুল',
+                      familyName: 'ইসলাম'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfDeath: '',
+                  deceasedName: []
+                },
+                {
+                  id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
+                  type: 'Birth',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'WAITING_VALIDATION',
+                    trackingId: 'BQRZWDR',
+                    registrationNumber: '2019333494BQRZWDR2',
+                    duplicates: null,
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfBirth: '2010-01-01',
+                  childName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Fokrul',
+                      familyName: 'Islam'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ফকরুল',
+                      familyName: 'ইসলাম'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfDeath: '',
+                  deceasedName: []
+                },
+                {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
                   type: 'Birth',
                   __typename: 'X',
@@ -302,6 +364,40 @@ describe('SearchResult tests', () => {
         trackingId: 'BQRZWDR',
         event: 'Birth',
         declarationStatus: 'REGISTERED',
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
+      },
+      {
+        id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
+        name: 'ফকরুল ইসলাম',
+        dob: '01 January 2010',
+        dod: '',
+        registrationNumber: '2019333494BQRZWDR2',
+        duplicates: [],
+        trackingId: 'BQRZWDR',
+        event: 'Birth',
+        declarationStatus: 'VALIDATED',
+        rejectionReasons: '',
+        rejectionComment: '',
+        contactNumber: '',
+        dateOfEvent: '2010-01-01',
+        createdAt: undefined,
+        modifiedAt: undefined
+      },
+      {
+        id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
+        name: 'ফকরুল ইসলাম',
+        dob: '01 January 2010',
+        dod: '',
+        registrationNumber: '2019333494BQRZWDR2',
+        duplicates: [],
+        trackingId: 'BQRZWDR',
+        event: 'Birth',
+        declarationStatus: 'WAITING_VALIDATION',
         rejectionReasons: '',
         rejectionComment: '',
         contactNumber: '',
@@ -700,6 +796,113 @@ describe('SearchResult tests', () => {
     )
 
     expect(updateButton.hostNodes()).toHaveLength(1)
+  })
+
+  it('renders print button in search page', async () => {
+    const application = {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
+      data: {},
+      event: Event.BIRTH,
+      downloadStatus: 'DOWNLOADED',
+      submissionStatus: 'REGISTERED'
+    }
+
+    // @ts-ignore
+    store.dispatch(storeApplication(application))
+    const graphqlMock = [
+      {
+        request: {
+          operationName: null,
+          query: SEARCH_EVENTS,
+          variables: {
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            sort: 'DESC',
+            trackingId: 'DW0UTHR',
+            registrationNumber: '',
+            contactNumber: '',
+            name: ''
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1,
+              results: [
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
+                  type: 'Death',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'REGISTERED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    duplicates: [],
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
+                }
+              ],
+              __typename: 'EventSearchResultSet'
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+
+    const printButton = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-0-Print'
+    )
+
+    printButton.hostNodes().simulate('click')
+
+    expect(window.location.pathname).toContain(
+      '/cert/collector/bc09200d-0160-43b4-9e2b-5b9e90424e92/death/certCollector'
+    )
+
+    expect(printButton.hostNodes()).toHaveLength(1)
   })
 
   it('goes to duplicate page while click duplicate button in search page', async () => {

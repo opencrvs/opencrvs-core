@@ -220,21 +220,6 @@ const ExpansionContentContainer = styled.div`
   margin-left: 10px;
 `
 
-const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabled};
-  color: ${({ theme }) => theme.colors.primary} !important;
-  ${({ theme }) => theme.fonts.buttonStyle};
-  svg {
-    margin-right: 15px;
-  }
-  &:hover {
-    background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabled};
-  }
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.background};
-  }
-`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
@@ -671,7 +656,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         }
       }
 
-      if (this.userHasRegisterScope() || this.userHasValidateScope()) {
+      if (this.userHasValidateScope() || this.userHasRegisterScope()) {
         if (!applicationIsRegistered && !applicationIsCertified) {
           listItemActions.push({
             label: applicationIsRejected
