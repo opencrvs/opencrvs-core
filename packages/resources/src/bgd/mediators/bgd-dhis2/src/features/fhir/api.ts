@@ -391,6 +391,11 @@ export async function getLastRegLocationFromFacility(
     if (
       facilityUnion &&
       facilityUnion.value &&
+      //Annoyingly Narsingdi 100 Bed Zilla Hospital has union_name set to "Urban Ward No-01 (narsingdi)"
+      //and paurasava_name set to "Narsingdi Paurashava", so the hierarchy doesnt work unless I ignore Urban Ward No-01 (narsingdi)
+      //I can't change this hierarchy as a lot of other facilities in unions seem to have
+      //this in parasava_name: "Unions of Bhurungamari Upazila" which is kind of crazy.
+      //Will get rid of it once BBS code is in picture again
       facilityUnion.value !== 'Urban Ward No-01 (narsingdi)'
     ) {
       matched = pilotUnions.find(
