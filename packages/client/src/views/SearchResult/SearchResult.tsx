@@ -275,6 +275,18 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
             <StatusGreen />
           </StatusIcon>
         )
+      case 'VALIDATED':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
+      case 'WAITING_VALIDATION':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
       case 'REJECTED':
         return (
           <StatusIcon>
@@ -302,6 +314,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         return this.props.intl.formatMessage(constantsMessages.application)
       case 'REGISTERED':
         return this.props.intl.formatMessage(constantsMessages.registered)
+      case 'VALIDATED':
+        return this.props.intl.formatMessage(constantsMessages.validated)
+      case 'WAITING_VALIDATION':
+        return this.props.intl.formatMessage(constantsMessages.waitingValidated)
       case 'REJECTED':
         return this.props.intl.formatMessage(constantsMessages.rejected)
       case 'CERTIFIED':
@@ -317,6 +333,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         return constantsMessages.applicationSubmittedOn
       case 'REGISTERED':
         return constantsMessages.applicationRegisteredOn
+      case 'VALIDATED':
+        return constantsMessages.applicationValidatedOn
+      case 'WAITING_VALIDATION':
+        return constantsMessages.applicationWaitingForValidationOn
       case 'REJECTED':
         return constantsMessages.applicationRejectedOn
       case 'CERTIFIED':
