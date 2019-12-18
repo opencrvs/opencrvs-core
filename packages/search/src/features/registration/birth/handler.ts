@@ -9,18 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
-import { internal } from 'boom'
 import { upsertEvent } from '@search/features/registration/birth/service'
 import { logger } from '@search/logger'
+import { internal } from 'boom'
+import * as Hapi from 'hapi'
 
 export async function birthEventHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as fhir.Bundle
   try {
-    await upsertEvent(payload)
+    await upsertEvent(request)
   } catch (error) {
     logger.error(`Search/birthEventHandler: error: ${error}`)
     return internal(error)
