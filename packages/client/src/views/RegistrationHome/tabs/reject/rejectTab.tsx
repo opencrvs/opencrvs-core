@@ -33,7 +33,11 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from '@client/forms'
@@ -144,6 +148,7 @@ class RejectTabComponent extends React.Component<
   }
 
   transformRejectedContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -190,9 +195,15 @@ class RejectTabComponent extends React.Component<
           }
         }
       }
-
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
       return {
         ...reg,
+        event,
         dateOfRejection:
           (reg.modifiedAt &&
             moment(

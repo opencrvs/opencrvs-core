@@ -14,6 +14,7 @@ import moment from 'moment'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
+import { IPrintableApplication } from '@client/applications'
 
 const FREE_PERIOD = window.config.CERTIFICATE_PRINT_CHARGE_FREE_PERIOD
 const CHARGE_UP_LIMIT = window.config.CERTIFICATE_PRINT_CHARGE_UP_LIMIT
@@ -161,4 +162,19 @@ export function getEvent(eventType: string | undefined) {
     case 'death':
       return Event.DEATH
   }
+}
+
+export function isCertificateForPrintInAdvance(
+  application: IPrintableApplication | undefined
+) {
+  const collectorType =
+    application &&
+    application.data.registration.certificates &&
+    application.data.registration.certificates[0] &&
+    application.data.registration.certificates[0].collector &&
+    application.data.registration.certificates[0].collector.type
+  if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
+    return true
+  }
+  return false
 }

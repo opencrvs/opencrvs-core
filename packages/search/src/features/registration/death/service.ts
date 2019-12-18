@@ -24,12 +24,12 @@ import {
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
-  findEntryResourceByUrl,
   findName,
   findNameLocal,
   findTask,
   findTaskExtension,
-  findTaskIdentifier
+  findTaskIdentifier,
+  findEntryResourceByUrl
 } from '@search/features/fhir/fhir-utils'
 
 const DECEASED_CODE = 'deceased-details'
@@ -81,6 +81,10 @@ async function updateEvent(task: fhir.Task) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/death-registration-number'
+  )
 
   const body: ICompositionBody = {
     status: (await getStatus(compositionId)) as IStatus[]
@@ -101,6 +105,8 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
 
   await createStatusHistory(body)
   await updateComposition(compositionId, body)
@@ -303,20 +309,11 @@ async function createApplicationIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  const relatedPerson = findEntry(
-    INFORMANT_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.RelatedPerson
-  const informant = findEntryResourceByUrl(
-    relatedPerson && relatedPerson.patient && relatedPerson.patient.reference,
-    bundleEntries
-  ) as fhir.Patient
-  const informantTelecom =
-    informant &&
-    informant.telecom &&
-    informant.telecom.find(telecom => telecom.system === 'phone')
   const task = findTask(bundleEntries)
+  const contactNumberExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person-phone-number'
+  )
   const placeOfApplicationExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
@@ -348,7 +345,8 @@ async function createApplicationIndex(
       code => code.system === 'http://opencrvs.org/doc-types'
     )
 
-  body.contactNumber = informantTelecom && informantTelecom.value
+  body.contactNumber =
+    contactNumberExtension && contactNumberExtension.valueString
   body.type =
     task &&
     task.businessStatus &&

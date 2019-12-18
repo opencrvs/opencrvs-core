@@ -26,6 +26,7 @@ interface IConstantsMessages {
   applicationTitle: MessageDescriptor
   applicationUpdatedOn: MessageDescriptor
   applicationValidatedOn: MessageDescriptor
+  applicationWaitingForValidationOn: MessageDescriptor
   birth: MessageDescriptor
   by: MessageDescriptor
   certificationPaymentTitle: MessageDescriptor
@@ -163,6 +164,12 @@ const messagesToDefine: IConstantsMessages = {
     description:
       'Label for the workflow timestamp when the status is validated',
     id: 'constants.applicationValidatedOn'
+  },
+  applicationWaitingForValidationOn: {
+    defaultMessage: 'Application sent for validation on',
+    description:
+      'Label for the workflow timestamp when the status is waiting_validation',
+    id: 'constants.applicationWaitingForValidationOn'
   },
   areYouSure: {
     defaultMessage: 'Are you sure?',

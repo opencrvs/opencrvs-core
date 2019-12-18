@@ -1159,5 +1159,31 @@ describe('Certificate collector test for a death registration', () => {
       const element = await waitForElement(component, '#type_INFORMANT')
       expect(element.hostNodes()).toHaveLength(1)
     })
+
+    it('redirects to review certificate for print in advance option', async () => {
+      component
+        .find('#type_PRINT_IN_ADVANCE')
+        .hostNodes()
+        .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      expect(history.location.pathname).toBe(
+        '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
+      )
+    })
   })
 })

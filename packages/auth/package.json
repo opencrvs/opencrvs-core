@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@types/hapi-pino": "^6.3.0",
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "crypto": "^1.0.1",
@@ -31,8 +32,8 @@
     "jsonwebtoken": "^8.3.0",
     "lint-staged": "^7.1.0",
     "node-fetch": "^2.6.0",
-    "redis": "^2.8.0",
-    "winston": "^3.0.0"
+    "pino": "^5.14.0",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
@@ -46,7 +47,6 @@
     "@types/jsonwebtoken": "^7.2.7",
     "@types/node-fetch": "^2.1.2",
     "@types/redis": "^2.8.6",
-    "@types/winston": "^2.3.9",
     "command-line-args": "^5.0.2",
     "command-line-usage": "^5.0.5",
     "cross-env": "^5.2.0",

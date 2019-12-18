@@ -24,7 +24,7 @@ import {
   TransformedData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
-import { set } from 'lodash'
+import { set, omit } from 'lodash'
 import { callingCountries } from 'country-data'
 
 export function transformCertificateData(
@@ -32,48 +32,48 @@ export function transformCertificateData(
   certificateData: ICertificate,
   sectionId: string
 ) {
-  if (!certificateData || !certificateData.collector) {
-    return transformedData
-  }
-  const collector: GQLRelatedPerson = {}
-  if (certificateData.collector.type) {
-    collector.relationship = certificateData.collector
-      .type as GQLRelationshipType
-  }
-  if (certificateData.collector.relationship) {
-    collector.otherRelationship = certificateData.collector
-      .relationship as string
-    collector.individual = {
-      name: [
-        {
-          use: 'en',
-          firstNames: certificateData.collector.firstName,
-          familyName: certificateData.collector.lastName
-        }
-      ],
-      identifier: [
-        {
-          id: certificateData.collector.iD,
-          type: certificateData.collector.iDType
-        }
-      ]
-    } as GQLPerson
-  }
-  if (certificateData.collector.affidavitFile) {
-    collector.affidavit = [
-      {
-        contentType: (certificateData.collector.affidavitFile as IFileValue)
-          .type,
-        data: (certificateData.collector.affidavitFile as IFileValue).data
-      }
-    ] as GQLAttachment[]
-  }
   transformedData[sectionId].certificates = [
     {
-      ...certificateData,
-      collector
+      ...omit(certificateData, 'collector')
     }
   ]
+  // for collector mapping
+  if (certificateData && certificateData.collector) {
+    const collector: GQLRelatedPerson = {}
+    if (certificateData.collector.type) {
+      collector.relationship = certificateData.collector
+        .type as GQLRelationshipType
+    }
+    if (certificateData.collector.relationship) {
+      collector.otherRelationship = certificateData.collector
+        .relationship as string
+      collector.individual = {
+        name: [
+          {
+            use: 'en',
+            firstNames: certificateData.collector.firstName,
+            familyName: certificateData.collector.lastName
+          }
+        ],
+        identifier: [
+          {
+            id: certificateData.collector.iD,
+            type: certificateData.collector.iDType
+          }
+        ]
+      } as GQLPerson
+    }
+    if (certificateData.collector.affidavitFile) {
+      collector.affidavit = [
+        {
+          contentType: (certificateData.collector.affidavitFile as IFileValue)
+            .type,
+          data: (certificateData.collector.affidavitFile as IFileValue).data
+        }
+      ] as GQLAttachment[]
+    }
+    transformedData[sectionId].certificates[0].collector = collector
+  }
 }
 
 export function setBirthRegistrationSectionTransformer(

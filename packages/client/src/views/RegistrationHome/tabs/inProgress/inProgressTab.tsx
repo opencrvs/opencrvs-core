@@ -35,7 +35,7 @@ import {
 } from '@client/navigation/routes'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap, sentenceCase } from '@client/utils/data-formatting'
+import { createNamesMap } from '@client/utils/data-formatting'
 import moment from 'moment'
 import * as React from 'react'
 import {
@@ -58,6 +58,7 @@ import { IStoreState } from '@client/store'
 import { Action } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -268,49 +269,19 @@ export class InProgressTabComponent extends React.Component<
   }
 
   transformDraftContent = () => {
+    const { intl } = this.props
+    const { locale } = intl
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
     return this.props.drafts.map((draft: IApplication) => {
-      let name
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
-        name =
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyNameEng &&
-            (!draft.data.child.firstNamesEng
-              ? ''
-              : draft.data.child.firstNamesEng + ' ') +
-              draft.data.child.familyNameEng) ||
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyName &&
-            (!draft.data.child.firstNames
-              ? ''
-              : draft.data.child.firstNames + ' ') +
-              draft.data.child.familyName) ||
-          ''
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (draft.event && draft.event.toString() === 'death') {
-        name =
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyNameEng &&
-            (!draft.data.deceased.firstNamesEng
-              ? ''
-              : draft.data.deceased.firstNamesEng + ' ') +
-              draft.data.deceased.familyNameEng) ||
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyName &&
-            (!draft.data.deceased.firstNames
-              ? ''
-              : draft.data.deceased.firstNames + ' ') +
-              draft.data.deceased.familyName) ||
-          ''
         pageRoute = DRAFT_DEATH_FORM_PAGE
       }
+      const name = getDraftApplicantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions = [
         {
@@ -326,7 +297,12 @@ export class InProgressTabComponent extends React.Component<
       ]
       return {
         id: draft.id,
-        event: (draft.event && sentenceCase(draft.event)) || '',
+        event:
+          (draft.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[draft.event.toLowerCase()]
+            )) ||
+          '',
         name: name || '',
         dateOfModification:
           (lastModificationDate && moment(lastModificationDate).fromNow()) ||

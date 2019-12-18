@@ -33,9 +33,13 @@ import { sentenceCase } from '@client/utils/data-formatting'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { calculateDays } from '@client/views/PrintCertificate/utils'
 import { goToApplicationDetails } from '@client/navigation'
-import { constantsMessages as messages } from '@client/i18n/messages'
+import {
+  constantsMessages as messages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
+import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -141,44 +145,15 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     }
     return this.props.applicationsReadyToSend.map(
       (draft: IApplication, index) => {
-        let name
-
-        if (draft.event && draft.event.toString() === 'birth') {
-          name =
-            (draft.data &&
-              draft.data.child &&
-              draft.data.child.familyNameEng &&
-              (!draft.data.child.firstNamesEng
-                ? ''
-                : draft.data.child.firstNamesEng + ' ') +
-                draft.data.child.familyNameEng) ||
-            (draft.data &&
-              draft.data.child &&
-              draft.data.child.familyName &&
-              (!draft.data.child.firstNames
-                ? ''
-                : draft.data.child.firstNames + ' ') +
-                draft.data.child.familyName) ||
-            ''
-        } else if (draft.event && draft.event.toString() === 'death') {
-          name =
-            (draft.data &&
-              draft.data.deceased &&
-              draft.data.deceased.familyNameEng &&
-              (!draft.data.deceased.firstNamesEng
-                ? ''
-                : draft.data.deceased.firstNamesEng + ' ') +
-                draft.data.deceased.familyNameEng) ||
-            (draft.data &&
-              draft.data.deceased &&
-              draft.data.deceased.familyName &&
-              (!draft.data.deceased.firstNames
-                ? ''
-                : draft.data.deceased.firstNames + ' ') +
-                draft.data.deceased.familyName) ||
-            ''
-        }
-
+        const { intl } = this.props
+        const { locale } = intl
+        const name = getDraftApplicantFullName(draft, locale)
+        const event =
+          (draft.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[draft.event.toLowerCase()]
+            )) ||
+          ''
         const { statusText, icon } = this.submissionStatusMap(
           draft.submissionStatus || '',
           navigator.onLine,
@@ -187,7 +162,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         )
         return {
           id: draft.id,
-          event: (draft.event && sentenceCase(draft.event)) || '',
+          event: event || '',
           name: name || '',
           submissionStatus: statusText || '',
           statusIndicator: icon ? [icon()] : null,
@@ -233,7 +208,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         {
           width: 45,
           label: this.props.intl.formatMessage(messages.name),
-          key: 'name'
+          key: 'name',
+          errorValue: this.props.intl.formatMessage(messages.noNameProvided)
         },
         {
           label: this.props.intl.formatMessage(messages.trackingId),

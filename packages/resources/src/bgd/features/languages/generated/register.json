@@ -90,6 +90,7 @@
         "constants.applicationSubmittedOn": "Application submitted on",
         "constants.applicationUpdatedOn": "Updated on",
         "constants.applicationValidatedOn": "Application reviewed on",
+        "constants.applicationWaitingForValidationOn": "Application sent for validation on",
         "constants.areYouSure": "Are you sure?",
         "constants.bbs": "BBS",
         "constants.birth": "Birth",
@@ -521,6 +522,7 @@
         "form.field.label.application.whoIsPresent.father": "Father",
         "form.field.label.application.whoIsPresent.mother": "Mother",
         "form.field.label.application.whoIsPresent.other": "Other",
+        "form.field.label.application.whoseContactDetails.applicant": "Applicant",
         "form.field.label.application.whoseContactDetails": "Who is the contact person for this application?",
         "form.field.label.application.whoseContactDetails.both": "Both Parents",
         "form.field.label.application.whoseContactDetails.father": "Father",
@@ -875,7 +877,7 @@
         "print.certificate.collector.idCheck.actions.withoutVerify": "No",
         "print.certificate.collector.idCheck.title": "Check proof of ID. Does it match the following details?",
         "print.certificate.collector.idCheckDialog.actions.cancel": "Cancel",
-        "print.certificate.collector.idCheckDialog.actions.send": "SEND",
+        "print.certificate.collector.idCheckDialog.actions.send": "CONTINUE",
         "print.certificate.collector.idCheckDialog.description": "Please be aware that if you proceed, you will be responsible for issuing a certificate without the necessary proof of ID from the collector",
         "print.certificate.collector.idCheckDialog.title": "Continue without proof of ID?",
         "print.certificate.collector.informant": "Informant",
@@ -1124,7 +1126,8 @@
         "certificate.receipt.service.5year": "{event} registration after 5 years of event",
         "certificate.receipt.service.45day.amount": "\u09F3 25.00",
         "certificate.receipt.service..5year.amount": "\u09F3 50.00",
-        "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000."
+        "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000.",
+        "form.field.label.certificatePrintInAdvance": "Print in advance for signatures and collection"
       }
     },
     {
@@ -1217,6 +1220,7 @@
         "constants.applicationSubmittedOn": "আবেদন জমা",
         "constants.applicationUpdatedOn": "আপডেট করা হয়েছে",
         "constants.applicationValidatedOn": "আবেদন পর্যালোচনা",
+        "constants.applicationWaitingForValidationOn": "আবেদন অধিকতর পর্যালোচনার জন্য জমা",
         "constants.areYouSure": "আপনি কি নিশ্চিত?",
         "constants.bbs": "পরিসংখ্যান ব্যুরো বাংলাদেশ",
         "constants.birth": "জন্ম",
@@ -1646,12 +1650,13 @@
         "form.field.label.application.whoIsPresent.father": "পিতা",
         "form.field.label.application.whoIsPresent.mother": "মা",
         "form.field.label.application.whoIsPresent.other": "অন্যান্য",
+        "form.field.label.application.whoseContactDetails.applicant": "আবেদনকারী",
         "form.field.label.application.whoseContactDetails": "যোগাযোগের মধ্যম হিসেবে তথ্যপ্রদানকারী কাকে পরিচয় করিয়ে দিতে সাচ্ছন্দ্যবোধ করেন",
         "form.field.label.application.whoseContactDetails.both": "মাতাপিতা উভয়",
         "form.field.label.application.whoseContactDetails.father": "পিতা",
         "form.field.label.application.whoseContactDetails.mother": "মা",
         "form.field.label.application.whoseContactDetails.other": "অন্যান্য",
-        "form.field.label.application.mainContact": "Main contact",
+        "form.field.label.application.mainContact": "যোগাযোগের প্রধান মাধ্যম",
         "form.field.label.attendantAtBirth": "জন্মকালীন সহকারী",
         "form.field.label.attendantAtBirthLayperson": "সাধারণ ব্যক্তি",
         "form.field.label.attendantAtBirthMidwife": "ধাত্রী",
@@ -2007,7 +2012,7 @@
         "print.certificate.collector.idCheck.actions.withoutVerify": "না",
         "print.certificate.collector.idCheck.title": "আইডির প্রমাণ পরীক্ষা করুন। এটি নিম্নলিখিত বিবরণ মেলে?",
         "print.certificate.collector.idCheckDialog.actions.cancel": "বাতিল",
-        "print.certificate.collector.idCheckDialog.actions.send": "পাঠান",
+        "print.certificate.collector.idCheckDialog.actions.send": "এগিয়ে যান",
         "print.certificate.collector.idCheckDialog.description": "দয়া করে সচেতন হন আপনি যদি এগিয়ে যান তবে আপনি সংগ্রাহকের কাছ থেকে আইডির প্রয়োজনীয় প্রমাণ ছাড়াই একটি সনদপত্র দেওয়ার জন্য দায়বদ্ধ থাকবেন",
         "print.certificate.collector.idCheckDialog.title": "আইডি প্রমাণ ছাড়াই চালিয়ে যাবেন?",
         "print.certificate.collector.informant": "তথ্যদাতা",
@@ -2136,7 +2141,7 @@
         "review.birthRegistration.queryError": "জন্ম নিবন্ধন fetching যখন একটি ত্রুটি ঘটেছে",
         "review.button.approve": "অনুমোদনের জন্য পাঠান",
         "review.documents.editDocuments": "সংযুক্তি যোগ করুন।",
-        "review.documents.zeroDocumentsText": "{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} জন্য কোন সমর্থিত নথি নেই  }",
+        "review.documents.zeroDocumentsText": "{section, select, child {শিশুর} mother {মায়ের} father {বাবার} deceased {মৃতের} informant {তথ্যদাতার} primaryCaregiver {পিতামাতার}} জন্য কোন সমর্থিত নথি নেই",
         "review.documentViewer.tagline": "প্রিভিউ বাছাই করুন",
         "review.documentViewer.title": "প্রমাণক ডকুমেন্ট",
         "review.edit.modal.backToPreview": "প্রিভিউতে ফেরত যান",
@@ -2255,7 +2260,8 @@
         "certificate.receipt.service.5year": "{event} তারিখের ৫ বছর পরে জন্ম নিবন্ধন",
         "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
         "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০",
-        "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000।"
+        "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000।",
+        "form.field.label.certificatePrintInAdvance": "স্বাক্ষর এবং সংগ্রহের জন্য আগাম প্রিন্ট করুন"
       }
     }
   ]

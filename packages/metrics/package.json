@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",
     "boom": "^7.2.0",
@@ -31,8 +32,8 @@
     "jwt-decode": "^2.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "typescript": "^3.7.2",
-    "winston": "^3.0.0"
+    "pino": "^5.14.0",
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
