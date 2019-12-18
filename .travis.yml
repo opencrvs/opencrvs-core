@@ -42,7 +42,6 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_CLIENT_URL=http://localhost:3000/
-        - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
         - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
         - docker

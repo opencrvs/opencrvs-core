@@ -119,7 +119,6 @@ const navigatorMock = {
   COUNTRY_LOGO_FILE: 'logo.png',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
-  PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040/bgd',
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
