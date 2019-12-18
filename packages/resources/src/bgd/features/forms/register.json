@@ -302,7 +302,7 @@
                   "label": {
                     "defaultMessage": "Main Contact",
                     "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirths"
+                    "id": "form.field.label.application.mainContact"
                   },
                   "required": false,
                   "initialValue": "",
@@ -418,7 +418,13 @@
                         "defaultMessage": "Mother",
                         "description": "Label for \"Mother\" radio option",
                         "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "FATHER",
@@ -426,7 +432,13 @@
                         "defaultMessage": "Father",
                         "description": "Label for \"Father\" radio option",
                         "id": "form.field.label.application.whoseContactDetails.father"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "OTHER",
@@ -7494,6 +7506,10 @@
                     {
                       "action": "hide",
                       "expression": "(draftData && draftData.registration && draftData.registration.whoseContactDetails === \"FATHER\")"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.primaryCaregiver && (draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\" || draftData.primaryCaregiver.parentDetailsType === \"MOTHER_AND_FATHER\"))"
                     }
                   ],
                   "mapping": {

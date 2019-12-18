@@ -40,6 +40,10 @@
         name: python3-pip
         state: present
 
+    - name: 'Install pexpect python module for ansible expect commands'
+      pip:
+        name: pexpect
+
     - name: 'Install docker python module for ansible docker commands'
       pip:
         name: docker
@@ -61,7 +65,7 @@
         name: 'backup opencrvs'
         minute: '0'
         hour: '0'
-        job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 172.16.17.54 /mnt/crypthome >> /var/log/opencrvs-backup.log 2>&1'
+        job: 'cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 172.16.17.54 /mnt/crypthome >> /var/log/opencrvs-backup.log 2>&1'
 
     - name: 'Check file for encrypted file system exists'
       stat:
@@ -121,6 +125,15 @@
       ufw:
         rule: allow
         name: OpenSSH
+
+    - name: 'Copy logrotate script'
+      copy:
+        src: ../logrotate.conf
+        dest: /etc/
+
+    - name: 'Save system logs to Papertrail'
+      register: papaertrailSystemLogs
+      shell: ' cd / && wget -qO - --header="X-Papertrail-Token: {{ papertrail_token }}" \ https://papertrailapp.com/destinations/16712142/setup.sh | sudo bash >> /var/log/papertrail.log 2>&1'
 
     # Docker swarm ports - Note: all published docker container port will override UFW rules!
     - name: 'Allow secure docker client communication'

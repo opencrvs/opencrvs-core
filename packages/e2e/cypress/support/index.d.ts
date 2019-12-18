@@ -22,5 +22,6 @@ declare namespace Cypress {
     verifyLandingPageVisible: () => void
     initializeFakeTimers: () => void
     downloadFirstApplication: () => void
+    registerApplicationWithMinimumInput: () => void
   }
 }

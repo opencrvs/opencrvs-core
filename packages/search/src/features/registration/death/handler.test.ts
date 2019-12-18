@@ -9,22 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
 import {
   indexComposition,
-  updateComposition,
-  searchByCompositionId
+  searchByCompositionId,
+  updateComposition
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/index'
 import {
   mockDeathFhirBundle,
   mockDeathFhirBundleWithoutCompositionId,
   mockDeathRejectionTaskBundle,
-  mockDeathRejectionTaskBundleWithoutCompositionReference,
+  mockLocationResponse,
+  mockMinimalDeathFhirBundle,
   mockSearchResponse,
-  mockSearchResponseWithoutCreatedBy
+  mockSearchResponseWithoutCreatedBy,
+  mockUserModelResponse
 } from '@search/test/utils'
+import { readFileSync } from 'fs'
+import * as fetchMock from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 
@@ -81,6 +86,12 @@ describe('Verify handlers', () => {
       >
       mockedIndexComposition.mockResolvedValue({})
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
+
+      fetch.mockResponses(
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -99,6 +110,30 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
+    it('should return status code 200 if the some sections is missing too', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
+      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:search-user'
+      })
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/new-declaration',
+        payload: mockMinimalDeathFhirBundle,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
@@ -108,6 +143,12 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(
         mockSearchResponseWithoutCreatedBy
       )
+
+      fetch.mockResponses(
+        [JSON.stringify(mockUserModelResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }]
+      )
+
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
@@ -139,27 +180,6 @@ describe('Verify handlers', () => {
         method: 'POST',
         url: '/events/death/mark-voided',
         payload: mockDeathRejectionTaskBundle,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('500 if the event data is updated with task where there is no focus reference for Composition', async () => {
-      ;(updateComposition as jest.Mock).mockReturnValue({})
-
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/mark-voided',
-        payload: mockDeathRejectionTaskBundleWithoutCompositionReference,
         headers: {
           Authorization: `Bearer ${token}`
         }

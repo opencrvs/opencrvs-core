@@ -25,6 +25,7 @@ export const resolvers: GQLResolver = {
         trackingId,
         registrationNumber,
         contactNumber,
+        name,
         count,
         skip,
         sort = 'desc'
@@ -45,6 +46,9 @@ export const resolvers: GQLResolver = {
       }
       if (contactNumber) {
         searchCriteria.contactNumber = contactNumber
+      }
+      if (name) {
+        searchCriteria.name = name
       }
       if (count) {
         searchCriteria.size = count

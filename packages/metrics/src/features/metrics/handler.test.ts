@@ -14,7 +14,7 @@ import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
-const readPoints = influx.readPoints as jest.Mock
+const readPoints = influx.query as jest.Mock
 
 describe('verify metrics handler', () => {
   let server: any

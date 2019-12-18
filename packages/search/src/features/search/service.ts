@@ -26,6 +26,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     status,
     type,
     applicationLocationId = EMPTY_STRING,
+    name = EMPTY_STRING,
     createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
@@ -42,6 +43,7 @@ export const searchComposition = async (params: ISearchQuery) => {
         trackingId,
         contactNumber,
         registrationNumber,
+        name,
         applicationLocationId,
         createdBy,
         { event, status, type }

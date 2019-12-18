@@ -9,6 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { DOWNLOAD_STATUS, IApplication } from '@client/applications'
+import { Action, Event } from '@client/forms'
+import {
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import {
+  goToApplicationDetails,
+  goToPrintCertificate
+} from '@client/navigation'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import { ITheme } from '@client/styledComponents'
+import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { Download } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -16,24 +33,11 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  goToPrintCertificate,
-  goToApplicationDetails
-} from '@client/navigation'
-import { transformData } from '@client/search/transformer'
-import { ITheme } from '@client/styledComponents'
 import moment from 'moment'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IStoreState } from '@client/store'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Event, Action } from '@client/forms'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -137,6 +141,7 @@ class PrintTabComponent extends React.Component<
   }
 
   transformRegisteredContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -181,9 +186,15 @@ class PrintTabComponent extends React.Component<
             )
         })
       }
-
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
       return {
         ...reg,
+        event,
         dateOfRegistration:
           (reg.modifiedAt &&
             moment(
@@ -208,7 +219,10 @@ class PrintTabComponent extends React.Component<
   }
 
   renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+    const { results } = this.props.queryData && this.props.queryData.data
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

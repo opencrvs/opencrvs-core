@@ -25,6 +25,20 @@ const allSearchFields = `
       createdAt
       modifiedAt
     }
+    operationHistories {
+      operationType
+      operatedOn
+      operatorRole
+      operatorName {
+        firstNames
+        familyName
+        use
+      }
+      operatorOfficeName
+      operatorOfficeAlias
+      rejectReason
+      rejectComment
+    }
     ... on BirthEventSearchSet {
       dateOfBirth
       childName {

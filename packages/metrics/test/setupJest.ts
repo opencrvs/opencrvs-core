@@ -16,7 +16,7 @@ jest.setMock('node-fetch', { default: fetch })
 jest.mock('@metrics/influxdb/client', () => ({
   __esModule: true,
   writePoints: jest.fn().mockReturnValue(Promise.resolve()),
-  readPoints: jest.fn()
+  query: jest.fn()
 }))
 
 const taskHistory = require('./test-data/task-history-response.json')

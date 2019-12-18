@@ -115,7 +115,7 @@ const SelectedSearchCriteria = styled.span`
   & .selected-icon {
     display: none;
   }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 2px;
     & .selected-icon {
       display: flex;

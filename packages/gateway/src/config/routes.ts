@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as glob from 'glob'
-import * as path from 'path'
+import { join, resolve } from 'path'
 import healthCheckHandler, {
   querySchema as healthCheckQuerySchema,
   responseSchema as healthCheckResponseSchema
@@ -50,8 +50,8 @@ export const getRoutes = () => {
   ]
   // add all routes from all modules to the routes array manually or write your routes inside a folder inside the server folder
   // with suffix as -routes.ts
-  glob.sync('./routes/**/*-route.ts').forEach(file => {
-    routes.push(require(path.resolve(file)))
+  glob.sync(join(__dirname, './routes/**/*-route.ts')).forEach(file => {
+    routes.push(require(resolve(file)).default)
   })
   return routes
 }

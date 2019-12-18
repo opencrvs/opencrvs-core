@@ -9,23 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import {
-  searchComposition,
-  searchByCompositionId
+  searchByCompositionId,
+  searchComposition
 } from '@search/elasticsearch/dbhelper'
+import {
+  findName,
+  findNameLocale,
+  findTaskExtension,
+  getFromFhir
+} from '@search/features/fhir/fhir-utils'
 import { SearchResponse } from 'elasticsearch'
-import { MATCH_SCORE_THRESHOLD } from '@search/constants'
+import fetch from 'node-fetch'
 
 export const enum EVENT {
   BIRTH = 'Birth',
   DEATH = 'Death'
 }
 
-export interface IStatus {
-  type: string
-  createdAt: string
-  createdBy: string
-  updatedBy?: string
+export const NAME_EN = 'en'
+
+export interface IOperationHistory {
+  operationType: string
+  operatedOn: string
+  operatorRole: string
+  operatorFirstNames: string
+  operatorFamilyName: string
+  operatorFirstNamesLocale: string
+  operatorFamilyNameLocale: string
+  operatorOfficeName: string
+  operatorOfficeAlias: string[]
   rejectReason?: string
   rejectComment?: string
 }
@@ -51,7 +65,7 @@ export interface ICompositionBody {
   updatedBy?: string
   createdAt?: string
   modifiedAt?: string
-  status?: IStatus[]
+  operationHistories?: IOperationHistory[]
 }
 
 export interface IBirthCompositionBody extends ICompositionBody {
@@ -73,6 +87,14 @@ export interface IBirthCompositionBody extends ICompositionBody {
   fatherFamilyNameLocal?: string
   fatherDoB?: string
   fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantFirstNamesLocal?: string
+  informantFamilyNameLocal?: string
+  primaryCaregiverFirstNames?: string
+  primaryCaregiverFamilyName?: string
+  primaryCaregiverFirstNamesLocal?: string
+  primaryCaregiverFamilyNameLocal?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {
@@ -81,6 +103,28 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
   deathDate?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherFirstNamesLocal?: string
+  motherFamilyNameLocal?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherFirstNamesLocal?: string
+  fatherFamilyNameLocal?: string
+  spouseFirstNames?: string
+  spouseFamilyName?: string
+  spouseFirstNamesLocal?: string
+  spouseFamilyNameLocal?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantFirstNamesLocal?: string
+  informantFamilyNameLocal?: string
+}
+
+interface IUserModelData {
+  _id: string
+  role: string
+  name: fhir.HumanName[]
 }
 
 export async function detectDuplicates(
@@ -109,20 +153,54 @@ export const getStatus = async (compositionId: string) => {
     results.hits.hits &&
     (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
 
-  return (result && result.status) as IStatus[]
+  return (result && result.operationHistories) as IOperationHistory[]
 }
 
-export const createStatusHistory = async (body: ICompositionBody) => {
-  const singleTask = {
-    type: body.type,
-    createdAt: Date.now().toString(),
+export const createStatusHistory = async (
+  body: ICompositionBody,
+  task: fhir.Task | undefined,
+  authHeader: string
+) => {
+  const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
+  const operatorName = user && findName(NAME_EN, user.name)
+  const operatorNameLocale = user && findNameLocale(user.name)
+
+  const operatorFirstNames =
+    (operatorName && operatorName.given && operatorName.given.join(' ')) || ''
+  const operatorFamilyName = (operatorName && operatorName.family) || ''
+  const operatorFirstNamesLocale =
+    (operatorNameLocale &&
+      operatorNameLocale.given &&
+      operatorNameLocale.given.join(' ')) ||
+    ''
+  const operatorFamilyNameLocale =
+    (operatorNameLocale && operatorNameLocale.family) || ''
+
+  const regLasOfficeExtension = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/regLastOffice'
+  )
+  const regLastOfficeReference =
+    regLasOfficeExtension &&
+    regLasOfficeExtension.valueReference &&
+    regLasOfficeExtension.valueReference.reference
+  const office: fhir.Location = await getFromFhir(`/${regLastOfficeReference}`)
+
+  const operationHistory = {
+    operationType: body.type,
+    operatedOn: task && task.lastModified,
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
-    createdBy: body.createdBy,
-    updatedBy: body.updatedBy
-  } as IStatus
-  body.status = body.status || []
-  body.status.push(singleTask)
+    operatorRole: user.role,
+    operatorFirstNames,
+    operatorFamilyName,
+    operatorFirstNamesLocale,
+    operatorFamilyNameLocale,
+    operatorOfficeName: (office && office.name) || '',
+    operatorOfficeAlias: (office && office.alias) || []
+  } as IOperationHistory
+  body.operationHistories = body.operationHistories || []
+  body.operationHistories.push(operationHistory)
 }
 
 function findDuplicateIds(
@@ -250,4 +328,18 @@ export function buildQuery(body: IBirthCompositionBody) {
       should
     }
   }
+}
+
+export async function getUser(practitionerId: string, authHeader: any) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify({
+      practitionerId
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authHeader
+    }
+  })
+  return await res.json()
 }

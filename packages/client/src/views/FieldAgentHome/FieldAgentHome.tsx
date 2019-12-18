@@ -76,7 +76,11 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { messages } from '@client/i18n/messages/views/fieldAgentHome'
-import { constantsMessages, errorMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  errorMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import moment from 'moment'
 
 const IconTab = styled(Button)<{ active: boolean }>`
@@ -264,6 +268,7 @@ class FieldAgentHomeView extends React.Component<
     }
 
     return data.searchEvents.results.map((reg: GQLEventSearchSet | null) => {
+      const { intl } = this.props
       const registrationSearchSet = reg as GQLEventSearchSet
       let names
       if (
@@ -285,10 +290,16 @@ class FieldAgentHomeView extends React.Component<
           registrationSearchSet.registration.dateOfApplication,
           APPLICATION_DATE_FORMAT
         ).fromNow()
+      const event = registrationSearchSet.type as string
 
       return {
         id: registrationSearchSet.id,
-        event: registrationSearchSet.type as string,
+        event:
+          (event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[event.toLowerCase()]
+            )) ||
+          '',
         name:
           (createNamesMap(names)[this.props.intl.locale] as string) ||
           (createNamesMap(names)[LANG_EN] as string),
