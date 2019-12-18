@@ -9,18 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Duplicate, Validate, Download } from '@opencrvs/components/lib/icons'
 import {
-  ColumnContentAlignment,
-  GridTable,
-  IAction
-} from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import {
+  goToApplicationDetails,
   goToPage,
-  goToReviewDuplicate,
-  goToApplicationDetails
+  goToReviewDuplicate
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
@@ -28,13 +20,20 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
-import moment from 'moment'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { withTheme } from 'styled-components'
 import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+import {
+  ColumnContentAlignment,
+  GridTable,
+  IAction
+} from '@opencrvs/components/lib/interface'
+import { HomeContent } from '@opencrvs/components/lib/layout'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import moment from 'moment'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import {
   constantsMessages,
@@ -44,6 +43,7 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { withTheme } from 'styled-components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -261,7 +261,10 @@ class ReviewTabComponent extends React.Component<
   }
 
   renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+    const { results } = this.props.queryData && this.props.queryData.data
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

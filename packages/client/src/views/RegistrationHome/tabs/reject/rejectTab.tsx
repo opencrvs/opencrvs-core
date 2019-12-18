@@ -10,16 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ColumnContentAlignment,
-  GridTable,
-  IAction
-} from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import {
+  goToApplicationDetails,
   goToPage,
-  goToReviewDuplicate,
-  goToApplicationDetails
+  goToReviewDuplicate
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
@@ -27,9 +20,16 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
+import {
+  ColumnContentAlignment,
+  GridTable,
+  IAction
+} from '@opencrvs/components/lib/interface'
+import { HomeContent } from '@opencrvs/components/lib/layout'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import moment from 'moment'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
@@ -223,7 +223,10 @@ class RejectTabComponent extends React.Component<
   }
 
   renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+    const { results } = this.props.queryData && this.props.queryData.data
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

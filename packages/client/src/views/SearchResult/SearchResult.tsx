@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import {
   Duplicate,
   StatusCertified,
@@ -548,8 +547,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const application = this.props.outboxApplications.find(
       application => application.id === item.id
     )
-    const downloadStatus =
-      (application && application.downloadStatus) || undefined
+    const downloadStatus = application && application.downloadStatus
     const info = []
     const status = []
     const icons = []

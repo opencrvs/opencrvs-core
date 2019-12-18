@@ -74,6 +74,9 @@ const ContentWrapper = styled.span<{
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
   ${({ color }) => color && `color: ${color};`}
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 const ActionWrapper = styled(ContentWrapper)`
   padding-right: 0px;
