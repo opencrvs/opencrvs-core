@@ -17,6 +17,7 @@ import * as Sentry from '@sentry/node'
 import { getExecutableSchema } from '@gateway/graphql/config'
 import { SENTRY_DSN } from '@gateway/constants'
 import { GraphQLError } from 'graphql'
+import { logger } from '@gateway/logger'
 
 export const getPlugins = (env: string | undefined, schemaPath: string) => {
   const plugins: any[] = []
@@ -28,7 +29,8 @@ export const getPlugins = (env: string | undefined, schemaPath: string) => {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
       }
     },
     {

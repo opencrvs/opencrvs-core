@@ -19,6 +19,7 @@ import {
   getAvailableLanguages,
   getDefaultLanguage
 } from '@notification/i18n/utils'
+import { logger } from '@notification/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -27,7 +28,8 @@ export default function getPlugins() {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
       }
     },
     {

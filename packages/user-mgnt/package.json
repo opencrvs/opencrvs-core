@@ -19,6 +19,7 @@
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.2",
     "@types/hapi-pino": "^6.3.0",
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "crypto": "^1.0.1",
@@ -32,8 +33,8 @@
     "lodash": "^4.17.11",
     "mongoose": "^5.1.5",
     "node-fetch": "^2.6.0",
-    "uuid": "^3.3.2",
-    "winston": "^3.0.0"
+    "pino": "^5.14.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/boom": "^7.2.0",
@@ -47,7 +48,6 @@
     "@types/mongoose": "^5.0.16",
     "@types/node-fetch": "^2.3.4",
     "@types/uuid": "^3.4.3",
-    "@types/winston": "^2.3.9",
     "cross-env": "^5.2.0",
     "jest": "24.7.1",
     "mockingoose": "^2.13.0",
