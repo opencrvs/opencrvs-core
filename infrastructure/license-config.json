@@ -5,6 +5,7 @@
     "**/patches",
     ".secrets",
     ".vscode",
+    ".history",
     "data",
     "backups",
     "**/coverage",
@@ -16,7 +17,8 @@
     "**/*Dockerfile",
     "**/packages/components/lib",
     "**/packages/*/build",
-    "packages/gateway/src/graphql/schema.d.ts"
+    "packages/gateway/src/graphql/schema.d.ts",
+    "infrastructure/configure-file-monitoring.sh"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

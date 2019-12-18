@@ -21,58 +21,17 @@ describe('fetch birth registration metrics', () => {
   it('returns an array of birth registraiton metrics', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        keyFigures: {},
-        regByAge: [
+        payments: [],
+        timeFrames: [
           {
-            label: '45d',
-            value: 200
-          },
-          {
-            label: '46d - 1yr',
-            value: 105
-          },
-          {
-            label: '1yr',
-            value: 300
-          },
-          {
-            label: '2yr',
-            value: 0
-          },
-          {
-            label: '3yr',
-            value: 0
-          },
-          {
-            label: '4yr',
-            value: 500
-          },
-          {
-            label: '5yr',
-            value: 0
-          },
-          {
-            label: '6yr',
-            value: 0
-          },
-          {
-            label: '7yr',
-            value: 0
-          },
-          {
-            label: '8yr',
-            value: 0
-          },
-          {
-            label: '9r',
-            value: 3
-          },
-          {
-            label: '10yr',
-            value: 0
+            locationId: 'fake',
+            regWithin45d: 0,
+            regWithin45dTo1yr: 0,
+            regWithin1yrTo5yr: 0,
+            regOver5yr: 0,
+            total: 0
           }
-        ],
-        regWithin$5d: {}
+        ]
       })
     )
 
@@ -82,17 +41,10 @@ describe('fetch birth registration metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.regByAge).toBeInstanceOf(Array)
-    expect(data.regByAge.length).toBe(12)
+    expect(data.timeFrames).toBeInstanceOf(Array)
+    expect(data.timeFrames.length).toBe(1)
   })
-  it('returns an empty array of birth registraiton metrics when the reponse is not valid', async () => {
-    fetch.mockResponse(JSON.stringify({ statusCode: 500, error: 'ERROR' }))
-    const data = await resolvers.Query.fetchBirthRegistrationMetrics({}, {})
 
-    expect(data).toBeDefined()
-    expect(data.regByAge).toBeInstanceOf(Array)
-    expect(data.regByAge.length).toBe(0)
-  })
   it('returns an empty array of birth registraiton metrics when error is thrown', async () => {
     fetch.mockReject(new Error('error'))
     await expect(

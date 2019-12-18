@@ -1633,6 +1633,9 @@ export const deathTaskMock = JSON.stringify({
       value: 'B5WGYJE'
     }
   ],
+  focus: {
+    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+  },
   extension: [
     {
       url: 'http://opencrvs.org/specs/extension/contact-person',
@@ -1655,3 +1658,13 @@ export const relatedPersonMock = JSON.stringify({
   },
   patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
 })
+
+export function wrapInBundle(...resources: [fhir.Resource | string]): string {
+  return JSON.stringify({
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: resources.map(resource => ({
+      resource: typeof resource === 'string' ? JSON.parse(resource) : resource
+    }))
+  })
+}

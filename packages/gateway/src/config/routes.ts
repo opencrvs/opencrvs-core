@@ -10,26 +10,48 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as glob from 'glob'
-import * as path from 'path'
+import { join, resolve } from 'path'
+import healthCheckHandler, {
+  querySchema as healthCheckQuerySchema,
+  responseSchema as healthCheckResponseSchema
+} from '@gateway/features/healthCheck/handler'
 
 export const getRoutes = () => {
-  // add ping route by default for health check
   const routes = [
+    // used for tests to check JWT auth
     {
       method: 'GET',
-      path: '/ping',
+      path: '/tokenTest',
       handler: (request: any, h: any) => {
-        return 'pong'
+        return 'success'
       },
       config: {
         tags: ['api']
+      }
+    },
+    // health check endpoint for all services
+    {
+      method: 'GET',
+      path: '/ping',
+      handler: healthCheckHandler,
+      config: {
+        tags: ['api'],
+        auth: false,
+        description: 'Checks the health of all services.',
+        notes: 'Pass the service as a query param: service',
+        validate: {
+          query: healthCheckQuerySchema
+        },
+        response: {
+          schema: healthCheckResponseSchema
+        }
       }
     }
   ]
   // add all routes from all modules to the routes array manually or write your routes inside a folder inside the server folder
   // with suffix as -routes.ts
-  glob.sync('./routes/**/*-route.ts').forEach(file => {
-    routes.push(require(path.resolve(file)))
+  glob.sync(join(__dirname, './routes/**/*-route.ts')).forEach(file => {
+    routes.push(require(resolve(file)).default)
   })
   return routes
 }

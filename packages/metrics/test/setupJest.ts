@@ -16,7 +16,7 @@ jest.setMock('node-fetch', { default: fetch })
 jest.mock('@metrics/influxdb/client', () => ({
   __esModule: true,
   writePoints: jest.fn().mockReturnValue(Promise.resolve()),
-  readPoints: jest.fn()
+  query: jest.fn()
 }))
 
 const taskHistory = require('./test-data/task-history-response.json')
@@ -30,7 +30,7 @@ jest.mock('@metrics/api', () => ({
 }))
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = 'TEST'
 
 beforeEach(() => {
   jest.clearAllMocks()

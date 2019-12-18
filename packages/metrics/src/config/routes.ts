@@ -20,7 +20,8 @@ import {
   markDeathRegisteredHandler,
   newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
-import { metricsHandler } from '@metrics/features/registration/metrics/handler'
+import { metricsHandler } from '@metrics/features/metrics/handler'
+import { exportHandler } from '@metrics/features/export/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -181,15 +182,41 @@ export const getRoutes = () => {
       }
     },
 
+    // Export all data from InfluxDB to CSV
+    {
+      method: 'GET',
+      path: '/export',
+      handler: exportHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    // used for tests to check JWT auth
+    {
+      method: 'GET',
+      path: '/tokenTest',
+      handler: (request: any, h: any) => {
+        return 'success'
+      },
+      config: {
+        tags: ['api']
+      }
+    },
+
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
       handler: (request: any, h: any) => {
-        return 'pong'
+        // Perform any health checks and return true or false for success prop
+        return {
+          success: true
+        }
       },
       config: {
-        tags: ['api']
+        auth: false,
+        tags: ['api'],
+        description: 'Health check endpoint'
       }
     }
   ]

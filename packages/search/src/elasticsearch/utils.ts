@@ -73,6 +73,14 @@ export interface IBirthCompositionBody extends ICompositionBody {
   fatherFamilyNameLocal?: string
   fatherDoB?: string
   fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantFirstNamesLocal?: string
+  informantFamilyNameLocal?: string
+  primaryCaregiverFirstNames?: string
+  primaryCaregiverFamilyName?: string
+  primaryCaregiverFirstNamesLocal?: string
+  primaryCaregiverFamilyNameLocal?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {
@@ -81,6 +89,22 @@ export interface IDeathCompositionBody extends ICompositionBody {
   deceasedFirstNamesLocal?: string
   deceasedFamilyNameLocal?: string
   deathDate?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherFirstNamesLocal?: string
+  motherFamilyNameLocal?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherFirstNamesLocal?: string
+  fatherFamilyNameLocal?: string
+  spouseFirstNames?: string
+  spouseFamilyName?: string
+  spouseFirstNamesLocal?: string
+  spouseFamilyNameLocal?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  informantFirstNamesLocal?: string
+  informantFamilyNameLocal?: string
 }
 
 export async function detectDuplicates(
@@ -113,7 +137,7 @@ export const getStatus = async (compositionId: string) => {
 }
 
 export const createStatusHistory = async (body: ICompositionBody) => {
-  const singleTask = {
+  const currentStatus = {
     type: body.type,
     createdAt: Date.now().toString(),
     rejectReason: body.rejectReason,
@@ -122,7 +146,7 @@ export const createStatusHistory = async (body: ICompositionBody) => {
     updatedBy: body.updatedBy
   } as IStatus
   body.status = body.status || []
-  body.status.push(singleTask)
+  body.status.push(currentStatus)
 }
 
 function findDuplicateIds(

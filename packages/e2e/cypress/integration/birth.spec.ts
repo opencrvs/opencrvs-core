@@ -18,88 +18,7 @@ context('Birth Integration Test', () => {
 
   it('Tests from application to registration using minimum input', () => {
     cy.initializeFakeTimers()
-
-    // LOGIN
-    cy.login('fieldWorker')
-    cy.createPin()
-    cy.verifyLandingPageVisible()
-
-    // EVENTS
-    cy.get('#select_vital_event_view').should('be.visible')
-    cy.get('#select_birth_event').click()
-    cy.get('#continue').click()
-
-    // SELECT INFORMANT
-    cy.get('#select_informant_BOTH_PARENTS').click()
-    cy.get('#continue').click()
-
-    // SELECT APPLICANT
-    cy.get('#applicant_MOTHER').click()
-    cy.goToNextFormSection()
-
-    // SELECT MAIN CONTACT POINT
-    cy.get('#contactPoint_MOTHER').click()
-    cy.get('#contactPoint\\.nestedFields\\.registrationPhone').type(
-      '01526972106'
-    )
-    cy.goToNextFormSection()
-
-    // APPLICATION FORM
-    // CHILD DETAILS
-    cy.get('#familyName').type('স্পিভক')
-    cy.get('#familyNameEng').type('Spivak')
-    cy.selectOption('#gender', 'Female', 'Female')
-    cy.get('#childBirthDate-dd').type('01')
-    cy.get('#childBirthDate-mm').type('08')
-    cy.get('#childBirthDate-yyyy').type('2018')
-    cy.get('#multipleBirth').type('1')
-    cy.selectOption('#placeOfBirth', 'Private_Home', 'Private Home')
-    cy.selectOption('#country', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#state', 'Dhaka', 'Dhaka')
-    cy.selectOption('#district', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4', 'Kaliganj', 'Kaliganj')
-    cy.goToNextFormSection()
-
-    // MOTHER DETAILS
-    cy.selectOption('#iDType', 'National_ID', 'National ID')
-    cy.get('#iD').type('19988010143317495')
-    cy.selectOption('#nationality', 'Bangladesh', 'Bangladesh')
-    cy.get('#familyName').type('বেগম')
-    cy.get('#familyNameEng').type('Begum')
-    cy.get('#motherBirthDate-dd').type('01')
-    cy.get('#motherBirthDate-mm').type('08')
-    cy.get('#motherBirthDate-yyyy').type('1971')
-    cy.selectOption('#countryPermanent', 'Bangladesh', 'Bangladesh')
-    cy.selectOption('#statePermanent', 'Dhaka', 'Dhaka')
-    cy.selectOption('#districtPermanent', 'Gazipur', 'Gazipur')
-    cy.selectOption('#addressLine4Permanent', 'Kaliganj', 'Kaliganj')
-    cy.goToNextFormSection()
-
-    // FATHER DETAILS
-    cy.get('#fathersDetailsExist_false').click()
-    cy.goToNextFormSection()
-
-    // DOCUMENTS
-    cy.goToNextFormSection()
-
-    cy.submitApplication()
-
-    // LOG OUT
-    cy.get('#ProfileMenuToggleButton').click()
-    cy.get('#ProfileMenuItem1').click()
-
-    // LOGIN AS LOCAL REGISTRAR
-    cy.login('registrar')
-    cy.createPin()
-
-    // LANDING PAGE
-    cy.downloadFirstApplication()
-    cy.get('#ListItemAction-0-Review').should('exist')
-    cy.get('#ListItemAction-0-Review')
-      .first()
-      .click()
-
-    cy.registerApplication()
+    cy.registerApplicationWithMinimumInput()
   })
 
   it('Tests from application to registration using maximum input', () => {
@@ -583,7 +502,7 @@ context('Birth Integration Test', () => {
     cy.registerApplication() // Wait for application to be sync'd
   })
 
-  it.only('Test Someone else journey using minimum input', () => {
+  it('Test Someone else journey using minimum input', () => {
     cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')

@@ -17,6 +17,7 @@ window.config = {
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
+  AUTH_URL: 'http://localhost:4040',
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040/bgd',

@@ -23,8 +23,7 @@ import {
   getTaskResource,
   findPersonEntry,
   findInformantEntry,
-  getSectionEntryBySectionCode,
-  INFORMANT_CODE
+  getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
 import fetch from 'node-fetch'
@@ -253,13 +252,35 @@ export async function postToHearth(payload: any) {
   return res.json()
 }
 
+export async function updateResourceInHearth(resource: fhir.ResourceBase) {
+  const res = await fetch(
+    `${HEARTH_URL}/${resource.resourceType}/${resource.id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(resource),
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `FHIR update to ${resource.resourceType} failed with [${
+        res.status
+      }] body: ${await res.text()}`
+    )
+  }
+
+  return res.text()
+}
+
 export async function getPhoneNo(
   composition: fhir.Composition,
   taskResource: fhir.Task,
   eventType: EVENT_TYPE
 ) {
   let phoneNumber
-  if (eventType === EVENT_TYPE.BIRTH) {
+  if (eventType === EVENT_TYPE.BIRTH || eventType === EVENT_TYPE.DEATH) {
     const phoneExtension =
       taskResource &&
       taskResource.extension &&
@@ -270,23 +291,6 @@ export async function getPhoneNo(
         )
       })
     phoneNumber = phoneExtension && phoneExtension.valueString
-  } else {
-    const informantSection = getSectionEntryBySectionCode(
-      composition,
-      INFORMANT_CODE
-    )
-    const relatedPerson =
-      informantSection && (await getFromFhir(`/${informantSection.reference}`))
-    const contact: fhir.Patient =
-      relatedPerson &&
-      (await getFromFhir(`/${relatedPerson.patient.reference}`))
-    const phoneEntry =
-      contact &&
-      contact.telecom &&
-      contact.telecom.find((contactPoint: fhir.ContactPoint) => {
-        return contactPoint.system === 'phone'
-      })
-    phoneNumber = phoneEntry && phoneEntry.value
   }
   if (!phoneNumber) {
     return false

@@ -20,6 +20,7 @@ import {
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
+import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 
 export async function baseHandler(
   request: Hapi.Request,
@@ -85,22 +86,23 @@ export async function markBirthRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
     const points = await Promise.all([
       generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['DECLARED', 'VALIDATED'],
+        bundle,
+        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
       ),
-      generateBirthRegPoint(
-        request.payload as fhir.Bundle,
-        'mark-existing-application-registered',
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(bundle)
     ])
 
     await writePoints(points)
@@ -138,22 +140,23 @@ export async function markDeathRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const bundle = await populateBundleFromPayload(
+      request.payload as fhir.Bundle | fhir.Task,
+      request.headers.authorization
+    )
+
     const points = await Promise.all([
       generateEventDurationPoint(
-        request.payload as fhir.Bundle,
-        ['DECLARED', 'VALIDATED'],
+        bundle,
+        ['DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
           Authorization: request.headers.authorization
         }
       ),
-      generateDeathRegPoint(
-        request.payload as fhir.Bundle,
-        'mark-existing-application-registered',
-        {
-          Authorization: request.headers.authorization
-        }
-      ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
+        Authorization: request.headers.authorization
+      }),
+      generateTimeLoggedPoint(bundle)
     ])
 
     await writePoints(points)
@@ -170,7 +173,9 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle),
+      generatePaymentPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],

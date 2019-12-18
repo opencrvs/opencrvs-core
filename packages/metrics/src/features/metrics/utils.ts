@@ -13,7 +13,7 @@ import * as moment from 'moment'
 import {
   IBirthKeyFigures,
   IEstimation
-} from '@metrics/features/registration/metrics/metricsGenerator'
+} from '@metrics/features/metrics/metricsGenerator'
 import {
   MALE,
   FEMALE,
@@ -21,7 +21,7 @@ import {
   CRUD_BIRTH_RATE_SEC,
   TOTAL_POPULATION_SEC,
   JURISDICTION_TYPE_SEC
-} from '@metrics/features/registration/metrics/constants'
+} from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchLocation } from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'

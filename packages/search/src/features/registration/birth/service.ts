@@ -27,20 +27,25 @@ import {
   addDuplicatesToComposition,
   findEntry,
   findName,
+  findNameLocal,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
   getCompositionById,
-  updateInHearth
+  updateInHearth,
+  findEntryResourceByUrl,
+  selectObservationEntry
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
+const INFORMANT_CODE = 'informant-details'
+const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
+const PRIMARY_CAREGIVER_TYPE_CODE = 'primary-caregiver'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 const NAME_EN = 'en'
-const NAME_BN = 'bn'
 
 export async function upsertEvent(bundle: fhir.Bundle) {
   const bundleEntries = bundle.entry
@@ -83,6 +88,10 @@ async function updateEvent(task: fhir.Task) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-registration-number'
+  )
   const body: ICompositionBody = {
     status: (await getStatus(compositionId)) as IStatus[]
   }
@@ -101,6 +110,8 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
 
   await createStatusHistory(body)
   await updateComposition(compositionId, body)
@@ -132,6 +143,8 @@ async function createIndexBody(
   createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
+  createInformantIndex(body, composition, bundleEntries)
+  createPrimaryCaregiverIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
   await createStatusHistory(body)
 }
@@ -154,7 +167,7 @@ function createChildIndex(
   ) as fhir.Encounter
 
   const childName = child && findName(NAME_EN, child)
-  const childNameLocal = child && findName(NAME_BN, child)
+  const childNameLocal = child && findNameLocal(child)
 
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
@@ -188,7 +201,7 @@ function createMotherIndex(
   }
 
   const motherName = findName(NAME_EN, mother)
-  const motherNameLocal = findName(NAME_BN, mother)
+  const motherNameLocal = findNameLocal(mother)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')
@@ -218,8 +231,8 @@ function createFatherIndex(
     return
   }
 
-  const fatherName = father && findName(NAME_EN, father)
-  const fatherNameLocal = father && findName(NAME_BN, father)
+  const fatherName = findName(NAME_EN, father)
+  const fatherNameLocal = findNameLocal(father)
 
   body.fatherFirstNames =
     fatherName && fatherName.given && fatherName.given.join(' ')
@@ -232,6 +245,99 @@ function createFatherIndex(
   body.fatherDoB = father.birthDate
   body.fatherIdentifier =
     father.identifier && father.identifier[0] && father.identifier[0].value
+}
+
+function createInformantIndex(
+  body: IBirthCompositionBody,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const informantRef = findEntry(
+    INFORMANT_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.RelatedPerson
+
+  if (!informantRef) {
+    return
+  }
+
+  const informant = findEntryResourceByUrl(
+    informantRef.patient.reference,
+    bundleEntries
+  ) as fhir.Patient
+
+  if (!informant) {
+    return
+  }
+
+  const informantName = findName(NAME_EN, informant)
+  const informantNameLocal = findNameLocal(informant)
+
+  body.informantFirstNames =
+    informantName && informantName.given && informantName.given.join(' ')
+  body.informantFamilyName =
+    informantName && informantName.family && informantName.family[0]
+  body.informantFirstNamesLocal =
+    informantNameLocal &&
+    informantNameLocal.given &&
+    informantNameLocal.given.join(' ')
+  body.informantFamilyNameLocal =
+    informantNameLocal &&
+    informantNameLocal.family &&
+    informantNameLocal.family[0]
+}
+
+function createPrimaryCaregiverIndex(
+  body: IBirthCompositionBody,
+  composition: fhir.Composition,
+  bundleEntries?: fhir.BundleEntry[]
+) {
+  const observationEntry = selectObservationEntry(
+    PRIMARY_CAREGIVER_TYPE_CODE,
+    bundleEntries
+  )
+  const observation =
+    observationEntry && (observationEntry.resource as fhir.Observation)
+  const primaryCaregiverType = (observation && observation.valueString) || ''
+
+  if (
+    primaryCaregiverType === 'MOTHER' ||
+    primaryCaregiverType === 'FATHER' ||
+    primaryCaregiverType === 'INFORMANT'
+  ) {
+    return
+  }
+
+  const primaryCaregiver = findEntry(
+    PRIMARY_CAREGIVER_CODE,
+    composition,
+    bundleEntries
+  ) as fhir.Patient
+
+  if (!primaryCaregiver) {
+    return
+  }
+
+  const primaryCaregiverName = findName(NAME_EN, primaryCaregiver)
+  const primaryCaregiverNameLocal = findNameLocal(primaryCaregiver)
+
+  body.primaryCaregiverFirstNames =
+    primaryCaregiverName &&
+    primaryCaregiverName.given &&
+    primaryCaregiverName.given.join(' ')
+  body.primaryCaregiverFamilyName =
+    primaryCaregiverName &&
+    primaryCaregiverName.family &&
+    primaryCaregiverName.family[0]
+  body.primaryCaregiverFirstNamesLocal =
+    primaryCaregiverNameLocal &&
+    primaryCaregiverNameLocal.given &&
+    primaryCaregiverNameLocal.given.join(' ')
+  body.primaryCaregiverFamilyNameLocal =
+    primaryCaregiverNameLocal &&
+    primaryCaregiverNameLocal.family &&
+    primaryCaregiverNameLocal.family[0]
 }
 
 async function createApplicationIndex(

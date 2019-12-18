@@ -23,15 +23,31 @@ const enum RouteScope {
 
 export const getRoutes = () => {
   const routes = [
+    // used for tests to check JWT auth
+    {
+      method: 'GET',
+      path: '/tokenTest',
+      handler: (request: any, h: any) => {
+        return 'success'
+      },
+      config: {
+        tags: ['api']
+      }
+    },
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
       handler: (request: any, h: any) => {
-        return 'pong'
+        // Perform any health checks and return true or false for success prop
+        return {
+          success: true
+        }
       },
       config: {
-        tags: ['api']
+        auth: false,
+        tags: ['api'],
+        description: 'Health check endpoint'
       }
     },
     {

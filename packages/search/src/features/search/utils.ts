@@ -23,6 +23,38 @@ const SEARCHABLE_FIELDS = [
   'registrationNumber',
   'contactNumber'
 ]
+
+const allNameFields = [
+  'childFirstNames',
+  'childFamilyName',
+  'childFirstNamesLocal',
+  'childFamilyNameLocal',
+  'motherFirstNames',
+  'motherFamilyName',
+  'motherFirstNamesLocal',
+  'motherFamilyNameLocal',
+  'fatherFirstNames',
+  'fatherFamilyName',
+  'fatherFirstNamesLocal',
+  'fatherFamilyNameLocal',
+  'informantFirstNames',
+  'informantFamilyName',
+  'informantFirstNamesLocal',
+  'informantFamilyNameLocal',
+  'primaryCaregiverFirstNames',
+  'primaryCaregiverFamilyName',
+  'primaryCaregiverFirstNamesLocal',
+  'primaryCaregiverFamilyNameLocal',
+  'deceasedFirstNames',
+  'deceasedFamilyName',
+  'deceasedFirstNamesLocal',
+  'deceasedFamilyNameLocal',
+  'spouseFirstNames',
+  'spouseFamilyName',
+  'spouseFirstNamesLocal',
+  'spouseFamilyNameLocal'
+]
+
 export const EMPTY_STRING = ''
 
 export function queryBuilder(
@@ -30,6 +62,7 @@ export function queryBuilder(
   trackingId: string,
   contactNumber: string,
   registrationNumber: string,
+  name: string,
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -42,6 +75,16 @@ export function queryBuilder(
       multi_match: {
         query: `${query}`,
         fields: SEARCHABLE_FIELDS,
+        fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (name !== EMPTY_STRING) {
+    must.push({
+      multi_match: {
+        query: name,
+        fields: allNameFields,
         fuzziness: 'AUTO'
       }
     })

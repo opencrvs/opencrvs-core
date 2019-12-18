@@ -17,12 +17,14 @@ export const SEARCH_EVENTS = gql`
     $trackingId: String
     $contactNumber: String
     $registrationNumber: String
+    $name: String
     $locationIds: [String]
   ) {
     searchEvents(
       sort: $sort
       trackingId: $trackingId
       registrationNumber: $registrationNumber
+      name: $name
       contactNumber: $contactNumber
       locationIds: $locationIds
     ) {

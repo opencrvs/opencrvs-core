@@ -11,17 +11,23 @@
  */
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
+import { logger } from '@metrics/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
     JWT,
-    {
-      plugin: Pino,
-      options: {
-        prettyPrint: false,
-        logPayload: false
-      }
-    }
+    ...(process.env.NODE_ENV === 'TEST'
+      ? []
+      : [
+          {
+            plugin: Pino,
+            options: {
+              prettyPrint: false,
+              logPayload: false,
+              instance: logger
+            }
+          }
+        ])
   ]
 
   return plugins

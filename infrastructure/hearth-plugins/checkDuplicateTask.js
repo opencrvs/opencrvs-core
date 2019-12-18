@@ -52,9 +52,7 @@ module.exports = (mongo, fhirResources) => {
 
               if (result && result.resource && result.resource.total !== 0) {
                 logger.warn(
-                  `OCRVS-plugin: Duplicate Task found for identifier: ${
-                    id.value
-                  }`
+                  `OCRVS-plugin: Duplicate Task found for identifier: ${id.value}`
                 )
 
                 callback(null, {
@@ -66,9 +64,7 @@ module.exports = (mongo, fhirResources) => {
                         severity: 'error',
                         code: 'duplicate',
                         details: {
-                          text: `Duplicate Task found for identifier: ${
-                            id.value
-                          }`
+                          text: `Duplicate Task found for identifier: ${id.value}`
                         }
                       }
                     ]

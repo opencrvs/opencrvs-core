@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Pino from 'hapi-pino'
+import { logger } from '@auth/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -17,7 +18,8 @@ export default function getPlugins() {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
       }
     }
   ]
