@@ -316,7 +316,7 @@ export class RegistrationHomeView extends React.Component<
         />
       )
     }
-    if (error || !data) {
+    if (!data) {
       return (
         <ErrorText id="search-result-error-text-count">
           {intl.formatMessage(errorMessages.queryError)}

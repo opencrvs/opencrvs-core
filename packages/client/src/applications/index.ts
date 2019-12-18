@@ -531,7 +531,8 @@ export async function writeApplicationByUser(
 async function getWorkqueueData(
   state: IStoreState,
   userDetails: IUserDetails,
-  workqueuePaginationParams: IWorkqueuePaginationParams
+  workqueuePaginationParams: IWorkqueuePaginationParams,
+  currentWorkqueue: IWorkqueue | undefined
 ) {
   const registrationLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
@@ -581,7 +582,7 @@ async function getWorkqueueData(
     workqueue = {
       loading: false,
       error: true,
-      data: state.workqueueState.workqueue.data
+      data: currentWorkqueue && currentWorkqueue.data
     }
   }
 
@@ -595,14 +596,15 @@ export async function writeRegistrarWorkqueueByUser(
   const state = getState()
   const userDetails = getUserDetails(state) as IUserDetails
 
+  const uID = userDetails.userMgntUserID || ''
+  let { allUserData, currentUserData } = await getUserData(uID)
+
   const workqueue = await getWorkqueueData(
     state,
     userDetails,
-    workqueuePaginationParams
+    workqueuePaginationParams,
+    currentUserData && currentUserData.workqueue
   )
-
-  const uID = userDetails.userMgntUserID || ''
-  let { allUserData, currentUserData } = await getUserData(uID)
 
   if (currentUserData) {
     currentUserData.workqueue = workqueue
