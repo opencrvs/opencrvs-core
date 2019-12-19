@@ -16,9 +16,9 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   findName,
+  findNameLocale,
   findTaskExtension,
-  getFromFhir,
-  findNameLocale
+  getFromFhir
 } from '@search/features/fhir/fhir-utils'
 import { SearchResponse } from 'elasticsearch'
 import fetch from 'node-fetch'
