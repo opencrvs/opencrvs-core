@@ -281,7 +281,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
+  it('should show pagination bar if pagination is used and items more than 11 in ReviewTab', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
@@ -308,6 +308,37 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
     testComponent.component
       .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+  })
+  it('should show loadmore button if loadmore is used and items more than 11 in ReviewTab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <ReviewTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+        showPaginated={false}
+      />,
+      store
+    )
+
+    const loadmore = await waitForElement(
+      testComponent.component,
+      '#load_more_button'
+    )
+
+    expect(loadmore.hostNodes()).toHaveLength(1)
+
+    testComponent.component
+      .find('#load_more_button')
       .last()
       .hostNodes()
       .simulate('click')
