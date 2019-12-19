@@ -9,6 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IApplication } from '@client/applications'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import { goToApplicationDetails, goToPage } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import styled, { ITheme } from '@client/styledComponents'
+import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import { Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -16,21 +28,12 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import { goToPage, goToApplicationDetails } from '@client/navigation'
-import { getScope } from '@client/profile/profileSelectors'
-import { transformData } from '@client/search/transformer'
-import { IStoreState } from '@client/store'
-import styled, { ITheme } from '@client/styledComponents'
 import moment from 'moment'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { withTheme } from 'styled-components'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import ReactTooltip from 'react-tooltip'
-import { constantsMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IApplication } from '@client/applications'
+import { withTheme } from 'styled-components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -142,6 +145,7 @@ class ApprovalTabComponent extends React.Component<
   }
 
   transformValidatedContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -151,8 +155,15 @@ class ApprovalTabComponent extends React.Component<
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
       return {
         ...reg,
+        event,
         eventTimeElapsed:
           (reg.dateOfEvent &&
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
@@ -181,7 +192,10 @@ class ApprovalTabComponent extends React.Component<
   }
 
   renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+    const { results } = this.props.queryData && this.props.queryData.data
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

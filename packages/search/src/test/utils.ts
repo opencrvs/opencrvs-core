@@ -1409,6 +1409,15 @@ export const mockDeathFhirBundle = {
         },
         extension: [
           {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
+          {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
               reference: 'Practitioner/cabb1751-2f1f-48a4-8ff5-31e7b1d79005'
@@ -1799,6 +1808,15 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           ]
         },
         extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'EXTENDED_FAMILY'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '01711111114'
+          },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
@@ -3469,4 +3487,85 @@ export const mockMinimalDeathFhirBundle = {
   meta: {
     lastUpdated: '2019-03-19T13:05:13.524Z'
   }
+}
+
+export const mockUserModelResponse = {
+  catchmentAreaIds: [
+    'c93cb3cf-38aa-4f07-b9a0-fe8b865a9fd9',
+    'd5ccd1d1-ca47-435b-93db-36c626ad2dfa',
+    '94429795-0a09-4de8-8e1e-27dab01877d2',
+    '1490d3dd-71a9-47e8-b143-f9fc64f71294',
+    '1490d3dd-71a9-47e8-b143-f9fc64f71294'
+  ],
+  scope: ['register', 'performance', 'certify', 'demo'],
+  status: 'active',
+  _id: '5ddfdfec61f7c0d1aafe1961',
+  name: [
+    {
+      given: ['Mohammad'],
+      use: 'en',
+      family: 'Ashraful'
+    }
+  ],
+  username: 'mohammad.ashraful',
+  email: 'test@test.org',
+  mobile: '+8801733333333',
+  passwordHash: 'hash',
+  salt: '78e7e7a1-9e21-42d7-b535-ca3d982fcbaf',
+  role: 'LOCAL_REGISTRAR',
+  type: 'CHAIRMAN',
+  practitionerId: '7f65e00c-88fc-4dd0-a7af-5ea42960ae61',
+  primaryOfficeId: '45e37658-cec7-4c61-b999-c49cfaf16da5',
+  securityQuestionAnswers: [],
+  identifiers: [],
+  creationDate: 1574952940762
+}
+
+export const mockLocationResponse = {
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/internal-id',
+      value: 'CRVS_FACILITY000002302'
+    }
+  ],
+  name: 'Alokbali Union Parishad',
+  alias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/c93cb3cf-38aa-4f07-b9a0-fe8b865a9fd9'
+  },
+  extension: [
+    {
+      url: 'http://opencrvs.org/extension/parent-location-reference',
+      valueString: 'Location/c93cb3cf-38aa-4f07-b9a0-fe8b865a9fd9'
+    }
+  ],
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'CRVS_OFFICE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  address: {
+    line: ['Alokbali', 'Narsingdi '],
+    district: 'Narsingdi',
+    state: 'Dhaka'
+  },
+  meta: {
+    lastUpdated: '2019-11-28T14:54:11.918+00:00',
+    versionId: '8de2fb91-0ba2-4179-841c-6867dc29abe2'
+  },
+  id: '45e37658-cec7-4c61-b999-c49cfaf16da5'
 }

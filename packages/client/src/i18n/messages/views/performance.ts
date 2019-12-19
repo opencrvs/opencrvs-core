@@ -27,6 +27,11 @@ const messagesToDefine = {
     defaultMessage:
       'No data for {searchedLocation}. We are currently piloting for two upazillas:',
     description: 'Message to show if no data is found for a location'
+  },
+  exportAll: {
+    id: 'performance.reports.exportAll',
+    defaultMessage: 'Export all performance data',
+    description: 'Link text where all performance data is downloaded from'
   }
 }
 

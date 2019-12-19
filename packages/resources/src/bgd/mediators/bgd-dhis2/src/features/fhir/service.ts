@@ -278,14 +278,19 @@ export async function createPersonEntry(
             }
           ]
         : [],
-      address: addressObject
+      address: [],
+      /*
+      
+      When DHIS2 is integrated with A2I BBS codes, this process will be correct
+      
+      addressObject
         ? [
             await convertAddressObjToFHIRPermanentAddress(
               addressObject,
               authHeader
             )
           ]
-        : [],
+        : [],*/
       birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT),
       deceasedBoolean: !!deathDate,
       deceasedDateTime: dateFormatter(deathDate, EVENT_DATE_FORMAT)

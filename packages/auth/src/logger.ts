@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createLogger, format, transports } from 'winston'
-
-export const logger = createLogger({
-  transports: [new transports.Console()],
-  format: format.combine(format.splat(), format.simple())
-})
+import * as pino from 'pino'
+export const logger = pino()
+if (process.env.NODE_ENV === 'test') {
+  logger.level = 'silent'
+}
