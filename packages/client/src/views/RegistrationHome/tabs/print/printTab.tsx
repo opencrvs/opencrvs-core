@@ -51,6 +51,7 @@ interface IBasePrintTabProps {
     compositionId: string,
     action: Action
   ) => void
+  showPaginated?: boolean
 }
 
 interface IPrintTabState {
@@ -228,6 +229,7 @@ class PrintTabComponent extends React.Component<
           currentPage={page}
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )

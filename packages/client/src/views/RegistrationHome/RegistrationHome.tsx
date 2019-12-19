@@ -200,6 +200,7 @@ export class RegistrationHomeView extends React.Component<
   IRegistrationHomeState
 > {
   pageSize = 10
+  showPaginated = false
   interval: any = undefined
   constructor(props: IRegistrationHomeProps) {
     super(props)
@@ -218,7 +219,18 @@ export class RegistrationHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    this.props.updateRegistrarWorkqueue()
+    this.props.updateRegistrarWorkqueue(
+      this.state.progressCurrentPage * this.pageSize,
+      this.state.reviewCurrentPage * this.pageSize,
+      this.state.updatesCurrentPage * this.pageSize,
+      this.state.approvalCurrentPage * this.pageSize,
+      this.state.printCurrentPage * this.pageSize,
+      0,
+      0,
+      0,
+      0,
+      0
+    )
   }
 
   componentDidMount() {
@@ -237,6 +249,13 @@ export class RegistrationHomeView extends React.Component<
     prevState: IRegistrationHomeState
   ) {
     if (prevProps.tabId !== this.props.tabId) {
+      this.setState({
+        progressCurrentPage: 1,
+        reviewCurrentPage: 1,
+        updatesCurrentPage: 1,
+        approvalCurrentPage: 1,
+        printCurrentPage: 1
+      })
       this.syncWorkqueue()
     }
   }
@@ -263,19 +282,29 @@ export class RegistrationHomeView extends React.Component<
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
       case TAB_ID.inProgress:
-        this.setState({ progressCurrentPage: newPageNumber })
+        this.setState({ progressCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.readyForReview:
-        this.setState({ reviewCurrentPage: newPageNumber })
+        this.setState({ reviewCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.sentForUpdates:
-        this.setState({ updatesCurrentPage: newPageNumber })
+        this.setState({ updatesCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.sentForApproval:
-        this.setState({ approvalCurrentPage: newPageNumber })
+        this.setState({ approvalCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.readyForPrint:
-        this.setState({ printCurrentPage: newPageNumber })
+        this.setState({ printCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
@@ -419,6 +448,7 @@ export class RegistrationHomeView extends React.Component<
               inProgressData: filteredData.inProgressTab,
               notificationData: filteredData.notificationTab
             }}
+            showPaginated={this.showPaginated}
             page={progressCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
@@ -430,6 +460,7 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.reviewTab
             }}
+            showPaginated={this.showPaginated}
             page={reviewCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
@@ -441,6 +472,7 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.rejectTab
             }}
+            showPaginated={this.showPaginated}
             page={updatesCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
@@ -452,6 +484,7 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.approvalTab
             }}
+            showPaginated={this.showPaginated}
             page={approvalCurrentPage}
             onPageChange={this.onPageChange}
           />
@@ -462,6 +495,7 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.printTab
             }}
+            showPaginated={this.showPaginated}
             page={printCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
@@ -500,7 +534,7 @@ export class RegistrationHomeView extends React.Component<
             icon={() => <PlusTransparentWhite />}
           />
         </FABContainer>
-        <NotificationToast />
+        <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
           <FloatingNotification

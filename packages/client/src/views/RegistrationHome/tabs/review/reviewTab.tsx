@@ -62,6 +62,7 @@ interface IBaseReviewTabProps {
     compositionId: string,
     action: Action
   ) => void
+  showPaginated?: boolean
 }
 
 interface IReviewTabState {
@@ -298,6 +299,7 @@ class ReviewTabComponent extends React.Component<
           currentPage={page}
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )

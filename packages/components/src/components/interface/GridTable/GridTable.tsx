@@ -114,7 +114,7 @@ interface IGridTableProps {
   currentPage?: number
   expandable?: boolean
   clickable?: boolean
-  usePagination?: boolean
+  showPaginated?: boolean
 }
 
 interface IGridTableState {
@@ -211,14 +211,22 @@ export class GridTable extends React.Component<
     pageSize: number,
     allItems: IDynamicValues[]
   ) => {
-    if (this.props.usePagination === false || allItems.length <= pageSize) {
+    const { showPaginated = false } = this.props
+    let displayItems
+    let offset
+    if (allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
       return allItems
     }
 
     // perform internal pagination
-    const offset = (currentPage - 1) * pageSize
-    const displayItems = allItems.slice(offset, offset + pageSize)
+    if (showPaginated === false) {
+      offset = 0
+      displayItems = allItems.slice(offset, currentPage * pageSize)
+    } else {
+      offset = (currentPage - 1) * pageSize
+      displayItems = allItems.slice(offset, offset + pageSize)
+    }
 
     return displayItems
   }
@@ -241,7 +249,7 @@ export class GridTable extends React.Component<
       hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
       currentPage = defaultConfiguration.currentPage,
-      usePagination = false
+      showPaginated = false
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -331,14 +339,14 @@ export class GridTable extends React.Component<
           }
         )}
 
-        {usePagination && totalItems > pageSize && (
+        {showPaginated && totalItems > pageSize && (
           <Pagination
             initialPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}
-        {!usePagination && totalItems > pageSize * currentPage && (
+        {!showPaginated && totalItems > pageSize * currentPage && (
           <LoadMore initialPage={currentPage} onLoadMore={this.onPageChange} />
         )}
 

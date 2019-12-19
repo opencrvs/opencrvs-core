@@ -57,6 +57,7 @@ interface IBaseRejectTabProps {
     compositionId: string,
     action: Action
   ) => void
+  showPaginated?: boolean
 }
 
 interface IRejectTabState {
@@ -245,6 +246,7 @@ class RejectTabComponent extends React.Component<
           currentPage={page}
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )

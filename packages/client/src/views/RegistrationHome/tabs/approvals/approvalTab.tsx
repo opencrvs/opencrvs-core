@@ -46,6 +46,7 @@ interface IBaseApprovalTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  showPaginated?: boolean
 }
 
 interface IApprovalTabState {
@@ -207,6 +208,7 @@ class ApprovalTabComponent extends React.Component<
           currentPage={page}
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )

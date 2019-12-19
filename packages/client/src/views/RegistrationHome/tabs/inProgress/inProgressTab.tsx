@@ -145,6 +145,7 @@ interface IRegistrarHomeState {
 
 interface IProps {
   resources: IOfflineData
+  showPaginated?: boolean
 }
 
 type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps & IProps
@@ -482,6 +483,7 @@ export class InProgressTabComponent extends React.Component<
         currentPage={page}
         expandable={this.getExpandable()}
         clickable={!this.getExpandable()}
+        showPaginated={this.props.showPaginated}
       />
     )
   }
@@ -504,6 +506,7 @@ export class InProgressTabComponent extends React.Component<
         currentPage={page}
         expandable={this.getExpandable()}
         clickable={!this.getExpandable()}
+        showPaginated={this.props.showPaginated}
       />
     )
   }
@@ -709,6 +712,7 @@ export class InProgressTabComponent extends React.Component<
             currentPage={page}
             expandable={this.getExpandable()}
             clickable={!this.getExpandable()}
+            showPaginated={this.props.showPaginated}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
