@@ -339,6 +339,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         queryData={{
           data: { totalItems: 14, results: [] }
         }}
+        showPaginated={true}
       />,
       store
     )

@@ -270,6 +270,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             results: []
           }
         }}
+        showPaginated={true}
       />,
       store
     )

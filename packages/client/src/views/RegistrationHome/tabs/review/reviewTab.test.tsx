@@ -294,6 +294,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
             results: []
           }
         }}
+        showPaginated={true}
       />,
       store
     )

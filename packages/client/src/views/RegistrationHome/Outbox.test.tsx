@@ -274,7 +274,7 @@ describe('OutBox tests', () => {
         applications.push(birthApp)
       }
       const testComp = (await createTestComponent(
-        <OutBox application={applications} />,
+        <OutBox application={applications} showPaginated={true} />,
         store
       )).component
       expect(testComp.exists('#pagination')).toBeTruthy()
