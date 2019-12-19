@@ -14,6 +14,7 @@
 context('Death Integration Test', () => {
   beforeEach(() => {
     indexedDB.deleteDatabase('OpenCRVS')
+    cy.initializeFakeTimers()
   })
 
   it('Tests from application to registration using minimum input', () => {

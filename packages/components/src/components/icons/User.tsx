@@ -11,12 +11,8 @@
  */
 import * as React from 'react'
 
-interface IProps {
-  isInvert?: boolean
-}
-
-export const User = (props: IProps & React.HTMLAttributes<SVGElement>) => {
-  const stroke = props.isInvert ? 'white' : '#35495D'
+export const User = (props: React.HTMLAttributes<SVGElement>) => {
+  const stroke = props.color === 'invert' ? 'white' : '#35495D'
   return (
     <svg width={24} height={24} fill="none" {...props}>
       <path

@@ -35,7 +35,7 @@ import {
 } from '@client/navigation/routes'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap, sentenceCase } from '@client/utils/data-formatting'
+import { createNamesMap } from '@client/utils/data-formatting'
 import moment from 'moment'
 import * as React from 'react'
 import {
@@ -55,9 +55,9 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
 import { get } from 'lodash'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 
 const BlueButton = styled(Button)`
@@ -133,11 +133,6 @@ interface IBaseRegistrarHomeProps {
   queryData: IQueryData
   page: number
   onPageChange: (newPageNumber: number) => void
-  onDownloadApplication: (
-    event: Event,
-    compositionId: string,
-    action: Action
-  ) => void
 }
 
 interface IRegistrarHomeState {
@@ -222,23 +217,15 @@ export class InProgressTabComponent extends React.Component<
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
-          label: '',
-          icon: () => <Download />,
-          handler: () => {
-            this.props.onDownloadApplication(
-              (event as unknown) as Event,
-              reg.id,
-              Action.LOAD_REVIEW_APPLICATION
-            )
-          },
-          loading:
-            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-          error:
-            downloadStatus === DOWNLOAD_STATUS.FAILED ||
-            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-          loadingLabel: this.props.intl.formatMessage(
-            constantsMessages.downloading
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: event as string,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
           )
         })
       } else {

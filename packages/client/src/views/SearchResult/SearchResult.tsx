@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import {
   Duplicate,
-  Edit,
   StatusCertified,
   StatusGray,
   StatusGreen,
@@ -63,10 +61,8 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { Scope } from '@client/utils/authUtils'
 import {
-  CERTIFICATE_DATE_FORMAT,
   DECLARED,
   LANG_EN,
-  LOCAL_DATE_FORMAT,
   REJECTED,
   REJECT_REASON,
   REJECT_COMMENTS,
@@ -85,6 +81,9 @@ import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/SearchResult/queries'
 import { Header } from '@client/components/interface/Header/Header'
+import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 const ListItemExpansionSpinner = styled(Spinner)`
   width: 70px;
@@ -220,21 +219,6 @@ const ExpansionContentContainer = styled.div`
   margin-left: 10px;
 `
 
-const StyledSecondaryButton = styled(SecondaryButton)`
-  border: solid 1px ${({ theme }) => theme.colors.disabled};
-  color: ${({ theme }) => theme.colors.primary} !important;
-  ${({ theme }) => theme.fonts.buttonStyle};
-  svg {
-    margin-right: 15px;
-  }
-  &:hover {
-    background: inherit;
-    border: solid 1px ${({ theme }) => theme.colors.disabled};
-  }
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.background};
-  }
-`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
@@ -244,6 +228,7 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
+  outboxApplications: IApplication[]
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
@@ -274,6 +259,18 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
             <StatusGreen />
           </StatusIcon>
         )
+      case 'VALIDATED':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
+      case 'WAITING_VALIDATION':
+        return (
+          <StatusIcon>
+            <StatusGray />
+          </StatusIcon>
+        )
       case 'REJECTED':
         return (
           <StatusIcon>
@@ -301,6 +298,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         return this.props.intl.formatMessage(constantsMessages.application)
       case 'REGISTERED':
         return this.props.intl.formatMessage(constantsMessages.registered)
+      case 'VALIDATED':
+        return this.props.intl.formatMessage(constantsMessages.validated)
+      case 'WAITING_VALIDATION':
+        return this.props.intl.formatMessage(constantsMessages.waitingValidated)
       case 'REJECTED':
         return this.props.intl.formatMessage(constantsMessages.rejected)
       case 'CERTIFIED':
@@ -316,6 +317,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         return constantsMessages.applicationSubmittedOn
       case 'REGISTERED':
         return constantsMessages.applicationRegisteredOn
+      case 'VALIDATED':
+        return constantsMessages.applicationValidatedOn
+      case 'WAITING_VALIDATION':
+        return constantsMessages.applicationWaitingForValidationOn
       case 'REJECTED':
         return constantsMessages.applicationRejectedOn
       case 'CERTIFIED':
@@ -462,10 +467,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                 } = status
                 const type = status.type as string
                 const officeName = status.officeName as string
-                const timestamp = moment(
-                  status.timestamp as string,
-                  LOCAL_DATE_FORMAT
-                ).format(CERTIFICATE_DATE_FORMAT)
+                const timestamp = status.timestamp as string
                 const collectorInfo = collectorName + ' (' + collectorType + ')'
 
                 return (
@@ -541,6 +543,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
+    const isDuplicate = item.duplicates && item.duplicates.length > 0
+    const application = this.props.outboxApplications.find(
+      application => application.id === item.id
+    )
+    const downloadStatus = application && application.downloadStatus
     const info = []
     const status = []
     const icons = []
@@ -620,68 +627,51 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
     const listItemActions = []
 
-    const expansionActions: JSX.Element[] = []
-    if (this.userHasCertifyScope()) {
-      if (applicationIsRegistered || applicationIsCertified) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () => this.props.goToPrintCertificate(item.id, item.event)
-        })
-      }
-    }
-
-    if (this.userHasRegisterScope()) {
-      if (
-        !(item.duplicates && item.duplicates.length > 0) &&
-        !applicationIsRegistered &&
-        !applicationIsRejected &&
-        !applicationIsCertified
-      ) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              item.id,
-              'review',
-              item.event.toLowerCase()
-            )
-        })
-      } else if (applicationIsRejected) {
-        listItemActions.push({
-          label: this.props.intl.formatMessage(constantsMessages.update),
-          handler: () =>
-            this.props.goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              item.id,
-              'review',
-              item.event.toLowerCase()
-            )
-        })
-      }
-    }
-
-    if (
-      item.duplicates &&
-      item.duplicates.length > 0 &&
-      !applicationIsRegistered &&
-      !applicationIsRejected
-    ) {
+    if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
       listItemActions.push({
-        label: this.props.intl.formatMessage(constantsMessages.review),
-        handler: () => this.props.goToReviewDuplicate(item.id)
+        actionComponent: (
+          <DownloadButton
+            key={item.id}
+            downloadConfigs={{
+              event: item.event,
+              compositionId: item.id,
+              action:
+                ((applicationIsRegistered || applicationIsCertified) &&
+                  Action.LOAD_CERTIFICATE_APPLICATION) ||
+                Action.LOAD_REVIEW_APPLICATION
+            }}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
+        )
       })
-    }
-    if (applicationIsRegistered) {
-      expansionActions.push(
-        <StyledSecondaryButton
-          id={`editBtn_${item.trackingId}`}
-          disabled={true}
-        >
-          <Edit />
-          {this.props.intl.formatMessage(buttonMessages.edit)}
-        </StyledSecondaryButton>
-      )
+    } else {
+      if (this.userHasCertifyScope()) {
+        if (applicationIsRegistered || applicationIsCertified) {
+          listItemActions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: () => this.props.goToPrintCertificate(item.id, item.event)
+          })
+        }
+      }
+
+      if (this.userHasValidateScope() || this.userHasRegisterScope()) {
+        if (!applicationIsRegistered && !applicationIsCertified) {
+          listItemActions.push({
+            label: applicationIsRejected
+              ? this.props.intl.formatMessage(constantsMessages.update)
+              : this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              !isDuplicate
+                ? this.props.goToPage(
+                    REVIEW_EVENT_PARENT_FORM_PAGE,
+                    item.id,
+                    'review',
+                    item.event.toLowerCase()
+                  )
+                : this.props.goToReviewDuplicate(item.id)
+          })
+        }
+      }
     }
 
     return (
@@ -705,6 +695,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
   }
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   userHasCertifyScope() {
@@ -738,6 +732,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   contactNumber: searchType === PHONE_TEXT ? searchText : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
+                fetchPolicy="no-cache"
               >
                 {({
                   loading,
@@ -768,7 +763,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                   }
 
                   const transformedData = transformData(data.searchEvents, intl)
-
                   const total = transformedData.length
                   return (
                     <>
@@ -813,7 +807,8 @@ export const SearchResult = connect(
   (state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
-    userDetails: getUserDetails(state)
+    userDetails: getUserDetails(state),
+    outboxApplications: state.applicationsState.applications
   }),
   {
     goToEvents: goToEventsAction,
