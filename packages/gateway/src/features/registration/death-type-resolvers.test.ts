@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { typeResolvers } from '@gateway/features/registration/type-resovlers'
+import { typeResolvers } from '@gateway/features/registration/type-resolvers'
 import { DECEASED_CODE } from '@gateway/features/fhir/templates'
 import {
   mockDeathComposition,

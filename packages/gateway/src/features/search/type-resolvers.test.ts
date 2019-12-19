@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
