@@ -128,7 +128,6 @@ export class Select extends React.Component<ISelectProps> {
         {...this.props}
         onChange={this.change}
         isSearchable={this.props.options.length > length}
-        isClearable={true}
         value={getSelectedOption(this.props.value, this.props.options)}
       />
     )

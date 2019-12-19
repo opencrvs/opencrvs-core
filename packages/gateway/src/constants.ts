@@ -27,6 +27,9 @@ export const NOTIFICATION_URL =
 export const WORKFLOW_URL = process.env.WORKFLOW_URL || 'http://localhost:5050/'
 export const RESOURCES_URL =
   process.env.RESOURCES_URL || 'http://localhost:3040'
+export const SENTRY_DSN =
+  process.env.SENTRY_DSN ||
+  'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.

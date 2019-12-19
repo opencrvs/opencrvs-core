@@ -20,7 +20,7 @@ import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   IUserSearchPayload,
   IUserPayload
-} from '@gateway/features/user/type-resovlers'
+} from '@gateway/features/user/type-resolvers'
 import { hasScope, isTokenOwner } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
