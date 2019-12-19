@@ -69,9 +69,9 @@ export default {
               }
               address {
                 type
-                line
-                district
-                state
+                lineName
+                districtName
+                stateName
                 city
                 postalCode
                 country
@@ -100,9 +100,9 @@ export default {
               }
               address {
                 type
-                line
-                district
-                state
+                lineName
+                districtName
+                stateName
                 city
                 postalCode
                 country
@@ -130,9 +130,9 @@ export default {
                 birthDate
                 address {
                   type
-                  line
-                  district
-                  state
+                  lineName
+                  districtName
+                  stateName
                   city
                   postalCode
                   country
@@ -183,8 +183,8 @@ export default {
                   name
                   alias
                   address {
-                    district
-                    state
+                    districtName
+                    stateName
                   }
                 }
               }
@@ -197,9 +197,9 @@ export default {
             eventLocation {
               type
               address {
-                line
-                district
-                state
+                lineName
+                districtName
+                stateName
                 city
                 postalCode
                 country
@@ -231,9 +231,9 @@ export default {
               }
               address {
                 type
-                line
-                district
-                state
+                lineName
+                districtName
+                stateName
                 city
                 postalCode
                 country
@@ -261,9 +261,9 @@ export default {
                 }
                 address {
                   type
-                  line
-                  district
-                  state
+                  lineName
+                  districtName
+                  stateName
                   city
                   postalCode
                   country
@@ -313,9 +313,9 @@ export default {
               type
               address {
                 type
-                line
-                district
-                state
+                lineName
+                districtName
+                stateName
                 city
                 postalCode
                 country

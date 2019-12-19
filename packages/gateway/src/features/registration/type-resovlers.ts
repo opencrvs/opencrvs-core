@@ -53,6 +53,7 @@ import {
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import * as validateUUID from 'uuid-validate'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -85,6 +86,30 @@ export const typeResolvers: GQLResolver = {
     },
     otherType: identifier => {
       return identifier.otherType
+    }
+  },
+  Address: {
+    stateName: async (address, _, authHeader) => {
+      const location = await fetchFHIR(`/Location/${address.state}`, authHeader)
+      return location.name
+    },
+    districtName: async (address, _, authHeader) => {
+      const location = await fetchFHIR(
+        `/Location/${address.district}`,
+        authHeader
+      )
+      return location.name
+    },
+    lineName: (address, _, authHeader) => {
+      return Promise.all(
+        address.line.map(async (line: string) => {
+          if (!validateUUID(line)) {
+            return line
+          }
+          const location = await fetchFHIR(`/Location/${line}`, authHeader)
+          return location.name
+        })
+      )
     }
   },
   Person: {

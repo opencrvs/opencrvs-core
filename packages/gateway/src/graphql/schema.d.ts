@@ -108,9 +108,12 @@ export interface GQLAddress {
   type?: GQLAddressType
   text?: string
   line?: Array<string | null>
+  lineName?: Array<string | null>
   city?: string
   district?: string
+  districtName?: string
   state?: string
+  stateName?: string
   postalCode?: string
   country?: string
   from?: GQLDate
@@ -1479,9 +1482,12 @@ export interface GQLAddressTypeResolver<TParent = any> {
   type?: AddressToTypeResolver<TParent>
   text?: AddressToTextResolver<TParent>
   line?: AddressToLineResolver<TParent>
+  lineName?: AddressToLineNameResolver<TParent>
   city?: AddressToCityResolver<TParent>
   district?: AddressToDistrictResolver<TParent>
+  districtName?: AddressToDistrictNameResolver<TParent>
   state?: AddressToStateResolver<TParent>
+  stateName?: AddressToStateNameResolver<TParent>
   postalCode?: AddressToPostalCodeResolver<TParent>
   country?: AddressToCountryResolver<TParent>
   from?: AddressToFromResolver<TParent>
@@ -1504,6 +1510,10 @@ export interface AddressToLineResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface AddressToLineNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface AddressToCityResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -1512,7 +1522,15 @@ export interface AddressToDistrictResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface AddressToDistrictNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface AddressToStateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AddressToStateNameResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
