@@ -41,6 +41,7 @@ export class LoadMore extends React.Component<ILoadMoreCustomProps, IState> {
     return (
       <LoadMoreContainer>
         <StyledButton
+          id="load_more_button"
           onClick={() => this.props.onLoadMore(this.props.initialPage + 1)}
         >
           Load More
