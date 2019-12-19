@@ -16,12 +16,12 @@ import { resolvers as registrationRootResolvers } from '@gateway/features/regist
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
-import { typeResolvers } from '@gateway/features/registration/type-resovlers'
+import { typeResolvers } from '@gateway/features/registration/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
-import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
-import { userTypeResolvers } from '@gateway/features/user/type-resovlers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { userTypeResolvers } from '@gateway/features/user/type-resolvers'
 import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
-import { roleTypeResolvers } from '@gateway/features/role/type-resovlers'
+import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 
 const graphQLSchemaPath = `${__dirname}/index.graphql`
 

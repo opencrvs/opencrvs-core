@@ -19,20 +19,22 @@
   },
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",
     "boom": "^7.2.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
+    "hapi-sentry": "^2.1.0",
     "influx": "^5.0.7",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
-    "typescript": "^3.7.2",
-    "winston": "^3.0.0"
+    "pino": "^5.14.0",
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",

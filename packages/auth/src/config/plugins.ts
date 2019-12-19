@@ -10,6 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Pino from 'hapi-pino'
+import * as Sentry from 'hapi-sentry'
+import { SENTRY_DSN } from '@auth/constants'
+import { logger } from '@auth/logger'
 
 export default function getPlugins() {
   const plugins: any[] = [
@@ -17,7 +20,18 @@ export default function getPlugins() {
       plugin: Pino,
       options: {
         prettyPrint: false,
-        logPayload: false
+        logPayload: false,
+        instance: logger
+      }
+    },
+    {
+      plugin: Sentry,
+      options: {
+        client: {
+          environment: process.env.NODE_ENV,
+          dsn: SENTRY_DSN
+        },
+        catchLogErrors: true
       }
     }
   ]

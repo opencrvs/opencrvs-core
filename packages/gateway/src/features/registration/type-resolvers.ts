@@ -349,9 +349,7 @@ export const typeResolvers: GQLResolver = {
           const historicalTask = taskEntry.resource
           // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
           if (historicalTask && historicalTask.meta) {
-            historicalTask.id = `${historicalTask.id}/_history/${
-              historicalTask.meta.versionId
-            }`
+            historicalTask.id = `${historicalTask.id}/_history/${historicalTask.meta.versionId}`
           }
           return historicalTask
         })
@@ -603,9 +601,7 @@ export const typeResolvers: GQLResolver = {
     },
     reasonsNotApplying: async (primaryCaregiver, _, authHeader) => {
       const observations = (await fetchFHIR(
-        `/Observation?encounter=${
-          primaryCaregiver.encounterSection.entry[0].reference
-        }`,
+        `/Observation?encounter=${primaryCaregiver.encounterSection.entry[0].reference}`,
         authHeader
       )) as fhir.Bundle
       const reasons: {
@@ -663,9 +659,7 @@ export const typeResolvers: GQLResolver = {
     },
     parentDetailsType: async (primaryCaregiver, _, authHeader) => {
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          primaryCaregiver.encounterSection.entry[0].reference
-        }&code=${PARENT_DETAILS}`,
+        `/Observation?encounter=${primaryCaregiver.encounterSection.entry[0].reference}&code=${PARENT_DETAILS}`,
         authHeader
       )
       return (
@@ -781,9 +775,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${MANNER_OF_DEATH_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MANNER_OF_DEATH_CODE}`,
         authHeader
       )
       return (
@@ -810,9 +802,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${CAUSE_OF_DEATH_METHOD_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_METHOD_CODE}`,
         authHeader
       )
       return (
@@ -835,9 +825,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${CAUSE_OF_DEATH_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_CODE}`,
         authHeader
       )
 
@@ -1003,9 +991,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BODY_WEIGHT_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BODY_WEIGHT_CODE}`,
         authHeader
       )
       return (
@@ -1025,9 +1011,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BIRTH_TYPE_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_TYPE_CODE}`,
         authHeader
       )
       return (
@@ -1069,9 +1053,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BIRTH_ATTENDANT_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_ATTENDANT_CODE}`,
         authHeader
       )
       return (
@@ -1095,9 +1077,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BIRTH_REG_TYPE_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_TYPE_CODE}`,
         authHeader
       )
       return (
@@ -1121,9 +1101,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${BIRTH_REG_PRESENT_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_PRESENT_CODE}`,
         authHeader
       )
       return (
@@ -1147,9 +1125,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${NUMBER_BORN_ALIVE_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${NUMBER_BORN_ALIVE_CODE}`,
         authHeader
       )
       return (
@@ -1173,9 +1149,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${NUMBER_FOEATAL_DEATH_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${NUMBER_FOEATAL_DEATH_CODE}`,
         authHeader
       )
       return (
@@ -1199,9 +1173,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const observations = await fetchFHIR(
-        `/Observation?encounter=${
-          encounterSection.entry[0].reference
-        }&code=${LAST_LIVE_BIRTH_CODE}`,
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${LAST_LIVE_BIRTH_CODE}`,
         authHeader
       )
       return (

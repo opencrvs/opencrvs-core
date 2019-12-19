@@ -24,7 +24,7 @@ import { ReactWrapper } from 'enzyme'
 import { Event } from '@client/forms'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { queries } from '@client/profile/queries'
-import { merge } from 'lodash'
+import { merge, cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { checkAuth } from '@client/profile/profileActions'
 
@@ -101,11 +101,16 @@ describe('when user wants to review birth certificate', () => {
 
   beforeEach(async () => {
     await store.dispatch(checkAuth({ '?token': validToken }))
-
+    const mockBirthApplicationData = cloneDeep(mockApplicationData)
+    mockBirthApplicationData.registration.certificates[0] = {
+      collector: {
+        type: 'PRINT_IN_ADVANCE'
+      }
+    }
     await store.dispatch(
       storeApplication(({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockApplicationData,
+        data: mockBirthApplicationData,
         event: Event.BIRTH
       } as unknown) as IApplication)
     )

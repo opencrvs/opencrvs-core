@@ -14,20 +14,21 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  createStatusHistory,
   detectDuplicates,
   EVENT,
+  getCreatedBy,
+  getStatus,
   IBirthCompositionBody,
   ICompositionBody,
-  getCreatedBy,
-  IStatus,
-  getStatus,
-  createStatusHistory
+  NAME_EN,
+  IOperationHistory
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
   findEntry,
   findName,
-  findNameLocal,
+  findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
@@ -37,6 +38,7 @@ import {
   selectObservationEntry
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
+import * as Hapi from 'hapi'
 
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
@@ -45,15 +47,16 @@ const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
 const PRIMARY_CAREGIVER_TYPE_CODE = 'primary-caregiver'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
-const NAME_EN = 'en'
 
-export async function upsertEvent(bundle: fhir.Bundle) {
+export async function upsertEvent(requestBundle: Hapi.Request) {
+  const bundle = requestBundle.payload as fhir.Bundle
   const bundleEntries = bundle.entry
+  const authHeader = requestBundle.headers.authorization
 
   if (bundleEntries && bundleEntries.length === 1) {
     const resource = bundleEntries[0].resource
     if (resource && resource.resourceType === 'Task') {
-      await updateEvent(resource as fhir.Task)
+      await updateEvent(resource as fhir.Task, authHeader)
       return
     }
   }
@@ -70,10 +73,15 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error(`Composition ID not found`)
   }
 
-  await indexAndSearchComposition(compositionId, composition, bundleEntries)
+  await indexAndSearchComposition(
+    compositionId,
+    composition,
+    authHeader,
+    bundleEntries
+  )
 }
 
-async function updateEvent(task: fhir.Task) {
+async function updateEvent(task: fhir.Task, authHeader: string) {
   const compositionId =
     task &&
     task.focus &&
@@ -88,8 +96,12 @@ async function updateEvent(task: fhir.Task) {
     task,
     'http://opencrvs.org/specs/extension/regLastUser'
   )
+  const registrationNumberIdentifier = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/birth-registration-number'
+  )
   const body: ICompositionBody = {
-    status: (await getStatus(compositionId)) as IStatus[]
+    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
   body.type =
     task &&
@@ -106,23 +118,26 @@ async function updateEvent(task: fhir.Task) {
     regLastUserIdentifier.valueReference &&
     regLastUserIdentifier.valueReference.reference &&
     regLastUserIdentifier.valueReference.reference.split('/')[1]
+  body.registrationNumber =
+    registrationNumberIdentifier && registrationNumberIdentifier.value
 
-  await createStatusHistory(body)
+  await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body)
 }
 
 async function indexAndSearchComposition(
   compositionId: string,
   composition: fhir.Composition,
+  authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
     createdAt: Date.now().toString(),
-    status: (await getStatus(compositionId)) as IStatus[]
+    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
-  await createIndexBody(body, composition, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body)
   if (body.type !== 'IN_PROGRESS') {
     await detectAndUpdateDuplicates(compositionId, composition, body)
@@ -132,6 +147,7 @@ async function indexAndSearchComposition(
 async function createIndexBody(
   body: IBirthCompositionBody,
   composition: fhir.Composition,
+  authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   createChildIndex(body, composition, bundleEntries)
@@ -140,7 +156,8 @@ async function createIndexBody(
   createInformantIndex(body, composition, bundleEntries)
   createPrimaryCaregiverIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
-  await createStatusHistory(body)
+  const task = findTask(bundleEntries)
+  await createStatusHistory(body, task, authHeader)
 }
 
 function createChildIndex(
@@ -160,8 +177,8 @@ function createChildIndex(
     bundleEntries
   ) as fhir.Encounter
 
-  const childName = child && findName(NAME_EN, child)
-  const childNameLocal = child && findNameLocal(child)
+  const childName = child && findName(NAME_EN, child.name)
+  const childNameLocal = child && findNameLocale(child.name)
 
   body.childFirstNames =
     childName && childName.given && childName.given.join(' ')
@@ -194,8 +211,8 @@ function createMotherIndex(
     return
   }
 
-  const motherName = findName(NAME_EN, mother)
-  const motherNameLocal = findNameLocal(mother)
+  const motherName = findName(NAME_EN, mother.name)
+  const motherNameLocal = findNameLocale(mother.name)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')
@@ -225,8 +242,8 @@ function createFatherIndex(
     return
   }
 
-  const fatherName = findName(NAME_EN, father)
-  const fatherNameLocal = findNameLocal(father)
+  const fatherName = findName(NAME_EN, father.name)
+  const fatherNameLocal = findNameLocale(father.name)
 
   body.fatherFirstNames =
     fatherName && fatherName.given && fatherName.given.join(' ')
@@ -265,8 +282,8 @@ function createInformantIndex(
     return
   }
 
-  const informantName = findName(NAME_EN, informant)
-  const informantNameLocal = findNameLocal(informant)
+  const informantName = findName(NAME_EN, informant.name)
+  const informantNameLocal = findNameLocale(informant.name)
 
   body.informantFirstNames =
     informantName && informantName.given && informantName.given.join(' ')
@@ -313,8 +330,8 @@ function createPrimaryCaregiverIndex(
     return
   }
 
-  const primaryCaregiverName = findName(NAME_EN, primaryCaregiver)
-  const primaryCaregiverNameLocal = findNameLocal(primaryCaregiver)
+  const primaryCaregiverName = findName(NAME_EN, primaryCaregiver.name)
+  const primaryCaregiverNameLocal = findNameLocale(primaryCaregiver.name)
 
   body.primaryCaregiverFirstNames =
     primaryCaregiverName &&
@@ -396,12 +413,8 @@ async function createApplicationIndex(
 
   const createdBy = await getCreatedBy(composition.id || '')
 
-  if (createdBy) {
-    body.createdBy = createdBy
-    body.updatedBy = regLastUser
-  } else {
-    body.createdBy = regLastUser
-  }
+  body.createdBy = createdBy || body.createdBy
+  body.updatedBy = regLastUser
 }
 
 async function detectAndUpdateDuplicates(

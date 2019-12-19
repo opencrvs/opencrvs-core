@@ -19,7 +19,12 @@ import { sentenceCase } from '@client/utils/data-formatting'
 import moment from 'moment'
 import { goToApplicationDetails } from '@client/navigation'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { constantsMessages as messages } from '@client/i18n/messages'
+import {
+  constantsMessages as messages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { LANG_EN } from '@client/utils/constants'
+import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 
 interface IInProgressProps {
   theme: ITheme
@@ -56,50 +61,23 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
     }
 
     return this.props.draftApplications.map((draft: IApplication) => {
-      let name
-      if (draft.event && draft.event.toString() === 'birth') {
-        name =
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyNameEng &&
-            (!draft.data.child.firstNamesEng
-              ? ''
-              : draft.data.child.firstNamesEng + ' ') +
-              draft.data.child.familyNameEng) ||
-          (draft.data &&
-            draft.data.child &&
-            draft.data.child.familyName &&
-            (!draft.data.child.firstNames
-              ? ''
-              : draft.data.child.firstNames + ' ') +
-              draft.data.child.familyName) ||
-          ''
-      } else if (draft.event && draft.event.toString() === 'death') {
-        name =
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyNameEng &&
-            (!draft.data.deceased.firstNamesEng
-              ? ''
-              : draft.data.deceased.firstNamesEng + ' ') +
-              draft.data.deceased.familyNameEng) ||
-          (draft.data &&
-            draft.data.deceased &&
-            draft.data.deceased.familyName &&
-            (!draft.data.deceased.firstNames
-              ? ''
-              : draft.data.deceased.firstNames + ' ') +
-              draft.data.deceased.familyName) ||
-          ''
-      }
+      const { intl } = this.props
+      const { locale } = intl
       const lastModificationDate = draft.modifiedOn || draft.savedOn
-
+      moment.locale(locale)
+      const event =
+        (draft.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[draft.event.toLowerCase()]
+          )) ||
+        ''
+      const name = getDraftApplicantFullName(draft, locale)
       return {
         id: draft.id,
-        event: (draft.event && sentenceCase(draft.event)) || '',
+        event: event,
         name: name || '',
         dateOfModification:
-          `Last updated ${lastModificationDate &&
+          `${intl.formatMessage(messages.lastUpdated)} ${lastModificationDate &&
             moment(lastModificationDate).fromNow()}` || '',
         rowClickHandler: [
           {

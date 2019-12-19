@@ -22,6 +22,7 @@ import {
   IPrintableApplication,
   IApplicationsState,
   modifyApplication,
+  writeApplication,
   storeApplication,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/applications'
@@ -45,7 +46,14 @@ import {
 } from '@client/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@client/forms/register/application-selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { getCountryTranslations, IAvailableCountries } from './utils'
+import {
+  getCountryTranslations,
+  IAvailableCountries,
+  isCertificateForPrintInAdvance,
+  getEventDate,
+  isFreeOfCost,
+  calculatePrice
+} from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
 
@@ -114,6 +122,7 @@ type IProps = {
   registerForm: IForm
   resources: IOfflineData
   modifyApplication: typeof modifyApplication
+  writeApplication: typeof writeApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
   storeApplication: typeof storeApplication
 }
@@ -162,19 +171,36 @@ class ReviewCertificateActionComponent extends React.Component<
     draft.action = Action.COLLECT_CERTIFICATE
 
     const certificate = draft.data.registration.certificates[0]
+    const eventDate = getEventDate(draft.data, draft.event)
+    let submittableCertificate
+    if (isCertificateForPrintInAdvance(draft)) {
+      if (isFreeOfCost(draft.event, eventDate)) {
+        submittableCertificate = {}
+      } else {
+        const paymentAmount = calculatePrice(draft.event, eventDate)
+        submittableCertificate = {
+          payments: {
+            type: 'MANUAL' as const,
+            total: paymentAmount,
+            amount: paymentAmount,
+            outcome: 'COMPLETED' as const,
+            date: Date.now()
+          }
+        }
+      }
+    } else {
+      submittableCertificate = certificate
+    }
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
-          ...certificate,
+          ...submittableCertificate,
           data:
             this.state.certificatePdf === null ? '' : this.state.certificatePdf
         }
       ]
     }
-    this.props.modifyApplication(draft)
-    this.toggleModal()
-    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
     printCertificate(
       this.props.intl,
       draft,
@@ -182,6 +208,10 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.resources,
       this.props.countries
     )
+    this.props.modifyApplication(draft)
+    this.props.writeApplication(draft)
+    this.toggleModal()
+    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
   }
 
   getTitle = () => {
@@ -327,6 +357,7 @@ function mapStatetoProps(
 }
 const mapDispatchToProps = {
   modifyApplication,
+  writeApplication,
   goToRegistrarHomeTabAction,
   storeApplication
 }
