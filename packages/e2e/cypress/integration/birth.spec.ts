@@ -668,8 +668,12 @@ context('Birth Integration Test', () => {
     cy.get('#searchText').type('+8801526972106')
     cy.get('#searchText').type('{enter}')
 
-    // CLICK DOWNLOAD APPLICATION
-    cy.get('#ListItemAction-0').click()
+    // CLICK DOWNLOAD AND REGISTER APPLICATION
+    cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Review').should('exist')
+    cy.get('#ListItemAction-0-Review')
+      .first()
+      .click()
+    cy.registerApplication()
   })
 })
