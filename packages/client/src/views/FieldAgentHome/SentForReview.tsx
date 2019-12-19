@@ -44,6 +44,7 @@ interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
   goToApplicationDetails: typeof goToApplicationDetails
+  showPaginated?: boolean
 }
 
 interface IState {
@@ -283,6 +284,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
           currentPage={this.state.sentForReviewPageNo}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )

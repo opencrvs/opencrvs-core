@@ -25,6 +25,7 @@ interface IInProgressProps {
   theme: ITheme
   draftApplications: IApplication[]
   goToApplicationDetails: typeof goToApplicationDetails
+  showPaginated?: boolean
 }
 
 type IFullProps = IInProgressProps & IntlShapeProps
@@ -181,6 +182,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           currentPage={this.state.inProgressPageNo}
           expandable={false}
           clickable={true}
+          showPaginated={this.props.showPaginated}
         />
       </HomeContent>
     )
