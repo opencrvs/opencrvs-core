@@ -688,7 +688,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
           )}
           {this.state.rejectFormOpen && (
             <RejectRegistrationForm
-              onBack={this.toggleRejectForm}
+              onClose={this.toggleRejectForm}
               confirmRejectionEvent={this.confirmSubmission}
               duplicate={duplicate}
               draftId={application.id}

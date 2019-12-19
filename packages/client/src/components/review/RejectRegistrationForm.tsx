@@ -11,7 +11,11 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ActionPage, Box } from '@opencrvs/components/lib/interface'
+import {
+  ActionPage,
+  Box,
+  ResponsiveModal
+} from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
 import { IFormSectionData, Event, Action } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
@@ -21,28 +25,13 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { IApplication, IPayload, SUBMISSION_STATUS } from '@client/applications'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { goToSearchResult } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
 
-const FormContainer = styled.div`
-  padding: 35px 25px;
-`
-export const OverlayContainer = styled.div`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: ${({ theme }) => theme.colors.background};
-  z-index: 4;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-`
-const StyledPrimaryButton = styled(PrimaryButton)`
-  box-shadow: 0 0 22px 0 rgba(0, 0, 0, 0.23);
+const Instruction = styled.div`
+  margin-bottom: 28px;
 `
 interface IState {
   data: IFormSectionData
@@ -53,7 +42,7 @@ interface IProps {
   application: IApplication
   event: Event
   duplicate?: boolean
-  onBack: () => void
+  onClose: () => void
   confirmRejectionEvent: (
     application: IApplication,
     status: string,
@@ -125,39 +114,48 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
     }
 
     return (
-      <OverlayContainer id="reject-registration-form-container">
-        <ActionPage
+      <div id="reject-registration-form-container">
+        <ResponsiveModal
           title={intl.formatMessage(messages.rejectionFormTitle)}
-          backLabel={intl.formatMessage(buttonMessages.back)}
-          goBack={this.props.onBack}
+          show={true}
+          width={918}
+          contentHeight={480}
+          handleClose={this.props.onClose}
+          actions={[
+            <TertiaryButton
+              id="cancel"
+              key="cancel"
+              onClick={this.props.onClose}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              id="submit_reject_form"
+              onClick={() =>
+                confirmRejectionEvent(
+                  application,
+                  SUBMISSION_STATUS.READY_TO_REJECT,
+                  Action.REJECT_APPLICATION,
+                  payload
+                )
+              }
+              disabled={!this.state.enableUploadButton}
+            >
+              {intl.formatMessage(buttonMessages.confirm)}
+            </PrimaryButton>
+          ]}
         >
-          <FormContainer>
-            <Box>
-              <FormFieldGenerator
-                id="reject_form"
-                fields={fields}
-                onChange={this.storeData}
-                setAllFieldsDirty={false}
-              />
-
-              <StyledPrimaryButton
-                id="submit_reject_form"
-                onClick={() =>
-                  confirmRejectionEvent(
-                    application,
-                    SUBMISSION_STATUS.READY_TO_REJECT,
-                    Action.REJECT_APPLICATION,
-                    payload
-                  )
-                }
-                disabled={!this.state.enableUploadButton}
-              >
-                {intl.formatMessage(messages.rejectionReasonSubmit)}
-              </StyledPrimaryButton>
-            </Box>
-          </FormContainer>
-        </ActionPage>
-      </OverlayContainer>
+          <Instruction>
+            {intl.formatMessage(messages.rejectionFormInstruction)}
+          </Instruction>
+          <FormFieldGenerator
+            id="reject_form"
+            fields={fields}
+            onChange={this.storeData}
+            setAllFieldsDirty={false}
+          />
+        </ResponsiveModal>
+      </div>
     )
   }
 }
