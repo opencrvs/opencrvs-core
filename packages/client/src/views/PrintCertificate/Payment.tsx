@@ -37,8 +37,10 @@ import { getOfflineData } from '@client/offline/selectors'
 const Header = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.black};
+  margin-bottom: 16px;
   margin-top: 0;
 `
+
 const Instruction = styled.p`
   color: ${({ theme }) => theme.colors.copy};
 `

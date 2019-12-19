@@ -314,93 +314,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
   it('renders expanded area for validated status', async () => {
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95'
-          }
-        },
-        result: {
-          data: {
-            fetchRegistration: {
-              id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-              registration: {
-                id: '345678',
-                type: 'DEATH',
-                certificates: null,
-                status: [
-                  {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                    timestamp: '2019-04-03T07:08:24.936Z',
-                    user: {
-                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Mohammad',
-                          familyName: 'Ashraful'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
-                        }
-                      ],
-                      role: 'LOCAL_REGISTRAR'
-                    },
-                    location: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: ['']
-                    },
-                    office: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: [''],
-                      address: {
-                        district: '7876',
-                        state: 'iuyiuy'
-                      }
-                    },
-                    type: 'VALIDATED',
-                    comments: null
-                  }
-                ],
-                contact: 'MOTHER',
-                contactPhoneNumber: null
-              },
-              child: null,
-              deceased: {
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Mushraful',
-                    familyName: 'Hoque'
-                  }
-                ],
-                deceased: {
-                  deathDate: '01-01-1984'
-                }
-              },
-              informant: {
-                individual: {
-                  telecom: [
-                    {
-                      use: null,
-                      system: 'phone',
-                      value: '01686972106'
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -452,6 +365,27 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   createdAt: '2007-01-01',
                   modifiedAt: '2007-01-01'
                 },
+                operationHistories: [
+                  {
+                    operationType: 'VALIDATED',
+                    operatedOn: '2019-12-12T15:23:21.280Z',
+                    operatorRole: 'REGISTRATION_AGENT',
+                    operatorName: [
+                      {
+                        firstNames: 'Tamim',
+                        familyName: 'Iqbal',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: null,
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfDeath: '2007-01-01',
                 deceasedName: [
                   {
@@ -470,8 +404,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     const gridTable = (await waitForElement(
@@ -491,93 +424,6 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
   it('renders expanded area for declared status', async () => {
     Date.now = jest.fn(() => 1554055200000)
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95'
-          }
-        },
-        result: {
-          data: {
-            fetchRegistration: {
-              id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-              registration: {
-                id: '345678',
-                type: 'DEATH',
-                certificates: null,
-                status: [
-                  {
-                    id:
-                      '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                    timestamp: '2019-04-03T07:08:24.936Z',
-                    user: {
-                      id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                      name: [
-                        {
-                          use: 'en',
-                          firstNames: 'Mohammad',
-                          familyName: 'Ashraful'
-                        },
-                        {
-                          use: 'bn',
-                          firstNames: '',
-                          familyName: ''
-                        }
-                      ],
-                      role: 'LOCAL_REGISTRAR'
-                    },
-                    location: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: ['']
-                    },
-                    office: {
-                      id: '123',
-                      name: 'Kaliganj Union Sub Center',
-                      alias: [''],
-                      address: {
-                        district: '7876',
-                        state: 'iuyiuy'
-                      }
-                    },
-                    type: 'DECLARED',
-                    comments: null
-                  }
-                ],
-                contact: 'MOTHER',
-                contactPhoneNumber: null
-              },
-              child: null,
-              deceased: {
-                name: [
-                  {
-                    use: 'en',
-                    firstNames: 'Mushraful',
-                    familyName: 'Hoque'
-                  }
-                ],
-                deceased: {
-                  deathDate: '01-01-1984'
-                }
-              },
-              informant: {
-                individual: {
-                  telecom: [
-                    {
-                      use: null,
-                      system: 'phone',
-                      value: '01686972106'
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    ]
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -629,6 +475,27 @@ describe('RegistrationHome sent for review tab related tests', () => {
                   createdAt: '2007-01-01',
                   modifiedAt: '2007-01-01'
                 },
+                operationHistories: [
+                  {
+                    operationType: 'DECLARED',
+                    operatedOn: '2019-12-12T15:23:21.280Z',
+                    operatorRole: 'FIELD_AGENT',
+                    operatorName: [
+                      {
+                        firstNames: 'Tamim',
+                        familyName: 'Iqbal',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: null,
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfDeath: '2007-01-01',
                 deceasedName: [
                   {
@@ -647,8 +514,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
           }
         }}
       />,
-      store,
-      graphqlMock
+      store
     )
 
     const instance = (await waitForElement(

@@ -9,47 +9,37 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled, { withTheme } from 'styled-components'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Spinner } from '@opencrvs/components/lib/interface'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from './queries'
-import { Query } from '@client/components/Query'
-
-import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLDeathRegistration,
-  GQLHumanName,
-  GQLQuery,
-  GQLComment,
-  GQLBirthRegistration,
-  GQLContactPoint
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import {
-  createNamesMap,
-  extractCommentFragmentValue
-} from '@client/utils/data-formatting'
-import {
-  LANG_EN,
-  REJECTED,
-  REJECT_REASON,
-  REJECT_COMMENTS,
-  CERTIFICATE_DATE_FORMAT,
-  CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT
-} from '@client/utils/constants'
 import {
   constantsMessages,
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/search'
-import moment from 'moment'
+import {
+  CERTIFICATE_DATE_FORMAT,
+  CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT,
+  LANG_EN,
+  REJECTED
+} from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
 import {
   StatusGray,
   StatusGreen,
   StatusOrange,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchSet,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema.d'
+import moment from 'moment'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import styled, { withTheme } from 'styled-components'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -166,40 +156,30 @@ function formatRoleCode(str: string) {
 
 type IProps = IntlShapeProps & {
   theme: ITheme
-  eventId: string
+  eventDetails?: GQLEventSearchSet | null
 }
 
 type ISODateString = string
 
 export class RowHistoryViewComponent extends React.Component<IProps> {
-  transformer = (data: GQLQuery) => {
+  transformer = () => {
+    const eventDetails = this.props.eventDetails as GQLEventSearchSet
+
     const { locale } = this.props.intl
-    const registration =
-      data && data.fetchRegistration && data.fetchRegistration.registration
-    const type = (registration && registration.type) || ''
+    const type = eventDetails.type || ''
+    const contactNumber =
+      eventDetails.registration && eventDetails.registration.contactNumber
+
     let name
     let dateOfEvent
-    let contactNumber: string | undefined | null
     if (type.toLowerCase() === 'birth') {
-      const birthReg = data && (data.fetchRegistration as GQLBirthRegistration)
-      name = (birthReg.child && birthReg.child.name) || []
-      dateOfEvent = birthReg.child && birthReg.child.birthDate
-      contactNumber =
-        birthReg.registration && birthReg.registration.contactPhoneNumber
+      const birthEventDetails = eventDetails as GQLBirthEventSearchSet
+      name = birthEventDetails.childName || []
+      dateOfEvent = birthEventDetails.dateOfBirth
     } else {
-      const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
-      name = (deathReg.deceased && deathReg.deceased.name) || []
-      dateOfEvent =
-        deathReg.deceased &&
-        deathReg.deceased.deceased &&
-        deathReg.deceased.deceased.deathDate
-      const informant = deathReg && deathReg.informant
-      contactNumber =
-        informant &&
-        informant.individual &&
-        informant.individual.telecom &&
-        informant.individual.telecom[0] &&
-        (informant.individual.telecom[0] as GQLContactPoint).value
+      const deathEventDetails = eventDetails as GQLDeathEventSearchSet
+      name = deathEventDetails.deceasedName || []
+      dateOfEvent = deathEventDetails.dateOfDeath
     }
 
     return {
@@ -212,45 +192,39 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
           )) ||
         '',
       contactNumber,
-      statuses:
-        (registration &&
-          registration.status &&
-          registration.status.map(status => {
+      operationHistories:
+        (eventDetails.operationHistories &&
+          eventDetails.operationHistories.map(operationHistory => {
             return {
-              type: status && status.type,
+              type: operationHistory && operationHistory.operationType,
               practitionerName:
-                (status &&
-                  status.user &&
-                  (createNamesMap(status.user.name as GQLHumanName[])[
-                    locale
-                  ] as string)) ||
+                (operationHistory &&
+                  (createNamesMap(
+                    operationHistory.operatorName as GQLHumanName[]
+                  )[locale] as string)) ||
                 '',
-              timestamp: status && (status.timestamp as ISODateString),
+              timestamp:
+                operationHistory &&
+                (operationHistory.operatedOn as ISODateString),
               practitionerRole:
-                status && status.user && status.user.role
+                operationHistory && operationHistory.operatorRole
                   ? this.props.intl.formatMessage(
-                      userMessages[status.user.role as string]
+                      userMessages[operationHistory.operatorRole as string]
                     )
                   : '',
               officeName:
                 locale === LANG_EN
-                  ? status && status.office && status.office.name
-                  : status && status.office && status.office.alias,
+                  ? operationHistory && operationHistory.operatorOfficeName
+                  : operationHistory && operationHistory.operatorOfficeAlias,
               rejectReasons:
-                (status &&
-                  status.type === REJECTED &&
-                  extractCommentFragmentValue(
-                    (status.comments as GQLComment[]) || [],
-                    REJECT_REASON
-                  )) ||
+                (operationHistory &&
+                  operationHistory.operationType === REJECTED &&
+                  operationHistory.rejectReason) ||
                 '',
               comment:
-                (status &&
-                  status.type === REJECTED &&
-                  extractCommentFragmentValue(
-                    (status.comments as GQLComment[]) || [],
-                    REJECT_COMMENTS
-                  )) ||
+                (operationHistory &&
+                  operationHistory.operationType === REJECTED &&
+                  operationHistory.rejectComment) ||
                 ''
             }
           })) ||
@@ -316,138 +290,101 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     }
   }
 
-  render() {
+  getRenderedData() {
     const { intl } = this.props
+    const transformedData = this.transformer()
+
     return (
-      <ExpansionContent>
-        <Query
-          query={FETCH_REGISTRATION_BY_COMPOSITION}
-          variables={{
-            id: this.props.eventId
-          }}
-          fetchPolicy="no-cache"
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: any
-            error?: any
-            data?: any
-          }) => {
-            if (error) {
-              return (
-                <ErrorText id="search-result-error-text-expanded">
-                  {intl.formatMessage(errorMessages.queryError)}
-                </ErrorText>
+      <>
+        <BorderedPaddedContent>
+          <ExpansionContainer>
+            <label>{intl.formatMessage(constantsMessages.name)}:</label>
+            <BoldSpan>{transformedData.name}</BoldSpan>
+          </ExpansionContainer>
+          <ExpansionContainer>
+            <label>
+              {intl.formatMessage(
+                transformedData.type.toLowerCase() === 'birth'
+                  ? constantsMessages.dob
+                  : constantsMessages.dod
+              )}
+              :
+            </label>
+            <BoldSpan>{transformedData.dateOfEvent}</BoldSpan>
+          </ExpansionContainer>
+          <ExpansionContainer>
+            <label>{intl.formatMessage(messages.informantContact)}:</label>
+            <BoldSpan>{transformedData.contactNumber}</BoldSpan>
+          </ExpansionContainer>
+        </BorderedPaddedContent>
+        <>
+          {transformedData.operationHistories
+            .map((operationHistory, index) => {
+              const {
+                practitionerName,
+                practitionerRole,
+                rejectReasons,
+                comment
+              } = operationHistory
+              const type = operationHistory.type as string
+              const officeName = operationHistory.officeName as string
+              const timestamp = moment(operationHistory.timestamp!).format(
+                CERTIFICATE_DATE_FORMAT
               )
-            } else if (loading) {
               return (
-                <SpinnerContainer>
-                  <QuerySpinner id="query-spinner" />
-                </SpinnerContainer>
-              )
-            }
-            const transformedData = this.transformer(data)
-            return (
-              <>
-                <BorderedPaddedContent>
-                  <ExpansionContainer>
-                    <label>{intl.formatMessage(constantsMessages.name)}:</label>
-                    <BoldSpan>{transformedData.name}</BoldSpan>
-                  </ExpansionContainer>
-                  <ExpansionContainer>
-                    <label>
-                      {intl.formatMessage(
-                        transformedData.type.toLowerCase() === 'birth'
-                          ? constantsMessages.dob
-                          : constantsMessages.dod
+                <HistoryWrapper key={index}>
+                  <ExpansionContainer
+                    id={type + '-' + index}
+                    className="history"
+                  >
+                    {this.getDeclarationStatusIcon(type)}
+                    <ExpansionContentContainer>
+                      <LabelValue
+                        id="expanded_history_item_timestamp"
+                        label={intl.formatMessage(
+                          this.getWorkflowDateLabel(type)
+                        )}
+                        value={timestamp}
+                      />
+                      <ValueContainer>
+                        <StyledLabel>
+                          {this.props.intl.formatMessage(constantsMessages.by)}:
+                        </StyledLabel>
+                        <ValuesWithSeparator
+                          strings={[
+                            practitionerName,
+                            formatRoleCode(practitionerRole),
+                            officeName
+                          ]}
+                        />
+                      </ValueContainer>
+                      {rejectReasons && (
+                        <>
+                          <LabelValue
+                            label={intl.formatMessage(constantsMessages.update)}
+                            value={rejectReasons}
+                          />
+                          <LabelValue
+                            label={intl.formatMessage(
+                              constantsMessages.comment
+                            )}
+                            value={comment}
+                          />
+                        </>
                       )}
-                      :
-                    </label>
-                    <BoldSpan>{transformedData.dateOfEvent}</BoldSpan>
+                    </ExpansionContentContainer>
                   </ExpansionContainer>
-                  <ExpansionContainer>
-                    <label>
-                      {intl.formatMessage(messages.informantContact)}:
-                    </label>
-                    <BoldSpan>{transformedData.contactNumber}</BoldSpan>
-                  </ExpansionContainer>
-                </BorderedPaddedContent>
-                <>
-                  {transformedData.statuses
-                    .map((status, index) => {
-                      const {
-                        practitionerName,
-                        practitionerRole,
-                        rejectReasons,
-                        comment
-                      } = status
-                      const type = status.type as string
-                      const officeName = status.officeName as string
-                      const timestamp = moment(status.timestamp!).format(
-                        CERTIFICATE_DATE_FORMAT
-                      )
-                      return (
-                        <HistoryWrapper key={index}>
-                          <ExpansionContainer
-                            id={type + '-' + index}
-                            className="history"
-                          >
-                            {this.getDeclarationStatusIcon(type)}
-                            <ExpansionContentContainer>
-                              <LabelValue
-                                id="expanded_history_item_timestamp"
-                                label={intl.formatMessage(
-                                  this.getWorkflowDateLabel(type)
-                                )}
-                                value={timestamp}
-                              />
-                              <ValueContainer>
-                                <StyledLabel>
-                                  {this.props.intl.formatMessage(
-                                    constantsMessages.by
-                                  )}
-                                  :
-                                </StyledLabel>
-                                <ValuesWithSeparator
-                                  strings={[
-                                    practitionerName,
-                                    formatRoleCode(practitionerRole),
-                                    officeName
-                                  ]}
-                                />
-                              </ValueContainer>
-                              {rejectReasons && (
-                                <>
-                                  <LabelValue
-                                    label={intl.formatMessage(
-                                      constantsMessages.update
-                                    )}
-                                    value={rejectReasons}
-                                  />
-                                  <LabelValue
-                                    label={intl.formatMessage(
-                                      constantsMessages.comment
-                                    )}
-                                    value={comment}
-                                  />
-                                </>
-                              )}
-                            </ExpansionContentContainer>
-                          </ExpansionContainer>
-                        </HistoryWrapper>
-                      )
-                    })
-                    .reverse()}
-                </>
-              </>
-            )
-          }}
-        </Query>
-      </ExpansionContent>
+                </HistoryWrapper>
+              )
+            })
+            .reverse()}
+        </>
+      </>
     )
+  }
+
+  render() {
+    return <ExpansionContent>{this.getRenderedData()}</ExpansionContent>
   }
 }
 

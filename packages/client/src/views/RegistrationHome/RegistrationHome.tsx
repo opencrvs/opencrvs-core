@@ -37,7 +37,6 @@ import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   Button,
   FloatingActionButton,
@@ -249,10 +248,6 @@ export class RegistrationHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
-  }
-
   subtractApplicationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedApplications.filter(
       app => app.submissionStatus && status.includes(app.submissionStatus)
@@ -321,7 +316,7 @@ export class RegistrationHomeView extends React.Component<
         />
       )
     }
-    if (error || !data) {
+    if (!data) {
       return (
         <ErrorText id="search-result-error-text-count">
           {intl.formatMessage(errorMessages.queryError)}
