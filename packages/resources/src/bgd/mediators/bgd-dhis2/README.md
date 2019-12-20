@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [Bangaldesh DHIS2 integration mediator](#bangaldesh-dhis2-integration-mediator)
   - [Production deployment](#production-deployment)
@@ -31,3 +32,11 @@ Start the service with `yarn start`
 Watch the tests with `yarn test:watch`
 
 When in dev mode swagger API docs are available at `http://localhost:8040/documentation`
+
+## After updating
+
+Build container with `yarn docker:build`
+
+Push image to Dockerhub `yarn docker:push`
+
+SSH into manager node and scale service down then pull image before scaling back up `docker pull jembi/ocrvs-bgd-dhis2-mediator`
