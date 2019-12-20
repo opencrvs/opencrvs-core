@@ -9,6 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
+import {
+  goToApplicationDetails,
+  goToPrintCertificate
+} from '@client/navigation'
+import { transformData } from '@client/search/transformer'
+import { ITheme } from '@client/styledComponents'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -16,15 +23,9 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { HomeContent } from '@opencrvs/components/lib/layout'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  goToPrintCertificate,
-  goToApplicationDetails
-} from '@client/navigation'
-import { transformData } from '@client/search/transformer'
-import { ITheme } from '@client/styledComponents'
 import moment from 'moment'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
@@ -36,8 +37,8 @@ import {
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IStoreState } from '@client/store'
 import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -50,11 +51,6 @@ interface IBasePrintTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
-  onDownloadApplication: (
-    event: Event,
-    compositionId: string,
-    action: Action
-  ) => void
 }
 
 interface IPrintTabState {
@@ -157,23 +153,15 @@ class PrintTabComponent extends React.Component<
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
-          label: '',
-          icon: () => <Download />,
-          handler: () => {
-            this.props.onDownloadApplication(
-              (reg.event as unknown) as Event,
-              reg.id,
-              Action.LOAD_CERTIFICATE_APPLICATION
-            )
-          },
-          loading:
-            downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
-            downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-          error:
-            downloadStatus === DOWNLOAD_STATUS.FAILED ||
-            downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK,
-          loadingLabel: this.props.intl.formatMessage(
-            constantsMessages.downloading
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_CERTIFICATE_APPLICATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
           )
         })
       } else {
@@ -219,7 +207,10 @@ class PrintTabComponent extends React.Component<
   }
 
   renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
+    const { results } = this.props.queryData && this.props.queryData.data
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   render() {

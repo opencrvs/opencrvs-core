@@ -1,0 +1,234 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "meta": { "lastUpdated": "2019-12-12T15:26:46.327Z" },
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:02ff366b-bac4-4bff-bd80-6698bc060f17",
+      "resource": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "urn:uuid:7be689e5-51e3-4b20-81df-ccd92fddd660"
+        },
+        "resourceType": "Composition",
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "birth-notification"
+            }
+          ],
+          "text": "Birth Notification"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "subject": {
+          "reference": "urn:uuid:60da9a1b-a45c-41cd-a2f3-6c34aa48fd8d"
+        },
+        "date": "2019-12-12T15:26:46.327Z",
+        "author": [],
+        "title": "Birth Notification",
+        "section": [
+          {
+            "title": "Child details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "child-details"
+                }
+              ],
+              "text": "Child details"
+            },
+            "entry": [
+              { "reference": "urn:uuid:60da9a1b-a45c-41cd-a2f3-6c34aa48fd8d" }
+            ]
+          },
+          {
+            "title": "Birth encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "birth-encounter"
+                }
+              ],
+              "text": "Birth encounter"
+            },
+            "entry": [{ "reference": "urn:uuid:<uuid>" }]
+          },
+          {
+            "title": "Mother's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "mother-details"
+                }
+              ],
+              "text": "Mother's details"
+            },
+            "entry": [
+              { "reference": "urn:uuid:a3b46e27-940f-4eb1-bdf9-14dd71fa9cce" }
+            ]
+          },
+          {
+            "title": "Father's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "father-details"
+                }
+              ],
+              "text": "Father's details"
+            },
+            "entry": [
+              { "reference": "urn:uuid:937081c1-e618-4905-80d4-119f2cc444ab" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c37c9e34-ca18-47a8-aa15-5d8d979126ff",
+      "resource": {
+        "resourceType": "Task",
+        "status": "draft",
+        "intent": "unknown",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "urn:uuid:02ff366b-bac4-4bff-bd80-6698bc060f17"
+        },
+        "lastModified": "2019-12-12T15:26:46.327Z",
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/66d11bf6-a43e-4e12-b3a7-d834ef8adaf1"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": { "reference": "Location/undefined" }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+88071111111"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:60da9a1b-a45c-41cd-a2f3-6c34aa48fd8d",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "identifier": [],
+        "name": [
+          { "use": "en", "family": ["Test"], "given": ["Import"] },
+          { "use": "bn", "family": ["ঠডুট"], "given": ["ঞমড়গপট"] }
+        ],
+        "gender": "male",
+        "telecom": [],
+        "address": [],
+        "birthDate": "2019-08-06",
+        "deceasedBoolean": false,
+        "deceasedDateTime": null
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a3b46e27-940f-4eb1-bdf9-14dd71fa9cce",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "identifier": [
+          { "use": "official", "type": "NATIONAL_ID", "value": "1234567890123" }
+        ],
+        "name": [
+          { "use": "en", "family": ["Test"], "given": ["Mom"] },
+          { "use": "bn", "family": ["ঠডুট"], "given": ["ঠডুট"] }
+        ],
+        "gender": "female",
+        "telecom": [
+          { "use": "mobile", "system": "phone", "value": "+88071111111" }
+        ],
+        "address": [],
+        "birthDate": null,
+        "deceasedBoolean": false,
+        "deceasedDateTime": null
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:937081c1-e618-4905-80d4-119f2cc444ab",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "identifier": [
+          { "use": "official", "type": "NATIONAL_ID", "value": "9876543210123" }
+        ],
+        "name": [
+          { "use": "en", "family": ["Test"], "given": ["Dad"] },
+          { "use": "bn", "family": ["ঠডুট"], "given": ["ঠডুট"] }
+        ],
+        "gender": "male",
+        "telecom": [
+          { "use": "mobile", "system": "phone", "value": "+88071111111" }
+        ],
+        "address": [],
+        "birthDate": null,
+        "deceasedBoolean": false,
+        "deceasedDateTime": null
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:<uuid>",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "class": {
+          "system": "http://hl7.org/fhir/v3/ActCode",
+          "code": "OBS",
+          "display": "Obstetrics"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://opencrvs.org/encounter-type",
+                "code": "birth-encounter",
+                "display": "Birth Encounter"
+              }
+            ]
+          }
+        ],
+        "location": [
+          {
+            "location": {
+              "reference": "Location/1f9e76a0-dcaf-4256-8d61-f01847020c30"
+            }
+          }
+        ],
+        "subject": {
+          "reference": "urn:uuid:60da9a1b-a45c-41cd-a2f3-6c34aa48fd8d"
+        }
+      }
+    }
+  ]
+}

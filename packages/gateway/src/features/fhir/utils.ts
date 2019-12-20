@@ -47,7 +47,7 @@ import {
   BIRTH_REG_NO,
   DEATH_REG_NO
 } from '@gateway/features/fhir/constants'
-import { ISearchCriteria } from '@gateway/features/search/type-resovlers'
+import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'

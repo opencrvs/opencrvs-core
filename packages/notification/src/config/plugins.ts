@@ -13,6 +13,8 @@
 import * as HapiI18n from 'hapi-i18n'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
+import * as Sentry from 'hapi-sentry'
+import { SENTRY_DSN } from '@notification/constants'
 import {
   getAvailableLanguages,
   getDefaultLanguage
@@ -37,6 +39,16 @@ export default function getPlugins() {
         directory: __dirname + '/../i18n/locales',
         defaultLocale: getDefaultLanguage(),
         languageHeaderField: 'language'
+      }
+    },
+    {
+      plugin: Sentry,
+      options: {
+        client: {
+          environment: process.env.NODE_ENV,
+          dsn: SENTRY_DSN
+        },
+        catchLogErrors: true
       }
     }
   ]

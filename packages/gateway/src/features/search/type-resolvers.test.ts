@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { searchTypeResolvers } from '@gateway/features/search/type-resovlers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any
@@ -160,6 +160,80 @@ describe('Search type resolvers', () => {
         childDoB: '01-01-2019'
       })
     })
+    it('returns _source.operationHistories as operationHistories from birth event search set', () => {
+      const operationHistories = searchTypeResolvers.BirthEventSearchSet.registration(
+        {
+          _type: 'compositions',
+          _id: '123',
+          _source: {
+            operationHistories: [
+              {
+                operatedOn: '2019-12-12T15:21:51.355Z',
+                operatorFirstNames: 'Shakib',
+                operatorFamilyName: 'Al Hasan',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'DECLARED',
+                operatorRole: 'FIELD_AGENT'
+              },
+              {
+                operatedOn: '2019-12-12T15:23:21.280Z',
+                operatorFirstNames: 'Tamim',
+                operatorFamilyName: 'Iqbal',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'VALIDATED',
+                operatorRole: 'REGISTRATION_AGENT'
+              },
+              {
+                operatedOn: '2019-12-12T15:24:53.586Z',
+                operatorFirstNames: 'Mohammad',
+                rejectReason: 'missing_supporting_doc',
+                operatorFamilyName: 'Ashraful',
+                rejectComment: 'No supporting documents provided.',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'REJECTED',
+                operatorRole: 'LOCAL_REGISTRAR'
+              }
+            ]
+          }
+        }
+      )
+      expect(operationHistories).toEqual({
+        operationHistories: [
+          {
+            operatedOn: '2019-12-12T15:21:51.355Z',
+            operatorFirstNames: 'Shakib',
+            operatorFamilyName: 'Al Hasan',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'DECLARED',
+            operatorRole: 'FIELD_AGENT'
+          },
+          {
+            operatedOn: '2019-12-12T15:23:21.280Z',
+            operatorFirstNames: 'Tamim',
+            operatorFamilyName: 'Iqbal',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'VALIDATED',
+            operatorRole: 'REGISTRATION_AGENT'
+          },
+          {
+            operatedOn: '2019-12-12T15:24:53.586Z',
+            operatorFirstNames: 'Mohammad',
+            rejectReason: 'missing_supporting_doc',
+            operatorFamilyName: 'Ashraful',
+            rejectComment: 'No supporting documents provided.',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'REJECTED',
+            operatorRole: 'LOCAL_REGISTRAR'
+          }
+        ]
+      })
+    })
   })
   describe('type resolvers for death event', () => {
     it('returns id from death event search set', () => {
@@ -282,6 +356,80 @@ describe('Search type resolvers', () => {
         deathDate: '01-01-2019'
       })
     })
+    it('returns _source.operationHistories as operationHistories from death event search set', () => {
+      const operationHistories = searchTypeResolvers.DeathEventSearchSet.registration(
+        {
+          _type: 'compositions',
+          _id: '123',
+          _source: {
+            operationHistories: [
+              {
+                operatedOn: '2019-12-12T15:21:51.355Z',
+                operatorFirstNames: 'Shakib',
+                operatorFamilyName: 'Al Hasan',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'DECLARED',
+                operatorRole: 'FIELD_AGENT'
+              },
+              {
+                operatedOn: '2019-12-12T15:23:21.280Z',
+                operatorFirstNames: 'Tamim',
+                operatorFamilyName: 'Iqbal',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'VALIDATED',
+                operatorRole: 'REGISTRATION_AGENT'
+              },
+              {
+                operatedOn: '2019-12-12T15:24:53.586Z',
+                operatorFirstNames: 'Mohammad',
+                rejectReason: 'missing_supporting_doc',
+                operatorFamilyName: 'Ashraful',
+                rejectComment: 'No supporting documents provided.',
+                operatorOfficeName: 'Alokbali Union Parishad',
+                operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                operationType: 'REJECTED',
+                operatorRole: 'LOCAL_REGISTRAR'
+              }
+            ]
+          }
+        }
+      )
+      expect(operationHistories).toEqual({
+        operationHistories: [
+          {
+            operatedOn: '2019-12-12T15:21:51.355Z',
+            operatorFirstNames: 'Shakib',
+            operatorFamilyName: 'Al Hasan',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'DECLARED',
+            operatorRole: 'FIELD_AGENT'
+          },
+          {
+            operatedOn: '2019-12-12T15:23:21.280Z',
+            operatorFirstNames: 'Tamim',
+            operatorFamilyName: 'Iqbal',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'VALIDATED',
+            operatorRole: 'REGISTRATION_AGENT'
+          },
+          {
+            operatedOn: '2019-12-12T15:24:53.586Z',
+            operatorFirstNames: 'Mohammad',
+            rejectReason: 'missing_supporting_doc',
+            operatorFamilyName: 'Ashraful',
+            rejectComment: 'No supporting documents provided.',
+            operatorOfficeName: 'Alokbali Union Parishad',
+            operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+            operationType: 'REJECTED',
+            operatorRole: 'LOCAL_REGISTRAR'
+          }
+        ]
+      })
+    })
   })
   describe('type resolvers for event registration', () => {
     it('returns status from search set', () => {
@@ -340,6 +488,33 @@ describe('Search type resolvers', () => {
         relatesTo: ['8a737727-a7db-4e77-865f-310dd7afb836']
       })
       expect(duplicates).toEqual(['8a737727-a7db-4e77-865f-310dd7afb836'])
+    })
+  })
+  describe('type resolvers for event operation history', () => {
+    it('returns operationHistories operator name as human name from birth event search set', () => {
+      const operatorName = searchTypeResolvers.OperationHistorySearchSet.operatorName(
+        {
+          operatedOn: '2019-12-12T15:21:51.355Z',
+          operatorFirstNames: 'Shakib',
+          operatorFamilyName: 'Al Hasan',
+          operatorOfficeName: 'Alokbali Union Parishad',
+          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+          operationType: 'DECLARED',
+          operatorRole: 'FIELD_AGENT'
+        }
+      )
+      expect(operatorName).toEqual([
+        {
+          given: ['Shakib'],
+          family: ['Al Hasan'],
+          use: 'en'
+        },
+        {
+          given: null,
+          family: null,
+          use: 'bn'
+        }
+      ])
     })
   })
 })

@@ -11,15 +11,20 @@
  */
 import { deathNotificationHandler } from '@bgd-dhis2-mediator/features/notification/death/handler'
 import { body } from '@bgd-dhis2-mediator/test/death-integration'
+import {
+  mockUnion,
+  mockUnionFacility
+} from '@bgd-dhis2-mediator/test/locations'
 import * as fetchMock from 'jest-fetch-mock'
 
 let fetch: fetchMock.FetchMock
-let locationTuple: [fetchMock.BodyOrFunction, fetchMock.MockParams]
+// When DHIS2 supports BBS codes, these tests will become valid
+// let locationTuple: [fetchMock.BodyOrFunction, fetchMock.MockParams]
 
 describe('Death handler', () => {
   beforeAll(() => {
     fetch = fetchMock as fetchMock.FetchMock
-    locationTuple = [
+    /*locationTuple = [
       JSON.stringify({
         resourceType: 'Bundle',
         entry: [
@@ -33,7 +38,7 @@ describe('Death handler', () => {
         ]
       }),
       {}
-    ]
+    ]*/
   })
 
   it('return a mediator response', async () => {
@@ -45,11 +50,13 @@ describe('Death handler', () => {
     const code = jest.fn().mockReturnValue({ header })
     const h = { response: () => ({ code }) }
 
+    fetch.mockResponses([JSON.stringify(mockUnionFacility), { status: 200 }])
+    fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
     // 3 x create patient location fetches
-    fetch.mockResponses(...new Array(12).fill(locationTuple))
+    // fetch.mockResponses(...new Array(12).fill(locationTuple))
 
     // Resolve union
-    fetch.mockResponses(...new Array(4).fill(locationTuple))
+    // fetch.mockResponses(...new Array(4).fill(locationTuple))
 
     // post bundle
     fetch.mockResponse(

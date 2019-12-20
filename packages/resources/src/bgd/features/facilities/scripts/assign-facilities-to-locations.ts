@@ -66,6 +66,7 @@ const facilityTypesCodesToInclude = [
   { code: '1036', name: 'Trauma Center' },
   { code: '1024', name: '50-bed Hospital' },*/
   { code: '1028', name: 'District Hospital' },
+  { code: null, name: '100 Bed Hospital (Not District Hospital)' },
   /*{ code: '1027', name: '10-bed Hospital' },
   { code: '1023', name: '200-250 bed Hospital (not district hospital)' },
   { code: '1025', name: '31-bed Hospital' },

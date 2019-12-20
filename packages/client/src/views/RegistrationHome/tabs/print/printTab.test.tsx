@@ -162,6 +162,27 @@ const mockPrintTabData = {
         createdAt: '1574696143372',
         modifiedAt: undefined
       },
+      operationHistories: [
+        {
+          operationType: 'REGISTERED',
+          operatedOn: '2019-10-20T11:03:20.660Z',
+          operatorRole: 'LOCAL_REGISTRAR',
+          operatorName: [
+            {
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              use: 'en'
+            },
+            {
+              firstNames: '',
+              familyName: null,
+              use: 'bn'
+            }
+          ],
+          operatorOfficeName: 'Alokbali Union Parishad',
+          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+        }
+      ],
       dateOfDeath: '2019-01-18',
       deceasedName: [
         {
@@ -359,127 +380,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     beforeEach(async () => {
       Date.now = jest.fn(() => 1554055200000)
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_REGISTRATION_BY_COMPOSITION,
-            variables: {
-              id: '956281c9-1f47-4c26-948a-970dd23c4094'
-            }
-          },
-          result: {
-            data: {
-              fetchRegistration: {
-                id: '956281c9-1f47-4c26-948a-970dd23c4094',
-                registration: {
-                  id: '345678',
-                  type: 'BIRTH',
-                  certificates: null,
-                  status: [
-                    {
-                      id:
-                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                      timestamp: '2019-10-20T11:03:20.660Z',
-                      user: {
-                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                        name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
-                            use: 'bn',
-                            firstNames: '',
-                            familyName: ''
-                          }
-                        ],
-                        role: 'LOCAL_REGISTRAR'
-                      },
-                      location: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: ['']
-                      },
-                      office: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: [''],
-                        address: {
-                          district: '7876',
-                          state: 'iuyiuy'
-                        }
-                      },
-                      type: 'REGISTERED',
-                      comments: [
-                        {
-                          comment: 'reason=duplicate&comment=dup'
-                        }
-                      ]
-                    },
-                    {
-                      id:
-                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-417',
-                      timestamp: '2019-10-20T11:03:20.660Z',
-                      user: {
-                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                        name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
-                            use: 'bn',
-                            firstNames: '',
-                            familyName: ''
-                          }
-                        ],
-                        role: 'LOCAL_REGISTRAR'
-                      },
-                      location: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: ['']
-                      },
-                      office: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: [''],
-                        address: {
-                          district: '7876',
-                          state: 'iuyiuy'
-                        }
-                      },
-                      type: 'WAITING_VALIDATION',
-                      comments: [
-                        {
-                          comment: 'reason=duplicate&comment=dup'
-                        }
-                      ]
-                    }
-                  ],
-                  contact: 'MOTHER',
-                  contactPhoneNumber: '01622688231'
-                },
-                child: {
-                  id: 'FAKE_ID',
-                  name: [
-                    {
-                      use: 'en',
-                      firstNames: 'Mushraful',
-                      familyName: 'Hoque'
-                    }
-                  ],
-                  birthDate: '01-01-1984'
-                },
-                deceased: null,
-                informant: null
-              }
-            }
-          }
-        }
-      ]
 
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -489,8 +389,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
             data: mockPrintTabData
           }}
         />,
-        store,
-        graphqlMock
+        store
       )
 
       const instance = (await waitForElement(
@@ -518,50 +417,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
           .text()
       ).toBe('Registered on:20 October 2019')
     })
-  })
-
-  it('expanded block renders error text when an error occurs', async () => {
-    const graphqlMock = [
-      {
-        request: {
-          query: FETCH_REGISTRATION_BY_COMPOSITION,
-          variables: {
-            id: '956281c9-1f47-4c26-948a-970dd23c4094'
-          }
-        },
-        error: new Error('boom')
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <PrintTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: mockPrintTabData
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    const table = await waitForElement(testComponent.component, GridTable)
-
-    const instance = table.instance()
-
-    instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
-
-    const element = await waitForElement(
-      testComponent.component,
-      '#search-result-error-text-expanded'
-    )
-
-    expect(
-      element
-        .children()
-        .hostNodes()
-        .text()
-    ).toBe('An error occurred while searching')
   })
 
   describe('handles download status', () => {

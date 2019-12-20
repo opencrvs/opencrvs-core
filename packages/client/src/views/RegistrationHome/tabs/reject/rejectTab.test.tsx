@@ -397,6 +397,29 @@ describe('RegistrationHome sent for update tab related tests', () => {
                   createdAt: '2018-05-23T14:44:58+02:00',
                   modifiedAt: '2018-05-23T14:44:58+02:00'
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: '2019-12-12T15:24:53.586Z',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: null,
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                    rejectReason: 'missing_supporting_doc',
+                    rejectComment: 'No supporting documents provided.'
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {

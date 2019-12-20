@@ -66,7 +66,7 @@ describe('Submission Controller', () => {
     }
     // @ts-ignore
     const subCon = new SubmissionController(store)
-    subCon.requeueHangingApplications()
+    await subCon.requeueHangingApplications()
 
     expect(store.dispatch).toHaveBeenCalledTimes(2)
   })

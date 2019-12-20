@@ -26,7 +26,7 @@ describe('reject registration form', () => {
   beforeEach(async () => {
     const testComponent = await createTestComponent(
       <RejectRegistrationForm
-        onBack={mockHandler}
+        onClose={mockHandler}
         duplicate={true}
         confirmRejectionEvent={mockHandler}
         application={draftApplication}

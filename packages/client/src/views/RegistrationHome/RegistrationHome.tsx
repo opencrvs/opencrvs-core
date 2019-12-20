@@ -10,17 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  downloadApplication,
   filterProcessingApplicationsFromQuery,
   IApplication,
   IWorkqueue,
-  makeApplicationReadyToDownload,
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue
 } from '@client/applications'
 import { Header } from '@client/components/interface/Header/Header'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
-import { Action, Event } from '@client/forms'
 import { errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import { messages } from '@client/i18n/messages/views/registrarHome'
@@ -37,7 +34,6 @@ import styled, { ITheme, withTheme } from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { getUserLocation } from '@client/utils/userUtils'
 import NotificationToast from '@client/views/RegistrationHome/NotificationToast'
-import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   Button,
   FloatingActionButton,
@@ -62,7 +58,6 @@ import {
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
-import { withApollo } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -151,7 +146,6 @@ interface IBaseRegistrationHomeProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
-  downloadApplication: typeof downloadApplication
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   registrarLocationId: string
@@ -249,10 +243,6 @@ export class RegistrationHomeView extends React.Component<
     return this.props.scope && this.props.scope.includes('validate')
   }
 
-  renderExpandedComponent = (itemId: string) => {
-    return <RowHistoryView eventId={itemId} />
-  }
-
   subtractApplicationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedApplications.filter(
       app => app.submissionStatus && status.includes(app.submissionStatus)
@@ -282,19 +272,6 @@ export class RegistrationHomeView extends React.Component<
     }
   }
 
-  downloadApplication = (
-    event: string,
-    compositionId: string,
-    action: Action
-  ) => {
-    const downloadableApplication = makeApplicationReadyToDownload(
-      event.toLowerCase() as Event,
-      compositionId,
-      action
-    )
-    this.props.downloadApplication(downloadableApplication, this.props.client)
-  }
-
   getData = (
     progressCurrentPage: number,
     reviewCurrentPage: number,
@@ -321,7 +298,7 @@ export class RegistrationHomeView extends React.Component<
         />
       )
     }
-    if (error || !data) {
+    if (!data) {
       return (
         <ErrorText id="search-result-error-text-count">
           {intl.formatMessage(errorMessages.queryError)}
@@ -421,7 +398,6 @@ export class RegistrationHomeView extends React.Component<
             }}
             page={progressCurrentPage}
             onPageChange={this.onPageChange}
-            onDownloadApplication={this.downloadApplication}
           />
         )}
         {tabId === TAB_ID.readyForReview && (
@@ -432,7 +408,6 @@ export class RegistrationHomeView extends React.Component<
             }}
             page={reviewCurrentPage}
             onPageChange={this.onPageChange}
-            onDownloadApplication={this.downloadApplication}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
@@ -443,7 +418,6 @@ export class RegistrationHomeView extends React.Component<
             }}
             page={updatesCurrentPage}
             onPageChange={this.onPageChange}
-            onDownloadApplication={this.downloadApplication}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
@@ -464,7 +438,6 @@ export class RegistrationHomeView extends React.Component<
             }}
             page={printCurrentPage}
             onPageChange={this.onPageChange}
-            onDownloadApplication={this.downloadApplication}
           />
         )}
       </>
@@ -556,7 +529,6 @@ export const RegistrationHome = connect(
     goToRegistrarHomeTab,
     goToReviewDuplicate,
     goToPrintCertificate,
-    downloadApplication,
     updateRegistrarWorkqueue
   }
-)(injectIntl(withTheme(withApollo(RegistrationHomeView))))
+)(injectIntl(withTheme(RegistrationHomeView)))

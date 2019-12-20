@@ -14,23 +14,25 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  createStatusHistory,
   EVENT,
-  ICompositionBody,
-  IDeathCompositionBody,
   getCreatedBy,
   getStatus,
-  IStatus,
-  createStatusHistory
+  ICompositionBody,
+  IDeathCompositionBody,
+  IOperationHistory,
+  NAME_EN
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
   findName,
-  findNameLocal,
+  findNameLocale,
   findTask,
   findTaskExtension,
   findTaskIdentifier,
   findEntryResourceByUrl
 } from '@search/features/fhir/fhir-utils'
+import * as Hapi from 'hapi'
 
 const DECEASED_CODE = 'deceased-details'
 const INFORMANT_CODE = 'informant-details'
@@ -38,15 +40,16 @@ const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
 const SPOUSE_CODE = 'spouse-details'
 const DEATH_ENCOUNTER_CODE = 'death-encounter'
-const NAME_EN = 'en'
 
-export async function upsertEvent(bundle: fhir.Bundle) {
+export async function upsertEvent(requestBundle: Hapi.Request) {
+  const bundle = requestBundle.payload as fhir.Bundle
   const bundleEntries = bundle.entry
+  const authHeader = requestBundle.headers.authorization
 
   if (bundleEntries && bundleEntries.length === 1) {
     const resource = bundleEntries[0].resource
     if (resource && resource.resourceType === 'Task') {
-      updateEvent(resource as fhir.Task)
+      updateEvent(resource as fhir.Task, authHeader)
       return
     }
   }
@@ -63,10 +66,10 @@ export async function upsertEvent(bundle: fhir.Bundle) {
     throw new Error(`Composition ID not found`)
   }
 
-  await indexDeclaration(compositionId, composition, bundleEntries)
+  await indexDeclaration(compositionId, composition, authHeader, bundleEntries)
 }
 
-async function updateEvent(task: fhir.Task) {
+async function updateEvent(task: fhir.Task, authHeader: string) {
   const compositionId =
     task &&
     task.focus &&
@@ -87,7 +90,7 @@ async function updateEvent(task: fhir.Task) {
   )
 
   const body: ICompositionBody = {
-    status: (await getStatus(compositionId)) as IStatus[]
+    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
   body.type =
@@ -108,28 +111,30 @@ async function updateEvent(task: fhir.Task) {
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
 
-  await createStatusHistory(body)
+  await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body)
 }
 
 async function indexDeclaration(
   compositionId: string,
   composition: fhir.Composition,
+  authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const body: ICompositionBody = {
     event: EVENT.DEATH,
     createdAt: Date.now().toString(),
-    status: (await getStatus(compositionId)) as IStatus[]
+    operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
-  await createIndexBody(body, composition, bundleEntries)
+  await createIndexBody(body, composition, authHeader, bundleEntries)
   await indexComposition(compositionId, body)
 }
 
 async function createIndexBody(
   body: IDeathCompositionBody,
   composition: fhir.Composition,
+  authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
   createDeceasedIndex(body, composition, bundleEntries)
@@ -138,7 +143,8 @@ async function createIndexBody(
   createSpouseIndex(body, composition, bundleEntries)
   createInformantIndex(body, composition, bundleEntries)
   await createApplicationIndex(body, composition, bundleEntries)
-  await createStatusHistory(body)
+  const task = findTask(bundleEntries)
+  await createStatusHistory(body, task, authHeader)
 }
 
 function createDeceasedIndex(
@@ -158,8 +164,8 @@ function createDeceasedIndex(
     bundleEntries
   ) as fhir.Encounter
 
-  const deceasedName = deceased && findName(NAME_EN, deceased)
-  const deceasedNameLocal = deceased && findNameLocal(deceased)
+  const deceasedName = deceased && findName(NAME_EN, deceased.name)
+  const deceasedNameLocal = deceased && findNameLocale(deceased.name)
 
   body.deceasedFirstNames =
     deceasedName && deceasedName.given && deceasedName.given.join(' ')
@@ -194,8 +200,8 @@ function createMotherIndex(
     return
   }
 
-  const motherName = findName(NAME_EN, mother)
-  const motherNameLocal = findNameLocal(mother)
+  const motherName = findName(NAME_EN, mother.name)
+  const motherNameLocal = findNameLocale(mother.name)
 
   body.motherFirstNames =
     motherName && motherName.given && motherName.given.join(' ')
@@ -222,8 +228,8 @@ function createFatherIndex(
     return
   }
 
-  const fatherName = findName(NAME_EN, father)
-  const fatherNameLocal = findNameLocal(father)
+  const fatherName = findName(NAME_EN, father.name)
+  const fatherNameLocal = findNameLocale(father.name)
 
   body.fatherFirstNames =
     fatherName && fatherName.given && fatherName.given.join(' ')
@@ -250,8 +256,8 @@ function createSpouseIndex(
     return
   }
 
-  const spouseName = findName(NAME_EN, spouse)
-  const spouseNameLocal = findNameLocal(spouse)
+  const spouseName = findName(NAME_EN, spouse.name)
+  const spouseNameLocal = findNameLocale(spouse.name)
 
   body.spouseFirstNames =
     spouseName && spouseName.given && spouseName.given.join(' ')
@@ -287,8 +293,8 @@ function createInformantIndex(
     return
   }
 
-  const informantName = findName(NAME_EN, informant)
-  const informantNameLocal = findNameLocal(informant)
+  const informantName = findName(NAME_EN, informant.name)
+  const informantNameLocal = findNameLocale(informant.name)
 
   body.informantFirstNames =
     informantName && informantName.given && informantName.given.join(' ')
@@ -366,10 +372,6 @@ async function createApplicationIndex(
 
   const createdBy = await getCreatedBy(composition.id as string)
 
-  if (createdBy) {
-    body.createdBy = createdBy
-    body.updatedBy = regLastUser
-  } else {
-    body.createdBy = regLastUser
-  }
+  body.createdBy = createdBy || body.createdBy
+  body.updatedBy = regLastUser
 }
