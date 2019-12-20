@@ -15,6 +15,11 @@ import { HapiRequest, ISMSPayload } from '@notification/features/sms/handler'
 import { buildAndSendSMS } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
 
+export interface IInProgressPayload extends ISMSPayload {
+  trackingid: string
+  crvsOffice: string
+}
+
 export interface IDeclarationPayload extends ISMSPayload {
   trackingid: string
   name: string
@@ -27,6 +32,28 @@ export interface IRegistrationPayload extends ISMSPayload {
 export interface IRejectionPayload extends ISMSPayload {
   trackingid: string
   name: string
+}
+
+export async function sendBirthInProgressConfirmation(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IInProgressPayload
+  logger.info(
+    `Notification service sendBirthInProgressConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'birthInProgressNotification',
+    {
+      trackingid: payload.trackingid,
+      crvsOffice: payload.crvsOffice
+    }
+  )
+  return h.response().code(200)
 }
 
 export async function sendBirthDeclarationConfirmation(
@@ -88,6 +115,14 @@ export async function sendBirthRejectionConfirmation(
   })
   return h.response().code(200)
 }
+
+export const inProgressNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  trackingid: Joi.string()
+    .length(7)
+    .required(),
+  crvsOffice: Joi.string().required()
+})
 
 export const declarationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
