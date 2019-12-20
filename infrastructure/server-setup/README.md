@@ -166,21 +166,21 @@ password protected and encrypted external harddrive and stored in a secure and a
 Hearth, OpenHIM and the Users database is saved in a mongo zip file here:
 
 ```
-/backups/mongo/hearth-dev-<date>.gz
-/backups/mongo/openhim-dev-<date>.gz
-/backups/mongo/user-mgnt-<date>.gz
+/data/backups/mongo/hearth-dev-<date>.gz
+/data/backups/mongo/openhim-dev-<date>.gz
+/data/backups/mongo/user-mgnt-<date>.gz
 ```
 
 Elasticsearch snapshot file is saved here:
 
 ```
-/backups/elasticsearch
+/data/backups/elasticsearch
 ```
 
 InfluxDB backup files are saved here:
 
 ```
-/backups/influxdb/<date>
+/data/backups/influxdb/<date>
 ```
 
 To perform a restore, ensure that you have backup files in the day's folders you wish to restore from.
