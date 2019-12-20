@@ -386,7 +386,8 @@ function findLocationByIdentifierAndParent(
     if (resource.identifier && resource.partOf && resource.partOf.reference) {
       const foundIdentifier = resource.identifier.find(
         (identifier: fhir.Identifier) =>
-          identifier.system === system && identifier.value === code
+          identifier.system === system &&
+          identifier.value === code.replace(/^0+/, '')
       )
 
       const foundParent = resource.partOf.reference === parentRef
@@ -494,7 +495,7 @@ export async function mapAndSaveHealthFacilities(
       // tslint:disable-next-line:no-console
       console.log(
         chalk.yellow(
-          `WARNING: Division not found for facility ${facility.name}, ignoring it: bbs-code=${facility.upazila_code}`
+          `WARNING: Division not found for facility ${facility.name}, ignoring it: bbs-code=${facility.division_code}`
         )
       )
       continue
@@ -512,7 +513,7 @@ export async function mapAndSaveHealthFacilities(
       console.log(
         chalk.yellow(
           // tslint:disable-next-line:max-line-length
-          `WARNING: District not found for facility ${facility.name}, ignoring it: bbs-code=${facility.upazila_code} with parent=${division.id}`
+          `WARNING: District not found for facility ${facility.name}, ignoring it: bbs-code=${facility.district_code} with parent=${division.id}`
         )
       )
       continue

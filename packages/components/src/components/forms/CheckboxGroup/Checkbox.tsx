@@ -29,20 +29,18 @@ const Label = styled.label`
 
 const Check = styled.span`
   display: inline-block;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.colors.copy};
   height: 20px;
   width: 20px;
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
   z-index: 1;
-  border-radius: 2px;
   &::after {
     display: block;
     position: relative;
     content: '';
     background: ${({ theme }) => theme.colors.white};
-    border-radius: 2px;
     height: 16px;
     width: 16px;
     top: -12px;
@@ -84,7 +82,7 @@ const Input = styled.input`
   /* stylelint-disable */
   &:checked ~ ${Check}::after {
     /* stylelint-enable */
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.colors.copy};
   }
 `
 

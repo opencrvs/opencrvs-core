@@ -11,7 +11,7 @@
  */
 import { IAction } from '../ListItem'
 import { ColumnContentAlignment } from './GridTable'
-export { IAction } from '../ListItem'
+export { IAction, IActionObject } from '../ListItem'
 
 enum GQLRegStatus {
   DECLARED = 'DECLARED',

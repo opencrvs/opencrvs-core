@@ -15,7 +15,7 @@ import { Pagination } from '..'
 import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { Box } from '../../interface'
-import { IAction, IColumn, IDynamicValues } from './types'
+import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
 export { IAction } from './types'
 
 const Wrapper = styled.div`
@@ -230,7 +230,7 @@ export class GridTable extends React.Component<
     }
   }
 
-  getRowClickHandler = (itemRowClickHandler: IAction[]) => {
+  getRowClickHandler = (itemRowClickHandler: IActionObject[]) => {
     return itemRowClickHandler[0].handler
   }
 
@@ -275,7 +275,7 @@ export class GridTable extends React.Component<
                       this.toggleExpanded(item.id as string)) ||
                     (clickable &&
                       this.getRowClickHandler(
-                        item.rowClickHandler as IAction[]
+                        item.rowClickHandler as IActionObject[]
                       )())
                   }
                 >

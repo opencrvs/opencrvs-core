@@ -55,6 +55,14 @@ export async function createServer() {
   const routes = getRoutes()
   server.route(routes)
 
+  server.ext({
+    type: 'onRequest',
+    method(request: Hapi.Request & { sentryScope: any }, h) {
+      request.sentryScope.setExtra('payload', request.payload)
+      return h.continue
+    }
+  })
+
   async function start() {
     await server.start()
     server.log('info', `Search server started on ${HOST}:${PORT}`)

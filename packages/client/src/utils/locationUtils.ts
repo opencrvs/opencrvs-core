@@ -20,7 +20,6 @@ export function filterLocations(
   userDetails: IUserDetails
 ): { [key: string]: ILocation } {
   const locationsCopy = Object.assign({}, locations)
-
   Object.values(locationsCopy).forEach((location: ILocation) => {
     if (
       location.partOf !== `Location/${filterValue}` &&
