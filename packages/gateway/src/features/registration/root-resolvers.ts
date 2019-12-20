@@ -38,7 +38,13 @@ export const resolvers: GQLResolver = {
           authHeader
         )
 
-        return res.entry.map(({ resource }: { resource: any }) => resource)
+        const compositions : fhir.Composition[] =  res.entry
+          .map(({ resource }: { resource: fhir.Composition }) => resource)
+
+        return compositions
+          .filter(({ type }) =>
+            type.coding?.some(({ code }) => code === 'birth-application')
+          )
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -52,7 +58,13 @@ export const resolvers: GQLResolver = {
           authHeader
         )
 
-        return res.entry.map(({ resource }: { resource: any }) => resource)
+        const compositions : fhir.Composition[] =  res.entry
+          .map(({ resource }: { resource: fhir.Composition }) => resource)
+
+        return compositions
+          .filter(({ type }) =>
+            type.coding?.some(({ code }) => code === 'death-application')
+          )
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
