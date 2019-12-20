@@ -107,7 +107,7 @@ export class SubmissionController {
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
   }
-  private requeueHangingApplications = () => {
+  private requeueHangingApplications = async () => {
     const now = moment(Date.now())
     this.getApplications()
       .filter((app: IApplication) => {
@@ -117,11 +117,11 @@ export class SubmissionController {
           now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
         )
       })
-      .forEach((app: IApplication) => {
+      .forEach(async (app: IApplication) => {
         if (app.submissionStatus) {
           app.submissionStatus = changeStatus[app.submissionStatus]
-          this.store.dispatch(modifyApplication(app))
-          this.store.dispatch(writeApplication(app))
+          await this.store.dispatch(modifyApplication(app))
+          await this.store.dispatch(writeApplication(app))
         }
       })
   }
@@ -138,7 +138,7 @@ export class SubmissionController {
 
     this.syncRunning = true
 
-    this.requeueHangingApplications()
+    await this.requeueHangingApplications()
     const applications = this.getSubmitableApplications()
     console.debug(
       `[${this.syncCount}] Syncing ${applications.length} applications`
@@ -177,8 +177,8 @@ export class SubmissionController {
       REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
       SUBMISSION_STATUS.SUBMITTING
     application.submissionStatus = requestInProgressStatus
-    this.store.dispatch(modifyApplication(application))
-    this.store.dispatch(writeApplication(application))
+    await this.store.dispatch(modifyApplication(application))
+    await this.store.dispatch(writeApplication(application))
 
     try {
       const mutationResult = await this.client.mutate({
@@ -187,13 +187,13 @@ export class SubmissionController {
         refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
         awaitRefetchQueries: true
       })
-      this.onSuccess(application, mutationResult)
+      await this.onSuccess(application, mutationResult)
     } catch (exception) {
-      this.onError(application, exception)
+      await this.onError(application, exception)
     }
   }
 
-  private onSuccess = (
+  private onSuccess = async (
     application: IApplication,
     result: FetchResult<any, any, any>
   ) => {
@@ -214,12 +214,12 @@ export class SubmissionController {
         application.trackingId = trackingId
       }
     }
-    this.store.dispatch(updateRegistrarWorkqueue())
-    this.store.dispatch(modifyApplication(application))
-    this.store.dispatch(writeApplication(application))
+    await this.store.dispatch(updateRegistrarWorkqueue())
+    await this.store.dispatch(modifyApplication(application))
+    await this.store.dispatch(writeApplication(application))
   }
 
-  private onError = (application: IApplication, error: ApolloError) => {
+  private onError = async (application: IApplication, error: ApolloError) => {
     let status
     if (error.networkError) {
       status = SUBMISSION_STATUS.FAILED_NETWORK
@@ -229,7 +229,7 @@ export class SubmissionController {
     }
 
     application.submissionStatus = status
-    this.store.dispatch(modifyApplication(application))
-    this.store.dispatch(writeApplication(application))
+    await this.store.dispatch(modifyApplication(application))
+    await this.store.dispatch(writeApplication(application))
   }
 }
