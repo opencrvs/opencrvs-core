@@ -26,19 +26,19 @@ jobs:
         apt:
           packages:
             - libgconf-2-4
-      script:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - ./node_modules/.bin/ts-node rebuild-only-changed-images.ts
-        - yarn global add wait-on
-        - yarn dev:secrets:gen
-        - docker swarm init
-        - sudo mkdir -p data/elasticsearch
-        - sudo chown -R 1000:1000 data/elasticsearch
-        - yarn compose:all &
-        - wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 tcp:8086 tcp:3447 tcp:5001
-        - cd packages/resources && yarn db:clear:all && yarn db:backup:restore bgd
-        - yarn save:testData && cd ../..
-        - cd packages/e2e && yarn start --record false
+      script: >-
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
+        ./node_modules/.bin/ts-node rebuild-only-changed-images.ts &&
+        yarn global add wait-on &&
+        yarn dev:secrets:gen &&
+        docker swarm init &&
+        sudo mkdir -p data/elasticsearch &&
+        sudo chown -R 1000:1000 data/elasticsearch &&
+        yarn compose:all &
+        wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 tcp:8086 tcp:3447 tcp:5001 &&
+        cd packages/resources && yarn db:clear:all && yarn db:backup:restore bgd &&
+        yarn save:testData && cd ../.. &&
+        cd packages/e2e && yarn start --record false
       env:
         - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
         - CYPRESS_LOGIN_URL=http://localhost:3020/
