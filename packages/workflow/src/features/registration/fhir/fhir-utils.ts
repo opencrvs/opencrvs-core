@@ -92,6 +92,30 @@ export async function getInformantName(
     .concat(name.family)
 }
 
+export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error(
+      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
+    )
+  }
+  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const regLastOfficeExt = taskResource?.extension?.find(
+    ext => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+  )
+  if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
+    throw new Error('No last registration office found on the bundle')
+  }
+  const office: fhir.Location = await getFromFhir(
+    `/${regLastOfficeExt.valueReference.reference}`
+  )
+  const language = getDefaultLanguage()
+  return (
+    (language === 'en'
+      ? office.name
+      : (office.alias && office.alias[0]) || office.name) || ''
+  )
+}
+
 export function getTrackingId(fhirBundle: fhir.Bundle) {
   const resource =
     fhirBundle && fhirBundle.entry && fhirBundle.entry[0].resource
