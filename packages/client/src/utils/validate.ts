@@ -126,6 +126,9 @@ export const requiredSymbol: Validation = (value: IFormFieldValue) =>
 export const required = (
   message: MessageDescriptor = messages.required
 ): Validation => (value: IFormFieldValue) => {
+  if (value === null) {
+    return { message }
+  }
   if (typeof value === 'string') {
     return value !== '' ? undefined : { message }
   }
