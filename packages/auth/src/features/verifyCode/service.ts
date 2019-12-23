@@ -67,7 +67,7 @@ export async function sendVerificationCode(
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    message: verificationCode
+    message: `Your OpenCRVS authentication code is: ${verificationCode}`
   }
 
   await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
