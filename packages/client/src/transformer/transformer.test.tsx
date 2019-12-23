@@ -294,7 +294,7 @@ describe('when draft data is transformed to graphql', () => {
         father: {},
         mother: {},
         registration: {
-          presentAtBirthRegistration: 'LEGAL_GUARDIAN',
+          presentAtBirthRegistration: 'OTHER',
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
