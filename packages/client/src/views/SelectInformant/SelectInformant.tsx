@@ -148,14 +148,6 @@ const setInformantFields = (
         disabled: false
       },
       {
-        id: `select_informant_${INFORMANT.LEGAL_GUARDIAN}`,
-        option: {
-          label: intl.formatMessage(messages.legalGuardian),
-          value: INFORMANT.LEGAL_GUARDIAN
-        },
-        disabled: false
-      },
-      {
         id: `select_informant_${INFORMANT.SOMEONE_ELSE}`,
         option: {
           label: intl.formatMessage(formMessages.someoneElse),

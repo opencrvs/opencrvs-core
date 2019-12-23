@@ -91,6 +91,14 @@
                       }
                     },
                     {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Option for form field: Legal guardian",
+                        "id": "register.selectinformant.legalGuardian"
+                      }
+                    },
+                    {
                       "value": "INSTITUTION_HEAD_PLACE_OF_BIRTH",
                       "label": {
                         "defaultMessage": "Head of the institution where the birth occured",
@@ -408,7 +416,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
                         }
                       ]
                     },
@@ -422,7 +430,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
                         }
                       ]
                     },
@@ -436,7 +444,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
                         }
                       ]
                     },
