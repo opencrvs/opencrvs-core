@@ -16,7 +16,7 @@ context('Search Integration Test', () => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
 
-  it('Tests search application by contact number using minimum input', () => {
+  it('Tests search application by child name using minimum input', () => {
     cy.initializeFakeTimers()
 
     // DECLARE APPLICATION AS FIELD AGENT
