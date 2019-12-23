@@ -67,16 +67,16 @@ BACKUP_DATE=$(date +%Y-%m-%d)
 
 # Backup Hearth, OpenHIM and any other service related Mongo databases into a mongo sub folder
 #---------------------------------------------------------------------------------------------
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d hearth-dev --gzip --archive=/data/backups/mongo/hearth-dev-$BACKUP_DATE.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d openhim-dev --gzip --archive=/data/backups/mongo/openhim-dev-$BACKUP_DATE.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongodump --host $HOST -d user-mgnt --gzip --archive=/data/backups/mongo/user-mgnt-$BACKUP_DATE.gz"
 
 # Register backup folder as an Elasticsearch repository for backing up the search data
 #-------------------------------------------------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/backups/elasticsearch", "compress": true }}'
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" 'http://elasticsearch:9200/_snapshot/ocrvs' -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
 
 # Backup Elasticsearch as a set of snapshot files into an elasticsearch sub folder
 #---------------------------------------------------------------------------------
@@ -92,29 +92,29 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 
 # If required, SSH into the node running the opencrvs_metrics container and backup the metrics data into an influxdb subfolder 
 #-----------------------------------------------------------------------------------------------------------------------------
-mkdir -p /backups/influxdb/$BACKUP_DATE
+mkdir -p /data/backups/influxdb/$BACKUP_DATE
 OWN_IP=$(hostname -I | cut -d' ' -f1)
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
   echo "Backing up Influx on own node"
-  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$BACKUP_DATE
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /data/backups/influxdb/$BACKUP_DATE
 else
   echo "Backing up Influx on other node $INFLUXDB_HOST"
-  scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /backups/influxdb/$BACKUP_DATE"
+  scp -r /data/backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/data/backups/influxdb
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd backup -portable -database ocrvs /data/backups/influxdb/$BACKUP_DATE"
   echo "Replacing backup for influxdb on manager node with new backup"
-  scp -r $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb /backups/influxdb
+  scp -r $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/data/backups/influxdb /data/backups/influxdb
 fi
 
 # Copy the backups to an offsite server in production 
 #----------------------------------------------------
 if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
-  script -q -c "scp -v -r -P $SSH_PORT /backups/elasticsearch/ $SSH_USER@$SSH_HOST:$REMOTE_DIR" && echo "Copied elasticsearch backup files to remote server."
-  script -q -c "scp -v -r -P $SSH_PORT /backups/influxdb/$BACKUP_DATE $SSH_USER@$SSH_HOST:$REMOTE_DIR/influxdb" && echo "Copied influx backup files to remote server."
-  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/hearth-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied hearth backup files to remote server."
-  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/user-mgnt-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied user backup files to remote server."
-  script -q -c "scp -v -r -P $SSH_PORT /backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/elasticsearch/ $SSH_USER@$SSH_HOST:$REMOTE_DIR" && echo "Copied elasticsearch backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/influxdb/$BACKUP_DATE $SSH_USER@$SSH_HOST:$REMOTE_DIR/influxdb" && echo "Copied influx backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/hearth-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied hearth backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/user-mgnt-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied user backup files to remote server."
+  script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
 fi
 
 # Cleanup any old backups. Keep previous 7 days of data 
 #------------------------------------------------------
-find /backups -mtime +7 -exec rm {} \;
+find /data/backups -mtime +7 -exec rm {} \;
