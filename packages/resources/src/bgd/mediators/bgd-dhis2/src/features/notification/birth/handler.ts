@@ -69,10 +69,7 @@ export async function birthNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification =
-    typeof request.payload === 'string'
-      ? (JSON.parse(request.payload as string) as IBirthNotification)
-      : (request.payload as IBirthNotification)
+  const notification = request.payload as IBirthNotification
 
   const child = await createPersonEntry(
     null,

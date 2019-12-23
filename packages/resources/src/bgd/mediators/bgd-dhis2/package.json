@@ -23,6 +23,7 @@
     "docker:push": "docker push jembi/ocrvs-bgd-dhis2-mediator"
   },
   "dependencies": {
+    "@types/hapi-pino": "^6.3.0",
     "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
