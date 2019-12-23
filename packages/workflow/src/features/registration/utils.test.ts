@@ -91,7 +91,15 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
-  it('send Birth registration notification successfully', async () => {
+  it('send new birth registration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    expect(
+      sendEventNotification(fhirBundle, Events.BIRTH_NEW_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send mark birth registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
       sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, '01711111111', {
@@ -163,7 +171,15 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
-  it('send Death registration notification successfully', async () => {
+  it('send new death registration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    expect(
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_REG, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send mark death registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
     expect(
       sendEventNotification(fhirBundle, Events.DEATH_MARK_REG, '01711111111', {
