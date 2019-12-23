@@ -75,10 +75,7 @@ export async function deathNotificationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const notification =
-    typeof request.payload === 'string'
-      ? (JSON.parse(request.payload as string) as IDeathNotification)
-      : (request.payload as IDeathNotification)
+  const notification = request.payload as IDeathNotification
 
   const deceased = await createPersonEntry(
     notification.deceased.nid || null,
