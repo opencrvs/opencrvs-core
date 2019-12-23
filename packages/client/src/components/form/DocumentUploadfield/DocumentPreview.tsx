@@ -44,11 +44,8 @@ const ImageHolder = styled.div`
   overflow: hidden;
   display: flex;
   & img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    max-height: 90vh;
-    max-width: 90vw;
+    max-height: 80vh;
+    max-width: 80vw;
     width: auto;
   }
 `
