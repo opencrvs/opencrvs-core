@@ -76,6 +76,19 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
+  it('send in-progress birth registration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    expect(
+      sendEventNotification(
+        fhirBundle,
+        Events.BIRTH_IN_PROGRESS_DEC,
+        '01711111111',
+        {
+          Authorization: 'bearer acd '
+        }
+      )
+    ).toBeDefined()
+  })
   it('send Birth registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
@@ -100,6 +113,19 @@ describe('Verify utility functions', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
+  })
+  it('send in-progress death declaration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    expect(
+      sendEventNotification(
+        fhirBundle,
+        Events.DEATH_IN_PROGRESS_DEC,
+        '01711111111',
+        {
+          Authorization: 'bearer acd '
+        }
+      )
+    ).toBeDefined()
   })
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)

@@ -15,13 +15,20 @@ import {
   getBirthRegistrationNumber,
   getEntryId,
   getInformantName,
+  getCRVSOfficeName,
   getPaperFormID,
   getRegStatusCode,
   getSharedContactMsisdn,
   getTrackingId
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { testFhirBundle, testFhirTaskBundle } from '@workflow/test/utils'
+import {
+  testFhirBundle,
+  testFhirTaskBundle,
+  officeMock
+} from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as any
 
 describe('Verify getSharedContactMsisdn', () => {
   it('Returned shared contact number properly', async () => {
@@ -85,6 +92,33 @@ describe('Verify getInformantName', () => {
     fhirBundle.entry[2].resource.name = []
     await expect(getInformantName(fhirBundle)).rejects.toThrow(
       "Didn't found informant's bn name"
+    )
+  })
+})
+
+describe('Verify getCRVSOfficeName', () => {
+  it('Returned informant name properly', async () => {
+    fetch.mockResponse(officeMock)
+    const officeName = await getCRVSOfficeName(testFhirBundle)
+    expect(officeName).toEqual('নকল অফিস')
+  })
+
+  it('Throws error when invalid fhir bundle is sent', async () => {
+    await expect(
+      getCRVSOfficeName({
+        resourceType: 'Bundle',
+        type: 'document'
+      })
+    ).rejects.toThrow(
+      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
+    )
+  })
+
+  it('Throws error when last reg office info is missing', async () => {
+    const fhirBundle = cloneDeep(testFhirBundle)
+    fhirBundle.entry[1].resource.extension = []
+    await expect(getCRVSOfficeName(fhirBundle)).rejects.toThrow(
+      'No last registration office found on the bundle'
     )
   })
 })

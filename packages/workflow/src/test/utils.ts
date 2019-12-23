@@ -135,6 +135,10 @@ export const testFhirBundle = {
             url:
               'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: { reference: '123' }
           }
         ]
       }
@@ -842,6 +846,8 @@ export const officeMock = JSON.stringify({
   type: {
     coding: [{ code: 'CRVS_OFFICE' }]
   },
+  name: 'Dummy CRVS Office',
+  alias: ['নকল অফিস'],
   physicalType: {
     coding: [
       {
