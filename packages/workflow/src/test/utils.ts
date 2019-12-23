@@ -1605,7 +1605,18 @@ export const testInProgressDeathFhirBundle = {
               code: 'death-registration'
             }
           ]
-        }
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '+8801622688231'
+          }
+        ]
       }
     }
   ],

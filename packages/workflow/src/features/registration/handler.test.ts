@@ -112,6 +112,9 @@ describe('Verify handler', () => {
           ]
         })
       )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -181,6 +184,9 @@ describe('Verify handler', () => {
           ]
         })
       )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
 
       const token = jwt.sign(
         { scope: ['declare'] },
