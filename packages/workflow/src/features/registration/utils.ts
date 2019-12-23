@@ -126,16 +126,22 @@ export async function sendEventNotification(
 export async function sendRegisteredNotification(
   msisdn: string,
   informantName: string,
+  trackingid: string,
+  registrationNumber: string,
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
 ) {
   if (eventType === EVENT_TYPE.BIRTH) {
     await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
-      name: informantName
+      name: informantName,
+      trackingid,
+      registrationNumber
     })
   } else {
     await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
-      name: informantName
+      name: informantName,
+      trackingid,
+      registrationNumber
     })
   }
 }
