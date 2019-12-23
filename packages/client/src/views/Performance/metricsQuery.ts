@@ -19,20 +19,36 @@ export const PERFORMANCE_METRICS = gql`
       locationId: $locationId
     ) {
       timeFrames {
-        locationId
-        regWithin45d
-        regWithin45dTo1yr
-        regWithin1yrTo5yr
-        regOver5yr
-        total
+        details {
+          locationId
+          regWithin45d
+          regWithin45dTo1yr
+          regWithin1yrTo5yr
+          regOver5yr
+          total
+        }
+        total {
+          regWithin45d
+          regWithin45dTo1yr
+          regWithin1yrTo5yr
+          regOver5yr
+        }
       }
       genderBasisMetrics {
-        location
-        maleUnder18
-        femaleUnder18
-        maleOver18
-        femaleOver18
-        total
+        details {
+          location
+          maleUnder18
+          femaleUnder18
+          maleOver18
+          femaleOver18
+          total
+        }
+        total {
+          maleUnder18
+          femaleUnder18
+          maleOver18
+          femaleOver18
+        }
       }
       payments {
         locationId
