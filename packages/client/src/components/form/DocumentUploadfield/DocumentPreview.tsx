@@ -43,6 +43,14 @@ const ImageHolder = styled.div`
   height: 100vh;
   overflow: hidden;
   display: flex;
+  & img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 90vh;
+    max-width: 90vw;
+    width: auto;
+  }
 `
 
 const Title = styled.span`
