@@ -17,9 +17,9 @@ print_usage_and_exit () {
     echo 'Usage: ./emergency-restore-metadata.sh date e.g. 2019-01-01'
     echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
     echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
-    echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /backups/mongo/{date} folder"
-    echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /backups/elasticsearch folder"
-    echo "The InfluxDB backup files must exist in the /backups/influxdb/{date} folder"
+    echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /data/backups/mongo/{date} folder"
+    echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /data/backups/elasticsearch folder"
+    echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
     exit 1
 }
 
@@ -72,12 +72,12 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 
 # Restore all data from a backup into Hearth, OpenHIM and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/hearth-dev-$1.gz"
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/openhim-dev-$1.gz"
-docker run --rm -v /backups/mongo:/backups/mongo --network=$NETWORK mongo:3.6 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/backups/mongo/user-mgnt-$1.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/hearth-dev-$1.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/openhim-dev-$1.gz"
+docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:3.6 bash \
+ -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/user-mgnt-$1.gz"
 
 # Restore all data from a backup into search
 #-------------------------------------------
@@ -95,9 +95,9 @@ INFLUXDB_SSH_USER=${INFLUXDB_SSH_USER:-root}
 #------------------------------------------------------------------------------------------------------------------------------
 OWN_IP=`echo $(hostname -I | cut -d' ' -f1)`
 if [[ "$OWN_IP" = "$INFLUXDB_HOST" ]]; then
-  docker cp backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/backups/influxdb/$1
-  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$1
+  docker cp /data/backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/data/backups/influxdb/$1
+  docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /data/backups/influxdb/$1
 else
-  scp -r /backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/backups/influxdb
-  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker cp backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/backups/influxdb/$1 && docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /backups/influxdb/$1"
+  scp -r /data/backups/influxdb $INFLUXDB_SSH_USER@$INFLUXDB_HOST:/data/backups/influxdb
+  ssh $INFLUXDB_SSH_USER@$INFLUXDB_HOST "docker cp /data/backups/influxdb/$1 $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID:/data/backups/influxdb/$1 && docker exec $INFLUXDB_CONTAINER_NAME.$INFLUXDB_CONTAINER_ID influxd restore -portable -db ocrvs /data/backups/influxdb/$1"
 fi
