@@ -23,7 +23,7 @@ import {
   JURISDICTION_TYPE_SEC
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation } from '@metrics/api'
+import { fetchLocation, fetchFHIR } from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -188,5 +188,43 @@ function getLocationType(locationBundle: fhir.Location) {
       identifier =>
         identifier.system === OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_SEC
     )
+  )
+}
+
+export function fillEmptyDataArrayByKey(
+  dataArray: Array<any>,
+  emptyDataArray: Array<any>,
+  key: string
+) {
+  const result: Array<any> = []
+  for (const eachItem of emptyDataArray) {
+    const index = dataArray.findIndex(
+      itemInDataArray => itemInDataArray[key] === eachItem[key]
+    )
+    if (index === -1) {
+      result.push(eachItem)
+    } else {
+      result.push(dataArray[index])
+    }
+  }
+
+  return result
+}
+
+export async function fetchChildLocationIdsByParentId(
+  parentLocationId: string,
+  authHeader: IAuthHeader
+) {
+  const bundle = await fetchFHIR(
+    `Location?partof=${parentLocationId}`,
+    authHeader
+  )
+
+  return (
+    (bundle &&
+      bundle.entry.map(
+        (entry: { resource: { id: string } }) => `Location/${entry.resource.id}`
+      )) ||
+    []
   )
 }

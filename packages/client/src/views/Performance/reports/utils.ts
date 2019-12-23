@@ -12,7 +12,9 @@ import { ILocation, IOfflineData } from '@client/offline/reducer'
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export function getValueWithPercentageString(value: number, total: number) {
-  return value + ' (' + Math.floor((value / total) * 100) + '%)'
+  return (
+    value + ' (' + String(total ? Math.floor((value / total) * 100) : 0) + '%)'
+  )
 }
 
 export function getLocationFromPartOfLocationId(

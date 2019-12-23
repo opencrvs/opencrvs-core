@@ -104,6 +104,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           isLoading={false}
           content={this.getContent()}
           tableHeight={280}
+          pageSize={300}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.week),
