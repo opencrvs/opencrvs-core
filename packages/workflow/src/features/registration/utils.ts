@@ -16,7 +16,9 @@ import { logger } from '@workflow/logger'
 import {
   getInformantName,
   getTrackingId,
-  getCRVSOfficeName
+  getCRVSOfficeName,
+  getBirthRegistrationNumber,
+  getDeathRegistrationNumber
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
@@ -24,12 +26,14 @@ import {
   DECEASED_SECTION_CODE
 } from '@workflow/features/registration/fhir/constants'
 import { Events } from '@workflow/features/events/handler'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 interface INotificationPayload {
   msisdn: string
   name?: string
   trackingid?: string
   crvsOffice?: string
+  registrationNumber?: string
 }
 
 export function generateBirthTrackingId(): string {
@@ -75,7 +79,11 @@ export async function sendEventNotification(
     case Events.BIRTH_NEW_REG:
     case Events.BIRTH_MARK_REG:
       await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE)
+        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle),
+        registrationNumber: getBirthRegistrationNumber(
+          getTaskResource(fhirBundle) as fhir.Task
+        )
       })
       break
     case Events.BIRTH_MARK_VOID:
@@ -100,7 +108,11 @@ export async function sendEventNotification(
     case Events.DEATH_NEW_REG:
     case Events.DEATH_MARK_REG:
       await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
-        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE)
+        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle),
+        registrationNumber: getDeathRegistrationNumber(
+          getTaskResource(fhirBundle) as fhir.Task
+        )
       })
       break
     case Events.DEATH_MARK_VOID:
@@ -136,6 +148,7 @@ async function sendNotification(
     name?: string
     trackingid?: string
     crvsOffice?: string
+    registrationNumber?: string
   }
 ) {
   const payload: INotificationPayload = {
