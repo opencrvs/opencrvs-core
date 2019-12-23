@@ -11,7 +11,7 @@
  */
 /// <reference types="Cypress" />
 
-context('Certificate Integration Test', () => {
+context('Search Integration Test', () => {
   beforeEach(() => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
