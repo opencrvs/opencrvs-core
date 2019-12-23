@@ -14,14 +14,17 @@ import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendBirthRejectionConfirmation,
+  inProgressNotificationSchema,
   declarationNotificationSchema,
   registrationNotificationSchema,
-  rejectionNotificationSchema
+  rejectionNotificationSchema,
+  sendBirthInProgressConfirmation
 } from '@notification/features/sms/birth-handler'
 import {
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation,
-  sendDeathRejectionConfirmation
+  sendDeathRejectionConfirmation,
+  sendDeathInProgressConfirmation
 } from '@notification/features/sms/death-handler'
 import {
   sendUserCredentials,
@@ -66,6 +69,26 @@ export default function getRoutes() {
         description: 'Sends an sms to a user',
         validate: {
           payload: requestSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birthInProgressSMS',
+      handler: sendBirthInProgressConfirmation,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user for birth in-progress entry',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
+        },
+        validate: {
+          payload: inProgressNotificationSchema
         }
       }
     },
@@ -117,6 +140,26 @@ export default function getRoutes() {
         },
         validate: {
           payload: rejectionNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deathInProgressSMS',
+      handler: sendDeathInProgressConfirmation,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user for death in-progress entry',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY
+          ]
+        },
+        validate: {
+          payload: inProgressNotificationSchema
         }
       }
     },
