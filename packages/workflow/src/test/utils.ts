@@ -466,6 +466,21 @@ export const testFhirBundleWithIdsForDeath = {
             system: 'http://opencrvs.org/specs/id/death-tracking-id',
             value: 'D5WGYJE'
           }
+        ],
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url:
+              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            valueString: '+8801818181818'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: { reference: '123' }
+          }
         ]
       }
     },
