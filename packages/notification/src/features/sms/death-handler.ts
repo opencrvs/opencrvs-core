@@ -12,12 +12,35 @@
 import * as Hapi from 'hapi'
 import { HapiRequest } from '@notification/features/sms/handler'
 import {
+  IInProgressPayload,
   IDeclarationPayload,
   IRegistrationPayload,
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
 import { buildAndSendSMS } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
+
+export async function sendDeathInProgressConfirmation(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IInProgressPayload
+  logger.info(
+    `Notification service sendDeathInProgressConfirmation calling sendSMS: ${JSON.stringify(
+      payload
+    )}`
+  )
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'deathInProgressNotification',
+    {
+      trackingid: payload.trackingid,
+      crvsOffice: payload.crvsOffice
+    }
+  )
+  return h.response().code(200)
+}
 
 export async function sendDeathDeclarationConfirmation(
   request: HapiRequest,
