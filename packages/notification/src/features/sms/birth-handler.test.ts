@@ -231,7 +231,9 @@ describe('Verify birth handlers', () => {
         url: '/birthRegistrationSMS',
         payload: {
           msisdn: '447789778823',
-          name: 'অনিক'
+          name: 'অনিক',
+          trackingid: 'B123456',
+          registrationNumber: '20196816020000129'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -242,7 +244,7 @@ describe('Verify birth handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('returns 400 if called with no name', async () => {
+    it('returns 400 if called with invalid data', async () => {
       const spy = fetch.once('')
 
       const token = jwt.sign(
@@ -291,7 +293,9 @@ describe('Verify birth handlers', () => {
         url: '/birthRegistrationSMS',
         payload: {
           msisdn: '447789778823',
-          name: 'অনিক'
+          name: 'অনিক',
+          trackingid: 'B123456',
+          registrationNumber: '20196816020000129'
         },
         headers: {
           Authorization: `Bearer ${token}`

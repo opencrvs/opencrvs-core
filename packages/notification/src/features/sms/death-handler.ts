@@ -79,7 +79,9 @@ export async function sendDeathRegistrationConfirmation(
     payload.msisdn,
     'deathRegistrationNotification',
     {
-      name: payload.name
+      name: payload.name,
+      trackingid: payload.trackingid,
+      registrationNumber: payload.registrationNumber
     }
   )
   return h.response().code(200)

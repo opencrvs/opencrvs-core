@@ -20,6 +20,7 @@ interface ISMSMessagePayload {
   username?: string
   password?: string
   crvsOffice?: string
+  registrationNumber?: string
 }
 
 export async function buildAndSendSMS(

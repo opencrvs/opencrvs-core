@@ -1,11 +1,11 @@
 {
   "birthInProgressNotification": "জন্ম নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। আবেদনটি সম্পূর্ণ করতে {{crvsOffice}} এ আসুন।",
   "birthDeclarationNotification": "{{name}} এর জন্য জন্ম নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। অগ্রগতি এবং পরবর্তী পদক্ষেপের সাথে আপনি 2 দিনের মধ্যে একটি এসএমএস পাবেন।",
-  "birthRegistrationNotification": "অভিনন্দন, {{name}} এর জন্ম নিবন্ধিত হয়েছে। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি নিয়ে আপনার স্থানীয় নিবন্ধন অফিসে যান",
+  "birthRegistrationNotification": "অভিনন্দন, {{name}} এর জন্ম নিবন্ধিত হয়েছে। জন্ম নিবন্ধন নাম্বার {{registrationNumber}}। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি নিয়ে ৩-৫ দিনের মধ্যে স্থানীয় নিবন্ধন অফিসে যান। আপনার ট্র্যাকিং আইডি হল {{trackingid}}।",
   "birthRejectionNotification": "{{name}} এর জন্ম নিবন্ধন আবেদনটি (ট্র্যাকিং আইডি: {{trackingid}}) বাতিল করা হয়েছে। পরবর্তী পদক্ষেপের জন্য আপনার স্থানীয় নিবন্ধন অফিসে যান।",
   "deathInProgressNotification": "মৃত্যু নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। আবেদনটি সম্পূর্ণ করতে {{crvsOffice}} এ আসুন।",
   "deathDeclarationNotification": "{{name}} এর জন্য মৃত্যু নিবন্ধন ট্র্যাকিং আইডি {{trackingid}}। অগ্রগতি এবং পরবর্তী পদক্ষেপের সাথে আপনি 2 দিনের মধ্যে একটি এসএমএস পাবেন।",
-  "deathRegistrationNotification": "{{name}} এর মৃত্যু নিবন্ধিত হয়েছে। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি দিয়ে আপনার স্থানীয় নিবন্ধন অফিসে যান।",
+  "deathRegistrationNotification": "{{name}} এর মৃত্যু নিবন্ধিত হয়েছে। মৃত্যু নিবন্ধন নাম্বার {{registrationNumber}}। সার্টিফিকেট সংগ্রহ করতে আপনার আইডি নিয়ে ৩-৫ দিনের মধ্যে স্থানীয় নিবন্ধন অফিসে যান। আপনার ট্র্যাকিং আইডি হল {{trackingid}}।",
   "deathRejectionNotification": "{{name}} এর মৃত্যু নিবন্ধন আবেদনটি (ট্র্যাকিং আইডি: {{trackingid}}) বাতিল করা হয়েছে। পরবর্তী পদক্ষেপের জন্য আপনার স্থানীয় নিবন্ধন অফিসে যান।",
   "userCredentialsNotification": "OpenCRVS এ লগইন করতে ব্যাবহার করুন, username: {{username}} এবং password: {{password}}",
   "retieveUserNameNotification": "আপনার OpenCRVS এর username হল: {{username}}"

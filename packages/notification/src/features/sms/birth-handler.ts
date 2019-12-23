@@ -27,6 +27,8 @@ export interface IDeclarationPayload extends ISMSPayload {
 
 export interface IRegistrationPayload extends ISMSPayload {
   name: string
+  registrationNumber: string
+  trackingid: string
 }
 
 export interface IRejectionPayload extends ISMSPayload {
@@ -93,7 +95,9 @@ export async function sendBirthRegistrationConfirmation(
     payload.msisdn,
     'birthRegistrationNotification',
     {
-      name: payload.name
+      name: payload.name,
+      trackingid: payload.trackingid,
+      registrationNumber: payload.registrationNumber
     }
   )
   return h.response().code(200)
@@ -134,7 +138,11 @@ export const declarationNotificationSchema = Joi.object({
 
 export const registrationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  name: Joi.string().required()
+  name: Joi.string().required(),
+  trackingid: Joi.string()
+    .length(7)
+    .required(),
+  registrationNumber: Joi.string().required()
 })
 
 export const rejectionNotificationSchema = Joi.object({
