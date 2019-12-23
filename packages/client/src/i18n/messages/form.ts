@@ -33,7 +33,7 @@ interface IFormMessages {
   applicantsRelationWithChild: MessageDescriptor
   applicantsRelationWithDeceased: MessageDescriptor
   applicantTitle: MessageDescriptor
-  assignedRegisterOffice: MessageDescriptor
+  assignedRegistrationOffice: MessageDescriptor
   attendantAtBirth: MessageDescriptor
   attendantAtBirthLayperson: MessageDescriptor
   attendantAtBirthMidwife: MessageDescriptor
@@ -464,10 +464,10 @@ const messagesToDefine: IFormMessages = {
     description: 'Form section title for applicants',
     id: 'form.section.applicant.title'
   },
-  assignedRegisterOffice: {
-    defaultMessage: 'Assigned Register Office',
-    description: 'Assigned Register Office section',
-    id: 'form.section.assignedRegisterOffice'
+  assignedRegistrationOffice: {
+    defaultMessage: 'Assigned Registration Office',
+    description: 'Assigned Registration Office section',
+    id: 'form.section.assignedRegistrationOffice'
   },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',
@@ -1607,7 +1607,7 @@ const messagesToDefine: IFormMessages = {
   },
   searchFieldModalTitle: {
     id: 'form.field.SearchField.modalTitle',
-    defaultMessage: `{fieldName, select, registrationOffice {Assigned Register Office} other {Health institutions}}`,
+    defaultMessage: `{fieldName, select, registrationOffice {Assigned Registration Office} other {Health institutions}}`,
     description: 'Modal title'
   },
   searchFieldPlaceHolderText: {
