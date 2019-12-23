@@ -29,7 +29,7 @@ context('Certificate Integration Test', () => {
     cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Print').click()
 
-    // GO FOR CERTFICATE COLLECTION
+    // GO FOR CERTIFICATE COLLECTION
     cy.get('#type_MOTHER').click()
     cy.get('#confirm_form').click()
     cy.get('#verifyPositive').click()
