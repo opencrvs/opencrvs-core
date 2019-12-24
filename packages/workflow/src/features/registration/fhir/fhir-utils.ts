@@ -22,7 +22,6 @@ import { HEARTH_URL, getDefaultLanguage } from '@workflow/constants'
 import {
   getTaskResource,
   findPersonEntry,
-  findInformantEntry,
   getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
 import { ITokenPayload, USER_SCOPE } from '@workflow/utils/authUtils.ts'
@@ -33,36 +32,10 @@ export async function getSharedContactMsisdn(fhirBundle: fhir.Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {
     throw new Error('Invalid FHIR bundle found for declaration')
   }
-  let phoneNumber
-  const eventType = getEventType(fhirBundle)
-  if (eventType === EVENT_TYPE.BIRTH) {
-    const taskResource = getTaskResource(fhirBundle) as fhir.Task
-    const phoneExtension =
-      taskResource &&
-      taskResource.extension &&
-      taskResource.extension.find(extension => {
-        return (
-          extension.url ===
-          `${OPENCRVS_SPECIFICATION_URL}extension/contact-person-phone-number`
-        )
-      })
-    phoneNumber = phoneExtension && phoneExtension.valueString
-  } else if (eventType === EVENT_TYPE.DEATH) {
-    const contact = await findInformantEntry(fhirBundle)
-    if (!contact || !contact.telecom) {
-      return false
-    }
-    const phoneEntry = contact.telecom.find(
-      (contactPoint: fhir.ContactPoint) => {
-        return contactPoint.system === 'phone'
-      }
-    )
-    phoneNumber = phoneEntry && phoneEntry.value
-  }
-  if (!phoneNumber) {
-    return false
-  }
-  return phoneNumber
+  return await getPhoneNo(
+    getTaskResource(fhirBundle) as fhir.Task,
+    getEventType(fhirBundle)
+  )
 }
 
 export async function getInformantName(
@@ -90,6 +63,30 @@ export async function getInformantName(
     .concat(name.given ? name.given.join(' ') : '')
     .concat(' ')
     .concat(name.family)
+}
+
+export async function getCRVSOfficeName(fhirBundle: fhir.Bundle) {
+  if (!fhirBundle || !fhirBundle.entry) {
+    throw new Error(
+      'getCRVSOfficeName: Invalid FHIR bundle found for declaration/notification'
+    )
+  }
+  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const regLastOfficeExt = taskResource?.extension?.find(
+    ext => ext.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
+  )
+  if (!regLastOfficeExt || !regLastOfficeExt.valueReference) {
+    throw new Error('No last registration office found on the bundle')
+  }
+  const office: fhir.Location = await getFromFhir(
+    `/${regLastOfficeExt.valueReference.reference}`
+  )
+  const language = getDefaultLanguage()
+  return (
+    (language === 'en'
+      ? office.name
+      : (office.alias && office.alias[0]) || office.name) || ''
+  )
 }
 
 export function getTrackingId(fhirBundle: fhir.Bundle) {
@@ -275,7 +272,6 @@ export async function updateResourceInHearth(resource: fhir.ResourceBase) {
 }
 
 export async function getPhoneNo(
-  composition: fhir.Composition,
   taskResource: fhir.Task,
   eventType: EVENT_TYPE
 ) {

@@ -38,7 +38,10 @@ const composeFhirLocation = (
       },
       {
         system: `${ORG_URL}/specs/id/bbs-code`,
-        value: location.bbs_code
+        value:
+          location.name_eng === 'Rangpur' && jurisdictionType === 'DIVISION' // TODO: A2I has the wrong BBS code for this division
+            ? '55'
+            : location.bbs_code
       },
       {
         system: `${ORG_URL}/specs/id/jurisdiction-type`,

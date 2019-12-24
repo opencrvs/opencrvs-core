@@ -12,5 +12,8 @@
     { "directory": "./packages/performance", "changeProcessCWD": true },
     { "directory": "./packages/client", "changeProcessCWD": true },
     { "directory": "./packages/login", "changeProcessCWD": true }
-  ]
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
 }

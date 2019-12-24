@@ -92,6 +92,8 @@ interface IConstantsMessages {
   within45DaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
   over5Years: MessageDescriptor
+  waitingValidated: MessageDescriptor
+  validated: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -503,6 +505,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: '1 year to 5 years',
     description: 'Label for registrations within 1 year to 5 years',
     id: 'constants.within1YearTo5Years'
+  },
+  waitingValidated: {
+    defaultMessage: 'Waiting for validation',
+    description: 'A label for waitingValidated',
+    id: 'constants.waitingValidated'
+  },
+  validated: {
+    id: 'constants.validated',
+    defaultMessage: 'validated',
+    description: 'A label for validated'
   }
 }
 
