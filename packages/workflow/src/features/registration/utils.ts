@@ -31,7 +31,7 @@ import { getTaskResource } from '@workflow/features/registration/fhir/fhir-templ
 interface INotificationPayload {
   msisdn: string
   name?: string
-  trackingid?: string
+  trackingId?: string
   crvsOffice?: string
   registrationNumber?: string
 }
@@ -65,7 +65,7 @@ export async function sendEventNotification(
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       await sendNotification('birthInProgressSMS', msisdn, authHeader, {
-        trackingid: getTrackingId(fhirBundle),
+        trackingId: getTrackingId(fhirBundle),
         crvsOffice: await getCRVSOfficeName(fhirBundle)
       })
       break
@@ -73,14 +73,13 @@ export async function sendEventNotification(
     case Events.BIRTH_NEW_VALIDATE:
       await sendNotification('birthDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle)
+        trackingId: getTrackingId(fhirBundle)
       })
       break
-    case Events.BIRTH_NEW_REG:
     case Events.BIRTH_MARK_REG:
       await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle),
+        trackingId: getTrackingId(fhirBundle),
         registrationNumber: getBirthRegistrationNumber(
           getTaskResource(fhirBundle) as fhir.Task
         )
@@ -89,12 +88,12 @@ export async function sendEventNotification(
     case Events.BIRTH_MARK_VOID:
       await sendNotification('birthRejectionSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle)
+        trackingId: getTrackingId(fhirBundle)
       })
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       await sendNotification('deathInProgressSMS', msisdn, authHeader, {
-        trackingid: getTrackingId(fhirBundle),
+        trackingId: getTrackingId(fhirBundle),
         crvsOffice: await getCRVSOfficeName(fhirBundle)
       })
       break
@@ -102,14 +101,13 @@ export async function sendEventNotification(
     case Events.DEATH_NEW_VALIDATE:
       await sendNotification('deathDeclarationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle)
+        trackingId: getTrackingId(fhirBundle)
       })
       break
-    case Events.DEATH_NEW_REG:
     case Events.DEATH_MARK_REG:
       await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle),
+        trackingId: getTrackingId(fhirBundle),
         registrationNumber: getDeathRegistrationNumber(
           getTaskResource(fhirBundle) as fhir.Task
         )
@@ -118,7 +116,7 @@ export async function sendEventNotification(
     case Events.DEATH_MARK_VOID:
       await sendNotification('deathRejectionSMS', msisdn, authHeader, {
         name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        trackingid: getTrackingId(fhirBundle)
+        trackingId: getTrackingId(fhirBundle)
       })
   }
 }
@@ -126,7 +124,7 @@ export async function sendEventNotification(
 export async function sendRegisteredNotification(
   msisdn: string,
   informantName: string,
-  trackingid: string,
+  trackingId: string,
   registrationNumber: string,
   eventType: EVENT_TYPE,
   authHeader: { Authorization: string }
@@ -134,13 +132,13 @@ export async function sendRegisteredNotification(
   if (eventType === EVENT_TYPE.BIRTH) {
     await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
       name: informantName,
-      trackingid,
+      trackingId,
       registrationNumber
     })
   } else {
     await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
       name: informantName,
-      trackingid,
+      trackingId,
       registrationNumber
     })
   }
@@ -152,7 +150,7 @@ async function sendNotification(
   authHeader: { Authorization: string },
   notificationPayload: {
     name?: string
-    trackingid?: string
+    trackingId?: string
     crvsOffice?: string
     registrationNumber?: string
   }

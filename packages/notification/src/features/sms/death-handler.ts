@@ -35,7 +35,7 @@ export async function sendDeathInProgressConfirmation(
     payload.msisdn,
     'deathInProgressNotification',
     {
-      trackingid: payload.trackingid,
+      trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
     }
   )
@@ -58,7 +58,7 @@ export async function sendDeathDeclarationConfirmation(
     'deathDeclarationNotification',
     {
       name: payload.name,
-      trackingid: payload.trackingid
+      trackingId: payload.trackingId
     }
   )
   return h.response().code(200)
@@ -80,7 +80,7 @@ export async function sendDeathRegistrationConfirmation(
     'deathRegistrationNotification',
     {
       name: payload.name,
-      trackingid: payload.trackingid,
+      trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
     }
   )
@@ -99,7 +99,7 @@ export async function sendDeathRejectionConfirmation(
   )
   await buildAndSendSMS(request, payload.msisdn, 'deathRejectionNotification', {
     name: payload.name,
-    trackingid: payload.trackingid
+    trackingId: payload.trackingId
   })
   return h.response().code(200)
 }

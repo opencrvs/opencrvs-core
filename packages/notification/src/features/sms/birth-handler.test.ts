@@ -42,7 +42,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -53,7 +53,7 @@ describe('Verify birth handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('returns 400 if called with invalid trackingid', async () => {
+    it('returns 400 if called with invalid trackingId', async () => {
       const spy = fetch.once('')
 
       const token = jwt.sign(
@@ -72,7 +72,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
-          trackingid: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           crvsOffice: 'আলকবালী ইউনিয়ন পরিষদ',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -137,7 +137,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -148,7 +148,7 @@ describe('Verify birth handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('returns 400 if called with invalid trackingid', async () => {
+    it('returns 400 if called with invalid trackingId', async () => {
       const spy = fetch.once('')
 
       const token = jwt.sign(
@@ -167,7 +167,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'childName',
-          trackingid: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -200,7 +200,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -232,7 +232,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456',
+          trackingId: 'B123456',
           registrationNumber: '20196816020000129'
         },
         headers: {
@@ -294,7 +294,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456',
+          trackingId: 'B123456',
           registrationNumber: '20196816020000129'
         },
         headers: {
@@ -327,7 +327,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`
@@ -338,7 +338,7 @@ describe('Verify birth handlers', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('returns 400 if called with invalid trackingid', async () => {
+    it('returns 400 if called with invalid trackingId', async () => {
       const spy = fetch.once('')
 
       const token = jwt.sign(
@@ -357,7 +357,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'childName',
-          trackingid: 'aeUxkeoseSd-afsdasdf-safasfasf'
+          trackingId: 'aeUxkeoseSd-afsdasdf-safasfasf'
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -390,7 +390,7 @@ describe('Verify birth handlers', () => {
         payload: {
           msisdn: '447789778823',
           name: 'অনিক',
-          trackingid: 'B123456'
+          trackingId: 'B123456'
         },
         headers: {
           Authorization: `Bearer ${token}`

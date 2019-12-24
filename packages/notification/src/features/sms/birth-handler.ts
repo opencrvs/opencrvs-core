@@ -16,23 +16,23 @@ import { buildAndSendSMS } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
 
 export interface IInProgressPayload extends ISMSPayload {
-  trackingid: string
+  trackingId: string
   crvsOffice: string
 }
 
 export interface IDeclarationPayload extends ISMSPayload {
-  trackingid: string
+  trackingId: string
   name: string
 }
 
 export interface IRegistrationPayload extends ISMSPayload {
   name: string
   registrationNumber: string
-  trackingid: string
+  trackingId: string
 }
 
 export interface IRejectionPayload extends ISMSPayload {
-  trackingid: string
+  trackingId: string
   name: string
 }
 
@@ -51,7 +51,7 @@ export async function sendBirthInProgressConfirmation(
     payload.msisdn,
     'birthInProgressNotification',
     {
-      trackingid: payload.trackingid,
+      trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
     }
   )
@@ -74,7 +74,7 @@ export async function sendBirthDeclarationConfirmation(
     'birthDeclarationNotification',
     {
       name: payload.name,
-      trackingid: payload.trackingid
+      trackingId: payload.trackingId
     }
   )
   return h.response().code(200)
@@ -96,7 +96,7 @@ export async function sendBirthRegistrationConfirmation(
     'birthRegistrationNotification',
     {
       name: payload.name,
-      trackingid: payload.trackingid,
+      trackingId: payload.trackingId,
       registrationNumber: payload.registrationNumber
     }
   )
@@ -115,14 +115,14 @@ export async function sendBirthRejectionConfirmation(
   )
   await buildAndSendSMS(request, payload.msisdn, 'birthRejectionNotification', {
     name: payload.name,
-    trackingid: payload.trackingid
+    trackingId: payload.trackingId
   })
   return h.response().code(200)
 }
 
 export const inProgressNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingid: Joi.string()
+  trackingId: Joi.string()
     .length(7)
     .required(),
   crvsOffice: Joi.string().required()
@@ -130,7 +130,7 @@ export const inProgressNotificationSchema = Joi.object({
 
 export const declarationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingid: Joi.string()
+  trackingId: Joi.string()
     .length(7)
     .required(),
   name: Joi.string().required()
@@ -139,7 +139,7 @@ export const declarationNotificationSchema = Joi.object({
 export const registrationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   name: Joi.string().required(),
-  trackingid: Joi.string()
+  trackingId: Joi.string()
     .length(7)
     .required(),
   registrationNumber: Joi.string().required()
@@ -147,7 +147,7 @@ export const registrationNotificationSchema = Joi.object({
 
 export const rejectionNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingid: Joi.string()
+  trackingId: Joi.string()
     .length(7)
     .required(),
   name: Joi.string().required()
