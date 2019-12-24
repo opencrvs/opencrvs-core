@@ -23,7 +23,8 @@ import {
   generateEmptyBirthKeyFigure,
   IPoint,
   LABEL_FOMRAT,
-  Location
+  Location,
+  EVENT_TYPE
 } from '@metrics/features/metrics/utils'
 import { query } from '@metrics/influxdb/client'
 import * as moment from 'moment'
@@ -119,36 +120,65 @@ export async function fetchRegWithinTimeFrames(
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  event: string
 ) {
-  const timeFramePoints = await query(
-    `SELECT
-      SUM(within45Days) AS regWithin45d,
-      SUM(within45DTo1Yr) AS regWithin45dTo1yr,
-      SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
-      SUM(over5Yr) AS regOver5yr
+  const queryString =
+    event === EVENT_TYPE.BIRTH
+      ? `SELECT
+    SUM(within45Days) AS regWithin45d,
+    SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+    SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+    SUM(over5Yr) AS regOver5yr
+   FROM (
+     SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
      FROM (
-       SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
-       FROM (
-        SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-      AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
-        GROUP BY ${lowerLocationLevel}
-       ), (
-        SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-      AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
-        GROUP BY ${lowerLocationLevel}
-       ), (
-        SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-      AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
-        GROUP BY ${lowerLocationLevel}
-       ), (
-        SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-      AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
-        GROUP BY ${lowerLocationLevel}
-       ) FILL(0)
-     ) GROUP BY ${lowerLocationLevel}
-     `
-  )
+      SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
+      GROUP BY ${lowerLocationLevel}
+     ), (
+      SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
+      GROUP BY ${lowerLocationLevel}
+     ), (
+      SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
+      GROUP BY ${lowerLocationLevel}
+     ), (
+      SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
+      GROUP BY ${lowerLocationLevel}
+     ) FILL(0)
+   ) GROUP BY ${lowerLocationLevel}
+   `
+      : `SELECT
+   SUM(within45Days) AS regWithin45d,
+   SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+   SUM(over5Yr) AS regOver5yr
+  FROM (
+    SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+    FROM (
+     SELECT COUNT(deathDays) AS within45Days FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+   AND deathDays > -1 AND deathDays <= 45 AND ${currentLocationLevel}='${locationId}'
+     GROUP BY ${lowerLocationLevel}
+    ), (
+     SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+   AND deathDays > 46 AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
+     GROUP BY ${lowerLocationLevel}
+    ), (
+     SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+   AND deathDays > 366 AND deathDays <= 1825 AND ${currentLocationLevel}='${locationId}'
+     GROUP BY ${lowerLocationLevel}
+    ), (
+     SELECT COUNT(deathDays) AS over5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+   AND deathDays > 1826 AND ${currentLocationLevel}='${locationId}'
+     GROUP BY ${lowerLocationLevel}
+    ) FILL(0)
+  ) GROUP BY ${lowerLocationLevel}
+  `
+
+  const timeFramePoints = await query(queryString)
 
   return timeFramePoints.map((point: any) => {
     const {
@@ -173,14 +203,15 @@ export async function fetchRegWithinTimeFrames(
 export async function getCurrentAndLowerLocationLevels(
   timeStart: string,
   timeEnd: string,
-  locationId: string
+  locationId: string,
+  regMeasurement: string
 ): Promise<ICurrentAndLowerLocationLevels> {
   const allPointsContainingLocationId = await query(
-    `SELECT LAST(*) FROM birth_reg WHERE time >'${timeStart}' AND time <= '${timeEnd}'
+    `SELECT LAST(*) FROM ${regMeasurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND ( locationLevel2 = '${locationId}'
         OR locationLevel3 = '${locationId}'
         OR locationLevel4 = '${locationId}'
-        OR locationLevel5 = '${locationId}')
+        OR locationLevel5 = '${locationId}' )
       GROUP BY locationLevel2,locationLevel3,locationLevel4,locationLevel5`
   )
 
@@ -359,9 +390,12 @@ export async function fetchGenderBasisMetrics(
   timeTo: string,
   currLocation: string,
   currLocationLevel: string,
-  locationLevel: string
+  locationLevel: string,
+  event: EVENT_TYPE
 ) {
-  const points = await query(`
+  const queryString =
+    event === EVENT_TYPE.BIRTH
+      ? `
   SELECT
     SUM(under18) AS under18,
     SUM(over18) AS over18
@@ -387,7 +421,36 @@ export async function fetchGenderBasisMetrics(
     ) FILL(0)
   )
   GROUP BY gender, ${locationLevel}
-  `)
+  `
+      : `
+  SELECT
+    SUM(under18) AS under18,
+    SUM(over18) AS over18
+  FROM (
+    SELECT under18, over18, gender, ${locationLevel} FROM (
+      SELECT
+        COUNT(ageInYears) AS under18
+      FROM death_reg
+      WHERE ageInYears < 18
+       AND time > '${timeFrom}'
+       AND time <= '${timeTo}'
+       AND ${currLocationLevel}='${currLocation}'
+      GROUP BY gender, ${locationLevel}
+    ), (
+      SELECT
+        COUNT(ageInYears) AS over18
+      FROM death_reg
+      WHERE ageInYears >= 18
+       AND time > '${timeFrom}'
+       AND time <= '${timeTo}'
+       AND ${currLocationLevel}='${currLocation}'
+      GROUP BY gender, ${locationLevel}
+    ) FILL(0)
+  )
+  GROUP BY gender, ${locationLevel}
+  `
+
+  const points = await query(queryString)
 
   return populateGenderBasisMetrics(points, locationLevel)
 }

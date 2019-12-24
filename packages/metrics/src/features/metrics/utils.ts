@@ -39,6 +39,16 @@ export interface IPoint {
   count: number
 }
 
+export enum EVENT_TYPE {
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH'
+}
+
+export enum REG_MEASUREMENTS_NAME {
+  BIRTH = 'birth_reg',
+  DEATH = 'death_reg'
+}
+
 export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [

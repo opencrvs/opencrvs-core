@@ -20,8 +20,13 @@ import {
 import {
   TIME_FROM,
   TIME_TO,
-  LOCATION_ID
+  LOCATION_ID,
+  EVENT
 } from '@metrics/features/metrics/constants'
+import {
+  EVENT_TYPE,
+  REG_MEASUREMENTS_NAME
+} from '@metrics/features/metrics/utils'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -30,7 +35,7 @@ export async function metricsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = 'Location/' + request.query[LOCATION_ID]
-
+  const event = request.query[EVENT].toUpperCase() as EVENT_TYPE
   let currentLocationLevel
   let lowerLocationLevel
 
@@ -38,7 +43,8 @@ export async function metricsHandler(
     const levels = await getCurrentAndLowerLocationLevels(
       timeStart,
       timeEnd,
-      locationId
+      locationId,
+      REG_MEASUREMENTS_NAME[event]
     )
     currentLocationLevel = levels.currentLocationLevel
     lowerLocationLevel = levels.lowerLocationLevel
@@ -55,8 +61,10 @@ export async function metricsHandler(
     timeEnd,
     locationId,
     currentLocationLevel,
-    lowerLocationLevel
+    lowerLocationLevel,
+    event
   )
+
   const payments = await fetchCertificationPayments(
     timeStart,
     timeEnd,
@@ -70,7 +78,8 @@ export async function metricsHandler(
     timeEnd,
     locationId,
     currentLocationLevel,
-    lowerLocationLevel
+    lowerLocationLevel,
+    event
   )
   return { timeFrames, payments, genderBasisMetrics }
 }
