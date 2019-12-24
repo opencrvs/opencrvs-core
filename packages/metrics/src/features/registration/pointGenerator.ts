@@ -148,6 +148,9 @@ export const generateDeathRegPoint = async (
     compositionId: composition.id,
     ageInYears: deceased.birthDate
       ? getAgeInYears(deceased.birthDate)
+      : undefined,
+    deathDays: deceased.deceasedDateTime
+      ? getAgeInDays(deceased.deceasedDateTime)
       : undefined
   }
 
