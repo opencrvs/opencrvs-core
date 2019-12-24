@@ -63,10 +63,10 @@ const Header = styled.div`
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
 `
-const Body = styled.div<{ height?: number; overflowY?: string }>`
+const Body = styled.div<{ height?: number; visible?: boolean }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
-  overflow-y: ${({ overflowY }) => (overflowY ? overflowY : 'auto')};
+  overflow-y: ${({ visible }) => (visible ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
@@ -110,7 +110,7 @@ interface IProps {
   show: boolean
   width?: number
   contentHeight?: number
-  contentOverflowY?: string
+  contentVisible?: boolean
   actions: JSX.Element[]
   handleClose?: () => void
 }
@@ -137,7 +137,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
-      contentOverflowY
+      contentVisible
     } = this.props
 
     this.toggleScroll()
@@ -155,7 +155,7 @@ export class ResponsiveModal extends React.Component<IProps> {
               <Cross color="currentColor" />
             </CircleButton>
           </Header>
-          <Body height={contentHeight} overflowY={contentOverflowY}>
+          <Body height={contentHeight} visible={contentVisible}>
             {this.props.children}
           </Body>
           <Footer>
