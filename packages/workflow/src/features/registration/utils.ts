@@ -15,7 +15,8 @@ import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import {
   getInformantName,
-  getTrackingId
+  getTrackingId,
+  getCRVSOfficeName
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   EVENT_TYPE,
@@ -26,8 +27,9 @@ import { Events } from '@workflow/features/events/handler'
 
 interface INotificationPayload {
   msisdn: string
-  name: string
+  name?: string
   trackingid?: string
+  crvsOffice?: string
 }
 
 export function generateBirthTrackingId(): string {
@@ -57,59 +59,55 @@ export async function sendEventNotification(
   logger.info(`sendEventNotification method for event: ${event}`)
   // tslint:disable-next-line
   switch (event) {
+    case Events.BIRTH_IN_PROGRESS_DEC:
+      await sendNotification('birthInProgressSMS', msisdn, authHeader, {
+        trackingid: getTrackingId(fhirBundle),
+        crvsOffice: await getCRVSOfficeName(fhirBundle)
+      })
+      break
     case Events.BIRTH_NEW_DEC:
-      await sendNotification(
-        'birthDeclarationSMS',
-        msisdn,
-        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        authHeader,
-        getTrackingId(fhirBundle)
-      )
+    case Events.BIRTH_NEW_VALIDATE:
+      await sendNotification('birthDeclarationSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle)
+      })
       break
     case Events.BIRTH_NEW_REG:
     case Events.BIRTH_MARK_REG:
-      await sendNotification(
-        'birthRegistrationSMS',
-        msisdn,
-        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        authHeader
-      )
+      await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE)
+      })
       break
     case Events.BIRTH_MARK_VOID:
-      await sendNotification(
-        'birthRejectionSMS',
-        msisdn,
-        await getInformantName(fhirBundle, CHILD_SECTION_CODE),
-        authHeader,
-        getTrackingId(fhirBundle)
-      )
+      await sendNotification('birthRejectionSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, CHILD_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle)
+      })
+      break
+    case Events.DEATH_IN_PROGRESS_DEC:
+      await sendNotification('deathInProgressSMS', msisdn, authHeader, {
+        trackingid: getTrackingId(fhirBundle),
+        crvsOffice: await getCRVSOfficeName(fhirBundle)
+      })
       break
     case Events.DEATH_NEW_DEC:
-      await sendNotification(
-        'deathDeclarationSMS',
-        msisdn,
-        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        authHeader,
-        getTrackingId(fhirBundle)
-      )
+    case Events.DEATH_NEW_VALIDATE:
+      await sendNotification('deathDeclarationSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle)
+      })
       break
     case Events.DEATH_NEW_REG:
     case Events.DEATH_MARK_REG:
-      await sendNotification(
-        'deathRegistrationSMS',
-        msisdn,
-        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        authHeader
-      )
+      await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE)
+      })
       break
     case Events.DEATH_MARK_VOID:
-      await sendNotification(
-        'deathRejectionSMS',
-        msisdn,
-        await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
-        authHeader,
-        getTrackingId(fhirBundle)
-      )
+      await sendNotification('deathRejectionSMS', msisdn, authHeader, {
+        name: await getInformantName(fhirBundle, DECEASED_SECTION_CODE),
+        trackingid: getTrackingId(fhirBundle)
+      })
   }
 }
 
@@ -120,35 +118,29 @@ export async function sendRegisteredNotification(
   authHeader: { Authorization: string }
 ) {
   if (eventType === EVENT_TYPE.BIRTH) {
-    await sendNotification(
-      'birthRegistrationSMS',
-      msisdn,
-      informantName,
-      authHeader
-    )
+    await sendNotification('birthRegistrationSMS', msisdn, authHeader, {
+      name: informantName
+    })
   } else {
-    await sendNotification(
-      'deathRegistrationSMS',
-      msisdn,
-      informantName,
-      authHeader
-    )
+    await sendNotification('deathRegistrationSMS', msisdn, authHeader, {
+      name: informantName
+    })
   }
 }
 
 async function sendNotification(
   smsType: string,
   msisdn: string,
-  name: string,
   authHeader: { Authorization: string },
-  trackingId?: string
+  notificationPayload: {
+    name?: string
+    trackingid?: string
+    crvsOffice?: string
+  }
 ) {
   const payload: INotificationPayload = {
     msisdn,
-    name
-  }
-  if (trackingId) {
-    payload.trackingid = trackingId
+    ...notificationPayload
   }
   logger.info(
     `Sending sms to : ${NOTIFICATION_SERVICE_URL}${smsType} with body: ${JSON.stringify(
@@ -248,10 +240,6 @@ export function isEventNotification(fhirBundle: fhir.Bundle) {
 export function isEventNonNotifiable(event: Events) {
   return (
     [
-      Events.BIRTH_IN_PROGRESS_DEC,
-      Events.DEATH_IN_PROGRESS_DEC,
-      Events.BIRTH_NEW_VALIDATE,
-      Events.DEATH_NEW_VALIDATE,
       Events.BIRTH_WAITING_VALIDATION,
       Events.DEATH_WAITING_VALIDATION,
       Events.BIRTH_NEW_WAITING_VALIDATION,
