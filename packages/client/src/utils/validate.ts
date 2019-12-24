@@ -126,13 +126,9 @@ export const requiredSymbol: Validation = (value: IFormFieldValue) =>
 export const required = (
   message: MessageDescriptor = messages.required
 ): Validation => (value: IFormFieldValue | null) => {
-  if (typeof value === 'string') {
-    return value !== '' ? undefined : { message }
-  }
-  if (isArray(value)) {
-    return value.length > 0 ? undefined : { message }
-  }
-  return Boolean(value) ? undefined : { message }
+  return Boolean(value) || (isArray(value) && value.length > 0)
+    ? undefined
+    : { message }
 }
 
 export const minLength = (min: number) => (value: string) => {
