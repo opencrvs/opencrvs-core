@@ -166,9 +166,9 @@ export const userSection: ISerializedFormSection = {
           validate: []
         },
         {
-          name: 'assignedRegisterOffice',
+          name: 'assignedRegistrationOffice',
           type: FIELD_GROUP_TITLE,
-          label: messages.assignedRegisterOffice,
+          label: messages.assignedRegistrationOffice,
           required: false,
           initialValue: '',
           validate: []

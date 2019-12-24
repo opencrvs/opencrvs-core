@@ -29,7 +29,7 @@ export enum UserStatus {
 
 export const mockIncompleteFormData = {
   accountDetails: '',
-  assignedRegisterOffice: '',
+  assignedRegistrationOffice: '',
   device: '',
   familyName: 'হোসেন',
   familyNameEng: 'Hossain',
@@ -45,7 +45,7 @@ export const mockIncompleteFormData = {
 
 export const mockCompleteFormData = {
   accountDetails: '',
-  assignedRegisterOffice: '',
+  assignedRegistrationOffice: '',
   device: '',
   familyName: 'হোসেন',
   familyNameEng: 'Hossain',
@@ -62,7 +62,7 @@ export const mockCompleteFormData = {
 
 export const mockDataWithRegistarRoleSelected = {
   accountDetails: '',
-  assignedRegisterOffice: '',
+  assignedRegistrationOffice: '',
   device: '',
   familyName: 'হোসেন',
   familyNameEng: 'Hossain',

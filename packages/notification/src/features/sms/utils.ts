@@ -19,6 +19,7 @@ interface ISMSMessagePayload {
   trackingid?: string
   username?: string
   password?: string
+  crvsOffice?: string
 }
 
 export async function buildAndSendSMS(

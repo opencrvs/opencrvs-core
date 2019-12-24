@@ -112,6 +112,9 @@ describe('Verify handler', () => {
           ]
         })
       )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -181,6 +184,9 @@ describe('Verify handler', () => {
           ]
         })
       )
+      jest
+        .spyOn(require('./utils'), 'sendEventNotification')
+        .mockReturnValue('')
 
       const token = jwt.sign(
         { scope: ['declare'] },
@@ -1329,7 +1335,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
 
   it('returns OK with death registration', async () => {
     fetch.mockResponses(
-      [wrapInBundle(deathTaskMock), { status: 200 }],
+      [wrapInBundle(JSON.parse(deathTaskMock)), { status: 200 }],
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
