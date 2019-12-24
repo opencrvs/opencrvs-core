@@ -36,10 +36,10 @@ import { IStoreState } from '@client/store'
 import { Query } from '@client/components/Query'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import {
-  GQLBirthRegistrationMetrics,
-  GQLBirthRegistrationTimeFrameMetrics,
-  GQLBirthRegistrationGenderBasisMetrics,
-  GQLCertificationPaymentMetrics
+  GQLCertificationPaymentMetrics,
+  GQLRegistrationMetrics,
+  GQLRegistrationGenderBasisMetrics,
+  GQLRegistrationTimeFrameMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import {
@@ -67,7 +67,7 @@ interface ReportProps {
 }
 
 interface IMetricsQueryResult {
-  fetchBirthRegistrationMetrics: GQLBirthRegistrationMetrics
+  fetchBirthRegistrationMetrics: GQLRegistrationMetrics
 }
 
 type Props = ReportProps &
@@ -155,7 +155,7 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics[]))) ||
+                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics[]))) ||
                     []
                   }
                 />
@@ -165,7 +165,7 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics[]))) ||
+                          .timeFrames as GQLRegistrationTimeFrameMetrics[]))) ||
                     []
                   }
                 />
