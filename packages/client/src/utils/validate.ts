@@ -132,7 +132,7 @@ export const required = (
   if (isArray(value)) {
     return value.length > 0 ? undefined : { message }
   }
-  return value !== undefined ? undefined : { message }
+  return value !== undefined && value !== null ? undefined : { message }
 }
 
 export const minLength = (min: number) => (value: string) => {
