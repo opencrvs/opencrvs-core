@@ -16,6 +16,7 @@ import { sendSMS } from '@notification/features/sms/service'
 
 interface ISendSMSPayload {
   name?: string
+  authCode?: string
   trackingId?: string
   username?: string
   password?: string
