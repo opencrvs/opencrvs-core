@@ -20,7 +20,10 @@ import { Action } from 'redux'
 import { formMessages as messages } from '@client/i18n/messages'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@client/navigation'
-import { transformRoleDataToDefinitions } from '@client/views/SysAdmin/utils'
+import {
+  transformRoleDataToDefinitions,
+  alterRolesBasedOnUserRole
+} from '@client/views/SysAdmin/utils'
 import {
   showSubmitFormSuccessToast,
   showSubmitFormErrorToast
@@ -35,6 +38,7 @@ const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
+const PROCESS_ROLES = 'USER_FORM/PROCESS_ROLES'
 
 enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
@@ -81,6 +85,20 @@ export function updateUserFormFieldDefinitions(
   return {
     type: UPDATE_FORM_FIELD_DEFINITIONS,
     payload: { data }
+  }
+}
+
+interface IProcessRoles {
+  type: typeof PROCESS_ROLES
+  payload: {
+    primatyOfficeId: string
+  }
+}
+
+export function processRoles(primatyOfficeId: string): IProcessRoles {
+  return {
+    type: PROCESS_ROLES,
+    payload: { primatyOfficeId }
   }
 }
 
@@ -161,6 +179,17 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   action: UserFormAction
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
+    case PROCESS_ROLES:
+      const { primatyOfficeId } = (action as IProcessRoles).payload
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run(alterRolesBasedOnUserRole, {
+          successActionCreator: updateUserFormFieldDefinitions,
+          args: [primatyOfficeId]
+        })
+      )
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
 

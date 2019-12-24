@@ -12,8 +12,8 @@
 import gql from 'graphql-tag'
 
 export const SEARCH_USERS = gql`
-  query($count: Int, $skip: Int) {
-    searchUsers(count: $count, skip: $skip) {
+  query($count: Int, $skip: Int, $primaryOfficeId: String) {
+    searchUsers(count: $count, skip: $skip, primaryOfficeId: $primaryOfficeId) {
       totalItems
       results {
         id

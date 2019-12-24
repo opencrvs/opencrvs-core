@@ -20,6 +20,8 @@ import { userMessages } from '@client/i18n/messages'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 import { getRolesQuery } from '@client/forms/user/fieldDefinitions/query/queries'
+import { SEARCH_USERS } from '@client/sysadmin/user/queries'
+import { client } from '@client/utils/apolloClient'
 
 export enum UserStatus {
   ACTIVE,
@@ -147,7 +149,7 @@ export const transformRoleDataToDefinitions = (
   fields: IFormField[],
   data: any
 ): IFormField[] => {
-  const roles = data.data.getRoles as Array<any>
+  const roles = data as Array<any>
   const transformTypes = (types: string[]) =>
     types.map(type => ({
       label: userMessages[type],
@@ -174,4 +176,39 @@ export const transformRoleDataToDefinitions = (
       return field
     } else return field
   })
+}
+
+export async function alterRolesBasedOnUserRole(primatyOfficeId: string) {
+  const roleData = await client.query({ query: getRolesQuery })
+  const userData = await client.query({
+    query: SEARCH_USERS,
+    variables: { primatyOfficeId }
+  })
+  const roles = roleData.data.getRoles as Array<any>
+  const users = userData.data.searchUsers.results as Array<any>
+
+  const hasSecretary = users.some(user => user.type === 'SECRETARY')
+  const hasMayor = users.some(user => user.type === 'MAYOR')
+  const hasChariman = users.some(user => user.type === 'CHAIRMAN')
+
+  const roleList = [] as Array<any>
+
+  roles.map(role => {
+    if (role.value === 'REGISTRATION_AGENT' || role.value === 'FIELD_AGENT') {
+      if (hasSecretary && (hasChariman || hasMayor)) {
+        roleList.push(role)
+      }
+    } else if (role.value === 'LOCAL_REGISTRAR') {
+      role.types = role.types.filter(
+        (t: string) =>
+          (t === 'SECRETARY' && !hasSecretary) ||
+          (t === 'MAYOR' && !hasMayor) ||
+          (t === 'CHAIRMAN' && !hasChariman)
+      )
+      role.types.length > 0 && roleList.push(role)
+    } else {
+      roleList.push(role)
+    }
+  })
+  return roleList
 }
