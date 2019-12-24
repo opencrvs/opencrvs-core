@@ -19,16 +19,21 @@ export interface ITimeRange {
 
 export const resolvers: GQLResolver = {
   Query: {
-    async fetchBirthRegistrationMetrics(
+    async fetchRegistrationMetrics(
       _,
-      { timeStart, timeEnd, locationId },
+      { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
       const timeRange: ITimeRange = {
         timeStart,
         timeEnd
       }
-      const metricsData = await getMetrics(authHeader, timeRange, locationId)
+      const metricsData = await getMetrics(
+        authHeader,
+        timeRange,
+        locationId,
+        event
+      )
 
       return {
         timeFrames: metricsData.timeFrames,

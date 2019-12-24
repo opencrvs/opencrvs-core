@@ -35,7 +35,7 @@ describe('fetch birth registration metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.fetchBirthRegistrationMetrics(
+    const data = await resolvers.Query.fetchRegistrationMetrics(
       {},
       { timeStart: '1552469068679', timeEnd: '1554814894419' }
     )
@@ -48,7 +48,7 @@ describe('fetch birth registration metrics', () => {
   it('returns an empty array of birth registraiton metrics when error is thrown', async () => {
     fetch.mockReject(new Error('error'))
     await expect(
-      resolvers.Query.fetchBirthRegistrationMetrics({}, {})
+      resolvers.Query.fetchRegistrationMetrics({}, {})
     ).rejects.toThrowError('Metrics request failed: error')
   })
 })
