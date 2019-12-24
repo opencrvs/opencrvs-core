@@ -23,5 +23,6 @@ declare namespace Cypress {
     initializeFakeTimers: () => void
     downloadFirstApplication: () => void
     registerApplicationWithMinimumInput: () => void
+    declareApplicationWithMinimumInput: () => void
   }
 }

@@ -65,10 +65,6 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     }
   }
 
-  .react-select__option {
-    color: ${({ theme }) => theme.colors.copy};
-  }
-
   .react-select__indicator-separator {
     display: none;
   }
