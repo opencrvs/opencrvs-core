@@ -25,12 +25,15 @@ import {
 } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 interface IInProgressProps {
   theme: ITheme
   draftApplications: IApplication[]
   goToApplicationDetails: typeof goToApplicationDetails
   showPaginated?: boolean
+  loading?: boolean
+  error?: boolean
 }
 
 type IFullProps = IInProgressProps & IntlShapeProps
@@ -161,6 +164,10 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           expandable={false}
           clickable={true}
           showPaginated={this.props.showPaginated}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
         />
       </HomeContent>
     )

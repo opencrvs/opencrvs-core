@@ -336,23 +336,7 @@ export class RegistrationHomeView extends React.Component<
       registrarLocationId,
       storedApplications
     } = this.props
-    const { loading, error, data } = workqueue
-    if (loading) {
-      return (
-        <StyledSpinner
-          id="search-result-spinner"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (!data) {
-      return (
-        <ErrorText id="search-result-error-text-count">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
-
+    const { loading, error, data, initialSyncDone } = workqueue
     const filteredData = filterProcessingApplicationsFromQuery(
       data,
       storedApplications
@@ -370,13 +354,15 @@ export class RegistrationHomeView extends React.Component<
             onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
           >
             {intl.formatMessage(messages.inProgress)} (
-            {drafts.filter(
-              draft =>
-                draft.submissionStatus ===
-                SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-            ).length +
-              (filteredData.inProgressTab.totalItems || 0) +
-              (filteredData.notificationTab.totalItems || 0)}
+            {!initialSyncDone
+              ? '?'
+              : drafts.filter(
+                  draft =>
+                    draft.submissionStatus ===
+                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                ).length +
+                (filteredData.inProgressTab.totalItems || 0) +
+                (filteredData.notificationTab.totalItems || 0)}
             )
           </IconTab>
           <IconTab
@@ -390,7 +376,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.readyForReview)} (
-            {filteredData.reviewTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.reviewTab.totalItems})
           </IconTab>
           <IconTab
             id={`tab_${TAB_ID.sentForUpdates}`}
@@ -403,7 +389,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.sentForUpdates)} (
-            {filteredData.rejectTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
           </IconTab>
           {this.userHasValidateScope() && (
             <IconTab
@@ -417,7 +403,7 @@ export class RegistrationHomeView extends React.Component<
               }
             >
               {intl.formatMessage(messages.sentForApprovals)} (
-              {filteredData.approvalTab.totalItems})
+              {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
             </IconTab>
           )}
           <IconTab
@@ -431,7 +417,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.readyToPrint)} (
-            {filteredData.printTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.printTab.totalItems})
           </IconTab>
         </TopBar>
         {tabId === TAB_ID.inProgress && (
@@ -447,6 +433,8 @@ export class RegistrationHomeView extends React.Component<
             page={progressCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.readyForReview && (
@@ -459,6 +447,8 @@ export class RegistrationHomeView extends React.Component<
             page={reviewCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
@@ -471,6 +461,8 @@ export class RegistrationHomeView extends React.Component<
             page={updatesCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
@@ -482,6 +474,8 @@ export class RegistrationHomeView extends React.Component<
             showPaginated={this.showPaginated}
             page={approvalCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.readyForPrint && (
@@ -494,6 +488,8 @@ export class RegistrationHomeView extends React.Component<
             page={printCurrentPage}
             onPageChange={this.onPageChange}
             onDownloadApplication={this.downloadApplication}
+            loading={loading}
+            error={error}
           />
         )}
       </>

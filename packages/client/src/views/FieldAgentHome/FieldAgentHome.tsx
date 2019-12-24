@@ -82,6 +82,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import moment from 'moment'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -389,7 +390,7 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.inProgressCount, {
-                          total: draftApplications.length
+                          total: loading ? '?' : draftApplications.length
                         })}
                       </IconTab>
                       <IconTab
@@ -403,7 +404,7 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.sentForReviewCount, {
-                          total: applicationsReadyToSend.length
+                          total: loading ? '?' : applicationsReadyToSend.length
                         })}
                       </IconTab>
                       <IconTab
@@ -511,6 +512,11 @@ class FieldAgentHomeView extends React.Component<
                             currentPage={this.state.requireUpdatesPage}
                             clickable={true}
                             showPaginated={this.showPaginated}
+                            loading={loading}
+                          />
+                          <LoadingIndicator
+                            loading={loading}
+                            hasError={error}
                           />
                         </HomeContent>
                       )}

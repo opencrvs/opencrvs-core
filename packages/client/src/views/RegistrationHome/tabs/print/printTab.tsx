@@ -38,6 +38,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -56,6 +57,8 @@ interface IBasePrintTabProps {
     action: Action
   ) => void
   showPaginated?: boolean
+  loading?: boolean
+  error?: boolean
 }
 
 interface IPrintTabState {
@@ -244,6 +247,11 @@ class PrintTabComponent extends React.Component<
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
           showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
         />
       </HomeContent>
     )
