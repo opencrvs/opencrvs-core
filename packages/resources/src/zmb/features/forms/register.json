@@ -29,6 +29,7 @@
                   "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"OTHER\" || draftData.registration.presentAtBirthRegistration === \"BOTH_PARENTS\" )"
                 }
               ],
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "applicant",
@@ -38,7 +39,7 @@
                     "description": "Form section title for contact point",
                     "id": "register.selectInformant.relation"
                   },
-                  "required": false,
+                  "required": true,
                   "readonly": true,
                   "hideHeader": true,
                   "initialValue": "",
