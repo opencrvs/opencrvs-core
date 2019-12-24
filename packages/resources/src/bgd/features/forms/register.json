@@ -697,6 +697,7 @@
               "fields": [
                 {
                   "name": "firstNames",
+                  "previewGroup": "childNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -723,6 +724,7 @@
                 },
                 {
                   "name": "familyName",
+                  "previewGroup": "childNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -749,6 +751,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -775,6 +778,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -1999,6 +2003,26 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "fieldToRedirect": "placeOfBirth"
+                },
+                {
+                  "id": "childNameInBengali",
+                  "label": {
+                    "defaultMessage": "Bengali name",
+                    "description": "Label for child name in bengali",
+                    "id": "form.preview.group.label.bengali.name"
+                  },
+                  "fieldToRedirect": "familyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "childNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for child name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -2343,6 +2367,7 @@
                 },
                 {
                   "name": "applicantFirstNames",
+                  "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -2382,6 +2407,7 @@
                 },
                 {
                   "name": "applicantFamilyName",
+                  "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -2421,6 +2447,7 @@
                 },
                 {
                   "name": "applicantFirstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -2460,6 +2487,7 @@
                 },
                 {
                   "name": "applicantFamilyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -4585,6 +4613,26 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "applicantNameInBengali",
+                  "label": {
+                    "defaultMessage": "Applicant's Bengali name",
+                    "description": "Label for applicant's name in bengali",
+                    "id": "form.preview.group.label.applicant.bengali.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -5582,6 +5630,7 @@
                 },
                 {
                   "name": "firstNames",
+                  "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -5608,6 +5657,7 @@
                 },
                 {
                   "name": "familyName",
+                  "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -5634,6 +5684,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -5660,6 +5711,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -7444,6 +7496,26 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "motherNameInBengali",
+                  "label": {
+                    "defaultMessage": "Mother's Bengali name",
+                    "description": "Group label for mother's name in bengali",
+                    "id": "form.preview.group.label.mother.bengali.name"
+                  },
+                  "fieldToRedirect": "familyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "motherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Mother's English name",
+                    "description": "Group label for mother's name in english",
+                    "id": "form.preview.group.label.mother.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -7818,6 +7890,7 @@
                 },
                 {
                   "name": "firstNames",
+                  "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -7850,6 +7923,7 @@
                 },
                 {
                   "name": "familyName",
+                  "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -7882,6 +7956,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -7914,6 +7989,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -9898,6 +9974,26 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "fatherNameInBengali",
+                  "label": {
+                    "defaultMessage": "Father's Bengali name",
+                    "description": "Group label for father's name in bengali",
+                    "id": "form.preview.group.label.father.bengali.name"
+                  },
+                  "fieldToRedirect": "familyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "fatherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Father's English name",
+                    "description": "Group label for father's name in english",
+                    "id": "form.preview.group.label.father.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -11140,6 +11236,7 @@
                 },
                 {
                   "name": "firstNames",
+                  "previewGroup": "deceasedNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -11166,6 +11263,7 @@
                 },
                 {
                   "name": "familyName",
+                  "previewGroup": "deceasedNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -11192,6 +11290,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -11218,6 +11317,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -12935,6 +13035,26 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "deceasedNameInBengali",
+                  "label": {
+                    "defaultMessage": "Bengali name",
+                    "description": "Label for deceased name in bengali",
+                    "id": "form.preview.group.label.bengali.name"
+                  },
+                  "fieldToRedirect": "familyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "deceasedNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for deceased name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -15191,6 +15311,7 @@
                 },
                 {
                   "name": "applicantFirstNames",
+                  "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -15230,6 +15351,7 @@
                 },
                 {
                   "name": "applicantFamilyName",
+                  "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -15269,6 +15391,7 @@
                 },
                 {
                   "name": "applicantFirstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -15308,6 +15431,7 @@
                 },
                 {
                   "name": "applicantFamilyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -17545,6 +17669,26 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "applicantNameInBengali",
+                  "label": {
+                    "defaultMessage": "Applicant's Bengali name",
+                    "description": "Label for applicant's name in bengali",
+                    "id": "form.preview.group.label.applicant.bengali.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -17583,6 +17727,7 @@
               "fields": [
                 {
                   "name": "fatherFirstNames",
+                  "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -17609,6 +17754,7 @@
                 },
                 {
                   "name": "fatherFamilyName",
+                  "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -17635,6 +17781,7 @@
                 },
                 {
                   "name": "fatherFirstNamesEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -17661,6 +17808,7 @@
                 },
                 {
                   "name": "fatherFamilyNameEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -17684,6 +17832,29 @@
                       "parameters": ["en", "familyName"]
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+
+                {
+                  "id": "fatherNameInBengali",
+                  "label": {
+                    "defaultMessage": "Father's Bengali name",
+                    "description": "Group label for father's name in bengali",
+                    "id": "form.preview.group.label.father.bengali.name"
+                  },
+                  "fieldToRedirect": "fatherFamilyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "fatherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Father's English name",
+                    "description": "Group label for father's name in english",
+                    "id": "form.preview.group.label.father.english.name"
+                  },
+                  "fieldToRedirect": "fatherFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -17714,6 +17885,7 @@
               "fields": [
                 {
                   "name": "motherFirstNames",
+                  "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in Bengali",
@@ -17740,6 +17912,7 @@
                 },
                 {
                   "name": "motherFamilyName",
+                  "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in Bengali",
@@ -17766,6 +17939,7 @@
                 },
                 {
                   "name": "motherFirstNamesEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name(s) in English",
@@ -17792,6 +17966,7 @@
                 },
                 {
                   "name": "motherFamilyNameEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name(s) in English",
@@ -17815,6 +17990,29 @@
                       "parameters": ["en", "familyName"]
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+
+                {
+                  "id": "motherNameInBengali",
+                  "label": {
+                    "defaultMessage": "Mother's Bengali name",
+                    "description": "Group label for mother's name in bengali",
+                    "id": "form.preview.group.label.mother.bengali.name"
+                  },
+                  "fieldToRedirect": "motherFamilyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "motherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Mother's English name",
+                    "description": "Group label for mother's name in english",
+                    "id": "form.preview.group.label.mother.english.name"
+                  },
+                  "fieldToRedirect": "motherFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -17873,6 +18071,7 @@
                     "Yes": [
                       {
                         "name": "spouseFirstNames",
+                        "previewGroup": "spouseNameInBengali",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "First Name(s) in Bengali",
@@ -17909,6 +18108,7 @@
                       },
                       {
                         "name": "spouseFamilyName",
+                        "previewGroup": "spouseNameInBengali",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Last Name(s) in Bengali",
@@ -17945,6 +18145,7 @@
                       },
                       {
                         "name": "spouseFirstNamesEng",
+                        "previewGroup": "spouseNameInEnglish",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "First Name(s) in English",
@@ -17981,6 +18182,7 @@
                       },
                       {
                         "name": "spouseFamilyNameEng",
+                        "previewGroup": "spouseNameInEnglish",
                         "type": "TEXT",
                         "label": {
                           "defaultMessage": "Last Name(s) in English",
@@ -18028,6 +18230,28 @@
                       "operation": "hasSpouseDetailsTransformer"
                     }
                   }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "spouseNameInBengali",
+                  "label": {
+                    "defaultMessage": "Spouse's Bengali name",
+                    "description": "Group label for spouse's name in bengali",
+                    "id": "form.preview.group.label.spouse.bengali.name"
+                  },
+                  "fieldToRedirect": "spouseFamilyName",
+                  "delimiter": " "
+                },
+                {
+                  "id": "spouseNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Spouse's English name",
+                    "description": "Group label for spouse's name in english",
+                    "id": "form.preview.group.label.spouse.english.name"
+                  },
+                  "fieldToRedirect": "spouseFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }

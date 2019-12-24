@@ -673,6 +673,7 @@
               "fields": [
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -699,6 +700,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -1598,6 +1600,16 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "fieldToRedirect": "placeOfBirth"
+                },
+                {
+                  "id": "childNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for child name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -1712,6 +1724,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -1751,6 +1764,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -2353,6 +2367,16 @@
                     "id": "form.field.previewGroups.permanentAddress"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -3418,6 +3442,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -3444,6 +3469,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -5740,6 +5766,16 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "motherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Mother's English name",
+                    "description": "Group label for mother's name in english",
+                    "id": "form.preview.group.label.mother.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -5911,6 +5947,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -5943,6 +5980,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -6986,6 +7024,16 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "fatherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Father's English name",
+                    "description": "Group label for father's name in english",
+                    "id": "form.preview.group.label.father.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -7719,6 +7767,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -7745,6 +7794,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -8608,6 +8658,16 @@
                     "id": "form.preview.tag.permanent.address"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "deceasedNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for deceased name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -9773,6 +9833,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -9812,6 +9873,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -10857,6 +10919,16 @@
                     "id": "form.field.previewGroups.permanentAddress"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }

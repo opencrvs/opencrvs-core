@@ -800,7 +800,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (completeValue = (
             <>
               {completeValue}
-              <br />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: tagDef[0].delimiter || '<br />'
+                }}
+              ></span>
               {value}
             </>
           ))
