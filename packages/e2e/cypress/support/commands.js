@@ -180,12 +180,12 @@ Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
   cy.get('#continue').click()
 
   // SELECT INFORMANT
-  cy.get('#select_informant_MOTHER').click()
+  cy.get('#select_informant_BOTH_PARENTS').click()
   cy.get('#continue').click()
 
   // SELECT APPLICANT
-  // cy.get('#applicant_MOTHER').click()
-  // cy.goToNextFormSection()
+  cy.get('#applicant_MOTHER').click()
+  cy.goToNextFormSection()
 
   // SELECT MAIN CONTACT POINT
   cy.get('#contactPoint_MOTHER').click()
