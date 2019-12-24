@@ -118,6 +118,7 @@ interface IGridTableProps {
   expandable?: boolean
   clickable?: boolean
   showPaginated?: boolean
+  loading?: boolean
 }
 
 interface IGridTableState {
@@ -349,11 +350,16 @@ export class GridTable extends React.Component<
             onPageChange={this.onPageChange}
           />
         )}
-        {!showPaginated && totalItems > pageSize * currentPage && (
-          <LoadMore initialPage={currentPage} onLoadMore={this.onPageChange} />
-        )}
+        {!showPaginated &&
+          !this.props.loading &&
+          totalItems > pageSize * currentPage && (
+            <LoadMore
+              initialPage={currentPage}
+              onLoadMore={this.onPageChange}
+            />
+          )}
 
-        {content.length <= 0 && (
+        {!this.props.loading && content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}
       </Wrapper>
