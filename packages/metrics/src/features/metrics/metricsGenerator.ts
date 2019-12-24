@@ -204,10 +204,11 @@ export async function getCurrentAndLowerLocationLevels(
   timeStart: string,
   timeEnd: string,
   locationId: string,
-  regMeasurement: string
+  event: EVENT_TYPE
 ): Promise<ICurrentAndLowerLocationLevels> {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
   const allPointsContainingLocationId = await query(
-    `SELECT LAST(*) FROM ${regMeasurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    `SELECT LAST(*) FROM ${measurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND ( locationLevel2 = '${locationId}'
         OR locationLevel3 = '${locationId}'
         OR locationLevel4 = '${locationId}'

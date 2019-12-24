@@ -23,10 +23,7 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import {
-  EVENT_TYPE,
-  REG_MEASUREMENTS_NAME
-} from '@metrics/features/metrics/utils'
+import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -44,7 +41,7 @@ export async function metricsHandler(
       timeStart,
       timeEnd,
       locationId,
-      REG_MEASUREMENTS_NAME[event]
+      event
     )
     currentLocationLevel = levels.currentLocationLevel
     lowerLocationLevel = levels.lowerLocationLevel

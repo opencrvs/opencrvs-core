@@ -44,11 +44,6 @@ export enum EVENT_TYPE {
   DEATH = 'DEATH'
 }
 
-export enum REG_MEASUREMENTS_NAME {
-  BIRTH = 'birth_reg',
-  DEATH = 'death_reg'
-}
-
 export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [
