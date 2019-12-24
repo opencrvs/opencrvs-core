@@ -98,7 +98,6 @@ enum INFORMANT {
   FATHER = 'FATHER',
   MOTHER = 'MOTHER',
   BOTH_PARENTS = 'BOTH_PARENTS',
-  LEGAL_GUARDIAN = 'LEGAL_GUARDIAN',
   SELF = 'SELF',
   SOMEONE_ELSE = 'OTHER',
   SPOUSE = 'SPOUSE',
@@ -144,14 +143,6 @@ const setInformantFields = (
         option: {
           label: intl.formatMessage(messages.parents),
           value: INFORMANT.BOTH_PARENTS
-        },
-        disabled: false
-      },
-      {
-        id: `select_informant_${INFORMANT.LEGAL_GUARDIAN}`,
-        option: {
-          label: intl.formatMessage(messages.legalGuardian),
-          value: INFORMANT.LEGAL_GUARDIAN
         },
         disabled: false
       },
