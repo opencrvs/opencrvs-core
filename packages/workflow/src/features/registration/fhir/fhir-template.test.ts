@@ -98,6 +98,10 @@ describe('Verify fhir templates', () => {
             url:
               'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+8801622688231'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastOffice',
+            valueReference: { reference: '123' }
           }
         ]
       })

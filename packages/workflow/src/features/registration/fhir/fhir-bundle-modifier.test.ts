@@ -272,14 +272,14 @@ describe('Verify fhir bundle modifier functions', () => {
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[2] &&
-          taskResource.extension[2].valueReference &&
-          taskResource.extension[2].valueReference.reference
+          taskResource.extension[3] &&
+          taskResource.extension[3].valueReference &&
+          taskResource.extension[3].valueReference.reference
         ) {
           expect(
-            taskResource.extension[2].valueReference.reference
+            taskResource.extension[3].valueReference.reference
           ).toBeDefined()
-          expect(taskResource.extension[2].valueReference.reference).toEqual(
+          expect(taskResource.extension[3].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -334,12 +334,12 @@ describe('Verify fhir bundle modifier functions', () => {
         if (
           taskResource &&
           taskResource.extension &&
-          taskResource.extension[2] &&
-          taskResource.extension[2].valueReference &&
-          taskResource.extension[2].valueReference.reference
+          taskResource.extension[3] &&
+          taskResource.extension[3].valueReference &&
+          taskResource.extension[3].valueReference.reference
         ) {
           expect(taskResource.extension.length).toBe(lengthOfTaskExtensions)
-          expect(taskResource.extension[2].valueReference.reference).toEqual(
+          expect(taskResource.extension[3].valueReference.reference).toEqual(
             'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
           )
         }
@@ -404,8 +404,8 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource as fhir.Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      if (taskResource && taskResource.extension && taskResource.extension[3]) {
-        expect(taskResource.extension[3]).toEqual({
+      if (taskResource && taskResource.extension && taskResource.extension[4]) {
+        expect(taskResource.extension[4]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastLocation',
           valueReference: {
             reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacdy48y'
@@ -418,8 +418,8 @@ describe('Verify fhir bundle modifier functions', () => {
         testFhirBundle.entry[1].resource as fhir.Task,
         JSON.parse(fieldAgentPractitionerMock)
       )
-      if (taskResource && taskResource.extension && taskResource.extension[4]) {
-        expect(taskResource.extension[4]).toEqual({
+      if (taskResource && taskResource.extension && taskResource.extension[2]) {
+        expect(taskResource.extension[2]).toEqual({
           url: 'http://opencrvs.org/specs/extension/regLastOffice',
           valueReference: {
             reference: 'Location/d33e4cb2-670e-4564-a8ed-c72baacd12yy'
