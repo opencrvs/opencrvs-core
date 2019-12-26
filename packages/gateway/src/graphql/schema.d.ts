@@ -575,6 +575,7 @@ export interface GQLGenderBasisTotalCount {
   femaleUnder18: number
   maleOver18: number
   femaleOver18: number
+  total: number
 }
 
 export interface GQLBirthRegistrationTimeFrameMetrics {
@@ -596,6 +597,7 @@ export interface GQLTimeFrameTotalCount {
   regWithin45dTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
+  total: number
 }
 
 export interface GQLCertificationPaymentMetrics {
@@ -2590,6 +2592,7 @@ export interface GQLGenderBasisTotalCountTypeResolver<TParent = any> {
   femaleUnder18?: GenderBasisTotalCountToFemaleUnder18Resolver<TParent>
   maleOver18?: GenderBasisTotalCountToMaleOver18Resolver<TParent>
   femaleOver18?: GenderBasisTotalCountToFemaleOver18Resolver<TParent>
+  total?: GenderBasisTotalCountToTotalResolver<TParent>
 }
 
 export interface GenderBasisTotalCountToMaleUnder18Resolver<
@@ -2614,6 +2617,13 @@ export interface GenderBasisTotalCountToMaleOver18Resolver<
 }
 
 export interface GenderBasisTotalCountToFemaleOver18Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GenderBasisTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {
@@ -2697,6 +2707,7 @@ export interface GQLTimeFrameTotalCountTypeResolver<TParent = any> {
   regWithin45dTo1yr?: TimeFrameTotalCountToRegWithin45dTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameTotalCountToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameTotalCountToRegOver5yrResolver<TParent>
+  total?: TimeFrameTotalCountToTotalResolver<TParent>
 }
 
 export interface TimeFrameTotalCountToRegWithin45dResolver<
@@ -2721,6 +2732,13 @@ export interface TimeFrameTotalCountToRegWithin1yrTo5yrResolver<
 }
 
 export interface TimeFrameTotalCountToRegOver5yrResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TimeFrameTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {

@@ -32,6 +32,7 @@ type GenderBasisTotalCount {
   femaleUnder18: Int!
   maleOver18: Int!
   femaleOver18: Int!
+  total: Int!
 }
 
 type CertificationPaymentMetrics {
@@ -49,6 +50,7 @@ type TimeFrameTotalCount {
   regWithin45dTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
+  total: Int!
 }
 
 type TimeFrameDetailMetrics {

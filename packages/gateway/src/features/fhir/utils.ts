@@ -1014,18 +1014,25 @@ export function timeFrameTotalCalculator(
     regWithin45d: 0,
     regWithin45dTo1yr: 0,
     regWithin1yrTo5yr: 0,
-    regOver5yr: 0
+    regOver5yr: 0,
+    total: 0
   }
   return reduce(
     timeFrameMetrics,
     (accumulator, item) => {
+      const regWithin45d = accumulator.regWithin45d + item.regWithin45d
+      const regWithin45dTo1yr =
+        accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr
+      const regWithin1yrTo5yr =
+        accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
+      const regOver5yr = accumulator.regOver5yr + item.regOver5yr
+
       return {
-        regWithin45d: accumulator.regWithin45d + item.regWithin45d,
-        regWithin45dTo1yr:
-          accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr,
-        regWithin1yrTo5yr:
-          accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr,
-        regOver5yr: accumulator.regOver5yr + item.regOver5yr
+        regWithin45d,
+        regWithin45dTo1yr,
+        regWithin1yrTo5yr,
+        regOver5yr,
+        total: regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
       }
     },
     initialValue
@@ -1039,16 +1046,23 @@ export function genderBasisTotalCalculator(
     maleUnder18: 0,
     femaleUnder18: 0,
     maleOver18: 0,
-    femaleOver18: 0
+    femaleOver18: 0,
+    total: 0
   }
   return reduce(
     genderMetrics,
     (accumulator, item) => {
+      const maleUnder18 = accumulator.maleUnder18 + item.maleUnder18
+      const femaleUnder18 = accumulator.femaleUnder18 + item.femaleUnder18
+      const maleOver18 = accumulator.maleOver18 + item.maleOver18
+      const femaleOver18 = accumulator.femaleOver18 + item.femaleOver18
+
       return {
-        maleUnder18: accumulator.maleUnder18 + item.maleUnder18,
-        femaleUnder18: accumulator.femaleUnder18 + item.femaleUnder18,
-        maleOver18: accumulator.maleOver18 + item.maleOver18,
-        femaleOver18: accumulator.femaleOver18 + item.femaleOver18
+        maleUnder18,
+        femaleUnder18,
+        maleOver18,
+        femaleOver18,
+        total: maleUnder18 + femaleUnder18 + maleOver18 + femaleOver18
       }
     },
     initialValue
