@@ -180,7 +180,7 @@ describe('Route authorization', () => {
       payload: {
         msisdn: '+447789778865',
         name: 'test',
-        trackingid: 'B123456'
+        trackingId: 'B123456'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -205,7 +205,7 @@ describe('Route authorization', () => {
       payload: {
         msisdn: '+447789778865',
         name: 'test',
-        trackingid: 'B123456'
+        trackingId: 'B123456'
       },
       headers: {
         Authorization: `Bearer ${token}`

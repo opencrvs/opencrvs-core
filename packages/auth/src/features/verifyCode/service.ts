@@ -67,10 +67,10 @@ export async function sendVerificationCode(
 ): Promise<void> {
   const params = {
     msisdn: mobile,
-    message: verificationCode
+    code: verificationCode
   }
 
-  await fetch(resolve(NOTIFICATION_SERVICE_URL, 'sms'), {
+  await fetch(resolve(NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {

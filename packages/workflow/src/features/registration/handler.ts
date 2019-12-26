@@ -214,9 +214,16 @@ export async function markEventAsRegisteredCallbackHandler(
       logger.info(
         'markEventAsRegisteredCallbackHandler sending event notification'
       )
-      sendRegisteredNotification(phoneNo, informantName, event, {
-        Authorization: request.headers.authorization
-      })
+      sendRegisteredNotification(
+        phoneNo,
+        informantName,
+        trackingId,
+        registrationNumber,
+        event,
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     } else {
       logger.info(
         'markEventAsRegisteredCallbackHandler could not send event notification'

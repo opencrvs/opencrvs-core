@@ -358,6 +358,8 @@ class SettingsView extends React.Component<IProps, IState> {
             </ApplyButton>
           ]}
           handleClose={this.cancelLanguageSettings}
+          contentHeight={175}
+          contentScrollableY={true}
         >
           <Message>
             {intl.formatMessage(messages.changeLanguageMessege)}

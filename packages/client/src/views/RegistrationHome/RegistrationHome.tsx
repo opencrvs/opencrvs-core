@@ -507,6 +507,7 @@ export class RegistrationHomeView extends React.Component<
 
         {this.state.showCertificateToast && (
           <FloatingNotification
+            id="print-cert-notification"
             type={NOTIFICATION_TYPE.SUCCESS}
             show={this.state.showCertificateToast}
             callback={() => {
