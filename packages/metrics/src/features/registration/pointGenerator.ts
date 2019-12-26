@@ -44,7 +44,8 @@ import {
 import {
   getAgeInDays,
   getAgeInYears,
-  getDurationInSeconds
+  getDurationInSeconds,
+  getDurationInDays
 } from '@metrics/features/registration/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
@@ -150,7 +151,7 @@ export const generateDeathRegPoint = async (
       ? getAgeInYears(deceased.birthDate)
       : undefined,
     deathDays: deceased.deceasedDateTime
-      ? getAgeInDays(deceased.deceasedDateTime)
+      ? getDurationInDays(deceased.deceasedDateTime, new Date().toISOString())
       : undefined
   }
 
