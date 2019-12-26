@@ -54,6 +54,7 @@ interface IConstantsMessages {
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   lastEdited: MessageDescriptor
+  month: MessageDescriptor
   name: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
@@ -313,6 +314,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Last edited',
     description: 'Label for rejection date in work queue list item',
     id: 'constants.lastEdited'
+  },
+  month: {
+    defaultMessage: 'Month',
+    description: 'Label for month',
+    id: 'constants.month'
   },
   name: {
     defaultMessage: 'Name',

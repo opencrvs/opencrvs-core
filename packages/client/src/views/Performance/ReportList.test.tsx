@@ -11,11 +11,11 @@
  */
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { ReportList } from './ReportList'
-import { WeeklyReports } from './WeeklyReports'
+import { MonthlyReports } from './MonthlyReports'
 
 describe('Report list', () => {
   const { store } = createStore()
@@ -28,7 +28,7 @@ describe('Report list', () => {
         <ReportList
           match={{
             params: {
-              reportType: PERFORMANCE_REPORT_TYPE_WEEKY
+              reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
             },
             isExact: true,
             path: '',
@@ -41,7 +41,7 @@ describe('Report list', () => {
     })
 
     it('loads list table', () => {
-      expect(app.find(WeeklyReports)).toHaveLength(1)
+      expect(app.find(MonthlyReports)).toHaveLength(1)
     })
   })
 
@@ -56,7 +56,7 @@ describe('Report list', () => {
     })
 
     it('loads list table', () => {
-      expect(app.find(WeeklyReports)).toHaveLength(1)
+      expect(app.find(MonthlyReports)).toHaveLength(1)
     })
   })
 })
