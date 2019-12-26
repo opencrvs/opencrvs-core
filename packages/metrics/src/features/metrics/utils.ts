@@ -198,14 +198,11 @@ export function fillEmptyDataArrayByKey(
 ) {
   const result: Array<any> = []
   for (const eachItem of emptyDataArray) {
-    const index = dataArray.findIndex(
+    const itemInArray = dataArray.find(
       itemInDataArray => itemInDataArray[key] === eachItem[key]
     )
-    if (index === -1) {
-      result.push(eachItem)
-    } else {
-      result.push(dataArray[index])
-    }
+
+    result.push(itemInArray || eachItem)
   }
 
   return result
