@@ -161,7 +161,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
-        ageInYears: 43
+        ageInYears: 43,
+        deathDays: -53
       }
     })
   })
