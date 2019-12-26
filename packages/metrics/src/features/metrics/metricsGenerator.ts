@@ -101,11 +101,13 @@ export async function fetchCertificationPayments(
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  eventType: EVENT_TYPE
 ) {
   const payments = await query(
     `SELECT SUM(total) as total FROM certification_payment WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND ${currentLocationLevel}='${locationId}'
+      AND eventType = '${eventType}'
       GROUP BY ${lowerLocationLevel}`
   )
 

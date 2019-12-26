@@ -100,7 +100,13 @@ export const influx = new Influx.InfluxDB({
         total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
-      tags: []
+      tags: [
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     }
   ]
 })

@@ -219,7 +219,10 @@ export async function generatePaymentPoint(
     compositionId: composition.id
   }
 
-  const tags = await generatePointLocations(payload, authHeader)
+  const tags = {
+    eventType: getApplicationType(task),
+    ...(await generatePointLocations(payload, authHeader))
+  }
 
   return {
     measurement: 'certification_payment',
