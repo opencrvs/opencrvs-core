@@ -58,7 +58,7 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
     moment.locale(this.props.intl.locale)
     let content = []
 
-    let currentYear = 2019
+    const currentYear = moment().year()
     let currentMonth = 1
 
     while (currentMonth <= 12) {
