@@ -194,7 +194,7 @@ export const userSection: ISerializedFormSection = {
     {
       id: 'signature-attachment',
       title: messages.userSignatureAttachmentTitle,
-      conditionals: [conditionals.isRegistrarRoleSelected],
+      conditionals: [conditionals.isRegistrarOrRegistrationAgentRoleSelected],
       fields: [
         {
           name: 'attachmentTitle',

@@ -1040,9 +1040,9 @@
         "validations.validDrivingLicenseNumber": "The Driving License Number can only be alpha numeric and must be {validLength} characters long",
         "validations.validNationalId": "The National ID can only be numeric and must be {validLength} digits long",
         "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long",
-        "form.field.label.userSignatureAttachmentTitle": "Attach the registrar’s signature",
-        "form.field.label.userSignatureAttachment": "Registrar’s signature",
-        "form.field.label.userSignatureAttachmentDesc": "Ask the registrar to sign a piece of paper and then scan or take a photo.",
+        "form.field.label.userSignatureAttachmentTitle": "Attach the signature",
+        "form.field.label.userSignatureAttachment": "User’s signature",
+        "form.field.label.userSignatureAttachmentDesc": "Ask the user to sign a piece of paper and then scan or take a photo.",
         "form.field.label.userAttachmentSection": "Attachments",
         "form.field.label.addFile": "Add file",
         "form.field.label.fileUploadError": "{type} supported only"
