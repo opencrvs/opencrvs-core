@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import { WeeklyReports } from './WeeklyReports'
+import { MonthlyReports } from './MonthlyReports'
 
 type Props = WrappedComponentProps & { reportType: string }
 
@@ -27,7 +27,7 @@ class ReportListComponent extends React.Component<Props, State> {
 
     return (
       <PerformanceContentWrapper tabId={reportType}>
-        {reportType === PERFORMANCE_REPORT_TYPE_WEEKY && <WeeklyReports />}
+        {reportType === PERFORMANCE_REPORT_TYPE_MONTHLY && <MonthlyReports />}
       </PerformanceContentWrapper>
     )
   }
@@ -40,7 +40,7 @@ function mapStateToProps(
   const { match } = props
 
   return {
-    reportType: match.params.reportType || PERFORMANCE_REPORT_TYPE_WEEKY
+    reportType: match.params.reportType || PERFORMANCE_REPORT_TYPE_MONTHLY
   }
 }
 

@@ -158,7 +158,7 @@ describe('Report page', () => {
         .find(Header)
         .first()
         .text()
-    ).toBe('06 December  to 13 December 2019')
+    ).toBe('December 2019')
   })
 
   it('loads and renders data from query after selecting a location', async () => {
