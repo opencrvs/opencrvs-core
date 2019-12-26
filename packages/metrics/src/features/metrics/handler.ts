@@ -23,7 +23,11 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import {
+  EVENT_TYPE,
+  fetchChildLocationIdsByParentId
+} from '@metrics/features/metrics/utils'
+import { IAuthHeader } from '@metrics/features/registration/'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -53,13 +57,23 @@ export async function metricsHandler(
     }
   }
 
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization
+  }
+
+  const childLocationIds = await fetchChildLocationIdsByParentId(
+    request.query[LOCATION_ID],
+    authHeader
+  )
+
   const timeFrames = await fetchRegWithinTimeFrames(
     timeStart,
     timeEnd,
     locationId,
     currentLocationLevel,
     lowerLocationLevel,
-    event
+    event,
+    childLocationIds
   )
 
   const payments = await fetchCertificationPayments(
@@ -68,7 +82,8 @@ export async function metricsHandler(
     locationId,
     currentLocationLevel,
     lowerLocationLevel,
-    event
+    event,
+    childLocationIds
   )
 
   const genderBasisMetrics = await fetchGenderBasisMetrics(
@@ -77,7 +92,8 @@ export async function metricsHandler(
     locationId,
     currentLocationLevel,
     lowerLocationLevel,
-    event
+    event,
+    childLocationIds
   )
   return { timeFrames, payments, genderBasisMetrics }
 }

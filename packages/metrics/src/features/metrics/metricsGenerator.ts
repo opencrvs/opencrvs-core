@@ -24,7 +24,8 @@ import {
   IPoint,
   LABEL_FOMRAT,
   Location,
-  EVENT_TYPE
+  EVENT_TYPE,
+  fillEmptyDataArrayByKey
 } from '@metrics/features/metrics/utils'
 import { query } from '@metrics/influxdb/client'
 import * as moment from 'moment'
@@ -102,7 +103,8 @@ export async function fetchCertificationPayments(
   locationId: string,
   currentLocationLevel: string,
   lowerLocationLevel: string,
-  eventType: EVENT_TYPE
+  eventType: EVENT_TYPE,
+  childLocationIds: Array<string>
 ) {
   const payments = await query(
     `SELECT SUM(total) as total FROM certification_payment WHERE time > '${timeStart}' AND time <= '${timeEnd}'
@@ -111,10 +113,19 @@ export async function fetchCertificationPayments(
       GROUP BY ${lowerLocationLevel}`
   )
 
-  return payments.map((payment: Payment) => ({
+  const dataFromInflux = payments.map((payment: Payment) => ({
     total: payment.total,
     locationId: payment[lowerLocationLevel]
   }))
+
+  const emptyData = childLocationIds.map(id => ({ locationId: id, total: 0 }))
+
+  const paymentsData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'locationId'
+  )
+  return paymentsData
 }
 
 export async function fetchRegWithinTimeFrames(
@@ -123,7 +134,8 @@ export async function fetchRegWithinTimeFrames(
   locationId: string,
   currentLocationLevel: string,
   lowerLocationLevel: string,
-  event: string
+  event: string,
+  childLocationIds: Array<string>
 ) {
   const queryString =
     event === EVENT_TYPE.BIRTH
@@ -182,7 +194,7 @@ export async function fetchRegWithinTimeFrames(
 
   const timeFramePoints = await query(queryString)
 
-  return timeFramePoints.map((point: any) => {
+  const dataFromInflux = timeFramePoints.map((point: any) => {
     const {
       regWithin45d,
       regWithin45dTo1yr,
@@ -200,6 +212,27 @@ export async function fetchRegWithinTimeFrames(
       total
     }
   })
+
+  const placeholder = {
+    total: 0,
+    regWithin45d: 0,
+    regWithin45dTo1yr: 0,
+    regWithin1yrTo5yr: 0,
+    regOver5yr: 0
+  }
+
+  const emptyData = childLocationIds.map(id => ({
+    locationId: id,
+    ...placeholder
+  }))
+
+  const timeFrameData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'locationId'
+  )
+
+  return timeFrameData
 }
 
 export async function getCurrentAndLowerLocationLevels(
@@ -394,7 +427,8 @@ export async function fetchGenderBasisMetrics(
   currLocation: string,
   currLocationLevel: string,
   locationLevel: string,
-  event: EVENT_TYPE
+  event: EVENT_TYPE,
+  childLocationIds: Array<string>
 ) {
   const queryString =
     event === EVENT_TYPE.BIRTH
@@ -455,7 +489,26 @@ export async function fetchGenderBasisMetrics(
 
   const points = await query(queryString)
 
-  return populateGenderBasisMetrics(points, locationLevel)
+  const dataFromInflux = populateGenderBasisMetrics(points, locationLevel)
+  const placeholder = {
+    total: 0,
+    maleOver18: 0,
+    maleUnder18: 0,
+    femaleOver18: 0,
+    femaleUnder18: 0
+  }
+
+  const emptyData = childLocationIds.map(id => ({
+    location: id,
+    ...placeholder
+  }))
+
+  const genderBasisData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'location'
+  )
+  return genderBasisData
 }
 
 function populateGenderBasisMetrics(

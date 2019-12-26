@@ -13,8 +13,13 @@ import { createServer } from '@metrics/index'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import * as fetchMock from 'jest-fetch-mock'
 
 const readPoints = influx.query as jest.Mock
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+const mockLocationBundle = {
+  entry: [{ resource: { id: '1490d3dd-71a9-47e8-b143-f9fc64f71294' } }]
+}
 
 describe('verify metrics handler', () => {
   let server: any
@@ -32,7 +37,8 @@ describe('verify metrics handler', () => {
     server = await createServer()
   })
 
-  it('returns ok for valid request birth', async () => {
+  it('returns ok for valid request for birth', async () => {
+    fetch.mockResponse(JSON.stringify(mockLocationBundle))
     readPoints.mockResolvedValueOnce([
       {
         locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',
@@ -79,7 +85,7 @@ describe('verify metrics handler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('returns ok for valid request death', async () => {
+  it('returns ok for valid request for death', async () => {
     readPoints.mockResolvedValueOnce([
       {
         locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',
