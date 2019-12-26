@@ -350,7 +350,7 @@ export class ListTable extends React.Component<
             <TableFooter>
               {footerColumns.map((preference, index) => (
                 <ContentWrapper key={index} width={preference.width}>
-                  {preference.label}
+                  {preference.label || ''}
                 </ContentWrapper>
               ))}
             </TableFooter>
