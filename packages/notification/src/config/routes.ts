@@ -29,8 +29,10 @@ import {
 import {
   sendUserCredentials,
   retrieveUserName,
+  sendUserAuthenticationCode,
   userCredentialsNotificationSchema,
-  retrieveUserNameNotificationSchema
+  retrieveUserNameNotificationSchema,
+  authCodeNotificationSchema
 } from '@notification/features/sms/user-handler'
 
 const enum RouteScope {
@@ -69,6 +71,18 @@ export default function getRoutes() {
         description: 'Sends an sms to a user',
         validate: {
           payload: requestSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/authenticationCode',
+      handler: sendUserAuthenticationCode,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with auth code',
+        validate: {
+          payload: authCodeNotificationSchema
         }
       }
     },
