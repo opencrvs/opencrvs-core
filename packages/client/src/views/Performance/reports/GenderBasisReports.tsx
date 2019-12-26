@@ -27,15 +27,6 @@ interface IStateProps {
   offlineResources: IOfflineData
 }
 
-interface IGenderBasisMetrics {
-  location: string
-  femaleOver18: number
-  maleOver18: number
-  maleUnder18: number
-  femaleUnder18: number
-  total: number
-}
-
 type FullProps = {
   genderBasisMetrics: GQLBirthRegistrationGenderBasisMetrics
   loading: boolean
