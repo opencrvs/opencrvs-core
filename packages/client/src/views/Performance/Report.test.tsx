@@ -37,26 +37,42 @@ describe('Report page', () => {
       result: {
         data: {
           fetchBirthRegistrationMetrics: {
-            timeFrames: [
-              {
-                locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+            timeFrames: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  regWithin45d: 0,
+                  regWithin45dTo1yr: 0,
+                  regWithin1yrTo5yr: 0,
+                  regOver5yr: 2,
+                  total: 2
+                }
+              ],
+              total: {
                 regWithin45d: 0,
                 regWithin45dTo1yr: 0,
                 regWithin1yrTo5yr: 0,
-                regOver5yr: 2,
-                total: 2
+                regOver5yr: 2
               }
-            ],
-            genderBasisMetrics: [
-              {
-                location: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+            },
+            genderBasisMetrics: {
+              details: [
+                {
+                  location: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  maleUnder18: 2,
+                  femaleUnder18: 0,
+                  maleOver18: 0,
+                  femaleOver18: 0,
+                  total: 2
+                }
+              ],
+              total: {
                 maleUnder18: 2,
                 femaleUnder18: 0,
                 maleOver18: 0,
-                femaleOver18: 0,
-                total: 2
+                femaleOver18: 0
               }
-            ],
+            },
             payments: [
               {
                 locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
@@ -79,8 +95,24 @@ describe('Report page', () => {
       result: {
         data: {
           fetchBirthRegistrationMetrics: {
-            timeFrames: [],
-            genderBasisMetrics: [],
+            timeFrames: {
+              details: [],
+              total: {
+                regWithin45d: 0,
+                regWithin45dTo1yr: 0,
+                regWithin1yrTo5yr: 0,
+                regOver5yr: 0
+              }
+            },
+            genderBasisMetrics: {
+              details: [],
+              total: {
+                maleUnder18: 0,
+                femaleUnder18: 0,
+                maleOver18: 0,
+                femaleOver18: 0
+              }
+            },
             payments: []
           }
         }
