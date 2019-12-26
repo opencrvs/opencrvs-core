@@ -470,7 +470,7 @@ test('should build a minimal FHIR registration document without error', async ()
   expect(fhir.entry[7].resource.subject).toEqual({
     display: 'MOTHER'
   })
-  // Certificate Collection
+  // Certificate collection
   expect(fhir.entry[8].resource.resourceType).toBe('DocumentReference')
   expect(fhir.entry[8].resource.type).toEqual({
     coding: [

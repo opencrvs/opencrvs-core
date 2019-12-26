@@ -363,7 +363,7 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Floating Toast message upon certificate ready to print'
   },
   otherCollectorFormTitle: {
-    defaultMessage: 'What is their ID and name',
+    defaultMessage: 'What is their ID and name?',
     description: 'Title for other collector form',
     id: 'print.certificate.collector.other.title'
   },
