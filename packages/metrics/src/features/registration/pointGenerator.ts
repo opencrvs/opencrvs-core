@@ -284,8 +284,11 @@ export function generateTimeLoggedPoint(payload: fhir.Bundle): IPoints {
     throw new Error('Current task not found')
   }
 
+  const timeLoggedInMS = getTimeLoggedFromTask(currentTask)
+  const timeLoggedInSeconds = timeLoggedInMS / 1000
+
   const fields: ITimeLoggedFields = {
-    timeSpentEditing: getTimeLoggedFromTask(currentTask),
+    timeSpentEditing: timeLoggedInSeconds,
     compositionId: composition.id
   }
 
