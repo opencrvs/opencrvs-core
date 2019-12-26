@@ -186,6 +186,7 @@ describe('Verify point generation', () => {
     expect(point).toEqual({
       measurement: 'certification_payment',
       tags: {
+        eventType: 'DEATH',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
       },
       fields: {
