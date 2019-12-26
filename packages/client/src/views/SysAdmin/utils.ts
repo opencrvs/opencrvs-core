@@ -19,9 +19,11 @@ import {
 import { userMessages } from '@client/i18n/messages'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
-import { getRolesQuery } from '@client/forms/user/fieldDefinitions/query/queries'
-import { SEARCH_USERS } from '@client/sysadmin/user/queries'
-import { client } from '@client/utils/apolloClient'
+import {
+  getRolesQuery,
+  roleQueries
+} from '@client/forms/user/fieldDefinitions/query/queries'
+import { userQueries } from '@client/sysadmin/user/queries'
 
 export enum UserStatus {
   ACTIVE,
@@ -179,11 +181,8 @@ export const transformRoleDataToDefinitions = (
 }
 
 export async function alterRolesBasedOnUserRole(primatyOfficeId: string) {
-  const roleData = await client.query({ query: getRolesQuery })
-  const userData = await client.query({
-    query: SEARCH_USERS,
-    variables: { primatyOfficeId }
-  })
+  const roleData = await roleQueries.fetchRoles()
+  const userData = await userQueries.searchUsers(primatyOfficeId)
   const roles = roleData.data.getRoles as Array<any>
   const users = userData.data.searchUsers.results as Array<any>
 
