@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { getMetrics } from '@gateway/features/fhir/utils'
+import {
+  getMetrics,
+  timeFrameTotalCalculator,
+  genderBasisTotalCalculator
+} from '@gateway/features/fhir/utils'
 
 export interface ITimeRange {
   timeStart: string
@@ -36,9 +40,15 @@ export const resolvers: GQLResolver = {
       )
 
       return {
-        timeFrames: metricsData.timeFrames,
-        payments: metricsData.payments,
-        genderBasisMetrics: metricsData.genderBasisMetrics
+        timeFrames: {
+          details: metricsData.timeFrames,
+          total: timeFrameTotalCalculator(metricsData.timeFrames)
+        },
+        genderBasisMetrics: {
+          details: metricsData.genderBasisMetrics,
+          total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
+        },
+        payments: metricsData.payments
       }
     }
   }

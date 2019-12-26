@@ -31,7 +31,8 @@ describe('fetch birth registration metrics', () => {
             regOver5yr: 0,
             total: 0
           }
-        ]
+        ],
+        genderBasisMetrics: []
       })
     )
 
@@ -46,8 +47,8 @@ describe('fetch birth registration metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.timeFrames).toBeInstanceOf(Array)
-    expect(data.timeFrames.length).toBe(1)
+    expect(data.timeFrames).toBeInstanceOf(Object)
+    expect(data.timeFrames.details.length).toBe(1)
   })
 
   it('returns an empty array of birth registraiton metrics when error is thrown', async () => {

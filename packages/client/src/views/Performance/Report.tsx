@@ -129,12 +129,15 @@ function ReportComponent(props: Props) {
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.timeFrames &&
-                data.fetchBirthRegistrationMetrics.timeFrames.length === 0) &&
+                data.fetchBirthRegistrationMetrics.timeFrames.details &&
+                data.fetchBirthRegistrationMetrics.timeFrames.details.length ===
+                  0) &&
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.genderBasisMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.length ===
-                  0) &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details
+                  .length === 0) &&
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.payments &&
@@ -155,8 +158,8 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics[]))) ||
-                    []
+                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
+                    {}
                   }
                 />
                 <TimeFrameReports
@@ -165,8 +168,8 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLRegistrationTimeFrameMetrics[]))) ||
-                    []
+                          .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
+                    {}
                   }
                 />
                 <CertificationPaymentReports

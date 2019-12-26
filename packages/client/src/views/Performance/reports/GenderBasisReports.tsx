@@ -21,53 +21,49 @@ import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
+import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
-interface IGenderBasisMetrics {
-  location: string
-  femaleOver18: number
-  maleOver18: number
-  maleUnder18: number
-  femaleUnder18: number
-  total: number
-}
-
 type FullProps = {
-  genderBasisMetrics: IGenderBasisMetrics[]
+  genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
 
 class GenderBasisComponent extends React.Component<FullProps> {
   getContent() {
-    return this.props.genderBasisMetrics.map(content => {
-      return {
-        location: getLocationFromPartOfLocationId(
-          content.location,
-          this.props.offlineResources
-        ).name,
-        femaleOver18: getValueWithPercentageString(
-          content.femaleOver18,
-          content.total
-        ),
-        maleOver18: getValueWithPercentageString(
-          content.maleOver18,
-          content.total
-        ),
-        maleUnder18: getValueWithPercentageString(
-          content.maleUnder18,
-          content.total
-        ),
-        femaleUnder18: getValueWithPercentageString(
-          content.femaleUnder18,
-          content.total
-        ),
-        total: String(content.total)
-      }
-    })
+    return (
+      (this.props.genderBasisMetrics.details &&
+        this.props.genderBasisMetrics.details.map(content => {
+          return {
+            location: getLocationFromPartOfLocationId(
+              content.location,
+              this.props.offlineResources
+            ).name,
+            femaleOver18: getValueWithPercentageString(
+              content.femaleOver18,
+              content.total
+            ),
+            maleOver18: getValueWithPercentageString(
+              content.maleOver18,
+              content.total
+            ),
+            maleUnder18: getValueWithPercentageString(
+              content.maleUnder18,
+              content.total
+            ),
+            femaleUnder18: getValueWithPercentageString(
+              content.femaleUnder18,
+              content.total
+            ),
+            total: String(content.total)
+          }
+        })) ||
+      []
+    )
   }
 
   render() {
