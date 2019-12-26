@@ -45,7 +45,6 @@ export interface IColumn {
 export interface IFooterFColumn {
   label?: string
   width: number
-  key: string
 }
 
 export interface IDynamicValues {
