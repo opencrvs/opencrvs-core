@@ -63,6 +63,8 @@ export async function metricsHandler(
 
   const childLocationIds = await fetchChildLocationIdsByParentId(
     request.query[LOCATION_ID],
+    currentLocationLevel,
+    lowerLocationLevel,
     authHeader
   )
 
