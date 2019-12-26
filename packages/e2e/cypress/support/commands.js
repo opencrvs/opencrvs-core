@@ -168,7 +168,7 @@ function getRandomNumbers(n) {
   return result
 }
 
-Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
+Cypress.Commands.add('declareApplicationWithMinimumInput', () => {
   // LOGIN
   cy.login('fieldWorker')
   cy.createPin()
@@ -249,6 +249,11 @@ Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
   // LOG OUT
   cy.get('#ProfileMenuToggleButton').click()
   cy.get('#ProfileMenuItem1').click()
+})
+
+Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
+  // DECLARE APPLICATION AS FIELD AGENT
+  cy.declareApplicationWithMinimumInput()
 
   // LOGIN AS LOCAL REGISTRAR
   cy.login('registrar')

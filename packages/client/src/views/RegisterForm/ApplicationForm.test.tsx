@@ -390,7 +390,7 @@ describe('when user has starts a new application', () => {
         beforeEach(async () => {
           await goToEndOfForm(app)
           app
-            .find('#btn_change_child_firstNames')
+            .find('#btn_change_child_familyName')
             .hostNodes()
             .simulate('click')
         })
@@ -402,7 +402,7 @@ describe('when user has starts a new application', () => {
 
           const changeNameButton = await waitForElement(
             app,
-            '#btn_change_child_firstNames'
+            '#btn_change_child_familyName'
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
@@ -417,17 +417,17 @@ describe('when user has starts a new application', () => {
 
           const changeNameButton = await waitForElement(
             app,
-            '#btn_change_child_firstNames'
+            '#btn_change_child_familyName'
           )
 
           changeNameButton.hostNodes().simulate('click')
 
-          const firstNamesEngInputField = await waitForElement(
+          const familyNameEngInputField = await waitForElement(
             app,
-            '#firstNamesEng'
+            '#familyNameEng'
           )
 
-          expect(firstNamesEngInputField.hostNodes()).toHaveLength(1)
+          expect(familyNameEngInputField.hostNodes()).toHaveLength(1)
         })
       })
       describe('when user clicks the "mother" page', () => {
