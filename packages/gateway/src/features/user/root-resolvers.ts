@@ -55,9 +55,10 @@ export const resolvers: GQLResolver = {
       // Only sysadmin should be able to search user
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
-          new Error(`Search user is only allowed for sysadmin`)
+          new Error('Search user is only allowed for sysadmin')
         )
       }
+
       let payload: IUserSearchPayload = {
         count,
         skip,
@@ -98,9 +99,10 @@ export const resolvers: GQLResolver = {
       // Only sysadmin should be able to create user
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
-          new Error(`Create user is only allowed for sysadmin`)
+          new Error('Create user is only allowed for sysadmin')
         )
       }
+
       const res = await fetch(`${USER_MANAGEMENT_URL}createUser`, {
         method: 'POST',
         body: JSON.stringify(createUserPayload(user)),
