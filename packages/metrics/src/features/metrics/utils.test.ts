@@ -12,7 +12,8 @@
 import {
   calculateInterval,
   fetchEstimateByLocation,
-  getDistrictLocation
+  getDistrictLocation,
+  fillEmptyDataArrayByKey
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
 
@@ -219,6 +220,59 @@ describe('verify metrics util', () => {
           Authorization: 'bearer token'
         })
       ).rejects.toThrowError('No district location found')
+    })
+  })
+
+  describe('verify fillEmptyDataArrayByKey', () => {
+    it('fills empty array with placeholder objects with data without duplication', () => {
+      const emptyArrayWithPlacholderObjects = [
+        {
+          locationId: 'Location/123',
+          data: 0
+        },
+        {
+          locationId: 'Location/456',
+          data: 0
+        },
+        {
+          locationId: 'Location/789',
+          data: 0
+        }
+      ]
+
+      const dataArray = [
+        {
+          locationId: 'Location/123',
+          data: 3
+        },
+        {
+          locationId: 'Location/456',
+          data: 4
+        }
+      ]
+
+      const expectedOutput = [
+        {
+          locationId: 'Location/123',
+          data: 3
+        },
+        {
+          locationId: 'Location/456',
+          data: 4
+        },
+        {
+          locationId: 'Location/789',
+          data: 0
+        }
+      ]
+
+      const output = fillEmptyDataArrayByKey(
+        dataArray,
+        emptyArrayWithPlacholderObjects,
+        'locationId'
+      )
+
+      expect(output).toEqual(expectedOutput)
     })
   })
 })

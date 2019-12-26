@@ -23,7 +23,8 @@ import {
   generateEmptyBirthKeyFigure,
   IPoint,
   LABEL_FOMRAT,
-  Location
+  Location,
+  fillEmptyDataArrayByKey
 } from '@metrics/features/metrics/utils'
 import { query } from '@metrics/influxdb/client'
 import * as moment from 'moment'
@@ -100,7 +101,8 @@ export async function fetchCertificationPayments(
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  childLocationIds: Array<string>
 ) {
   const payments = await query(
     `SELECT SUM(total) as total FROM certification_payment WHERE time > '${timeStart}' AND time <= '${timeEnd}'
@@ -108,10 +110,19 @@ export async function fetchCertificationPayments(
       GROUP BY ${lowerLocationLevel}`
   )
 
-  return payments.map((payment: Payment) => ({
+  const dataFromInflux = payments.map((payment: Payment) => ({
     total: payment.total,
     locationId: payment[lowerLocationLevel]
   }))
+
+  const emptyData = childLocationIds.map(id => ({ locationId: id, total: 0 }))
+
+  const paymentsData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'locationId'
+  )
+  return paymentsData
 }
 
 export async function fetchRegWithinTimeFrames(
@@ -119,7 +130,8 @@ export async function fetchRegWithinTimeFrames(
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  childLocationIds: Array<string>
 ) {
   const timeFramePoints = await query(
     `SELECT
@@ -150,7 +162,7 @@ export async function fetchRegWithinTimeFrames(
      `
   )
 
-  return timeFramePoints.map((point: any) => {
+  const dataFromInflux = timeFramePoints.map((point: any) => {
     const {
       regWithin45d,
       regWithin45dTo1yr,
@@ -168,6 +180,27 @@ export async function fetchRegWithinTimeFrames(
       total
     }
   })
+
+  const placeholder = {
+    total: 0,
+    regWithin45d: 0,
+    regWithin45dTo1yr: 0,
+    regWithin1yrTo5yr: 0,
+    regOver5yr: 0
+  }
+
+  const emptyData = childLocationIds.map(id => ({
+    locationId: id,
+    ...placeholder
+  }))
+
+  const timeFrameData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'locationId'
+  )
+
+  return timeFrameData
 }
 
 export async function getCurrentAndLowerLocationLevels(
@@ -359,7 +392,8 @@ export async function fetchGenderBasisMetrics(
   timeTo: string,
   currLocation: string,
   currLocationLevel: string,
-  locationLevel: string
+  locationLevel: string,
+  childLocationIds: Array<string>
 ) {
   const points = await query(`
   SELECT
@@ -389,7 +423,26 @@ export async function fetchGenderBasisMetrics(
   GROUP BY gender, ${locationLevel}
   `)
 
-  return populateGenderBasisMetrics(points, locationLevel)
+  const dataFromInflux = populateGenderBasisMetrics(points, locationLevel)
+  const placeholder = {
+    total: 0,
+    maleOver18: 0,
+    maleUnder18: 0,
+    femaleOver18: 0,
+    femaleUnder18: 0
+  }
+
+  const emptyData = childLocationIds.map(id => ({
+    location: id,
+    ...placeholder
+  }))
+
+  const genderBasisData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyData,
+    'location'
+  )
+  return genderBasisData
 }
 
 function populateGenderBasisMetrics(

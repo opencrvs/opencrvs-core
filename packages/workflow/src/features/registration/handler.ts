@@ -207,16 +207,23 @@ export async function markEventAsRegisteredCallbackHandler(
     )
     await updateResourceInHearth(task)
 
-    const phoneNo = await getPhoneNo(composition, task, event)
+    const phoneNo = await getPhoneNo(task, event)
     const informantName = await getEventInformantName(composition, event)
     /* sending notification to the contact */
     if (phoneNo && informantName) {
       logger.info(
         'markEventAsRegisteredCallbackHandler sending event notification'
       )
-      sendRegisteredNotification(phoneNo, informantName, event, {
-        Authorization: request.headers.authorization
-      })
+      sendRegisteredNotification(
+        phoneNo,
+        informantName,
+        trackingId,
+        registrationNumber,
+        event,
+        {
+          Authorization: request.headers.authorization
+        }
+      )
     } else {
       logger.info(
         'markEventAsRegisteredCallbackHandler could not send event notification'

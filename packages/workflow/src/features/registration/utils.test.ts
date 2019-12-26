@@ -19,7 +19,8 @@ import { setTrackingId } from '@workflow/features/registration/fhir/fhir-bundle-
 import { logger } from '@workflow/logger'
 import {
   testFhirBundle,
-  testFhirBundleWithIdsForDeath
+  testFhirBundleWithIdsForDeath,
+  officeMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
 
@@ -51,6 +52,20 @@ describe('Verify utility functions', () => {
     expect(ascii).toBe('66538771897469')
   })
 
+  it('send in-progress birth declaration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    fetch.mockResponse(officeMock)
+    expect(
+      sendEventNotification(
+        fhirBundle,
+        Events.BIRTH_IN_PROGRESS_DEC,
+        '01711111111',
+        {
+          Authorization: 'bearer acd '
+        }
+      )
+    ).toBeDefined()
+  })
   it('send Birth declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
     expect(
@@ -76,8 +91,13 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
-  it('send Birth registration notification successfully', async () => {
+  it('send mark birth registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundle)
+    //@ts-ignore
+    fhirBundle.entry[1].resource.identifier.push({
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '20196816020000129'
+    })
     expect(
       sendEventNotification(fhirBundle, Events.BIRTH_MARK_REG, '01711111111', {
         Authorization: 'bearer acd '
@@ -100,6 +120,28 @@ describe('Verify utility functions', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
+  })
+  it('send Birth rejection notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundle)
+    expect(
+      sendEventNotification(fhirBundle, Events.BIRTH_MARK_VOID, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send in-progress death declaration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    fetch.mockResponse(officeMock)
+    expect(
+      sendEventNotification(
+        fhirBundle,
+        Events.DEATH_IN_PROGRESS_DEC,
+        '01711111111',
+        {
+          Authorization: 'bearer acd '
+        }
+      )
+    ).toBeDefined()
   })
   it('send Death declaration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
@@ -126,8 +168,13 @@ describe('Verify utility functions', () => {
       'Unable to send notification for error : Error: Mock Error'
     )
   })
-  it('send Death registration notification successfully', async () => {
+  it('send mark death registration notification successfully', async () => {
     const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    //@ts-ignore
+    fhirBundle.entry[1].resource.identifier.push({
+      system: 'http://opencrvs.org/specs/id/death-registration-number',
+      value: '20196816020000129'
+    })
     expect(
       sendEventNotification(fhirBundle, Events.DEATH_MARK_REG, '01711111111', {
         Authorization: 'bearer acd '
@@ -150,5 +197,21 @@ describe('Verify utility functions', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       'Unable to send notification for error : Error: Mock Error'
     )
+  })
+  it('send Death rejection notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    expect(
+      sendEventNotification(fhirBundle, Events.DEATH_MARK_VOID, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
+  })
+  it('send Death declaration notification successfully', async () => {
+    const fhirBundle = setTrackingId(testFhirBundleWithIdsForDeath)
+    expect(
+      sendEventNotification(fhirBundle, Events.DEATH_NEW_DEC, '01711111111', {
+        Authorization: 'bearer acd '
+      })
+    ).toBeDefined()
   })
 })
