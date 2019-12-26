@@ -593,7 +593,9 @@ async function getWorkqueueData(
     workqueue = {
       loading: false,
       error: true,
-      data: currentWorkqueue && currentWorkqueue.data,
+      data:
+        (currentWorkqueue && currentWorkqueue.data) ||
+        (state.workqueueState && state.workqueueState.workqueue.data),
       initialSyncDone: false
     }
   }
