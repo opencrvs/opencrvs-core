@@ -138,7 +138,9 @@ function ReportComponent(props: Props) {
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.payments &&
-                data.fetchBirthRegistrationMetrics.payments.length === 0)
+                data.fetchBirthRegistrationMetrics.payments.details &&
+                data.fetchBirthRegistrationMetrics.payments.details.length ===
+                  0)
             )
               return (
                 <NoResultMessage
@@ -173,10 +175,10 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   data={
                     (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .payments as GQLCertificationPaymentMetrics[]))) ||
-                    []
+                      data.fetchBirthRegistrationMetrics &&
+                      (data.fetchBirthRegistrationMetrics
+                        .payments as GQLCertificationPaymentMetrics)) ||
+                    {}
                   }
                 />
               </ReportWrapper>

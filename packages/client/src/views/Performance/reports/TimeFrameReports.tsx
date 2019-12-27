@@ -75,7 +75,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
       regWithin1yrTo5yr = 0,
       regOver5yr = 0
     } = this.props.data.total || {}
-    const total = get(this.props.data, 'total.total') || 0
+    const total = get(this.props.data, 'total.total') || '0'
     return [
       {
         width: 25

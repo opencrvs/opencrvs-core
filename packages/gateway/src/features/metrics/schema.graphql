@@ -10,7 +10,7 @@
 type BirthRegistrationMetrics {
   genderBasisMetrics: BirthRegistrationGenderBasisMetrics
   timeFrames: BirthRegistrationTimeFrameMetrics
-  payments: [CertificationPaymentMetrics]
+  payments: CertificationPaymentMetrics
 }
 
 type BirthRegistrationGenderBasisMetrics {
@@ -36,8 +36,17 @@ type GenderBasisTotalCount {
 }
 
 type CertificationPaymentMetrics {
+  details: [CertificationPaymentDetailsMetrics!]
+  total: CertificationPaymentTotalCount
+}
+
+type CertificationPaymentDetailsMetrics {
   total: Int!
   locationId: String!
+}
+
+type CertificationPaymentTotalCount {
+  total: Int!
 }
 
 type BirthRegistrationTimeFrameMetrics {

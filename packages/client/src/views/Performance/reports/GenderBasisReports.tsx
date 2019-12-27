@@ -75,7 +75,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
       maleOver18 = 0,
       femaleOver18 = 0
     } = this.props.genderBasisMetrics.total || {}
-    const total = get(this.props.genderBasisMetrics, 'total.total') || 0
+    const total = get(this.props.genderBasisMetrics, 'total.total') || '0'
     return [
       {
         width: 25

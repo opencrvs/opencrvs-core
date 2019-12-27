@@ -53,8 +53,13 @@ export const PERFORMANCE_METRICS = gql`
         }
       }
       payments {
-        locationId
-        total
+        details {
+          locationId
+          total
+        }
+        total {
+          total
+        }
       }
     }
   }

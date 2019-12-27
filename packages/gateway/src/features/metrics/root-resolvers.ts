@@ -13,7 +13,8 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import {
   getMetrics,
   timeFrameTotalCalculator,
-  genderBasisTotalCalculator
+  genderBasisTotalCalculator,
+  paymentTotalCalculator
 } from '@gateway/features/fhir/utils'
 
 export interface ITimeRange {
@@ -43,7 +44,10 @@ export const resolvers: GQLResolver = {
           details: metricsData.genderBasisMetrics,
           total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
         },
-        payments: metricsData.payments
+        payments: {
+          details: metricsData.payments,
+          total: paymentTotalCalculator(metricsData.payments)
+        }
       }
     }
   }

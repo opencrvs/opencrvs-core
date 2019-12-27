@@ -55,7 +55,9 @@ import {
   GQLTimeFrameDetailMetrics,
   GQLTimeFrameTotalCount,
   GQLGenderBasisDetailsMetrics,
-  GQLGenderBasisTotalCount
+  GQLGenderBasisTotalCount,
+  GQLCertificationPaymentDetailsMetrics,
+  GQLCertificationPaymentTotalCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1066,5 +1068,17 @@ export function genderBasisTotalCalculator(
       }
     },
     initialValue
+  )
+}
+
+export function paymentTotalCalculator(
+  paymentMetrics: Array<GQLCertificationPaymentDetailsMetrics>
+): GQLCertificationPaymentTotalCount {
+  return reduce(
+    paymentMetrics,
+    (accumulator, item) => ({
+      total: accumulator.total + item.total
+    }),
+    { total: 0 }
   )
 }
