@@ -10160,7 +10160,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -10238,7 +10238,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
                     }
                   ],
                   "mapping": {
