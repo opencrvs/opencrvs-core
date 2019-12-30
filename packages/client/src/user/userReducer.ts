@@ -91,14 +91,14 @@ export function updateUserFormFieldDefinitions(
 interface IProcessRoles {
   type: typeof PROCESS_ROLES
   payload: {
-    primatyOfficeId: string
+    primaryOfficeId: string
   }
 }
 
-export function processRoles(primatyOfficeId: string): IProcessRoles {
+export function processRoles(primaryOfficeId: string): IProcessRoles {
   return {
     type: PROCESS_ROLES,
-    payload: { primatyOfficeId }
+    payload: { primaryOfficeId }
   }
 }
 
@@ -180,14 +180,14 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case PROCESS_ROLES:
-      const { primatyOfficeId } = (action as IProcessRoles).payload
+      const { primaryOfficeId } = (action as IProcessRoles).payload
       return loop(
         {
           ...state
         },
         Cmd.run(alterRolesBasedOnUserRole, {
           successActionCreator: updateUserFormFieldDefinitions,
-          args: [primatyOfficeId]
+          args: [primaryOfficeId]
         })
       )
     case UPDATE_FORM_FIELD_DEFINITIONS:

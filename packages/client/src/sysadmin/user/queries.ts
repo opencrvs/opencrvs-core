@@ -31,12 +31,12 @@ export const SEARCH_USERS = gql`
     }
   }
 `
-async function searchUsers(primatyOfficeId: string) {
+async function searchUsers(primaryOfficeId: string) {
   return (
     client &&
     client.query({
       query: SEARCH_USERS,
-      variables: { primatyOfficeId }
+      variables: { primaryOfficeId }
     })
   )
 }
