@@ -390,7 +390,7 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.inProgressCount, {
-                          total: loading ? '?' : draftApplications.length
+                          total: draftApplications.length
                         })}
                       </IconTab>
                       <IconTab
@@ -404,7 +404,7 @@ class FieldAgentHomeView extends React.Component<
                         }
                       >
                         {intl.formatMessage(messages.sentForReviewCount, {
-                          total: loading ? '?' : applicationsReadyToSend.length
+                          total: applicationsReadyToSend.length
                         })}
                       </IconTab>
                       <IconTab

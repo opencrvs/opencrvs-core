@@ -698,7 +698,7 @@ export class InProgressTabComponent extends React.Component<
             />
             <LoadingIndicator
               loading={this.props.loading ? true : false}
-              hasError={this.props.error ? true : false}
+              hasError={false}
             />
           </>
         )}

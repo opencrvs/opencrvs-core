@@ -265,10 +265,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           currentPage={this.state.sentForReviewPageNo}
           showPaginated={this.props.showPaginated}
         />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
+        <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>
     )
   }

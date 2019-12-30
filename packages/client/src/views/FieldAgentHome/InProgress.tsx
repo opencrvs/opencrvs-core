@@ -165,10 +165,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           clickable={true}
           showPaginated={this.props.showPaginated}
         />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
+        <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>
     )
   }
