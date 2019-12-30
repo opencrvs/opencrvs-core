@@ -12,15 +12,15 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
-  weeklyTabTitle: {
-    id: 'performance.topbar.tab.title.weekly',
-    defaultMessage: 'Weekly',
-    description: 'Title used for weekly tab in performance page header'
+  monthlyTabTitle: {
+    id: 'performance.topbar.tab.title.monthly',
+    defaultMessage: 'Monthly',
+    description: 'Title used for monthly tab in performance page header'
   },
-  weeklyReportsBodyHeader: {
-    id: 'performance.body.header.weekly.reports',
-    defaultMessage: 'Weekly reports',
-    description: 'Header used for the body of weekly reports page'
+  monthlyReportsBodyHeader: {
+    id: 'performance.body.header.monthly.reports',
+    defaultMessage: 'Monthly reports',
+    description: 'Header used for the body of monthly reports page'
   },
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',

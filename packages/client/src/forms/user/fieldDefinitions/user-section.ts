@@ -166,9 +166,9 @@ export const userSection: ISerializedFormSection = {
           validate: []
         },
         {
-          name: 'assignedRegisterOffice',
+          name: 'assignedRegistrationOffice',
           type: FIELD_GROUP_TITLE,
-          label: messages.assignedRegisterOffice,
+          label: messages.assignedRegistrationOffice,
           required: false,
           initialValue: '',
           validate: []
@@ -212,8 +212,7 @@ export const userSection: ISerializedFormSection = {
           description: messages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
-          required: true,
-          hideAsterisk: true,
+          required: false,
           validate: []
         }
       ]

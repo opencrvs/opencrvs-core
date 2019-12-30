@@ -43,7 +43,7 @@ describe('Birth handler', () => {
 
   it('return a mediator response', async () => {
     const request = {
-      payload: JSON.stringify(body),
+      payload: body,
       headers: { authorization: 'bearer xyz' }
     }
     const header = jest.fn()

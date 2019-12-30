@@ -66,26 +66,6 @@ describe('signature upload tests', () => {
       expect(title).toBe('Attach the registrar’s signature')
     })
 
-    it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      testComponent
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      testComponent.update()
-
-      const error = testComponent
-        .find('#field-error')
-        .hostNodes()
-        .text()
-
-      expect(error).toBe('Required to register a new user')
-    })
-
     it('No error while uploading if valid file', async () => {
       await new Promise(resolve => {
         setTimeout(resolve, 100)

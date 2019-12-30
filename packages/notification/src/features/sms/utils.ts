@@ -14,18 +14,21 @@ import { HapiRequest } from '@notification/features/sms/handler'
 import { internal } from 'boom'
 import { sendSMS } from '@notification/features/sms/service'
 
-interface ISMSMessagePayload {
+interface ISendSMSPayload {
   name?: string
-  trackingid?: string
+  authCode?: string
+  trackingId?: string
   username?: string
   password?: string
+  crvsOffice?: string
+  registrationNumber?: string
 }
 
 export async function buildAndSendSMS(
   request: HapiRequest,
   msisdn: string,
   messageKey: string,
-  messagePayload: ISMSMessagePayload
+  messagePayload: ISendSMSPayload
 ) {
   try {
     return await sendSMS(
