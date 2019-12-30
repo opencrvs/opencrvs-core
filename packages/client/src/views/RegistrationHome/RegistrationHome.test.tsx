@@ -215,7 +215,10 @@ describe('RegistrationHome related tests', () => {
             params: {
               tabId: 'progress',
               selectorId: SELECTOR_ID.fieldAgentDrafts
-            }
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,
@@ -235,7 +238,10 @@ describe('RegistrationHome related tests', () => {
             params: {
               tabId: 'progress',
               selectorId: SELECTOR_ID.hospitalDrafts
-            }
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,
@@ -320,7 +326,10 @@ describe('RegistrationHome related tests', () => {
             params: {
               tabId: 'progress',
               selectorId: SELECTOR_ID.fieldAgentDrafts
-            }
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,
@@ -343,7 +352,10 @@ describe('RegistrationHome related tests', () => {
             params: {
               tabId: 'progress',
               selectorId: SELECTOR_ID.hospitalDrafts
-            }
+            },
+            isExact: true,
+            path: '',
+            url: ''
           }}
         />,
         store,
