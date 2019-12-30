@@ -42,6 +42,11 @@ export interface IColumn {
   sortFunction?: (key: string) => void
 }
 
+export interface IFooterFColumn {
+  label?: string
+  width: number
+}
+
 export interface IDynamicValues {
   [key: string]:
     | string

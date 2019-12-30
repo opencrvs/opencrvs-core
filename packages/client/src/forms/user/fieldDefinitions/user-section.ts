@@ -212,8 +212,7 @@ export const userSection: ISerializedFormSection = {
           description: messages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
-          required: true,
-          hideAsterisk: true,
+          required: false,
           validate: []
         }
       ]

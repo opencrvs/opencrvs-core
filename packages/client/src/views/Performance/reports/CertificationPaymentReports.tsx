@@ -33,17 +33,6 @@ type FullProps = {
   WrappedComponentProps
 
 class CertificationPaymentReportComponent extends React.Component<FullProps> {
-  getLocationByLocationId = (locationId: string) => {
-    const id = (locationId && locationId.split('/')[1]) || ''
-    return (
-      Object.values(this.props.offlineResources.locations).find(
-        location => location.id === id
-      ) || {
-        name: ''
-      }
-    )
-  }
-
   getContent = () => {
     return this.props.data.map(payment => ({
       location: getLocationFromPartOfLocationId(

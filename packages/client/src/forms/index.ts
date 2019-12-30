@@ -531,6 +531,7 @@ export interface IFormTag {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
+  delimiter?: string
 }
 
 export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &

@@ -24,6 +24,10 @@ interface IRetrieveUserNamePayload extends ISMSPayload {
   username: string
 }
 
+interface IUserAuthCodePayload extends ISMSPayload {
+  code: string
+}
+
 export async function sendUserCredentials(
   request: HapiRequest,
   h: Hapi.ResponseToolkit
@@ -62,6 +66,23 @@ export async function retrieveUserName(
   return h.response().code(200)
 }
 
+export async function sendUserAuthenticationCode(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IUserAuthCodePayload
+  logger.info(`Username: ${payload.code}`)
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'authenticationCodeNotification',
+    {
+      authCode: payload.code
+    }
+  )
+  return h.response().code(200)
+}
+
 export const userCredentialsNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   username: Joi.string().required(),
@@ -71,4 +92,9 @@ export const userCredentialsNotificationSchema = Joi.object({
 export const retrieveUserNameNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   username: Joi.string().required()
+})
+
+export const authCodeNotificationSchema = Joi.object({
+  msisdn: Joi.string().required(),
+  code: Joi.string().required()
 })
