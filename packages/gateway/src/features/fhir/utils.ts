@@ -51,6 +51,13 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
+import {
+  GQLTimeFrameDetailMetrics,
+  GQLTimeFrameTotalCount,
+  GQLGenderBasisDetailsMetrics,
+  GQLGenderBasisTotalCount
+} from '@gateway/graphql/schema'
+import { reduce } from 'lodash'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -998,4 +1005,52 @@ export async function setInformantReference(
       }
     }
   }
+}
+
+export function timeFrameTotalCalculator(
+  timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
+): GQLTimeFrameTotalCount {
+  const initialValue: GQLTimeFrameTotalCount = {
+    regWithin45d: 0,
+    regWithin45dTo1yr: 0,
+    regWithin1yrTo5yr: 0,
+    regOver5yr: 0
+  }
+  return reduce(
+    timeFrameMetrics,
+    (accumulator, item) => {
+      return {
+        regWithin45d: accumulator.regWithin45d + item.regWithin45d,
+        regWithin45dTo1yr:
+          accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr,
+        regWithin1yrTo5yr:
+          accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr,
+        regOver5yr: accumulator.regOver5yr + item.regOver5yr
+      }
+    },
+    initialValue
+  )
+}
+
+export function genderBasisTotalCalculator(
+  genderMetrics: Array<GQLGenderBasisDetailsMetrics>
+): GQLGenderBasisTotalCount {
+  const initialValue: GQLGenderBasisTotalCount = {
+    maleUnder18: 0,
+    femaleUnder18: 0,
+    maleOver18: 0,
+    femaleOver18: 0
+  }
+  return reduce(
+    genderMetrics,
+    (accumulator, item) => {
+      return {
+        maleUnder18: accumulator.maleUnder18 + item.maleUnder18,
+        femaleUnder18: accumulator.femaleUnder18 + item.femaleUnder18,
+        maleOver18: accumulator.maleOver18 + item.maleOver18,
+        femaleOver18: accumulator.femaleOver18 + item.femaleOver18
+      }
+    },
+    initialValue
+  )
 }
