@@ -17,7 +17,7 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { Header } from '@client/views/Performance/utils'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -86,10 +86,7 @@ function ReportComponent(props: Props) {
   const { reportType, timeRange, intl } = props
   const { start, end } = timeRange
 
-  const title = `${moment(start).format('DD MMMM')}  ${props.intl.formatMessage(
-    constantsMessages.to
-  )} ${moment(end).format('DD MMMM YYYY')}`
-
+  const title = moment(start).format('MMMM YYYY')
   return (
     <PerformanceContentWrapper tabId={reportType}>
       <BackButton
@@ -129,12 +126,15 @@ function ReportComponent(props: Props) {
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.timeFrames &&
-                data.fetchBirthRegistrationMetrics.timeFrames.length === 0) &&
+                data.fetchBirthRegistrationMetrics.timeFrames.details &&
+                data.fetchBirthRegistrationMetrics.timeFrames.details.length ===
+                  0) &&
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.genderBasisMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.length ===
-                  0) &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details &&
+                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details
+                  .length === 0) &&
               (data &&
                 data.fetchBirthRegistrationMetrics &&
                 data.fetchBirthRegistrationMetrics.payments &&
@@ -155,8 +155,8 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics[]))) ||
-                    []
+                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics))) ||
+                    {}
                   }
                 />
                 <TimeFrameReports
@@ -165,8 +165,8 @@ function ReportComponent(props: Props) {
                     (data &&
                       (data.fetchBirthRegistrationMetrics &&
                         (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics[]))) ||
-                    []
+                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics))) ||
+                    {}
                   }
                 />
                 <CertificationPaymentReports
@@ -192,7 +192,7 @@ function mapStateToProps(state: IStoreState, props: Props) {
   return {
     reportType:
       (props.location.state && props.location.state.reportType) ||
-      PERFORMANCE_REPORT_TYPE_WEEKY,
+      PERFORMANCE_REPORT_TYPE_MONTHLY,
     timeRange: (props.location.state && props.location.state.timeRange) || {
       start: new Date(),
       end: new Date()

@@ -65,7 +65,7 @@ export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
 export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'
 export const FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES = 'updates'
 
-export const PERFORMANCE_REPORT_TYPE_WEEKY = 'weekly'
+export const PERFORMANCE_REPORT_TYPE_MONTHLY = 'monthly'
 
 export const PHONE_NO_FIELD_STRING = 'phoneNo'
 export const CONTACT_POINT_FIELD_STRING = 'contactPoint'
