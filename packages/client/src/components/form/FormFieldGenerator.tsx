@@ -118,7 +118,7 @@ const fadeIn = keyframes`
 
 const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
