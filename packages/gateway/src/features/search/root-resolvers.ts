@@ -36,6 +36,11 @@ export const resolvers: GQLResolver = {
         sort
       }
       if (locationIds) {
+        if (locationIds.length <= 0 || locationIds.includes('')) {
+          return await Promise.reject(
+            new Error('User includes wrong location id')
+          )
+        }
         searchCriteria.applicationLocationId = locationIds.join(',')
       }
       if (trackingId) {

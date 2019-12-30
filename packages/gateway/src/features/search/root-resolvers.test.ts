@@ -88,6 +88,22 @@ describe('Search root resolvers', () => {
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
+    it('should returns error for invalid locationIds', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+
+      await expect(
+        resolvers.Query.searchEvents(
+          {},
+          {
+            locationIds: ['']
+          }
+        )
+      ).rejects.toThrowError('User includes wrong location id')
+    })
     it('returns an array of composition results for searchContent', async () => {
       fetch.mockResponse(
         JSON.stringify({
