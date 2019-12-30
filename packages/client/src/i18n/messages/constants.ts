@@ -493,7 +493,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.location'
   },
   birthRegistrationTitle: {
-    defaultMessage: 'Births Registered',
+    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
     description: 'Label for birthRegistrationTitle',
     id: 'constants.birthRegistrationTitle'
   },

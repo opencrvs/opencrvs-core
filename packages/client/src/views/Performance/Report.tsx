@@ -14,7 +14,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
@@ -48,6 +48,7 @@ import {
   CertificationPaymentReports
 } from '@client/views/Performance/reports'
 import moment from 'moment'
+import { Event } from '@client/forms'
 
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
@@ -62,6 +63,7 @@ const ReportWrapper = styled.div`
 interface ReportProps {
   timeRange: { start: Date; end: Date }
   reportType: string
+  eventType: Event
   goBack: typeof goBack
   offlineResources: IOfflineData
 }
@@ -75,7 +77,11 @@ type Props = ReportProps &
   RouteComponentProps<
     {},
     {},
-    { reportType: string; timeRange: { start: Date; end: Date } }
+    {
+      reportType: string
+      eventType: Event
+      timeRange: { start: Date; end: Date }
+    }
   >
 
 function ReportComponent(props: Props) {
@@ -83,7 +89,7 @@ function ReportComponent(props: Props) {
     selectedLocation,
     setSelectedLocation
   ] = React.useState<ISearchLocation | null>(null)
-  const { reportType, timeRange, intl } = props
+  const { reportType, timeRange, intl, eventType } = props
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')
@@ -107,10 +113,10 @@ function ReportComponent(props: Props) {
         <Query
           query={PERFORMANCE_METRICS}
           variables={{
+            event: { eventType },
             timeStart: start.toISOString(),
             timeEnd: end.toISOString(),
-            locationId: selectedLocation.id,
-            event: 'birth'
+            locationId: selectedLocation.id
           }}
         >
           {({
@@ -151,6 +157,7 @@ function ReportComponent(props: Props) {
             return (
               <ReportWrapper>
                 <GenderBasisReports
+                  eventType={eventType}
                   loading={loading}
                   genderBasisMetrics={
                     (data &&
@@ -161,6 +168,7 @@ function ReportComponent(props: Props) {
                   }
                 />
                 <TimeFrameReports
+                  eventType={eventType}
                   loading={loading}
                   data={
                     (data &&
@@ -171,6 +179,7 @@ function ReportComponent(props: Props) {
                   }
                 />
                 <CertificationPaymentReports
+                  eventType={eventType}
                   loading={loading}
                   data={
                     (data &&
@@ -194,6 +203,7 @@ function mapStateToProps(state: IStoreState, props: Props) {
     reportType:
       (props.location.state && props.location.state.reportType) ||
       PERFORMANCE_REPORT_TYPE_MONTHLY,
+    eventType: props.location.state && props.location.state.eventType,
     timeRange: (props.location.state && props.location.state.timeRange) || {
       start: new Date(),
       end: new Date()
