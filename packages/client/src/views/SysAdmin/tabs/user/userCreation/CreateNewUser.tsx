@@ -81,6 +81,10 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   }
 
   componentDidMount() {
+    /* TODO
+     * The following hardcoded location id will have to be replaced by the
+     * id of the selected location.
+     */
     this.props.processRoles('56df364b-6e36-432f-98d5-4f3ed07e142b')
   }
 
