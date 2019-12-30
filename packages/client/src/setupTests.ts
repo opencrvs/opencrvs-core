@@ -18,6 +18,8 @@ import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
+import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
+import { userQueries } from './sysadmin/user/queries'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
@@ -100,6 +102,8 @@ console.log = jest.fn().mockImplementation((...messages) => {
 
 const { queries } = require('./profile/queries')
 queries.fetchUserDetails = jest.fn()
+roleQueries.fetchRoles = jest.fn()
+userQueries.searchUsers = jest.fn()
 
 /*
  * Navigator & Window
