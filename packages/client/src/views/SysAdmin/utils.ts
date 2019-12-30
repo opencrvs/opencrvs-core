@@ -197,7 +197,12 @@ export async function alterRolesBasedOnUserRole(primatyOfficeId: string) {
       if (hasSecretary && (hasChariman || hasMayor)) {
         roleList.push(role)
       }
-    } else if (role.value === 'LOCAL_REGISTRAR') {
+    } else if (
+      role.value === 'NATIONAL_REGISTRAR' ||
+      role.value === 'STATE_REGISTRAR' ||
+      role.value === 'DISTRICT_REGISTRAR' ||
+      role.value === 'LOCAL_REGISTRAR'
+    ) {
       role.types = role.types.filter(
         (t: string) =>
           (t === 'SECRETARY' && !hasSecretary) ||

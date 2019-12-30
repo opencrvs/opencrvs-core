@@ -27,7 +27,7 @@ import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
 import { userQueries } from '@client/sysadmin/user/queries'
 import { queries } from '@client/profile/queries'
-const mockRoles = {
+export const mockRoles = {
   data: {
     getRoles: [
       { value: 'FIELD_AGENT', types: ['HOSPITAL', 'CHA'], __typename: 'Role' },
@@ -66,7 +66,7 @@ const mockRoles = {
   }
 }
 
-const mockUsers = {
+export const mockUsers = {
   data: {
     searchUsers: {
       totalItems: 8,
@@ -204,6 +204,9 @@ const mockUsers = {
     }
   }
 }
+;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
+;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+
 describe('create new user tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
@@ -226,12 +229,6 @@ describe('create new user tests', () => {
         store,
         [mockFetchRoleGraphqlOperation]
       )).component
-    })
-
-    it('Process role', async () => {
-      ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-      ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
-      store.dispatch(processRoles('56df364b-6e36-432f-98d5-4f3ed07e142b'))
     })
 
     it('clicking on confirm button with unfilled required fields shows validation errors', async () => {
