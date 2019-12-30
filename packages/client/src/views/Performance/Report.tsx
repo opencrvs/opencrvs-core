@@ -113,7 +113,7 @@ function ReportComponent(props: Props) {
         <Query
           query={PERFORMANCE_METRICS}
           variables={{
-            event: { eventType },
+            event: eventType,
             timeStart: start.toISOString(),
             timeEnd: end.toISOString(),
             locationId: selectedLocation.id
@@ -134,63 +134,63 @@ function ReportComponent(props: Props) {
                 data.fetchRegistrationMetrics &&
                 data.fetchRegistrationMetrics.timeFrames &&
                 data.fetchRegistrationMetrics.timeFrames.details &&
-                data.fetchRegistrationMetrics.timeFrames.details.length ===
-                  0) &&
+                data.fetchRegistrationMetrics.timeFrames.details.length > 0) &&
               (data &&
                 data.fetchRegistrationMetrics &&
                 data.fetchRegistrationMetrics.genderBasisMetrics &&
                 data.fetchRegistrationMetrics.genderBasisMetrics.details &&
                 data.fetchRegistrationMetrics.genderBasisMetrics.details
-                  .length === 0) &&
+                  .length > 0) &&
               (data &&
                 data.fetchRegistrationMetrics &&
                 data.fetchRegistrationMetrics.payments &&
-                data.fetchRegistrationMetrics.payments.length === 0)
-            )
+                data.fetchRegistrationMetrics.payments.length > 0)
+            ) {
+              return (
+                <ReportWrapper>
+                  <GenderBasisReports
+                    eventType={eventType}
+                    loading={loading}
+                    genderBasisMetrics={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
+                      {}
+                    }
+                  />
+                  <TimeFrameReports
+                    eventType={eventType}
+                    loading={loading}
+                    data={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
+                      {}
+                    }
+                  />
+                  <CertificationPaymentReports
+                    eventType={eventType}
+                    loading={loading}
+                    data={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .payments as GQLCertificationPaymentMetrics[]))) ||
+                      []
+                    }
+                  />
+                </ReportWrapper>
+              )
+            } else {
               return (
                 <NoResultMessage
                   id="reports"
                   searchedLocation={selectedLocation.displayLabel}
                 />
               )
-
-            return (
-              <ReportWrapper>
-                <GenderBasisReports
-                  eventType={eventType}
-                  loading={loading}
-                  genderBasisMetrics={
-                    (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
-                    {}
-                  }
-                />
-                <TimeFrameReports
-                  eventType={eventType}
-                  loading={loading}
-                  data={
-                    (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
-                    {}
-                  }
-                />
-                <CertificationPaymentReports
-                  eventType={eventType}
-                  loading={loading}
-                  data={
-                    (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .payments as GQLCertificationPaymentMetrics[]))) ||
-                    []
-                  }
-                />
-              </ReportWrapper>
-            )
+            }
           }}
         </Query>
       )}
