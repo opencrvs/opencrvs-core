@@ -29,48 +29,41 @@ interface IStateProps {
 }
 
 type FullProps = {
-  data: GQLBirthRegistrationTimeFrameMetrics[]
+  data: GQLBirthRegistrationTimeFrameMetrics
   eventType?: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
 
 class TimeFrameComponent extends React.Component<FullProps> {
-  getLocationByLocationId = (locationId: string) => {
-    const id = (locationId && locationId.split('/')[1]) || ''
-    return (
-      Object.values(this.props.offlineResources.locations).find(
-        location => location.id === id
-      ) || {
-        name: ''
-      }
-    )
-  }
-
   getContent = () => {
-    return this.props.data.map(timeFrame => ({
-      location: getLocationFromPartOfLocationId(
-        timeFrame.locationId,
-        this.props.offlineResources
-      ).name,
-      regWithin45d: getValueWithPercentageString(
-        timeFrame.regWithin45d,
-        timeFrame.total
-      ),
-      regWithin45dTo1yr: getValueWithPercentageString(
-        timeFrame.regWithin45dTo1yr,
-        timeFrame.total
-      ),
-      regWithin1yrTo5yr: getValueWithPercentageString(
-        timeFrame.regWithin1yrTo5yr,
-        timeFrame.total
-      ),
-      regOver5yr: getValueWithPercentageString(
-        timeFrame.regOver5yr,
-        timeFrame.total
-      ),
-      total: String(timeFrame.total)
-    }))
+    return (
+      (this.props.data.details &&
+        this.props.data.details.map(timeFrame => ({
+          location: getLocationFromPartOfLocationId(
+            timeFrame.locationId,
+            this.props.offlineResources
+          ).name,
+          regWithin45d: getValueWithPercentageString(
+            timeFrame.regWithin45d,
+            timeFrame.total
+          ),
+          regWithin45dTo1yr: getValueWithPercentageString(
+            timeFrame.regWithin45dTo1yr,
+            timeFrame.total
+          ),
+          regWithin1yrTo5yr: getValueWithPercentageString(
+            timeFrame.regWithin1yrTo5yr,
+            timeFrame.total
+          ),
+          regOver5yr: getValueWithPercentageString(
+            timeFrame.regOver5yr,
+            timeFrame.total
+          ),
+          total: String(timeFrame.total)
+        }))) ||
+      []
+    )
   }
 
   render() {

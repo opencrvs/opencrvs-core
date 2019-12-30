@@ -17,16 +17,24 @@ import { Event } from '@client/forms'
 
 describe('Time frame report tests', () => {
   const { store } = createStore()
-  const timeFramesData = [
-    {
-      locationId: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
+  const timeFramesData = {
+    details: [
+      {
+        locationId: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
+        regWithin45d: 0,
+        regWithin45dTo1yr: 0,
+        regWithin1yrTo5yr: 0,
+        regOver5yr: 2,
+        total: 2
+      }
+    ],
+    total: {
       regWithin45d: 0,
       regWithin45dTo1yr: 0,
       regWithin1yrTo5yr: 0,
-      regOver5yr: 2,
-      total: 2
+      regOver5yr: 2
     }
-  ]
+  }
 
   it('Renders without crashing', async () => {
     const testComponent = await createTestComponent(
