@@ -946,7 +946,7 @@
         "review.header.subject.subjectWitName": "{eventType, select, birth {Birth} death {Death}} Application for {name}",
         "review.header.title.govtName": "Republic of Zambia",
         "review.inputs.additionalComments": "Any additional comments?",
-        "review.modal.desc.submitConfirmation": "{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the Registrar for completion. Please inform the Applicant that they will need to visit the office with the missing information and supporting documents.}}",
+        "review.modal.desc.submitConfirmation": "{completeApplication, select, true {This application will be sent to the Registrar for them to review.} false {This application will be sent to the Registrar for completion. Please inform the Applicant that they will need to visit the office with the missing information and supporting documents.}}",
         "review.modal.title.registerConfirmation": "Register this application?",
         "review.modal.title.submitConfirmation": "{completeApplication, select, true {Send application for review?} false {Send incomplete application?}}",
         "review.rejection.form": "Rejection form",
