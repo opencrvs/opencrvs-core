@@ -49,6 +49,7 @@ import {
 } from '@client/views/Performance/reports'
 import moment from 'moment'
 import { Event } from '@client/forms'
+import { isEmpty, get } from 'lodash'
 
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
@@ -130,22 +131,21 @@ function ReportComponent(props: Props) {
           }) => {
             if (
               !loading &&
-              (data &&
-                data.fetchRegistrationMetrics &&
-                data.fetchRegistrationMetrics.timeFrames &&
-                data.fetchRegistrationMetrics.timeFrames.details &&
-                data.fetchRegistrationMetrics.timeFrames.details.length > 0) &&
-              (data &&
-                data.fetchRegistrationMetrics &&
-                data.fetchRegistrationMetrics.genderBasisMetrics &&
-                data.fetchRegistrationMetrics.genderBasisMetrics.details &&
-                data.fetchRegistrationMetrics.genderBasisMetrics.details
-                  .length > 0) &&
-              (data &&
-                data.fetchRegistrationMetrics &&
-                data.fetchRegistrationMetrics.payments &&
-                data.fetchRegistrationMetrics.payments.length > 0)
+              isEmpty(
+                get(data, 'fetchRegistrationMetrics.timeFrames.details')
+              ) &&
+              isEmpty(
+                get(data, 'fetchRegistrationMetrics.genderBasisMetrics.details')
+              ) &&
+              isEmpty(get(data, 'fetchRegistrationMetrics.payments'))
             ) {
+              return (
+                <NoResultMessage
+                  id="reports"
+                  searchedLocation={selectedLocation.displayLabel}
+                />
+              )
+            } else {
               return (
                 <ReportWrapper>
                   <GenderBasisReports
@@ -182,13 +182,6 @@ function ReportComponent(props: Props) {
                     }
                   />
                 </ReportWrapper>
-              )
-            } else {
-              return (
-                <NoResultMessage
-                  id="reports"
-                  searchedLocation={selectedLocation.displayLabel}
-                />
               )
             }
           }}
