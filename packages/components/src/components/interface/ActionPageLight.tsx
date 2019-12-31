@@ -45,7 +45,7 @@ const BackButton = styled(Button)`
 
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  text-transform: uppercase;
+  text-transform: capitalize;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }

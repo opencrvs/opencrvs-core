@@ -39,7 +39,7 @@ const GoToHomepage = styled(Button)`
   color: ${({ theme }) => theme.colors.secondary};
   background: ${({ theme }) => theme.colors.white};
   ${({ theme }) => theme.fonts.subtitleStyle};
-  text-transform: uppercase;
+  text-transform: capitalize;
   cursor: pointer;
   margin-top: 60px;
 `

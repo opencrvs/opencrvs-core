@@ -179,8 +179,8 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.review'
   },
   saveExitButton: {
-    defaultMessage: 'SAVE & EXIT',
-    description: 'SAVE & EXIT Button Text',
+    defaultMessage: 'Save & Exit',
+    description: 'Save & Exit Button Text',
     id: 'buttons.saveAndExit'
   },
   search: {
