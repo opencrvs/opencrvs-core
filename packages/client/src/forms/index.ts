@@ -94,6 +94,11 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
+export interface IDispatchOptions {
+  action: string
+  payloadKey: string
+}
+
 export interface IDynamicItems {
   dependency: string
   valueMapper: IDynamicValueMapper
@@ -456,6 +461,7 @@ export interface ISearchFormField extends IFormFieldBase {
   searchableResource: Extract<keyof IOfflineData, 'facilities'>
   searchableType: string
   dynamicOptions?: IDynamicOptions
+  dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
 }
 
@@ -925,6 +931,7 @@ export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
   searchableResource: Extract<keyof IOfflineData, 'locations'>
   searchableType: string
+  dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
 }
 
