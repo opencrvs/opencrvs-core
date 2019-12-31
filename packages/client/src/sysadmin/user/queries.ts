@@ -10,10 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
+import { client } from '@client/utils/apolloClient'
 
 export const SEARCH_USERS = gql`
-  query($count: Int, $skip: Int) {
-    searchUsers(count: $count, skip: $skip) {
+  query($count: Int, $skip: Int, $primaryOfficeId: String) {
+    searchUsers(count: $count, skip: $skip, primaryOfficeId: $primaryOfficeId) {
       totalItems
       results {
         id
@@ -30,3 +31,16 @@ export const SEARCH_USERS = gql`
     }
   }
 `
+async function searchUsers(primaryOfficeId: string) {
+  return (
+    client &&
+    client.query({
+      query: SEARCH_USERS,
+      variables: { primaryOfficeId }
+    })
+  )
+}
+
+export const userQueries = {
+  searchUsers
+}
