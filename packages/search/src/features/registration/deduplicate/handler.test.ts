@@ -28,25 +28,6 @@ describe('Verify handlers', () => {
       server = await createServer()
     })
 
-    it('should return status code 500 if invalid payload received', async () => {
-      const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/not-duplicate',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(500)
-    })
-
     it('should return status code 200 if the composition indexed correctly', async () => {
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
