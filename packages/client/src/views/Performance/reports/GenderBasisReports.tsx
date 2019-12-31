@@ -21,14 +21,14 @@ import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
-import { GQLBirthRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
 type FullProps = {
-  genderBasisMetrics: GQLBirthRegistrationGenderBasisMetrics
+  genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
