@@ -10,12 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
+import { client } from '@client/utils/apolloClient'
 
 export const getRolesQuery = gql`
-  query roles {
+  query {
     getRoles(active: true) {
       value
       types
     }
   }
 `
+async function fetchRoles() {
+  return (
+    client &&
+    client.query({
+      query: getRolesQuery
+    })
+  )
+}
+
+export const roleQueries = {
+  fetchRoles
+}

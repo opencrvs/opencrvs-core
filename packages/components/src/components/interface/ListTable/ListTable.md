@@ -93,6 +93,24 @@ class ListTableExample extends React.Component {
             key: 'status'
           }
         ]}
+        footerColumns={[
+          {
+            label: '',
+            width: 30
+          },
+          {
+            label: 'Rule',
+            width: 30
+          },
+          {
+            label: 'Type',
+            width: 30
+          },
+          {
+            label: 'Status',
+            width: 10
+          }
+        ]}
         noResultText="No result to display"
       />
     )
