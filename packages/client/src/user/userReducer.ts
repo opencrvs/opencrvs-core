@@ -68,7 +68,7 @@ const initialState: IUserFormState = {
     ]
   }),
   userFormData: {},
-  submitting: true,
+  submitting: false,
   submissionError: false
 }
 
@@ -194,20 +194,17 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
 
       const userSection = state.userForm.sections[0]
-
-      const updatedFields = transformRoleDataToDefinitions(
-        state.userForm.sections[0].groups[0].fields,
-        data
-      )
+      const updatedSectionGroups = userSection.groups
+      updatedSectionGroups[1] = {
+        ...updatedSectionGroups[1],
+        fields: transformRoleDataToDefinitions(
+          state.userForm.sections[0].groups[1].fields,
+          data
+        )
+      }
       const updatedSection: IFormSection = {
         ...userSection,
-        groups: [
-          {
-            ...userSection.groups[0],
-            fields: updatedFields
-          },
-          ...userSection.groups.slice(1)
-        ]
+        groups: [...updatedSectionGroups]
       }
       const newState = {
         ...state,

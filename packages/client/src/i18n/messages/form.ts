@@ -34,6 +34,7 @@ interface IFormMessages {
   applicantsRelationWithDeceased: MessageDescriptor
   applicantTitle: MessageDescriptor
   assignedRegistrationOffice: MessageDescriptor
+  assignedRegistrationOfficeGroupTitle: MessageDescriptor
   attendantAtBirth: MessageDescriptor
   attendantAtBirthLayperson: MessageDescriptor
   attendantAtBirthMidwife: MessageDescriptor
@@ -468,6 +469,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Assigned Registration Office',
     description: 'Assigned Registration Office section',
     id: 'form.section.assignedRegistrationOffice'
+  },
+  assignedRegistrationOfficeGroupTitle: {
+    defaultMessage: 'Assigned registration office',
+    description: 'Assigned Registration Office section',
+    id: 'form.section.assignedRegistrationOfficeGroupTitle'
   },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',

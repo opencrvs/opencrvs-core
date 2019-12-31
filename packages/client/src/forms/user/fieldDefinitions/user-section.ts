@@ -34,6 +34,41 @@ export const userSection: ISerializedFormSection = {
   title: messages.userFormTitle,
   groups: [
     {
+      id: 'registration-office',
+      title: messages.assignedRegistrationOffice,
+      fields: [
+        {
+          name: 'assignedRegistrationOffice',
+          type: FIELD_GROUP_TITLE,
+          label: messages.assignedRegistrationOfficeGroupTitle,
+          required: false,
+          hidden: true,
+          initialValue: '',
+          validate: []
+        },
+        {
+          name: 'registrationOffice',
+          type: SEARCH_FIELD,
+          label: messages.registrationOffice,
+          required: true,
+          initialValue: '',
+          searchableResource: 'facilities',
+          searchableType: 'CRVS_OFFICE',
+          dispatchOptions: {
+            action: 'USER_FORM/PROCESS_ROLES',
+            payloadKey: 'primaryOfficeId'
+          },
+          validate: [],
+          mapping: {
+            mutation: {
+              operation: 'fieldNameTransformer',
+              parameters: ['primaryOffice']
+            }
+          }
+        }
+      ]
+    },
+    {
       id: 'user-view-group',
       fields: [
         {
@@ -164,30 +199,6 @@ export const userSection: ISerializedFormSection = {
           required: false,
           initialValue: '',
           validate: []
-        },
-        {
-          name: 'assignedRegistrationOffice',
-          type: FIELD_GROUP_TITLE,
-          label: messages.assignedRegistrationOffice,
-          required: false,
-          initialValue: '',
-          validate: []
-        },
-        {
-          name: 'registrationOffice',
-          type: SEARCH_FIELD,
-          label: messages.registrationOffice,
-          required: true,
-          initialValue: '',
-          searchableResource: 'facilities',
-          searchableType: 'CRVS_OFFICE',
-          validate: [],
-          mapping: {
-            mutation: {
-              operation: 'fieldNameTransformer',
-              parameters: ['primaryOffice']
-            }
-          }
         }
       ]
     },
