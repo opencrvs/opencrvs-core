@@ -19,7 +19,7 @@ import {
 import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { modifyUserFormData } from '@client/user/userReducer'
+import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import {
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
@@ -27,6 +27,11 @@ import {
 } from '@client/views/SysAdmin/utils'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
+import { userQueries } from '@client/sysadmin/user/queries'
+import { mockRoles, mockUsers } from './CreateNewUser.test'
+;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
+;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
