@@ -400,7 +400,7 @@ const messagesToDefine: IFormMessages = {
     id: 'user.form.securityquestion.answer'
   },
   applicantIDProof: {
-    defaultMessage: 'Proof of applicant ID',
+    defaultMessage: "Proof of applicant's ID",
     description: 'Option for radio group field: Type of Document To Upload',
     id: 'form.field.label.applicantIDProof'
   },
@@ -582,7 +582,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
@@ -751,8 +751,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deathAtPrivateHome'
   },
   deathDate: {
-    defaultMessage:
-      'Enter the date in the format day, month and year. For example 24 10 2020.',
+    defaultMessage: 'Enter the date as: day, month, year e.g. 24 10 2020',
     description: 'Label for form field: Date of occurrence',
     id: 'form.field.label.deathDate'
   },
@@ -1671,24 +1670,24 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.applicantRelation.spouse'
   },
   headOfTheInstitute: {
-    defaultMessage: 'Head of the institution where the death occured',
+    defaultMessage: 'Head of the institution where the death occurred',
     description: 'Option for form field: Head of the institute',
     id: 'form.field.label.applicantRelation.headOfTheInstitute'
   },
   driverOfTheVehicle: {
     defaultMessage:
-      'Driver or operator of the land or water vehicle or aircraft where the death occured',
+      'Driver or operator of the land or water vehicle or aircraft where the death occurred',
     description: 'Option for form field: Driver of the vehicle',
     id: 'form.field.label.applicantRelation.driverOfTheVehicle'
   },
   ownerOfTheHouse: {
-    defaultMessage: 'Owner of the house or building where the death occured',
+    defaultMessage: 'Owner of the house or building where the death occurred',
     description: 'Option for form field: Owner of the house',
     id: 'form.field.label.applicantRelation.ownerOfTheHouse'
   },
   officerInCharge: {
     defaultMessage:
-      'Officer-in-charge of the Thana of a road or public space where the death occured',
+      'Officer-in-charge of the Thana of a road or public space where the death occurred',
     description: 'Option for form field: Officer-in-charge',
     id: 'form.field.label.applicantRelation.officerInCharge'
   },
