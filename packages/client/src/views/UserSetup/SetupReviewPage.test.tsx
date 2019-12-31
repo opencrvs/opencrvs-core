@@ -167,7 +167,7 @@ describe('SetupReviewPage page tests', () => {
         .find('#GlobalError')
         .hostNodes()
         .text()
-    ).toBe('An error occured. Please try again.')
+    ).toBe('An error occurred. Please try again.')
   })
 
   it('shows nothing for undefined fields of userDetails', async () => {
