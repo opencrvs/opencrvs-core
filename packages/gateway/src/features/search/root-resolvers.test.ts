@@ -11,6 +11,8 @@
  */
 import { resolvers } from '@gateway/features/search/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 const fetch = fetchAny as any
 
@@ -20,6 +22,38 @@ beforeEach(() => {
 
 describe('Search root resolvers', () => {
   describe('searchEvents()', () => {
+    let authHeaderValidUserRegister: { Authorization: string }
+    let authHeaderValidUserDeclare: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserTokenRegister = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUserRegister = {
+        Authorization: `Bearer ${validUserTokenRegister}`
+      }
+      const validUserTokenDeclare = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUserDeclare = {
+        Authorization: `Bearer ${validUserTokenDeclare}`
+      }
+    })
     it('returns an array of composition results for eventType', async () => {
       fetch.mockResponse(
         JSON.stringify({
@@ -88,6 +122,23 @@ describe('Search root resolvers', () => {
       expect(result.results).toBeInstanceOf(Array)
       expect(result.totalItems).toBe(1)
     })
+    it('should returns error for not register scope user without location IDs', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+        })
+      )
+
+      await expect(
+        resolvers.Query.searchEvents(
+          {},
+          {
+            type: ['birth-application', 'death-application']
+          },
+          authHeaderValidUserDeclare
+        )
+      ).rejects.toThrowError('User does not have permission')
+    })
     it('should returns error for invalid locationIds', async () => {
       fetch.mockResponse(
         JSON.stringify({
@@ -100,9 +151,10 @@ describe('Search root resolvers', () => {
           {},
           {
             locationIds: ['']
-          }
+          },
+          authHeaderValidUserRegister
         )
-      ).rejects.toThrowError('User includes wrong location id')
+      ).rejects.toThrowError('Invalid location id')
     })
     it('returns an array of composition results for searchContent', async () => {
       fetch.mockResponse(
