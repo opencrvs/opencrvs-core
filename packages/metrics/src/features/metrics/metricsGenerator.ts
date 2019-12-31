@@ -128,6 +128,76 @@ export async function fetchCertificationPayments(
   return paymentsData
 }
 
+const birthRegWithinTimeFramesQuery = (
+  timeStart: string,
+  timeEnd: string,
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
+): string => {
+  return `SELECT
+  SUM(within45Days) AS regWithin45d,
+  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+  SUM(over5Yr) AS regOver5yr
+ FROM (
+   SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   FROM (
+    SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ) FILL(0)
+ ) GROUP BY ${lowerLocationLevel}
+ `
+}
+
+const deathRegWithinTimeFramesQuery = (
+  timeStart: string,
+  timeEnd: string,
+  locationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string
+): string => {
+  return `SELECT
+  SUM(within45Days) AS regWithin45d,
+  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
+  SUM(over5Yr) AS regOver5yr
+ FROM (
+   SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   FROM (
+    SELECT COUNT(deathDays) AS within45Days FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND deathDays > -1 AND deathDays <= 45 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND deathDays > 46 AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND deathDays > 366 AND deathDays <= 1825 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ), (
+    SELECT COUNT(deathDays) AS over5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+  AND deathDays > 1826 AND ${currentLocationLevel}='${locationId}'
+    GROUP BY ${lowerLocationLevel}
+   ) FILL(0)
+ ) GROUP BY ${lowerLocationLevel}
+ `
+}
+
 export async function fetchRegWithinTimeFrames(
   timeStart: string,
   timeEnd: string,
@@ -137,60 +207,25 @@ export async function fetchRegWithinTimeFrames(
   event: string,
   childLocationIds: Array<string>
 ) {
-  const queryString =
-    event === EVENT_TYPE.BIRTH
-      ? `SELECT
-    SUM(within45Days) AS regWithin45d,
-    SUM(within45DTo1Yr) AS regWithin45dTo1yr,
-    SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
-    SUM(over5Yr) AS regOver5yr
-   FROM (
-     SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
-     FROM (
-      SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-    AND ageInDays > -1 AND ageInDays <= 45 AND ${currentLocationLevel}='${locationId}'
-      GROUP BY ${lowerLocationLevel}
-     ), (
-      SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-    AND ageInDays > 46 AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
-      GROUP BY ${lowerLocationLevel}
-     ), (
-      SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-    AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
-      GROUP BY ${lowerLocationLevel}
-     ), (
-      SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-    AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
-      GROUP BY ${lowerLocationLevel}
-     ) FILL(0)
-   ) GROUP BY ${lowerLocationLevel}
-   `
-      : `SELECT
-   SUM(within45Days) AS regWithin45d,
-   SUM(within45DTo1Yr) AS regWithin45dTo1yr,
-   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
-   SUM(over5Yr) AS regOver5yr
-  FROM (
-    SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
-    FROM (
-     SELECT COUNT(deathDays) AS within45Days FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-   AND deathDays > -1 AND deathDays <= 45 AND ${currentLocationLevel}='${locationId}'
-     GROUP BY ${lowerLocationLevel}
-    ), (
-     SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-   AND deathDays > 46 AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
-     GROUP BY ${lowerLocationLevel}
-    ), (
-     SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-   AND deathDays > 366 AND deathDays <= 1825 AND ${currentLocationLevel}='${locationId}'
-     GROUP BY ${lowerLocationLevel}
-    ), (
-     SELECT COUNT(deathDays) AS over5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
-   AND deathDays > 1826 AND ${currentLocationLevel}='${locationId}'
-     GROUP BY ${lowerLocationLevel}
-    ) FILL(0)
-  ) GROUP BY ${lowerLocationLevel}
-  `
+  let queryString = ''
+
+  if (event === EVENT_TYPE.BIRTH) {
+    queryString = birthRegWithinTimeFramesQuery(
+      timeStart,
+      timeEnd,
+      locationId,
+      currentLocationLevel,
+      lowerLocationLevel
+    )
+  } else if (event === EVENT_TYPE.DEATH) {
+    queryString = deathRegWithinTimeFramesQuery(
+      timeStart,
+      timeEnd,
+      locationId,
+      currentLocationLevel,
+      lowerLocationLevel
+    )
+  }
 
   const timeFramePoints = await query(queryString)
 
@@ -421,18 +456,14 @@ const populateBirthKeyFigurePoint = (
   }
 }
 
-export async function fetchGenderBasisMetrics(
+const birthGenderBasisMetricsQuery = (
   timeFrom: string,
   timeTo: string,
   currLocation: string,
   currLocationLevel: string,
-  locationLevel: string,
-  event: EVENT_TYPE,
-  childLocationIds: Array<string>
-) {
-  const queryString =
-    event === EVENT_TYPE.BIRTH
-      ? `
+  locationLevel: string
+): string => {
+  return `
   SELECT
     SUM(under18) AS under18,
     SUM(over18) AS over18
@@ -459,7 +490,16 @@ export async function fetchGenderBasisMetrics(
   )
   GROUP BY gender, ${locationLevel}
   `
-      : `
+}
+
+const deathGenderBasisMetricsQuery = (
+  timeFrom: string,
+  timeTo: string,
+  currLocation: string,
+  currLocationLevel: string,
+  locationLevel: string
+): string => {
+  return `
   SELECT
     SUM(under18) AS under18,
     SUM(over18) AS over18
@@ -486,6 +526,35 @@ export async function fetchGenderBasisMetrics(
   )
   GROUP BY gender, ${locationLevel}
   `
+}
+
+export async function fetchGenderBasisMetrics(
+  timeFrom: string,
+  timeTo: string,
+  currLocation: string,
+  currLocationLevel: string,
+  locationLevel: string,
+  event: EVENT_TYPE,
+  childLocationIds: Array<string>
+) {
+  let queryString = ''
+  if (event === EVENT_TYPE.BIRTH) {
+    queryString = birthGenderBasisMetricsQuery(
+      timeFrom,
+      timeTo,
+      currLocation,
+      currLocationLevel,
+      locationLevel
+    )
+  } else if (event === EVENT_TYPE.DEATH) {
+    queryString = deathGenderBasisMetricsQuery(
+      timeFrom,
+      timeTo,
+      currLocation,
+      currLocationLevel,
+      locationLevel
+    )
+  }
 
   const points = await query(queryString)
 
