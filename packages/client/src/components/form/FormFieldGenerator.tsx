@@ -448,9 +448,17 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (fields: IFormField[]) =>
+const mapFieldsToValues = (
+  fields: IFormField[],
+  draftData: IFormData | undefined
+) =>
   fields.reduce((memo, field) => {
+    console.log(draftData)
     let fieldInitialValue = field.initialValue as IFormFieldValue
+    if (field.initialValueKey) {
+      // eslint-disable-next-line no-eval
+      fieldInitialValue = eval(field.initialValueKey)
+    }
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
@@ -885,7 +893,7 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps,
   IFormSectionData
 >({
-  mapPropsToValues: props => mapFieldsToValues(props.fields),
+  mapPropsToValues: props => mapFieldsToValues(props.fields, props.draftData),
   handleSubmit: values => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(

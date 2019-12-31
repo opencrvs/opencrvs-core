@@ -8147,7 +8147,7 @@
                     "id": "form.field.label.dateOfMarriage"
                   },
                   "required": false,
-                  "initialValue": "",
+                  "initialValueKey": "draftData.mother.dateOfMarriage",
                   "validate": [],
                   "mapping": {
                     "mutation": {
@@ -17845,7 +17845,6 @@
                 }
               ],
               "previewGroups": [
-
                 {
                   "id": "fatherNameInBengali",
                   "label": {
@@ -18003,7 +18002,6 @@
                 }
               ],
               "previewGroups": [
-
                 {
                   "id": "motherNameInBengali",
                   "label": {
