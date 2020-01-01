@@ -7,13 +7,14 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-type BirthRegistrationMetrics {
-  genderBasisMetrics: BirthRegistrationGenderBasisMetrics
-  timeFrames: BirthRegistrationTimeFrameMetrics
-  payments: [CertificationPaymentMetrics]
+
+type RegistrationMetrics {
+  genderBasisMetrics: RegistrationGenderBasisMetrics
+  timeFrames: RegistrationTimeFrameMetrics
+  payments: CertificationPaymentMetrics
 }
 
-type BirthRegistrationGenderBasisMetrics {
+type RegistrationGenderBasisMetrics {
   details: [GenderBasisDetailsMetrics!]
   total: GenderBasisTotalCount
 }
@@ -32,14 +33,24 @@ type GenderBasisTotalCount {
   femaleUnder18: Int!
   maleOver18: Int!
   femaleOver18: Int!
+  total: Int!
 }
 
 type CertificationPaymentMetrics {
+  details: [CertificationPaymentDetailsMetrics!]
+  total: CertificationPaymentTotalCount
+}
+
+type CertificationPaymentDetailsMetrics {
   total: Int!
   locationId: String!
 }
 
-type BirthRegistrationTimeFrameMetrics {
+type CertificationPaymentTotalCount {
+  total: Int!
+}
+
+type RegistrationTimeFrameMetrics {
   details: [TimeFrameDetailMetrics!]
   total: TimeFrameTotalCount
 }
@@ -49,6 +60,7 @@ type TimeFrameTotalCount {
   regWithin45dTo1yr: Int!
   regWithin1yrTo5yr: Int!
   regOver5yr: Int!
+  total: Int!
 }
 
 type TimeFrameDetailMetrics {
@@ -85,9 +97,10 @@ type BirthKeyFiguresData {
 }
 
 type Query {
-  fetchBirthRegistrationMetrics(
+  fetchRegistrationMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): BirthRegistrationMetrics
+    event: String!
+  ): RegistrationMetrics
 }

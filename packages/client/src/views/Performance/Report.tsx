@@ -36,10 +36,10 @@ import { IStoreState } from '@client/store'
 import { Query } from '@client/components/Query'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import {
-  GQLBirthRegistrationMetrics,
-  GQLBirthRegistrationTimeFrameMetrics,
-  GQLBirthRegistrationGenderBasisMetrics,
-  GQLCertificationPaymentMetrics
+  GQLCertificationPaymentMetrics,
+  GQLRegistrationMetrics,
+  GQLRegistrationGenderBasisMetrics,
+  GQLRegistrationTimeFrameMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import {
@@ -67,7 +67,7 @@ interface ReportProps {
 }
 
 interface IMetricsQueryResult {
-  fetchBirthRegistrationMetrics: GQLBirthRegistrationMetrics
+  fetchRegistrationMetrics: GQLRegistrationMetrics
 }
 
 type Props = ReportProps &
@@ -109,7 +109,8 @@ function ReportComponent(props: Props) {
           variables={{
             timeStart: start.toISOString(),
             timeEnd: end.toISOString(),
-            locationId: selectedLocation.id
+            locationId: selectedLocation.id,
+            event: 'birth'
           }}
         >
           {({
@@ -124,21 +125,22 @@ function ReportComponent(props: Props) {
             if (
               !loading &&
               (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.timeFrames &&
-                data.fetchBirthRegistrationMetrics.timeFrames.details &&
-                data.fetchBirthRegistrationMetrics.timeFrames.details.length ===
+                data.fetchRegistrationMetrics &&
+                data.fetchRegistrationMetrics.timeFrames &&
+                data.fetchRegistrationMetrics.timeFrames.details &&
+                data.fetchRegistrationMetrics.timeFrames.details.length ===
                   0) &&
               (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details
+                data.fetchRegistrationMetrics &&
+                data.fetchRegistrationMetrics.genderBasisMetrics &&
+                data.fetchRegistrationMetrics.genderBasisMetrics.details &&
+                data.fetchRegistrationMetrics.genderBasisMetrics.details
                   .length === 0) &&
               (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.payments &&
-                data.fetchBirthRegistrationMetrics.payments.length === 0)
+                data.fetchRegistrationMetrics &&
+                data.fetchRegistrationMetrics.payments &&
+                data.fetchRegistrationMetrics.payments.details &&
+                data.fetchRegistrationMetrics.payments.details.length === 0)
             )
               return (
                 <NoResultMessage
@@ -153,9 +155,9 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   genderBasisMetrics={
                     (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics))) ||
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
                     {}
                   }
                 />
@@ -163,9 +165,9 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   data={
                     (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics))) ||
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
                     {}
                   }
                 />
@@ -173,10 +175,10 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   data={
                     (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .payments as GQLCertificationPaymentMetrics[]))) ||
-                    []
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .payments as GQLCertificationPaymentMetrics))) ||
+                    {}
                   }
                 />
               </ReportWrapper>

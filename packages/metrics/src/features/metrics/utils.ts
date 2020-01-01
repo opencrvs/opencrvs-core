@@ -39,6 +39,11 @@ export interface IPoint {
   count: number
 }
 
+export enum EVENT_TYPE {
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH'
+}
+
 export type Location = fhir.Location & { id: string }
 
 export const ageIntervals = [
@@ -210,18 +215,24 @@ export function fillEmptyDataArrayByKey(
 
 export async function fetchChildLocationIdsByParentId(
   parentLocationId: string,
+  currentLocationLevel: string,
+  lowerLocationLevel: string,
   authHeader: IAuthHeader
 ) {
-  const bundle = await fetchFHIR(
-    `Location?partof=${parentLocationId}`,
-    authHeader
-  )
+  if (currentLocationLevel !== lowerLocationLevel) {
+    const bundle = await fetchFHIR(
+      `Location?partof=${parentLocationId}`,
+      authHeader
+    )
 
-  return (
-    (bundle &&
-      bundle.entry.map(
-        (entry: { resource: { id: string } }) => `Location/${entry.resource.id}`
-      )) ||
-    []
-  )
+    return (
+      (bundle &&
+        bundle.entry.map(
+          (entry: { resource: { id: string } }) =>
+            `Location/${entry.resource.id}`
+        )) ||
+      []
+    )
+  }
+  return [`Location/${parentLocationId}`]
 }

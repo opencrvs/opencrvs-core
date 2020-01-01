@@ -26,7 +26,6 @@ import {
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
 import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
 import { userQueries } from '@client/sysadmin/user/queries'
-import { queries } from '@client/profile/queries'
 export const mockRoles = {
   data: {
     getRoles: [
@@ -218,16 +217,15 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user',
-              groupId: userSection.groups[0].id
+              sectionId: userSection.id,
+              groupId: userSection.groups[1].id
             },
             isExact: true,
             path: '/createUser',
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation]
+        store
       )).component
     })
 
@@ -237,14 +235,13 @@ describe('create new user tests', () => {
       })
       testComponent.update()
       store.dispatch(modifyUserFormData(mockIncompleteFormData))
-
+      store.dispatch(processRoles(mockIncompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
         .simulate('click')
 
       await flushPromises()
-
       testComponent.update()
 
       expect(
@@ -263,7 +260,7 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-
+      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -280,7 +277,9 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-
+      store.dispatch(
+        processRoles(mockDataWithRegistarRoleSelected.registrationOffice)
+      )
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -296,6 +295,7 @@ describe('create new user tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
+      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -309,8 +309,7 @@ describe('create new user tests', () => {
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
+        store
       )).component
     })
 

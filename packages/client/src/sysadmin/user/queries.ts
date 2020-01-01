@@ -36,7 +36,8 @@ async function searchUsers(primaryOfficeId: string) {
     client &&
     client.query({
       query: SEARCH_USERS,
-      variables: { primaryOfficeId }
+      variables: { primaryOfficeId },
+      fetchPolicy: 'no-cache'
     })
   )
 }

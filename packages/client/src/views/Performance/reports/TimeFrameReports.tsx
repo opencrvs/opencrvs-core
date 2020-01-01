@@ -17,19 +17,21 @@ import { connect } from 'react-redux'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { GQLBirthRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
 import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
 type FullProps = {
-  data: GQLBirthRegistrationTimeFrameMetrics
+  data: GQLRegistrationTimeFrameMetrics
   eventType?: Event
   loading: boolean
 } & IStateProps &
@@ -64,6 +66,41 @@ class TimeFrameComponent extends React.Component<FullProps> {
         }))) ||
       []
     )
+  }
+
+  getFooterColumns(): IFooterFColumn[] {
+    const {
+      regWithin45d = 0,
+      regWithin45dTo1yr = 0,
+      regWithin1yrTo5yr = 0,
+      regOver5yr = 0
+    } = this.props.data.total || {}
+    const total = get(this.props.data, 'total.total') || '0'
+    return [
+      {
+        width: 25
+      },
+      {
+        label: getValueWithPercentageString(regWithin45d, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regWithin45dTo1yr, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regWithin1yrTo5yr, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regOver5yr, total),
+        width: 15
+      },
+      {
+        label: total,
+        width: 15
+      }
+    ]
   }
 
   render() {
@@ -116,6 +153,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )

@@ -68,7 +68,8 @@ const initialState: IUserFormState = {
     ]
   }),
   userFormData: {},
-  submitting: true,
+  submitting: false,
+  loadingRoles: false,
   submissionError: false
 }
 
@@ -171,6 +172,7 @@ export interface IUserFormState {
   userForm: IForm
   userFormData: IFormSectionData
   submitting: boolean
+  loadingRoles: boolean
   submissionError: boolean
 }
 
@@ -183,7 +185,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { primaryOfficeId } = (action as IProcessRoles).payload
       return loop(
         {
-          ...state
+          ...state,
+          loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
           successActionCreator: updateUserFormFieldDefinitions,
@@ -193,33 +196,33 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
 
-      const userSection = state.userForm.sections[0]
-
-      const updatedFields = transformRoleDataToDefinitions(
-        state.userForm.sections[0].groups[0].fields,
-        data
-      )
-      const updatedSection: IFormSection = {
-        ...userSection,
-        groups: [
-          {
-            ...userSection.groups[0],
-            fields: updatedFields
-          },
-          ...userSection.groups.slice(1)
-        ]
-      }
+      const updatedSections = state.userForm.sections
+      updatedSections.forEach(section => {
+        section.groups.forEach(group => {
+          group.fields = transformRoleDataToDefinitions(
+            group.fields,
+            data,
+            state.userFormData
+          )
+        })
+      })
       const newState = {
         ...state,
+        loadingRoles: false,
         submitting: false,
         userForm: {
-          sections: [updatedSection, ...state.userForm.sections.slice(1)]
+          sections: updatedSections
         }
       }
       return newState
     case MODIFY_USER_FORM_DATA:
+      let submitting = state.submitting
+      if (state.loadingRoles) {
+        submitting = true
+      }
       return {
         ...state,
+        submitting,
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:

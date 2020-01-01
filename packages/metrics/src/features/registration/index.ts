@@ -17,6 +17,7 @@ export interface IBirthRegistrationFields extends IPoint {
 export interface IDeathRegistrationFields extends IPoint {
   compositionId: string
   ageInYears: number | undefined
+  deathDays: number | undefined
 }
 
 export interface IPoint {

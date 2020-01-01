@@ -24,7 +24,7 @@ export interface GQLQuery {
   locationById?: GQLLocation
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
-  fetchBirthRegistrationMetrics?: GQLBirthRegistrationMetrics
+  fetchRegistrationMetrics?: GQLRegistrationMetrics
   searchEvents?: GQLEventSearchResultSet
   getRoles?: Array<GQLRole | null>
 }
@@ -549,13 +549,13 @@ export interface GQLSearchUserResult {
   totalItems?: number
 }
 
-export interface GQLBirthRegistrationMetrics {
-  genderBasisMetrics?: GQLBirthRegistrationGenderBasisMetrics
-  timeFrames?: GQLBirthRegistrationTimeFrameMetrics
-  payments?: Array<GQLCertificationPaymentMetrics | null>
+export interface GQLRegistrationMetrics {
+  genderBasisMetrics?: GQLRegistrationGenderBasisMetrics
+  timeFrames?: GQLRegistrationTimeFrameMetrics
+  payments?: GQLCertificationPaymentMetrics
 }
 
-export interface GQLBirthRegistrationGenderBasisMetrics {
+export interface GQLRegistrationGenderBasisMetrics {
   details?: Array<GQLGenderBasisDetailsMetrics>
   total?: GQLGenderBasisTotalCount
 }
@@ -574,9 +574,10 @@ export interface GQLGenderBasisTotalCount {
   femaleUnder18: number
   maleOver18: number
   femaleOver18: number
+  total: number
 }
 
-export interface GQLBirthRegistrationTimeFrameMetrics {
+export interface GQLRegistrationTimeFrameMetrics {
   details?: Array<GQLTimeFrameDetailMetrics>
   total?: GQLTimeFrameTotalCount
 }
@@ -595,11 +596,21 @@ export interface GQLTimeFrameTotalCount {
   regWithin45dTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
+  total: number
 }
 
 export interface GQLCertificationPaymentMetrics {
+  details?: Array<GQLCertificationPaymentDetailsMetrics>
+  total?: GQLCertificationPaymentTotalCount
+}
+
+export interface GQLCertificationPaymentDetailsMetrics {
   total: number
   locationId: string
+}
+
+export interface GQLCertificationPaymentTotalCount {
+  total: number
 }
 
 export interface GQLEventSearchResultSet {
@@ -987,14 +998,16 @@ export interface GQLResolver {
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
-  BirthRegistrationMetrics?: GQLBirthRegistrationMetricsTypeResolver
-  BirthRegistrationGenderBasisMetrics?: GQLBirthRegistrationGenderBasisMetricsTypeResolver
+  RegistrationMetrics?: GQLRegistrationMetricsTypeResolver
+  RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   GenderBasisDetailsMetrics?: GQLGenderBasisDetailsMetricsTypeResolver
   GenderBasisTotalCount?: GQLGenderBasisTotalCountTypeResolver
-  BirthRegistrationTimeFrameMetrics?: GQLBirthRegistrationTimeFrameMetricsTypeResolver
+  RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
   TimeFrameDetailMetrics?: GQLTimeFrameDetailMetricsTypeResolver
   TimeFrameTotalCount?: GQLTimeFrameTotalCountTypeResolver
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
+  CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
+  CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1027,9 +1040,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   locationById?: QueryToLocationByIdResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
-  fetchBirthRegistrationMetrics?: QueryToFetchBirthRegistrationMetricsResolver<
-    TParent
-  >
+  fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
@@ -1241,18 +1252,19 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToFetchBirthRegistrationMetricsArgs {
+export interface QueryToFetchRegistrationMetricsArgs {
   timeStart: string
   timeEnd: string
   locationId: string
+  event: string
 }
-export interface QueryToFetchBirthRegistrationMetricsResolver<
+export interface QueryToFetchRegistrationMetricsResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: QueryToFetchBirthRegistrationMetricsArgs,
+    args: QueryToFetchRegistrationMetricsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2483,50 +2495,46 @@ export interface SearchUserResultToTotalItemsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthRegistrationMetricsTypeResolver<TParent = any> {
-  genderBasisMetrics?: BirthRegistrationMetricsToGenderBasisMetricsResolver<
-    TParent
-  >
-  timeFrames?: BirthRegistrationMetricsToTimeFramesResolver<TParent>
-  payments?: BirthRegistrationMetricsToPaymentsResolver<TParent>
+export interface GQLRegistrationMetricsTypeResolver<TParent = any> {
+  genderBasisMetrics?: RegistrationMetricsToGenderBasisMetricsResolver<TParent>
+  timeFrames?: RegistrationMetricsToTimeFramesResolver<TParent>
+  payments?: RegistrationMetricsToPaymentsResolver<TParent>
 }
 
-export interface BirthRegistrationMetricsToGenderBasisMetricsResolver<
+export interface RegistrationMetricsToGenderBasisMetricsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationMetricsToTimeFramesResolver<
+export interface RegistrationMetricsToTimeFramesResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationMetricsToPaymentsResolver<
+export interface RegistrationMetricsToPaymentsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthRegistrationGenderBasisMetricsTypeResolver<
-  TParent = any
-> {
-  details?: BirthRegistrationGenderBasisMetricsToDetailsResolver<TParent>
-  total?: BirthRegistrationGenderBasisMetricsToTotalResolver<TParent>
+export interface GQLRegistrationGenderBasisMetricsTypeResolver<TParent = any> {
+  details?: RegistrationGenderBasisMetricsToDetailsResolver<TParent>
+  total?: RegistrationGenderBasisMetricsToTotalResolver<TParent>
 }
 
-export interface BirthRegistrationGenderBasisMetricsToDetailsResolver<
+export interface RegistrationGenderBasisMetricsToDetailsResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationGenderBasisMetricsToTotalResolver<
+export interface RegistrationGenderBasisMetricsToTotalResolver<
   TParent = any,
   TResult = any
 > {
@@ -2589,6 +2597,7 @@ export interface GQLGenderBasisTotalCountTypeResolver<TParent = any> {
   femaleUnder18?: GenderBasisTotalCountToFemaleUnder18Resolver<TParent>
   maleOver18?: GenderBasisTotalCountToMaleOver18Resolver<TParent>
   femaleOver18?: GenderBasisTotalCountToFemaleOver18Resolver<TParent>
+  total?: GenderBasisTotalCountToTotalResolver<TParent>
 }
 
 export interface GenderBasisTotalCountToMaleUnder18Resolver<
@@ -2619,21 +2628,26 @@ export interface GenderBasisTotalCountToFemaleOver18Resolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLBirthRegistrationTimeFrameMetricsTypeResolver<
-  TParent = any
-> {
-  details?: BirthRegistrationTimeFrameMetricsToDetailsResolver<TParent>
-  total?: BirthRegistrationTimeFrameMetricsToTotalResolver<TParent>
-}
-
-export interface BirthRegistrationTimeFrameMetricsToDetailsResolver<
+export interface GenderBasisTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface BirthRegistrationTimeFrameMetricsToTotalResolver<
+export interface GQLRegistrationTimeFrameMetricsTypeResolver<TParent = any> {
+  details?: RegistrationTimeFrameMetricsToDetailsResolver<TParent>
+  total?: RegistrationTimeFrameMetricsToTotalResolver<TParent>
+}
+
+export interface RegistrationTimeFrameMetricsToDetailsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationTimeFrameMetricsToTotalResolver<
   TParent = any,
   TResult = any
 > {
@@ -2696,6 +2710,7 @@ export interface GQLTimeFrameTotalCountTypeResolver<TParent = any> {
   regWithin45dTo1yr?: TimeFrameTotalCountToRegWithin45dTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameTotalCountToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameTotalCountToRegOver5yrResolver<TParent>
+  total?: TimeFrameTotalCountToTotalResolver<TParent>
 }
 
 export interface TimeFrameTotalCountToRegWithin45dResolver<
@@ -2726,9 +2741,23 @@ export interface TimeFrameTotalCountToRegOver5yrResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface TimeFrameTotalCountToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCertificationPaymentMetricsTypeResolver<TParent = any> {
+  details?: CertificationPaymentMetricsToDetailsResolver<TParent>
   total?: CertificationPaymentMetricsToTotalResolver<TParent>
-  locationId?: CertificationPaymentMetricsToLocationIdResolver<TParent>
+}
+
+export interface CertificationPaymentMetricsToDetailsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface CertificationPaymentMetricsToTotalResolver<
@@ -2738,7 +2767,32 @@ export interface CertificationPaymentMetricsToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface CertificationPaymentMetricsToLocationIdResolver<
+export interface GQLCertificationPaymentDetailsMetricsTypeResolver<
+  TParent = any
+> {
+  total?: CertificationPaymentDetailsMetricsToTotalResolver<TParent>
+  locationId?: CertificationPaymentDetailsMetricsToLocationIdResolver<TParent>
+}
+
+export interface CertificationPaymentDetailsMetricsToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificationPaymentDetailsMetricsToLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCertificationPaymentTotalCountTypeResolver<TParent = any> {
+  total?: CertificationPaymentTotalCountToTotalResolver<TParent>
+}
+
+export interface CertificationPaymentTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {

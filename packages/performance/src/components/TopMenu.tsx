@@ -109,7 +109,7 @@ const BackButton = styled(PrimaryButton)`
 
 const BackButtonText = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
-  text-transform: uppercase;
+  text-transform: capitalize;
   margin-left: 14px;
 `
 

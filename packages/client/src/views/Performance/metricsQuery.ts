@@ -12,11 +12,17 @@
 import gql from 'graphql-tag'
 
 export const PERFORMANCE_METRICS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
-    fetchBirthRegistrationMetrics(
+  query data(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String!
+    $event: String!
+  ) {
+    fetchRegistrationMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      event: $event
     ) {
       timeFrames {
         details {
@@ -32,6 +38,7 @@ export const PERFORMANCE_METRICS = gql`
           regWithin45dTo1yr
           regWithin1yrTo5yr
           regOver5yr
+          total
         }
       }
       genderBasisMetrics {
@@ -48,11 +55,17 @@ export const PERFORMANCE_METRICS = gql`
           femaleUnder18
           maleOver18
           femaleOver18
+          total
         }
       }
       payments {
-        locationId
-        total
+        details {
+          locationId
+          total
+        }
+        total {
+          total
+        }
       }
     }
   }
