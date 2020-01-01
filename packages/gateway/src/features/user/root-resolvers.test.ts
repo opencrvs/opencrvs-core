@@ -62,6 +62,37 @@ describe('User root resolvers', () => {
     })
   })
   describe('searchUsers()', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegister: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const regsiterToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegister = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+    })
     const dummyUserList = [
       {
         name: [
@@ -142,7 +173,7 @@ describe('User root resolvers', () => {
         creationDate: 1559054406555
       }
     ]
-    it('returns full user list', async () => {
+    it('should returns full user list for sysadmin', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           totalItems: dummyUserList.length,
@@ -150,10 +181,26 @@ describe('User root resolvers', () => {
         })
       )
 
-      const response = await resolvers.Query.searchUsers({}, {})
+      const response = await resolvers.Query.searchUsers(
+        {},
+        {},
+        authHeaderSysAdmin
+      )
 
       expect(response.totalItems).toBe(3)
       expect(response.results).toEqual(dummyUserList)
+    })
+    it('should return error for register', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: dummyUserList.length,
+          results: dummyUserList
+        })
+      )
+
+      expect(
+        resolvers.Query.searchUsers({}, {}, authHeaderRegister)
+      ).rejects.toThrow('Search user is only allowed for sysadmin')
     })
     it('returns filtered user list', async () => {
       fetch.mockResponseOnce(
@@ -176,7 +223,8 @@ describe('User root resolvers', () => {
           count: 10,
           skip: 0,
           sort: 'desc'
-        }
+        },
+        authHeaderSysAdmin
       )
 
       expect(response.totalItems).toBe(1)
@@ -336,6 +384,37 @@ describe('User root resolvers', () => {
   })
 
   describe('createUser mutation', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegister: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const regsiterToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegister = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+    })
     const user = {
       name: [{ use: 'en', given: ['Mohammad'], family: 'Ashraful' }],
       identifiers: [{ system: 'NATIONAL_ID', value: '1014881922' }],
@@ -348,7 +427,7 @@ describe('User root resolvers', () => {
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }
 
-    it('creates user', async () => {
+    it('creates user for sysadmin', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -356,11 +435,28 @@ describe('User root resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.createUser({}, { user })
+      const response = await resolvers.Mutation.createUser(
+        {},
+        { user },
+        authHeaderSysAdmin
+      )
 
       expect(response).toEqual({
         username: 'someUser123'
       })
+    })
+
+    it('should throw error for register', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          statusCode: '201'
+        }),
+        { status: 400 }
+      )
+
+      expect(
+        resolvers.Mutation.createUser({}, { user }, authHeaderRegister)
+      ).rejects.toThrowError('Create user is only allowed for sysadmin')
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
@@ -371,7 +467,9 @@ describe('User root resolvers', () => {
         { status: 400 }
       )
 
-      expect(resolvers.Mutation.createUser({}, { user })).rejects.toThrowError(
+      expect(
+        resolvers.Mutation.createUser({}, { user }, authHeaderSysAdmin)
+      ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't create user"
       )
     })
