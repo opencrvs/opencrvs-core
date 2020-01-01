@@ -161,7 +161,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: 'ef8b8775-5770-4bf7-8fba-e0ba4d334433',
-        ageInYears: 43
+        ageInYears: 43,
+        deathDays: -53
       }
     })
   })
@@ -185,6 +186,7 @@ describe('Verify point generation', () => {
     expect(point).toEqual({
       measurement: 'certification_payment',
       tags: {
+        eventType: 'DEATH',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
       },
       fields: {
