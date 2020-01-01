@@ -45,7 +45,8 @@ export const influx = new Influx.InfluxDB({
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
-        ageInYears: Influx.FieldType.INTEGER
+        ageInYears: Influx.FieldType.INTEGER,
+        deathDays: Influx.FieldType.INTEGER
       },
       tags: [
         'regStatus',
@@ -99,7 +100,13 @@ export const influx = new Influx.InfluxDB({
         total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
-      tags: []
+      tags: [
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     }
   ]
 })

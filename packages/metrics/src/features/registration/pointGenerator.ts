@@ -44,7 +44,8 @@ import {
 import {
   getAgeInDays,
   getAgeInYears,
-  getDurationInSeconds
+  getDurationInSeconds,
+  getDurationInDays
 } from '@metrics/features/registration/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
@@ -148,6 +149,9 @@ export const generateDeathRegPoint = async (
     compositionId: composition.id,
     ageInYears: deceased.birthDate
       ? getAgeInYears(deceased.birthDate)
+      : undefined,
+    deathDays: deceased.deceasedDateTime
+      ? getDurationInDays(deceased.deceasedDateTime, new Date().toISOString())
       : undefined
   }
 
@@ -216,7 +220,10 @@ export async function generatePaymentPoint(
     compositionId: composition.id
   }
 
-  const tags = await generatePointLocations(payload, authHeader)
+  const tags = {
+    eventType: getApplicationType(task),
+    ...(await generatePointLocations(payload, authHeader))
+  }
 
   return {
     measurement: 'certification_payment',
