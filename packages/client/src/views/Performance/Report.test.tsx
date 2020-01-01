@@ -53,7 +53,8 @@ describe('Report page', () => {
                 regWithin45d: 0,
                 regWithin45dTo1yr: 0,
                 regWithin1yrTo5yr: 0,
-                regOver5yr: 2
+                regOver5yr: 2,
+                total: 2
               }
             },
             genderBasisMetrics: {
@@ -71,15 +72,21 @@ describe('Report page', () => {
                 maleUnder18: 2,
                 femaleUnder18: 0,
                 maleOver18: 0,
-                femaleOver18: 0
+                femaleOver18: 0,
+                total: 2
               }
             },
-            payments: [
-              {
-                locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+            payments: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  total: 200
+                }
+              ],
+              total: {
                 total: 200
               }
-            ]
+            }
           }
         }
       }
@@ -103,7 +110,8 @@ describe('Report page', () => {
                 regWithin45d: 0,
                 regWithin45dTo1yr: 0,
                 regWithin1yrTo5yr: 0,
-                regOver5yr: 0
+                regOver5yr: 0,
+                total: 0
               }
             },
             genderBasisMetrics: {
@@ -112,10 +120,16 @@ describe('Report page', () => {
                 maleUnder18: 0,
                 femaleUnder18: 0,
                 maleOver18: 0,
-                femaleOver18: 0
+                femaleOver18: 0,
+                total: 0
               }
             },
-            payments: []
+            payments: {
+              details: [],
+              total: {
+                total: 0
+              }
+            }
           }
         }
       }
