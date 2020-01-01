@@ -594,13 +594,9 @@ export const isValidDeathOccurrenceDate: Validation = (
 }
 
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {
-  if (!value && value !== 0) {
-    return { message: messages.required }
-  } else {
-    return value && Number(value) > 0
-      ? undefined
-      : {
-          message: messages.greaterThanZero
-        }
-  }
+  return !value && value !== 0
+    ? { message: messages.required }
+    : value && Number(value) > 0
+    ? undefined
+    : { message: messages.greaterThanZero }
 }
