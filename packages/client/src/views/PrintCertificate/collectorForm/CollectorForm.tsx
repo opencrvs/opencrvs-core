@@ -83,6 +83,8 @@ import {
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
+  margin-top: 0px;
+  margin-bottom: 16px;
 `
 
 interface IBaseProps {
