@@ -196,7 +196,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const updatedSections = state.userForm.sections
       updatedSections.forEach(section => {
         section.groups.forEach(group => {
-          group.fields = transformRoleDataToDefinitions(group.fields, data)
+          group.fields = transformRoleDataToDefinitions(
+            group.fields,
+            data,
+            state.userFormData
+          )
         })
       })
       const newState = {
