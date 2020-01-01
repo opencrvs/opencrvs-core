@@ -20,13 +20,15 @@ import { getOfflineData } from '@client/offline/selectors'
 import { GQLCertificationPaymentMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
 import { getLocationFromPartOfLocationId } from '@client/views/Performance/reports/utils'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
 type FullProps = {
-  data: GQLCertificationPaymentMetrics[]
+  data: GQLCertificationPaymentMetrics
   eventType?: Event
   loading: boolean
 } & IStateProps &
@@ -34,13 +36,30 @@ type FullProps = {
 
 class CertificationPaymentReportComponent extends React.Component<FullProps> {
   getContent = () => {
-    return this.props.data.map(payment => ({
-      location: getLocationFromPartOfLocationId(
-        payment.locationId,
-        this.props.offlineResources
-      ).name,
-      total: String(payment.total)
-    }))
+    return (
+      (this.props.data.details &&
+        this.props.data.details.map(payment => ({
+          location: getLocationFromPartOfLocationId(
+            payment.locationId,
+            this.props.offlineResources
+          ).name,
+          total: String(payment.total)
+        }))) ||
+      []
+    )
+  }
+
+  getFooterColumns(): IFooterFColumn[] {
+    const total = get(this.props.data, 'total.total') || '0'
+    return [
+      {
+        width: 85
+      },
+      {
+        label: total,
+        width: 15
+      }
+    ]
   }
 
   render() {
@@ -72,6 +91,7 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )
