@@ -159,6 +159,9 @@ describe('when user has starts a new application', () => {
         const data = {
           registration: {
             presentAtBirthRegistration: 'MOTHER'
+          },
+          mother: {
+            dateOfMarriage: '01-01-2020'
           }
         }
         draft = createApplication(Event.BIRTH, data)

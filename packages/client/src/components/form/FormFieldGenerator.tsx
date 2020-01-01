@@ -453,9 +453,8 @@ const mapFieldsToValues = (
   draftData: IFormData | undefined
 ) =>
   fields.reduce((memo, field) => {
-    console.log(draftData)
     let fieldInitialValue = field.initialValue as IFormFieldValue
-    if (field.initialValueKey) {
+    if (field.initialValueKey && field.initialValueKey.length > 0) {
       // eslint-disable-next-line no-eval
       fieldInitialValue = eval(field.initialValueKey)
     }
