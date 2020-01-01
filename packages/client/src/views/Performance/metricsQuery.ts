@@ -12,11 +12,17 @@
 import gql from 'graphql-tag'
 
 export const PERFORMANCE_METRICS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
-    fetchBirthRegistrationMetrics(
+  query data(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String!
+    $event: String!
+  ) {
+    fetchRegistrationMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      event: $event
     ) {
       timeFrames {
         details {

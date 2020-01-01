@@ -7,13 +7,14 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-type BirthRegistrationMetrics {
-  genderBasisMetrics: BirthRegistrationGenderBasisMetrics
-  timeFrames: BirthRegistrationTimeFrameMetrics
+
+type RegistrationMetrics {
+  genderBasisMetrics: RegistrationGenderBasisMetrics
+  timeFrames: RegistrationTimeFrameMetrics
   payments: CertificationPaymentMetrics
 }
 
-type BirthRegistrationGenderBasisMetrics {
+type RegistrationGenderBasisMetrics {
   details: [GenderBasisDetailsMetrics!]
   total: GenderBasisTotalCount
 }
@@ -49,7 +50,7 @@ type CertificationPaymentTotalCount {
   total: Int!
 }
 
-type BirthRegistrationTimeFrameMetrics {
+type RegistrationTimeFrameMetrics {
   details: [TimeFrameDetailMetrics!]
   total: TimeFrameTotalCount
 }
@@ -96,9 +97,10 @@ type BirthKeyFiguresData {
 }
 
 type Query {
-  fetchBirthRegistrationMetrics(
+  fetchRegistrationMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): BirthRegistrationMetrics
+    event: String!
+  ): RegistrationMetrics
 }

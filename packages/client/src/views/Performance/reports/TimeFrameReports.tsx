@@ -17,7 +17,7 @@ import { connect } from 'react-redux'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { GQLBirthRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
 import {
   getValueWithPercentageString,
@@ -31,7 +31,7 @@ interface IStateProps {
 }
 
 type FullProps = {
-  data: GQLBirthRegistrationTimeFrameMetrics
+  data: GQLRegistrationTimeFrameMetrics
   eventType?: Event
   loading: boolean
 } & IStateProps &

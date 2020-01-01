@@ -75,7 +75,7 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     decoded = decode(token)
   } catch (err) {
     throw new Error(
-      `getTokenPayload: Error occured during token decode : ${err}`
+      `getTokenPayload: Error occurred during token decode : ${err}`
     )
   }
   return decoded

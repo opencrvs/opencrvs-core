@@ -69,15 +69,15 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.title.unauthorized'
   },
   fieldAgentQueryError: {
-    defaultMessage: 'An error occured while loading applications',
+    defaultMessage: 'An error occurred while loading applications',
     description: 'The text when error ocurred loading rejected applications',
     id: 'fieldAgentHome.queryError'
   },
   pleaseTryAgainError: {
-    defaultMessage: 'An error occured. Please try again.',
+    defaultMessage: 'An error occurred. Please try again.',
     description:
-      'The error message that displays if we wnat the user to try the action again',
-    id: 'error.occured'
+      'The error message that displays if we want the user to try the action again',
+    id: 'error.occurred'
   },
   printQueryError: {
     defaultMessage:
@@ -101,7 +101,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'review.error.unauthorized'
   },
   userQueryError: {
-    defaultMessage: 'An error occured while loading system users',
+    defaultMessage: 'An error occurred while loading system users',
     description: 'The text when error ocurred loading system users',
     id: 'system.user.queryError'
   },

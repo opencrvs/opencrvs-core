@@ -21,7 +21,7 @@ import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
-import { GQLBirthRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import { get } from 'lodash'
 
@@ -30,7 +30,7 @@ interface IStateProps {
 }
 
 type FullProps = {
-  genderBasisMetrics: GQLBirthRegistrationGenderBasisMetrics
+  genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
 } & IStateProps &
   WrappedComponentProps

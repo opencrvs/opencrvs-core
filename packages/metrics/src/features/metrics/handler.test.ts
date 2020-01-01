@@ -37,7 +37,7 @@ describe('verify metrics handler', () => {
     server = await createServer()
   })
 
-  it('returns ok for valid request', async () => {
+  it('returns ok for valid request for birth', async () => {
     fetch.mockResponse(JSON.stringify(mockLocationBundle))
     readPoints.mockResolvedValueOnce([
       {
@@ -76,7 +76,54 @@ describe('verify metrics handler', () => {
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/metrics/birth?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=birth',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('returns ok for valid request for death', async () => {
+    readPoints.mockResolvedValueOnce([
+      {
+        locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
+
+    readPoints.mockResolvedValueOnce([
+      {
+        regWithin45d: 1,
+        regWithin45dTo1yr: 3,
+        regWithin1yrTo5yr: 0,
+        regOver5yr: 3,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
+
+    readPoints.mockResolvedValueOnce([])
+
+    readPoints.mockResolvedValueOnce([
+      {
+        gender: 'male',
+        over18: 5,
+        under18: 2,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      },
+      {
+        gender: 'female',
+        over18: 3,
+        under18: 2,
+        locationLevel3: 'Location/94429795-0a09-4de8-8e1e-27dab01877d2'
+      }
+    ])
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url:
+        '/metrics?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=death',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -88,7 +135,7 @@ describe('verify metrics handler', () => {
   it('returns 400 for required params', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url: '/metrics/birth',
+      url: '/metrics',
       headers: {
         Authorization: `Bearer ${token}`
       }

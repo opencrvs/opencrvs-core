@@ -195,7 +195,7 @@ const messagesToDefine: IReviewMessages = {
   },
   submitConfirmationDesc: {
     defaultMessage:
-      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the register who is now required to complete the application.}}',
+      '{completeApplication, select, true {This application will be sent to the registrar for them to review.} false {This application will be sent to the Registrar for completion. Please inform the Applicant that they will need to visit the office with the missing information and supporting documents.}}',
     description: 'Submit description text on modal',
     id: 'review.modal.desc.submitConfirmation'
   },
