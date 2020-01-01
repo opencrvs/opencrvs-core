@@ -42,7 +42,7 @@ export const PrimaryButton = styled(Button)`
     box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
   }
 
-  &:disabled {
+  &:not([data-focus-visible-added]):disabled {
     background: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
     color: ${({ theme }) => theme.colors.placeholder};
