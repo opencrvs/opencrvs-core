@@ -110,6 +110,7 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
+import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -448,15 +449,25 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (
-  fields: IFormField[],
-  draftData: IFormData | undefined
-) =>
+const mapFieldsToValues = (fields: IFormField[], draftData?: IFormData) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
-    if (field.initialValueKey && field.initialValueKey.length > 0) {
-      // eslint-disable-next-line no-eval
-      fieldInitialValue = eval(field.initialValueKey)
+    if (
+      draftData &&
+      field.initialValueKey &&
+      field.initialValueKey.length > 0
+    ) {
+      try {
+        fieldInitialValue = getValueFromApplicationDataByKey(
+          draftData,
+          field.initialValueKey
+        )
+      } catch (error) {
+        console.error(
+          'Error while looking for key in draft to set initial value.',
+          error
+        )
+      }
     }
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
