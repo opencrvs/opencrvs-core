@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button } from '@opencrvs/components/lib/buttons'
+import { Button } from '../../buttons/Button'
 
 interface ILoadMoreCustomProps {
   initialPage: number
