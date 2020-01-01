@@ -12,6 +12,7 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import { postSearch } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
+import { hasScope } from '@gateway/features/user/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -36,7 +37,13 @@ export const resolvers: GQLResolver = {
         sort
       }
       if (locationIds) {
+        if (locationIds.length <= 0 || locationIds.includes('')) {
+          return await Promise.reject(new Error('Invalid location id'))
+        }
         searchCriteria.applicationLocationId = locationIds.join(',')
+      } else if (authHeader && !hasScope(authHeader, 'register')) {
+        // Only register scope user can search without locationIds
+        return await Promise.reject(new Error('User does not have permission'))
       }
       if (trackingId) {
         searchCriteria.trackingId = trackingId
