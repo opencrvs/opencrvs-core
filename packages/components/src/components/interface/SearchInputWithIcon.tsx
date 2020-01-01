@@ -25,7 +25,7 @@ const Wrapper = styled.div<{
   position: relative;
   border-radius: 2px;
   width: 515px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
   }
   ${({ error, touched, theme }) =>
@@ -41,7 +41,7 @@ const SearchTextInput = styled.input`
   margin: 2px 5px;
   ${({ theme }) => theme.fonts.bigBodyStyle};
   flex-grow: 1;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
   }
   &:focus {

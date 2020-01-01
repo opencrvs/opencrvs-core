@@ -395,6 +395,16 @@ export function createReviewApplication(
   }
 }
 
+export function dynamicDispatch(
+  action: string,
+  payload: { [key: string]: string }
+) {
+  return {
+    type: action,
+    payload
+  }
+}
+
 export function storeApplication(
   application: IApplication
 ): IStoreApplicationAction {
