@@ -168,14 +168,15 @@ export const getRoutes = () => {
     // Metrics query API
     {
       method: 'GET',
-      path: '/metrics/birth',
+      path: '/metrics',
       handler: metricsHandler,
       config: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required()
+            locationId: Joi.string().required(),
+            event: Joi.string().required()
           })
         },
         tags: ['api']

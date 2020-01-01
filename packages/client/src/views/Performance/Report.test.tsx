@@ -31,12 +31,13 @@ describe('Report page', () => {
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),
-          locationId: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+          locationId: '8cbc862a-b817-4c29-a490-4a8767ff023c',
+          event: 'birth'
         }
       },
       result: {
         data: {
-          fetchBirthRegistrationMetrics: {
+          fetchRegistrationMetrics: {
             timeFrames: {
               details: [
                 {
@@ -89,12 +90,13 @@ describe('Report page', () => {
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),
-          locationId: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e'
+          locationId: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
+          event: 'birth'
         }
       },
       result: {
         data: {
-          fetchBirthRegistrationMetrics: {
+          fetchRegistrationMetrics: {
             timeFrames: {
               details: [],
               total: {
