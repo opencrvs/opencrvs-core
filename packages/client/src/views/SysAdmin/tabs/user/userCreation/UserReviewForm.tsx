@@ -126,7 +126,8 @@ class UserReviewFormComponent extends React.Component<
       const offlineLocations = this.props.offlineResources[
         field.searchableResource
       ]
-      const locationId = formData[field.name].toString()
+
+      const locationId = formData[field.name] as string
       return offlineLocations[locationId] && offlineLocations[locationId].name
     }
 
