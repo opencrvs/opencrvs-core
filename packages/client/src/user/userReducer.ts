@@ -69,6 +69,7 @@ const initialState: IUserFormState = {
   }),
   userFormData: {},
   submitting: false,
+  loadingRoles: false,
   submissionError: false
 }
 
@@ -171,6 +172,7 @@ export interface IUserFormState {
   userForm: IForm
   userFormData: IFormSectionData
   submitting: boolean
+  loadingRoles: boolean
   submissionError: boolean
 }
 
@@ -183,7 +185,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { primaryOfficeId } = (action as IProcessRoles).payload
       return loop(
         {
-          ...state
+          ...state,
+          loadingRoles: true
         },
         Cmd.run(alterRolesBasedOnUserRole, {
           successActionCreator: updateUserFormFieldDefinitions,
@@ -205,6 +208,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       })
       const newState = {
         ...state,
+        loadingRoles: false,
         submitting: false,
         userForm: {
           sections: updatedSections
@@ -212,8 +216,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       }
       return newState
     case MODIFY_USER_FORM_DATA:
+      let submitting = state.submitting
+      if (state.loadingRoles) {
+        submitting = true
+      }
       return {
         ...state,
+        submitting,
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:
