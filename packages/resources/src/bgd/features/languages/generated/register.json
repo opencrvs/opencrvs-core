@@ -898,7 +898,7 @@
         "print.certificate.collector.whoToCollect": "Who is collecting the certificate?",
         "print.certificate.collector.other.title": "What is their ID and name?",
         "print.certificate.collector.other.paragraph": "Because there are no details of this person on record, we need to capture their details",
-        "print.certificate.collector.form.error": "Select who is collecting the certificate",
+        "print.certificate.collector.form.error": "Please select who is collecting the certificate",
         "print.certificate.collector.other.form.error": "Complete all the mandatory fields",
         "print.certificate.collector.other.affidavit.form.title": "Attach a signed affidavit",
         "print.certificate.collector.other.affidavit.form.error": "Attach a signed affidavit or click the checkbox if they do not have one.",
