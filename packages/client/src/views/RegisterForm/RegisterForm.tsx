@@ -789,7 +789,7 @@ function mapStateToProps(
           visitedGroup.groupId === activeSectionGroup.id
       ) > -1) ||
     false
-  console.log(application.data)
+
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
     application.data[activeSection.id] || {},
