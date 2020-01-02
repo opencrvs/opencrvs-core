@@ -35,6 +35,7 @@ interface IState {
 }
 interface IProps {
   application: IApplication[]
+  showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
 class Outbox extends React.Component<IFullProps, IState> {
@@ -198,6 +199,7 @@ class Outbox extends React.Component<IFullProps, IState> {
           totalItems={application.length}
           onPageChange={this.onPageChange}
           pageSize={10}
+          showPaginated={this.props.showPaginated}
         />
       </Container>
     )

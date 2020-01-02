@@ -17,6 +17,7 @@ import { grid } from '../../grid'
 import { Box } from '../../interface'
 import { IAction, IColumn, IDynamicValues, IActionObject } from './types'
 export { IAction } from './types'
+import { LoadMore } from './LoadMore'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -116,6 +117,8 @@ interface IGridTableProps {
   currentPage?: number
   expandable?: boolean
   clickable?: boolean
+  showPaginated?: boolean
+  loading?: boolean
 }
 
 interface IGridTableState {
@@ -212,14 +215,22 @@ export class GridTable extends React.Component<
     pageSize: number,
     allItems: IDynamicValues[]
   ) => {
+    const { showPaginated = false } = this.props
+    let displayItems
+    let offset
     if (allItems.length <= pageSize) {
       // expect that allItem is already sliced correctly externally
       return allItems
     }
 
     // perform internal pagination
-    const offset = (currentPage - 1) * pageSize
-    const displayItems = allItems.slice(offset, offset + pageSize)
+    if (showPaginated === false) {
+      offset = 0
+      displayItems = allItems.slice(offset, currentPage * pageSize)
+    } else {
+      offset = (currentPage - 1) * pageSize
+      displayItems = allItems.slice(offset, offset + pageSize)
+    }
 
     return displayItems
   }
@@ -241,7 +252,8 @@ export class GridTable extends React.Component<
       noResultText,
       hideTableHeader,
       pageSize = defaultConfiguration.pageSize,
-      currentPage = defaultConfiguration.currentPage
+      currentPage = defaultConfiguration.currentPage,
+      showPaginated = false
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -331,14 +343,23 @@ export class GridTable extends React.Component<
           }
         )}
 
-        {totalItems > pageSize && (
+        {showPaginated && totalItems > pageSize && (
           <Pagination
             initialPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}
           />
         )}
-        {content.length <= 0 && (
+        {!showPaginated &&
+          !this.props.loading &&
+          totalItems > pageSize * currentPage && (
+            <LoadMore
+              initialPage={currentPage}
+              onLoadMore={this.onPageChange}
+            />
+          )}
+
+        {!this.props.loading && content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}
       </Wrapper>
