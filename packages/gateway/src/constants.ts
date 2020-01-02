@@ -35,7 +35,7 @@ export const SENTRY_DSN =
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export function getLanguages() {
-  const LANGUAGES = process.env.LANGUAGES || 'en'
+  const LANGUAGES = process.env.LANGUAGES || 'bn,en'
   return LANGUAGES.split(',')
 }
 
