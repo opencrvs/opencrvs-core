@@ -38,6 +38,7 @@ export const PERFORMANCE_METRICS = gql`
           regWithin45dTo1yr
           regWithin1yrTo5yr
           regOver5yr
+          total
         }
       }
       genderBasisMetrics {
@@ -54,11 +55,17 @@ export const PERFORMANCE_METRICS = gql`
           femaleUnder18
           maleOver18
           femaleOver18
+          total
         }
       }
       payments {
-        locationId
-        total
+        details {
+          locationId
+          total
+        }
+        total {
+          total
+        }
       }
     }
   }

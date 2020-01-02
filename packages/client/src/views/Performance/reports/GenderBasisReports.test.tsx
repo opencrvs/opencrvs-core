@@ -32,7 +32,8 @@ describe('Gender basis report tests', () => {
       femaleOver18: 5,
       maleOver18: 5,
       maleUnder18: 5,
-      femaleUnder18: 5
+      femaleUnder18: 5,
+      total: 20
     }
   }
 

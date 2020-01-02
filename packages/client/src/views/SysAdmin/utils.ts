@@ -14,7 +14,8 @@ import { draftToGqlTransformer } from '@client/transformer'
 import {
   IFormField,
   ISelectFormFieldWithOptions,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  IFormSectionData
 } from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
@@ -158,7 +159,8 @@ export const mockFetchRoleGraphqlOperation = {
 
 export const transformRoleDataToDefinitions = (
   fields: IFormField[],
-  data: any
+  data: any,
+  userFormData: IFormSectionData
 ): IFormField[] => {
   const roles = data as Array<any>
   const transformTypes = (types: string[]) =>
@@ -169,6 +171,9 @@ export const transformRoleDataToDefinitions = (
 
   return fields.map(field => {
     if (field.name === 'role') {
+      if (userFormData && userFormData.role) {
+        userFormData.role = ''
+      }
       ;(field as ISelectFormFieldWithOptions).options = roles.map(
         ({ value }: { value: string }) => ({
           label: userMessages[value],
@@ -177,6 +182,9 @@ export const transformRoleDataToDefinitions = (
       )
       return field
     } else if (field.name === 'type') {
+      if (userFormData && userFormData.type) {
+        userFormData.type = ''
+      }
       ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options = roles.reduce(
         (options, { value, types }) => ({
           ...options,

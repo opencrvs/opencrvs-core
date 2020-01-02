@@ -552,7 +552,7 @@ export interface GQLSearchUserResult {
 export interface GQLRegistrationMetrics {
   genderBasisMetrics?: GQLRegistrationGenderBasisMetrics
   timeFrames?: GQLRegistrationTimeFrameMetrics
-  payments?: Array<GQLCertificationPaymentMetrics | null>
+  payments?: GQLCertificationPaymentMetrics
 }
 
 export interface GQLRegistrationGenderBasisMetrics {
@@ -574,6 +574,7 @@ export interface GQLGenderBasisTotalCount {
   femaleUnder18: number
   maleOver18: number
   femaleOver18: number
+  total: number
 }
 
 export interface GQLRegistrationTimeFrameMetrics {
@@ -595,11 +596,21 @@ export interface GQLTimeFrameTotalCount {
   regWithin45dTo1yr: number
   regWithin1yrTo5yr: number
   regOver5yr: number
+  total: number
 }
 
 export interface GQLCertificationPaymentMetrics {
+  details?: Array<GQLCertificationPaymentDetailsMetrics>
+  total?: GQLCertificationPaymentTotalCount
+}
+
+export interface GQLCertificationPaymentDetailsMetrics {
   total: number
   locationId: string
+}
+
+export interface GQLCertificationPaymentTotalCount {
+  total: number
 }
 
 export interface GQLEventSearchResultSet {
@@ -995,6 +1006,8 @@ export interface GQLResolver {
   TimeFrameDetailMetrics?: GQLTimeFrameDetailMetricsTypeResolver
   TimeFrameTotalCount?: GQLTimeFrameTotalCountTypeResolver
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
+  CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
+  CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -2584,6 +2597,7 @@ export interface GQLGenderBasisTotalCountTypeResolver<TParent = any> {
   femaleUnder18?: GenderBasisTotalCountToFemaleUnder18Resolver<TParent>
   maleOver18?: GenderBasisTotalCountToMaleOver18Resolver<TParent>
   femaleOver18?: GenderBasisTotalCountToFemaleOver18Resolver<TParent>
+  total?: GenderBasisTotalCountToTotalResolver<TParent>
 }
 
 export interface GenderBasisTotalCountToMaleUnder18Resolver<
@@ -2608,6 +2622,13 @@ export interface GenderBasisTotalCountToMaleOver18Resolver<
 }
 
 export interface GenderBasisTotalCountToFemaleOver18Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GenderBasisTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {
@@ -2689,6 +2710,7 @@ export interface GQLTimeFrameTotalCountTypeResolver<TParent = any> {
   regWithin45dTo1yr?: TimeFrameTotalCountToRegWithin45dTo1yrResolver<TParent>
   regWithin1yrTo5yr?: TimeFrameTotalCountToRegWithin1yrTo5yrResolver<TParent>
   regOver5yr?: TimeFrameTotalCountToRegOver5yrResolver<TParent>
+  total?: TimeFrameTotalCountToTotalResolver<TParent>
 }
 
 export interface TimeFrameTotalCountToRegWithin45dResolver<
@@ -2719,9 +2741,23 @@ export interface TimeFrameTotalCountToRegOver5yrResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface TimeFrameTotalCountToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLCertificationPaymentMetricsTypeResolver<TParent = any> {
+  details?: CertificationPaymentMetricsToDetailsResolver<TParent>
   total?: CertificationPaymentMetricsToTotalResolver<TParent>
-  locationId?: CertificationPaymentMetricsToLocationIdResolver<TParent>
+}
+
+export interface CertificationPaymentMetricsToDetailsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
 export interface CertificationPaymentMetricsToTotalResolver<
@@ -2731,7 +2767,32 @@ export interface CertificationPaymentMetricsToTotalResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface CertificationPaymentMetricsToLocationIdResolver<
+export interface GQLCertificationPaymentDetailsMetricsTypeResolver<
+  TParent = any
+> {
+  total?: CertificationPaymentDetailsMetricsToTotalResolver<TParent>
+  locationId?: CertificationPaymentDetailsMetricsToLocationIdResolver<TParent>
+}
+
+export interface CertificationPaymentDetailsMetricsToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CertificationPaymentDetailsMetricsToLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCertificationPaymentTotalCountTypeResolver<TParent = any> {
+  total?: CertificationPaymentTotalCountToTotalResolver<TParent>
+}
+
+export interface CertificationPaymentTotalCountToTotalResolver<
   TParent = any,
   TResult = any
 > {

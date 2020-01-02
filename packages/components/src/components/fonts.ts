@@ -113,7 +113,7 @@ export const fonts = (language: string): IFonts => {
       line-height: 24px;
       font-weight: normal;
       letter-spacing: 1px;
-      text-transform: uppercase;`,
+      text-transform: capitalize;`,
     smallButtonStyle: `font-family: ${regularFont};
       font-size: 14px;
       line-height: 0px;

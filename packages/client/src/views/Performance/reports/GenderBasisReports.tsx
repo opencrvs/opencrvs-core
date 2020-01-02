@@ -23,6 +23,8 @@ import {
 } from './utils'
 import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
@@ -66,6 +68,41 @@ class GenderBasisComponent extends React.Component<FullProps> {
         })) ||
       []
     )
+  }
+
+  getFooterColumns(): IFooterFColumn[] {
+    const {
+      maleUnder18 = 0,
+      femaleUnder18 = 0,
+      maleOver18 = 0,
+      femaleOver18 = 0
+    } = this.props.genderBasisMetrics.total || {}
+    const total = get(this.props.genderBasisMetrics, 'total.total') || '0'
+    return [
+      {
+        width: 25
+      },
+      {
+        label: getValueWithPercentageString(maleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(maleOver18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleOver18, total),
+        width: 15
+      },
+      {
+        label: total,
+        width: 15
+      }
+    ]
   }
 
   render() {
@@ -121,6 +158,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )

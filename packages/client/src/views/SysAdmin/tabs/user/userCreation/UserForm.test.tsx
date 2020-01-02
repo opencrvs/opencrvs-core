@@ -50,9 +50,6 @@ describe('Create new user page tests', () => {
   it('it checks component has loaded', () => {
     // @ts-ignore
     expect(component.containsMatchingElement(ActionPageLight)).toBe(true)
-    component.find('input#firstNamesEng').simulate('change', {
-      target: { id: 'firstNamesEng', value: 'test' }
-    })
   })
 
   it('it checks office search modal appears', () => {

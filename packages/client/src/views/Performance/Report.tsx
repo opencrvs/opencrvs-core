@@ -137,7 +137,7 @@ function ReportComponent(props: Props) {
               isEmpty(
                 get(data, 'fetchRegistrationMetrics.genderBasisMetrics.details')
               ) &&
-              isEmpty(get(data, 'fetchRegistrationMetrics.payments'))
+              isEmpty(get(data, 'fetchRegistrationMetrics.payments.details'))
             ) {
               return (
                 <NoResultMessage
@@ -177,8 +177,8 @@ function ReportComponent(props: Props) {
                       (data &&
                         (data.fetchRegistrationMetrics &&
                           (data.fetchRegistrationMetrics
-                            .payments as GQLCertificationPaymentMetrics[]))) ||
-                      []
+                            .payments as GQLCertificationPaymentMetrics))) ||
+                      {}
                     }
                   />
                 </ReportWrapper>
