@@ -44,6 +44,9 @@ const BackButton = styled(props => <CircleButton {...props} />)`
 const MenuTitle = styled.span`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   margin-left: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 const EmptyTitle = styled(MenuTitle)`
   color: ${({ theme }) => theme.colors.error};
