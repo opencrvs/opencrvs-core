@@ -87,17 +87,17 @@ export function getEventDateFromBundle(bundle: fhir.Bundle): string {
     getEventType(bundle) === EVENT_TYPE.DEATH
       ? {
           sectionCode: DECEASED_CODE,
-          eventDateFieldKye: 'deceasedDateTime'
+          eventDateFieldKey: 'deceasedDateTime'
         }
       : {
           sectionCode: CHILD_CODE,
-          eventDateFieldKye: 'birthDate'
+          eventDateFieldKey: 'birthDate'
         }
   const patient = findPersonEntryFromBundle(personInfo.sectionCode, bundle)
-  if (!patient || !patient[personInfo.eventDateFieldKye]) {
+  if (!patient || !patient[personInfo.eventDateFieldKey]) {
     throw new Error('Unable to find event date from given bundle')
   }
-  return patient[personInfo.eventDateFieldKye] as string
+  return patient[personInfo.eventDateFieldKey] as string
 }
 
 export function getEventType(bundle: fhir.Bundle) {
