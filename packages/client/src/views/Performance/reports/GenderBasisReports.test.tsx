@@ -13,6 +13,7 @@ import * as React from 'react'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { GenderBasisReports } from './GenderBasisReports'
+import { Event } from '@client/forms'
 
 describe('Gender basis report tests', () => {
   const { store } = createStore()
@@ -39,6 +40,7 @@ describe('Gender basis report tests', () => {
   it('Renders without crashing', async () => {
     const testComponent = await createTestComponent(
       <GenderBasisReports
+        eventType={Event.BIRTH}
         genderBasisMetrics={genderBasisMetrics}
         loading={false}
       />,

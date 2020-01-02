@@ -17,6 +17,7 @@ import { createStore } from '@client/store'
 import { Report } from './Report'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/forms'
 
 describe('Report page', () => {
   let testComponent: ReactWrapper
@@ -156,6 +157,7 @@ describe('Report page', () => {
           hash: '',
           state: {
             reportType: 'weekly',
+            eventType: Event.BIRTH,
             timeRange: {
               start: timeStart,
               end: timeEnd
