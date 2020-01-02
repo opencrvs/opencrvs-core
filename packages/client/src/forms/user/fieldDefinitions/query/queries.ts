@@ -24,7 +24,8 @@ async function fetchRoles() {
   return (
     client &&
     client.query({
-      query: getRolesQuery
+      query: getRolesQuery,
+      fetchPolicy: 'no-cache'
     })
   )
 }

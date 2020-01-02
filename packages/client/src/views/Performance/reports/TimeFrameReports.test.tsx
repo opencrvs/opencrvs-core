@@ -32,7 +32,8 @@ describe('Time frame report tests', () => {
       regWithin45d: 0,
       regWithin45dTo1yr: 0,
       regWithin1yrTo5yr: 0,
-      regOver5yr: 2
+      regOver5yr: 2,
+      total: 2
     }
   }
 
