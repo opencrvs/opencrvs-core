@@ -257,7 +257,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if items more than 11 in Approval Tab', async () => {
+  it('should show pagination bar if pagination is used and items more than 11 in Approval Tab', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
@@ -270,6 +270,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             results: []
           }
         }}
+        showPaginated={true}
       />,
       store
     )
@@ -280,6 +281,35 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     testComponent.component
       .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+  })
+
+  it('should show loadmore button if loadmore is used and items more than 11 in Approval Tab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <ApprovalTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+        showPaginated={false}
+      />,
+      store
+    )
+
+    expect(
+      testComponent.component.find('#load_more_button').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent.component
+      .find('#load_more_button')
       .last()
       .hostNodes()
       .simulate('click')
