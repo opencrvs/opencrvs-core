@@ -17,9 +17,10 @@ context('Reports Integration Test', () => {
   })
 
   it('Tests for performance reports birth using minimum input', () => {
-    // REGISTER APPLICATION
+    // LOGIN AS LOCAL REGISTRAR
     cy.initializeFakeTimers()
-    cy.registerApplicationWithMinimumInput()
+    cy.login('registrar')
+    cy.createPin()
 
     // CLICK PERFORMANCE MENU ITEM
     cy.get('#menu-performance').click()
@@ -46,13 +47,13 @@ context('Reports Integration Test', () => {
     cy.get('#listTable-genderBasisMetrics-footer')
       .children()
       .last()
-      .contains(1)
+      .contains(7)
 
     //  CHECK TIMEFRAMES TOTAL
     cy.get('#listTable-timeFrames-footer')
       .children()
       .last()
-      .contains(1)
+      .contains(7)
 
     //  CHECK PAYMENTS TOTAL
     cy.get('#listTable-payments-footer')
