@@ -347,7 +347,7 @@ export class ListTable extends React.Component<
             </TableScroller>
           )}
           {!isLoading && footerColumns && content.length > 1 && (
-            <TableFooter>
+            <TableFooter id={'listTable-' + id + '-footer'}>
               {footerColumns.map((preference, index) => (
                 <ContentWrapper key={index} width={preference.width}>
                   {preference.label || ''}
