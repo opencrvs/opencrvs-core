@@ -88,7 +88,7 @@ interface IConstantsMessages {
   maleOver18: MessageDescriptor
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
-  birthRegistrationTitle: MessageDescriptor
+  registrationTitle: MessageDescriptor
   within45Days: MessageDescriptor
   within45DaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
@@ -492,10 +492,10 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for location',
     id: 'constants.location'
   },
-  birthRegistrationTitle: {
+  registrationTitle: {
     defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
-    description: 'Label for birthRegistrationTitle',
-    id: 'constants.birthRegistrationTitle'
+    description: 'Label for registrationTitle',
+    id: 'constants.registrationTitle'
   },
   within45Days: {
     defaultMessage: 'Within 45 days',

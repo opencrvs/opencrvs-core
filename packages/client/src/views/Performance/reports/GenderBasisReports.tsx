@@ -111,12 +111,9 @@ class GenderBasisComponent extends React.Component<FullProps> {
     return (
       <ListTable
         id="genderBasisMetrics"
-        tableTitle={intl.formatMessage(
-          constantsMessages.birthRegistrationTitle,
-          {
-            event: eventType
-          }
-        )}
+        tableTitle={intl.formatMessage(constantsMessages.registrationTitle, {
+          event: eventType
+        })}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}
