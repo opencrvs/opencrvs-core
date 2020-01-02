@@ -725,14 +725,14 @@ function getInitialValue(field: IFormField, data: IFormData) {
 export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
-  data: IFormData
+  data?: IFormData
 ) {
   return fields.map(field => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
       isNull(sectionValues[field.name])
-        ? getInitialValue(field, data)
+        ? getInitialValue(field, data || {})
         : sectionValues[field.name]
   }))
 }
@@ -793,7 +793,7 @@ function mapStateToProps(
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
     application.data[activeSection.id] || {},
-    application.data || {}
+    application.data
   )
 
   return {
