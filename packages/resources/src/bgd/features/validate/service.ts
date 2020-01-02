@@ -51,6 +51,9 @@ export async function createWebHookResponseFromBundle(bundle: fhir.Bundle) {
 
   return {
     trackingId,
-    registrationNumber: await generateRegistrationNumber(practitioner.id)
+    registrationNumber: await generateRegistrationNumber(
+      practitioner.id,
+      bundle
+    )
   }
 }
