@@ -290,7 +290,7 @@ describe('In Progress tab', () => {
       expect(data[0].actions).toBeDefined()
     })
 
-    it('Should render pagination in progress tab if data is more than 10', async () => {
+    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IApplication[] = []
       for (let i = 0; i < 12; i++) {
@@ -306,6 +306,7 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
+          showPaginated={true}
         />,
         store
       )
@@ -525,7 +526,7 @@ describe('In Progress tab', () => {
       expect(data[0].event).toBe('Birth')
     })
 
-    it('Should render pagination in progress tab if data is more than 10', async () => {
+    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
@@ -539,6 +540,7 @@ describe('In Progress tab', () => {
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
+          showPaginated={true}
         />,
         store
       )

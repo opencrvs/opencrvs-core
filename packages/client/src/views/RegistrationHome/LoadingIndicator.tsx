@@ -43,7 +43,7 @@ const Text = styled.span`
 type IBaseLoadingProps = {
   loading: boolean
   hasError: boolean
-  noApplication: boolean
+  noApplication?: boolean
 }
 
 type IState = {
