@@ -19,7 +19,7 @@ import {
 import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { modifyUserFormData, processRoles } from '@client/user/userReducer'
+import { modifyUserFormData } from '@client/user/userReducer'
 import {
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
@@ -27,11 +27,6 @@ import {
 } from '@client/views/SysAdmin/utils'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
-import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
-import { userQueries } from '@client/sysadmin/user/queries'
-import { mockRoles, mockUsers } from './CreateNewUser.test'
-;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
@@ -44,16 +39,15 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user',
-              groupId: userSection.groups[1].id
+              sectionId: userSection.id,
+              groupId: userSection.groups[2].id
             },
             isExact: true,
             path: '/createUser',
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation]
+        store
       )).component
     })
 
@@ -68,7 +62,7 @@ describe('signature upload tests', () => {
         .hostNodes()
         .text()
 
-      expect(title).toBe('Attach the registrar’s signature')
+      expect(title).toBe('Attach the signature')
     })
 
     it('No error while uploading if valid file', async () => {
@@ -123,7 +117,7 @@ describe('signature upload tests', () => {
       testComponent.update()
 
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-user-view-group'
+        '/createUser/preview/preview-registration-office'
       )
     })
   })

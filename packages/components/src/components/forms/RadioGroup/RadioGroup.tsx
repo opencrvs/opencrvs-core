@@ -18,7 +18,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   margin-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 `
 
 const List = styled.ul`

@@ -374,7 +374,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other.paragraph'
   },
   certificateCollectorError: {
-    defaultMessage: 'Select who is collecting the certificate',
+    defaultMessage: 'Please select who is collecting the certificate',
     description: 'Form level error for collector form',
     id: 'print.certificate.collector.form.error'
   },

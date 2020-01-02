@@ -22,6 +22,7 @@ import {
   getLocationFromPartOfLocationId
 } from './utils'
 import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { Event } from '@client/forms'
 import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import { get } from 'lodash'
 
@@ -32,6 +33,7 @@ interface IStateProps {
 type FullProps = {
   genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
+  eventType: Event
 } & IStateProps &
   WrappedComponentProps
 
@@ -104,14 +106,14 @@ class GenderBasisComponent extends React.Component<FullProps> {
   }
 
   render() {
-    const { intl, loading } = this.props
+    const { intl, loading, eventType } = this.props
 
     return (
       <ListTable
         id="genderBasisMetrics"
-        tableTitle={intl.formatMessage(
-          constantsMessages.birthRegistrationTitle
-        )}
+        tableTitle={intl.formatMessage(constantsMessages.registrationTitle, {
+          event: eventType
+        })}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}

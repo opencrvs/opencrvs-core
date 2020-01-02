@@ -19,10 +19,14 @@ import { ListTable } from '@opencrvs/components/lib/interface'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
+import {
+  PERFORMANCE_REPORT_TYPE_MONTHLY,
+  MONTHS_IN_YEAR
+} from '@client/utils/constants'
 import { Header, getMonthDateRange } from '@client/views/Performance/utils'
 import { getToken } from '@client/utils/authUtils'
 import styled from '@client/styledComponents'
+import { Event } from '@client/forms'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
@@ -54,7 +58,7 @@ type Props = ReportProps & WrappedComponentProps
 type State = {}
 
 class MonthlyReportsComponent extends React.Component<Props, State> {
-  getContent() {
+  getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
     let content = []
 
@@ -70,6 +74,7 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
             onClick={() =>
               this.props.goToPerformanceReport(
                 PERFORMANCE_REPORT_TYPE_MONTHLY,
+                eventType,
                 start.toDate(),
                 end.toDate()
               )
@@ -99,8 +104,9 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.birth)}
           isLoading={false}
-          content={this.getContent()}
+          content={this.getContent(Event.BIRTH)}
           tableHeight={280}
+          pageSize={MONTHS_IN_YEAR}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.month),
@@ -122,8 +128,9 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
-          content={this.getContent()}
+          content={this.getContent(Event.DEATH)}
           tableHeight={280}
+          pageSize={MONTHS_IN_YEAR}
           columns={[
             {
               label: intl.formatMessage(constantsMessages.month),
