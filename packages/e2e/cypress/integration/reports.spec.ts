@@ -47,13 +47,13 @@ context('Reports Integration Test', () => {
     cy.get('#listTable-genderBasisMetrics-footer')
       .children()
       .last()
-      .contains(7)
+      .contains(6)
 
     //  CHECK TIMEFRAMES TOTAL
     cy.get('#listTable-timeFrames-footer')
       .children()
       .last()
-      .contains(7)
+      .contains(6)
 
     //  CHECK PAYMENTS TOTAL
     cy.get('#listTable-payments-footer')
