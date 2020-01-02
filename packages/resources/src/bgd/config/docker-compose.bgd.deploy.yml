@@ -28,6 +28,10 @@ services:
     environment:
       - OISF_SECRET=/run/secrets/oisf-secret
 
+  gateway:
+    environment:
+      - LANGUAGES=bn,en
+
   workflow:
     environment:
       - LANGUAGES=bn,en
