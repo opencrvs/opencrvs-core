@@ -287,7 +287,7 @@ describe('Certificate collector test for a birth registration without father det
           .find('#form_error')
           .hostNodes()
           .text()
-      ).toBe('Select who is collecting the certificate')
+      ).toBe('Please select who is collecting the certificate')
     })
 
     it('redirects to user form for other collector upon Someone else option selection', async () => {
