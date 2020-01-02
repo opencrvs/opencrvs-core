@@ -45,7 +45,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
-import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
+import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -424,7 +424,11 @@ export class InProgressTabComponent extends React.Component<
   }
 
   renderInProgressDataExpandedComponent = (itemId: string) => {
-    return <RemoteInProgressDataDetails eventId={itemId} />
+    const { results } =
+      this.props.queryData && this.props.queryData.notificationData
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   renderFieldAgentTable = (
