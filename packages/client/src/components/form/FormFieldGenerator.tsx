@@ -110,7 +110,6 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
-import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -449,26 +448,9 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (fields: IFormField[], draftData?: IFormData) =>
+const mapFieldsToValues = (fields: IFormField[]) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
-    if (
-      draftData &&
-      field.initialValueKey &&
-      field.initialValueKey.length > 0
-    ) {
-      try {
-        fieldInitialValue = getValueFromApplicationDataByKey(
-          draftData,
-          field.initialValueKey
-        )
-      } catch (error) {
-        console.error(
-          'Error while looking for key in draft to set initial value.',
-          error
-        )
-      }
-    }
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
@@ -903,7 +885,7 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps,
   IFormSectionData
 >({
-  mapPropsToValues: props => mapFieldsToValues(props.fields, props.draftData),
+  mapPropsToValues: props => mapFieldsToValues(props.fields),
   handleSubmit: values => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
