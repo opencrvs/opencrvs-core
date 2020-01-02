@@ -259,7 +259,10 @@ class ReviewCertificateActionComponent extends React.Component<
           title={intl.formatHTMLMessage(
             certificateMessages.certificateCollectionTitle
           )}
-          goHome={() => goToRegistrarHomeTabAction(TAB_ID.readyForPrint)}
+          goHome={() => {
+            this.resetCertificatesInformation()
+            goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+          }}
         />
         <BodyContent>
           <FormContainer>
