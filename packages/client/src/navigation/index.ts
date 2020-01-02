@@ -160,12 +160,14 @@ export function goToPerformanceHome() {
 
 export function goToPerformanceReport(
   reportType: string,
+  eventType: Event,
   timeStart: Date,
   timeEnd: Date
 ) {
   return push(PERFORMANCE_REPORT, {
     reportType,
-    timeRange: { start: timeStart, end: timeEnd }
+    timeRange: { start: timeStart, end: timeEnd },
+    eventType
   })
 }
 

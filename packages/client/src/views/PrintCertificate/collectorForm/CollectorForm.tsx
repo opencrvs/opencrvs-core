@@ -87,6 +87,11 @@ const FormSectionTitle = styled.h4`
   margin-bottom: 16px;
 `
 
+const ErrorWrapper = styled.div`
+  margin-top: -3px;
+  margin-bottom: 16px;
+`
+
 interface IBaseProps {
   registerForm: IForm
   event: Event
@@ -396,9 +401,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             </>
           </FormSectionTitle>
           {showError && (
-            <ErrorText id="form_error">
-              {(formGroup.error && intl.formatMessage(formGroup.error)) || ''}
-            </ErrorText>
+            <ErrorWrapper>
+              <ErrorText id="form_error">
+                {(formGroup.error && intl.formatMessage(formGroup.error)) || ''}
+              </ErrorText>
+            </ErrorWrapper>
           )}
           <FormFieldGenerator
             id={formGroup.id}

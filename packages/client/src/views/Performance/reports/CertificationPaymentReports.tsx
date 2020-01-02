@@ -29,7 +29,7 @@ interface IStateProps {
 
 type FullProps = {
   data: GQLCertificationPaymentMetrics
-  eventType?: Event
+  eventType: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps

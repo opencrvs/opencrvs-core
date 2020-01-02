@@ -112,7 +112,7 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined
+    ageInDays: (child.birthDate && getAgeInDays(child.birthDate)) || undefined
   }
 
   const tags: IBirthRegistrationTags = {
@@ -147,12 +147,15 @@ export const generateDeathRegPoint = async (
 
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
-    ageInYears: deceased.birthDate
-      ? getAgeInYears(deceased.birthDate)
-      : undefined,
-    deathDays: deceased.deceasedDateTime
-      ? getDurationInDays(deceased.deceasedDateTime, new Date().toISOString())
-      : undefined
+    ageInYears:
+      (deceased.birthDate && getAgeInYears(deceased.birthDate)) || undefined,
+    deathDays:
+      (deceased.deceasedDateTime &&
+        getDurationInDays(
+          deceased.deceasedDateTime,
+          new Date().toISOString()
+        )) ||
+      undefined
   }
 
   const tags: IDeathRegistrationTags = {

@@ -32,7 +32,7 @@ interface IStateProps {
 
 type FullProps = {
   data: GQLRegistrationTimeFrameMetrics
-  eventType?: Event
+  eventType: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps

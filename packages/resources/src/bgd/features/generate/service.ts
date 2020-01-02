@@ -18,12 +18,14 @@ import {
   getRMOCode
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
+import { getEventDateFromBundle } from '@resources/bgd/features/utils/fhir-utils'
 
 export async function generateRegistrationNumber(
-  practionerId: string
+  practionerId: string,
+  bundle: fhir.Bundle
 ): Promise<string> {
-  /* adding current year */
-  let brn = new Date().getFullYear().toString()
+  /* adding event date year */
+  let brn = new Date(getEventDateFromBundle(bundle)).getFullYear().toString()
   /* appending BBS code for district & upazila & union */
   brn = brn.concat((await getLocationBBSCode(practionerId)) as string)
 
