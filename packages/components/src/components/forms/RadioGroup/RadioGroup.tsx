@@ -25,6 +25,9 @@ const List = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  & > div {
+    margin-bottom: 16px;
+  }
 `
 const LargeList = styled.ul`
   list-style: none;
@@ -117,16 +120,18 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
           <List>
             {options.map(option => {
               return (
-                <Radio
-                  {...props}
-                  key={option.label}
-                  name={name}
-                  label={option.label}
-                  value={option.value}
-                  id={`${name}_${option.value}`}
-                  selected={value}
-                  onChange={this.props.onChange}
-                />
+                <div key={option.label}>
+                  <RadioButton
+                    {...props}
+                    size={'small'}
+                    name={name}
+                    label={option.label}
+                    value={option.value}
+                    id={`${name}_${option.value}`}
+                    selected={value}
+                    onChange={this.props.onChange}
+                  />
+                </div>
               )
             })}
           </List>
