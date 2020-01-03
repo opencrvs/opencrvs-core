@@ -413,7 +413,7 @@ async function createApplicationIndex(
 
   const createdBy = await getCreatedBy(composition.id || '')
 
-  body.createdBy = createdBy || body.createdBy
+  body.createdBy = createdBy || regLastUser
   body.updatedBy = regLastUser
 }
 
