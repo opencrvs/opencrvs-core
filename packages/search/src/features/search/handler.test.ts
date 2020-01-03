@@ -97,6 +97,10 @@ describe('Verify handlers', () => {
       })
       expect(res.statusCode).toBe(500)
     })
+
+    afterAll(async () => {
+      jest.clearAllMocks()
+    })
   })
 
   describe('When the request is made', () => {
@@ -127,6 +131,10 @@ describe('Verify handlers', () => {
         }
       })
       expect(JSON.parse(res.payload)).toHaveProperty('_shards')
+    })
+
+    afterAll(async () => {
+      jest.clearAllMocks()
     })
   })
 })

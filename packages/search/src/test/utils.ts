@@ -2206,7 +2206,7 @@ export const mockCompositionResponse = {
     {
       code: 'duplicate',
       targetReference: {
-        reference: 'Composi$ion/ff6a4fce-4e72-463c-a6aa-718054643983'
+        reference: 'Composition/ff6a4fce-4e72-463c-a6aa-718054643983'
       }
     },
     {
