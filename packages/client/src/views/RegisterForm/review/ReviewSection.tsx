@@ -1059,10 +1059,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <LinkButton
                     id="edit-document"
                     onClick={() =>
-                      this.editLinkClickHandler(
+                      this.editLinkClickHandlerForDraft(
                         documentsSection.id,
                         documentsSection.groups[0].id,
-                        this.state.activeSection!
+                        this.state.editClickFieldName!
                       )
                     }
                   >
