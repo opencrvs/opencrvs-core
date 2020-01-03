@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  constantsMessages,
-  errorMessages,
-  userMessages
-} from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/search'
 import {
   CERTIFICATE_DATE_FORMAT,
@@ -26,9 +22,9 @@ import {
   StatusGray,
   StatusGreen,
   StatusOrange,
-  StatusRejected
+  StatusRejected,
+  StatusProgress
 } from '@opencrvs/components/lib/icons'
-import { Spinner } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLBirthEventSearchSet,
@@ -45,17 +41,6 @@ const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
   margin-bottom: 1px;
   border-top: ${({ theme }) => `2px solid ${theme.colors.background}`};
-`
-const QuerySpinner = styled(Spinner)`
-  width: 50px;
-  height: 50px;
-  margin: 30px;
-`
-const SpinnerContainer = styled.div`
-  min-height: 70px;
-  min-width: 70px;
-  display: flex;
-  justify-content: center;
 `
 const ExpansionContainer = styled.div`
   flex: 1;
@@ -111,12 +96,6 @@ const BoldSpan = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
 `
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-align: center;
-  margin: 24px;
-`
 
 function LabelValue({
   label,
@@ -163,6 +142,17 @@ type IProps = IntlShapeProps & {
 }
 
 type ISODateString = string
+
+interface IOperationHistory {
+  type: string | null | undefined
+  practitionerName: string
+  timestamp: string | null | undefined
+  practitionerRole: string
+  officeName: string | (string | null)[] | null | undefined
+  facilityName: string | (string | null)[] | null | undefined
+  rejectReasons: string
+  comment: string
+}
 
 export class RowHistoryViewComponent extends React.Component<IProps> {
   transformer = () => {
@@ -219,6 +209,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                 locale === LANG_EN
                   ? operationHistory && operationHistory.operatorOfficeName
                   : operationHistory && operationHistory.operatorOfficeAlias,
+              facilityName:
+                locale === LANG_EN
+                  ? operationHistory &&
+                    operationHistory.notificationFacilityName
+                  : operationHistory &&
+                    operationHistory.notificationFacilityAlias,
               rejectReasons:
                 (operationHistory &&
                   operationHistory.operationType === REJECTED &&
@@ -237,6 +233,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 
   getDeclarationStatusIcon = (status: string) => {
     switch (status) {
+      case 'IN_PROGRESS':
+        return (
+          <StatusIcon>
+            <StatusProgress />
+          </StatusIcon>
+        )
       case 'DECLARED':
         return (
           <StatusIcon>
@@ -278,6 +280,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
 
   getWorkflowDateLabel = (status: string) => {
     switch (status) {
+      case 'IN_PROGRESS':
+        return constantsMessages.applicationStartedOn
       case 'DECLARED':
         return constantsMessages.applicationSubmittedOn
       case 'VALIDATED':
@@ -290,6 +294,23 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         return constantsMessages.applicationRejectedOn
       default:
         return constantsMessages.applicationSubmittedOn
+    }
+  }
+
+  getValueSepartorsProp = (operationHistory: IOperationHistory) => {
+    //Search service only populate facility name for in-progress notifications
+    const facilityName =
+      operationHistory.facilityName && (operationHistory.facilityName as string)
+
+    if (operationHistory.type === 'IN_PROGRESS' && facilityName) {
+      return [facilityName]
+    } else {
+      const officeName = operationHistory.officeName as string
+      return [
+        operationHistory.practitionerName,
+        formatRoleCode(operationHistory.practitionerRole),
+        officeName
+      ]
     }
   }
 
@@ -323,14 +344,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         <>
           {transformedData.operationHistories
             .map((operationHistory, index) => {
-              const {
-                practitionerName,
-                practitionerRole,
-                rejectReasons,
-                comment
-              } = operationHistory
+              const { rejectReasons, comment } = operationHistory
               const type = operationHistory.type as string
-              const officeName = operationHistory.officeName as string
               const timestamp = moment(operationHistory.timestamp!).format(
                 CERTIFICATE_DATE_FORMAT
               )
@@ -354,11 +369,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                           {this.props.intl.formatMessage(constantsMessages.by)}:
                         </StyledLabel>
                         <ValuesWithSeparator
-                          strings={[
-                            practitionerName,
-                            formatRoleCode(practitionerRole),
-                            officeName
-                          ]}
+                          strings={this.getValueSepartorsProp(operationHistory)}
                         />
                       </ValueContainer>
                       {rejectReasons && (
