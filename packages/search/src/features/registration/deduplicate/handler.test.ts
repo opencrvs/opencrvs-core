@@ -28,7 +28,7 @@ describe('Verify handlers', () => {
       server = await createServer()
     })
 
-    it('should return status code 500 if invalid payload received', async () => {
+    it.skip('should return status code 500 if invalid payload received', async () => {
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
