@@ -22,7 +22,7 @@ import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { DuplicateDetails } from '@client/components/DuplicateDetails'
 import { clone } from 'lodash'
-import { SEARCH_RESULT } from '@client/navigation/routes'
+import { REGISTRAR_HOME } from '@client/navigation/routes'
 import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 
 const assign = window.location.assign as jest.Mock
@@ -276,6 +276,21 @@ describe('Review Duplicates component', () => {
               ]
             }
           }
+        }
+      }
+    },
+
+    {
+      request: {
+        query: notADuplicateMutation,
+        variables: {
+          id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
+          duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        }
+      },
+      result: {
+        data: {
+          notADuplicate: 'ec9e0fae-8342-4fb9-803a-07b7c71325a1'
         }
       }
     }
@@ -869,7 +884,7 @@ describe('Review Duplicates component', () => {
       ).toHaveLength(0)
     })
 
-    it('successfully redirects to work queue if all duplicates removed', async () => {
+    it('successfully redirects to Registration-Home if all duplicates removed', async () => {
       const mock = clone(graphqlMock)
       // @ts-ignore
       mock.push({
@@ -878,13 +893,13 @@ describe('Review Duplicates component', () => {
           variables: {
             id: '450ce5e3-b495-4868-bb6a-1183ffd0fee1',
             // @ts-ignore
-            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+            duplicateId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         },
         result: {
           data: {
             // @ts-ignore
-            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+            notADuplicate: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
           }
         }
       })
@@ -904,7 +919,7 @@ describe('Review Duplicates component', () => {
 
       const link = await waitForElement(
         testComponent.component,
-        '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fff1'
+        '#not_duplicate_link_450ce5e3-b495-4868-bb6a-1183ffd0fee1'
       )
 
       link.hostNodes().simulate('click')
@@ -918,10 +933,10 @@ describe('Review Duplicates component', () => {
 
       await waitFor(() => assign.mock.calls.length > 0)
 
-      expect(assign).toBeCalledWith(SEARCH_RESULT)
+      expect(assign).toBeCalledWith(REGISTRAR_HOME)
     })
 
-    it('successfully redirects to work queue if no duplicates returned from fetch query', async () => {
+    it('successfully redirects to Registration-Home if no duplicates returned from fetch query', async () => {
       const { store } = createStore()
       const testComponent = await createTestComponent(
         <ReviewDuplicates
@@ -946,38 +961,7 @@ describe('Review Duplicates component', () => {
       })
       testComponent.component.update()
 
-      expect(assign).toBeCalledWith(SEARCH_RESULT)
+      expect(assign).toBeCalledWith(REGISTRAR_HOME)
     })
-  })
-
-  it('takes user back to work queue page when back button is pressed', async () => {
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
-      <ReviewDuplicates
-        // @ts-ignore
-        match={{
-          params: {
-            applicationId: '450ce5e3-b495-4868-bb6a-1183ffd0fee1'
-          }
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise(resolve => {
-      setTimeout(resolve, 200)
-    })
-
-    testComponent.component.update()
-
-    testComponent.component
-      .find('#action_page_back_button')
-      .hostNodes()
-      .simulate('click')
-    testComponent.component.update()
-
-    expect(assign).toBeCalledWith(SEARCH_RESULT)
   })
 })
