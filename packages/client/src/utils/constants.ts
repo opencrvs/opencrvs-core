@@ -96,3 +96,5 @@ export const JURISDICTION_TYPE: { [key: string]: string } = {
 
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
+
+export const MONTHS_IN_YEAR = 12

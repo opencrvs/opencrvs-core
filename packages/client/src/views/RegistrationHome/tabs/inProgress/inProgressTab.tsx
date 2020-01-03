@@ -59,6 +59,7 @@ import { Action } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const BlueButton = styled(Button)`
   background-color: ${({ theme }) => theme.colors.secondary};
@@ -141,6 +142,9 @@ interface IRegistrarHomeState {
 
 interface IProps {
   resources: IOfflineData
+  showPaginated?: boolean
+  loading?: boolean
+  error?: boolean
 }
 
 type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps & IProps
@@ -434,18 +438,26 @@ export class InProgressTabComponent extends React.Component<
     onPageChange: (newPageNumber: number) => void
   ) => {
     return (
-      <GridTable
-        content={this.transformRemoteDraftsContent(data)}
-        columns={this.getRemoteDraftColumns()}
-        renderExpandedComponent={this.renderInProgressDataExpandedComponent}
-        noResultText={intl.formatMessage(constantsMessages.noResults)}
-        onPageChange={onPageChange}
-        pageSize={this.pageSize}
-        totalItems={(data && data.totalItems) || 0}
-        currentPage={page}
-        expandable={this.getExpandable()}
-        clickable={!this.getExpandable()}
-      />
+      <>
+        <GridTable
+          content={this.transformRemoteDraftsContent(data)}
+          columns={this.getRemoteDraftColumns()}
+          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          expandable={this.getExpandable()}
+          clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
+        />
+      </>
     )
   }
 
@@ -456,18 +468,26 @@ export class InProgressTabComponent extends React.Component<
     onPageChange: (newPageNumber: number) => void
   ) => {
     return (
-      <GridTable
-        content={this.transformRemoteDraftsContent(data)}
-        columns={this.getNotificationColumns()}
-        renderExpandedComponent={this.renderInProgressDataExpandedComponent}
-        noResultText={intl.formatMessage(constantsMessages.noResults)}
-        onPageChange={onPageChange}
-        pageSize={this.pageSize}
-        totalItems={(data && data.totalItems) || 0}
-        currentPage={page}
-        expandable={this.getExpandable()}
-        clickable={!this.getExpandable()}
-      />
+      <>
+        <GridTable
+          content={this.transformRemoteDraftsContent(data)}
+          columns={this.getNotificationColumns()}
+          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          noResultText={intl.formatMessage(constantsMessages.noResults)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          expandable={this.getExpandable()}
+          clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
+        />
+      </>
     )
   }
 
@@ -661,18 +681,26 @@ export class InProgressTabComponent extends React.Component<
           notificationData.totalItems || 0
         )}
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <GridTable
-            content={this.transformDraftContent()}
-            columns={this.getDraftColumns()}
-            renderExpandedComponent={this.renderDraftDataExpandedComponent}
-            noResultText={intl.formatMessage(constantsMessages.noResults)}
-            onPageChange={onPageChange}
-            pageSize={this.pageSize}
-            totalItems={drafts && drafts.length}
-            currentPage={page}
-            expandable={this.getExpandable()}
-            clickable={!this.getExpandable()}
-          />
+          <>
+            <GridTable
+              content={this.transformDraftContent()}
+              columns={this.getDraftColumns()}
+              renderExpandedComponent={this.renderDraftDataExpandedComponent}
+              noResultText={intl.formatMessage(constantsMessages.noResults)}
+              onPageChange={onPageChange}
+              pageSize={this.pageSize}
+              totalItems={drafts && drafts.length}
+              currentPage={page}
+              expandable={this.getExpandable()}
+              clickable={!this.getExpandable()}
+              showPaginated={this.props.showPaginated}
+              loading={this.props.loading}
+            />
+            <LoadingIndicator
+              loading={this.props.loading ? true : false}
+              hasError={false}
+            />
+          </>
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
           this.renderFieldAgentTable(inProgressData, intl, page, onPageChange)}

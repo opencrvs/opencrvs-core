@@ -21,15 +21,19 @@ import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
-import { GQLBirthRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { Event } from '@client/forms'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
 type FullProps = {
-  genderBasisMetrics: GQLBirthRegistrationGenderBasisMetrics
+  genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
+  eventType: Event
 } & IStateProps &
   WrappedComponentProps
 
@@ -66,15 +70,50 @@ class GenderBasisComponent extends React.Component<FullProps> {
     )
   }
 
+  getFooterColumns(): IFooterFColumn[] {
+    const {
+      maleUnder18 = 0,
+      femaleUnder18 = 0,
+      maleOver18 = 0,
+      femaleOver18 = 0
+    } = this.props.genderBasisMetrics.total || {}
+    const total = get(this.props.genderBasisMetrics, 'total.total') || '0'
+    return [
+      {
+        width: 25
+      },
+      {
+        label: getValueWithPercentageString(maleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(maleOver18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleOver18, total),
+        width: 15
+      },
+      {
+        label: total,
+        width: 15
+      }
+    ]
+  }
+
   render() {
-    const { intl, loading } = this.props
+    const { intl, loading, eventType } = this.props
 
     return (
       <ListTable
         id="genderBasisMetrics"
-        tableTitle={intl.formatMessage(
-          constantsMessages.birthRegistrationTitle
-        )}
+        tableTitle={intl.formatMessage(constantsMessages.registrationTitle, {
+          event: eventType
+        })}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}
@@ -116,6 +155,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )

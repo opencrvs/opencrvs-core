@@ -256,19 +256,15 @@ export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
       }
 }
 
-export const isValidChildBirthDate: Validation = (
-  value: IFormFieldValue,
-  drafts
-) => {
+export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   const childBirthDate = value as string
-
-  return childBirthDate &&
-    isAValidDateFormat(childBirthDate) &&
-    isDateNotInFuture(childBirthDate)
+  return !childBirthDate
+    ? { message: messages.required }
+    : childBirthDate &&
+      isAValidDateFormat(childBirthDate) &&
+      isDateNotInFuture(childBirthDate)
     ? undefined
-    : {
-        message: messages.isValidBirthDate
-      }
+    : { message: messages.isValidBirthDate }
 }
 
 export const isValidParentsBirthDate = (minAgeGap: number): Validation => (
@@ -594,9 +590,9 @@ export const isValidDeathOccurrenceDate: Validation = (
 }
 
 export const greaterThanZero: Validation = (value: IFormFieldValue) => {
-  return value && Number(value) > 0
+  return !value && value !== 0
+    ? { message: messages.required }
+    : value && Number(value) > 0
     ? undefined
-    : {
-        message: messages.greaterThanZero
-      }
+    : { message: messages.greaterThanZero }
 }

@@ -14,7 +14,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
@@ -36,10 +36,10 @@ import { IStoreState } from '@client/store'
 import { Query } from '@client/components/Query'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import {
-  GQLBirthRegistrationMetrics,
-  GQLBirthRegistrationTimeFrameMetrics,
-  GQLBirthRegistrationGenderBasisMetrics,
-  GQLCertificationPaymentMetrics
+  GQLCertificationPaymentMetrics,
+  GQLRegistrationMetrics,
+  GQLRegistrationGenderBasisMetrics,
+  GQLRegistrationTimeFrameMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import {
@@ -48,6 +48,8 @@ import {
   CertificationPaymentReports
 } from '@client/views/Performance/reports'
 import moment from 'moment'
+import { Event } from '@client/forms'
+import { isEmpty, get } from 'lodash'
 
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
@@ -62,12 +64,13 @@ const ReportWrapper = styled.div`
 interface ReportProps {
   timeRange: { start: Date; end: Date }
   reportType: string
+  eventType: Event
   goBack: typeof goBack
   offlineResources: IOfflineData
 }
 
 interface IMetricsQueryResult {
-  fetchBirthRegistrationMetrics: GQLBirthRegistrationMetrics
+  fetchRegistrationMetrics: GQLRegistrationMetrics
 }
 
 type Props = ReportProps &
@@ -75,7 +78,11 @@ type Props = ReportProps &
   RouteComponentProps<
     {},
     {},
-    { reportType: string; timeRange: { start: Date; end: Date } }
+    {
+      reportType: string
+      eventType: Event
+      timeRange: { start: Date; end: Date }
+    }
   >
 
 function ReportComponent(props: Props) {
@@ -83,7 +90,7 @@ function ReportComponent(props: Props) {
     selectedLocation,
     setSelectedLocation
   ] = React.useState<ISearchLocation | null>(null)
-  const { reportType, timeRange, intl } = props
+  const { reportType, timeRange, intl, eventType } = props
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')
@@ -107,6 +114,7 @@ function ReportComponent(props: Props) {
         <Query
           query={PERFORMANCE_METRICS}
           variables={{
+            event: eventType,
             timeStart: start.toISOString(),
             timeEnd: end.toISOString(),
             locationId: selectedLocation.id
@@ -123,64 +131,59 @@ function ReportComponent(props: Props) {
           }) => {
             if (
               !loading &&
-              (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.timeFrames &&
-                data.fetchBirthRegistrationMetrics.timeFrames.details &&
-                data.fetchBirthRegistrationMetrics.timeFrames.details.length ===
-                  0) &&
-              (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details &&
-                data.fetchBirthRegistrationMetrics.genderBasisMetrics.details
-                  .length === 0) &&
-              (data &&
-                data.fetchBirthRegistrationMetrics &&
-                data.fetchBirthRegistrationMetrics.payments &&
-                data.fetchBirthRegistrationMetrics.payments.length === 0)
-            )
+              isEmpty(
+                get(data, 'fetchRegistrationMetrics.timeFrames.details')
+              ) &&
+              isEmpty(
+                get(data, 'fetchRegistrationMetrics.genderBasisMetrics.details')
+              ) &&
+              isEmpty(get(data, 'fetchRegistrationMetrics.payments.details'))
+            ) {
               return (
                 <NoResultMessage
                   id="reports"
                   searchedLocation={selectedLocation.displayLabel}
                 />
               )
-
-            return (
-              <ReportWrapper>
-                <GenderBasisReports
-                  loading={loading}
-                  genderBasisMetrics={
-                    (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .genderBasisMetrics as GQLBirthRegistrationGenderBasisMetrics))) ||
-                    {}
-                  }
-                />
-                <TimeFrameReports
-                  loading={loading}
-                  data={
-                    (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .timeFrames as GQLBirthRegistrationTimeFrameMetrics))) ||
-                    {}
-                  }
-                />
-                <CertificationPaymentReports
-                  loading={loading}
-                  data={
-                    (data &&
-                      (data.fetchBirthRegistrationMetrics &&
-                        (data.fetchBirthRegistrationMetrics
-                          .payments as GQLCertificationPaymentMetrics[]))) ||
-                    []
-                  }
-                />
-              </ReportWrapper>
-            )
+            } else {
+              return (
+                <ReportWrapper>
+                  <GenderBasisReports
+                    eventType={eventType}
+                    loading={loading}
+                    genderBasisMetrics={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
+                      {}
+                    }
+                  />
+                  <TimeFrameReports
+                    eventType={eventType}
+                    loading={loading}
+                    data={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
+                      {}
+                    }
+                  />
+                  <CertificationPaymentReports
+                    eventType={eventType}
+                    loading={loading}
+                    data={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .payments as GQLCertificationPaymentMetrics))) ||
+                      {}
+                    }
+                  />
+                </ReportWrapper>
+              )
+            }
           }}
         </Query>
       )}
@@ -193,6 +196,7 @@ function mapStateToProps(state: IStoreState, props: Props) {
     reportType:
       (props.location.state && props.location.state.reportType) ||
       PERFORMANCE_REPORT_TYPE_MONTHLY,
+    eventType: props.location.state && props.location.state.eventType,
     timeRange: (props.location.state && props.location.state.timeRange) || {
       start: new Date(),
       end: new Date()

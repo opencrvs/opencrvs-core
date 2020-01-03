@@ -94,6 +94,11 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
+export interface IDispatchOptions {
+  action: string
+  payloadKey: string
+}
+
 export interface IDynamicItems {
   dependency: string
   valueMapper: IDynamicValueMapper
@@ -335,6 +340,7 @@ export interface IFormFieldBase {
   postfix?: string
   disabled?: boolean
   initialValue?: IFormFieldValue
+  initialValueKey?: string
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: MessageDescriptor
@@ -456,6 +462,7 @@ export interface ISearchFormField extends IFormFieldBase {
   searchableResource: Extract<keyof IOfflineData, 'facilities'>
   searchableType: string
   dynamicOptions?: IDynamicOptions
+  dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
 }
 
@@ -588,7 +595,7 @@ export interface IConditionals {
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
-  isRegistrarRoleSelected: IConditional
+  isRegistrarOrRegistrationAgentRoleSelected: IConditional
   certCollectorOther: IConditional
 }
 
@@ -925,6 +932,7 @@ export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   type: typeof SEARCH_FIELD
   searchableResource: Extract<keyof IOfflineData, 'locations'>
   searchableType: string
+  dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
 }
 

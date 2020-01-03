@@ -49,15 +49,15 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
   }
 
   render() {
-    const { icon, title, onClick, ...otherProps } = this.props
+    const { icon, title, ...otherProps } = this.props
     return (
       <ImageBase
         {...otherProps}
         onClick={event => {
-          if (onClick !== undefined) {
-            this.fileUploader.current!.click()
-            onClick(event)
+          if (this.props.onClick) {
+            this.props.onClick(event)
           }
+          this.fileUploader.current!.click()
         }}
       >
         {title}

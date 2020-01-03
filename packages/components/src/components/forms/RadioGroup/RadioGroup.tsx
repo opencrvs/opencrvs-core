@@ -18,7 +18,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   margin-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 `
 
 const List = styled.ul`
@@ -39,10 +39,6 @@ const NestedChildren = styled.div`
   padding-left: 33px;
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
-
-  > div {
-    padding: 16px 0;
-  }
 `
 
 export enum RadioSize {
