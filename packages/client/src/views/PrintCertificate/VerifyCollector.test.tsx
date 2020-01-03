@@ -63,6 +63,39 @@ describe('verify collector tests', () => {
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
+    it('should takes user go back', async () => {
+      const testComponent = (await createTestComponent(
+        // @ts-ignore
+        <VerifyCollector
+          history={history}
+          match={{
+            params: {
+              registrationId: 'mockBirth1234',
+              eventType: Event.BIRTH,
+              collector: 'mother'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )).component
+
+      testComponent
+        .find('#action_page_back_button')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+
+      testComponent.update()
+
+      expect(history.location.pathname).toBe('/')
+    })
+
     describe('when father is collector', () => {
       let testComponent: ReactWrapper
       beforeEach(async () => {
