@@ -9,9 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { detectDuplicates, buildQuery } from '@search/elasticsearch/utils'
-import { mockSearchResponse, mockCompositionBody } from '@search/test/utils'
+import {
+  detectDuplicates,
+  buildQuery,
+  createStatusHistory
+} from '@search/elasticsearch/utils'
+import {
+  mockSearchResponse,
+  mockCompositionBody,
+  mockBirthFhirBundle,
+  mockUserModelResponse,
+  mockLocationResponse,
+  mockFacilityResponse
+} from '@search/test/utils'
 import { searchComposition } from '@search/elasticsearch/dbhelper'
+import * as fetchAny from 'jest-fetch-mock'
+
+const fetch = fetchAny as any
 
 jest.mock('@search/elasticsearch/dbhelper.ts')
 
@@ -29,5 +43,27 @@ describe('elastic search utils', () => {
     const query = await buildQuery(mockCompositionBody)
     expect(query.bool.must).toHaveLength(4)
     expect(query.bool.should).toHaveLength(8)
+  })
+
+  it('should return appropriate history with facility name for notifications', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockUserModelResponse), { status: 200 }],
+      [JSON.stringify(mockLocationResponse), { status: 200 }],
+      [JSON.stringify(mockFacilityResponse), { status: 200 }]
+    )
+    const mockNotificationBody = {
+      compositionId: '9c0dde8d-65b2-49dd-8b7e-5dd0c7c63779',
+      compositionType: 'birth-notification',
+      type: 'IN_PROGRESS',
+      updatedBy: '489b76cf-6b58-4b0d-96ba-caa1271f787b',
+      eventLocationId: '489b76cf-6b58-4b0d-96ba-caa1271f787c',
+      operationHistories: []
+    }
+    await createStatusHistory(
+      mockNotificationBody,
+      mockBirthFhirBundle.entry[1].resource as fhir.Task,
+      'Bearer abc'
+    )
+    expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
 })
