@@ -63,6 +63,11 @@ const ExpansionContentContainer = styled.div`
 const StatusIcon = styled.div`
   margin-top: 3px;
 `
+const InProgressStatusIcon = styled(StatusIcon)`
+  margin-left: -3px;
+  margin-right: -3px;
+`
+
 const StyledLabel = styled.label`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   margin-right: 3px;
@@ -235,9 +240,9 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     switch (status) {
       case 'IN_PROGRESS':
         return (
-          <StatusIcon>
+          <InProgressStatusIcon>
             <StatusProgress />
-          </StatusIcon>
+          </InProgressStatusIcon>
         )
       case 'DECLARED':
         return (
