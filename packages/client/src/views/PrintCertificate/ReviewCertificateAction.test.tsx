@@ -168,4 +168,17 @@ describe('when user wants to review birth certificate', () => {
 
     expect(modalIsClosed).toBe(false)
   })
+
+  it('Should close the modal on clicking the cross the button', async () => {
+    component
+      .find('#crcl-btn')
+      .hostNodes()
+      .simulate('click')
+    component.update()
+
+    const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
+      .length
+
+    expect(modalIsClosed).toBe(false)
+  })
 })

@@ -12,6 +12,13 @@
 
 import { OPENCRVS_SPECIFICATION_URL } from '@resources/bgd/features/utils'
 
+export const CHILD_CODE = 'child-details'
+export const DECEASED_CODE = 'deceased-details'
+export enum EVENT_TYPE {
+  BIRTH = 'BIRTH',
+  DEATH = 'DEATH'
+}
+
 export function getTaskResource(
   bundle: fhir.Bundle & fhir.BundleEntry
 ): fhir.Task | undefined {
@@ -73,4 +80,93 @@ export function getTrackingIdFromTaskResource(taskResource: fhir.Task) {
     throw new Error("Didn't find any identifier for tracking id")
   }
   return trackingIdentifier.value
+}
+
+export function getEventDateFromBundle(bundle: fhir.Bundle): string {
+  const personInfo =
+    getEventType(bundle) === EVENT_TYPE.DEATH
+      ? {
+          sectionCode: DECEASED_CODE,
+          eventDateFieldKey: 'deceasedDateTime'
+        }
+      : {
+          sectionCode: CHILD_CODE,
+          eventDateFieldKey: 'birthDate'
+        }
+  const patient = findPersonEntryFromBundle(personInfo.sectionCode, bundle)
+  if (!patient || !patient[personInfo.eventDateFieldKey]) {
+    throw new Error('Unable to find event date from given bundle')
+  }
+  return patient[personInfo.eventDateFieldKey] as string
+}
+
+export function getEventType(bundle: fhir.Bundle) {
+  if (
+    !bundle ||
+    bundle.type !== 'document' ||
+    !bundle.entry ||
+    !bundle.entry[0] ||
+    !bundle.entry[0].resource ||
+    bundle.entry[0].resource.resourceType !== 'Composition'
+  ) {
+    throw new Error('Invalid FHIR bundle found')
+  }
+  const composition = bundle.entry[0].resource as fhir.Composition
+
+  const eventType =
+    composition &&
+    composition.type &&
+    composition.type.coding &&
+    composition.type.coding[0].code
+
+  if (eventType === 'death-application' || eventType === 'death-notification') {
+    return EVENT_TYPE.DEATH
+  } else {
+    return EVENT_TYPE.BIRTH
+  }
+}
+
+export function findPersonEntryFromBundle(
+  sectionCode: string,
+  bundle: fhir.Bundle
+): fhir.Patient {
+  const composition =
+    bundle && bundle.entry && (bundle.entry[0].resource as fhir.Composition)
+
+  const personSectionEntry = getSectionEntryBySectionCode(
+    composition,
+    sectionCode
+  )
+  const personEntry =
+    bundle.entry &&
+    bundle.entry.find(entry => entry.fullUrl === personSectionEntry.reference)
+
+  if (!personEntry) {
+    throw new Error(
+      'Patient referenced from composition section not found in FHIR bundle'
+    )
+  }
+  return personEntry.resource as fhir.Patient
+}
+
+export function getSectionEntryBySectionCode(
+  composition: fhir.Composition | undefined,
+  sectionCode: string
+): fhir.Reference {
+  const personSection =
+    composition &&
+    composition.section &&
+    composition.section.find((section: fhir.CompositionSection) => {
+      if (!section.code || !section.code.coding) {
+        return false
+      }
+      return section.code.coding.some(coding => coding.code === sectionCode)
+    })
+
+  if (!personSection || !personSection.entry) {
+    throw new Error(
+      `Invalid person section found for given code: ${sectionCode}`
+    )
+  }
+  return personSection.entry[0]
 }

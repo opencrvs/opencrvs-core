@@ -127,7 +127,7 @@ const Row = styled.div`
   }
 `
 const Column = styled.div`
-  width: 50%;
+  width: 40%;
   margin: 0px 15px;
 
   &:first-child {
@@ -145,6 +145,7 @@ const Column = styled.div`
 
 const StyledColumn = styled(Column)`
   ${({ theme }) => theme.shadows.mistyShadow};
+  width: 60%;
 `
 
 const ZeroDocument = styled.div`

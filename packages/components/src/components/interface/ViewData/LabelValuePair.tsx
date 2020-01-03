@@ -17,6 +17,13 @@ const Label = styled.span`
 `
 const Value = styled.span`
   ${({ theme }) => theme.fonts.bigBodyStyle}
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+const LabelValuePairContainer = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
 `
 interface IInfo {
   label: string
@@ -25,9 +32,9 @@ interface IInfo {
 
 export function LabelValuePair({ label, value }: IInfo) {
   return (
-    <div>
+    <LabelValuePairContainer>
       <Label>{label}: </Label>
       <Value>{value}</Value>
-    </div>
+    </LabelValuePairContainer>
   )
 }

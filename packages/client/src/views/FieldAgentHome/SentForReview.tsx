@@ -40,6 +40,7 @@ import {
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const APPLICATIONS_DAY_LIMIT = 7
 
@@ -48,6 +49,9 @@ interface ISentForReviewProps {
   applicationsReadyToSend: IApplication[]
   deleteApplication: typeof deleteApplication
   goToApplicationDetails: typeof goToApplicationDetails
+  showPaginated?: boolean
+  loading?: boolean
+  error?: boolean
 }
 
 interface IState {
@@ -259,7 +263,9 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           onPageChange={this.onPageChange}
           pageSize={this.pageSize}
           currentPage={this.state.sentForReviewPageNo}
+          showPaginated={this.props.showPaginated}
         />
+        <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>
     )
   }

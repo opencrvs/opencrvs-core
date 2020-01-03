@@ -44,6 +44,7 @@ const ExpandableNotificationContainer = styled.div`
 
 interface IProps {
   application: IApplication[]
+  showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
 class NotificationToast extends React.Component<IFullProps> {
@@ -76,7 +77,10 @@ class NotificationToast extends React.Component<IFullProps> {
             }
           )}
         >
-          <Outbox application={outboxData} />
+          <Outbox
+            application={outboxData}
+            showPaginated={this.props.showPaginated}
+          />
         </ExpandableNotification>
       </ExpandableNotificationContainer>
     ) : null
