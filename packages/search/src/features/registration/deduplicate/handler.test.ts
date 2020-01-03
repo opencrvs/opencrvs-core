@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  indexComposition,
+  updateComposition,
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import { createServer } from '@search/index'
@@ -48,12 +48,14 @@ describe('Verify handlers', () => {
     })
 
     it('should return status code 200 if the composition indexed correctly', async () => {
-      const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
         any
       >
-      mockedIndexComposition.mockResolvedValue({})
+      const mockedUpdateComposition = updateComposition as jest.Mocked<any>
+
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
+      mockedUpdateComposition.mockReturnValue({})
+
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
         algorithm: 'RS256',
         issuer: 'opencrvs:auth-service',
