@@ -122,6 +122,8 @@ interface IQueryData {
   notificationData: GQLEventSearchResultSet
 }
 
+type QueryDataKey = 'inProgressData' | 'notificationData'
+
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
@@ -427,9 +429,23 @@ export class InProgressTabComponent extends React.Component<
     return <LocalInProgressDataDetails eventId={itemId} />
   }
 
-  renderInProgressDataExpandedComponent = (itemId: string) => {
+  renderFieldAgentDataExpandedComponent = (itemId: string) => {
+    return this.renderInProgressDataExpandedComponent(itemId, 'inProgressData')
+  }
+
+  renderHospitalDataExpandedComponent = (itemId: string) => {
+    return this.renderInProgressDataExpandedComponent(
+      itemId,
+      'notificationData'
+    )
+  }
+
+  renderInProgressDataExpandedComponent = (
+    itemId: string,
+    queryDataKey: QueryDataKey
+  ) => {
     const { results } =
-      this.props.queryData && this.props.queryData.notificationData
+      this.props.queryData && this.props.queryData[queryDataKey]
     const eventDetails =
       results && results.find(result => result && result.id === itemId)
     return <RowHistoryView eventDetails={eventDetails} />
@@ -446,7 +462,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getRemoteDraftColumns()}
-          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          renderExpandedComponent={this.renderFieldAgentDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
@@ -476,7 +492,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getNotificationColumns()}
-          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          renderExpandedComponent={this.renderHospitalDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
