@@ -244,6 +244,52 @@ describe('Certificate collector test for a birth registration without father det
       )
     })
 
+    it('should redirects back to certificate collector option selection prompt error when no option is selected', async () => {
+      component
+        .find('#type_MOTHER')
+        .hostNodes()
+        .simulate('change', { target: { value: 'MOTHER' } })
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#action_page_back_button')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await waitForElement(component, '#form_error')
+
+      expect(
+        component
+          .find('#form_error')
+          .hostNodes()
+          .text()
+      ).toBe('Please select who is collecting the certificate')
+    })
+
     it('redirects to user form for other collector upon Someone else option selection', async () => {
       component
         .find('#type_OTHER')
