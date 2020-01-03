@@ -34,6 +34,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -49,6 +50,9 @@ interface IBaseApprovalTabProps {
   }
   page: number
   onPageChange: (newPageNumber: number) => void
+  showPaginated?: boolean
+  loading?: boolean
+  error?: boolean
 }
 
 interface IApprovalTabState {
@@ -221,6 +225,12 @@ class ApprovalTabComponent extends React.Component<
           currentPage={page}
           expandable={this.getExpandable()}
           clickable={!this.getExpandable()}
+          showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
         />
       </HomeContent>
     )

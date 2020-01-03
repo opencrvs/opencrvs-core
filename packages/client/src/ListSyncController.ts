@@ -32,6 +32,11 @@ export async function syncRegistrarWorkqueue(
       variables: {
         locationIds: [locationId],
         count: 10,
+        inProgressCount,
+        reviewCount,
+        rejectCount,
+        approvalCount,
+        printCount,
         reviewStatuses: reviewStatuses,
         inProgressSkip: inProgressSkip,
         reviewSkip: reviewSkip,

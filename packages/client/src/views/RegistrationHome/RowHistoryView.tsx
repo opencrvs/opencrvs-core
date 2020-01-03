@@ -107,6 +107,9 @@ const BorderedPaddedContent = styled(PaddedContent)`
 const BoldSpan = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};

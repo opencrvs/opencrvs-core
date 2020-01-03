@@ -42,10 +42,6 @@ const NestedChildren = styled.div`
   padding-left: 33px;
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
-
-  > div {
-    padding: 16px 0;
-  }
 `
 
 export enum RadioSize {

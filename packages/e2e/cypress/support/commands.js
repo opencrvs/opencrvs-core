@@ -148,7 +148,7 @@ Cypress.Commands.add('verifyLandingPageVisible', () => {
   cy.get('#header_new_event').click()
 })
 Cypress.Commands.add('initializeFakeTimers', () => {
-  cy.clock(1573557567230)
+  cy.clock(new Date().getTime())
 })
 Cypress.Commands.add('downloadFirstApplication', () => {
   cy.get('#ListItemAction-0-icon').should('exist')

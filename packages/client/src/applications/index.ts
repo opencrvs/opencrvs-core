@@ -141,7 +141,8 @@ export interface IApplication {
 export interface IWorkqueue {
   loading?: boolean
   error?: boolean
-  data?: IQueryData
+  data: IQueryData
+  initialSyncDone: boolean
 }
 
 interface IWorkqueuePaginationParams {
@@ -346,7 +347,16 @@ export interface WorkqueueState {
 const workqueueInitialState = {
   workqueue: {
     loading: true,
-    error: false
+    error: false,
+    data: {
+      inProgressTab: { totalItems: 0, results: [] },
+      notificationTab: { totalItems: 0, results: [] },
+      reviewTab: { totalItems: 0, results: [] },
+      rejectTab: { totalItems: 0, results: [] },
+      approvalTab: { totalItems: 0, results: [] },
+      printTab: { totalItems: 0, results: [] }
+    },
+    initialSyncDone: false
   }
 }
 
@@ -586,13 +596,17 @@ async function getWorkqueueData(
     workqueue = {
       loading: false,
       error: false,
-      data: result
+      data: result,
+      initialSyncDone: true
     }
   } else {
     workqueue = {
       loading: false,
       error: true,
-      data: currentWorkqueue && currentWorkqueue.data
+      data:
+        (currentWorkqueue && currentWorkqueue.data) ||
+        (state.workqueueState && state.workqueueState.workqueue.data),
+      initialSyncDone: false
     }
   }
 
