@@ -1097,7 +1097,7 @@
                   "name": "placeOfBirth",
                   "type": "SELECT_WITH_OPTIONS",
                   "previewGroup": "placeOfBirth",
-                  "ignorePlaceOfDeliveryLabel": true,
+                  "ignoreFieldLabelOnErrorMessage": true,
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
