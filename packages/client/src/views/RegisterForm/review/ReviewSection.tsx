@@ -578,7 +578,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   editLinkClickHandlerForDraft = (
     sectionId: string,
     groupId: string,
-    fieldName: string
+    fieldName?: string
   ) => {
     const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
     const application = draft
@@ -1060,10 +1060,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <LinkButton
                     id="edit-document"
                     onClick={() =>
-                      this.editLinkClickHandler(
+                      this.editLinkClickHandlerForDraft(
                         documentsSection.id,
-                        documentsSection.groups[0].id,
-                        this.state.activeSection!
+                        documentsSection.groups[0].id!
                       )
                     }
                   >
