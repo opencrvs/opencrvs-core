@@ -33,6 +33,8 @@ context('Reports Integration Test', () => {
       .children()
       .click()
 
+    cy.tick(20000)
+
     // INPUT SEARCH LOCATION
     cy.get('#locationSearchInput').type('Narsingdi')
     cy.get('#locationSearchInput')
