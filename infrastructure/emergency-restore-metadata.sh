@@ -37,7 +37,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "Are you sure?  This script will clear all data from OpenCRVS and restore from a backup") || \
+if [[ "no" == $(ask_yes_or_no "This script will clear all data from OpenCRVS and restore from a backup. Are you sure you are logged in as a root user?  ") || \
       "no" == $(ask_yes_or_no "Are you *really* sure?  Have you tested these backup files in a restore process on a development environment first?") ]]
 then
     echo "Skipped."

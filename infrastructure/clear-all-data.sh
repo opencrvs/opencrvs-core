@@ -16,10 +16,18 @@ else
   NETWORK=opencrvs_overlay_net
 fi
 
+# Delete all data from mongo
+#---------------------------
 docker run --rm --network=$NETWORK mongo:3.6 mongo hearth-dev --host $HOST --eval "db.dropDatabase()"
 
 docker run --rm --network=$NETWORK mongo:3.6 mongo openhim-dev --host $HOST --eval "db.dropDatabase()"
 
 docker run --rm --network=$NETWORK mongo:3.6 mongo user-mgnt --host $HOST --eval "db.dropDatabase()"
 
+# Delete all data from elasticsearch
+#-----------------------------------
 docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
+
+# Delete all data from metrics
+#-----------------------------
+docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
