@@ -244,7 +244,7 @@ describe('Certificate collector test for a birth registration without father det
       )
     })
 
-    it('should redirects back to certificate collector option selection prompt error when no option is selected', async () => {
+    it('should redirects back to certificate collector option selection with mother already selected', async () => {
       component
         .find('#type_MOTHER')
         .hostNodes()
@@ -275,19 +275,12 @@ describe('Certificate collector test for a birth registration without father det
       })
       component.update()
 
-      component
-        .find('#confirm_form')
-        .hostNodes()
-        .simulate('click')
-
-      await waitForElement(component, '#form_error')
-
       expect(
         component
-          .find('#form_error')
+          .find('#type_MOTHER')
           .hostNodes()
-          .text()
-      ).toBe('Please select who is collecting the certificate')
+          .props().checked
+      ).toBe(true)
     })
 
     it('redirects to user form for other collector upon Someone else option selection', async () => {
