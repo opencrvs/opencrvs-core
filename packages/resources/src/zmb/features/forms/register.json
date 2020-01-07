@@ -1023,6 +1023,7 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "previewGroup": "placeOfBirth",
+                  "ignoreFieldLabelOnErrorMessage": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [],

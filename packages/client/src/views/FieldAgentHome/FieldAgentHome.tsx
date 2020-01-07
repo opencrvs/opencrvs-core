@@ -450,7 +450,7 @@ class FieldAgentHomeView extends React.Component<
               <Query
                 query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                 variables={{
-                  userId: userDetails ? userDetails.practitionerId : '',
+                  userId: userDetails!.practitionerId,
                   status: [EVENT_STATUS.REJECTED],
                   locationIds: fieldAgentLocationId
                     ? [fieldAgentLocationId]
