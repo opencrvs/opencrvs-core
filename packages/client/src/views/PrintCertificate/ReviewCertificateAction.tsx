@@ -157,11 +157,6 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.countries
       )
     }
-
-    window.onpopstate = (e: any) => {
-      e.preventDefault()
-      this.resetCertificatesInformation()
-    }
   }
 
   toggleModal = () => {

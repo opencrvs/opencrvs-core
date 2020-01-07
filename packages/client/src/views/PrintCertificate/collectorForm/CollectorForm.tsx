@@ -79,6 +79,7 @@ import {
   certCollectorGroupForBirthAppWithoutParentDetails,
   certCollectorGroupForBirthAppWithoutMotherDetails
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -388,10 +389,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         <ActionPageLight
           id="collector_form"
           title={intl.formatMessage(formSection.title)}
-          goBack={() => {
-            this.resetCertificatesInformation()
-            goBack()
-          }}
+          goBack={goBack}
         >
           <FormSectionTitle>
             {formGroup.fields.length === 1 &&
@@ -444,10 +442,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               <TertiaryButton
                 id="cancel-btn"
                 key="cancel"
-                onClick={() => {
-                  this.resetCertificatesInformation()
-                  this.toggleSubmitModalOpen()
-                }}
+                onClick={this.toggleSubmitModalOpen}
               >
                 {intl.formatMessage(buttonMessages.cancel)}
               </TertiaryButton>,
@@ -535,6 +530,17 @@ const mapStateToProps = (
     clonedFormSection.groups.find(group => group.id === groupId) ||
     clonedFormSection.groups[0]
 
+  const fields = replaceInitialValues(
+    formGroup.fields,
+    (application &&
+      application.data.registration.certificates &&
+      application.data.registration.certificates[
+        application.data.registration.certificates.length - 1
+      ].collector) ||
+      {},
+    application && application.data
+  )
+
   return {
     registerForm: getRegisterForm(state)[event],
     event,
@@ -542,7 +548,10 @@ const mapStateToProps = (
     applicationId: registrationId,
     application,
     formSection: clonedFormSection,
-    formGroup
+    formGroup: {
+      ...formGroup,
+      fields
+    }
   }
 }
 
