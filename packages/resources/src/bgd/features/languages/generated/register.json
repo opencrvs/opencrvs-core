@@ -1079,7 +1079,7 @@
         "tab.inProgress.selector.hospital.drafts": "Hospitals",
         "unlockApp.incorrectPin": "Incorrect pin. Please try again",
         "unlockApp.lastTry": "Last Try",
-        "unlockApp.locked": "your account has been locked. Please try again in 1 minute.",
+        "unlockApp.locked": "Your account has been locked. Please try again in 1 minute.",
         "user.form.buttons.submit": "Create user",
         "user.form.securityquestion.answer": "Answer",
         "user.form.securityquestion.description": "From the drop down lists below, select questions that can be used later to confirm your identity should you forget your password.",
