@@ -36,6 +36,8 @@ const allSearchFields = `
       }
       operatorOfficeName
       operatorOfficeAlias
+      notificationFacilityName
+      notificationFacilityAlias
       rejectReason
       rejectComment
     }

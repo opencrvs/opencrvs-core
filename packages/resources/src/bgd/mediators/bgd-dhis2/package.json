@@ -58,13 +58,13 @@
     "jest-fetch-mock": "^2.1.2",
     "lint-staged": "^7.1.0",
     "nodemon": "^1.17.5",
-    "prettier": "^1.13.5",
+    "prettier": "^1.19.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.4"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

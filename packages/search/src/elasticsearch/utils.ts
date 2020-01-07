@@ -28,6 +28,8 @@ export const enum EVENT {
   DEATH = 'Death'
 }
 
+export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
+export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
 export interface IOperationHistory {
@@ -42,6 +44,8 @@ export interface IOperationHistory {
   operatorOfficeAlias: string[]
   rejectReason?: string
   rejectComment?: string
+  notificationFacilityName?: string
+  notificationFacilityAlias?: string[]
 }
 
 export interface ICompositionBody {
@@ -138,22 +142,14 @@ export async function detectDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId)
-  const result =
-    results &&
-    results.hits.hits &&
-    (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
-
-  return result && result.createdBy
+  const result = results?.hits?.hits?.[0]?._source as ICompositionBody
+  return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
   const results = await searchByCompositionId(compositionId)
-  const result =
-    results &&
-    results.hits.hits &&
-    (results.hits.hits[0] && (results.hits.hits[0]._source as ICompositionBody))
-
-  return (result && result.operationHistories) as IOperationHistory[]
+  const result = results?.hits?.hits?.[0]?._source as ICompositionBody
+  return result?.operationHistories as IOperationHistory[]
 }
 
 export const createStatusHistory = async (
@@ -165,30 +161,23 @@ export const createStatusHistory = async (
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)
 
-  const operatorFirstNames =
-    (operatorName && operatorName.given && operatorName.given.join(' ')) || ''
-  const operatorFamilyName = (operatorName && operatorName.family) || ''
-  const operatorFirstNamesLocale =
-    (operatorNameLocale &&
-      operatorNameLocale.given &&
-      operatorNameLocale.given.join(' ')) ||
-    ''
-  const operatorFamilyNameLocale =
-    (operatorNameLocale && operatorNameLocale.family) || ''
+  const operatorFirstNames = operatorName?.given?.join(' ') || ''
+  const operatorFamilyName = operatorName?.family || ''
+  const operatorFirstNamesLocale = operatorNameLocale?.given?.join(' ') || ''
+  const operatorFamilyNameLocale = operatorNameLocale?.family || ''
 
   const regLasOfficeExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
-  const regLastOfficeReference =
-    regLasOfficeExtension &&
-    regLasOfficeExtension.valueReference &&
-    regLasOfficeExtension.valueReference.reference
-  const office: fhir.Location = await getFromFhir(`/${regLastOfficeReference}`)
+
+  const office: fhir.Location = await getFromFhir(
+    `/${regLasOfficeExtension?.valueReference?.reference}`
+  )
 
   const operationHistory = {
     operationType: body.type,
-    operatedOn: task && task.lastModified,
+    operatedOn: task?.lastModified,
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
     operatorRole: user.role,
@@ -196,11 +185,38 @@ export const createStatusHistory = async (
     operatorFamilyName,
     operatorFirstNamesLocale,
     operatorFamilyNameLocale,
-    operatorOfficeName: (office && office.name) || '',
-    operatorOfficeAlias: (office && office.alias) || []
+    operatorOfficeName: office?.name || '',
+    operatorOfficeAlias: office?.alias || []
   } as IOperationHistory
+
+  if (
+    isApplicationInStatus(body, IN_PROGRESS_STATUS) &&
+    isNotification(body) &&
+    body.eventLocationId
+  ) {
+    const facility: fhir.Location = await getFromFhir(
+      `/Location/${body.eventLocationId}`
+    )
+    operationHistory.notificationFacilityName = facility?.name || ''
+    operationHistory.notificationFacilityAlias = facility?.alias || []
+  }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
+}
+
+function isApplicationInStatus(
+  body: ICompositionBody,
+  status: string
+): boolean {
+  return (body.type && body.type === status) || false
+}
+
+function isNotification(body: ICompositionBody): boolean {
+  return (
+    (body.compositionType &&
+      NOTIFICATION_TYPES.includes(body.compositionType)) ||
+    false
+  )
 }
 
 function findDuplicateIds(

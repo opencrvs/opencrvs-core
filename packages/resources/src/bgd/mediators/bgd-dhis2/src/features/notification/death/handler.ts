@@ -166,21 +166,16 @@ export async function deathNotificationHandler(
     )
   }
 
+  // Contact type is always passing FATHER
+  // TODO: may need to change it based on the available data from dhis2
   const task = await createTaskEntry(
     composition.fullUrl,
     lastRegLocation,
     'DEATH',
+    'APPLICANT',
+    notification.phone_number,
     request.headers.authorization
   )
-
-  const causeOfDeathObservation =
-    notification.underlying_cause_of_death &&
-    (await createDeathObservation(
-      encounter.fullUrl,
-      notification.underlying_cause_of_death,
-      deceased.fullUrl,
-      notification.death_date
-    ))
 
   const entries: fhir.BundleEntry[] = []
   entries.push(composition)
@@ -189,7 +184,16 @@ export async function deathNotificationHandler(
   entries.push(relatedPerson)
   entries.push(informant)
   entries.push(encounter)
-  causeOfDeathObservation && entries.push(causeOfDeathObservation)
+  if (notification.underlying_cause_of_death) {
+    entries.push(
+      createDeathObservation(
+        encounter.fullUrl,
+        notification.underlying_cause_of_death,
+        deceased.fullUrl,
+        notification.death_date
+      )
+    )
+  }
 
   const bundle = createBundle(entries)
 
