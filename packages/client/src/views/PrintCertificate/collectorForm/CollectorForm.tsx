@@ -408,6 +408,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           <FormFieldGenerator
             id={formGroup.id}
             onChange={values => {
+              if (values && values.affidavitFile) {
+                this.setState({
+                  showError: false
+                })
+              }
               this.modifyApplication(values, applicationToBeCertified)
             }}
             setAllFieldsDirty={false}
