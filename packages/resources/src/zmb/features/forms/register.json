@@ -29,6 +29,7 @@
                   "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"OTHER\" || draftData.registration.presentAtBirthRegistration === \"BOTH_PARENTS\" )"
                 }
               ],
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "applicant",
@@ -38,7 +39,7 @@
                     "description": "Form section title for contact point",
                     "id": "register.selectInformant.relation"
                   },
-                  "required": false,
+                  "required": true,
                   "readonly": true,
                   "hideHeader": true,
                   "initialValue": "",
@@ -93,32 +94,32 @@
                     {
                       "value": "INSTITUTION_HEAD_PLACE_OF_BIRTH",
                       "label": {
-                        "defaultMessage": "Head of the institution where the birth occured",
-                        "description": "Option for form field: Head of the institution where the birth occured",
+                        "defaultMessage": "Head of the institution where the birth occurred",
+                        "description": "Option for form field: Head of the institution where the birth occurred",
                         "id": "form.field.label.relationInstitutionHeadPlaceOfBirth"
                       }
                     },
                     {
                       "value": "HOUSE_OWNER",
                       "label": {
-                        "defaultMessage": "Owner of the house or building where the birth occured",
-                        "description": "Option for form field: Owner of the house or building where the birth occured",
+                        "defaultMessage": "Owner of the house or building where the birth occurred",
+                        "description": "Option for form field: Owner of the house or building where the birth occurred",
                         "id": "form.field.label.relationHouseOwner"
                       }
                     },
                     {
                       "value": "OPERATOR",
                       "label": {
-                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the birth occured",
-                        "description": "Option for form field: Driver or operator of the land or water vehicle or aircraft where the birth occured",
+                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the birth occurred",
+                        "description": "Option for form field: Driver or operator of the land or water vehicle or aircraft where the birth occurred",
                         "id": "form.field.label.relationOperator"
                       }
                     },
                     {
                       "value": "OFFICE_IN_CHARGE",
                       "label": {
-                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the birth occured",
-                        "description": "Option for form field: Officer-in-charge of the Thana of a road or public space where the birth occured",
+                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the birth occurred",
+                        "description": "Option for form field: Officer-in-charge of the Thana of a road or public space where the birth occurred",
                         "id": "form.field.label.relationOfficeInCharge"
                       }
                     },
@@ -673,6 +674,7 @@
               "fields": [
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -699,6 +701,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "childNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -1020,6 +1023,7 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "previewGroup": "placeOfBirth",
+                  "ignoreFieldLabelOnErrorMessage": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -1598,6 +1602,16 @@
                     "id": "form.field.label.placeOfBirth"
                   },
                   "fieldToRedirect": "placeOfBirth"
+                },
+                {
+                  "id": "childNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for child name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -1712,6 +1726,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -1751,6 +1766,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -2353,6 +2369,16 @@
                     "id": "form.field.previewGroups.permanentAddress"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -3418,6 +3444,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -3444,6 +3471,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -5740,6 +5768,16 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "motherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Mother's English name",
+                    "description": "Group label for mother's name in english",
+                    "id": "form.preview.group.label.mother.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -5911,6 +5949,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First Name",
@@ -5943,6 +5982,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "fatherNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last Name",
@@ -6986,6 +7026,16 @@
                     "id": "form.preview.tag.current.address"
                   },
                   "fieldToRedirect": "country"
+                },
+                {
+                  "id": "fatherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Father's English name",
+                    "description": "Group label for father's name in english",
+                    "id": "form.preview.group.label.father.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -7159,7 +7209,7 @@
                   "name": "uploadDocForApplicant",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of applicant ID",
+                    "defaultMessage": "Proof of applicant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
                     "id": "form.field.label.applicantIDProof"
                   },
@@ -7315,7 +7365,7 @@
             {
               "id": "other-relationship-with-deceased",
               "title": {
-                "defaultMessage": "What is the applicants relationship to the deceased?",
+                "defaultMessage": "What is the applicant's relationship to the deceased?",
                 "description": "Form section title for primary applicant",
                 "id": "register.selectInformant.deathInformantSomeOneElseTitle"
               },
@@ -7330,7 +7380,7 @@
                   "name": "relationship",
                   "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
                   "label": {
-                    "defaultMessage": "What is the applicants relationship to the deceased?",
+                    "defaultMessage": "What is the applicant's relationship to the deceased?",
                     "description": "Form section title for primary applicant",
                     "id": "register.selectInformant.deathInformantSomeoneElseTitle"
                   },
@@ -7343,7 +7393,7 @@
                     {
                       "value": "HEAD_OF_THE_INSTITUTE",
                       "label": {
-                        "defaultMessage": "Head of the institution where the death occured",
+                        "defaultMessage": "Head of the institution where the death occurred",
                         "description": "Option for form field: Head of the institute",
                         "id": "form.field.label.applicantRelation.headOfTheInstitute"
                       }
@@ -7351,7 +7401,7 @@
                     {
                       "value": "OWNER_OF_THE_HOUSE",
                       "label": {
-                        "defaultMessage": "Owner of the house or building where the death occured",
+                        "defaultMessage": "Owner of the house or building where the death occurred",
                         "description": "Option for form field: Owner of the house",
                         "id": "form.field.label.applicantRelation.ownerOfTheHouse"
                       }
@@ -7359,7 +7409,7 @@
                     {
                       "value": "DRIVER_OF_THE_VEHICLE",
                       "label": {
-                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the death occured",
+                        "defaultMessage": "Driver or operator of the land or water vehicle or aircraft where the death occurred",
                         "description": "Option for form field: Driver of the vehicle",
                         "id": "form.field.label.applicantRelation.driverOfTheVehicle"
                       }
@@ -7367,7 +7417,7 @@
                     {
                       "value": "OFFICER_IN_CHARGE",
                       "label": {
-                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the death occured",
+                        "defaultMessage": "Officer-in-charge of the Thana of a road or public space where the death occurred",
                         "description": "Option for form field: Officer-in-charge",
                         "id": "form.field.label.applicantRelation.officerInCharge"
                       }
@@ -7719,6 +7769,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -7745,6 +7796,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "deceasedNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -8608,6 +8660,16 @@
                     "id": "form.preview.tag.permanent.address"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "deceasedNameInEnglish",
+                  "label": {
+                    "defaultMessage": "English name",
+                    "description": "Label for deceased name in english",
+                    "id": "form.preview.group.label.english.name"
+                  },
+                  "fieldToRedirect": "familyNameEng",
+                  "delimiter": " "
                 }
               ]
             }
@@ -8639,7 +8701,7 @@
                     "id": "form.section.deathEvent.title"
                   },
                   "notice": {
-                    "defaultMessage": "Enter the date in the format day, month and year. For example 24 10 2020.",
+                    "defaultMessage": "Enter the date as: day, month, year e.g. 24 10 2020",
                     "description": "Label for form field: Date of occurrence",
                     "id": "form.field.label.deathDate"
                   },
@@ -9581,7 +9643,7 @@
                     "id": "form.field.label.causeOfDeathEstablished"
                   },
                   "notice": {
-                    "defaultMessage": "Official cause of death is not mandatory to submit the application. A cause of death can be added at a later date.",
+                    "defaultMessage": "A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.",
                     "description": "Form section notice for Cause of Death",
                     "id": "form.section.causeOfDeathNotice"
                   },
@@ -9773,6 +9835,7 @@
                 },
                 {
                   "name": "firstNamesEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "First name(s)",
@@ -9812,6 +9875,7 @@
                 },
                 {
                   "name": "familyNameEng",
+                  "previewGroup": "applicantNameInEnglish",
                   "type": "TEXT",
                   "label": {
                     "defaultMessage": "Last name",
@@ -10857,6 +10921,16 @@
                     "id": "form.field.previewGroups.permanentAddress"
                   },
                   "fieldToRedirect": "countryPermanent"
+                },
+                {
+                  "id": "applicantNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Applicant's English name",
+                    "description": "Label for applicant's name in english",
+                    "id": "form.preview.group.label.applicant.english.name"
+                  },
+                  "fieldToRedirect": "applicantFamilyNameEng",
+                  "delimiter": " "
                 }
               ]
             }

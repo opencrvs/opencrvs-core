@@ -17,6 +17,7 @@ import { createStore } from '@client/store'
 import { Report } from './Report'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { Event } from '@client/forms'
 
 describe('Report page', () => {
   let testComponent: ReactWrapper
@@ -31,38 +32,62 @@ describe('Report page', () => {
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),
-          locationId: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+          locationId: '8cbc862a-b817-4c29-a490-4a8767ff023c',
+          event: 'birth'
         }
       },
       result: {
         data: {
-          fetchBirthRegistrationMetrics: {
-            timeFrames: [
-              {
-                locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+          fetchRegistrationMetrics: {
+            timeFrames: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  regWithin45d: 0,
+                  regWithin45dTo1yr: 0,
+                  regWithin1yrTo5yr: 0,
+                  regOver5yr: 2,
+                  total: 2
+                }
+              ],
+              total: {
                 regWithin45d: 0,
                 regWithin45dTo1yr: 0,
                 regWithin1yrTo5yr: 0,
                 regOver5yr: 2,
                 total: 2
               }
-            ],
-            genderBasisMetrics: [
-              {
-                location: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+            },
+            genderBasisMetrics: {
+              details: [
+                {
+                  location: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  maleUnder18: 2,
+                  femaleUnder18: 0,
+                  maleOver18: 0,
+                  femaleOver18: 0,
+                  total: 2
+                }
+              ],
+              total: {
                 maleUnder18: 2,
                 femaleUnder18: 0,
                 maleOver18: 0,
                 femaleOver18: 0,
                 total: 2
               }
-            ],
-            payments: [
-              {
-                locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+            },
+            payments: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  total: 200
+                }
+              ],
+              total: {
                 total: 200
               }
-            ]
+            }
           }
         }
       }
@@ -73,15 +98,39 @@ describe('Report page', () => {
         variables: {
           timeStart: timeStart.toISOString(),
           timeEnd: timeEnd.toISOString(),
-          locationId: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e'
+          locationId: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
+          event: 'birth'
         }
       },
       result: {
         data: {
-          fetchBirthRegistrationMetrics: {
-            timeFrames: [],
-            genderBasisMetrics: [],
-            payments: []
+          fetchRegistrationMetrics: {
+            timeFrames: {
+              details: [],
+              total: {
+                regWithin45d: 0,
+                regWithin45dTo1yr: 0,
+                regWithin1yrTo5yr: 0,
+                regOver5yr: 0,
+                total: 0
+              }
+            },
+            genderBasisMetrics: {
+              details: [],
+              total: {
+                maleUnder18: 0,
+                femaleUnder18: 0,
+                maleOver18: 0,
+                femaleOver18: 0,
+                total: 0
+              }
+            },
+            payments: {
+              details: [],
+              total: {
+                total: 0
+              }
+            }
           }
         }
       }
@@ -108,6 +157,7 @@ describe('Report page', () => {
           hash: '',
           state: {
             reportType: 'weekly',
+            eventType: Event.BIRTH,
             timeRange: {
               start: timeStart,
               end: timeEnd
@@ -126,7 +176,7 @@ describe('Report page', () => {
         .find(Header)
         .first()
         .text()
-    ).toBe('06 December  to 13 December 2019')
+    ).toBe('December 2019')
   })
 
   it('loads and renders data from query after selecting a location', async () => {

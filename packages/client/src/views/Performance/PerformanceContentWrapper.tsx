@@ -14,7 +14,7 @@ import { TopBar } from '@opencrvs/components/lib/interface'
 import { Container } from '@opencrvs/components/lib/layout'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages } from '@client/i18n/messages/views/performance'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { IconTab } from '@client/views/RegistrationHome/RegistrationHome'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -25,7 +25,7 @@ type Props = WrappedComponentProps & { tabId: string }
 type State = {}
 
 const TAB_ID = {
-  weekly: PERFORMANCE_REPORT_TYPE_WEEKY
+  monthly: PERFORMANCE_REPORT_TYPE_MONTHLY
 }
 
 const Content = styled.div`
@@ -39,12 +39,12 @@ class PerformanceContentWrapperComponent extends React.Component<Props, State> {
     return (
       <TopBar id="top-bar">
         <IconTab
-          id={`tab_${TAB_ID.weekly}`}
-          key={TAB_ID.weekly}
-          active={tabId === TAB_ID.weekly}
+          id={`tab_${TAB_ID.monthly}`}
+          key={TAB_ID.monthly}
+          active={tabId === TAB_ID.monthly}
           align={ICON_ALIGNMENT.LEFT}
         >
-          {intl.formatMessage(messages.weeklyTabTitle)}
+          {intl.formatMessage(messages.monthlyTabTitle)}
         </IconTab>
       </TopBar>
     )

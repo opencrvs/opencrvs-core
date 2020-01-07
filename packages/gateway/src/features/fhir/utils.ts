@@ -51,6 +51,15 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
+import {
+  GQLTimeFrameDetailMetrics,
+  GQLTimeFrameTotalCount,
+  GQLGenderBasisDetailsMetrics,
+  GQLGenderBasisTotalCount,
+  GQLCertificationPaymentDetailsMetrics,
+  GQLCertificationPaymentTotalCount
+} from '@gateway/graphql/schema'
+import { reduce } from 'lodash'
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -839,10 +848,11 @@ export const postSearch = (
 export const getMetrics = (
   authHeader: IAuthHeader,
   timeRange: ITimeRange,
-  locationId: string
+  locationId: string,
+  event: string
 ) => {
-  const params = new URLSearchParams({ ...timeRange, locationId })
-  return fetch(`${METRICS_URL}/metrics/birth?` + params, {
+  const params = new URLSearchParams({ ...timeRange, locationId, event })
+  return fetch(`${METRICS_URL}/metrics?` + params, {
     method: 'GET',
     headers: {
       ...authHeader
@@ -998,4 +1008,78 @@ export async function setInformantReference(
       }
     }
   }
+}
+
+export function timeFrameTotalCalculator(
+  timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
+): GQLTimeFrameTotalCount {
+  const initialValue: GQLTimeFrameTotalCount = {
+    regWithin45d: 0,
+    regWithin45dTo1yr: 0,
+    regWithin1yrTo5yr: 0,
+    regOver5yr: 0,
+    total: 0
+  }
+  return reduce(
+    timeFrameMetrics,
+    (accumulator, item) => {
+      const regWithin45d = accumulator.regWithin45d + item.regWithin45d
+      const regWithin45dTo1yr =
+        accumulator.regWithin45dTo1yr + item.regWithin45dTo1yr
+      const regWithin1yrTo5yr =
+        accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
+      const regOver5yr = accumulator.regOver5yr + item.regOver5yr
+
+      return {
+        regWithin45d,
+        regWithin45dTo1yr,
+        regWithin1yrTo5yr,
+        regOver5yr,
+        total: regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+      }
+    },
+    initialValue
+  )
+}
+
+export function genderBasisTotalCalculator(
+  genderMetrics: Array<GQLGenderBasisDetailsMetrics>
+): GQLGenderBasisTotalCount {
+  const initialValue: GQLGenderBasisTotalCount = {
+    maleUnder18: 0,
+    femaleUnder18: 0,
+    maleOver18: 0,
+    femaleOver18: 0,
+    total: 0
+  }
+  return reduce(
+    genderMetrics,
+    (accumulator, item) => {
+      const maleUnder18 = accumulator.maleUnder18 + item.maleUnder18
+      const femaleUnder18 = accumulator.femaleUnder18 + item.femaleUnder18
+      const maleOver18 = accumulator.maleOver18 + item.maleOver18
+      const femaleOver18 = accumulator.femaleOver18 + item.femaleOver18
+
+      return {
+        maleUnder18,
+        femaleUnder18,
+        maleOver18,
+        femaleOver18,
+        total: maleUnder18 + femaleUnder18 + maleOver18 + femaleOver18
+      }
+    },
+    initialValue
+  )
+}
+
+export function paymentTotalCalculator(
+  paymentMetrics: Array<GQLCertificationPaymentDetailsMetrics>
+): GQLCertificationPaymentTotalCount {
+  return reduce(
+    paymentMetrics,
+    (accumulator, item) => ({
+      total: accumulator.total + item.total
+    }),
+    { total: 0 }
+  )
 }

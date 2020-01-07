@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { getMetrics } from '@gateway/features/fhir/utils'
+import {
+  getMetrics,
+  timeFrameTotalCalculator,
+  genderBasisTotalCalculator,
+  paymentTotalCalculator
+} from '@gateway/features/fhir/utils'
 
 export interface ITimeRange {
   timeStart: string
@@ -19,21 +24,35 @@ export interface ITimeRange {
 
 export const resolvers: GQLResolver = {
   Query: {
-    async fetchBirthRegistrationMetrics(
+    async fetchRegistrationMetrics(
       _,
-      { timeStart, timeEnd, locationId },
+      { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
       const timeRange: ITimeRange = {
         timeStart,
         timeEnd
       }
-      const metricsData = await getMetrics(authHeader, timeRange, locationId)
+      const metricsData = await getMetrics(
+        authHeader,
+        timeRange,
+        locationId,
+        event
+      )
 
       return {
-        timeFrames: metricsData.timeFrames,
-        payments: metricsData.payments,
-        genderBasisMetrics: metricsData.genderBasisMetrics
+        timeFrames: {
+          details: metricsData.timeFrames,
+          total: timeFrameTotalCalculator(metricsData.timeFrames)
+        },
+        genderBasisMetrics: {
+          details: metricsData.genderBasisMetrics,
+          total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
+        },
+        payments: {
+          details: metricsData.payments,
+          total: paymentTotalCalculator(metricsData.payments)
+        }
       }
     }
   }

@@ -9,31 +9,46 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Box, Chip } from '@opencrvs/components/lib/interface'
-import styled from '@client/styledComponents'
 import {
-  StatusGray,
-  StatusOrange,
-  StatusGreen,
-  StatusRejected,
-  StatusCollected,
-  Delete
-} from '@opencrvs/components/lib/icons'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { goToPage as goToPageAction } from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import Moment from 'react-moment'
-import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+  downloadApplication,
+  DOWNLOAD_STATUS,
+  IApplication,
+  makeApplicationReadyToDownload
+} from '@client/applications'
 import {
-  buttonMessages,
-  formMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/duplicates'
+import { goToPage as goToPageAction } from '@client/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+import {
+  DangerButton,
+  PrimaryButton,
+  SuccessButton
+} from '@opencrvs/components/lib/buttons'
+import {
+  Cross,
+  Download,
+  StatusCollected,
+  StatusGray,
+  StatusGreen,
+  StatusOrange,
+  StatusRejected,
+  TickLarge,
+  Warning
+} from '@opencrvs/components/lib/icons'
+import { Box, Chip, Spinner } from '@opencrvs/components/lib/interface'
+import { find, get } from 'lodash'
+import * as React from 'react'
+import { withApollo, WithApolloClient } from 'react-apollo'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import Moment from 'react-moment'
+import { connect } from 'react-redux'
 
 export enum Event {
   BIRTH = 'BIRTH',
@@ -47,9 +62,9 @@ export enum Action {
   VALIDATED = 'VALIDATED',
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
-  CERTIFIED = 'CERTIFIED'
+  CERTIFIED = 'CERTIFIED',
+  LOAD_REVIEW_APPLICATION = 'load application data for review'
 }
-
 interface IProps extends IntlShapeProps {
   id: string
   duplicateContextId: string
@@ -85,6 +100,8 @@ interface IProps extends IntlShapeProps {
   notDuplicateHandler?: () => void
   rejectHandler?: () => void
   goToPage: typeof goToPageAction
+  outboxApplications: IApplication[]
+  downloadApplication: typeof downloadApplication
 }
 
 const DetailsBox = styled(Box)<{ id: string; currentStatus: string }>`
@@ -138,29 +155,16 @@ const ListItem = styled.div`
 const ListStatusContainer = styled.span`
   margin: 4px 8px;
 `
-
-const RejectApplication = styled.a`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.error};
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: 60px;
-  svg {
-    margin-right: 15px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    margin-left: 30px;
-  }
-`
-const ConditionalSeparator = styled(Separator)`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    border: 0px;
-    display: block;
+const ButtonContainer = styled.div`
+  display: flex;
+  button {
+    margin-right: 10px;
   }
 `
 
-class DuplicateDetailsClass extends React.Component<IProps> {
+class DuplicateDetailsClass extends React.Component<
+  IProps & WithApolloClient<{}>
+> {
   normalizeAction(action: string) {
     if (action === 'DECLARED') {
       return 'application'
@@ -184,6 +188,69 @@ class DuplicateDetailsClass extends React.Component<IProps> {
     }
   }
 
+  downloadApplication = (
+    event: string,
+    compositionId: string,
+    action: Action
+  ) => {
+    const downloadableApplication = makeApplicationReadyToDownload(
+      event.toLowerCase() as Event,
+      compositionId,
+      action
+    )
+    this.props.downloadApplication(downloadableApplication, this.props.client)
+  }
+
+  downloadAndReview = () => {
+    const { intl, data, outboxApplications, duplicateContextId } = this.props
+
+    const application = find(outboxApplications, { id: data.id })
+    const downloadStatus = get(application, 'downloadStatus')
+
+    if (
+      downloadStatus === DOWNLOAD_STATUS.DOWNLOADING ||
+      downloadStatus === DOWNLOAD_STATUS.READY_TO_DOWNLOAD
+    ) {
+      return <Spinner id="action-loading" size={24} />
+    } else if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+      return (
+        <PrimaryButton
+          id={`review_link_${data.id}`}
+          onClick={() => {
+            this.props.goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
+              data.id,
+              'review',
+              'birth',
+              '',
+              { duplicate: true, duplicateContextId }
+            )
+          }}
+        >
+          {intl.formatMessage(constantsMessages.review)}
+        </PrimaryButton>
+      )
+    }
+
+    return (
+      <>
+        {(downloadStatus === DOWNLOAD_STATUS.FAILED ||
+          downloadStatus === DOWNLOAD_STATUS.FAILED_NETWORK) && (
+          <Warning id="download-error" />
+        )}
+        <Download
+          onClick={() =>
+            this.downloadApplication(
+              data.event,
+              data.id,
+              Action.LOAD_REVIEW_APPLICATION
+            )
+          }
+        />
+      </>
+    )
+  }
+
   render() {
     const currentStatus = this.props.data.regStatusHistory.slice(-1)[0].action
     const {
@@ -203,9 +270,6 @@ class DuplicateDetailsClass extends React.Component<IProps> {
             <br />
             <b>{intl.formatMessage(constantsMessages.dob)}:</b> {data.child.dob}
             <br />
-            <b>{intl.formatMessage(constantsMessages.gender)}:</b>{' '}
-            {data.child.gender}
-            <br />
             <b>
               {intl.formatMessage(constantsMessages.dateOfApplication)}:
             </b>{' '}
@@ -214,23 +278,14 @@ class DuplicateDetailsClass extends React.Component<IProps> {
             <b>{intl.formatMessage(constantsMessages.trackingId)}:</b>{' '}
             {data.trackingId}
             <br />
-            <br />
           </DetailText>
-          {notDuplicateHandler && (
-            <Link
-              id={`not_duplicate_link_${data.id}`}
-              onClick={notDuplicateHandler}
-            >
-              {intl.formatMessage(messages.notDuplicate)}
-            </Link>
-          )}
+          {this.downloadAndReview()}
         </DetailTextContainer>
-        <DetailTextSplitContainer>
+        <Separator />
+        <DetailTextContainer>
           {data.mother && (
             <DetailText>
-              <b>{intl.formatMessage(formMessages.mother)}</b>
-              <br />
-              <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
+              <b>{intl.formatMessage(formMessages.mother)}:</b>{' '}
               {data.mother.name}
               <br />
               <b>{intl.formatMessage(constantsMessages.dob)}:</b>{' '}
@@ -239,13 +294,14 @@ class DuplicateDetailsClass extends React.Component<IProps> {
               <b>{intl.formatMessage(constantsMessages.id)}:</b>{' '}
               {data.mother.id}
               <br />
+              <br />
             </DetailText>
           )}
+        </DetailTextContainer>
+        <DetailTextContainer>
           {data.father && (
             <DetailText>
-              <b>{intl.formatMessage(formMessages.father)}</b>
-              <br />
-              <b>{intl.formatMessage(constantsMessages.name)}:</b>{' '}
+              <b>{intl.formatMessage(formMessages.father)}:</b>{' '}
               {data.father.name}
               <br />
               <b>{intl.formatMessage(constantsMessages.dob)}:</b>{' '}
@@ -256,7 +312,7 @@ class DuplicateDetailsClass extends React.Component<IProps> {
               <br />
             </DetailText>
           )}
-        </DetailTextSplitContainer>
+        </DetailTextContainer>
         <Separator />
         <TagContainer>
           <Chip
@@ -316,33 +372,28 @@ class DuplicateDetailsClass extends React.Component<IProps> {
         {currentStatus === Action.DECLARED && (
           <>
             <Separator />
-            <PrimaryButton
-              id={`review_link_${data.id}`}
-              onClick={() => {
-                this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
-                  data.id,
-                  'review',
-                  'birth',
-                  '',
-                  { duplicate: true, duplicateContextId }
-                )
-              }}
-            >
-              {intl.formatMessage(constantsMessages.review)}
-            </PrimaryButton>
-            {rejectHandler && (
-              <>
-                <ConditionalSeparator />
-                <RejectApplication
+            <ButtonContainer>
+              {notDuplicateHandler && (
+                <SuccessButton
+                  id={`not_duplicate_link_${data.id}`}
+                  onClick={notDuplicateHandler}
+                >
+                  <TickLarge />
+                  &nbsp;
+                  {intl.formatMessage(messages.keep)}
+                </SuccessButton>
+              )}
+
+              {rejectHandler && (
+                <DangerButton
                   id={`reject_link_${data.id}`}
                   onClick={rejectHandler}
                 >
-                  <Delete />
-                  {intl.formatMessage(buttonMessages.reject)}
-                </RejectApplication>
-              </>
-            )}
+                  <Cross color="white" /> &nbsp;
+                  {intl.formatMessage(messages.duplicate)}
+                </DangerButton>
+              )}
+            </ButtonContainer>
           </>
         )}
       </DetailsBox>
@@ -350,9 +401,18 @@ class DuplicateDetailsClass extends React.Component<IProps> {
   }
 }
 
-export const DuplicateDetails = connect(
-  null,
-  {
-    goToPage: goToPageAction
+const mapStateToProps = (state: IStoreState) => {
+  return {
+    outboxApplications: state.applicationsState.applications
   }
-)(injectIntl<'intl', IProps>(DuplicateDetailsClass))
+}
+
+const mapDispatchToProps = {
+  goToPage: goToPageAction,
+  downloadApplication
+}
+
+export const DuplicateDetails = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(injectIntl(withApollo(DuplicateDetailsClass)))

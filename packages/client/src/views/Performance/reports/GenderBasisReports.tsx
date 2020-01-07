@@ -21,64 +21,99 @@ import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
+import { GQLRegistrationGenderBasisMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { Event } from '@client/forms'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
-interface IGenderBasisMetrics {
-  location: string
-  femaleOver18: number
-  maleOver18: number
-  maleUnder18: number
-  femaleUnder18: number
-  total: number
-}
-
 type FullProps = {
-  genderBasisMetrics: IGenderBasisMetrics[]
+  genderBasisMetrics: GQLRegistrationGenderBasisMetrics
   loading: boolean
+  eventType: Event
 } & IStateProps &
   WrappedComponentProps
 
 class GenderBasisComponent extends React.Component<FullProps> {
   getContent() {
-    return this.props.genderBasisMetrics.map(content => {
-      return {
-        location: getLocationFromPartOfLocationId(
-          content.location,
-          this.props.offlineResources
-        ).name,
-        femaleOver18: getValueWithPercentageString(
-          content.femaleOver18,
-          content.total
-        ),
-        maleOver18: getValueWithPercentageString(
-          content.maleOver18,
-          content.total
-        ),
-        maleUnder18: getValueWithPercentageString(
-          content.maleUnder18,
-          content.total
-        ),
-        femaleUnder18: getValueWithPercentageString(
-          content.femaleUnder18,
-          content.total
-        ),
-        total: String(content.total)
+    return (
+      (this.props.genderBasisMetrics.details &&
+        this.props.genderBasisMetrics.details.map(content => {
+          return {
+            location: getLocationFromPartOfLocationId(
+              content.location,
+              this.props.offlineResources
+            ).name,
+            femaleOver18: getValueWithPercentageString(
+              content.femaleOver18,
+              content.total
+            ),
+            maleOver18: getValueWithPercentageString(
+              content.maleOver18,
+              content.total
+            ),
+            maleUnder18: getValueWithPercentageString(
+              content.maleUnder18,
+              content.total
+            ),
+            femaleUnder18: getValueWithPercentageString(
+              content.femaleUnder18,
+              content.total
+            ),
+            total: String(content.total)
+          }
+        })) ||
+      []
+    )
+  }
+
+  getFooterColumns(): IFooterFColumn[] {
+    const {
+      maleUnder18 = 0,
+      femaleUnder18 = 0,
+      maleOver18 = 0,
+      femaleOver18 = 0
+    } = this.props.genderBasisMetrics.total || {}
+    const total = get(this.props.genderBasisMetrics, 'total.total') || '0'
+    return [
+      {
+        width: 25
+      },
+      {
+        label: getValueWithPercentageString(maleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleUnder18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(maleOver18, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(femaleOver18, total),
+        width: 15
+      },
+      {
+        label: total,
+        width: 15
       }
-    })
+    ]
   }
 
   render() {
-    const { intl, loading } = this.props
+    const { intl, loading, eventType } = this.props
 
     return (
       <ListTable
         id="genderBasisMetrics"
-        tableTitle={intl.formatMessage(
-          constantsMessages.birthRegistrationTitle
-        )}
+        tableTitle={intl.formatMessage(constantsMessages.registrationTitle, {
+          event: eventType
+        })}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}
@@ -120,6 +155,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )

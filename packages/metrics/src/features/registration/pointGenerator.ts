@@ -44,7 +44,8 @@ import {
 import {
   getAgeInDays,
   getAgeInYears,
-  getDurationInSeconds
+  getDurationInSeconds,
+  getDurationInDays
 } from '@metrics/features/registration/utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
@@ -111,7 +112,7 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined
+    ageInDays: (child.birthDate && getAgeInDays(child.birthDate)) || undefined
   }
 
   const tags: IBirthRegistrationTags = {
@@ -146,9 +147,15 @@ export const generateDeathRegPoint = async (
 
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
-    ageInYears: deceased.birthDate
-      ? getAgeInYears(deceased.birthDate)
-      : undefined
+    ageInYears:
+      (deceased.birthDate && getAgeInYears(deceased.birthDate)) || undefined,
+    deathDays:
+      (deceased.deceasedDateTime &&
+        getDurationInDays(
+          deceased.deceasedDateTime,
+          new Date().toISOString()
+        )) ||
+      undefined
   }
 
   const tags: IDeathRegistrationTags = {
@@ -216,7 +223,10 @@ export async function generatePaymentPoint(
     compositionId: composition.id
   }
 
-  const tags = await generatePointLocations(payload, authHeader)
+  const tags = {
+    eventType: getApplicationType(task),
+    ...(await generatePointLocations(payload, authHeader))
+  }
 
   return {
     measurement: 'certification_payment',
@@ -284,8 +294,11 @@ export function generateTimeLoggedPoint(payload: fhir.Bundle): IPoints {
     throw new Error('Current task not found')
   }
 
+  const timeLoggedInMS = getTimeLoggedFromTask(currentTask)
+  const timeLoggedInSeconds = timeLoggedInMS / 1000
+
   const fields: ITimeLoggedFields = {
-    timeSpentEditing: getTimeLoggedFromTask(currentTask),
+    timeSpentEditing: timeLoggedInSeconds,
     compositionId: composition.id
   }
 

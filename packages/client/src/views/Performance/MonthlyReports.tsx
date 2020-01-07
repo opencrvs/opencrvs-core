@@ -19,10 +19,14 @@ import { ListTable } from '@opencrvs/components/lib/interface'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
-import { Header } from '@client/views/Performance/utils'
+import {
+  PERFORMANCE_REPORT_TYPE_MONTHLY,
+  MONTHS_IN_YEAR
+} from '@client/utils/constants'
+import { Header, getMonthDateRange } from '@client/views/Performance/utils'
 import { getToken } from '@client/utils/authUtils'
 import styled from '@client/styledComponents'
+import { Event } from '@client/forms'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
@@ -53,26 +57,24 @@ type Props = ReportProps & WrappedComponentProps
 
 type State = {}
 
-class WeeklyReportsComponent extends React.Component<Props, State> {
-  getContent() {
+class MonthlyReportsComponent extends React.Component<Props, State> {
+  getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
     let content = []
 
-    const startDayOfYear = moment([2019, 0]).startOf('month')
-    const endDayOfYear = moment([2019, 11]).endOf('month')
+    const currentYear = moment().year()
+    let currentMonth = 1
 
-    while (startDayOfYear < endDayOfYear) {
-      const start = startDayOfYear.clone()
-      const end = startDayOfYear.clone().add(7, 'days')
-      const title = `${start.format('DD MMMM')} ${this.props.intl.formatMessage(
-        constantsMessages.to
-      )} ${end.format('DD MMMM YYYY')}`
+    while (currentMonth <= 12) {
+      const { start, end } = getMonthDateRange(currentYear, currentMonth)
+      const title = start.format('MMMM YYYY')
       content.push({
-        week: (
+        month: (
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
-                PERFORMANCE_REPORT_TYPE_WEEKY,
+                PERFORMANCE_REPORT_TYPE_MONTHLY,
+                eventType,
                 start.toDate(),
                 end.toDate()
               )
@@ -87,7 +89,7 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
           </>
         )
       })
-      startDayOfYear.add(7, 'days')
+      currentMonth++
     }
     return content
   }
@@ -97,18 +99,19 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <Header>{intl.formatMessage(messages.weeklyReportsBodyHeader)}</Header>
+        <Header>{intl.formatMessage(messages.monthlyReportsBodyHeader)}</Header>
 
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.birth)}
           isLoading={false}
-          content={this.getContent()}
+          content={this.getContent(Event.BIRTH)}
           tableHeight={280}
+          pageSize={MONTHS_IN_YEAR}
           columns={[
             {
-              label: intl.formatMessage(constantsMessages.week),
+              label: intl.formatMessage(constantsMessages.month),
               width: 70,
-              key: 'week',
+              key: 'month',
               isSortable: true,
               icon: <ArrowDownBlue />,
               sortFunction: () => {}
@@ -125,13 +128,14 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.death)}
           isLoading={false}
-          content={this.getContent()}
+          content={this.getContent(Event.DEATH)}
           tableHeight={280}
+          pageSize={MONTHS_IN_YEAR}
           columns={[
             {
-              label: intl.formatMessage(constantsMessages.week),
+              label: intl.formatMessage(constantsMessages.month),
               width: 70,
-              key: 'week',
+              key: 'month',
               isSortable: true,
               icon: <ArrowDownBlue />,
               sortFunction: () => {}
@@ -154,9 +158,9 @@ class WeeklyReportsComponent extends React.Component<Props, State> {
   }
 }
 
-export const WeeklyReports = connect(
+export const MonthlyReports = connect(
   null,
   {
     goToPerformanceReport
   }
-)(injectIntl(WeeklyReportsComponent))
+)(injectIntl(MonthlyReportsComponent))

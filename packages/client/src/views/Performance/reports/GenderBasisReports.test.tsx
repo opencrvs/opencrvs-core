@@ -13,23 +13,34 @@ import * as React from 'react'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { GenderBasisReports } from './GenderBasisReports'
+import { Event } from '@client/forms'
 
 describe('Gender basis report tests', () => {
   const { store } = createStore()
-  const genderBasisMetrics = [
-    {
-      location: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
+  const genderBasisMetrics = {
+    details: [
+      {
+        location: 'Location/d5ccd1d1-ca47-435b-93db-36c626ad2dfa',
+        femaleOver18: 5,
+        maleOver18: 5,
+        maleUnder18: 5,
+        femaleUnder18: 5,
+        total: 20
+      }
+    ],
+    total: {
       femaleOver18: 5,
       maleOver18: 5,
       maleUnder18: 5,
       femaleUnder18: 5,
       total: 20
     }
-  ]
+  }
 
   it('Renders without crashing', async () => {
     const testComponent = await createTestComponent(
       <GenderBasisReports
+        eventType={Event.BIRTH}
         genderBasisMetrics={genderBasisMetrics}
         loading={false}
       />,

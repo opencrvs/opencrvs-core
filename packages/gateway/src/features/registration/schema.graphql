@@ -39,7 +39,6 @@ enum BirthRegPresence {
   MOTHER
   FATHER
   OTHER
-  LEGAL_GUARDIAN
 }
 
 enum BirthType {

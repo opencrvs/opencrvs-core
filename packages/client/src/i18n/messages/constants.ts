@@ -54,6 +54,7 @@ interface IConstantsMessages {
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
   lastEdited: MessageDescriptor
+  month: MessageDescriptor
   name: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
@@ -87,7 +88,7 @@ interface IConstantsMessages {
   maleOver18: MessageDescriptor
   femaleOver18: MessageDescriptor
   total: MessageDescriptor
-  birthRegistrationTitle: MessageDescriptor
+  registrationTitle: MessageDescriptor
   within45Days: MessageDescriptor
   within45DaysTo1Year: MessageDescriptor
   within1YearTo5Years: MessageDescriptor
@@ -314,6 +315,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for rejection date in work queue list item',
     id: 'constants.lastEdited'
   },
+  month: {
+    defaultMessage: 'Month',
+    description: 'Label for month',
+    id: 'constants.month'
+  },
   name: {
     defaultMessage: 'Name',
     description: 'Name label',
@@ -486,10 +492,10 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for location',
     id: 'constants.location'
   },
-  birthRegistrationTitle: {
-    defaultMessage: 'Births Registered',
-    description: 'Label for birthRegistrationTitle',
-    id: 'constants.birthRegistrationTitle'
+  registrationTitle: {
+    defaultMessage: '{event, select, birth{Birth} death{Death}} Registered',
+    description: 'Label for registrationTitle',
+    id: 'constants.registrationTitle'
   },
   within45Days: {
     defaultMessage: 'Within 45 days',

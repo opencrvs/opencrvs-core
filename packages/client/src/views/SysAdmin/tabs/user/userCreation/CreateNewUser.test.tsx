@@ -15,7 +15,7 @@ import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/Cre
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { FormFieldGenerator } from '@client/components/form'
-import { modifyUserFormData } from '@client/user/userReducer'
+import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import {
   mockIncompleteFormData,
   mockCompleteFormData,
@@ -24,6 +24,187 @@ import {
   mockDataWithRegistarRoleSelected
 } from '@client/views/SysAdmin/utils'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
+import { userQueries } from '@client/sysadmin/user/queries'
+export const mockRoles = {
+  data: {
+    getRoles: [
+      { value: 'FIELD_AGENT', types: ['HOSPITAL', 'CHA'], __typename: 'Role' },
+      {
+        value: 'REGISTRATION_AGENT',
+        types: ['ENTREPENEUR', 'DATA_ENTRY_CLERK'],
+        __typename: 'Role'
+      },
+      {
+        value: 'LOCAL_REGISTRAR',
+        types: ['SECRETARY', 'CHAIRMAN', 'MAYOR'],
+        __typename: 'Role'
+      },
+      {
+        value: 'LOCAL_SYSTEM_ADMIN',
+        types: ['LOCAL_SYSTEM_ADMIN'],
+        __typename: 'Role'
+      },
+      {
+        value: 'NATIONAL_SYSTEM_ADMIN',
+        types: ['NATIONAL_SYSTEM_ADMIN'],
+        __typename: 'Role'
+      },
+      {
+        value: 'PERFORMANCE_OVERSIGHT',
+        types: ['CABINET_DIVISION', 'BBS'],
+        __typename: 'Role'
+      },
+      {
+        value: 'PERFORMANCE_MANAGEMENT',
+        types: ['HEALTH_DIVISION', 'ORG_DIVISION'],
+        __typename: 'Role'
+      },
+      { value: 'API_USER', types: ['API_USER'], __typename: 'Role' }
+    ]
+  }
+}
+
+export const mockUsers = {
+  data: {
+    searchUsers: {
+      totalItems: 8,
+      results: [
+        {
+          id: '5db9f3fdd2ce28e4e2da1a7e',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'API',
+              familyName: 'User',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'api.user',
+          role: 'API_USER',
+          type: 'API_USER',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a7d',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Sahriar',
+              familyName: 'Nafis',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'shahriar.nafis',
+          role: 'LOCAL_SYSTEM_ADMIN',
+          type: 'LOCAL_SYSTEM_ADMIN',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a7c',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Mohamed',
+              familyName: 'Abu Abdullah',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'mohamed.abu',
+          role: 'NATIONAL_REGISTRAR',
+          type: 'SECRETARY',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a7b',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Nasreen Pervin',
+              familyName: 'Huq',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'nasreen.pervin',
+          role: 'STATE_REGISTRAR',
+          type: 'MAYOR',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a7a',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Muhammad Abdul Muid',
+              familyName: 'Khan',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'muid.khan',
+          role: 'DISTRICT_REGISTRAR',
+          type: 'MAYOR',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a79',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'mohammad.ashraful',
+          role: 'LOCAL_REGISTRAR',
+          type: 'CHAIRMAN',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a78',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Tamim',
+              familyName: 'Iqbal',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'tamim.iqbal',
+          role: 'REGISTRATION_AGENT',
+          type: 'ENTREPENEUR',
+          status: 'active',
+          __typename: 'User'
+        },
+        {
+          id: '5db9f3fcd2ce28e4e2da1a77',
+          name: [
+            {
+              use: 'en',
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan',
+              __typename: 'HumanName'
+            }
+          ],
+          username: 'sakibal.hasan',
+          role: 'FIELD_AGENT',
+          type: 'CHA',
+          status: 'active',
+          __typename: 'User'
+        }
+      ],
+      __typename: 'SearchUserResult'
+    }
+  }
+}
+;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
+;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
 
 describe('create new user tests', () => {
   const { store, history } = createStore()
@@ -36,16 +217,15 @@ describe('create new user tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user',
-              groupId: userSection.groups[0].id
+              sectionId: userSection.id,
+              groupId: userSection.groups[1].id
             },
             isExact: true,
             path: '/createUser',
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation]
+        store
       )).component
     })
 
@@ -55,14 +235,13 @@ describe('create new user tests', () => {
       })
       testComponent.update()
       store.dispatch(modifyUserFormData(mockIncompleteFormData))
-
+      store.dispatch(processRoles(mockIncompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
         .simulate('click')
 
       await flushPromises()
-
       testComponent.update()
 
       expect(
@@ -81,7 +260,7 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-
+      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -98,7 +277,9 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-
+      store.dispatch(
+        processRoles(mockDataWithRegistarRoleSelected.registrationOffice)
+      )
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -114,6 +295,7 @@ describe('create new user tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
+      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent = (await createTestComponent(
         // @ts-ignore
         <CreateNewUser
@@ -127,8 +309,7 @@ describe('create new user tests', () => {
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
+        store
       )).component
     })
 

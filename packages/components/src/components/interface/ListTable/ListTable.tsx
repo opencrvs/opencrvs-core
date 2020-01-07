@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { grid } from '../../grid'
 import { Pagination } from '../DataTable/Pagination'
-import { IColumn, IDynamicValues } from '../GridTable/types'
+import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
@@ -46,6 +46,23 @@ const TableHeader = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
+  }
+`
+const TableFooter = styled(TableHeader)`
+  background: ${({ theme }) => theme.colors.background};
+  border-top: 2px solid ${({ theme }) => theme.colors.disabled};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+
+  & span {
+    color: ${({ theme }) => theme.colors.copy};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
+  }
+  & span:last-child {
+    padding-right: 10px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
   }
 `
 const TableBody = styled.div`
@@ -148,6 +165,7 @@ interface IListTableProps {
   id?: string
   content: IDynamicValues[]
   columns: IColumn[]
+  footerColumns?: IFooterFColumn[]
   noResultText: string
   tableHeight?: number
   onPageChange?: (currentPage: number) => void
@@ -231,7 +249,8 @@ export class ListTable extends React.Component<
       isLoading = false,
       tableTitle,
       tableHeight,
-      hideBoxShadow
+      hideBoxShadow,
+      footerColumns
     } = this.props
     const { width } = this.state
     const totalItems = this.props.totalItems || 0
@@ -326,6 +345,15 @@ export class ListTable extends React.Component<
                 )}
               </TableBody>
             </TableScroller>
+          )}
+          {!isLoading && footerColumns && content.length > 1 && (
+            <TableFooter id={'listTable-' + id + '-footer'}>
+              {footerColumns.map((preference, index) => (
+                <ContentWrapper key={index} width={preference.width}>
+                  {preference.label || ''}
+                </ContentWrapper>
+              ))}
+            </TableFooter>
           )}
         </Wrapper>
 

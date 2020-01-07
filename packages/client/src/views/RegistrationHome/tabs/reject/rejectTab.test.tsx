@@ -268,7 +268,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar in sent for update tab if items more than 11', async () => {
+  it('should show pagination bar in sent for update tab if pagination is used and items more than 11', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RejectTab
@@ -279,6 +279,7 @@ describe('RegistrationHome sent for update tab related tests', () => {
             results: []
           }
         }}
+        showPaginated={true}
       />,
       store
     )
@@ -287,6 +288,31 @@ describe('RegistrationHome sent for update tab related tests', () => {
 
     testComponent.component
       .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+  })
+
+  it('should show loadmore button in sent for update tab if loadmore is used and items more than 11', async () => {
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <RejectTab
+        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+        showPaginated={false}
+      />,
+      store
+    )
+
+    await waitForElement(testComponent.component, '#load_more_button')
+
+    testComponent.component
+      .find('#load_more_button')
       .last()
       .hostNodes()
       .simulate('click')

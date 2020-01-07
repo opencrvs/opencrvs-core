@@ -12,6 +12,7 @@
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
 import { searchDeclaration } from '@search/features/search/handler'
+import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -79,6 +80,15 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Handles indexing a new application or updating an existing application'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/not-duplicate',
+      handler: deduplicateHandler,
+      config: {
+        tags: ['api'],
+        description: 'Marks the application as not a duplicate'
       }
     }
   ]

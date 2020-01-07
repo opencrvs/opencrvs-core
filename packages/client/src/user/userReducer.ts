@@ -20,7 +20,10 @@ import { Action } from 'redux'
 import { formMessages as messages } from '@client/i18n/messages'
 import ApolloClient from 'apollo-client'
 import { goToHome } from '@client/navigation'
-import { transformRoleDataToDefinitions } from '@client/views/SysAdmin/utils'
+import {
+  transformRoleDataToDefinitions,
+  alterRolesBasedOnUserRole
+} from '@client/views/SysAdmin/utils'
 import {
   showSubmitFormSuccessToast,
   showSubmitFormErrorToast
@@ -35,6 +38,7 @@ const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
+const PROCESS_ROLES = 'USER_FORM/PROCESS_ROLES'
 
 enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
@@ -64,7 +68,8 @@ const initialState: IUserFormState = {
     ]
   }),
   userFormData: {},
-  submitting: true,
+  submitting: false,
+  loadingRoles: false,
   submissionError: false
 }
 
@@ -81,6 +86,20 @@ export function updateUserFormFieldDefinitions(
   return {
     type: UPDATE_FORM_FIELD_DEFINITIONS,
     payload: { data }
+  }
+}
+
+interface IProcessRoles {
+  type: typeof PROCESS_ROLES
+  payload: {
+    primaryOfficeId: string
+  }
+}
+
+export function processRoles(primaryOfficeId: string): IProcessRoles {
+  return {
+    type: PROCESS_ROLES,
+    payload: { primaryOfficeId }
   }
 }
 
@@ -153,6 +172,7 @@ export interface IUserFormState {
   userForm: IForm
   userFormData: IFormSectionData
   submitting: boolean
+  loadingRoles: boolean
   submissionError: boolean
 }
 
@@ -161,36 +181,48 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   action: UserFormAction
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
+    case PROCESS_ROLES:
+      const { primaryOfficeId } = (action as IProcessRoles).payload
+      return loop(
+        {
+          ...state,
+          loadingRoles: true
+        },
+        Cmd.run(alterRolesBasedOnUserRole, {
+          successActionCreator: updateUserFormFieldDefinitions,
+          args: [primaryOfficeId]
+        })
+      )
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
 
-      const userSection = state.userForm.sections[0]
-
-      const updatedFields = transformRoleDataToDefinitions(
-        state.userForm.sections[0].groups[0].fields,
-        data
-      )
-      const updatedSection: IFormSection = {
-        ...userSection,
-        groups: [
-          {
-            ...userSection.groups[0],
-            fields: updatedFields
-          },
-          ...userSection.groups.slice(1)
-        ]
-      }
+      const updatedSections = state.userForm.sections
+      updatedSections.forEach(section => {
+        section.groups.forEach(group => {
+          group.fields = transformRoleDataToDefinitions(
+            group.fields,
+            data,
+            state.userFormData
+          )
+        })
+      })
       const newState = {
         ...state,
+        loadingRoles: false,
         submitting: false,
         userForm: {
-          sections: [updatedSection, ...state.userForm.sections.slice(1)]
+          sections: updatedSections
         }
       }
       return newState
     case MODIFY_USER_FORM_DATA:
+      let submitting = state.submitting
+      if (state.loadingRoles) {
+        submitting = true
+      }
       return {
         ...state,
+        submitting,
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:

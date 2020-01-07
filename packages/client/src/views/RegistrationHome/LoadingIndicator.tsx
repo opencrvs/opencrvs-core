@@ -34,6 +34,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 38px;
 `
 const Text = styled.span`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -43,7 +44,7 @@ const Text = styled.span`
 type IBaseLoadingProps = {
   loading: boolean
   hasError: boolean
-  noApplication: boolean
+  noApplication?: boolean
 }
 
 type IState = {

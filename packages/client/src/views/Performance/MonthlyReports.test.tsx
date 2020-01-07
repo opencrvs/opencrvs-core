@@ -15,18 +15,18 @@ import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { WeeklyReports } from './WeeklyReports'
+import { MonthlyReports } from './MonthlyReports'
 
-describe('Weekly report', () => {
+describe('Monthly report', () => {
   const { store, history } = createStore()
   let app: ReactWrapper
 
   beforeAll(async () => {
-    app = (await createTestComponent(<WeeklyReports />, store)).component
+    app = (await createTestComponent(<MonthlyReports />, store)).component
     app.update()
   })
 
-  it('loads weekly report list table', () => {
+  it('loads monthly report list table', () => {
     expect(app.find(ListTable)).toHaveLength(2)
   })
 

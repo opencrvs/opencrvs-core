@@ -61,6 +61,11 @@ export const REGISTRATION_HOME_QUERY = gql`
   query registrationHome(
     $locationIds: [String]
     $count: Int
+    $inProgressCount: Int
+    $reviewCount: Int
+    $rejectCount: Int
+    $approvalCount: Int
+    $printCount: Int
     $inProgressSkip: Int
     $reviewStatuses: [String]
     $reviewSkip: Int
@@ -72,7 +77,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
       type: ["birth-application", "death-application"]
-      count: $count
+      count: $inProgressCount
       skip: $inProgressSkip
     ) {
       totalItems
@@ -95,7 +100,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     reviewTab: searchEvents(
       locationIds: $locationIds
       status: $reviewStatuses
-      count: $count
+      count: $reviewCount
       skip: $reviewSkip
     ) {
       totalItems
@@ -106,7 +111,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     rejectTab: searchEvents(
       locationIds: $locationIds
       status: ["REJECTED"]
-      count: $count
+      count: $rejectCount
       skip: $rejectSkip
     ) {
       totalItems
@@ -117,7 +122,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     approvalTab: searchEvents(
       locationIds: $locationIds
       status: ["VALIDATED"]
-      count: $count
+      count: $approvalCount
       skip: $approvalSkip
     ) {
       totalItems
@@ -128,7 +133,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     printTab: searchEvents(
       locationIds: $locationIds
       status: ["REGISTERED"]
-      count: $count
+      count: $printCount
       skip: $printSkip
     ) {
       totalItems

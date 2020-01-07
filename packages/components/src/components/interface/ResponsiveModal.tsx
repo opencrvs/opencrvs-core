@@ -63,10 +63,10 @@ const Header = styled.div`
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
 `
-const Body = styled.div<{ height?: number }>`
+const Body = styled.div<{ height?: number; scrollableY?: boolean }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
-  overflow-y: auto;
+  overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
@@ -110,6 +110,7 @@ interface IProps {
   show: boolean
   width?: number
   contentHeight?: number
+  contentScrollableY?: boolean
   actions: JSX.Element[]
   handleClose?: () => void
 }
@@ -135,7 +136,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       id,
       actions,
       width,
-      contentHeight
+      contentHeight,
+      contentScrollableY
     } = this.props
 
     this.toggleScroll()
@@ -153,7 +155,9 @@ export class ResponsiveModal extends React.Component<IProps> {
               <Cross color="currentColor" />
             </CircleButton>
           </Header>
-          <Body height={contentHeight}>{this.props.children}</Body>
+          <Body height={contentHeight} scrollableY={contentScrollableY}>
+            {this.props.children}
+          </Body>
           <Footer>
             {actions.map((action, i) => (
               <Action key={i}>{action}</Action>

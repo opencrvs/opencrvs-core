@@ -127,7 +127,7 @@ const Row = styled.div`
   }
 `
 const Column = styled.div`
-  width: 50%;
+  width: 40%;
   margin: 0px 15px;
 
   &:first-child {
@@ -145,6 +145,7 @@ const Column = styled.div`
 
 const StyledColumn = styled(Column)`
   ${({ theme }) => theme.shadows.mistyShadow};
+  width: 60%;
 `
 
 const ZeroDocument = styled.div`
@@ -577,7 +578,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   editLinkClickHandlerForDraft = (
     sectionId: string,
     groupId: string,
-    fieldName: string
+    fieldName?: string
   ) => {
     const { draft, pageRoute, writeApplication, goToPageGroup } = this.props
     const application = draft
@@ -637,7 +638,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     return (
       <RequiredField id={`required_label_${section.id}_${field.name}`}>
-        {field.previewGroup && this.props.intl.formatMessage(field.label) + ' '}
+        {field.ignoreFieldLabelOnErrorMessage ||
+          (field.previewGroup &&
+            this.props.intl.formatMessage(field.label) + ' ')}
         {this.props.intl.formatMessage(
           errorsOnField.message,
           errorsOnField.props
@@ -800,7 +803,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (completeValue = (
             <>
               {completeValue}
-              <br />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: tagDef[0].delimiter || '<br />'
+                }}
+              ></span>
               {value}
             </>
           ))
@@ -1055,10 +1062,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <LinkButton
                     id="edit-document"
                     onClick={() =>
-                      this.editLinkClickHandler(
+                      this.editLinkClickHandlerForDraft(
                         documentsSection.id,
-                        documentsSection.groups[0].id,
-                        this.state.activeSection!
+                        documentsSection.groups[0].id!
                       )
                     }
                   >

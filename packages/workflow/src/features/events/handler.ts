@@ -38,7 +38,6 @@ export enum Events {
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_WAITING_VALIDATION = '/events/birth/waiting-validation',
   BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation',
-  BIRTH_NEW_REG = '/events/birth/new-registration',
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
@@ -48,13 +47,13 @@ export enum Events {
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_WAITING_VALIDATION = '/events/death/waiting-validation',
   DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation',
-  DEATH_NEW_REG = '/events/death/new-registration',
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
   BIRTH_NEW_VALIDATE = '/events/birth/new-validation',
   DEATH_NEW_VALIDATE = '/events/death/new-validation',
+  EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   UNKNOWN = 'unknown'
 }
 
@@ -152,6 +151,10 @@ function detectEvent(request: Hapi.Request): Events {
     } else if (eventType === EVENT_TYPE.DEATH) {
       return Events.DEATH_MARK_VOID
     }
+  }
+
+  if (request.method === 'put' && request.path.includes('/fhir/Composition')) {
+    return Events.EVENT_NOT_DUPLICATE
   }
 
   return Events.UNKNOWN
@@ -346,6 +349,14 @@ export async function fhirWorkflowEventHandler(
       response = await updateTaskHandler(request, h, event)
       await triggerEvent(
         Events.DEATH_MARK_VOID,
+        request.payload,
+        request.headers.authorization
+      )
+      break
+    case Events.EVENT_NOT_DUPLICATE:
+      response = await forwardToHearth(request, h)
+      await triggerEvent(
+        Events.EVENT_NOT_DUPLICATE,
         request.payload,
         request.headers.authorization
       )

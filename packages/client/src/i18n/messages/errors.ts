@@ -54,7 +54,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.somethingWentWrong'
   },
   unknownErrorDescription: {
-    defaultMessage: "It's not you, it us. This is our fault.",
+    defaultMessage: "It's not you, it's us. This is our fault.",
     description: 'Error description',
     id: 'error.weAreTryingToFixThisError'
   },
@@ -69,19 +69,19 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.title.unauthorized'
   },
   fieldAgentQueryError: {
-    defaultMessage: 'An error occured while loading applications',
+    defaultMessage: 'An error occurred while loading applications',
     description: 'The text when error ocurred loading rejected applications',
     id: 'fieldAgentHome.queryError'
   },
   pleaseTryAgainError: {
-    defaultMessage: 'An error occured. Please try again.',
+    defaultMessage: 'An error occurred. Please try again.',
     description:
-      'The error message that displays if we wnat the user to try the action again',
-    id: 'error.occured'
+      'The error message that displays if we want the user to try the action again',
+    id: 'error.occurred'
   },
   printQueryError: {
     defaultMessage:
-      'An error occurred while quering for birth registration data',
+      'An error occurred while querying for birth registration data',
     description: 'The error message shown when a query fails',
     id: 'print.certificate.queryError'
   },
@@ -101,7 +101,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'review.error.unauthorized'
   },
   userQueryError: {
-    defaultMessage: 'An error occured while loading system users',
+    defaultMessage: 'An error occurred while loading system users',
     description: 'The text when error ocurred loading system users',
     id: 'system.user.queryError'
   },

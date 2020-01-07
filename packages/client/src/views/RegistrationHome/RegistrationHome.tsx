@@ -194,6 +194,7 @@ export class RegistrationHomeView extends React.Component<
   IRegistrationHomeState
 > {
   pageSize = 10
+  showPaginated = false
   interval: any = undefined
   constructor(props: IRegistrationHomeProps) {
     super(props)
@@ -212,7 +213,18 @@ export class RegistrationHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    this.props.updateRegistrarWorkqueue()
+    this.props.updateRegistrarWorkqueue(
+      this.state.progressCurrentPage * this.pageSize,
+      this.state.reviewCurrentPage * this.pageSize,
+      this.state.updatesCurrentPage * this.pageSize,
+      this.state.approvalCurrentPage * this.pageSize,
+      this.state.printCurrentPage * this.pageSize,
+      0,
+      0,
+      0,
+      0,
+      0
+    )
   }
 
   componentDidMount() {
@@ -231,6 +243,13 @@ export class RegistrationHomeView extends React.Component<
     prevState: IRegistrationHomeState
   ) {
     if (prevProps.tabId !== this.props.tabId) {
+      this.setState({
+        progressCurrentPage: 1,
+        reviewCurrentPage: 1,
+        updatesCurrentPage: 1,
+        approvalCurrentPage: 1,
+        printCurrentPage: 1
+      })
       this.syncWorkqueue()
     }
   }
@@ -253,19 +272,29 @@ export class RegistrationHomeView extends React.Component<
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
       case TAB_ID.inProgress:
-        this.setState({ progressCurrentPage: newPageNumber })
+        this.setState({ progressCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.readyForReview:
-        this.setState({ reviewCurrentPage: newPageNumber })
+        this.setState({ reviewCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.sentForUpdates:
-        this.setState({ updatesCurrentPage: newPageNumber })
+        this.setState({ updatesCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.sentForApproval:
-        this.setState({ approvalCurrentPage: newPageNumber })
+        this.setState({ approvalCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case TAB_ID.readyForPrint:
-        this.setState({ printCurrentPage: newPageNumber })
+        this.setState({ printCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
@@ -289,23 +318,7 @@ export class RegistrationHomeView extends React.Component<
       registrarLocationId,
       storedApplications
     } = this.props
-    const { loading, error, data } = workqueue
-    if (loading) {
-      return (
-        <StyledSpinner
-          id="search-result-spinner"
-          baseColor={theme.colors.background}
-        />
-      )
-    }
-    if (!data) {
-      return (
-        <ErrorText id="search-result-error-text-count">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
-      )
-    }
-
+    const { loading, error, data, initialSyncDone } = workqueue
     const filteredData = filterProcessingApplicationsFromQuery(
       data,
       storedApplications
@@ -323,13 +336,15 @@ export class RegistrationHomeView extends React.Component<
             onClick={() => this.props.goToRegistrarHomeTab(TAB_ID.inProgress)}
           >
             {intl.formatMessage(messages.inProgress)} (
-            {drafts.filter(
-              draft =>
-                draft.submissionStatus ===
-                SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-            ).length +
-              (filteredData.inProgressTab.totalItems || 0) +
-              (filteredData.notificationTab.totalItems || 0)}
+            {!initialSyncDone
+              ? '?'
+              : drafts.filter(
+                  draft =>
+                    draft.submissionStatus ===
+                    SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+                ).length +
+                (filteredData.inProgressTab.totalItems || 0) +
+                (filteredData.notificationTab.totalItems || 0)}
             )
           </IconTab>
           <IconTab
@@ -343,7 +358,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.readyForReview)} (
-            {filteredData.reviewTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.reviewTab.totalItems})
           </IconTab>
           <IconTab
             id={`tab_${TAB_ID.sentForUpdates}`}
@@ -356,7 +371,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.sentForUpdates)} (
-            {filteredData.rejectTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
           </IconTab>
           {this.userHasValidateScope() && (
             <IconTab
@@ -370,7 +385,7 @@ export class RegistrationHomeView extends React.Component<
               }
             >
               {intl.formatMessage(messages.sentForApprovals)} (
-              {filteredData.approvalTab.totalItems})
+              {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
             </IconTab>
           )}
           <IconTab
@@ -384,7 +399,7 @@ export class RegistrationHomeView extends React.Component<
             }
           >
             {intl.formatMessage(messages.readyToPrint)} (
-            {filteredData.printTab.totalItems})
+            {!initialSyncDone ? '?' : filteredData.printTab.totalItems})
           </IconTab>
         </TopBar>
         {tabId === TAB_ID.inProgress && (
@@ -396,8 +411,11 @@ export class RegistrationHomeView extends React.Component<
               inProgressData: filteredData.inProgressTab,
               notificationData: filteredData.notificationTab
             }}
+            showPaginated={this.showPaginated}
             page={progressCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.readyForReview && (
@@ -406,8 +424,11 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.reviewTab
             }}
+            showPaginated={this.showPaginated}
             page={reviewCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.sentForUpdates && (
@@ -416,8 +437,11 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.rejectTab
             }}
+            showPaginated={this.showPaginated}
             page={updatesCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.sentForApproval && (
@@ -426,8 +450,11 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.approvalTab
             }}
+            showPaginated={this.showPaginated}
             page={approvalCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
         {tabId === TAB_ID.readyForPrint && (
@@ -436,8 +463,11 @@ export class RegistrationHomeView extends React.Component<
             queryData={{
               data: filteredData.printTab
             }}
+            showPaginated={this.showPaginated}
             page={printCurrentPage}
             onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
           />
         )}
       </>
@@ -473,10 +503,11 @@ export class RegistrationHomeView extends React.Component<
             icon={() => <PlusTransparentWhite />}
           />
         </FABContainer>
-        <NotificationToast />
+        <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
           <FloatingNotification
+            id="print-cert-notification"
             type={NOTIFICATION_TYPE.SUCCESS}
             show={this.state.showCertificateToast}
             callback={() => {

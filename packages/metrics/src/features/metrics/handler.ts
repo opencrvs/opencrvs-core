@@ -20,8 +20,14 @@ import {
 import {
   TIME_FROM,
   TIME_TO,
-  LOCATION_ID
+  LOCATION_ID,
+  EVENT
 } from '@metrics/features/metrics/constants'
+import {
+  EVENT_TYPE,
+  fetchChildLocationIdsByParentId
+} from '@metrics/features/metrics/utils'
+import { IAuthHeader } from '@metrics/features/registration/'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -30,7 +36,7 @@ export async function metricsHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = 'Location/' + request.query[LOCATION_ID]
-
+  const event = request.query[EVENT].toUpperCase() as EVENT_TYPE
   let currentLocationLevel
   let lowerLocationLevel
 
@@ -38,7 +44,8 @@ export async function metricsHandler(
     const levels = await getCurrentAndLowerLocationLevels(
       timeStart,
       timeEnd,
-      locationId
+      locationId,
+      event
     )
     currentLocationLevel = levels.currentLocationLevel
     lowerLocationLevel = levels.lowerLocationLevel
@@ -50,19 +57,35 @@ export async function metricsHandler(
     }
   }
 
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization
+  }
+
+  const childLocationIds = await fetchChildLocationIdsByParentId(
+    request.query[LOCATION_ID],
+    currentLocationLevel,
+    lowerLocationLevel,
+    authHeader
+  )
+
   const timeFrames = await fetchRegWithinTimeFrames(
     timeStart,
     timeEnd,
     locationId,
     currentLocationLevel,
-    lowerLocationLevel
+    lowerLocationLevel,
+    event,
+    childLocationIds
   )
+
   const payments = await fetchCertificationPayments(
     timeStart,
     timeEnd,
     locationId,
     currentLocationLevel,
-    lowerLocationLevel
+    lowerLocationLevel,
+    event,
+    childLocationIds
   )
 
   const genderBasisMetrics = await fetchGenderBasisMetrics(
@@ -70,7 +93,9 @@ export async function metricsHandler(
     timeEnd,
     locationId,
     currentLocationLevel,
-    lowerLocationLevel
+    lowerLocationLevel,
+    event,
+    childLocationIds
   )
   return { timeFrames, payments, genderBasisMetrics }
 }

@@ -148,7 +148,7 @@ Cypress.Commands.add('verifyLandingPageVisible', () => {
   cy.get('#header_new_event').click()
 })
 Cypress.Commands.add('initializeFakeTimers', () => {
-  cy.clock(1573557567230)
+  cy.clock(new Date().getTime())
 })
 Cypress.Commands.add('downloadFirstApplication', () => {
   cy.get('#ListItemAction-0-icon').should('exist')
@@ -168,7 +168,7 @@ function getRandomNumbers(n) {
   return result
 }
 
-Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
+Cypress.Commands.add('declareApplicationWithMinimumInput', () => {
   // LOGIN
   cy.login('fieldWorker')
   cy.createPin()
@@ -249,6 +249,11 @@ Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
   // LOG OUT
   cy.get('#ProfileMenuToggleButton').click()
   cy.get('#ProfileMenuItem1').click()
+})
+
+Cypress.Commands.add('registerApplicationWithMinimumInput', () => {
+  // DECLARE APPLICATION AS FIELD AGENT
+  cy.declareApplicationWithMinimumInput()
 
   // LOGIN AS LOCAL REGISTRAR
   cy.login('registrar')

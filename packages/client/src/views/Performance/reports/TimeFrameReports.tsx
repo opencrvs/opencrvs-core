@@ -17,60 +17,90 @@ import { connect } from 'react-redux'
 import { IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { GQLBirthRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLRegistrationTimeFrameMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import { Event } from '@client/forms'
 import {
   getValueWithPercentageString,
   getLocationFromPartOfLocationId
 } from './utils'
+import { IFooterFColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import { get } from 'lodash'
 
 interface IStateProps {
   offlineResources: IOfflineData
 }
 
 type FullProps = {
-  data: GQLBirthRegistrationTimeFrameMetrics[]
-  eventType?: Event
+  data: GQLRegistrationTimeFrameMetrics
+  eventType: Event
   loading: boolean
 } & IStateProps &
   WrappedComponentProps
 
 class TimeFrameComponent extends React.Component<FullProps> {
-  getLocationByLocationId = (locationId: string) => {
-    const id = (locationId && locationId.split('/')[1]) || ''
+  getContent = () => {
     return (
-      Object.values(this.props.offlineResources.locations).find(
-        location => location.id === id
-      ) || {
-        name: ''
-      }
+      (this.props.data.details &&
+        this.props.data.details.map(timeFrame => ({
+          location: getLocationFromPartOfLocationId(
+            timeFrame.locationId,
+            this.props.offlineResources
+          ).name,
+          regWithin45d: getValueWithPercentageString(
+            timeFrame.regWithin45d,
+            timeFrame.total
+          ),
+          regWithin45dTo1yr: getValueWithPercentageString(
+            timeFrame.regWithin45dTo1yr,
+            timeFrame.total
+          ),
+          regWithin1yrTo5yr: getValueWithPercentageString(
+            timeFrame.regWithin1yrTo5yr,
+            timeFrame.total
+          ),
+          regOver5yr: getValueWithPercentageString(
+            timeFrame.regOver5yr,
+            timeFrame.total
+          ),
+          total: String(timeFrame.total)
+        }))) ||
+      []
     )
   }
 
-  getContent = () => {
-    return this.props.data.map(timeFrame => ({
-      location: getLocationFromPartOfLocationId(
-        timeFrame.locationId,
-        this.props.offlineResources
-      ).name,
-      regWithin45d: getValueWithPercentageString(
-        timeFrame.regWithin45d,
-        timeFrame.total
-      ),
-      regWithin45dTo1yr: getValueWithPercentageString(
-        timeFrame.regWithin45dTo1yr,
-        timeFrame.total
-      ),
-      regWithin1yrTo5yr: getValueWithPercentageString(
-        timeFrame.regWithin1yrTo5yr,
-        timeFrame.total
-      ),
-      regOver5yr: getValueWithPercentageString(
-        timeFrame.regOver5yr,
-        timeFrame.total
-      ),
-      total: String(timeFrame.total)
-    }))
+  getFooterColumns(): IFooterFColumn[] {
+    const {
+      regWithin45d = 0,
+      regWithin45dTo1yr = 0,
+      regWithin1yrTo5yr = 0,
+      regOver5yr = 0
+    } = this.props.data.total || {}
+    const total = get(this.props.data, 'total.total') || '0'
+    return [
+      {
+        width: 25
+      },
+      {
+        label: getValueWithPercentageString(regWithin45d, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regWithin45dTo1yr, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regWithin1yrTo5yr, total),
+        width: 15
+      },
+      {
+        label: getValueWithPercentageString(regOver5yr, total),
+        width: 15
+      },
+      {
+        label: total,
+        width: 15
+      }
+    ]
   }
 
   render() {
@@ -123,6 +153,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
             isSortable: false
           }
         ]}
+        footerColumns={this.getFooterColumns()}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
       />
     )

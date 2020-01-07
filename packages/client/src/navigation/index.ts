@@ -42,7 +42,7 @@ import {
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { Event } from '@client/forms'
-import { PERFORMANCE_REPORT_TYPE_WEEKY } from '@client/utils/constants'
+import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -153,19 +153,21 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
 export function goToPerformanceHome() {
   return push(
     formatUrl(PERFORMANCE_REPORT_LIST, {
-      reportType: PERFORMANCE_REPORT_TYPE_WEEKY
+      reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
     })
   )
 }
 
 export function goToPerformanceReport(
   reportType: string,
+  eventType: Event,
   timeStart: Date,
   timeEnd: Date
 ) {
   return push(PERFORMANCE_REPORT, {
     reportType,
-    timeRange: { start: timeStart, end: timeEnd }
+    timeRange: { start: timeStart, end: timeEnd },
+    eventType
   })
 }
 
