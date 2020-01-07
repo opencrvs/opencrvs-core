@@ -34,7 +34,9 @@
     "node-fetch": "^2.6.0",
     "node-verhoeff": "^0.0.11",
     "pino": "^5.14.0",
+    "prettier": "^1.19.1",
     "short-uid": "^0.1.0",
+    "typescript": "^3.7.4",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

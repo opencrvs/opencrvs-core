@@ -54,7 +54,7 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.somethingWentWrong'
   },
   unknownErrorDescription: {
-    defaultMessage: "It's not you, it us. This is our fault.",
+    defaultMessage: "It's not you, it's us. This is our fault.",
     description: 'Error description',
     id: 'error.weAreTryingToFixThisError'
   },
@@ -81,7 +81,7 @@ const messagesToDefine: IErrorMessages = {
   },
   printQueryError: {
     defaultMessage:
-      'An error occurred while quering for birth registration data',
+      'An error occurred while querying for birth registration data',
     description: 'The error message shown when a query fails',
     id: 'print.certificate.queryError'
   },
