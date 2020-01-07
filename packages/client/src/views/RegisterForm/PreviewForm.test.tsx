@@ -640,7 +640,7 @@ describe('when user is previewing the form data', () => {
           .find('#validateApplicationBtn')
           .hostNodes()
           .text()
-      ).toBe('SEND FOR APPROVAL')
+      ).toBe('Send For Approval')
     })
   })
 })
