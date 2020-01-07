@@ -9,16 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as bcrypt from 'bcryptjs'
-import { pinLoader } from '@client/views/Unlock/utils'
+import { getCurrentUserID, IUserData } from '@client/applications'
+import { storage } from '@client/storage'
 
-// wrapping bcrypt.compare in a separate file
-// and exporting this function for tests
-async function isValidPin(pin: string) {
-  const userPin = await pinLoader.loadUserPin()
-  return await bcrypt.compare(pin, userPin)
+async function loadUserPin() {
+  const currentUserID = await getCurrentUserID()
+  const allUserData = JSON.parse(
+    await storage.getItem('USER_DATA')
+  ) as IUserData[]
+  const currentUserData = allUserData.find(
+    user => user.userID === currentUserID
+  ) as IUserData
+  return currentUserData.userPIN as string
 }
 
-export const pinValidator = {
-  isValidPin: isValidPin
+export const pinLoader = {
+  loadUserPin
 }
