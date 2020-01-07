@@ -18,7 +18,7 @@ print_usage_and_exit () {
     echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
     echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
     echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /data/backups/mongo/{date} folder"
-    echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /data/backups/elasticsearch folder"
+    echo "The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required"
     echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
     exit 1
 }

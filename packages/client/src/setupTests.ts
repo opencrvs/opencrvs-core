@@ -118,6 +118,7 @@ const navigatorMock = {
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
+  AUTH_URL: 'http://localhost:4040',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
