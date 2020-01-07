@@ -638,7 +638,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     return (
       <RequiredField id={`required_label_${section.id}_${field.name}`}>
-        {field.previewGroup && this.props.intl.formatMessage(field.label) + ' '}
+        {field.ignoreFieldLabelOnErrorMessage ||
+          (field.previewGroup &&
+            this.props.intl.formatMessage(field.label) + ' ')}
         {this.props.intl.formatMessage(
           errorsOnField.message,
           errorsOnField.props

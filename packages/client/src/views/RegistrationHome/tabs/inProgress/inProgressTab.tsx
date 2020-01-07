@@ -45,7 +45,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { LocalInProgressDataDetails } from './localInProgressDataDetails'
-import { RemoteInProgressDataDetails } from './remoteInProgressDataDetails'
+import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
 import {
   buttonMessages,
   constantsMessages,
@@ -121,6 +121,8 @@ interface IQueryData {
   inProgressData: GQLEventSearchResultSet
   notificationData: GQLEventSearchResultSet
 }
+
+type QueryDataKey = 'inProgressData' | 'notificationData'
 
 interface IBaseRegistrarHomeProps {
   theme: ITheme
@@ -427,8 +429,26 @@ export class InProgressTabComponent extends React.Component<
     return <LocalInProgressDataDetails eventId={itemId} />
   }
 
-  renderInProgressDataExpandedComponent = (itemId: string) => {
-    return <RemoteInProgressDataDetails eventId={itemId} />
+  renderFieldAgentDataExpandedComponent = (itemId: string) => {
+    return this.renderInProgressDataExpandedComponent(itemId, 'inProgressData')
+  }
+
+  renderHospitalDataExpandedComponent = (itemId: string) => {
+    return this.renderInProgressDataExpandedComponent(
+      itemId,
+      'notificationData'
+    )
+  }
+
+  renderInProgressDataExpandedComponent = (
+    itemId: string,
+    queryDataKey: QueryDataKey
+  ) => {
+    const { results } =
+      this.props.queryData && this.props.queryData[queryDataKey]
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
   }
 
   renderFieldAgentTable = (
@@ -442,7 +462,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getRemoteDraftColumns()}
-          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          renderExpandedComponent={this.renderFieldAgentDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
@@ -472,7 +492,7 @@ export class InProgressTabComponent extends React.Component<
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getNotificationColumns()}
-          renderExpandedComponent={this.renderInProgressDataExpandedComponent}
+          renderExpandedComponent={this.renderHospitalDataExpandedComponent}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
           onPageChange={onPageChange}
           pageSize={this.pageSize}
