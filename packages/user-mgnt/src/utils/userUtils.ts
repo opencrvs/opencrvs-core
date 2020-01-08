@@ -17,15 +17,18 @@ export const statuses = {
   DISABLED: 'disabled'
 }
 
-export const roleScopeMapping = {
-  // TODO remove 'demo' from these for production
-  FIELD_AGENT: ['declare', 'demo'],
-  REGISTRATION_AGENT: ['validate', 'demo'],
-  LOCAL_REGISTRAR: ['register', 'performance', 'certify', 'demo'],
-  LOCAL_SYSTEM_ADMIN: ['sysadmin', 'demo'],
-  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'demo'],
-  PERFORMANCE_OVERSIGHT: ['performance', 'demo'],
-  PERFORMANCE_MANAGEMENT: ['performance', 'demo'],
+interface IRoleScopeMapping {
+  [key: string]: string[]
+}
+
+export const roleScopeMapping: IRoleScopeMapping = {
+  FIELD_AGENT: ['declare'],
+  REGISTRATION_AGENT: ['validate'],
+  LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
+  LOCAL_SYSTEM_ADMIN: ['sysadmin'],
+  NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
+  PERFORMANCE_OVERSIGHT: ['performance'],
+  PERFORMANCE_MANAGEMENT: ['performance'],
   API_USER: ['declare', 'api']
 }
 

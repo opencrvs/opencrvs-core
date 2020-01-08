@@ -17,7 +17,7 @@ import { composeAndSavePractitioners } from '@resources/bgd/features/employees/s
 
 const sourceJSON = `${EMPLOYEES_SOURCE}test-employees.json`
 
-export default async function importFacilities() {
+export default async function importEmployees() {
   // tslint:disable-next-line:no-console
   console.log(
     `${chalk.blueBright(
@@ -26,11 +26,15 @@ export default async function importFacilities() {
   )
   const employees = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
-    await composeAndSavePractitioners(employees)
+    await composeAndSavePractitioners(
+      employees,
+      process.argv[2],
+      process.argv[3]
+    )
   } catch (err) {
     return internal(err)
   }
   return true
 }
 
-importFacilities()
+importEmployees()

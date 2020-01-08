@@ -15,7 +15,8 @@ import {
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
   CONFIG_TOKEN_EXPIRY_SECONDS,
-  PRODUCTION
+  PRODUCTION,
+  QA_ENV
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -30,6 +31,7 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger } from '@auth/logger'
+import { unauthorized } from 'boom'
 
 const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -128,13 +130,17 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce, mobile)
   }
-  if (!PRODUCTION || isDemoUser) {
+  if (!PRODUCTION || QA_ENV) {
     logger.info('Sending a verification SMS', {
       mobile: mobile,
       verificationCode
     })
   } else {
-    await sendVerificationCode(mobile, verificationCode)
+    if (isDemoUser) {
+      throw unauthorized()
+    } else {
+      await sendVerificationCode(mobile, verificationCode)
+    }
   }
 }
 
