@@ -3439,10 +3439,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/redux-form@^8.1.3":
-  version "8.1.3"
-  resolved "https://registry.yarnpkg.com/@types/redux-form/-/redux-form-8.1.3.tgz#b8b45f888ac59260af7a92a26457381fd51869eb"
-  integrity sha512-6Xsrl2pgiLUOUnx4XGwfeEK+V0Y9vlwZ62l1EsnWX9lEC6e6nEELNygmdHqh2/oLwUYW8gTzJRrmEc98BHgRAw==
+"@types/redux-form@^8.2.0":
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/@types/redux-form/-/redux-form-8.2.0.tgz#e177fb1b837c11ec4c9eb66b4f5e833cdb4bef3f"
+  integrity sha512-tC3DGzd7hvunwjcb+8VOuzaRq+/m56aw5zujHE8AsZs0ZjqIpJDrq95T40Wms7cAazfR+02hpQS/NzsNJICoJA==
   dependencies:
     "@types/react" "*"
     redux "^3.6.0 || ^4.0.0"
