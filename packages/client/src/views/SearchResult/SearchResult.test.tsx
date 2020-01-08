@@ -1011,4 +1011,105 @@ describe('SearchResult tests', () => {
       'duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e93'
     )
   })
+
+  it('renders review button in search page while application is validated', async () => {
+    const application = {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
+      data: {},
+      event: Event.BIRTH,
+      downloadStatus: 'DOWNLOADED',
+      submissionStatus: 'VALIDATED'
+    }
+
+    // @ts-ignore
+    store.dispatch(storeApplication(application))
+    const graphqlMock = [
+      {
+        request: {
+          operationName: null,
+          query: SEARCH_EVENTS,
+          variables: {
+            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            sort: 'DESC',
+            trackingId: 'DW0UTHR',
+            registrationNumber: '',
+            contactNumber: '',
+            name: ''
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1,
+              results: [
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
+                  type: 'Death',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'VALIDATED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    duplicates: [],
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
+                }
+              ],
+              __typename: 'EventSearchResultSet'
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.component.update()
+
+    const reviewButton = await waitForElement(
+      testComponent.component,
+      '#ListItemAction-0-Review'
+    )
+
+    expect(reviewButton.hostNodes()).toHaveLength(1)
+  })
 })
