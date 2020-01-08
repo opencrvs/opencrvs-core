@@ -380,6 +380,8 @@ export async function createTaskEntry(
   compositionRef: string,
   lastRegLocation: fhir.Location,
   eventType: 'BIRTH' | 'DEATH',
+  contactPerson: string,
+  contactNumber: string,
   authHeader: string
 ) {
   const taskResource: fhir.Task = {
@@ -392,22 +394,30 @@ export async function createTaskEntry(
     focus: {
       reference: compositionRef
     },
+    extension: [
+      {
+        url: 'http://opencrvs.org/specs/extension/contact-person',
+        valueString: contactPerson
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+        valueString: contactNumber
+      }
+    ],
     lastModified: new Date().toISOString()
   }
   if (lastRegLocation.id) {
-    taskResource.extension = [
-      {
-        url: 'http://opencrvs.org/specs/extension/regLastLocation',
-        valueReference: {
-          reference: `Location/${lastRegLocation.id}`
-        }
+    taskResource.extension?.push({
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: {
+        reference: `Location/${lastRegLocation.id}`
       }
-    ]
+    })
     const lastRegOffice = await fetchCRVSOfficeByParentLocation(
       lastRegLocation,
       authHeader
     )
-    taskResource.extension.push({
+    taskResource.extension?.push({
       url: 'http://opencrvs.org/specs/extension/regLastOffice',
       valueReference: {
         reference: `Location/${lastRegOffice.id}`
@@ -420,7 +430,7 @@ export async function createTaskEntry(
   }
 }
 
-export async function createDeathObservation(
+export function createDeathObservation(
   encounterRef: string,
   causeOfDeath: string,
   subjectRef: string,
