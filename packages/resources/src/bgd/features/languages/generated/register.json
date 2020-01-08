@@ -1798,7 +1798,7 @@
         "form.field.label.fetchModalSuccessTitle": "আইডি বৈধ",
         "form.field.label.fetchModalTitle": "পরীক্ষা করা হচ্ছে",
         "form.field.label.fetchMotherDetails": "জাতীয় পরিচয় পত্র যাচাই করুন",
-        "form.field.label.fetchPersonByNIDModalErrorText": "জাতীয় পরিচয় পত্র পাওয়া যায় নি। বৈধ জাতীয় পরিকায় পত্র নম্বর এবং জন্মতারিখ প্রবেশ করুন।",
+        "form.field.label.fetchPersonByNIDModalErrorText": "জাতীয় পরিচয় পত্র পাওয়া যায় নি। বৈধ জাতীয় পরিচয় পত্র নম্বর এবং জন্মতারিখ প্রবেশ করুন।",
         "form.field.label.fetchPersonByNIDModalInfo": "জাতীয় পরিচয়পত্র",
         "form.field.label.fetchRegistrationModalErrorText": "প্রদত্ত BRN এর জন্য কোনো রেজিস্ট্রেশন পাওয়া যায় নি ",
         "form.field.label.fetchRegistrationModalInfo": "জন্ম নিবন্ধন নম্বর",
