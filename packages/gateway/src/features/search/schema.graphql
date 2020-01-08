@@ -41,6 +41,8 @@ type OperationHistorySearchSet {
   operatorName: [HumanName]
   operatorOfficeName: String
   operatorOfficeAlias: [String]
+  notificationFacilityName: String
+  notificationFacilityAlias: [String]
   rejectReason: String
   rejectComment: String
 }

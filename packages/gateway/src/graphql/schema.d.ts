@@ -663,6 +663,8 @@ export interface GQLOperationHistorySearchSet {
   operatorName?: Array<GQLHumanName | null>
   operatorOfficeName?: string
   operatorOfficeAlias?: Array<string | null>
+  notificationFacilityName?: string
+  notificationFacilityAlias?: Array<string | null>
   rejectReason?: string
   rejectComment?: string
 }
@@ -2991,6 +2993,12 @@ export interface GQLOperationHistorySearchSetTypeResolver<TParent = any> {
   operatorOfficeAlias?: OperationHistorySearchSetToOperatorOfficeAliasResolver<
     TParent
   >
+  notificationFacilityName?: OperationHistorySearchSetToNotificationFacilityNameResolver<
+    TParent
+  >
+  notificationFacilityAlias?: OperationHistorySearchSetToNotificationFacilityAliasResolver<
+    TParent
+  >
   rejectReason?: OperationHistorySearchSetToRejectReasonResolver<TParent>
   rejectComment?: OperationHistorySearchSetToRejectCommentResolver<TParent>
 }
@@ -3031,6 +3039,20 @@ export interface OperationHistorySearchSetToOperatorOfficeNameResolver<
 }
 
 export interface OperationHistorySearchSetToOperatorOfficeAliasResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface OperationHistorySearchSetToNotificationFacilityNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface OperationHistorySearchSetToNotificationFacilityAliasResolver<
   TParent = any,
   TResult = any
 > {
