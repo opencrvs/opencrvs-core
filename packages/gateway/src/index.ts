@@ -30,13 +30,11 @@ DotEnv.config({
   path: `${process.cwd()}/.env`
 })
 
-const graphQLSchemaPath = `${__dirname}/graphql/index.graphql`
-
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
   const server = getServer()
-  const plugins = getPlugins(process.env.NODE_ENV, graphQLSchemaPath)
+  const plugins = getPlugins()
 
   await server.register(plugins)
 
