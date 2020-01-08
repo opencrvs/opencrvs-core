@@ -11,6 +11,7 @@
  */
 import { authApi, client } from '@client/utils/authApi'
 import * as moxios from 'moxios'
+jest.unmock('@client/utils/authApi')
 
 describe('authApi', () => {
   beforeEach(() => {
