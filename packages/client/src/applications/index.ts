@@ -543,7 +543,7 @@ export async function writeApplicationByUser(
     }
     allUserData.push(currentUserData)
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
   return JSON.stringify(currentUserData)
 }
