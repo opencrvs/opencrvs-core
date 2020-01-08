@@ -16,7 +16,7 @@ context('Reports Integration Test', () => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
 
-  it('Tests for performance reports birth using minimum input', () => {
+  it.skip('Tests for performance reports birth using minimum input', () => {
     // LOGIN AS LOCAL REGISTRAR
     cy.initializeFakeTimers()
     cy.login('registrar')
