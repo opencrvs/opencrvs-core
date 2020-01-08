@@ -19,10 +19,12 @@ import { SENTRY_DSN } from '@gateway/constants'
 import { GraphQLError } from 'graphql'
 import { logger } from '@gateway/logger'
 
-export const getPlugins = (env: string | undefined, schemaPath: string) => {
+export const getPlugins = () => {
   const plugins: any[] = []
-  const executableSchema = getExecutableSchema(schemaPath)
+  const executableSchema = getExecutableSchema()
+
   Sentry.init({ dsn: SENTRY_DSN, environment: process.env.NODE_ENV })
+
   plugins.push(
     JWT,
     {
