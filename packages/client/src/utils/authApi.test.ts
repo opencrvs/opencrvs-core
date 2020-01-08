@@ -9,23 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { authApi, client } from '@client/utils/authApi'
-import * as moxios from 'moxios'
+import { authApi } from '@client/utils/authApi'
+import * as fetchMock from 'jest-fetch-mock'
+
+jest.unmock('@client/utils/authApi')
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 describe('authApi', () => {
   beforeEach(() => {
-    moxios.install(client)
+    fetch.resetMocks()
   })
-  afterEach(() => {
-    moxios.uninstall(client)
-  })
+
   it('invalidates a token', async () => {
     const expectedResponse = {}
-
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      request.respondWith({ status: 200, response: expectedResponse })
-    })
+    fetch.mockResponseOnce(JSON.stringify(expectedResponse))
 
     const result = await authApi.invalidateToken('test')
 
