@@ -10,7 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createStore } from '@client/store'
-import { createTestComponent, selectOption } from '@client/tests/util'
+import {
+  createTestComponent,
+  selectOption,
+  getFileFromBase64String,
+  validImageB64String,
+  flushPromises
+} from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
 import { ReactWrapper } from 'enzyme'
@@ -479,6 +485,40 @@ describe('Certificate collector test for a birth registration without father det
       expect(history.location.pathname).toBe(
         '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
+    })
+
+    it('should hide form level error while uploading valid file', async () => {
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'index.png',
+                'image/png'
+              )
+            ]
+          }
+        })
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      expect(component.find('#form_error').hostNodes()).toHaveLength(0)
     })
   })
 })
