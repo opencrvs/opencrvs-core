@@ -12,6 +12,7 @@ node_js:
   - 'lts/*'
 env:
   - CI=true
+
 jobs:
   include:
     - stage: tests (unit and integration)

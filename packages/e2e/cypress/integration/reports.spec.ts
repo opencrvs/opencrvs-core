@@ -16,7 +16,7 @@ context('Reports Integration Test', () => {
     indexedDB.deleteDatabase('OpenCRVS')
   })
 
-  it('Tests for performance reports birth using minimum input', () => {
+  it.skip('Tests for performance reports birth using minimum input', () => {
     // LOGIN AS LOCAL REGISTRAR
     cy.initializeFakeTimers()
     cy.login('registrar')
@@ -32,6 +32,8 @@ context('Reports Integration Test', () => {
       .first()
       .children()
       .click()
+
+    cy.tick(20000)
 
     // INPUT SEARCH LOCATION
     cy.get('#locationSearchInput').type('Narsingdi')
