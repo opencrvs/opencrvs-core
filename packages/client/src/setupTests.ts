@@ -16,6 +16,7 @@ import { IUserData } from './applications'
 import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
+import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
@@ -161,6 +162,14 @@ jest.mock('@client/utils/referenceApi', (): {
         templates: mockOfflineData.templates
       }),
     loadAssets: () => Promise.resolve(mockOfflineData.assets)
+  }
+}))
+
+jest.mock('@client/utils/authApi', (): {
+  authApi: typeof authApi
+} => ({
+  authApi: {
+    invalidateToken: () => Promise.resolve({})
   }
 }))
 
