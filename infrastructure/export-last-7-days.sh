@@ -40,10 +40,10 @@ PASSWORD=$3
 WEEK_AGO=$(date -v-1w +"%Y-%m-%dT%H:%M:%SZ")
 TODAY=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-AUTHENTICATE_URL=https://auth.$HOST/authenticate
+AUTHENTICATE_URL=http://localhost:4040/authenticate
 TOKEN=$(curl -d "username=$USERNAME&password=$PASSWORD" -X POST $AUTHENTICATE_URL | docker run --rm -i imega/jq -r '.token')
 
-EXPORT_URL="https://gateway.$HOST/registrations/export?fromDate=$WEEK_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
+EXPORT_URL="http://localhost:7070/registrations/export?fromDate=$WEEK_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
 
 curl $EXPORT_URL -fo export.zip
 
