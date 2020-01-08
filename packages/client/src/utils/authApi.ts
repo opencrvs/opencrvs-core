@@ -49,6 +49,5 @@ const invalidateToken = (token: string): Promise<void> => {
 }
 
 export const authApi = {
-  request,
   invalidateToken
 }

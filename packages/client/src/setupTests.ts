@@ -169,7 +169,7 @@ jest.mock('@client/utils/authApi', (): {
   authApi: typeof authApi
 } => ({
   authApi: {
-    invalidateToken: () => Promise.resolve({})
+    invalidateToken: () => Promise.resolve()
   }
 }))
 
