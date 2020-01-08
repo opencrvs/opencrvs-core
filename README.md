@@ -392,6 +392,15 @@ All hotfixes that are done for that release should be submitted in a PR against 
 6. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
 7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`
 
+## How do I export recent registrations?
+
+You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh`.
+
+For example running:
+`./infrastructure/export-last-7-days.sh opencrvs.qa1.jembi.org api.user test`
+
+Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
+
 ## Contributing
 
 You may view/add issues here: https://github.com/jembi/OpenCRVS/issues
