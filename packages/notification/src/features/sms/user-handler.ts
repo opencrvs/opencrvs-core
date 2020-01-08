@@ -71,7 +71,7 @@ export async function sendUserAuthenticationCode(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IUserAuthCodePayload
-  logger.info(`Username: ${payload.code}`)
+  logger.info(`Authentication Code: ${payload.code}`)
   await buildAndSendSMS(
     request,
     payload.msisdn,
