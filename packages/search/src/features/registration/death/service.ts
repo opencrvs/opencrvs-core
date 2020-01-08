@@ -280,7 +280,7 @@ function createInformantIndex(
     bundleEntries
   ) as fhir.RelatedPerson
 
-  if (!informantRef) {
+  if (!informantRef || !informantRef.patient) {
     return
   }
 
