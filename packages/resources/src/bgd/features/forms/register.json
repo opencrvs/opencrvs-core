@@ -4791,6 +4791,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"MOTHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "MOTHER",
                   "required": false,
@@ -4874,6 +4880,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"FATHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "FATHER",
                   "required": false,
