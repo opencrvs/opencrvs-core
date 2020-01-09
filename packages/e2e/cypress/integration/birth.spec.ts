@@ -502,7 +502,7 @@ context('Birth Integration Test', () => {
     cy.registerApplication() // Wait for application to be sync'd
   })
 
-  it('Test Someone else journey using minimum input', () => {
+  it.only('Test Someone else journey using minimum input', () => {
     cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')
@@ -560,7 +560,7 @@ context('Birth Integration Test', () => {
     cy.get('#parentDetailsType_NONE').click()
     cy.goToNextFormSection()
     //  Why are the mother and father not applying?
-    cy.get('#motherIsDeceaseddeceased').click()
+    cy.get('#reasonMotherNotApplying').type('She is very sick to come.')
     cy.get('#fatherIsDeceaseddeceased').click()
     cy.goToNextFormSection()
     //  Who is looking after the child?
