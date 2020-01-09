@@ -9,22 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { pinOps } from '@client/views/Unlock/ComparePINs'
+import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import * as bcrypt from 'bcryptjs'
+import { pinLoader } from '@client/views/Unlock/utils'
 
 describe('Compare two PINs', () => {
   const pin = '1212'
-  const salt = bcrypt.genSaltSync(10)
-  const hash = bcrypt.hashSync(pin, salt)
+
+  beforeEach(() => {
+    const salt = bcrypt.genSaltSync(10)
+    const hash = bcrypt.hashSync(pin, salt)
+    pinLoader.loadUserPin = jest.fn(async () => Promise.resolve(hash))
+  })
 
   it('should return true when PINs match', async () => {
-    const result = await pinOps.comparePins(pin, hash)
+    const result = await pinValidator.isValidPin(pin)
     expect(result).toBe(true)
   })
 
   it('should return false when PINs do not match', async () => {
-    const pin2 = '2121'
-    const result = await pinOps.comparePins(pin2, hash)
+    const invalidPin = '2121'
+    const result = await pinValidator.isValidPin(invalidPin)
     expect(result).toBe(false)
   })
 })

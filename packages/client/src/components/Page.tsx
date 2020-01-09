@@ -23,7 +23,10 @@ import {
 } from '@client/offline/selectors'
 import { parse } from 'querystring'
 import { checkAuth } from '@client/profile/profileActions'
-import { showConfigurationErrorNotification } from '@client/notification/actions'
+import {
+  showConfigurationErrorNotification,
+  hideConfigurationErrorNotification
+} from '@client/notification/actions'
 import { storage } from '@client/storage'
 import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
@@ -107,13 +110,16 @@ interface IDispatchProps {
   setInitialApplications: () => void
   checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
+  hideConfigurationErrorNotification: () => void
   changeLanguage: (values: Ii18n) => void
 }
 
 class Component extends React.Component<
   RouteComponentProps<{}> & IPageProps & IDispatchProps
 > {
-  componentDidUpdate(prevProps: RouteComponentProps<{}>) {
+  componentDidUpdate(
+    prevProps: RouteComponentProps<{}> & IPageProps & IDispatchProps
+  ) {
     const { hash } = this.props.location
     const hashChanged = hash && hash !== prevProps.location.hash
     if (hashChanged) {
@@ -130,6 +136,9 @@ class Component extends React.Component<
     }
     if (this.props.loadingError && navigator.onLine) {
       this.props.showConfigurationErrorNotification()
+    }
+    if (prevProps.loadingError && !this.props.loadingError) {
+      this.props.hideConfigurationErrorNotification()
     }
   }
 
@@ -181,12 +190,13 @@ const mapDispatchToProps = {
   setInitialApplications,
   checkAuth,
   showConfigurationErrorNotification,
+  hideConfigurationErrorNotification,
   changeLanguage
 }
 
 export const Page = withRouter(
-  connect<IPageProps, IDispatchProps, IPageProps, IStoreState>(
+  connect<IPageProps, IDispatchProps, {}, IStoreState>(
     mapStateToProps,
     mapDispatchToProps
   )(Component)
-) as any
+)

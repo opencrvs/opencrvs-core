@@ -38,7 +38,8 @@ const messagesToDefine: IPinMessages = {
   },
   locked: {
     id: 'unlockApp.locked',
-    defaultMessage: 'Locked',
+    defaultMessage:
+      'Your account has been locked. Please try again in 1 minute.',
     description: 'The title displayed while creating a PIN'
   },
   createTitle: {

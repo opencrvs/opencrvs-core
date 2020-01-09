@@ -297,11 +297,9 @@ class FieldAgentHomeView extends React.Component<
       const daysOfRejection =
         registrationSearchSet.registration &&
         registrationSearchSet.registration.dateOfApplication &&
-        registrationSearchSet.registration.dateOfApplication &&
-        moment(
-          registrationSearchSet.registration.dateOfApplication,
-          APPLICATION_DATE_FORMAT
-        ).fromNow()
+        moment(registrationSearchSet.registration.dateOfApplication)
+          .startOf('minute')
+          .fromNow()
       const event = registrationSearchSet.type as string
 
       return {

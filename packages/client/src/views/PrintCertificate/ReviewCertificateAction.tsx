@@ -157,11 +157,6 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.countries
       )
     }
-
-    window.onpopstate = (e: any) => {
-      e.preventDefault()
-      this.resetCertificatesInformation()
-    }
   }
 
   toggleModal = () => {
@@ -244,12 +239,6 @@ class ReviewCertificateActionComponent extends React.Component<
     }
   }
 
-  resetCertificatesInformation = () => {
-    const application = Object.assign({}, this.props.draft)
-    application.data.registration.certificates = []
-    this.props.modifyApplication(application)
-  }
-
   render = () => {
     const { goToRegistrarHomeTabAction, intl } = this.props
 
@@ -260,7 +249,6 @@ class ReviewCertificateActionComponent extends React.Component<
             certificateMessages.certificateCollectionTitle
           )}
           goHome={() => {
-            this.resetCertificatesInformation()
             goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
           }}
         />
