@@ -11,13 +11,15 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { createTestComponent, flushPromises, wait } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
-import { pinOps } from '@client/views/Unlock/ComparePINs'
+import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { waitForElement } from '@client/tests/wait-for-element'
+import moment from 'moment'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -31,6 +33,8 @@ const clearPassword = (component: ReactWrapper) => {
 describe('Unlock page loads Properly', () => {
   let testComponent: { component: ReactWrapper }
   beforeEach(async () => {
+    await flushPromises()
+
     // mock indexeddb
     const indexedDB = {
       USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
@@ -80,15 +84,17 @@ describe('Unlock page loads Properly', () => {
     numberElem.simulate('click')
     testComponent.component.update()
 
-    const errorElem = testComponent.component.find('#errorMsg').hostNodes()
-      .length
-    expect(errorElem).toBe(0)
+    expect(testComponent.component.find('#errorMsg').hostNodes()).toHaveLength(
+      0
+    )
   })
 })
 
 describe('For wrong inputs', () => {
   let testComponent: { component: ReactWrapper }
   beforeEach(async () => {
+    await flushPromises()
+    jest.clearAllMocks()
     const { store } = createStore()
     testComponent = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} />,
@@ -96,10 +102,9 @@ describe('For wrong inputs', () => {
     )
 
     // These tests are only for wrong inputs, so this mock fn only returns a promise of false
-    pinOps.comparePins = jest.fn(async (pin1, pin2) => Promise.resolve(false))
+    pinValidator.isValidPin = jest.fn(async pin => Promise.resolve(false))
   })
   it('Should Display Incorrect error message', async () => {
-    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
@@ -107,115 +112,87 @@ describe('For wrong inputs', () => {
     numberElem.simulate('click')
     testComponent.component.update()
 
-    setTimeout(() => {
-      const errorElem = testComponent.component
-        .find('#errorMsg')
-        .hostNodes()
-        .text()
-      expect(errorElem).toBe('Incorrect pin. Please try again')
-    }, 2000)
+    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
+
+    expect(errorMsg.hostNodes().text()).toBe('Incorrect pin. Please try again')
   })
 
   it('Should display the Last try message', async () => {
-    await flushPromises()
-    testComponent.component.update()
+    testComponent.component
+      .find('UnlockView')
+      .instance()
+      .setState({ attempt: 2 })
+
     const numberElem = testComponent.component.find('#keypad-1').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
 
+    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
+
+    expect(errorMsg.hostNodes().text()).toBe('Last Try')
+  })
+})
+
+describe('Pin locked session', () => {
+  let testComponent: { component: ReactWrapper }
+  beforeEach(async () => {
     await flushPromises()
-    testComponent.component.update()
+    jest.clearAllMocks()
 
-    clearPassword(testComponent.component)
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
+    moment.now = jest.fn(() => 1578308937586)
+    // mock indexeddb
+    const indexedDB = {
+      USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
+      USER_DATA: JSON.stringify([
+        {
+          userID: 'shakib75',
+          userPIN:
+            '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
+          drafts: []
+        }
+      ]),
+      screenLock: undefined,
+      USER_ID: 'shakib75',
+      // eslint-disable-next-line @typescript-eslint/camelcase
+      locked_time: '1578308927392'
+    }
 
-    await flushPromises()
-    testComponent.component.update()
+    storage.getItem = jest.fn(async (key: string) =>
+      // @ts-ignore
+      Promise.resolve(indexedDB[key])
+    )
 
-    setTimeout(() => {
-      const errorElem = testComponent.component
-        .find('#errorMsg')
-        .hostNodes()
-        .text()
-      expect(errorElem).toBe('Last Try')
-    }, 2000)
+    storage.setItem = jest.fn(
+      // @ts-ignore
+      async (key: string, value: string) => (indexedDB[key] = value)
+    )
+
+    const { store } = createStore()
+    testComponent = await createTestComponent(
+      <Unlock onCorrectPinMatch={() => null} />,
+      store
+    )
   })
 
-  /*
-   * This test is extremely flaky and doesn't actually assert on anything
-   * before the test exits. This is because of the setTimeout call inside of it that's
-   * not awaited by the test runner thus mostly passing the test.
-   * In some rare cases the test does manage to run the assertions before the end of the test
-   * in which case it fails as the underlying logic has probably changed.
-   */
-  it.skip('Should display Locked Message', async () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
+  it('Should not accept correct pin while the account is locked', async () => {
+    testComponent.component
+      .find('UnlockView')
+      .instance()
+      .setState({ attempt: 4 })
 
-    await flushPromises()
-    testComponent.component.update()
-
-    setTimeout(() => {
-      const errorElem = testComponent.component
-        .find('#errorMsg')
-        .hostNodes()
-        .text()
-      expect(errorElem).toBe('Locked')
-    }, 2000)
-  })
-
-  it('Should not accept any attempt during timeout', async () => {
-    const numberElem = testComponent.component.find('#keypad-1').hostNodes()
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-    numberElem.simulate('click')
-
-    await flushPromises()
-    testComponent.component.update()
-
-    setTimeout(() => {
-      const errorElem = testComponent.component
-        .find('#errorMsg')
-        .hostNodes()
-        .text()
-      expect(errorElem).toBe('Locked')
-    }, 2000)
-  })
-
-  /*
-   * This test is extremely flaky and doesn't actually assert on anything
-   * before the test exits. This is because of the setTimeout call inside of it that's
-   * not awaited by the test runner thus mostly passing the test.
-   * In some rare cases the test does manage to run the assertions before the end of the test
-   * in which case it fails as the underlying logic has probably changed.
-   */
-  it.skip('Should not accept correct pin while locked', async () => {
-    clearPassword(testComponent.component)
     const numberElem = testComponent.component.find('#keypad-0').hostNodes()
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
     numberElem.simulate('click')
 
-    await flushPromises()
-    testComponent.component.update()
+    const errorMsg = await waitForElement(testComponent.component, '#errorMsg')
 
-    setTimeout(() => {
-      const errorElem = testComponent.component
-        .find('#errorMsg')
-        .hostNodes()
-        .text()
-      expect(errorElem).toBe('Locked')
-    }, 2000)
+    expect(errorMsg.hostNodes().text()).toBe(
+      'Your account has been locked. Please try again in 1 minute.'
+    )
   })
 })
 

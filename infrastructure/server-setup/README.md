@@ -171,7 +171,7 @@ Hearth, OpenHIM and the Users database is saved in a mongo zip file here:
 /data/backups/mongo/user-mgnt-<date>.gz
 ```
 
-Elasticsearch snapshot file is saved here:
+Elasticsearch snapshot files and indices are saved here:
 
 ```
 /data/backups/elasticsearch
@@ -185,12 +185,20 @@ InfluxDB backup files are saved here:
 
 To perform a restore, ensure that you have backup files in the day's folders you wish to restore from.
 
-SSH into the manager node and cd to the / directory
+Backup files:
 
-Run the following script but beware that **ALL DATA WILL BE REPLACED BY YOUR BACKUP DATA**
+The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /data/backups/mongo/{date} folder
+The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required
+The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder
+
+1. SSH into the manager node
+2. Make sure you are a root user
+3. cd to the /tmp/compose/infrastructure directory
+
+Run the following script as root but beware that **ALL DATA WILL BE REPLACED BY YOUR BACKUP DATA**
 
 ```
-./tmp/compose/infrastructure/emergency-restore-metadata.sh <day of the week to restore from>
+./emergency-restore-metadata.sh <day of the week to restore from>
 ```
 
 ## How to know when to scale a service

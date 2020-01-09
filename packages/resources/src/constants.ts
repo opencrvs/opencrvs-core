@@ -27,7 +27,6 @@ export const SENTRY_DSN =
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
-export const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD || 'test'
 // Send registration to BDRIS2 for validation before confirming registration
 // This needs to be a string to make it easy to pass as an ENV var.
 export const VALIDATE_IN_BDRIS2 = process.env.VALIDATE_IN_BDRIS2 || 'false'

@@ -9,9 +9,25 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+if [ -z "$1" ] 
+  then
+    echo 'Error: Argument for test user password is required in position 1.'
+    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS API user password}'
+    echo "Script must receive a parameter of HRIS token"
+    exit 1
+fi
+
+if [ -z "$2" ] 
+  then
+    echo 'Error: Argument for OpenCRVS API user password is required in position 2.'
+    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS API user password}'
+    echo "Script must receive a parameter of HRIS token"
+    exit 1
+fi
+
 ts-node -r tsconfig-paths/register src/zmb/features/administrative/scripts/prepare-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/administrative/scripts/assign-admin-structure-to-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/facilities/scripts/prepare-source-facilities.ts
 ts-node -r tsconfig-paths/register src/zmb/features/facilities/scripts/assign-facilities-to-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/prepare-source-employees.ts
-ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/assign-employees-to-practitioners.ts
+ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/assign-employees-to-practitioners.ts -- $1 $2
