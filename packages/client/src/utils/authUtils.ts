@@ -14,6 +14,7 @@ import decode from 'jwt-decode'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
+import { authApi } from '@client/utils/authApi'
 
 export interface IURLParams {
   [key: string]: string | string[] | undefined
@@ -44,6 +45,14 @@ export function storeToken(token: string) {
 }
 
 export function removeToken() {
+  const token = getToken()
+  if (token) {
+    try {
+      authApi.invalidateToken(token)
+    } catch (err) {
+      Sentry.captureException(err)
+    }
+  }
   localStorage.removeItem('opencrvs')
 }
 

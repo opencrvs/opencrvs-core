@@ -43,11 +43,10 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:not([data-focus-visible-added]):disabled {
-    background: ${({ theme }) => theme.colors.disabled};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.placeholder};
+    opacity: 0.6;
     path {
-      stroke: ${({ theme }) => theme.colors.placeholder};
+      stroke: ${({ theme }) => theme.colors.white};
     }
   }
 `

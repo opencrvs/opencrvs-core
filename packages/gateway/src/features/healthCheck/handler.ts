@@ -63,9 +63,7 @@ export default async function healthCheckHandler(
 
   switch (service) {
     case Services.GATEWAY:
-      response = {
-        success: true
-      }
+      response = true
       break
     case Services.AUTH:
       response = await checkServiceHealth(`${AUTH_URL}/ping`)

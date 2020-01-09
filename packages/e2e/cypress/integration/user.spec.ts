@@ -21,7 +21,7 @@ context('User Integration Test', () => {
     cy.login('sysAdmin')
     cy.createPin()
     cy.get('#add-user').click()
-    cy.get('#searchInputText').type('Alokbali')
+    cy.get('#searchInputText').type('Baniajan')
     cy.get('#searchInputIcon').click()
     cy.get('#location-0').click()
     cy.get('#modal_select').click()

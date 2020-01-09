@@ -141,28 +141,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
   }
 
-  resetCertificatesInformation = () => {
-    const application = Object.assign({}, this.props.application)
-    application.data.registration.certificates = []
-    this.props.modifyApplication(application)
-  }
-
-  componentDidMount = () => {
-    window.onpopstate = (e: any) => {
-      e.preventDefault()
-      this.resetCertificatesInformation()
-    }
-  }
-
   render() {
     const { collector } = this.props.match.params
     const { intl } = this.props
     return (
       <ActionPageLight
-        goBack={() => {
-          this.resetCertificatesInformation()
-          this.props.goBack()
-        }}
+        goBack={this.props.goBack}
         title={intl.formatMessage(messages.certificateCollectionTitle)}
       >
         <IDVerifier
