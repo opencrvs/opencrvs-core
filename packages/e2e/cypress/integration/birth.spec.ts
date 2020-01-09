@@ -502,7 +502,7 @@ context('Birth Integration Test', () => {
     cy.registerApplication() // Wait for application to be sync'd
   })
 
-  it.only('Test Someone else journey using minimum input', () => {
+  it('Test Someone else journey using minimum input', () => {
     cy.initializeFakeTimers()
     // LOGIN
     cy.login('fieldWorker')
