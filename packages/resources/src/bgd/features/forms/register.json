@@ -322,17 +322,71 @@
               "fields": [
                 {
                   "name": "presentAtBirthRegistration",
-                  "type": "TEXT",
+                  "type": "RADIO_GROUP",
                   "required": true,
                   "readonly": true,
                   "hidden": true,
-                  "hideInPreview": true,
+                  "hideInPreview": false,
                   "initialValue": "",
                   "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for option Mother",
+                        "id": "form.field.label.applicantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for option Father",
+                        "id": "form.field.label.applicantRelation.father"
+                      }
+                    },
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "id": "register.selectInformant.parents",
+                        "defaultMessage": "Mother & Father",
+                        "description": "The description that appears when selecting the parent as informant"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Other Label",
+                        "id": "form.field.label.someoneElse"
+                      }
+                    }
+                  ],
                   "label": {
                     "defaultMessage": "Who is present for the birth registration?",
                     "description": "Form section title for contact point",
                     "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "reviewOverrides": {
+                    "residingSection": "registration",
+                    "reference": [
+                      "registration",
+                      "contact-view-group",
+                      "contactPoint"
+                    ],
+                    "position": "before",
+                    "labelAs": {
+                      "defaultMessage": "Who is the applicant?",
+                      "description": "Form section title for contact point",
+                      "id": "register.selectInformant.relation"
+                    },
+                    "conditionals": [
+                      {
+                        "action": "hide",
+                        "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
+                      }
+                    ]
                   },
                   "mapping": {
                     "mutation": {
@@ -15609,6 +15663,24 @@
                       }
                     }
                   ],
+                  "reviewOverrides": {
+                    "residingSection": "informant",
+                    "reference": [
+                      "registration",
+                      "point-of-contact",
+                      "contactPoint"
+                    ],
+                    "position": "before",
+                    "labelAs": {
+                      "defaultMessage": "Applicant",
+                      "description": "Label for relation to deceased",
+                      "id": "form.field.label.applicant"
+                    },
+                    "conditionals": [{
+                      "action": "hide",
+                      "expression": "(!draftData || !draftData.informant || [\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
+                    }]
+                  },
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueSectionExchangeTransformer",
@@ -17845,7 +17917,6 @@
                 }
               ],
               "previewGroups": [
-
                 {
                   "id": "fatherNameInBengali",
                   "label": {
@@ -18003,7 +18074,6 @@
                 }
               ],
               "previewGroups": [
-
                 {
                   "id": "motherNameInBengali",
                   "label": {
