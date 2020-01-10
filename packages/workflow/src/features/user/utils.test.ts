@@ -11,7 +11,7 @@
  */
 import {
   getLoggedInPractitionerResource,
-  getUserMobile,
+  getUser,
   getLoggedInPractitionerPrimaryLocation,
   getPrimaryLocationFromLocationList,
   getPractitionerRef
@@ -137,11 +137,11 @@ describe('Verify getLoggedInPractitionerResource', () => {
     expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
   })
 })
-describe('Verify getUserMobile', () => {
+describe('Verify getUser', () => {
   it('get user mobile throw an error in case of an bad response', async () => {
     fetch.mockImplementationOnce(() => ({ ok: false, status: 401 }))
     await expect(
-      getUserMobile('XXX', { Authorization: 'bearer acd ' })
+      getUser('XXX', { Authorization: 'bearer acd ' })
     ).rejects.toThrowError(
       'Unable to retrieve user mobile number. Error: 401 status received'
     )
@@ -316,9 +316,9 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       JSON.parse(unionMock),
       JSON.parse(officeMock)
     ]
-    const primaryLocation = getPrimaryLocationFromLocationList(locations as [
-      fhir.Location
-    ])
+    const primaryLocation = getPrimaryLocationFromLocationList(
+      locations as [fhir.Location]
+    )
     expect(primaryLocation).toBeDefined()
     expect(primaryLocation).toEqual(JSON.parse(unionMock))
   })
