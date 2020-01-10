@@ -15,7 +15,8 @@ import {
   generateUsername,
   postFhir,
   rollback,
-  sendCredentialsNotification
+  sendCredentialsNotification,
+  getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser } from '@user-mgnt/model/user'
@@ -51,6 +52,10 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
+    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
+      user.primaryOfficeId,
+      token
+    )
     user.role = user.role ? user.role : 'FIELD_AGENT'
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
@@ -60,7 +65,10 @@ export default async function createUser(
       )
     }
     const userScopes: string[] = roleScopeMapping[user.role]
-    if (process.env.NODE_ENV === 'development') {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      !userScopes.includes('demo')
+    ) {
       userScopes.push('demo')
     }
     user.status = statuses.PENDING
