@@ -58,7 +58,9 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING
+  WARNING,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
 import {
   getBirthSection,
@@ -503,11 +505,34 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
+  getLabelForDocType = (docForWhom: string, docType: string) => {
+    const { intl } = this.props
+    const documentSection = this.props.registerForm[
+      this.props.draft.event
+    ].sections.find(section => section.id == 'documents')
+    const docSectionFields = documentSection && documentSection.groups[0].fields
+    const docFieldsWithOptions =
+      docSectionFields &&
+      (docSectionFields.filter(
+        field =>
+          field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
+      ) as IDocumentUploaderWithOptionsFormField[])
+    let allOptionsForPerson: ISelectOption[][] = []
+    if (docFieldsWithOptions) {
+      for (let i = 0; i < docFieldsWithOptions.length; i++) {
+        allOptionsForPerson.push(docFieldsWithOptions[i].options)
+      }
+    }
+    const matchedOption = allOptionsForPerson
+      .flat()
+      .find(option => option.value === docType)
+    return matchedOption && intl.formatMessage(matchedOption.label)
+  }
   prepSectionDocuments = (
     draft: IApplication,
     activeSection: Section
   ): IDocumentViewerOptions => {
-    const { documentsSection } = this.props
+    const { documentsSection, intl } = this.props
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
@@ -534,8 +559,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title = sectionTitle[activeSection as keyof typeof sectionMapping]
-        const label = title + ' ' + document.optionValues[1]
+        const title: string =
+          sectionTitle[activeSection as keyof typeof sectionMapping]
+        const label =
+          intl.formatMessage(messages.documentForWhom, {
+            section: title.toLowerCase()
+          }) +
+          ' ' +
+          (this.getLabelForDocType(title, document.optionValues[1] as string) ||
+            document.optionValues[1])
 
         documentOptions.push({
           value: document.data,

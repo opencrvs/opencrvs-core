@@ -39,6 +39,7 @@ interface IImagePickerProps {
   icon?: () => React.ReactNode
   handleFileChange: (file: File) => void
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
+  disabled?: boolean
 }
 
 export class ImageUploader extends React.Component<IImagePickerProps, {}> {
@@ -49,7 +50,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
   }
 
   render() {
-    const { icon, title, ...otherProps } = this.props
+    const { icon, title, disabled = false, ...otherProps } = this.props
     return (
       <ImageBase
         {...otherProps}
@@ -59,6 +60,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
           }
           this.fileUploader.current!.click()
         }}
+        disabled={disabled}
       >
         {title}
         {icon && <Icon>{icon()}</Icon>}
