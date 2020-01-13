@@ -9,7 +9,7 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 language: node_js
 node_js:
-  - '13.6'
+  - '11.15'
 env:
   - CI=true
 
