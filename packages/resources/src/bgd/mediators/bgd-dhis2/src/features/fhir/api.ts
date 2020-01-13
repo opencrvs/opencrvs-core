@@ -60,7 +60,6 @@ export async function fetchCRVSOfficeByParentLocation(
   parentLocation: fhir.Location,
   authHeader: string
 ): Promise<fhir.Location> {
-  // TODO: need to go through the location hierarchy to find crvs office
   const res = await fetch(
     `${FHIR_URL}/Location?parentRef=Location/${parentLocation.id}&type=CRVS_OFFICE`,
     {
@@ -309,15 +308,17 @@ export async function fetchUnionByFullBBSCode(
     )
   }
 
-  return (await fetchHierarchicalBangladeshLocations(
-    {
-      divisionCode,
-      districtCode,
-      upazilaCode,
-      unionCode
-    },
-    authHeader
-  )).union
+  return (
+    await fetchHierarchicalBangladeshLocations(
+      {
+        divisionCode,
+        districtCode,
+        upazilaCode,
+        unionCode
+      },
+      authHeader
+    )
+  ).union
 }
 
 export async function fetchAllAddressLocations(

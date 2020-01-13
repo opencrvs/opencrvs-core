@@ -209,6 +209,7 @@ describe('when user has starts a new application', () => {
             .find('#next_section')
             .hostNodes()
             .simulate('click')
+          await flushPromises()
         })
         it('stores the value to a new draft and move to next section', () => {
           const mockCalls = (storage.setItem as jest.Mock).mock.calls

@@ -23,6 +23,7 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
+  ILocationTags,
   IPoints,
   IPaymentPoints
 } from '@metrics/features/registration'
@@ -75,9 +76,12 @@ export const generateInCompleteFieldPoints = async (
   }
 
   const fields: IInProgressApplicationFields = {
-    compositionId: composition.id,
-    ...(await generatePointLocations(payload, authHeader))
+    compositionId: composition.id
   }
+  const locationTags: ILocationTags = await generatePointLocations(
+    payload,
+    authHeader
+  )
   return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
     const missingFieldIds = missingFieldId.split('/')
     const tags: IInProgressApplicationTags = {
@@ -85,7 +89,8 @@ export const generateInCompleteFieldPoints = async (
       missingFieldGroupId: missingFieldIds[1],
       missingFieldId: missingFieldIds[2],
       eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS'
+      regStatus: 'IN_PROGESS',
+      ...locationTags
     }
     return {
       measurement: 'in_complete_fields',
@@ -112,7 +117,7 @@ export const generateBirthRegPoint = async (
 
   const fields: IBirthRegistrationFields = {
     compositionId: composition.id,
-    ageInDays: child.birthDate ? getAgeInDays(child.birthDate) : undefined
+    ageInDays: (child.birthDate && getAgeInDays(child.birthDate)) || undefined
   }
 
   const tags: IBirthRegistrationTags = {
@@ -147,12 +152,15 @@ export const generateDeathRegPoint = async (
 
   const fields: IDeathRegistrationFields = {
     compositionId: composition.id,
-    ageInYears: deceased.birthDate
-      ? getAgeInYears(deceased.birthDate)
-      : undefined,
-    deathDays: deceased.deceasedDateTime
-      ? getDurationInDays(deceased.deceasedDateTime, new Date().toISOString())
-      : undefined
+    ageInYears:
+      (deceased.birthDate && getAgeInYears(deceased.birthDate)) || undefined,
+    deathDays:
+      (deceased.deceasedDateTime &&
+        getDurationInDays(
+          deceased.deceasedDateTime,
+          new Date().toISOString()
+        )) ||
+      undefined
   }
 
   const tags: IDeathRegistrationTags = {

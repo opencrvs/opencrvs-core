@@ -62,7 +62,7 @@ export const deathDocumentTypeFhirMapping = {
   'Coroners Report': 'CORONERS_REPORT',
   'Signed Affidavit': 'SIGNED_AFFIDAVIT',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF_PAPER',
-  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF',
+  'Letter from ward councillor': 'LETTER_FROM_COUNCILLOR',
   Other: 'OTHER'
 }
 

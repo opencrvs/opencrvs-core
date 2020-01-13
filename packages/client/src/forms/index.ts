@@ -345,6 +345,7 @@ export interface IFormFieldBase {
   postfix?: string
   disabled?: boolean
   initialValue?: IFormFieldValue
+  initialValueKey?: string
   extraValue?: IFormFieldValue
   conditionals?: IConditional[]
   description?: MessageDescriptor
@@ -369,6 +370,7 @@ export interface IFormFieldBase {
     labelAs?: MessageDescriptor
     conditionals?: IConditional[]
   }
+  ignoreFieldLabelOnErrorMessage?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {

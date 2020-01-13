@@ -10,7 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createStore } from '@client/store'
-import { createTestComponent, selectOption } from '@client/tests/util'
+import {
+  createTestComponent,
+  selectOption,
+  getFileFromBase64String,
+  validImageB64String,
+  flushPromises
+} from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
 import { ReactWrapper } from 'enzyme'
@@ -215,7 +221,7 @@ describe('Certificate collector test for a birth registration without father det
           .find('#form_error')
           .hostNodes()
           .text()
-      ).toBe('Select who is collecting the certificate')
+      ).toBe('Please select who is collecting the certificate')
     })
 
     it('redirects to id check component upon MOTHER option selection', async () => {
@@ -242,6 +248,45 @@ describe('Certificate collector test for a birth registration without father det
       expect(history.location.pathname).toBe(
         '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/mother'
       )
+    })
+
+    it('should redirects back to certificate collector option selection with mother already selected', async () => {
+      component
+        .find('#type_MOTHER')
+        .hostNodes()
+        .simulate('change', { target: { value: 'MOTHER' } })
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#action_page_back_button')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      expect(
+        component
+          .find('#type_MOTHER')
+          .hostNodes()
+          .props().checked
+      ).toBe(true)
     })
 
     it('redirects to user form for other collector upon Someone else option selection', async () => {
@@ -440,6 +485,40 @@ describe('Certificate collector test for a birth registration without father det
       expect(history.location.pathname).toBe(
         '/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
       )
+    })
+
+    it('should hide form level error while uploading valid file', async () => {
+      component
+        .find('#confirm_form')
+        .hostNodes()
+        .simulate('click')
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'index.png',
+                'image/png'
+              )
+            ]
+          }
+        })
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 500)
+      })
+      component.update()
+
+      expect(component.find('#form_error').hostNodes()).toHaveLength(0)
     })
   })
 })

@@ -82,6 +82,7 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import moment from 'moment'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -199,6 +200,7 @@ class FieldAgentHomeView extends React.Component<
   IFieldAgentHomeState
 > {
   pageSize = 10
+  showPaginated = false
   constructor(props: FieldAgentHomeProps) {
     super(props)
     this.state = {
@@ -211,6 +213,16 @@ class FieldAgentHomeView extends React.Component<
     window.addEventListener('resize', this.recordWindowWidth)
   }
 
+  componentDidUpdate(
+    prevProps: IBaseFieldAgentHomeProps,
+    prevState: IFieldAgentHomeState
+  ) {
+    if (prevProps.tabId !== this.props.tabId) {
+      this.setState({
+        requireUpdatesPage: 1
+      })
+    }
+  }
   componentWillUnmount() {
     window.removeEventListener('resize', this.recordWindowWidth)
   }
@@ -285,11 +297,9 @@ class FieldAgentHomeView extends React.Component<
       const daysOfRejection =
         registrationSearchSet.registration &&
         registrationSearchSet.registration.dateOfApplication &&
-        registrationSearchSet.registration.dateOfApplication &&
-        moment(
-          registrationSearchSet.registration.dateOfApplication,
-          APPLICATION_DATE_FORMAT
-        ).fromNow()
+        moment(registrationSearchSet.registration.dateOfApplication)
+          .startOf('minute')
+          .fromNow()
       const event = registrationSearchSet.type as string
 
       return {
@@ -421,12 +431,16 @@ class FieldAgentHomeView extends React.Component<
             </Query>
 
             {tabId === TAB_ID.inProgress && (
-              <InProgress draftApplications={draftApplications} />
+              <InProgress
+                draftApplications={draftApplications}
+                showPaginated={this.showPaginated}
+              />
             )}
 
             {tabId === TAB_ID.sentForReview && (
               <SentForReview
                 applicationsReadyToSend={applicationsReadyToSend}
+                showPaginated={this.showPaginated}
               />
             )}
 
@@ -434,13 +448,17 @@ class FieldAgentHomeView extends React.Component<
               <Query
                 query={SEARCH_APPLICATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
                 variables={{
-                  userId: userDetails ? userDetails.practitionerId : '',
+                  userId: userDetails!.practitionerId,
                   status: [EVENT_STATUS.REJECTED],
                   locationIds: fieldAgentLocationId
                     ? [fieldAgentLocationId]
                     : [],
-                  count: this.pageSize,
-                  skip: (this.state.requireUpdatesPage - 1) * this.pageSize
+                  count: this.showPaginated
+                    ? this.pageSize
+                    : this.pageSize * this.state.requireUpdatesPage,
+                  skip: this.showPaginated
+                    ? (this.state.requireUpdatesPage - 1) * this.pageSize
+                    : 0
                 }}
               >
                 {({
@@ -491,6 +509,12 @@ class FieldAgentHomeView extends React.Component<
                             }
                             currentPage={this.state.requireUpdatesPage}
                             clickable={true}
+                            showPaginated={this.showPaginated}
+                            loading={loading}
+                          />
+                          <LoadingIndicator
+                            loading={loading}
+                            hasError={error}
                           />
                         </HomeContent>
                       )}

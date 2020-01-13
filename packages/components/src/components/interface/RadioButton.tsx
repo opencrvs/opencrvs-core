@@ -28,10 +28,10 @@ const Label = styled.label<{ size?: string; disabled?: boolean }>`
     size === 'large'
       ? `
     ${theme.fonts.bigBodyStyle};
-    margin-left: 16px`
+    margin-left: 14px`
       : `
-    ${theme.fonts.bodyBoldStyle};
-    margin-left: 8px;`}
+    ${theme.fonts.bodyStyle};
+    margin-left: 16px;`}
 `
 const CheckOuter = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -48,8 +48,8 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
     size === 'large'
       ? `height: 40px;
   width: 40px;`
-      : `height: 28px;
-  width: 28px;`}
+      : `height: 24px;
+  width: 24px;`}
   border-radius: 50%;
   align-items: center;
   ${({ disabled }) => (disabled ? `&:focus { box-shadow:none}` : '')}
@@ -60,8 +60,8 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
       size === 'large'
         ? `height: 20px;
     width: 20px;`
-        : ` height: 16px;
-    width: 16px;`}
+        : ` height: 12px;
+    width: 12px;`}
     border-radius: 50%;
     background: ${({ theme }) => theme.colors.white};
     align-self: center;

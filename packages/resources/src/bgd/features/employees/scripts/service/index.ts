@@ -9,12 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ORG_URL, TEST_USER_PASSWORD } from '@resources/constants'
+import { ORG_URL } from '@resources/constants'
 import { getFromFhir, sendToFhir } from '@resources/bgd/features/utils'
 import chalk from 'chalk'
 import { logger } from '@resources/logger'
 import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'
-import { generateSaltedHash, convertToMSISDN } from '@resources/utils'
+import {
+  generateSaltedHash,
+  convertToMSISDN,
+  ISaltedHash
+} from '@resources/utils'
 import {
   createUsers,
   getScope
@@ -22,6 +26,7 @@ import {
 
 interface ITestPractitioner {
   facilityId: string
+  environment: string
   username: string
   givenNames: string
   familyName: string
@@ -99,7 +104,9 @@ const composeFhirPractitionerRole = (
 }
 
 export async function composeAndSavePractitioners(
-  practitioners: ITestPractitioner[]
+  practitioners: ITestPractitioner[],
+  testUserPassword: string,
+  apiUserPassword: string
 ): Promise<boolean> {
   const users: IUserModel[] = []
   for (const practitioner of practitioners) {
@@ -177,10 +184,12 @@ export async function composeAndSavePractitioners(
     }`
 
     logger.info(`PractitionerRole saved to fhir: ${practitionerRoleReference}`)
-
-    // create user account
-
-    const pass = generateSaltedHash(TEST_USER_PASSWORD)
+    let pass: ISaltedHash
+    if (practitioner.role !== 'API_USER') {
+      pass = generateSaltedHash(testUserPassword)
+    } else {
+      pass = generateSaltedHash(apiUserPassword)
+    }
     const user = new User({
       name: [
         {
@@ -196,7 +205,7 @@ export async function composeAndSavePractitioners(
       salt: pass.salt,
       role: practitioner.role,
       type: practitioner.type,
-      scope: getScope(practitioner.role),
+      scope: getScope(practitioner.role, practitioner.environment),
       status: 'active',
       practitionerId,
       primaryOfficeId,

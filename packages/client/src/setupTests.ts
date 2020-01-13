@@ -16,6 +16,7 @@ import { IUserData } from './applications'
 import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
+import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
@@ -118,6 +119,7 @@ const navigatorMock = {
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
+  AUTH_URL: 'http://localhost:4040',
   BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
@@ -160,6 +162,14 @@ jest.mock('@client/utils/referenceApi', (): {
         templates: mockOfflineData.templates
       }),
     loadAssets: () => Promise.resolve(mockOfflineData.assets)
+  }
+}))
+
+jest.mock('@client/utils/authApi', (): {
+  authApi: typeof authApi
+} => ({
+  authApi: {
+    invalidateToken: () => Promise.resolve()
   }
 }))
 

@@ -290,7 +290,7 @@ describe('In Progress tab', () => {
       expect(data[0].actions).toBeDefined()
     })
 
-    it('Should render pagination in progress tab if data is more than 10', async () => {
+    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IApplication[] = []
       for (let i = 0; i < 12; i++) {
@@ -306,6 +306,7 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
+          showPaginated={true}
         />,
         store
       )
@@ -471,35 +472,55 @@ describe('In Progress tab', () => {
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: {
-              totalItems: 2,
+              totalItems: 1,
               results: [
                 {
-                  id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
-                  type: 'Birth',
-                  registration: {
-                    trackingId: 'BQ2IDOP',
-                    modifiedAt: TIME_STAMP
-                  },
-                  childName: [
-                    {
-                      use: 'en',
-                      firstNames: 'Anik',
-                      familyName: 'Hoque'
-                    }
-                  ]
-                } as GQLBirthEventSearchSet,
-                {
-                  id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
+                  id: '956281c9-1f47-4c26-948a-970dd23c4094',
                   type: 'Death',
                   registration: {
-                    trackingId: 'DZECJZC',
-                    modifiedAt: TIME_STAMP
+                    status: 'IN_PROGRESS',
+                    contactNumber: undefined,
+                    trackingId: 'DG6PECX',
+                    registrationNumber: undefined,
+                    eventLocationId: undefined,
+                    registeredLocationId:
+                      'd8cfd240-4b5a-4557-9df7-b1591a11d843',
+                    duplicates: [null],
+                    createdAt: TIME_STAMP,
+                    modifiedAt: undefined
                   },
+                  operationHistories: [
+                    {
+                      operationType: 'IN_PROGRESS',
+                      operatedOn: '2019-10-20T11:03:20.660Z',
+                      operatorRole: 'FIELD_AGENT',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: null,
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                    }
+                  ],
+                  dateOfDeath: '2019-01-18',
                   deceasedName: [
                     {
+                      use: 'bn',
+                      firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                      familyName: 'খান'
+                    },
+                    {
                       use: 'en',
-                      firstNames: 'Anik',
-                      familyName: 'Hoque'
+                      firstNames: 'K M Abdullah al amin',
+                      familyName: 'Khan'
                     }
                   ]
                 } as GQLDeathEventSearchSet
@@ -519,13 +540,13 @@ describe('In Progress tab', () => {
       const data = testComponent.component.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = moment(Number(TIME_STAMP)).fromNow()
 
-      expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-      expect(data[0].name).toBe('Anik Hoque')
+      expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
+      expect(data[0].name).toBe('K M Abdullah al amin Khan')
       expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
-      expect(data[0].event).toBe('Birth')
+      expect(data[0].event).toBe('Death')
     })
 
-    it('Should render pagination in progress tab if data is more than 10', async () => {
+    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
@@ -539,6 +560,7 @@ describe('In Progress tab', () => {
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
+          showPaginated={true}
         />,
         store
       )
@@ -564,122 +586,78 @@ describe('In Progress tab', () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IApplication[] = []
       drafts.push(createApplication(Event.BIRTH))
-      const applicationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-      const graphqlMock = [
-        {
-          request: {
-            query: FETCH_REGISTRATION_BY_COMPOSITION,
-            variables: {
-              id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
-            }
-          },
-          result: {
-            data: {
-              fetchRegistration: {
-                id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                registration: {
-                  id: '345678',
-                  type: 'BIRTH',
-                  certificates: null,
-                  status: [
-                    {
-                      id:
-                        '17e9b24-b00f-4a0f-a5a4-9c84c6e64e98/_history/86c3044a-329f-418',
-                      timestamp: '2019-04-03T07:08:24.936Z',
-                      user: {
-                        id: '153f8364-96b3-4b90-8527-bf2ec4a367bd',
-                        name: [
-                          {
-                            use: 'en',
-                            firstNames: 'Mohammad',
-                            familyName: 'Ashraful'
-                          },
-                          {
-                            use: 'bn',
-                            firstNames: '',
-                            familyName: ''
-                          }
-                        ],
-                        role: 'LOCAL_REGISTRAR'
-                      },
-                      location: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: ['']
-                      },
-                      office: {
-                        id: '123',
-                        name: 'Kaliganj Union Sub Center',
-                        alias: [''],
-                        address: {
-                          district: '7876',
-                          state: 'iuyiuy'
-                        }
-                      },
-                      type: 'IN_PROGRESS',
-                      comments: [
-                        {
-                          comment: 'reason=duplicate&comment=dup'
-                        }
-                      ]
-                    }
-                  ],
-                  contact: 'MOTHER',
-                  contactPhoneNumber: '01622688231'
-                },
-                child: {
-                  id: 'FAKE_ID',
-                  name: [
-                    {
-                      use: 'en',
-                      firstNames: 'Mushraful',
-                      familyName: 'Hoque'
-                    }
-                  ],
-                  multipleBirth: null,
-                  birthDate: '01-01-1984'
-                },
-                deceased: null,
-                informant: null
-              }
-            }
-          }
-        }
-      ]
-
       // @ts-ignore
       const testComponent = await createTestComponent(
         // @ts-ignore
         <InProgressTab
           drafts={drafts}
-          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          selectorId={SELECTOR_ID.hospitalDrafts}
           registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
-            inProgressData: {
+            inProgressData: {},
+            notificationData: {
               totalItems: 1,
               results: [
                 {
-                  id: applicationId,
-                  type: 'Birth',
+                  id: '956281c9-1f47-4c26-948a-970dd23c4094',
+                  type: 'Death',
                   registration: {
-                    trackingId: 'BQ2IDOP',
-                    modifiedAt: TIME_STAMP
+                    status: 'IN_PROGRESS',
+                    contactNumber: undefined,
+                    trackingId: 'DG6PECX',
+                    registrationNumber: undefined,
+                    eventLocationId: undefined,
+                    registeredLocationId:
+                      'd8cfd240-4b5a-4557-9df7-b1591a11d843',
+                    duplicates: [null],
+                    createdAt: TIME_STAMP,
+                    modifiedAt: undefined
                   },
-                  childName: [
+                  operationHistories: [
+                    {
+                      operationType: 'IN_PROGRESS',
+                      operatedOn: '2019-10-20T11:03:20.660Z',
+                      operatorRole: 'FIELD_AGENT',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: null,
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+                      notificationFacilityName:
+                        'Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar',
+                      notificationFacilityAlias: [
+                        'Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar'
+                      ]
+                    }
+                  ],
+                  dateOfDeath: '2019-01-18',
+                  deceasedName: [
+                    {
+                      use: 'bn',
+                      firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                      familyName: 'খান'
+                    },
                     {
                       use: 'en',
-                      firstNames: 'Anik',
-                      familyName: 'Hoque'
+                      firstNames: 'K M Abdullah al amin',
+                      familyName: 'Khan'
                     }
                   ]
-                } as GQLBirthEventSearchSet
+                } as GQLDeathEventSearchSet
               ]
-            },
-            notificationData: {}
+            }
           }}
         />,
-        store,
-        graphqlMock
+        store
       )
 
       // wait for mocked data to load mockedProvider
@@ -693,7 +671,7 @@ describe('In Progress tab', () => {
         GridTable
       )).instance()
 
-      instance.toggleExpanded('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
+      instance.toggleExpanded('956281c9-1f47-4c26-948a-970dd23c4094')
       const element = await waitForElement(
         testComponent.component,
         '#IN_PROGRESS-0'

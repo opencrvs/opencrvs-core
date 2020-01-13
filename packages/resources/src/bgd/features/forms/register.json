@@ -1151,6 +1151,7 @@
                   "name": "placeOfBirth",
                   "type": "SELECT_WITH_OPTIONS",
                   "previewGroup": "placeOfBirth",
+                  "ignoreFieldLabelOnErrorMessage": true,
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
@@ -4844,6 +4845,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"MOTHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "MOTHER",
                   "required": false,
@@ -4927,6 +4934,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"FATHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "FATHER",
                   "required": false,
@@ -8201,7 +8214,7 @@
                     "id": "form.field.label.dateOfMarriage"
                   },
                   "required": false,
-                  "initialValue": "",
+                  "initialValueKey": "mother.dateOfMarriage",
                   "validate": [],
                   "mapping": {
                     "mutation": {
@@ -10292,7 +10305,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
                     }
                   ],
                   "mapping": {
