@@ -104,7 +104,7 @@ import { BIRTH, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 import { EditConfirmation } from '@client/views/RegisterForm/review/EditConfirmation'
-import { flatten, isArray, flattenDeep, get } from 'lodash'
+import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import {
@@ -889,18 +889,32 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return nestedItems
   }
 
-  getOverriddenFieldsListFor(formSections: IFormSection[]): IFormField[] {
+  getOverriddenFieldsListForPreview(
+    formSections: IFormSection[]
+  ): IFormField[] {
     const overriddenFields = formSections
       .map(section => {
         return section.groups
           .map(group => {
             return group.fields
               .map(field => {
-                field.conditionals =
+                const { draft, offlineResources } = this.props
+                const tempField = clone(field)
+                const residingSection =
+                  get(field.reviewOverrides, 'residingSection') || ''
+                tempField.conditionals =
                   get(field.reviewOverrides, 'conditionals') ||
                   field.conditionals ||
                   []
-                return field
+
+                const isVisible = getConditionalActionsForField(
+                  tempField,
+                  draft.data[residingSection] || {},
+                  offlineResources,
+                  draft.data
+                ).includes('hide')
+
+                return isVisible ? field : ({} as IFormField)
               })
               .filter(field => !Boolean(field.hideInPreview))
               .filter(field => Boolean(field.reviewOverrides))
@@ -970,7 +984,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     errorsOnFields: IErrorsBySection
   ) => {
     const { intl, draft } = this.props
-    const overriddenFields = this.getOverriddenFieldsListFor(formSections)
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      formSections
+    )
     let tempItem: any
 
     const initialTransformedSection = formSections.map(section => {
