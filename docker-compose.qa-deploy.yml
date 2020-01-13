@@ -33,6 +33,7 @@ services:
 
   user-mgnt:
     environment:
+      - QA_ENV=true
       - NODE_ENV=production
 
   notification:

@@ -23,7 +23,8 @@ import {
   createTestComponent,
   createTestComponentWithApolloClient,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  registrationClerkScopeToken
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
@@ -152,8 +153,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
   const client = createClient(store)
 
   beforeAll(async () => {
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    getItem.mockReturnValue(registrationClerkScopeToken)
+    await store.dispatch(checkAuth({ '?token': registrationClerkScopeToken }))
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
