@@ -23,6 +23,7 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
+  ILocationTags,
   IPoints,
   IPaymentPoints
 } from '@metrics/features/registration'
@@ -75,9 +76,12 @@ export const generateInCompleteFieldPoints = async (
   }
 
   const fields: IInProgressApplicationFields = {
-    compositionId: composition.id,
-    ...(await generatePointLocations(payload, authHeader))
+    compositionId: composition.id
   }
+  const locationTags: ILocationTags = await generatePointLocations(
+    payload,
+    authHeader
+  )
   return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
     const missingFieldIds = missingFieldId.split('/')
     const tags: IInProgressApplicationTags = {
@@ -85,7 +89,8 @@ export const generateInCompleteFieldPoints = async (
       missingFieldGroupId: missingFieldIds[1],
       missingFieldId: missingFieldIds[2],
       eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS'
+      regStatus: 'IN_PROGESS',
+      ...locationTags
     }
     return {
       measurement: 'in_complete_fields',

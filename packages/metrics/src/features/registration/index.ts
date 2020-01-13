@@ -71,6 +71,13 @@ export interface IInProgressApplicationTags {
   locationLevel2?: string
 }
 
+export interface ILocationTags {
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+}
+
 export interface ITimeLoggedFields {
   timeSpentEditing: number
   compositionId: string

@@ -11,7 +11,7 @@
  */
 import {
   getLoggedInPractitionerResource,
-  getUserMobile,
+  getUser,
   getLoggedInPractitionerPrimaryLocation,
   getPrimaryLocationFromLocationList,
   getPractitionerRef
@@ -37,47 +37,27 @@ describe('Verify getLoggedInPractitionerResource', () => {
     fetch.mockResponses(
       [
         JSON.stringify({
-          mobile: '+880711111111'
+          practitionerId: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
         }),
         { status: 200 }
       ],
       [
         JSON.stringify({
-          resourceType: 'Bundle',
-          id: 'eacae600-a501-42d6-9d59-b8b94f3e50c1',
-          meta: { lastUpdated: '2018-11-27T17:13:20.662+00:00' },
-          type: 'searchset',
-          total: 1,
-          link: [
-            {
-              relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
-            }
+          resourceType: 'Practitioner',
+          identifier: [
+            { use: 'official', system: 'mobile', value: '01711111111' }
           ],
-          entry: [
-            {
-              fullUrl:
-                'http://localhost:3447/fhir/Practitioner/b1f46aba-075d-431e-8aeb-ebc57a4a0ad0',
-              resource: {
-                resourceType: 'Practitioner',
-                identifier: [
-                  { use: 'official', system: 'mobile', value: '01711111111' }
-                ],
-                telecom: [{ system: 'phone', value: '01711111111' }],
-                name: [
-                  { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
-                  { use: 'bn', family: [''], given: [''] }
-                ],
-                gender: 'male',
-                meta: {
-                  lastUpdated: '2018-11-25T17:31:08.062+00:00',
-                  versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
-                },
-                id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
-              }
-            }
-          ]
+          telecom: [{ system: 'phone', value: '01711111111' }],
+          name: [
+            { use: 'en', family: ['Al Hasan'], given: ['Shakib'] },
+            { use: 'bn', family: [''], given: [''] }
+          ],
+          gender: 'male',
+          meta: {
+            lastUpdated: '2018-11-25T17:31:08.062+00:00',
+            versionId: '7b21f3ac-2d92-46fc-9b87-c692aa81c858'
+          },
+          id: 'e0daf66b-509e-4f45-86f3-f922b74f3dbf'
         }),
         { status: 200 }
       ]
@@ -137,11 +117,11 @@ describe('Verify getLoggedInPractitionerResource', () => {
     expect(getLoggedInPractitionerResource(token)).rejects.toThrowError()
   })
 })
-describe('Verify getUserMobile', () => {
+describe('Verify getUser', () => {
   it('get user mobile throw an error in case of an bad response', async () => {
     fetch.mockImplementationOnce(() => ({ ok: false, status: 401 }))
     await expect(
-      getUserMobile('XXX', { Authorization: 'bearer acd ' })
+      getUser('XXX', { Authorization: 'bearer acd ' })
     ).rejects.toThrowError(
       'Unable to retrieve user mobile number. Error: 401 status received'
     )
@@ -316,9 +296,9 @@ describe('Verify getPrimaryLocationFromLocationList', () => {
       JSON.parse(unionMock),
       JSON.parse(officeMock)
     ]
-    const primaryLocation = getPrimaryLocationFromLocationList(locations as [
-      fhir.Location
-    ])
+    const primaryLocation = getPrimaryLocationFromLocationList(
+      locations as [fhir.Location]
+    )
     expect(primaryLocation).toBeDefined()
     expect(primaryLocation).toEqual(JSON.parse(unionMock))
   })
