@@ -33,7 +33,6 @@ export async function sendUserCredentials(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as ICredentialsPayload
-  // TODO: need to remove this once dev env check code is here
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
 
@@ -71,7 +70,7 @@ export async function sendUserAuthenticationCode(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IUserAuthCodePayload
-  logger.info(`Username: ${payload.code}`)
+  logger.info(`Authentication Code: ${payload.code}`)
   await buildAndSendSMS(
     request,
     payload.msisdn,

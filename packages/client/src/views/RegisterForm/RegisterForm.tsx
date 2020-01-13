@@ -344,8 +344,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  onSaveAsDraftClicked = () => {
-    this.props.writeApplication(this.props.application)
+  onSaveAsDraftClicked = async () => {
+    await this.props.writeApplication(this.props.application)
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
@@ -362,7 +362,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
-  continueButtonHandler = (
+  continueButtonHandler = async (
     pageRoute: string,
     applicationId: string,
     pageId: string,
@@ -387,7 +387,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
     this.updateVisitedGroups()
-    this.props.writeApplication(this.props.application)
+    await this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
   }
 

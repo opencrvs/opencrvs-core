@@ -10,13 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as bcrypt from 'bcryptjs'
+import { pinLoader } from '@client/views/Unlock/utils'
 
 // wrapping bcrypt.compare in a separate file
 // and exporting this function for tests
-async function comparePins(pin1: string, pin2: string) {
-  return await bcrypt.compare(pin1, pin2)
+async function isValidPin(pin: string) {
+  const userPin = await pinLoader.loadUserPin()
+  return await bcrypt.compare(pin, userPin)
 }
 
-export const pinOps = {
-  comparePins
+export const pinValidator = {
+  isValidPin: isValidPin
 }

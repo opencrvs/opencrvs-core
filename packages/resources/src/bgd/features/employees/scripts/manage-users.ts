@@ -14,26 +14,37 @@ import * as mongoose from 'mongoose'
 import Role from '@opencrvs/user-mgnt/src/model/role'
 import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'
 
-export function getScope(role: string): string[] {
+function setDemoUser(scopes: string[], environment: string): string[] {
+  if (environment === 'development') {
+    // This makes sure that for test users in development, the SMS code is always 000000
+    scopes.push('demo')
+  }
+  return scopes
+}
+
+export function getScope(role: string, environment: string): string[] {
   switch (role) {
     case 'FIELD_AGENT':
-      return ['declare', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['declare'], environment)
     case 'REGISTRATION_AGENT':
-      return ['validate', 'certify', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['validate', 'certify'], environment)
     case 'LOCAL_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['register', 'performance', 'certify'], environment)
     case 'DISTRICT_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['register', 'performance', 'certify'], environment)
     case 'STATE_REGISTRAR':
-      return ['register', 'performance', 'certify', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['register', 'performance', 'certify'], environment)
     case 'NATIONAL_REGISTRAR':
-      return ['register', 'performance', 'certify', 'config', 'teams', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(
+        ['register', 'performance', 'certify', 'config', 'teams'],
+        environment
+      )
     case 'LOCAL_SYSTEM_ADMIN':
-      return ['sysadmin', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['sysadmin'], environment)
     case 'API_USER':
-      return ['declare', 'api']
+      return setDemoUser(['declare', 'api'], environment)
     default:
-      return ['declare', 'demo'] // PEN_TEST comment out demo
+      return setDemoUser(['declare'], environment)
   }
 }
 

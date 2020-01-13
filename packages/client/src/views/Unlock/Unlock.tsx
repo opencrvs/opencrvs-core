@@ -9,26 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
-import { Logo, Logout } from '@opencrvs/components/lib/icons'
-import styled from '@client/styledComponents'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { storage } from '@client/storage'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import moment from 'moment'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { ErrorMessage } from '@opencrvs/components/lib/forms'
-import { pinOps } from '@client/views/Unlock/ComparePINs'
-import * as ReactDOM from 'react-dom'
-import { getCurrentUserID, IUserData } from '@client/applications'
 import { messages } from '@client/i18n/messages/views/pin'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
+import { IUserDetails } from '@client/utils/userUtils'
+import { pinValidator } from '@client/views/Unlock/ComparePINs'
+import { ErrorMessage } from '@opencrvs/components/lib/forms'
+import { Logo, Logout } from '@opencrvs/components/lib/icons'
+import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
+import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import moment from 'moment'
+import * as React from 'react'
+import * as ReactDOM from 'react-dom'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
 
 const PageWrapper = styled.div`
@@ -80,7 +79,6 @@ const Name = styled.p`
 
 interface IState {
   pin: string
-  userPin: string
   resetKey: number
   showSpinner: boolean
 }
@@ -111,31 +109,15 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       attempt: 0,
       errorMessage: '',
       pin: '',
-      userPin: '',
       resetKey: Date.now(),
       showSpinner: false
     }
   }
 
   componentDidMount() {
-    this.loadUserPin()
     this.screenLockTimer()
     document.addEventListener('mouseup', this.handleClick, false)
     this.focusKeypad()
-  }
-
-  async loadUserPin() {
-    const currentUserID = await getCurrentUserID()
-    const allUserData = JSON.parse(
-      await storage.getItem('USER_DATA')
-    ) as IUserData[]
-    const currentUserData = allUserData.find(
-      user => user.userID === currentUserID
-    ) as IUserData
-    const userPin = currentUserData.userPIN as string
-    this.setState(() => ({
-      userPin
-    }))
   }
 
   showName() {
@@ -164,12 +146,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   onPinProvided = async (pin: string) => {
     const { intl } = this.props
-    const { userPin } = this.state
 
     this.setState({
       showSpinner: true
     })
-    const pinMatched = await pinOps.comparePins(pin, userPin)
+    const pinMatched = await pinValidator.isValidPin(pin)
     this.setState({
       showSpinner: false
     })
@@ -219,30 +200,32 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   screenLockTimer = async () => {
     const { intl } = this.props
     const lockedAt = await storage.getItem(SECURITY_PIN_EXPIRED_AT)
-
-    const intervalID = setInterval(() => {
-      const currentTime = moment.now()
-      const timeDiff = moment(currentTime).diff(
-        parseInt(lockedAt, 10),
-        'minutes'
-      )
-      if (lockedAt && timeDiff < MAX_LOCK_TIME) {
-        if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
-          return
+    if (lockedAt) {
+      const intervalID = setInterval(() => {
+        const currentTime = moment.now()
+        const timeDiff = moment(currentTime).diff(
+          parseInt(lockedAt, 10),
+          'minutes'
+        )
+        if (timeDiff < MAX_LOCK_TIME) {
+          if (this.state.attempt === MAX_ALLOWED_ATTEMPT + 2) {
+            return
+          }
+          this.setState(prevState => ({
+            attempt: MAX_ALLOWED_ATTEMPT + 2,
+            errorMessage: intl.formatMessage(messages.locked)
+          }))
+        } else {
+          clearInterval(intervalID)
+          storage.setItem(SECURITY_PIN_EXPIRED_AT, '')
+          this.setState(() => ({
+            attempt: 0,
+            errorMessage: '',
+            resetKey: Date.now()
+          }))
         }
-        this.setState(prevState => ({
-          attempt: MAX_ALLOWED_ATTEMPT + 2,
-          errorMessage: intl.formatMessage(messages.locked)
-        }))
-      } else {
-        clearInterval(intervalID)
-        this.setState(() => ({
-          attempt: 0,
-          errorMessage: '',
-          resetKey: Date.now()
-        }))
-      }
-    }, 100)
+      }, 100)
+    }
   }
 
   logout = () => {

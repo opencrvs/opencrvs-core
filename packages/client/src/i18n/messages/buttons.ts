@@ -189,7 +189,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.search'
   },
   select: {
-    defaultMessage: 'SELECT',
+    defaultMessage: 'Select',
     description: 'The select title',
     id: 'buttons.select'
   },
@@ -199,7 +199,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.send'
   },
   sendForReview: {
-    defaultMessage: 'SEND FOR REVIEW',
+    defaultMessage: 'Send For Review',
     description: 'Submit Button Text',
     id: 'buttons.sendForReview'
   },
@@ -209,7 +209,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendIncomplete'
   },
   sendForApproval: {
-    defaultMessage: 'SEND FOR APPROVAL',
+    defaultMessage: 'Send For Approval',
     description: 'Title for complete submit button',
     id: 'buttons.sendForApproval'
   },

@@ -18,7 +18,7 @@ print_usage_and_exit () {
     echo "This script CLEARS ALL DATA and RESTORES'S A SPECIFIC DAY'S DATA.  This process is irreversable, so USE WITH CAUTION."
     echo "Script must receive a date parameter to restore data from that specific day in format +%Y-%m-%d"
     echo "The Hearth, OpenHIM and User db backup zips you would like to restore from: hearth-dev-{date}.gz, openhim-dev-{date}.gz and user-mgnt-{date}.gz must exist in /data/backups/mongo/{date} folder"
-    echo "The Elasticsearch backup snapshot file named: snapshot_{date} must exist in the /data/backups/elasticsearch folder"
+    echo "The Elasticsearch backup folder /data/backups/elasticsearch must exist with all previous snapshots and indices. All files are required"
     echo "The InfluxDB backup files must exist in the /data/backups/influxdb/{date} folder"
     exit 1
 }
@@ -37,7 +37,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "Are you sure?  This script will clear all data from OpenCRVS and restore from a backup") || \
+if [[ "no" == $(ask_yes_or_no "This script will clear all data from OpenCRVS and restore from a backup. Are you sure you are logged in as a root user?  ") || \
       "no" == $(ask_yes_or_no "Are you *really* sure?  Have you tested these backup files in a restore process on a development environment first?") ]]
 then
     echo "Skipped."

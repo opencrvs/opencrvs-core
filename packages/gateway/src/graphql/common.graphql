@@ -226,9 +226,12 @@ type Address { # -> Address (mostly the same property name except:)
   type: AddressType
   text: String # Reserve for geo-code
   line: [String]
+  lineName: [String]
   city: String
   district: String
+  districtName: String
   state: String
+  stateName: String
   postalCode: String
   country: String
   from: Date # -> .period.start

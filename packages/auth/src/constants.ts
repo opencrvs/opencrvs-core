@@ -29,6 +29,7 @@ export const SENTRY_DSN =
   'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
+export const QA_ENV = process.env.QA_ENV || false
 
 export const CONFIG_TOKEN_EXPIRY_SECONDS = process.env
   .CONFIG_TOKEN_EXPIRY_SECONDS

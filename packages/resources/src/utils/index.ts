@@ -13,7 +13,7 @@ import { callingCountries } from 'country-data'
 import { createHash } from 'crypto'
 import * as uuid from 'uuid/v4'
 
-interface ISaltedHash {
+export interface ISaltedHash {
   hash: string
   salt: string
 }
