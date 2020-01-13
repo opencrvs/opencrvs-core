@@ -29,6 +29,7 @@ import {
   roleScopeMapping,
   hasDemoScope
 } from '@user-mgnt/utils/userUtils'
+import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from 'hapi'
 import * as _ from 'lodash'
 
@@ -66,7 +67,7 @@ export default async function createUser(
     }
     const userScopes: string[] = roleScopeMapping[user.role]
     if (
-      process.env.NODE_ENV === 'development' &&
+      (process.env.NODE_ENV === 'development' || QA_ENV) &&
       !userScopes.includes('demo')
     ) {
       userScopes.push('demo')
