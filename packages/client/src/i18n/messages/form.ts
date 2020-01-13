@@ -171,6 +171,7 @@ interface IFormMessages {
   fetchInformantDetails: MessageDescriptor
   fetchMotherDetails: MessageDescriptor
   fetchPersonByNIDModalErrorText: MessageDescriptor
+  fetchPersonByNIDModalNetworkErrorText: MessageDescriptor
   fetchPersonByNIDModalInfo: MessageDescriptor
   fetchRegistrationModalErrorText: MessageDescriptor
   fetchRegistrationModalInfo: MessageDescriptor
@@ -1164,6 +1165,12 @@ const messagesToDefine: IFormMessages = {
       'National ID not found. Please enter a valid National ID and date of birth.',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalErrorText'
+  },
+  fetchPersonByNIDModalNetworkErrorText: {
+    defaultMessage:
+      'Could not connect to the server because of low connectivity. Please try again.',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
   },
   fetchPersonByNIDModalInfo: {
     defaultMessage: 'National ID',

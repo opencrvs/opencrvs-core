@@ -2302,6 +2302,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -5589,6 +5594,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -7839,6 +7849,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -11200,6 +11215,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -15258,6 +15278,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
