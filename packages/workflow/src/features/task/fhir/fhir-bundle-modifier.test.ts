@@ -75,7 +75,7 @@ describe('Verify handler', () => {
         fhirTask.note[0].authorString
       ) {
         expect(fhirTask.note[0].authorString).toEqual(
-          'Practitioner/e0daf66b-509e-4f45-86f3-f922b74f3dbf'
+          'Practitioner/eacae600-a501-42d6-9d59-b8b94f3e50c1'
         )
       }
     } else {
