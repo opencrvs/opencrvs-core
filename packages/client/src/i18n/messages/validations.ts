@@ -22,6 +22,8 @@ interface IValidationMessages {
   greaterThanZero: MessageDescriptor
   isValidBirthDate: MessageDescriptor
   isValidDateOfDeath: MessageDescriptor
+  isDateNotAfterDeath: MessageDescriptor
+  isDateNotBeforeBirth: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   numberRequired: MessageDescriptor
@@ -103,6 +105,18 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message appears when the given date of death is not valid',
     id: 'validations.isValidDateOfDeath'
+  },
+  isDateNotBeforeBirth: {
+    defaultMessage: 'Date must be after deceased birth date',
+    description:
+      'The error message appears when the given date of death is not valid',
+    id: 'validations.isDateNotBeforeBirth'
+  },
+  isDateNotAfterDeath: {
+    defaultMessage: 'Date must be before decease date',
+    description:
+      'The error message appears when the given date of death is not valid',
+    id: 'validations.isDateNotAfterDeath'
   },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',

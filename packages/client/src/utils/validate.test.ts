@@ -467,6 +467,18 @@ describe('validate', () => {
       })
     })
 
+    it('should error when input a date after death', () => {
+      const drafts = {
+        deathEvent: {
+          deathDate: '1991-10-22'
+        }
+      }
+      const invalidDate = '1994-10-22'
+      expect(isValidBirthDate(invalidDate, drafts)).toEqual({
+        message: messages.isDateNotAfterDeath
+      })
+    })
+
     it('should pass when supplied a valid birth date with single digit', () => {
       const validDate = '2011-8-12'
       const response = undefined
@@ -831,7 +843,7 @@ describe('validate', () => {
       const futureDate = '1991-10-21'
 
       expect(isValidDeathOccurrenceDate(futureDate, drafts)).toEqual({
-        message: messages.isValidDateOfDeath
+        message: messages.isDateNotBeforeBirth
       })
     })
 

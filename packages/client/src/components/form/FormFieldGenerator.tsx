@@ -117,9 +117,10 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
-const FormItem = styled.div`
+const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
   animation: ${fadeIn} 500ms;
-  margin-bottom: 24px;
+  margin-bottom: ${({ ignoreBottomMargin }) =>
+    ignoreBottomMargin ? '0px' : '32px'};
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -763,7 +764,10 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
           ) {
             return (
-              <FormItem key={`${field.name}`}>
+              <FormItem
+                key={`${field.name}`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
                 <Field name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
@@ -818,7 +822,10 @@ class FormSectionComponent extends React.Component<Props> {
                       .nestedFields[nestedField.name]
 
                   return (
-                    <FormItem key={nestedFieldName}>
+                    <FormItem
+                      key={nestedFieldName}
+                      ignoreBottomMargin={field.ignoreBottomMargin}
+                    >
                       <FastField name={nestedFieldName}>
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
@@ -846,7 +853,10 @@ class FormSectionComponent extends React.Component<Props> {
             )
 
             return (
-              <FormItem key={field.name}>
+              <FormItem
+                key={field.name}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
                 <Field name={`${field.name}.value`}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
@@ -876,6 +886,7 @@ class FormSectionComponent extends React.Component<Props> {
                 key={`${field.name}${language}${
                   isFieldDisabled ? 'disabled' : ''
                 }`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <FastField name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
