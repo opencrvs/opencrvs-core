@@ -1792,7 +1792,7 @@
                 "addressKey": "name",
                 "addresses": {
                   "countryCode": "mother.countryPermanent",
-                  "localAddress": "{mother.addressLine4Permanent}, {mother.districtPermanent}, {mother.statePermanent}, {mother.countryPermanent}",
+                  "localAddress": "{mother.addressLine4Permanent}, {mother.districtPermanent}, {mother.statePermanent}",
                   "internationalAddress": "{mother.internationalDistrictPermanent}, {mother.internationalStatePermanent}, {mother.countryPermanent}"
                 }
               }
