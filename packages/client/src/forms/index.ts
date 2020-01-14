@@ -359,6 +359,7 @@ export interface IFormFieldBase {
   hideInPreview?: boolean
   ignoreNestedFieldWrappingInPreview?: boolean
   ignoreFieldLabelOnErrorMessage?: boolean
+  ignoreBottomMargin?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -828,6 +829,7 @@ export interface Ii18nFormFieldBase {
   placeholder?: string
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
+  ignoreBottomMargin?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
