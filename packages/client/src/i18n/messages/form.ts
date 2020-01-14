@@ -171,6 +171,7 @@ interface IFormMessages {
   fetchInformantDetails: MessageDescriptor
   fetchMotherDetails: MessageDescriptor
   fetchPersonByNIDModalErrorText: MessageDescriptor
+  fetchPersonByNIDModalNetworkErrorText: MessageDescriptor
   fetchPersonByNIDModalInfo: MessageDescriptor
   fetchRegistrationModalErrorText: MessageDescriptor
   fetchRegistrationModalInfo: MessageDescriptor
@@ -588,7 +589,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
@@ -1160,9 +1161,16 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fetchMotherDetails'
   },
   fetchPersonByNIDModalErrorText: {
-    defaultMessage: 'National ID not found. Please enter valid National ID',
+    defaultMessage:
+      'National ID not found. Please enter a valid National ID and date of birth.',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalErrorText'
+  },
+  fetchPersonByNIDModalNetworkErrorText: {
+    defaultMessage:
+      'Could not connect to the server because of low connectivity. Please try again.',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
   },
   fetchPersonByNIDModalInfo: {
     defaultMessage: 'National ID',

@@ -120,7 +120,7 @@ const fadeIn = keyframes`
 const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '24px'};
+    ignoreBottomMargin ? '0px' : '32px'};
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};

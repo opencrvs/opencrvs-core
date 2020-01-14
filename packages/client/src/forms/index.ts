@@ -485,6 +485,7 @@ export interface IQuery {
   variables?: IDynamicValues
   modalInfoText: MessageDescriptor
   errorText: MessageDescriptor
+  networkErrorText: MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
@@ -961,6 +962,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   successTitle: string
   errorTitle: string
   errorText: string
+  networkErrorText: string
 }
 
 export type Ii18nFormField =

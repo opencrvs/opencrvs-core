@@ -23,7 +23,7 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 
@@ -298,6 +298,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
           processingDocuments={this.state.filesBeingProcessed}
           documents={this.state.uploadedDocuments}
           onSelect={this.selectForPreview}
+          dropdownOptions={this.props.options}
         />
         <Flex>
           <Select
@@ -309,9 +310,10 @@ class DocumentUploaderWithOptionComp extends React.Component<
 
           <DocumentUploader
             id="upload_document"
-            title="Add file"
+            title={intl.formatMessage(formMessages.addFile)}
             onClick={e => !this.isValid() && e.preventDefault()}
             handleFileChange={this.handleFileChange}
+            disabled={this.state.filesBeingProcessed.length > 0}
           />
         </Flex>
 
