@@ -249,7 +249,9 @@ export const minAgeGapExist = (
 
 export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
   const cast = value as string
-  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+  return !cast
+    ? { message: messages.required }
+    : cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? undefined
     : {
         message: messages.isValidBirthDate
