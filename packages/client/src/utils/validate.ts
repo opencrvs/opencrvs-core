@@ -259,11 +259,12 @@ export const isValidBirthDate: Validation = (
   drafts?
 ) => {
   const cast = value as string
-  return cast &&
-    isDateNotInFuture(cast) &&
-    isAValidDateFormat(cast) &&
-    isDateNotAfterDeath(cast, drafts as IFormData)
-    ? undefined
+  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+    ? isDateNotAfterDeath(cast, drafts as IFormData)
+      ? undefined
+      : {
+          message: messages.isDateNotAfterDeath
+        }
     : {
         message: messages.isValidBirthDate
       }
@@ -592,11 +593,12 @@ export const isValidDeathOccurrenceDate: Validation = (
 ) => {
   const cast = value && value.toString()
 
-  return cast &&
-    isDateNotInFuture(cast) &&
-    isAValidDateFormat(cast) &&
-    isDateNotBeforeBirth(cast, drafts as IFormData)
-    ? undefined
+  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+    ? isDateNotBeforeBirth(cast, drafts as IFormData)
+      ? undefined
+      : {
+          message: messages.isDateNotBeforeBirth
+        }
     : {
         message: messages.isValidDateOfDeath
       }
