@@ -475,7 +475,7 @@ describe('validate', () => {
       }
       const invalidDate = '1994-10-22'
       expect(isValidBirthDate(invalidDate, drafts)).toEqual({
-        message: messages.isValidBirthDate
+        message: messages.isDateNotAfterDeath
       })
     })
 
@@ -843,7 +843,7 @@ describe('validate', () => {
       const futureDate = '1991-10-21'
 
       expect(isValidDeathOccurrenceDate(futureDate, drafts)).toEqual({
-        message: messages.isValidDateOfDeath
+        message: messages.isDateNotBeforeBirth
       })
     })
 
