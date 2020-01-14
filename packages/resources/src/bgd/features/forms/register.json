@@ -235,6 +235,7 @@
                   "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"BOTH_PARENTS\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
                 }
               ],
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "paragraph",
@@ -18101,6 +18102,7 @@
                         },
                         "required": false,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18138,6 +18140,7 @@
                         },
                         "required": true,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18175,6 +18178,7 @@
                         },
                         "required": false,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
@@ -18212,6 +18216,7 @@
                         },
                         "required": true,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
