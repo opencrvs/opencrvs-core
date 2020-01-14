@@ -543,9 +543,12 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
+    const applicationIsValidated = item.declarationStatus === 'VALIDATED'
     const isDuplicate = item.duplicates && item.duplicates.length > 0
     const application = this.props.outboxApplications.find(
-      application => application.id === item.id
+      application =>
+        (application.compositionId && application.compositionId === item.id) ||
+        application.id === item.id
     )
     const downloadStatus = application && application.downloadStatus
     const info = []
@@ -627,7 +630,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
     const listItemActions = []
 
-    if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+    if (
+      downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
+      ((!applicationIsValidated && this.userHasValidateOrRegistrarScope()) ||
+        (applicationIsValidated && this.userHasRegisterScope()))
+    ) {
       listItemActions.push({
         actionComponent: (
           <DownloadButton
@@ -644,34 +651,35 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           />
         )
       })
-    } else {
-      if (this.userHasCertifyScope()) {
-        if (applicationIsRegistered || applicationIsCertified) {
-          listItemActions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: () => this.props.goToPrintCertificate(item.id, item.event)
-          })
-        }
-      }
-
-      if (this.userHasValidateScope() || this.userHasRegisterScope()) {
-        if (!applicationIsRegistered && !applicationIsCertified) {
-          listItemActions.push({
-            label: applicationIsRejected
-              ? this.props.intl.formatMessage(constantsMessages.update)
-              : this.props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
-              !isDuplicate
-                ? this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    item.id,
-                    'review',
-                    item.event.toLowerCase()
-                  )
-                : this.props.goToReviewDuplicate(item.id)
-          })
-        }
-      }
+    } else if (
+      (applicationIsRegistered || applicationIsCertified) &&
+      this.userHasCertifyScope()
+    ) {
+      listItemActions.push({
+        label: this.props.intl.formatMessage(buttonMessages.print),
+        handler: () => this.props.goToPrintCertificate(item.id, item.event)
+      })
+    } else if (
+      (applicationIsValidated && this.userHasRegisterScope()) ||
+      (!applicationIsValidated &&
+        !applicationIsRegistered &&
+        !applicationIsCertified &&
+        this.userHasValidateOrRegistrarScope())
+    ) {
+      listItemActions.push({
+        label: applicationIsRejected
+          ? this.props.intl.formatMessage(constantsMessages.update)
+          : this.props.intl.formatMessage(constantsMessages.review),
+        handler: () =>
+          !isDuplicate
+            ? this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                item.id,
+                'review',
+                item.event.toLowerCase()
+              )
+            : this.props.goToReviewDuplicate(item.id)
+      })
     }
 
     return (
@@ -703,6 +711,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
 
   userHasCertifyScope() {
     return this.props.scope && this.props.scope.includes('certify')
+  }
+
+  userHasValidateOrRegistrarScope() {
+    return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
   render() {

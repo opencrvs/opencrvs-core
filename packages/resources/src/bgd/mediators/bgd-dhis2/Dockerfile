@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
+ENV CHECK_INVALID_TOKEN true
 
 WORKDIR /usr/src/app/packages/resources/src/bgd/mediators/bgd-dhis2
 COPY packages/resources/src/bgd/mediators/bgd-dhis2/package.json package.json

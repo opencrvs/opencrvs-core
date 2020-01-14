@@ -34,6 +34,7 @@ interface IFormMessages {
   applicantsRelationWithDeceased: MessageDescriptor
   applicantTitle: MessageDescriptor
   assignedRegistrationOffice: MessageDescriptor
+  assignedRegistrationOfficeGroupTitle: MessageDescriptor
   attendantAtBirth: MessageDescriptor
   attendantAtBirthLayperson: MessageDescriptor
   attendantAtBirthMidwife: MessageDescriptor
@@ -468,6 +469,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Assigned Registration Office',
     description: 'Assigned Registration Office section',
     id: 'form.section.assignedRegistrationOffice'
+  },
+  assignedRegistrationOfficeGroupTitle: {
+    defaultMessage: 'Assigned registration office',
+    description: 'Assigned Registration Office section',
+    id: 'form.section.assignedRegistrationOfficeGroupTitle'
   },
   attendantAtBirth: {
     defaultMessage: 'Attendant at birth',
@@ -1840,18 +1846,18 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.application.whoseContactDetails'
   },
   userSignatureAttachmentTitle: {
-    defaultMessage: 'Attach the registrar’s signature',
+    defaultMessage: 'Attach the signature',
     description: 'Title for user signature attachment',
     id: 'form.field.label.userSignatureAttachmentTitle'
   },
   userSignatureAttachment: {
-    defaultMessage: 'Registrar’s signature',
+    defaultMessage: 'User’s signature',
     description: 'Input label for user signature attachment',
     id: 'form.field.label.userSignatureAttachment'
   },
   userSignatureAttachmentDesc: {
     defaultMessage:
-      'Ask the registrar to sign a piece of paper and then scan or take a photo.',
+      'Ask the user to sign a piece of paper and then scan or take a photo.',
     description: 'Description for user signature attachment',
     id: 'form.field.label.userSignatureAttachmentDesc'
   },

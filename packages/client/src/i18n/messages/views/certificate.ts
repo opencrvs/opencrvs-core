@@ -363,7 +363,7 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Floating Toast message upon certificate ready to print'
   },
   otherCollectorFormTitle: {
-    defaultMessage: 'What is their ID and name',
+    defaultMessage: 'What is their ID and name?',
     description: 'Title for other collector form',
     id: 'print.certificate.collector.other.title'
   },
@@ -374,7 +374,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other.paragraph'
   },
   certificateCollectorError: {
-    defaultMessage: 'Select who is collecting the certificate',
+    defaultMessage: 'Please select who is collecting the certificate',
     description: 'Form level error for collector form',
     id: 'print.certificate.collector.form.error'
   },

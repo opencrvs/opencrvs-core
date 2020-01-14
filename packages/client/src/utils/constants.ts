@@ -51,15 +51,22 @@ export const BRN_DRN_TEXT = 'brn-drn'
 export const PHONE_TEXT = 'phone'
 export const NAME_TEXT = 'name'
 export const SEARCH_RESULT_SORT = 'DESC'
-export const FIELD_AGENT_ROLES = ['FIELD_AGENT']
+export const ROLE_FIELD_AGENT = 'FIELD_AGENT'
+export const ROLE_REGISTRATION_AGENT = 'REGISTRATION_AGENT'
+export const ROLE_LOCAL_REGISTRAR = 'LOCAL_REGISTRAR'
+export const FIELD_AGENT_ROLES = [ROLE_FIELD_AGENT]
 export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
 export const REGISTRAR_ROLES = [
-  'LOCAL_REGISTRAR',
+  ROLE_LOCAL_REGISTRAR,
   'DISTRICT_REGISTRAR',
   'STATE_REGISTRAR',
   'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
+  ROLE_REGISTRATION_AGENT
 ]
+
+export const ROLE_TYPE_SECRETARY = 'SECRETARY'
+export const ROLE_TYPE_MAYOR = 'MAYOR'
+export const ROLE_TYPE_CHAIRMAN = 'CHAIRMAN'
 
 export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
 export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'
@@ -89,3 +96,5 @@ export const JURISDICTION_TYPE: { [key: string]: string } = {
 
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
+
+export const MONTHS_IN_YEAR = 12

@@ -39,16 +39,15 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'user',
-              groupId: userSection.groups[1].id
+              sectionId: userSection.id,
+              groupId: userSection.groups[2].id
             },
             isExact: true,
             path: '/createUser',
             url: ''
           }}
         />,
-        store,
-        [mockFetchRoleGraphqlOperation]
+        store
       )).component
     })
 
@@ -63,7 +62,7 @@ describe('signature upload tests', () => {
         .hostNodes()
         .text()
 
-      expect(title).toBe('Attach the registrar’s signature')
+      expect(title).toBe('Attach the signature')
     })
 
     it('No error while uploading if valid file', async () => {
@@ -118,7 +117,7 @@ describe('signature upload tests', () => {
       testComponent.update()
 
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-user-view-group'
+        '/createUser/preview/preview-registration-office'
       )
     })
   })

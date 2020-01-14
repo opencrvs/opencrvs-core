@@ -115,6 +115,9 @@ if [[ "$OWN_IP" = "$PRODUCTION_IP" ]]; then
   script -q -c "scp -v -r -P $SSH_PORT /data/backups/mongo/openhim-dev-$BACKUP_DATE.gz $SSH_USER@$SSH_HOST:$REMOTE_DIR/mongo" && echo "Copied openhim backup files to remote server."
 fi
 
-# Cleanup any old backups. Keep previous 7 days of data 
-#------------------------------------------------------
-find /data/backups -mtime +7 -exec rm {} \;
+# Cleanup any old backups from influx or mongo. Keep previous 7 days of data and all elastic data
+# Elastic snapshots require a random selection of files in the data/backups/elasticsearch/indices
+# folder
+#------------------------------------------------------------------------------------------------
+find /data/backups/influxdb -mtime +7 -exec rm {} \;
+find /data/backups/mongo -mtime +7 -exec rm {} \;

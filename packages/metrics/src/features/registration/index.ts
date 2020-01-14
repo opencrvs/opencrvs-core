@@ -17,6 +17,7 @@ export interface IBirthRegistrationFields extends IPoint {
 export interface IDeathRegistrationFields extends IPoint {
   compositionId: string
   ageInYears: number | undefined
+  deathDays: number | undefined
 }
 
 export interface IPoint {
@@ -64,6 +65,13 @@ export interface IInProgressApplicationTags {
   missingFieldGroupId: string
   missingFieldId: string
   eventType: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
+}
+
+export interface ILocationTags {
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string

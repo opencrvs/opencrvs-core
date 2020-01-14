@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { NATIVE_LANGUAGE } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
 
 interface ISearchEventDataTemplate {
@@ -61,7 +62,7 @@ export const searchTypeResolvers: GQLResolver = {
       if (!resultSet._source) {
         return null
       }
-      return [
+      const names = [
         {
           use: 'en',
           given:
@@ -74,9 +75,12 @@ export const searchTypeResolvers: GQLResolver = {
               resultSet._source.childFamilyName
             ]) ||
             null
-        },
-        {
-          use: 'bn',
+        }
+      ]
+
+      if (NATIVE_LANGUAGE) {
+        names.push({
+          use: NATIVE_LANGUAGE,
           given:
             (resultSet._source.childFirstNamesLocal && [
               resultSet._source.childFirstNamesLocal
@@ -87,8 +91,10 @@ export const searchTypeResolvers: GQLResolver = {
               resultSet._source.childFamilyNameLocal
             ]) ||
             null
-        }
-      ]
+        })
+      }
+
+      return names
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
@@ -111,7 +117,8 @@ export const searchTypeResolvers: GQLResolver = {
       if (!resultSet._source) {
         return null
       }
-      return [
+
+      const names = [
         {
           use: 'en',
           given:
@@ -124,9 +131,12 @@ export const searchTypeResolvers: GQLResolver = {
               resultSet._source.deceasedFamilyName
             ]) ||
             null
-        },
-        {
-          use: 'bn',
+        }
+      ]
+
+      if (NATIVE_LANGUAGE) {
+        names.push({
+          use: NATIVE_LANGUAGE,
           given:
             (resultSet._source.deceasedFirstNamesLocal && [
               resultSet._source.deceasedFirstNamesLocal
@@ -137,8 +147,10 @@ export const searchTypeResolvers: GQLResolver = {
               resultSet._source.deceasedFamilyNameLocal
             ]) ||
             null
-        }
-      ]
+        })
+      }
+
+      return names
     },
     dateOfDeath(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.deathDate) || null
@@ -160,7 +172,7 @@ export const searchTypeResolvers: GQLResolver = {
   },
   OperationHistorySearchSet: {
     operatorName(searchData: ISearchDataTemplate) {
-      return [
+      const names = [
         {
           use: 'en',
           given:
@@ -173,9 +185,12 @@ export const searchTypeResolvers: GQLResolver = {
               searchData.operatorFamilyName
             ]) ||
             null
-        },
-        {
-          use: 'bn',
+        }
+      ]
+
+      if (NATIVE_LANGUAGE) {
+        names.push({
+          use: NATIVE_LANGUAGE,
           given:
             (searchData.operatorFirstNamesLocale && [
               searchData.operatorFirstNamesLocale
@@ -186,8 +201,10 @@ export const searchTypeResolvers: GQLResolver = {
               searchData.operatorFamilyNameLocale
             ]) ||
             null
-        }
-      ]
+        })
+      }
+
+      return names
     }
   }
 }

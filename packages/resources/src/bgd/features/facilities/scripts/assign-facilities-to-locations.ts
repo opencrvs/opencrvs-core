@@ -117,7 +117,10 @@ export default async function importFacilities() {
     // if we cannot map an office to A2I location
     // A2I data has many formatting issues in the English name.  "Narsingdi " needs a space at the end.
     // Using these to also set pilot municipalities which are not included in A2I data
-    const deploymentUpazilas = ['Narsingdi ', 'Bhurungamari']
+    // Using the Atpara Upazila in Netrakona District, Mymensingh Division as a test location in production
+    // TODO: If OpenCRVS is to be scaled to Atpara, test registrations for this Upazila must be deleted in
+    // production and the test user locations changed in test-employees.csv and the test users deleted from production.
+    const deploymentUpazilas = ['Narsingdi ', 'Bhurungamari', 'Atpara']
 
     crvsOfficeLocations = await mapAndSaveCRVSFacilities(
       crvsOffices,

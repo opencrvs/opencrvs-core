@@ -14,12 +14,26 @@ import { draftToGqlTransformer } from '@client/transformer'
 import {
   IFormField,
   ISelectFormFieldWithOptions,
-  ISelectFormFieldWithDynamicOptions
+  ISelectFormFieldWithDynamicOptions,
+  IFormSectionData
 } from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
-import { getRolesQuery } from '@client/forms/user/fieldDefinitions/query/queries'
+import {
+  getRolesQuery,
+  roleQueries
+} from '@client/forms/user/fieldDefinitions/query/queries'
+import { userQueries } from '@client/sysadmin/user/queries'
+import { GQLUser, GQLRole } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  ROLE_LOCAL_REGISTRAR,
+  ROLE_FIELD_AGENT,
+  ROLE_REGISTRATION_AGENT,
+  ROLE_TYPE_SECRETARY,
+  ROLE_TYPE_CHAIRMAN,
+  ROLE_TYPE_MAYOR
+} from '@client/utils/constants'
 
 export enum UserStatus {
   ACTIVE,
@@ -145,9 +159,10 @@ export const mockFetchRoleGraphqlOperation = {
 
 export const transformRoleDataToDefinitions = (
   fields: IFormField[],
-  data: any
+  data: any,
+  userFormData: IFormSectionData
 ): IFormField[] => {
-  const roles = data.data.getRoles as Array<any>
+  const roles = data as Array<any>
   const transformTypes = (types: string[]) =>
     types.map(type => ({
       label: userMessages[type],
@@ -156,6 +171,9 @@ export const transformRoleDataToDefinitions = (
 
   return fields.map(field => {
     if (field.name === 'role') {
+      if (userFormData && userFormData.role) {
+        userFormData.role = ''
+      }
       ;(field as ISelectFormFieldWithOptions).options = roles.map(
         ({ value }: { value: string }) => ({
           label: userMessages[value],
@@ -164,6 +182,9 @@ export const transformRoleDataToDefinitions = (
       )
       return field
     } else if (field.name === 'type') {
+      if (userFormData && userFormData.type) {
+        userFormData.type = ''
+      }
       ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options = roles.reduce(
         (options, { value, types }) => ({
           ...options,
@@ -174,4 +195,42 @@ export const transformRoleDataToDefinitions = (
       return field
     } else return field
   })
+}
+
+export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
+  const roleData = await roleQueries.fetchRoles()
+  const userData = await userQueries.searchUsers(primaryOfficeId)
+  const roles = roleData.data.getRoles as Array<GQLRole>
+  const users = userData.data.searchUsers.results as Array<GQLUser>
+
+  const hasSecretary = users.some(user => user.type === ROLE_TYPE_SECRETARY)
+  const hasMayor = users.some(user => user.type === ROLE_TYPE_MAYOR)
+  const hasChariman = users.some(user => user.type === ROLE_TYPE_CHAIRMAN)
+
+  const roleList = [] as Array<GQLRole>
+
+  roles.map(role => {
+    if (
+      role.value === ROLE_FIELD_AGENT ||
+      role.value === ROLE_REGISTRATION_AGENT
+    ) {
+      if (hasSecretary && (hasChariman || hasMayor)) {
+        roleList.push(role)
+      }
+    } else if (role.value === ROLE_LOCAL_REGISTRAR) {
+      role.types =
+        (role.types &&
+          role.types.filter(
+            (t: string | null) =>
+              (t === ROLE_TYPE_SECRETARY && !hasSecretary) ||
+              (t === ROLE_TYPE_MAYOR && !hasMayor) ||
+              (t === ROLE_TYPE_CHAIRMAN && !hasChariman)
+          )) ||
+        []
+      role.types.length > 0 && roleList.push(role)
+    } else {
+      roleList.push(role)
+    }
+  })
+  return roleList
 }

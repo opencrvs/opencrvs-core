@@ -27,8 +27,6 @@ import { withApollo } from 'react-apollo'
 import { Spinner, ActionPageLight } from '@opencrvs/components/lib/interface'
 import styled from '@client/styledComponents'
 import { goBack } from '@client/navigation'
-import { getRolesQuery } from '@client/forms/user/fieldDefinitions/query/queries'
-import { updateUserFormFieldDefinitions } from '@client/user/userReducer'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import { formMessages } from '@client/i18n/messages'
@@ -51,7 +49,6 @@ type INewUserProps = {
 
 interface IDispatchProps {
   goBack: typeof goBack
-  updateUserFormFieldDefinitions: typeof updateUserFormFieldDefinitions
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -79,15 +76,6 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
         </Container>
       </ActionPageLight>
     )
-  }
-
-  componentDidMount() {
-    this.props.client
-      .query({ query: getRolesQuery, variables: {} })
-      .then(this.props.updateUserFormFieldDefinitions)
-      .catch(e => {
-        Sentry.captureException(e)
-      })
   }
 
   render() {
@@ -184,5 +172,5 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(
   mapStateToProps,
-  { goBack, updateUserFormFieldDefinitions }
+  { goBack }
 )(injectIntl(withApollo(CreateNewUserComponent)))

@@ -65,7 +65,7 @@ describe('resend handler receives a request', () => {
     })
 
     it('does not generate new verification code for a demo user', async () => {
-      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      server = await createServerWithEnvironment({ NODE_ENV: 'development' })
       const codeService = require('../verifyCode/service')
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({

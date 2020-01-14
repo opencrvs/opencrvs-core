@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { USER_MANAGEMENT_URL, COUNTRY } from '@workflow/constants'
+import { USER_MANAGEMENT_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { getTokenPayload } from '@workflow/utils/authUtils.ts'
@@ -18,11 +18,11 @@ const JURISDICTION_TYPE_DISTRICT = 'district'
 const JURISDICTION_TYPE_UPAZILA = 'upazila'
 const JURISDICTION_TYPE_UNION = 'union'
 
-export async function getUserMobile(
+export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
 ) {
-  const res = await fetch(`${USER_MANAGEMENT_URL}getUserMobile`, {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {
@@ -137,22 +137,10 @@ export async function getLoggedInPractitionerResource(
   token: string
 ): Promise<fhir.Practitioner> {
   const tokenPayload = getTokenPayload(token)
-  const userMobileResponse = await getUserMobile(tokenPayload.sub, {
+  const userResponse = await getUser(tokenPayload.sub, {
     Authorization: `Bearer ${token}`
   })
-  const localMobile = convertToLocal(userMobileResponse.mobile, COUNTRY)
-  const practitionerBundle = await getFromFhir(
-    `/Practitioner?telecom=phone|${localMobile}`
-  )
-  if (
-    !practitionerBundle ||
-    !practitionerBundle.entry ||
-    !practitionerBundle.entry[0] ||
-    !practitionerBundle.entry[0].resource
-  ) {
-    throw new Error('Practitioner resource not found')
-  }
-  return practitionerBundle.entry[0].resource
+  return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
 }
 
 export async function getPractitionerLocations(

@@ -8,6 +8,7 @@ Object {
   },
   "measurement": "certification_payment",
   "tags": Object {
+    "eventType": "BIRTH",
     "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
   },
 }
@@ -102,11 +103,11 @@ exports[`When an in-progress application is received writes the in complete fiel
 Object {
   "fields": Object {
     "compositionId": "b2fbb82c-a68d-4793-98e1-87484fc785c4",
-    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
   },
   "measurement": "in_complete_fields",
   "tags": Object {
     "eventType": "BIRTH",
+    "locationLevel5": "Location/308c35b4-04f8-4664-83f5-9790e790cde1",
     "missingFieldGroupId": "child-view-group",
     "missingFieldId": "placeOfBirth",
     "missingFieldSectionId": "child",

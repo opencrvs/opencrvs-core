@@ -44,7 +44,8 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup
+  IFormSectionGroup,
+  IFormData
 } from '@client/forms'
 import {
   goBack as goBackAction,
@@ -74,6 +75,7 @@ import {
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
+import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -342,8 +344,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
-  onSaveAsDraftClicked = () => {
-    this.props.writeApplication(this.props.application)
+  onSaveAsDraftClicked = async () => {
+    await this.props.writeApplication(this.props.application)
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
@@ -360,7 +362,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
-  continueButtonHandler = (
+  continueButtonHandler = async (
     pageRoute: string,
     applicationId: string,
     pageId: string,
@@ -385,7 +387,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
     this.updateVisitedGroups()
-    this.props.writeApplication(this.props.application)
+    await this.props.writeApplication(this.props.application)
     this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
   }
 
@@ -702,13 +704,35 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-export function replaceInitialValues(fields: IFormField[], sectionValues: any) {
+function getInitialValue(field: IFormField, data: IFormData) {
+  let fieldInitialValue = field.initialValue
+  if (field.initialValueKey) {
+    try {
+      fieldInitialValue = getValueFromApplicationDataByKey(
+        data,
+        field.initialValueKey
+      )
+    } catch (error) {
+      console.error(
+        'Error while looking for key in draft to set initial value.',
+        error
+      )
+    }
+  }
+  return fieldInitialValue
+}
+
+export function replaceInitialValues(
+  fields: IFormField[],
+  sectionValues: any,
+  data?: IFormData
+) {
   return fields.map(field => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
       isNull(sectionValues[field.name])
-        ? field.initialValue
+        ? getInitialValue(field, data || {})
         : sectionValues[field.name]
   }))
 }
@@ -768,7 +792,8 @@ function mapStateToProps(
 
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
-    application.data[activeSection.id] || {}
+    application.data[activeSection.id] || {},
+    application.data
   )
 
   return {

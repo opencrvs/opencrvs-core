@@ -9,14 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { loop, Cmd, Loop, liftState, getModel, getCmd } from 'redux-loop'
+import {
+  loop,
+  Cmd,
+  Loop,
+  liftState,
+  getModel,
+  getCmd,
+  RunCmd
+} from 'redux-loop'
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import { referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
-import { tempData } from '@client/offline/temp/tempLocations'
 import { ISerializedForm } from '@client/forms'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -123,24 +130,41 @@ function checkIfDone(
   return loopWithState
 }
 
+const FACILITIES_CMD = Cmd.run(() => referenceApi.loadFacilities(), {
+  successActionCreator: actions.facilitiesLoaded,
+  failActionCreator: actions.facilitiesFailed
+})
+
+const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
+  successActionCreator: actions.locationsLoaded,
+  failActionCreator: actions.locationsFailed
+})
+
+const DEFINITIONS_CMD = Cmd.run(() => referenceApi.loadDefinitions(), {
+  successActionCreator: actions.definitionsLoaded,
+  failActionCreator: actions.definitionsFailed
+})
+
+const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
+  successActionCreator: actions.assetsLoaded,
+  failActionCreator: actions.assetsFailed
+})
+
+const RETRY_TIMEOUT = 5000
+
+function delay(cmd: RunCmd<any>, time: number) {
+  return Cmd.list(
+    [Cmd.run(() => new Promise(resolve => setTimeout(resolve, time))), cmd],
+    { sequence: true }
+  )
+}
+
 function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
-    Cmd.run(referenceApi.loadFacilities, {
-      successActionCreator: actions.facilitiesLoaded,
-      failActionCreator: actions.facilitiesFailed
-    }),
-    Cmd.run(referenceApi.loadLocations, {
-      successActionCreator: actions.locationsLoaded,
-      failActionCreator: actions.locationsFailed
-    }),
-    Cmd.run(referenceApi.loadDefinitions, {
-      successActionCreator: actions.definitionsLoaded,
-      failActionCreator: actions.definitionsFailed
-    }),
-    Cmd.run(referenceApi.loadAssets, {
-      successActionCreator: actions.assetsLoaded,
-      failActionCreator: actions.assetsFailed
-    })
+    FACILITIES_CMD,
+    LOCATIONS_CMD,
+    DEFINITIONS_CMD,
+    ASSETS_CMD
   ])
 }
 
@@ -159,6 +183,14 @@ function updateGlobalConfig() {
     head.appendChild(newConfigElement)
     head.removeChild(currentConfigElement)
   })
+}
+
+/*
+ * If offline data is already stored, but we're just not able to update it
+ * we retry, but do not show the user an error
+ */
+function errorIfDataNotLoaded(state: IOfflineDataState) {
+  return !isOfflineDataLoaded(state.offlineData)
 }
 
 function reducer(
@@ -215,7 +247,6 @@ function reducer(
     case actions.DEFINITIONS_LOADED: {
       return {
         ...state,
-        loadingError: false,
         offlineData: {
           ...state.offlineData,
           languages: action.payload.languages,
@@ -225,10 +256,13 @@ function reducer(
       }
     }
     case actions.DEFINITIONS_FAILED: {
-      return {
-        ...state,
-        loadingError: true
-      }
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(DEFINITIONS_CMD, RETRY_TIMEOUT)
+      )
     }
 
     /*
@@ -245,14 +279,13 @@ function reducer(
       }
     }
     case actions.LOCATIONS_FAILED: {
-      return {
-        ...state,
-        loadingError: true,
-        offlineData: {
-          ...state.offlineData,
-          locations: tempData.locations
-        }
-      }
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(LOCATIONS_CMD, RETRY_TIMEOUT)
+      )
     }
 
     /*
@@ -275,14 +308,13 @@ function reducer(
       }
     }
     case actions.FACILITIES_FAILED: {
-      return {
-        ...state,
-        loadingError: true,
-        offlineData: {
-          ...state.offlineData,
-          facilities: tempData.facilities
-        }
-      }
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(FACILITIES_CMD, RETRY_TIMEOUT)
+      )
     }
 
     /*
@@ -292,7 +324,6 @@ function reducer(
     case actions.ASSETS_LOADED: {
       return {
         ...state,
-        loadingError: false,
         offlineData: {
           ...state.offlineData,
           assets: {
@@ -302,16 +333,20 @@ function reducer(
       }
     }
     case actions.ASSETS_FAILED: {
-      return {
-        ...state,
-        loadingError: true
-      }
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(ASSETS_CMD, RETRY_TIMEOUT)
+      )
     }
 
     case actions.READY: {
       const offlineDataLoaded = isOfflineDataLoaded(action.payload)
       return {
         ...state,
+        loadingError: false,
         offlineData: action.payload,
         offlineDataLoaded
       }

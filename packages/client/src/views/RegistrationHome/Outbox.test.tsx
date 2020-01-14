@@ -267,19 +267,30 @@ describe('OutBox tests', () => {
     })
   })
 
-  describe('Pagination test', () => {
-    it('shows pagination bar for more than 10 applications', async () => {
-      const applications: IApplication[] = []
-      for (let i = 0; i < 16; i++) {
-        applications.push(birthApp)
-      }
+  describe('Pagination/loadmore test for more than 10 applications', () => {
+    const applications: IApplication[] = []
+    for (let i = 0; i < 16; i++) {
+      applications.push(birthApp)
+    }
+    it('shows pagination bar when pagination is used', async () => {
       const testComp = (await createTestComponent(
-        <OutBox application={applications} />,
+        <OutBox application={applications} showPaginated={true} />,
         store
       )).component
       expect(testComp.exists('#pagination')).toBeTruthy()
       testComp
         .find('#pagination')
+        .children()
+        .map(child => child.simulate('click'))
+    })
+    it('shows loadmore button when loadmore is used', async () => {
+      const testComp = (await createTestComponent(
+        <OutBox application={applications} showPaginated={false} />,
+        store
+      )).component
+      expect(testComp.exists('#load_more_button')).toBeTruthy()
+      testComp
+        .find('#load_more_button')
         .children()
         .map(child => child.simulate('click'))
     })

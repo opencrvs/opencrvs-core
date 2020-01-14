@@ -110,6 +110,7 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
+import { dynamicDispatch } from '@client/applications'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -118,7 +119,7 @@ const fadeIn = keyframes`
 
 const FormItem = styled.div`
   animation: ${fadeIn} 500ms;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -142,7 +143,7 @@ type GeneratedInputFieldProps = {
   error: string
   draftData?: IFormData
   disabled?: boolean
-}
+} & IDispatchProps
 
 function GeneratedInputField({
   fieldDefinition,
@@ -156,7 +157,8 @@ function GeneratedInputField({
   value,
   nestedFields,
   draftData,
-  disabled
+  disabled,
+  dynamicDispatch
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -415,6 +417,11 @@ function GeneratedInputField({
           touched={inputProps.touched}
           onModalComplete={(value: string) => {
             onSetFieldValue(fieldDefinition.name, value)
+            if (fieldDefinition.dispatchOptions) {
+              dynamicDispatch(fieldDefinition.dispatchOptions.action, {
+                [fieldDefinition.dispatchOptions.payloadKey]: value
+              })
+            }
           }}
         />
       </InputField>
@@ -486,8 +493,13 @@ interface IStateProps {
   resources: IOfflineData
 }
 
+interface IDispatchProps {
+  dynamicDispatch: typeof dynamicDispatch
+}
+
 type Props = IFormSectionProps &
   IStateProps &
+  IDispatchProps &
   FormikProps<IFormSectionData> &
   IntlShapeProps
 
@@ -612,7 +624,8 @@ class FormSectionComponent extends React.Component<Props> {
       resources,
       intl,
       draftData,
-      setValues
+      setValues,
+      dynamicDispatch
     } = this.props
 
     const language = this.props.intl.locale
@@ -764,6 +777,7 @@ class FormSectionComponent extends React.Component<Props> {
                       error={error}
                       draftData={draftData}
                       disabled={conditionalActions.includes('disable')}
+                      dynamicDispatch={dynamicDispatch}
                     />
                   )}
                 </Field>
@@ -817,6 +831,7 @@ class FormSectionComponent extends React.Component<Props> {
                             touched={nestedFieldTouched || false}
                             error={nestedError}
                             draftData={draftData}
+                            dynamicDispatch={dynamicDispatch}
                           />
                         )}
                       </FastField>
@@ -846,6 +861,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={Boolean(touched[field.name]) || false}
                       error={error}
                       draftData={draftData}
+                      dynamicDispatch={dynamicDispatch}
                     />
                   )}
                 </Field>
@@ -869,6 +885,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
+                      dynamicDispatch={dynamicDispatch}
                     />
                   )}
                 </FastField>
@@ -882,7 +899,7 @@ class FormSectionComponent extends React.Component<Props> {
 }
 
 const FormFieldGeneratorWithFormik = withFormik<
-  IFormSectionProps & IStateProps,
+  IFormSectionProps & IStateProps & IDispatchProps,
   IFormSectionData
 >({
   mapPropsToValues: props => mapFieldsToValues(props.fields),
@@ -901,5 +918,6 @@ export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
     resources: getOfflineData(state)
-  })
+  }),
+  { dynamicDispatch }
 )(FormFieldGeneratorWithFormik)

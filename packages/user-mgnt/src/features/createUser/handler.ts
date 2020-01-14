@@ -15,7 +15,8 @@ import {
   generateUsername,
   postFhir,
   rollback,
-  sendCredentialsNotification
+  sendCredentialsNotification,
+  getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser } from '@user-mgnt/model/user'
@@ -28,6 +29,7 @@ import {
   roleScopeMapping,
   hasDemoScope
 } from '@user-mgnt/utils/userUtils'
+import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from 'hapi'
 import * as _ from 'lodash'
 
@@ -51,6 +53,10 @@ export default async function createUser(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
+    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
+      user.primaryOfficeId,
+      token
+    )
     user.role = user.role ? user.role : 'FIELD_AGENT'
     const role = createFhirPractitionerRole(user, practitionerId)
     roleId = await postFhir(token, role)
@@ -59,9 +65,15 @@ export default async function createUser(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
       )
     }
-
+    const userScopes: string[] = roleScopeMapping[user.role]
+    if (
+      (process.env.NODE_ENV === 'development' || QA_ENV) &&
+      !userScopes.includes('demo')
+    ) {
+      userScopes.push('demo')
+    }
     user.status = statuses.PENDING
-    user.scope = roleScopeMapping[user.role]
+    user.scope = userScopes
 
     if (user.role === 'API_USER') {
       // Immediately active API users

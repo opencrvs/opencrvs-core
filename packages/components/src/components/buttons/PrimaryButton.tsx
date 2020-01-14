@@ -42,12 +42,11 @@ export const PrimaryButton = styled(Button)`
     box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
   }
 
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+  &:not([data-focus-visible-added]):disabled {
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.placeholder};
+    opacity: 0.6;
     path {
-      stroke: ${({ theme }) => theme.colors.placeholder};
+      stroke: ${({ theme }) => theme.colors.white};
     }
   }
 `

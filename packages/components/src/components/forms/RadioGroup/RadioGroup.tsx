@@ -18,13 +18,16 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   margin-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 `
 
 const List = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  & > div {
+    margin-bottom: 16px;
+  }
 `
 const LargeList = styled.ul`
   list-style: none;
@@ -39,10 +42,6 @@ const NestedChildren = styled.div`
   padding-left: 33px;
   border-left: 4px solid ${({ theme }) => theme.colors.copy};
   padding-top: 0px !important;
-
-  > div {
-    padding: 16px 0;
-  }
 `
 
 export enum RadioSize {
@@ -117,16 +116,18 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
           <List>
             {options.map(option => {
               return (
-                <Radio
-                  {...props}
-                  key={option.label}
-                  name={name}
-                  label={option.label}
-                  value={option.value}
-                  id={`${name}_${option.value}`}
-                  selected={value}
-                  onChange={this.props.onChange}
-                />
+                <div key={option.label}>
+                  <RadioButton
+                    {...props}
+                    size={'small'}
+                    name={name}
+                    label={option.label}
+                    value={option.value}
+                    id={`${name}_${option.value}`}
+                    selected={value}
+                    onChange={this.props.onChange}
+                  />
+                </div>
               )
             })}
           </List>

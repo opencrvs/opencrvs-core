@@ -2206,7 +2206,7 @@ export const mockCompositionResponse = {
     {
       code: 'duplicate',
       targetReference: {
-        reference: 'Composi$ion/ff6a4fce-4e72-463c-a6aa-718054643983'
+        reference: 'Composition/ff6a4fce-4e72-463c-a6aa-718054643983'
       }
     },
     {
@@ -3568,4 +3568,42 @@ export const mockLocationResponse = {
     versionId: '8de2fb91-0ba2-4179-841c-6867dc29abe2'
   },
   id: '45e37658-cec7-4c61-b999-c49cfaf16da5'
+}
+
+export const mockFacilityResponse = {
+  resourceType: 'Location',
+  name: 'Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar',
+  alias: ['Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/240e4216-5c32-41d3-b8a8-025e8c8260cb'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'HEALTH_FACILITY'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  telecom: [],
+  address: {
+    line: ['Alokbali', 'Narsingdi Sadar'],
+    district: 'Narsingdi',
+    state: 'Dhaka'
+  },
+  meta: {
+    lastUpdated: '2019-12-19T16:45:00.661+00:00',
+    versionId: '25b82e56-003f-4da7-975a-e9395100e819'
+  },
+  id: 'f1ea7c2f-0b71-43e8-a199-a92a0e17102c'
 }

@@ -130,7 +130,7 @@ export class TextInput extends React.Component<ITextInputProps> {
         ref={this.$element}
         name={props.id}
         {...this.props}
-        autocomplete={false}
+        autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
       />
     )

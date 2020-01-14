@@ -26,7 +26,11 @@ export default async function loadTestEmployees() {
   )
   const employees = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
-    await composeAndSavePractitioners(employees.slice(0, 1))
+    await composeAndSavePractitioners(
+      employees.slice(0, 1),
+      process.argv[2],
+      process.argv[3]
+    )
   } catch (err) {
     return internal(err)
   }
