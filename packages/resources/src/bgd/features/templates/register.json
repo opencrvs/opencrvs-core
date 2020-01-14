@@ -2546,15 +2546,15 @@
       ],
       "fonts": {
         "bn": {
-          "notosans": {
-            "normal": "NotoSansBengali-Light.ttf",
-            "regular": "NotoSansBengali-Light.ttf",
-            "bold": "NotoSansBengali-Regular.ttf"
-          },
           "notosanscurrency": {
             "normal": "NotoSansBengali-Light.ttf",
             "regular": "NotoSansBengali-Light.ttf",
             "bold": "NotoSansBengali-Light.ttf"
+          },
+          "notosans": {
+            "normal": "NotoSans-Light.ttf",
+            "regular": "NotoSans-Light.ttf",
+            "bold": "NotoSans-Regular.ttf"
           },
           "notosanslocation": {
             "normal": "NotoSans-Light.ttf",
@@ -3940,15 +3940,15 @@
       ],
       "fonts": {
         "bn": {
-          "notosans": {
-            "normal": "NotoSansBengali-Light.ttf",
-            "regular": "NotoSansBengali-Light.ttf",
-            "bold": "NotoSansBengali-Regular.ttf"
-          },
           "notosanscurrency": {
             "normal": "NotoSansBengali-Light.ttf",
             "regular": "NotoSansBengali-Light.ttf",
             "bold": "NotoSansBengali-Light.ttf"
+          },
+          "notosans": {
+            "normal": "NotoSans-Light.ttf",
+            "regular": "NotoSans-Light.ttf",
+            "bold": "NotoSans-Regular.ttf"
           },
           "notosanslocation": {
             "normal": "NotoSans-Light.ttf",
