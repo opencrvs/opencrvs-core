@@ -910,7 +910,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   field.conditionals ||
                   []
 
-                const isVisible = getConditionalActionsForField(
+                const isVisible = !getConditionalActionsForField(
                   tempField,
                   draft.data[residingSection] || {},
                   offlineResources,
