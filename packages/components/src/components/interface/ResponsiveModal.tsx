@@ -43,7 +43,7 @@ const ModalContent = styled.div<{ width?: number; responsive?: boolean }>`
   display: flex;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
+    flex-grow: 1;
     margin: 0 24px;
   }
   @media (max-width: ${({ theme, responsive }) =>
