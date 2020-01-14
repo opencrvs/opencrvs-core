@@ -370,11 +370,11 @@
                   },
                   "reviewOverrides": {
                     "residingSection": "registration",
-                    "reference": [
-                      "registration",
-                      "contact-view-group",
-                      "contactPoint"
-                    ],
+                    "reference": {
+                      "sectionID": "registration",
+                      "groupID": "contact-view-group",
+                      "fieldName": "contactPoint"
+                    },
                     "position": "before",
                     "labelAs": {
                       "defaultMessage": "Who is the applicant?",
@@ -15678,21 +15678,23 @@
                   ],
                   "reviewOverrides": {
                     "residingSection": "informant",
-                    "reference": [
-                      "registration",
-                      "point-of-contact",
-                      "contactPoint"
-                    ],
+                    "reference": {
+                      "sectionID": "registration",
+                      "groupID": "point-of-contact",
+                      "fieldName": "contactPoint"
+                    },
                     "position": "before",
                     "labelAs": {
                       "defaultMessage": "Applicant",
                       "description": "Label for relation to deceased",
                       "id": "form.field.label.applicant"
                     },
-                    "conditionals": [{
-                      "action": "hide",
-                      "expression": "(!draftData || !draftData.informant || [\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
-                    }]
+                    "conditionals": [
+                      {
+                        "action": "hide",
+                        "expression": "(!draftData || !draftData.informant || [\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
+                      }
+                    ]
                   },
                   "mapping": {
                     "mutation": {

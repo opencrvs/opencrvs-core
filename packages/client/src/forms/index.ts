@@ -365,7 +365,11 @@ export interface IFormFieldBase {
   ignoreNestedFieldWrappingInPreview?: boolean
   reviewOverrides?: {
     residingSection: string
-    reference: [string, string, string]
+    reference: {
+      sectionID: string
+      groupID: string
+      fieldName: string
+    }
     position?: REVIEW_OVERRIDE_POSITION
     labelAs?: MessageDescriptor
     conditionals?: IConditional[]

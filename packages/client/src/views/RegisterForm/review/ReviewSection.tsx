@@ -955,11 +955,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       sectionErrors
     )
 
-    const [
+    const {
       sectionID,
       groupID,
       fieldName
-    ] = overriddenField!.reviewOverrides!.reference
+    } = overriddenField!.reviewOverrides!.reference
     if (
       sectionID === section.id &&
       groupID === group.id &&
