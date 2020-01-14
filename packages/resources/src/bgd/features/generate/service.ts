@@ -77,7 +77,7 @@ async function getLocationBBSCode(practionerId: string): Promise<string> {
     })
   }
   const bbsCode = jurisdictionalLocations.reduce(
-    (locBBSCode, loc) => locBBSCode.concat(loc.bbsCode || ''),
+    (locBBSCode, loc) => locBBSCode.concat(loc.bbsCode?.padStart(2, '0') || ''),
     ''
   )
 
