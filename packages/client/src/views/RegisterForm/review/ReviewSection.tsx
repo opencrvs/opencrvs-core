@@ -618,7 +618,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineResources,
       draft.data
     )
-    return !conditionalActions.includes('hide')
+    return (
+      !conditionalActions.includes('hide') &&
+      !conditionalActions.includes('disable')
+    )
   }
 
   isViewOnly(field: IFormField) {
