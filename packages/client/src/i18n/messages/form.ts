@@ -589,7 +589,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
