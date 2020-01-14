@@ -18101,6 +18101,7 @@
                         },
                         "required": false,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18138,6 +18139,7 @@
                         },
                         "required": true,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18175,6 +18177,7 @@
                         },
                         "required": false,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
@@ -18212,6 +18215,7 @@
                         },
                         "required": true,
                         "initialValue": "",
+                        "extraValue":"Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
