@@ -1123,8 +1123,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               {intl.formatMessage(buttonMessages.cancel)}
             </TertiaryButton>,
             <PrimaryButton
+              id="edit_confirm"
               key="submit"
-              id="submit_confirm"
               onClick={() => {
                 this.editLinkClickHandlerForDraft(
                   this.state.editClickedSectionId!,
