@@ -15,7 +15,7 @@ import { Select, ISelectOption as SelectComponentOptions } from './../forms'
 import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`
-  width: calc(50vw - 50px);
+  width: calc(40vw - 50px);
   position: fixed;
   top: 94px;
   background-color: ${({ theme }) => theme.colors.background};
