@@ -316,15 +316,7 @@ You can use **ctrl + b** and arrow keys to navigate between tmux windows.
 
 This will require installation of [tmux](https://github.com/tmux/tmux/wiki) which is `brew install tmux` on OSX and [tmuxinator](https://github.com/tmuxinator/tmuxinator) which is usually `gem install tmuxinator`.
 
-### Local PWA development setup
-
-To expose all services with an external domain and HTTPS:
-
-1. Go to `ngrok.conf` and add an auth token.
-2. Run `ngrok start -config infrastructure/ngrok.conf --all`
-3. Open `https://ocrvs-client.ngrok.io` on your device
-
-# Remote mobile debugging setup
+# Remote mobile debugging setup / Local PWA development setup
 
 This is the best way to work and debug service workers and do actual device testing.
 
