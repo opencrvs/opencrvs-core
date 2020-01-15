@@ -119,11 +119,7 @@ import { ReviewHeader } from './ReviewHeader'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
-  display: inline-block;
   text-transform: lowercase;
-  &::first-letter {
-    text-transform: uppercase;
-  }
 `
 const Row = styled.div`
   display: flex;
