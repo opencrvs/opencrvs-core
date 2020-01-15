@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 window.config = {
-  AUTH_API_URL: 'http://192.168.8.105:4040/',
+  AUTH_API_URL: 'http://localhost:4040/',
   COUNTRY: 'bgd',
   LANGUAGES: 'bn,en',
   CLIENT_APP_URL: 'https://505b10ae.eu.ngrok.io',
