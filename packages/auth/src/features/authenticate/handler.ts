@@ -51,10 +51,6 @@ export default async function authenticateHandler(
   }
 
   const nonce = generateNonce()
-  await storeUserInformation(nonce, result.userId, result.scope, result.mobile)
-
-  await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
-
   const response: IAuthResponse = {
     mobile: result.mobile,
     status: result.status,
@@ -74,6 +70,15 @@ export default async function authenticateHandler(
         : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
+  } else {
+    await storeUserInformation(
+      nonce,
+      result.userId,
+      result.scope,
+      result.mobile
+    )
+
+    await generateAndSendVerificationCode(nonce, result.mobile, result.scope)
   }
   return response
 }

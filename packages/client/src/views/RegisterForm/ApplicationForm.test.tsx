@@ -325,7 +325,11 @@ describe('when user has starts a new application', () => {
           })
 
           it('No error while uploading valid file', async () => {
-            selectOption(app, '#uploadDocForMother', 'Other')
+            selectOption(
+              app,
+              '#uploadDocForMother',
+              'Birth registration certificate'
+            )
             app.update()
             app
               .find('#image_file_uploader_field')
@@ -355,7 +359,11 @@ describe('when user has starts a new application', () => {
           })
 
           it('Error while uploading invalid file', async () => {
-            selectOption(app, '#uploadDocForMother', 'Other')
+            selectOption(
+              app,
+              '#uploadDocForMother',
+              'Birth registration certificate'
+            )
             app.update()
             app
               .find('#image_file_uploader_field')

@@ -544,6 +544,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
     const applicationIsRejected = item.declarationStatus === 'REJECTED'
     const applicationIsValidated = item.declarationStatus === 'VALIDATED'
+    const applicationIsInProgress = item.declarationStatus === 'IN_PROGRESS'
     const isDuplicate = item.duplicates && item.duplicates.length > 0
     const application = this.props.outboxApplications.find(
       application =>
@@ -667,9 +668,10 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
         this.userHasValidateOrRegistrarScope())
     ) {
       listItemActions.push({
-        label: applicationIsRejected
-          ? this.props.intl.formatMessage(constantsMessages.update)
-          : this.props.intl.formatMessage(constantsMessages.review),
+        label:
+          applicationIsRejected || applicationIsInProgress
+            ? this.props.intl.formatMessage(constantsMessages.update)
+            : this.props.intl.formatMessage(constantsMessages.review),
         handler: () =>
           !isDuplicate
             ? this.props.goToPage(

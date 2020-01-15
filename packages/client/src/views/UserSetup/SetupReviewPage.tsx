@@ -218,7 +218,7 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
           )
         }}
       >
-        <Header>{intl.formatMessage(messages.header)}</Header>
+        <Header>{intl.formatMessage(messages.userSetupReviewHeader)}</Header>
         <Instruction>{intl.formatMessage(messages.instruction)}</Instruction>
         <GlobalError id="GlobalError">
           {this.state.submitError && (

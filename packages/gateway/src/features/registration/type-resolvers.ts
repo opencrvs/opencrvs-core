@@ -196,6 +196,13 @@ export const typeResolvers: GQLResolver = {
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
+      if (
+        !relatedPerson ||
+        !relatedPerson.patient ||
+        !relatedPerson.patient.reference
+      ) {
+        return
+      }
       if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
         // tslint:disable-next-line
         relatedPerson = await fetchFHIR(

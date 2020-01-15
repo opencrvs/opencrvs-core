@@ -375,6 +375,7 @@ export interface IFormFieldBase {
     conditionals?: IConditional[]
   }
   ignoreFieldLabelOnErrorMessage?: boolean
+  ignoreBottomMargin?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -500,6 +501,7 @@ export interface IQuery {
   variables?: IDynamicValues
   modalInfoText: MessageDescriptor
   errorText: MessageDescriptor
+  networkErrorText: MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
@@ -844,6 +846,7 @@ export interface Ii18nFormFieldBase {
   placeholder?: string
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
+  ignoreBottomMargin?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -975,6 +978,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   successTitle: string
   errorTitle: string
   errorText: string
+  networkErrorText: string
 }
 
 export type Ii18nFormField =

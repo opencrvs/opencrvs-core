@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/bgd-dhis2-mediator",
-  "version": "1.0.0-alpha.1.2",
+  "version": "1.0.0-alpha.2.0",
   "description": "Bangaldesh DHIS2 integration mediator",
   "license": "MPL-2.0",
   "private": true,
