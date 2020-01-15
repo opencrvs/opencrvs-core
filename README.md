@@ -324,6 +324,22 @@ To expose all services with an external domain and HTTPS:
 2. Run `ngrok start -config infrastructure/ngrok.conf --all`
 3. Open `https://ocrvs-client.ngrok.io` on your device
 
+# Remote mobile debugging setup
+
+This is the best way to work and debug service workers and do actual device testing.
+
+1. Register to https://ngrok.com/. The free plan is enough for this.
+2. Go to https://dashboard.ngrok.com/auth and get yourself an auth token
+3. Create a `.env` file to `packages/mobile-proxy`
+
+```
+AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
+```
+
+4. Start the development environment as you normally would
+5. Run `yarn start` in the mobile-proxy package
+6. You should now have an ngrok url that can be used remotely on any device. It's still required to be in the same network as the host machine, as some services (login) aren't used through ngrok.
+
 ## Docker scripts
 
 There are a number of docker scripts available via `yarn`. `yarn dev` is the easiest command to run to get started (see above) but if you need to manage the docker containers some of these scripts may be useful.
