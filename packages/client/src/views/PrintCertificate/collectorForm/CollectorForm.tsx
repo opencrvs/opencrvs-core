@@ -507,11 +507,21 @@ const mapStateToProps = (
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
     const applicationData = application && application.data
-    const motherDataExist = applicationData && applicationData.mother
+    const motherDataExist =
+      applicationData &&
+      applicationData.mother &&
+      (!applicationData.primaryCaregiver ||
+        !applicationData.primaryCaregiver.motherIsDeceased ||
+        applicationData.primaryCaregiver.motherIsDeceased.toString() !==
+          ['deceased'].toString())
     const fatherDataExist =
       applicationData &&
       applicationData.father &&
-      applicationData.father.fathersDetailsExist
+      applicationData.father.fathersDetailsExist &&
+      (!applicationData.primaryCaregiver ||
+        !applicationData.primaryCaregiver.fatherIsDeceased ||
+        applicationData.primaryCaregiver.fatherIsDeceased.toString() !==
+          ['deceased'].toString())
 
     if (motherDataExist && fatherDataExist) {
       clonedFormSection.groups.unshift(
