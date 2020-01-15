@@ -1148,7 +1148,17 @@
         "certificate.receipt.service.45day.amount": "\u09F3 25.00",
         "certificate.receipt.service..5year.amount": "\u09F3 50.00",
         "form.field.tooltip.tooltipNationalID": "If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000.",
-        "form.field.label.certificatePrintInAdvance": "Print in advance for signatures and collection"
+        "form.field.label.certificatePrintInAdvance": "Print in advance for signatures and collection",
+        "form.field.label.relationGrandfather": "Grandfather",
+        "form.field.label.relationGrandmother": "Grandmother",
+        "form.field.label.relationBrother": "Brother",
+        "form.field.label.relationSister": "Sister",
+        "form.field.label.relationOtherFamilyMember": "Other family member",
+        "form.field.label.relationInstitutionHeadPlaceOfBirth": "Head of the institution where the birth occurred",
+        "form.field.label.relationHouseOwner": "Owner of the house or building where the birth occurred",
+        "form.field.label.relationOperator": "Driver or operator of the land or water vehicle or aircraft where the birth occurred",
+        "form.field.label.relationOfficeInCharge": "Officer-in-charge of the Thana of a road or public space where the birth occurred",
+        "form.field.label.relationSomeoneElse": "Someone else"
       }
     },
     {
@@ -2141,11 +2151,13 @@
         "register.SelectContactPoint.phoneNoError": "বৈধ মোবাইল নম্বর নয়",
         "register.SelectContactPoint.phoneNoLabel": "ফোন নম্বর",
         "register.SelectContactPoint.title": "জন্ম আবেদন",
-        "register.selectInformant.birthErrorMessage": "Please select who is present and applying.",
+        "register.selectInformant.relation": "আবেদনকারী কে?",
+        "register.selectInformant.birthErrorMessage": "অনুগ্রহ পূর্বক কারা উপস্থিত এবং আবেদন করছেন নির্বাচন করুন।",
         "register.selectInformant.birthInformantTitle": "কে জন্ম নিবন্ধনের জন্য আবেদন করছে?",
         "register.selectInformant.daughter": "কন্যা",
         "register.selectInformant.deathErrorMessage": "অনুগ্রহ পূর্বক মৃত ব্যাক্তির সাথে বিদ্যমান সম্পর্ক নির্বাচন করুন।",
         "register.selectInformant.deathInformantTitle": "মৃত বেক্তির সাথে আবেদনকারীর সম্পর্ক কি ?",
+        "register.selectInformant.deathInformantSomeoneElseTitle": "মৃতের সাথে আবেদনকারীর সম্পর্ক কী?",
         "register.selectInformant.extendedFamily": "যৌথ পরিবার",
         "register.selectInformant.newBirthRegistration": "জন্মের আবেদন",
         "register.selectInformant.newDeathRegistration": "মৃত্যুর আবেদন",
@@ -2303,7 +2315,17 @@
         "certificate.receipt.service.45day.amount": "\u09F3 ২৫.০০",
         "certificate.receipt.service.5year.amount": "\u09F3 ৫০.০০",
         "form.field.tooltip.tooltipNationalID": "যদি জাতীয় আইডি নম্বর 13 অঙ্ক দীর্ঘ হয় তবে আপনাকে অবশ্যই জন্মের বছরটি শুরুতে যুক্ত করতে হবে। এটি পছন্দ করুন: YYYY000000000000000।",
-        "form.field.label.certificatePrintInAdvance": "স্বাক্ষর এবং সংগ্রহের জন্য আগাম প্রিন্ট করুন"
+        "form.field.label.certificatePrintInAdvance": "স্বাক্ষর এবং সংগ্রহের জন্য আগাম প্রিন্ট করুন",
+        "form.field.label.relationGrandfather": "দাদা",
+        "form.field.label.relationGrandmother": "দাদী",
+        "form.field.label.relationBrother": "ভাই",
+        "form.field.label.relationSister": "বোন",
+        "form.field.label.relationOtherFamilyMember": "পরিবারের অন্য সদস্য",
+        "form.field.label.relationInstitutionHeadPlaceOfBirth": "যে প্রতিষ্ঠানের জন্ম হয়েছিল সেখানের প্রধান",
+        "form.field.label.relationHouseOwner": "যে বাড়িতে জন্ম হয়েছিল তার মালিক",
+        "form.field.label.relationOperator": "চালক অথবা জলযান  বা বিমান যেখানে জন্ম হয়েছে তার চালক",
+        "form.field.label.relationOfficeInCharge": "যেখানে জন্ম হয়েছিল এমন কোনও রাস্তা বা সর্বজনীন স্থানের থানা অফিসার ইনচার্জ",
+        "form.field.label.relationSomeoneElse": "অন্য কেউ"
       }
     }
   ]
