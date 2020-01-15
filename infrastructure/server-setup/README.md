@@ -57,6 +57,8 @@ job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ss
 
 Ensure your external server also allows SSH from the OpenCRVS manager node. Follow the same process as per the workers
 
+Create an inventory file `your-environment.ini`. You can use the example file in `example-environment.ini`.
+
 Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - remove Papertrail config from playbook if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
 
 ```
