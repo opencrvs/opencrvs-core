@@ -68,6 +68,16 @@ async function init() {
       .toString()
       .replace(/localhost/g, iface.address)
       .replace(/(CLIENT_APP_URL: ).*,/, `$1 '${url}',`)
+  )
+
+  const clientConfig = readFileSync(
+    join(__dirname, '../client/public/config.js')
+  )
+
+  writeFileSync(
+    join(__dirname, '../client/public/config.js'),
+    clientConfig
+      .toString()
       .replace(/(API_GATEWAY_URL: ).*,/, `$1 '/gateway/',`)
       .replace(/(RESOURCES_URL: ).*,/, `$1 '/resources',`)
   )
