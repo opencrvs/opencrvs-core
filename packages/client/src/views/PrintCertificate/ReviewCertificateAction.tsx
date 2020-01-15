@@ -92,7 +92,7 @@ const ButtonWrapper = styled.div`
 const PdfWrapper = styled.div`
   background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
-  height: 80vh;
+  height: 90vh;
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;

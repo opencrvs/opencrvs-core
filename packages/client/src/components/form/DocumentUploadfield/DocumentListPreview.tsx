@@ -15,7 +15,7 @@ import { PaperClip } from '@opencrvs/components/lib/icons'
 import { IFileValue, IAttachmentValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { withTheme, ITheme } from '@client/styledComponents'
-
+import { ISelectOption } from '@opencrvs/components/lib/forms'
 const Wrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
@@ -50,9 +50,16 @@ type IProps = {
   label?: string
   theme: ITheme
   onSelect: (document: IFileValue | IAttachmentValue) => void
+  dropdownOptions?: ISelectOption[]
 }
 
 class DocumentListPreviewComponent extends React.Component<IProps> {
+  getFormattedLabelForDocType = (docType: string) => {
+    const matchingOptionForDocType =
+      this.props.dropdownOptions &&
+      this.props.dropdownOptions.find(option => option.value === docType)
+    return matchingOptionForDocType && matchingOptionForDocType.label
+  }
   render() {
     const {
       documents,
@@ -67,14 +74,17 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
           documents.map((document: IFileValue, key: number) => (
             <PreviewLink key={key} onClick={_ => this.props.onSelect(document)}>
               <PaperClip />
-              <span>{document.optionValues[1]}</span>
+              <span>
+                {this.getFormattedLabelForDocType(document
+                  .optionValues[1] as string) || document.optionValues[1]}
+              </span>
             </PreviewLink>
           ))}
         {processingDocuments &&
           processingDocuments.map(({ label }) => (
             <PreviewLink disabled={true} key={label}>
               <PaperClip stroke={theme.colors.disabled} />
-              <span>{label}</span>
+              <span>{this.getFormattedLabelForDocType(label) || label}</span>
               <ProcessingSpinner
                 size={24}
                 id={`document_${label}_processing`}
@@ -84,7 +94,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
         {attachment && attachment.data && label && (
           <PreviewLink onClick={_ => this.props.onSelect(attachment)}>
             <PaperClip />
-            <span>{label}</span>
+            <span>{this.getFormattedLabelForDocType(label) || label}</span>
           </PreviewLink>
         )}
       </Wrapper>

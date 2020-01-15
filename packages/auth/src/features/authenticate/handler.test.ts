@@ -68,7 +68,7 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          status: 'pending',
+          status: 'active',
           scope: ['admin'],
           mobile: `+345345343`
         })
@@ -87,6 +87,34 @@ describe('authenticate handler receives a request', () => {
       expect(spy).toHaveBeenCalled()
       expect(spy.mock.calls[0]).toHaveLength(2)
       expect(spy.mock.calls[0][0]).toBe('+345345343')
+    })
+    it('does not generate a mobile verification code for pending users', async () => {
+      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+
+      const reloadedCodeService = require('../verifyCode/service')
+
+      jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
+
+      fetch.mockResponse(
+        JSON.stringify({
+          userId: '1',
+          status: 'pending',
+          scope: ['admin'],
+          mobile: `+345345343`
+        })
+      )
+      const spy = jest.spyOn(reloadedCodeService, 'sendVerificationCode')
+
+      await server.server.inject({
+        method: 'POST',
+        url: '/authenticate',
+        payload: {
+          username: '+345345343',
+          password: '2r23432'
+        }
+      })
+
+      expect(spy).not.toHaveBeenCalled()
     })
   })
 })

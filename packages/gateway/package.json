@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.0.0-alpha.1.2",
+  "version": "1.0.0-alpha.2.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -19,7 +19,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@opencrvs/commons": "^1.0.0-alpha.1.2",
+    "@opencrvs/commons": "^1.0.0-alpha.2.0",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
     "@types/uuid-validate": "^0.0.1",

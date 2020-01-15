@@ -322,7 +322,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             ...{
               presentAtBirthRegistration: this.state.informant,
               applicant: {
-                value: this.state.informant,
+                value:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).value) ||
+                  '',
                 nestedFields: {}
               }
             }

@@ -46,6 +46,7 @@ interface IFetchButtonState {
   loading?: boolean
   show?: boolean
   isDisconnected: boolean
+  networkError?: boolean
 }
 
 type IFullProps = IFetchButtonProps & IntlShapeProps
@@ -169,6 +170,15 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     } catch (error) {
       Sentry.captureException(error)
       this.setState({ error: true, loading: false, success: false })
+
+      if (Boolean(error.networkError)) {
+        this.setState({
+          error: false,
+          loading: false,
+          success: false,
+          networkError: true
+        })
+      }
     }
   }
 
@@ -192,7 +202,14 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       queryData,
       isDisabled
     } = this.props
-    const { loading, error, success, show, isDisconnected } = this.state
+    const {
+      loading,
+      error,
+      success,
+      show,
+      isDisconnected,
+      networkError
+    } = this.state
 
     return (
       <Container {...this.props}>
@@ -227,6 +244,17 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
                           {queryData && (
                             <Info>
                               {intl.formatMessage(queryData.errorText)}
+                            </Info>
+                          )}
+                        </>
+                      )}
+                      {networkError && (
+                        <>
+                          {this.getModalInfo(intl)}
+                          <StyledError id="loader-button-error" />
+                          {queryData && (
+                            <Info>
+                              {intl.formatMessage(queryData.networkErrorText)}
                             </Info>
                           )}
                         </>

@@ -46,6 +46,7 @@ interface IReviewMessages {
   validateApplicationActionModalTitle: MessageDescriptor
   validateApplicationActionModalDescription: MessageDescriptor
   govtName: MessageDescriptor
+  documentForWhom: MessageDescriptor
 }
 
 const messagesToDefine: IReviewMessages = {
@@ -231,6 +232,11 @@ const messagesToDefine: IReviewMessages = {
     id: 'review.header.title.govtName',
     defaultMessage: 'Government of the peoples republic of Bangladesh',
     description: 'Header title that shows bgd govt name'
+  },
+  documentForWhom: {
+    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents'}}`,
+    description: 'Describes for whom the document has been uploaded',
+    id: 'review.documents.documentForWhom'
   }
 }
 
