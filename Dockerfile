@@ -22,7 +22,6 @@ COPY packages/integration/package.json packages/integration/package.json
 COPY packages/login/package.json packages/login/package.json
 COPY packages/metrics/package.json packages/metrics/package.json
 COPY packages/notification/package.json packages/notification/package.json
-COPY packages/performance/package.json packages/performance/package.json
 COPY packages/client/package.json packages/client/package.json
 COPY packages/resources/package.json packages/resources/package.json
 COPY packages/search/package.json packages/search/package.json

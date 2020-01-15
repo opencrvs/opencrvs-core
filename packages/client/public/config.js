@@ -16,11 +16,10 @@ window.config = {
   DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LANGUAGES: 'en,bn',
-  LOGIN_URL: 'http://localhost:3020',
-  AUTH_URL: 'http://localhost:4040',
-  API_GATEWAY_URL: 'http://localhost:7070/',
-  PERFORMANCE_URL: 'http://localhost:3001',
-  RESOURCES_URL: 'http://localhost:3040/bgd',
+  LOGIN_URL: 'http://192.168.8.105:3020',
+  AUTH_URL: 'http://192.168.8.105:4040',
+  API_GATEWAY_URL: '/gateway/',
+  RESOURCES_URL: '/resources',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
