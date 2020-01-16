@@ -1,6 +1,6 @@
 {
   "name": "e2e",
-  "version": "1.0.0-alpha.1.2",
+  "version": "1.0.0-alpha.2.0",
   "description": "OpenCRVS automted end to end tests",
   "license": "MPL-2.0",
   "dependencies": {

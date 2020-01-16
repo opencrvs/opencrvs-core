@@ -34,7 +34,8 @@ export async function createServer() {
     host: HOST,
     port: PORT,
     routes: {
-      cors: { origin: ['*'] }
+      cors: { origin: ['*'] },
+      payload: { maxBytes: 52428800 }
     }
   })
 

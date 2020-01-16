@@ -2303,6 +2303,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -4761,6 +4766,7 @@
                   },
                   "validate": [],
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "required": true,
                   "extraValue": "MOTHER",
                   "previewGroup": "reasonMotherNotApplying",
@@ -4850,6 +4856,7 @@
                   },
                   "validate": [],
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "required": true,
                   "previewGroup": "reasonFatherNotApplying",
                   "extraValue": "FATHER",
@@ -5590,6 +5597,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -7840,6 +7852,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -10112,7 +10129,7 @@
                   "name": "uploadDocForMother",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of mother's ID",
+                    "defaultMessage": "Proof of Mother's ID",
                     "description": "Label for list item Mother ID Proof",
                     "id": "form.field.label.proofOfMothersID"
                   },
@@ -10144,30 +10161,6 @@
                         "description": "Label for select option radio option NID back",
                         "id": "form.field.label.docTypeNIDBack"
                       }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    },
-                    {
-                      "value": "School Certificate",
-                      "label": {
-                        "defaultMessage": "School certificate",
-                        "description": "Label for radio option School Certificate",
-                        "id": "form.field.label.docTypeSC"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
-                      }
                     }
                   ],
                   "conditionals": [
@@ -10190,7 +10183,7 @@
                   "name": "uploadDocForFather",
                   "type": "DOCUMENT_UPLOADER_WITH_OPTION",
                   "label": {
-                    "defaultMessage": "Proof of father's ID",
+                    "defaultMessage": "Proof of Father's ID",
                     "description": "Label for list item Father ID Proof",
                     "id": "form.field.label.proofOfFathersID"
                   },
@@ -10221,30 +10214,6 @@
                         "defaultMessage": "National ID (Back)",
                         "description": "Label for select option radio option NID back",
                         "id": "form.field.label.docTypeNIDBack"
-                      }
-                    },
-                    {
-                      "value": "Passport",
-                      "label": {
-                        "defaultMessage": "Passport",
-                        "description": "Label for radio option Passport",
-                        "id": "form.field.label.docTypePassport"
-                      }
-                    },
-                    {
-                      "value": "School Certificate",
-                      "label": {
-                        "defaultMessage": "School certificate",
-                        "description": "Label for radio option School Certificate",
-                        "id": "form.field.label.docTypeSC"
-                      }
-                    },
-                    {
-                      "value": "Other",
-                      "label": {
-                        "defaultMessage": "Other",
-                        "description": "Label for radio option Other",
-                        "id": "form.field.label.docTypeOther"
                       }
                     }
                   ],
@@ -10427,6 +10396,12 @@
                         "description": "Label for radio option Other",
                         "id": "form.field.label.docTypeOther"
                       }
+                    }
+                  ],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "((draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData.mother && draftData.mother.iDType === \"NATIONAL_ID\") || (draftData.father && draftData.father.iDType === \"NATIONAL_ID\"))"
                     }
                   ],
                   "mapping": {
@@ -11201,6 +11176,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
@@ -14913,7 +14893,7 @@
                     "id": "form.field.label.causeOfDeathEstablished"
                   },
                   "notice": {
-                    "defaultMessage": "A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.",
+                    "defaultMessage": "A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.",
                     "description": "Form section notice for Cause of Death",
                     "id": "form.section.causeOfDeathNotice"
                   },
@@ -15259,6 +15239,11 @@
                         "defaultMessage": "No person found for provided NID",
                         "description": "Label for fetch modal error title",
                         "id": "form.field.label.fetchPersonByNIDModalErrorText"
+                      },
+                      "networkErrorText": {
+                        "defaultMessage": "Could not connect to the server because of low connectivity. Please try again.",
+                        "description": "Label for fetch modal error title",
+                        "id": "form.field.label.fetchPersonByNIDModalNetworkErrorText"
                       }
                     }
                   },
