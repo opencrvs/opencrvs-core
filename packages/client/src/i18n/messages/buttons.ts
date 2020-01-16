@@ -38,6 +38,7 @@ interface IButtonsMessages {
   review: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteApplication: MessageDescriptor
+  closeApplication: MessageDescriptor
   search: MessageDescriptor
   select: MessageDescriptor
   send: MessageDescriptor
@@ -188,6 +189,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Delete Application',
     description: 'Delete application button text',
     id: 'buttons.deleteApplication'
+  },
+  closeApplication: {
+    defaultMessage: 'Close Application',
+    description: 'Close application button text',
+    id: 'buttons.closeApplication'
   },
   search: {
     defaultMessage: 'Search',

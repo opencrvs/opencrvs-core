@@ -496,7 +496,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             handler: () => this.onDeleteApplication(application)
           }
         : {
-            label: 'Close Application',
+            label: intl.formatMessage(buttonMessages.closeApplication),
             handler: () => this.onCloseApplication()
           }
 
