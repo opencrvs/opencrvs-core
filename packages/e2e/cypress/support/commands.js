@@ -156,7 +156,7 @@ Cypress.Commands.add('downloadFirstApplication', () => {
     .first()
     .click()
   cy.log('Waiting for application to sync...')
-  cy.tick(20000)
+  cy.wait(20000)
   cy.get('#action-loading-ListItemAction-0').should('not.exist')
 })
 
