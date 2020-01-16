@@ -1,6 +1,6 @@
 {
   "chromeWebSecurity": false,
-  "video": false,
+  "video": true,
   "projectId": "ayoz3q",
   "viewportWidth": 1024,
   "viewportHeight": 768,
