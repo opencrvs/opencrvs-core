@@ -84,7 +84,6 @@ Cypress.Commands.add('selectOption', (selector, text, option) => {
   cy.get(`${selector} input`)
     .first()
     .click({ force: true })
-    .type(text, { force: true })
     .get(`${selector} .react-select__menu`)
     .contains(option)
     .click()
