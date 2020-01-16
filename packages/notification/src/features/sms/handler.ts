@@ -33,12 +33,10 @@ export async function smsHandler(
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IAuthPayload
-  if (process.env.NODE_ENV === 'production') {
-    try {
-      await sendSMS(payload.msisdn, payload.message)
-    } catch (err) {
-      return internal(err)
-    }
+  try {
+    await sendSMS(payload.msisdn, payload.message)
+  } catch (err) {
+    return internal(err)
   }
 
   return h.response().code(200)

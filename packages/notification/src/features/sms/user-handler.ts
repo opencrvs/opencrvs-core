@@ -36,17 +36,15 @@ export async function sendUserCredentials(
   logger.info(`Username: ${payload.username}`)
   logger.info(`Password: ${payload.password}`)
 
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'userCredentialsNotification',
-      {
-        username: payload.username,
-        password: payload.password
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'userCredentialsNotification',
+    {
+      username: payload.username,
+      password: payload.password
+    }
+  )
   return h.response().code(200)
 }
 
@@ -56,16 +54,14 @@ export async function retrieveUserName(
 ) {
   const payload = request.payload as IRetrieveUserNamePayload
   logger.info(`Username: ${payload.username}`)
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'retieveUserNameNotification',
-      {
-        username: payload.username
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'retieveUserNameNotification',
+    {
+      username: payload.username
+    }
+  )
   return h.response().code(200)
 }
 
@@ -75,16 +71,14 @@ export async function sendUserAuthenticationCode(
 ) {
   const payload = request.payload as IUserAuthCodePayload
   logger.info(`Authentication Code: ${payload.code}`)
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'authenticationCodeNotification',
-      {
-        authCode: payload.code
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'authenticationCodeNotification',
+    {
+      authCode: payload.code
+    }
+  )
   return h.response().code(200)
 }
 

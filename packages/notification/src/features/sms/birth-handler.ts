@@ -46,17 +46,15 @@ export async function sendBirthInProgressConfirmation(
       payload
     )}`
   )
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'birthInProgressNotification',
-      {
-        trackingId: payload.trackingId,
-        crvsOffice: payload.crvsOffice
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'birthInProgressNotification',
+    {
+      trackingId: payload.trackingId,
+      crvsOffice: payload.crvsOffice
+    }
+  )
   return h.response().code(200)
 }
 
@@ -70,17 +68,15 @@ export async function sendBirthDeclarationConfirmation(
       payload
     )}`
   )
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'birthDeclarationNotification',
-      {
-        name: payload.name,
-        trackingId: payload.trackingId
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'birthDeclarationNotification',
+    {
+      name: payload.name,
+      trackingId: payload.trackingId
+    }
+  )
   return h.response().code(200)
 }
 
@@ -94,18 +90,16 @@ export async function sendBirthRegistrationConfirmation(
       payload
     )}`
   )
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'birthRegistrationNotification',
-      {
-        name: payload.name,
-        trackingId: payload.trackingId,
-        registrationNumber: payload.registrationNumber
-      }
-    )
-  }
+  await buildAndSendSMS(
+    request,
+    payload.msisdn,
+    'birthRegistrationNotification',
+    {
+      name: payload.name,
+      trackingId: payload.trackingId,
+      registrationNumber: payload.registrationNumber
+    }
+  )
   return h.response().code(200)
 }
 
@@ -119,17 +113,10 @@ export async function sendBirthRejectionConfirmation(
       payload
     )}`
   )
-  if (process.env.NODE_ENV === 'production') {
-    await buildAndSendSMS(
-      request,
-      payload.msisdn,
-      'birthRejectionNotification',
-      {
-        name: payload.name,
-        trackingId: payload.trackingId
-      }
-    )
-  }
+  await buildAndSendSMS(request, payload.msisdn, 'birthRejectionNotification', {
+    name: payload.name,
+    trackingId: payload.trackingId
+  })
   return h.response().code(200)
 }
 
