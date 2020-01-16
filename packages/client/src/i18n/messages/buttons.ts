@@ -37,6 +37,7 @@ interface IButtonsMessages {
   retry: MessageDescriptor
   review: MessageDescriptor
   saveExitButton: MessageDescriptor
+  deleteApplication: MessageDescriptor
   search: MessageDescriptor
   select: MessageDescriptor
   send: MessageDescriptor
@@ -182,6 +183,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Save & Exit',
     description: 'Save & Exit Button Text',
     id: 'buttons.saveAndExit'
+  },
+  deleteApplication: {
+    defaultMessage: 'Delete Application',
+    description: 'Delete application button text',
+    id: 'buttons.deleteApplication'
   },
   search: {
     defaultMessage: 'Search',
