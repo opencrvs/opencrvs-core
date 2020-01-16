@@ -46,15 +46,17 @@ export async function sendBirthInProgressConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthInProgressNotification',
-    {
-      trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'birthInProgressNotification',
+      {
+        trackingId: payload.trackingId,
+        crvsOffice: payload.crvsOffice
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -68,15 +70,17 @@ export async function sendBirthDeclarationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthDeclarationNotification',
-    {
-      name: payload.name,
-      trackingId: payload.trackingId
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'birthDeclarationNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -90,16 +94,18 @@ export async function sendBirthRegistrationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthRegistrationNotification',
-    {
-      name: payload.name,
-      trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'birthRegistrationNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId,
+        registrationNumber: payload.registrationNumber
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -113,10 +119,17 @@ export async function sendBirthRejectionConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(request, payload.msisdn, 'birthRejectionNotification', {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'birthRejectionNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId
+      }
+    )
+  }
   return h.response().code(200)
 }
 

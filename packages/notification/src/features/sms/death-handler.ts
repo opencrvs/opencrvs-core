@@ -30,15 +30,17 @@ export async function sendDeathInProgressConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathInProgressNotification',
-    {
-      trackingId: payload.trackingId,
-      crvsOffice: payload.crvsOffice
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'deathInProgressNotification',
+      {
+        trackingId: payload.trackingId,
+        crvsOffice: payload.crvsOffice
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -52,15 +54,17 @@ export async function sendDeathDeclarationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathDeclarationNotification',
-    {
-      name: payload.name,
-      trackingId: payload.trackingId
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'deathDeclarationNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -74,16 +78,18 @@ export async function sendDeathRegistrationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathRegistrationNotification',
-    {
-      name: payload.name,
-      trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
-    }
-  )
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'deathRegistrationNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId,
+        registrationNumber: payload.registrationNumber
+      }
+    )
+  }
   return h.response().code(200)
 }
 
@@ -97,9 +103,16 @@ export async function sendDeathRejectionConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(request, payload.msisdn, 'deathRejectionNotification', {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  if (process.env.NODE_ENV === 'production') {
+    await buildAndSendSMS(
+      request,
+      payload.msisdn,
+      'deathRejectionNotification',
+      {
+        name: payload.name,
+        trackingId: payload.trackingId
+      }
+    )
+  }
   return h.response().code(200)
 }
