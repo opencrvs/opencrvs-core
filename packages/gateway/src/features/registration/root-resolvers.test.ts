@@ -101,7 +101,7 @@ describe('Registration root resolvers', () => {
         resolvers.Query.fetchBirthRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-          authHeaderNotRegCert
+          authHeaderCertify
         )
       ).rejects.toThrowError('User does not have a register or validate scope')
     })
@@ -128,7 +128,7 @@ describe('Registration root resolvers', () => {
         resolvers.Query.fetchDeathRegistration(
           {},
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
-          authHeaderNotRegCert
+          authHeaderCertify
         )
       ).rejects.toThrowError('User does not have a register or validate scope')
     })
