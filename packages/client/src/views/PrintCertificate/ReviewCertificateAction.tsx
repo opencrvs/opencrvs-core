@@ -90,6 +90,7 @@ const ButtonWrapper = styled.div`
   }
 `
 const PdfWrapper = styled.div`
+  ${({ theme }) => theme.shadows.mistyShadow};
   background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
   height: 90vh;
