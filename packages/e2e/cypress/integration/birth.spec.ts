@@ -17,12 +17,12 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests from application to registration using minimum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
     cy.registerApplicationWithMinimumInput()
   })
 
   it('Tests from application to registration using maximum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
 
     // LOGIN AS FIELD WORKER
     cy.login('fieldWorker')
@@ -168,7 +168,7 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests from application to rejection using minimum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
     // LOGIN
     cy.login('fieldWorker')
     // CREATE PIN
@@ -245,7 +245,7 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests from application to rejection using maximum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
     // LOGIN AS FIELD WORKER
     cy.login('fieldWorker')
     // CREATE PIN
@@ -381,7 +381,7 @@ context('Birth Integration Test', () => {
   })
 
   it('Tests registration by registrar using maximum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
     // LOGIN AS FIELD WORKER
     cy.login('registrar')
     // CREATE PIN
@@ -503,7 +503,7 @@ context('Birth Integration Test', () => {
   })
 
   it('Test Someone else journey using minimum input', () => {
-    cy.initializeFakeTimers()
+    cy.clock(1573557567230)
     // LOGIN
     cy.login('fieldWorker')
     // CREATE PIN
