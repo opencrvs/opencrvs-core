@@ -86,7 +86,7 @@ describe('when user wants to review death certificate', () => {
     component = testComponent.component
   })
 
-  it('Should display have the Confirm And print Button', async () => {
+  it('Should display have the Continue and print Button', async () => {
     const confirmBtn = await waitForElement(component, '#confirm-print')
     const confirmBtnExist = !!confirmBtn.hostNodes().length
     expect(confirmBtnExist).toBe(true)
@@ -136,7 +136,7 @@ describe('when user wants to review birth certificate', () => {
     component = testComponent.component
   })
 
-  it('Should display have the Confirm And print Button', () => {
+  it('Should display have the Continue and print Button', () => {
     const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
       .length
     expect(confirmBtnExist).toBe(true)
