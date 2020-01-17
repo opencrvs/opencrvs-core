@@ -49,4 +49,6 @@ export const PrimaryButton = styled(Button)`
       stroke: ${({ theme }) => theme.colors.white};
     }
   }
+
+  text-transform: uppercase;
 `
