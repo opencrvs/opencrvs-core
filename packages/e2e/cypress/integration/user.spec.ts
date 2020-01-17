@@ -115,7 +115,7 @@ context('User Integration Test', () => {
   })
 
   it('should reset password successfully', () => {
-    cy.clock(1573557567230)
+    cy.initializeFakeTimers()
     cy.get('#login-forgot-password').click()
 
     // Forgotten item form appears
