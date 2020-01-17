@@ -104,6 +104,7 @@ const Info = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
   color: ${({ theme }) => theme.colors.menuBackground};
+  width: 80%;
 `
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
