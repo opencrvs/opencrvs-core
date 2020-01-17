@@ -1168,7 +1168,7 @@ const messagesToDefine: IFormMessages = {
   },
   fetchPersonByNIDModalNetworkErrorText: {
     defaultMessage:
-      'Could not connect to the server because of low connectivity. Please try again.',
+      'The request to the NID system was unsuccessful. Please try again with a better connection.',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
   },
