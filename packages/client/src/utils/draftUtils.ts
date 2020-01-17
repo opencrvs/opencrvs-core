@@ -9,8 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IApplication, ITaskHistory } from '@client/applications'
 import { Event, IFormSectionData } from '@client/forms'
-import { IApplication } from '@client/applications'
+import {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchSet,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema'
+import { createNamesMap } from './data-formatting'
+import { LANG_EN, REJECTED } from './constants'
 
 const getApplicantFullName = (
   sectionData: IFormSectionData,
@@ -46,4 +54,100 @@ export const getDraftApplicantFullName = (
     case Event.DEATH:
       return getApplicantFullName(draft.data.deceased, language)
   }
+}
+
+const transformBirthSearchQueryDataToDraft = (
+  data: GQLBirthEventSearchSet,
+  application: IApplication
+) => {
+  application.data = {
+    child: {
+      firstNamesEng:
+        (data.childName &&
+          data.childName
+            .filter(name => name && name.use === 'en')
+            .map(name => name && name.firstNames)[0]) ||
+        '',
+      familyNameEng:
+        (data.childName &&
+          data.childName
+            .filter(name => name && name.use === 'en')
+            .map(name => name && name.familyName)[0]) ||
+        '',
+      firstNames:
+        (data.childName &&
+          data.childName
+            .filter(name => name && name.use !== 'en')
+            .map(name => name && name.firstNames)[0]) ||
+        '',
+      familyName:
+        (data.childName &&
+          data.childName
+            .filter(name => name && name.use !== 'en')
+            .map(name => name && name.familyName)[0]) ||
+        ''
+    }
+  }
+}
+
+const transformDeathSearchQueryDataToDraft = (
+  data: GQLDeathEventSearchSet,
+  application: IApplication
+) => {
+  application.data = {
+    deceased: {
+      firstNamesEng:
+        (data.deceasedName &&
+          data.deceasedName
+            .map(name => name && name.use === 'en' && name.firstNames)
+            .toString()) ||
+        '',
+      familyNameEng:
+        (data.deceasedName &&
+          data.deceasedName
+            .map(name => name && name.use === 'en' && name.familyName)
+            .toString()) ||
+        '',
+      firstNames:
+        (data.deceasedName &&
+          data.deceasedName
+            .map(name => name && name.use !== 'en' && name.firstNames)
+            .toString()) ||
+        '',
+      familyName:
+        (data.deceasedName &&
+          data.deceasedName
+            .map(name => name && name.use !== 'en' && name.familyName)
+            .toString()) ||
+        ''
+    }
+  }
+}
+
+export const transformSearchQueryDataToDraft = (
+  data: GQLEventSearchSet
+): IApplication => {
+  let application: IApplication = {
+    id: data.id,
+    data: {},
+    event: Event.BIRTH
+  }
+
+  application.trackingId = data.registration && data.registration.trackingId
+  application.submissionStatus = data.registration && data.registration.status
+  application.compositionId = data.id
+
+  application.operationHistories = data.operationHistories as ITaskHistory[]
+
+  switch (data.type) {
+    case Event.BIRTH:
+    default:
+      transformBirthSearchQueryDataToDraft(data, application)
+      break
+    case Event.DEATH:
+      transformDeathSearchQueryDataToDraft(data, application)
+      break
+  }
+
+  return application
 }
