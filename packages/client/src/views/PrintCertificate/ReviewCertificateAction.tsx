@@ -93,11 +93,10 @@ const PdfWrapper = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
   background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
-  height: 90vh;
+  height: 100%;
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
-  overflow: scroll;
 `
 
 const Info = styled.div`
