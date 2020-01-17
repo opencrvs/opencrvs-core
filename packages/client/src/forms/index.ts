@@ -796,6 +796,7 @@ export interface IFormSectionGroup {
   conditionals?: IConditional[]
   error?: MessageDescriptor
   preventContinueIfError?: boolean
+  showExitButtonOnly?: boolean
 }
 
 export interface IForm {

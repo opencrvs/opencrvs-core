@@ -30,6 +30,7 @@
                 }
               ],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "applicant",
@@ -236,6 +237,7 @@
                 }
               ],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "paragraph",
@@ -307,6 +309,7 @@
               },
               "conditionals": [],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
@@ -10670,6 +10673,8 @@
                   "expression": "(!draftData || !draftData.informant || ![\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
                 }
               ],
+              "showExitButtonOnly": true,
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "relationship",
@@ -10783,6 +10788,7 @@
                 "id": "register.SelectContactPoint.heading"
               },
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "conditionals": [],
               "fields": [
                 {
@@ -18087,7 +18093,7 @@
                         },
                         "required": false,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18125,7 +18131,7 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18163,7 +18169,7 @@
                         },
                         "required": false,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
@@ -18201,7 +18207,7 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
