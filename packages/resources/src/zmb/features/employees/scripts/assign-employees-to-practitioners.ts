@@ -29,7 +29,8 @@ export default async function importEmployees() {
     await composeAndSavePractitioners(
       employees,
       process.argv[2],
-      process.argv[3]
+      process.argv[3],
+      process.argv[4]
     )
   } catch (err) {
     return internal(err)

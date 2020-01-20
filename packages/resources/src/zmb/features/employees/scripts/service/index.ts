@@ -106,7 +106,8 @@ const composeFhirPractitionerRole = (
 export async function composeAndSavePractitioners(
   practitioners: ITestPractitioner[],
   testUserPassword: string,
-  apiUserPassword: string
+  healthApiUserPassword: string,
+  validatorApiUserPassword: string
 ): Promise<boolean> {
   const users: IUserModel[] = []
   for (const practitioner of practitioners) {
@@ -188,10 +189,12 @@ export async function composeAndSavePractitioners(
 
     // create user account
     let pass: ISaltedHash
-    if (practitioner.role !== 'API_USER') {
-      pass = generateSaltedHash(testUserPassword)
+    if (practitioner.role === 'HEALTH_API_USER') {
+      pass = generateSaltedHash(healthApiUserPassword)
+    } else if (practitioner.role === 'VALIDATOR_API_USER') {
+      pass = generateSaltedHash(validatorApiUserPassword)
     } else {
-      pass = generateSaltedHash(apiUserPassword)
+      pass = generateSaltedHash(testUserPassword)
     }
     const user = new User({
       name: [

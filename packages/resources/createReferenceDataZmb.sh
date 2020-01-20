@@ -12,22 +12,31 @@
 if [ -z "$1" ] 
   then
     echo 'Error: Argument for test user password is required in position 1.'
-    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS API user password}'
+    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of HRIS token"
     exit 1
 fi
 
 if [ -z "$2" ] 
   then
-    echo 'Error: Argument for OpenCRVS API user password is required in position 2.'
-    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS API user password}'
-    echo "Script must receive a parameter of HRIS token"
+    echo 'Error: Argument for OpenCRVS Health API user password is required in position 2.'
+    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a paramether of Health API user password"
     exit 1
 fi
+
+if [ -z "$3" ] 
+  then
+    echo 'Error: Argument for OpenCRVS Validator API user password is required in position 3.'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a parameter of Validator API user password"
+    exit 1
+fi
+
 
 ts-node -r tsconfig-paths/register src/zmb/features/administrative/scripts/prepare-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/administrative/scripts/assign-admin-structure-to-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/facilities/scripts/prepare-source-facilities.ts
 ts-node -r tsconfig-paths/register src/zmb/features/facilities/scripts/assign-facilities-to-locations.ts
 ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/prepare-source-employees.ts
-ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/assign-employees-to-practitioners.ts -- $1 $2
+ts-node -r tsconfig-paths/register src/zmb/features/employees/scripts/assign-employees-to-practitioners.ts -- $1 $2 $3
