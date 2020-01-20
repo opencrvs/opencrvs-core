@@ -59,6 +59,7 @@ import {
   SUBSECTION,
   TEXTAREA,
   WARNING,
+  REVIEW_OVERRIDE_POSITION,
   DOCUMENT_UPLOADER_WITH_OPTION,
   IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
@@ -105,7 +106,7 @@ import { BIRTH, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
 import { EditConfirmation } from '@client/views/RegisterForm/review/EditConfirmation'
-import { flatten, isArray } from 'lodash'
+import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import {
@@ -715,7 +716,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ignoreNestedFieldWrapping?: boolean
   ) => {
     const { intl, draft, offlineResources, language } = this.props
-    const errorsOnField = sectionErrors[section.id][field.name].errors
+    const errorsOnField =
+      get(sectionErrors[section.id][field.name], 'errors') || []
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
@@ -922,13 +924,107 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return nestedItems
   }
 
+  getOverriddenFieldsListForPreview(
+    formSections: IFormSection[]
+  ): IFormField[] {
+    const overriddenFields = formSections
+      .map(section => {
+        return section.groups
+          .map(group => {
+            return group.fields
+              .map(field => {
+                const { draft, offlineResources } = this.props
+                const tempField = clone(field)
+                const residingSection =
+                  get(field.reviewOverrides, 'residingSection') || ''
+                tempField.conditionals =
+                  get(field.reviewOverrides, 'conditionals') ||
+                  field.conditionals ||
+                  []
+
+                const isVisible = !getConditionalActionsForField(
+                  tempField,
+                  draft.data[residingSection] || {},
+                  offlineResources,
+                  draft.data
+                ).includes('hide')
+
+                return isVisible ? field : ({} as IFormField)
+              })
+              .filter(field => !Boolean(field.hideInPreview))
+              .filter(field => Boolean(field.reviewOverrides))
+              .filter(field => this.isVisibleField(field, section))
+          })
+          .filter(item => item.length)
+      })
+      .filter(item => item.length)
+    return flattenDeep(overriddenFields)
+  }
+
+  getOverRiddenPreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    overriddenField: IFormField,
+    sectionErrors: IErrorsBySection,
+    field: IFormField,
+    items: any[],
+    item: any
+  ) {
+    overriddenField.label =
+      get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
+    const residingSectionId = get(
+      overriddenField,
+      'reviewOverrides.residingSection'
+    )
+    const residingSection = this.props.registerForm.death.sections.find(
+      section => section.id === residingSectionId
+    ) as IFormSection
+
+    const result = this.getSinglePreviewField(
+      residingSection,
+      group,
+      overriddenField,
+      sectionErrors
+    )
+
+    const {
+      sectionID,
+      groupID,
+      fieldName
+    } = overriddenField!.reviewOverrides!.reference
+    if (
+      sectionID === section.id &&
+      groupID === group.id &&
+      fieldName === field.name
+    ) {
+      if (
+        overriddenField!.reviewOverrides!.position ===
+        REVIEW_OVERRIDE_POSITION.BEFORE
+      ) {
+        items = items.concat(result)
+        items = items.concat(item)
+      } else {
+        items = items.concat(item)
+        items = items.concat(result)
+      }
+      return items
+    }
+
+    items = items.concat(item)
+    return items
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
   ) => {
     const { intl, draft } = this.props
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      formSections
+    )
+    let tempItem: any
 
-    return formSections.map(section => {
+    const initialTransformedSection = formSections.map(section => {
       let items: any[] = []
       let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
@@ -942,30 +1038,45 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               this.isVisibleField(field, section) && !this.isViewOnly(field)
           )
           .filter(field => !Boolean(field.hideInPreview))
+          .filter(field => !Boolean(field.reviewOverrides))
           .forEach(field => {
-            items = items.concat(
-              field.previewGroup
-                ? this.getPreviewGroupsField(
-                    section,
-                    group,
-                    field,
-                    visitedTags,
-                    errorsOnFields
-                  )
-                : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-                ? this.getNestedPreviewField(
-                    section,
-                    group,
-                    field,
-                    errorsOnFields
-                  )
-                : this.getSinglePreviewField(
-                    section,
-                    group,
-                    field,
-                    errorsOnFields
-                  )
-            )
+            tempItem = field.previewGroup
+              ? this.getPreviewGroupsField(
+                  section,
+                  group,
+                  field,
+                  visitedTags,
+                  errorsOnFields
+                )
+              : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
+              ? this.getNestedPreviewField(
+                  section,
+                  group,
+                  field,
+                  errorsOnFields
+                )
+              : this.getSinglePreviewField(
+                  section,
+                  group,
+                  field,
+                  errorsOnFields
+                )
+
+            overriddenFields.forEach(overriddenField => {
+              items = this.getOverRiddenPreviewField(
+                section,
+                group,
+                overriddenField as IFormField,
+                errorsOnFields,
+                field,
+                items,
+                tempItem
+              )
+            })
+
+            if (!overriddenFields.length) {
+              items = items.concat(tempItem)
+            }
           })
       })
       return {
@@ -974,6 +1085,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         items: items.filter(item => item)
       }
     })
+
+    return initialTransformedSection
   }
 
   render() {
@@ -1018,7 +1131,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(application, intl.locale)
     const draft = this.isDraft()
-
+    const transformedSectionData = this.transformSectionData(
+      formSections,
+      errorsOnFields
+    )
     return (
       <FullBodyContent>
         <Row>
@@ -1044,11 +1160,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   isDraft: draft
                 })}
               </FormDataHeader>
-              {this.transformSectionData(formSections, errorsOnFields).map(
-                (sec, index) => (
-                  <DataSection key={index} {...sec} id={'Section_' + sec.id} />
-                )
-              )}
+              {transformedSectionData.map((sec, index) => (
+                <DataSection key={index} {...sec} id={'Section_' + sec.id} />
+              ))}
               {event === BIRTH && (
                 <InputWrapper>
                   <InputField
