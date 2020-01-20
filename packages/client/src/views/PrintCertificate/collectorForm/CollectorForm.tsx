@@ -65,7 +65,7 @@ import {
 import { StyledSpinner } from '@client/views/RegistrationHome/RegistrationHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { flatten, cloneDeep } from 'lodash'
+import { flatten, cloneDeep, get, isEqual } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -507,11 +507,23 @@ const mapStateToProps = (
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
     const applicationData = application && application.data
-    const motherDataExist = applicationData && applicationData.mother
+
+    const isMotherDeceased = isEqual(
+      get(applicationData, 'primaryCaregiver.motherIsDeceased'),
+      ['deceased']
+    )
+    const isFatherDeceased = isEqual(
+      get(applicationData, 'primaryCaregiver.fatherIsDeceased'),
+      ['deceased']
+    )
+
+    const motherDataExist =
+      applicationData && applicationData.mother && !isMotherDeceased
     const fatherDataExist =
       applicationData &&
       applicationData.father &&
-      applicationData.father.fathersDetailsExist
+      applicationData.father.fathersDetailsExist &&
+      !isFatherDeceased
 
     if (motherDataExist && fatherDataExist) {
       clonedFormSection.groups.unshift(

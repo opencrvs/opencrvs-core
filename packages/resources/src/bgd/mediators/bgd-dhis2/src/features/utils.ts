@@ -91,7 +91,36 @@ export const pilotUnions: Ia2ILocationRefences[] = [
     a2iRef: 'division=6&district=55&upazila=413&union=743'
   },
   { name: 'Shilkhuri', a2iRef: 'division=6&district=55&upazila=413&union=744' },
-  { name: 'Tilai', a2iRef: 'division=6&district=55&upazila=413&union=745' }
+  { name: 'Tilai', a2iRef: 'division=6&district=55&upazila=413&union=745' },
+  // Atpara Upazilas for testing in production
+  {
+    name: 'Baniajan',
+    a2iRef: 'division=9&district=30&upazila=233&union=4194'
+  },
+  {
+    name: 'Duaz',
+    a2iRef: 'division=9&district=30&upazila=233&union=4195'
+  },
+  {
+    name: 'Loneshwar',
+    a2iRef: 'division=9&district=30&upazila=233&union=4196'
+  },
+  {
+    name: 'Sarmaisa',
+    a2iRef: 'division=9&district=30&upazila=233&union=4197'
+  },
+  {
+    name: 'Sukhari',
+    a2iRef: 'division=9&district=30&upazila=233&union=4198'
+  },
+  {
+    name: 'Sonai',
+    a2iRef: 'division=9&district=30&upazila=233&union=4199'
+  },
+  {
+    name: 'Teligati',
+    a2iRef: 'division=9&district=30&upazila=233&union=4200'
+  }
 ]
 export const pilotMunicipalities: Ia2ILocationRefences[] = [
   {

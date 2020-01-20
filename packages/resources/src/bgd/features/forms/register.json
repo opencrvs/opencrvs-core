@@ -30,6 +30,7 @@
                 }
               ],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "applicant",
@@ -236,6 +237,7 @@
                 }
               ],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "paragraph",
@@ -307,6 +309,7 @@
               },
               "conditionals": [],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
@@ -323,17 +326,71 @@
               "fields": [
                 {
                   "name": "presentAtBirthRegistration",
-                  "type": "TEXT",
+                  "type": "RADIO_GROUP",
                   "required": true,
                   "readonly": true,
                   "hidden": true,
-                  "hideInPreview": true,
+                  "hideInPreview": false,
                   "initialValue": "",
                   "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for option Mother",
+                        "id": "form.field.label.applicantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for option Father",
+                        "id": "form.field.label.applicantRelation.father"
+                      }
+                    },
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "id": "register.selectInformant.parents",
+                        "defaultMessage": "Mother & Father",
+                        "description": "The description that appears when selecting the parent as informant"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Other Label",
+                        "id": "form.field.label.someoneElse"
+                      }
+                    }
+                  ],
                   "label": {
                     "defaultMessage": "Who is present for the birth registration?",
                     "description": "Form section title for contact point",
                     "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "reviewOverrides": {
+                    "residingSection": "registration",
+                    "reference": {
+                      "sectionID": "registration",
+                      "groupID": "contact-view-group",
+                      "fieldName": "contactPoint"
+                    },
+                    "position": "before",
+                    "labelAs": {
+                      "defaultMessage": "Who is the applicant?",
+                      "description": "Form section title for contact point",
+                      "id": "register.selectInformant.relation"
+                    },
+                    "conditionals": [
+                      {
+                        "action": "hide",
+                        "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
+                      }
+                    ]
                   },
                   "mapping": {
                     "mutation": {
@@ -711,7 +768,7 @@
                   "previewGroup": "childNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: First names",
                     "id": "form.field.label.childFirstNames"
                   },
@@ -738,7 +795,7 @@
                   "previewGroup": "childNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.childFamilyName"
                   },
@@ -2387,7 +2444,7 @@
                   "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.applicantsGivenNames"
                   },
@@ -2427,7 +2484,7 @@
                   "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.applicantsFamilyName"
                   },
@@ -4754,7 +4811,7 @@
                   "name": "reasonMotherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
@@ -4844,7 +4901,7 @@
                   "name": "reasonFatherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
@@ -5669,7 +5726,7 @@
                   "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: First names",
                     "id": "form.field.label.motherFirstNames"
                   },
@@ -5696,7 +5753,7 @@
                   "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.motherFamilyName"
                   },
@@ -7934,7 +7991,7 @@
                   "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: First name",
                     "id": "form.field.label.fatherFirstNames"
                   },
@@ -7967,7 +8024,7 @@
                   "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.fatherFamilyName"
                   },
@@ -10670,6 +10727,8 @@
                   "expression": "(!draftData || !draftData.informant || ![\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
                 }
               ],
+              "showExitButtonOnly": true,
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "relationship",
@@ -10783,6 +10842,7 @@
                 "id": "register.SelectContactPoint.heading"
               },
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "conditionals": [],
               "fields": [
                 {
@@ -11243,7 +11303,7 @@
                   "previewGroup": "deceasedNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.deceasedGivenNames"
                   },
@@ -11270,7 +11330,7 @@
                   "previewGroup": "deceasedNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.deceasedFamilyName"
                   },
@@ -15323,7 +15383,7 @@
                   "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.applicantsGivenNames"
                   },
@@ -15363,7 +15423,7 @@
                   "previewGroup": "applicantNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.applicantsFamilyName"
                   },
@@ -15608,6 +15668,26 @@
                       }
                     }
                   ],
+                  "reviewOverrides": {
+                    "residingSection": "informant",
+                    "reference": {
+                      "sectionID": "registration",
+                      "groupID": "point-of-contact",
+                      "fieldName": "contactPoint"
+                    },
+                    "position": "before",
+                    "labelAs": {
+                      "defaultMessage": "Applicant",
+                      "description": "Label for relation to deceased",
+                      "id": "form.field.label.applicant"
+                    },
+                    "conditionals": [
+                      {
+                        "action": "hide",
+                        "expression": "(!draftData || !draftData.informant || [\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
+                      }
+                    ]
+                  },
                   "mapping": {
                     "mutation": {
                       "operation": "fieldValueSectionExchangeTransformer",
@@ -17739,7 +17819,7 @@
                   "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.deceasedFathersGivenNames"
                   },
@@ -17766,7 +17846,7 @@
                   "previewGroup": "fatherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.deceasedFathersFamilyName"
                   },
@@ -17896,7 +17976,7 @@
                   "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in Bengali",
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                     "description": "Label for form field: Given names",
                     "id": "form.field.label.deceasedMothersGivenNames"
                   },
@@ -17923,7 +18003,7 @@
                   "previewGroup": "motherNameInBengali",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in Bengali",
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
                     "description": "Label for form field: Family name",
                     "id": "form.field.label.deceasedMothersFamilyName"
                   },
@@ -18081,13 +18161,13 @@
                         "previewGroup": "spouseNameInBengali",
                         "type": "TEXT",
                         "label": {
-                          "defaultMessage": "First Name(s) in Bengali",
+                          "defaultMessage": "নামের প্রথমাংশ বাংলায়",
                           "description": "Label for form field: Given names",
                           "id": "form.field.label.deceasedSpouseGivenNames"
                         },
                         "required": false,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18119,13 +18199,13 @@
                         "previewGroup": "spouseNameInBengali",
                         "type": "TEXT",
                         "label": {
-                          "defaultMessage": "Last Name(s) in Bengali",
+                          "defaultMessage": "নামের শেষাংশ বাংলায়",
                           "description": "Label for form field: Family name",
                           "id": "form.field.label.deceasedSpousesFamilyName"
                         },
                         "required": true,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "bengaliOnlyNameFormat"
@@ -18163,7 +18243,7 @@
                         },
                         "required": false,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"
@@ -18201,7 +18281,7 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "extraValue":"Yes",
+                        "extraValue": "Yes",
                         "validate": [
                           {
                             "operation": "englishOnlyNameFormat"

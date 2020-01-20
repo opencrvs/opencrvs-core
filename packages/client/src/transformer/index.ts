@@ -83,6 +83,7 @@ export const draftToGqlTransformer = (
         if (
           fieldDef.required &&
           !conditionalActions.includes('hide') &&
+          !conditionalActions.includes('disable') &&
           (draftData[section.id][fieldDef.name] === undefined ||
             draftData[section.id][fieldDef.name] === '')
         ) {

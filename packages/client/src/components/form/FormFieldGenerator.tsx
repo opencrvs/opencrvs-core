@@ -451,6 +451,7 @@ function GeneratedInputField({
         {...inputProps}
         value={inputProps.value as string}
         maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
+        isDisabled={disabled}
       />
     </InputField>
   )
@@ -674,6 +675,8 @@ class FormSectionComponent extends React.Component<Props> {
             return null
           }
 
+          const isFieldDisabled = conditionalActions.includes('disable')
+
           if (
             field.type === DATE &&
             touched[`${field.name}-dd`] !== undefined &&
@@ -780,7 +783,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
-                      disabled={conditionalActions.includes('disable')}
+                      disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
                     />
                   )}
@@ -880,7 +883,9 @@ class FormSectionComponent extends React.Component<Props> {
           } else {
             return (
               <FormItem
-                key={`${field.name}${language}`}
+                key={`${field.name}${language}${
+                  isFieldDisabled ? 'disabled' : ''
+                }`}
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <FastField name={field.name}>
@@ -896,9 +901,10 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
-                      error={error}
+                      error={isFieldDisabled ? '' : error}
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
+                      disabled={isFieldDisabled}
                     />
                   )}
                 </FastField>

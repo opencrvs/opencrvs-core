@@ -37,17 +37,17 @@ const Item = styled.span`
   display: flex;
   align-items: center;
 `
-interface IProps {
+export interface IEventTopBarProps {
   id?: string
   title: string
   pageIcon?: JSX.Element
   goHome?: () => void
-  saveAction?: IAction
-  exitAction?: IAction
+  saveAction?: IEventTopBarMenuAction
+  exitAction?: IEventTopBarMenuAction
   menuItems?: IToggleMenuItem[]
   iconColor?: string
 }
-interface IAction {
+export interface IEventTopBarMenuAction {
   handler: () => void
   label: string
 }
@@ -57,7 +57,7 @@ interface IToggleMenuItem {
   handler: () => void
 }
 
-export const EventTopBar = (props: IProps) => {
+export const EventTopBar = (props: IEventTopBarProps) => {
   const {
     goHome,
     title,

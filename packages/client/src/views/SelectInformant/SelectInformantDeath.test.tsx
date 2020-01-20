@@ -142,7 +142,7 @@ describe('when user is selecting the informant', () => {
         .simulate('click')
 
       app
-        .find('#relationship_OTHER')
+        .find('#relationship_OFFICER_IN_CHARGE')
         .hostNodes()
         .simulate('change')
 

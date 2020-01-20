@@ -412,6 +412,7 @@ class ReviewActionComponent extends React.Component<
               ...actionContent.modal.title.payload,
               event: application.event
             })}
+            responsive={false}
             contentHeight={96}
             actions={[
               <TertiaryButton
