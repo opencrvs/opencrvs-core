@@ -300,13 +300,14 @@ const getFormFieldValue = (
   sectionId: string,
   field: IFormField
 ): IFormFieldValue => {
-  if (field.name in draftData[sectionId]) {
-    return draftData[sectionId][field.name]
+  const sectionDraftData = draftData[sectionId] || {}
+  if (field.name in sectionDraftData) {
+    return sectionDraftData[field.name]
   }
 
   let tempField: IFormField
-  for (let key in draftData[sectionId]) {
-    tempField = draftData[sectionId][key] as IFormField
+  for (let key in sectionDraftData) {
+    tempField = sectionDraftData[key] as IFormField
     return (tempField &&
       tempField.nestedFields &&
       tempField.nestedFields[field.name]) as IFormFieldValue
