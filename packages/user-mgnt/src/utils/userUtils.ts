@@ -29,7 +29,8 @@ export const roleScopeMapping: IRoleScopeMapping = {
   NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
   PERFORMANCE_OVERSIGHT: ['performance'],
   PERFORMANCE_MANAGEMENT: ['performance'],
-  API_USER: ['declare', 'api']
+  HEALTH_API_USER: ['declare', 'health-api'],
+  VALIDATOR_API_USER: ['declare', 'validator-api']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {

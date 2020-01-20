@@ -22,7 +22,8 @@ import { unauthorized } from 'boom'
 import {
   WEB_USER_JWT_AUDIENCES,
   JWT_ISSUER,
-  API_USER_AUDIENCE
+  HEALTH_API_USER_AUDIENCE,
+  VALIDATOR_API_USER_AUDIENCE
 } from '@auth/constants'
 
 interface IAuthPayload {
@@ -58,15 +59,18 @@ export default async function authenticateHandler(
   }
 
   const isPendingUser = response.status && response.status === 'pending'
-  const isAPIUser = result.scope.indexOf('api') > -1
+  const isHealthAPIUser = result.scope.indexOf('health-api') > -1
+  const isValidatorAPIUser = result.scope.indexOf('validator-api') > -1
 
   // directly send the token if the user is pending or an API user
-  if (isPendingUser || isAPIUser) {
+  if (isPendingUser || isHealthAPIUser || isValidatorAPIUser) {
     response.token = await createToken(
       result.userId,
       result.scope,
-      isAPIUser
-        ? WEB_USER_JWT_AUDIENCES.concat([API_USER_AUDIENCE])
+      isHealthAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([HEALTH_API_USER_AUDIENCE])
+        : isValidatorAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([VALIDATOR_API_USER_AUDIENCE])
         : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )

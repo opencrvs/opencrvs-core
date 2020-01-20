@@ -75,7 +75,7 @@ export default async function createUser(
     user.status = statuses.PENDING
     user.scope = userScopes
 
-    if (user.role === 'API_USER') {
+    if (user.role === 'HEALTH_API_USER' || user.role === 'VALIDATOR_API_USER') {
       // Immediately active API users
       user.status = statuses.ACTIVE
     }
