@@ -4811,7 +4811,7 @@
                   "name": "reasonMotherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
@@ -4901,7 +4901,7 @@
                   "name": "reasonFatherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
