@@ -470,7 +470,7 @@ const messagesToDefine: IConstantsMessages = {
   femaleUnder18: {
     defaultMessage: 'Female Under 18',
     description: 'Label for femaleUnder18',
-    id: 'constants.maleUnder18'
+    id: 'constants.femaleUnder18'
   },
   maleOver18: {
     defaultMessage: 'Male Over 18',
