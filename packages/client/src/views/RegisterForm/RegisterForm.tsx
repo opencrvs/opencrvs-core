@@ -492,11 +492,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const menuItemDeleteOrClose =
       application.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
-            label: 'Delete Application',
+            label: intl.formatMessage(buttonMessages.deleteApplication),
             handler: () => this.onDeleteApplication(application)
           }
         : {
-            label: 'Close Application',
+            label: intl.formatMessage(buttonMessages.closeApplication),
             handler: () => this.onCloseApplication()
           }
 
