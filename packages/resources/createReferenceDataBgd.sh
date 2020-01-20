@@ -12,7 +12,7 @@
 if [ -z "$1" ] 
   then
     echo 'Error: Argument for a2i secret is required in position 1.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of a2i secret"
     exit 1
 fi
@@ -20,7 +20,7 @@ fi
 if [ -z "$2" ] 
   then
     echo 'Error: Argument for HRIS client id is required in position 2.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of HRIS client id"
     exit 1
 fi
@@ -28,7 +28,7 @@ fi
 if [ -z "$3" ] 
   then
     echo 'Error: Argument for HRIS token is required in position 3.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of HRIS token"
     exit 1
 fi
@@ -36,16 +36,24 @@ fi
 if [ -z "$4" ] 
   then
     echo 'Error: Argument for test user password is required in position 4.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password}'
-    echo "Script must receive a parameter of HRIS token"
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a parameter of test user password"
     exit 1
 fi
 
 if [ -z "$5" ] 
   then
-    echo 'Error: Argument for OpenCRVS API user password is required in position 5.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password}'
-    echo "Script must receive a parameter of HRIS token"
+    echo 'Error: Argument for OpenCRVS Health API user password is required in position 5.'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a parameter of Health API user password"
+    exit 1
+fi
+
+if [ -z "$6" ] 
+  then
+    echo 'Error: Argument for OpenCRVS Validator API user password is required in position 6.'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a parameter of Validator API user password"
     exit 1
 fi
 
@@ -55,7 +63,7 @@ ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/updat
 ts-node -r tsconfig-paths/register src/bgd/features/facilities/scripts/prepare-source-facilities.ts -- $2 $3
 ts-node -r tsconfig-paths/register src/bgd/features/facilities/scripts/assign-facilities-to-locations.ts
 ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/prepare-source-employees.ts
-ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/assign-employees-to-practitioners.ts -- $4 $5
+ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/assign-employees-to-practitioners.ts -- $4 $5 $6
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/prepare-statistical-data.ts
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/add-statistical-data.ts
 ts-node -r tsconfig-paths/register src/bgd/features/administrative/scripts/update-statistical-data.ts

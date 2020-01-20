@@ -15,7 +15,7 @@
     "start:prod": "ts-node --transpile-only -r tsconfig-paths/register src/index.ts",
     "prep:employees:bgd": "ts-node -r tsconfig-paths/register src/bgd/features/employees/scripts/prepare-source-employees.ts",
     "save:testLocations": "ts-node -r tsconfig-paths/register src/tests/loadTestData.ts",
-    "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts $1 $2",
+    "save:testEmployees": "ts-node -r tsconfig-paths/register src/tests/loadTestEmployees.ts $1 $2 $3",
     "save:testData": "yarn prep:employees:bgd && yarn save:testLocations && yarn save:testEmployees",
     "db:populate:bgd": "bash createReferenceDataBgd.sh",
     "db:populate:zmb": "bash createReferenceDataZmb.sh",
