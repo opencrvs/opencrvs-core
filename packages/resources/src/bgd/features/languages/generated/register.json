@@ -2153,21 +2153,13 @@
         "register.SelectContactPoint.phoneNoError": "বৈধ মোবাইল নম্বর নয়",
         "register.SelectContactPoint.phoneNoLabel": "ফোন নম্বর",
         "register.SelectContactPoint.title": "জন্ম আবেদন",
-<<<<<<< HEAD
-        "register.selectInformant.birthErrorMessage": "অনুগ্রহ পূর্বক কে উপস্থিত থেকে আবেদন করছেন সেটা নির্বাচন করুন।",
-        "register.selectInformant.birthInformantTitle": "কে জন্ম নিবন্ধনের জন্য আবেদন করছে?",
         "register.selectInformant.daughter": "কন্যা",
-        "register.selectInformant.deathErrorMessage": "অনুগ্রহ পূর্বক মৃত ব্যাক্তির সাথে বিদ্যমান সম্পর্ক নির্বাচন করুন।",
         "register.selectInformant.deathInformantTitle": "মৃত ব্যক্তির সাথে আবেদনকারীর সম্পর্ক কি?",
-=======
         "register.selectInformant.relation": "আবেদনকারী কে?",
         "register.selectInformant.birthErrorMessage": "অনুগ্রহ পূর্বক কারা উপস্থিত এবং আবেদন করছেন নির্বাচন করুন।",
         "register.selectInformant.birthInformantTitle": "কে জন্ম নিবন্ধনের জন্য আবেদন করছে?",
-        "register.selectInformant.daughter": "কন্যা",
         "register.selectInformant.deathErrorMessage": "অনুগ্রহ পূর্বক মৃত ব্যাক্তির সাথে বিদ্যমান সম্পর্ক নির্বাচন করুন।",
-        "register.selectInformant.deathInformantTitle": "মৃত বেক্তির সাথে আবেদনকারীর সম্পর্ক কি ?",
         "register.selectInformant.deathInformantSomeoneElseTitle": "মৃতের সাথে আবেদনকারীর সম্পর্ক কী?",
->>>>>>> 08b5514756c070eda7246e22d883a3793d22e35c
         "register.selectInformant.extendedFamily": "যৌথ পরিবার",
         "register.selectInformant.newBirthRegistration": "জন্মের আবেদন",
         "register.selectInformant.newDeathRegistration": "মৃত্যুর আবেদন",
