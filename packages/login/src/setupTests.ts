@@ -14,6 +14,5 @@
   AUTH_API_URL: 'http://localhost:4040/',
   COUNTRY: 'bgd',
   LANGUAGES: 'bn,en',
-  PERFORMANCE_APP_URL: 'http://localhost:3001/',
   CLIENT_APP_URL: 'http://localhost:3000/'
 }
