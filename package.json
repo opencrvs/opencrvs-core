@@ -42,7 +42,6 @@
     "cy:run": "cd packages/resources && yarn db:clear:all && yarn db:backup:restore bgd && cd ../e2e && CYPRESS_LOGIN_URL=http://localhost:3020/ CYPRESS_CLIENT_URL=http://localhost:3000/ CYPRESS_AUTH_URL=http://localhost:4040/ yarn start",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
-    "cov:performance": "cd packages/performance && yarn open:cov",
     "cy": "cd packages/e2e && yarn open",
     "build": "lerna run build --stream --concurrency=1",
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",

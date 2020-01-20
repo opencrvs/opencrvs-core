@@ -14,8 +14,7 @@ import {
   createTestComponent,
   selectOption,
   getFileFromBase64String,
-  validImageB64String,
-  flushPromises
+  validImageB64String
 } from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
@@ -1263,6 +1262,298 @@ describe('Certificate collector test for a death registration', () => {
       expect(history.location.pathname).toBe(
         '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
       )
+    })
+  })
+})
+
+describe('Certificate collector test for a birth registration without father and mother details', () => {
+  const { store, history } = createStore()
+  const mockLocation: any = jest.fn()
+  const graphqlMock = [
+    {
+      request: {
+        query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
+        variables: { id: '6a5fd35d-01ec-4c37-976e-e055107at5674' }
+      },
+      result: {
+        data: {
+          fetchBirthRegistration: {
+            _fhirIDMap: {
+              composition: '6a5fd35d-01ec-4c37-976e-e055107at5674',
+              encounter: 'cd56d5da-0c9d-471f-8e4a-e1db73856795',
+              observation: {
+                presentAtBirthRegistration:
+                  '1590856c-ece2-456a-9141-24ca5961da63'
+              }
+            },
+            id: '6a5fd35d-01ec-4c37-976e-e055107at5674',
+            child: {
+              id: '8ad1796f-de75-4e62-ad3d-a0b38bbbc281',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'ইসলাম',
+                  __typename: 'HumanName'
+                },
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'Islam',
+                  __typename: 'HumanName'
+                }
+              ],
+              birthDate: '2018-08-01',
+              gender: 'male',
+              __typename: 'Person'
+            },
+            informant: {
+              id: '0df90d42-1615-4ffd-9f47-b6a30a9ddae1',
+              individual: {
+                id: '9c6c68c7-6bb0-4e40-a3bf-8cac6448ac2e',
+                name: [
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'রোয়া',
+                    __typename: 'HumanName'
+                  },
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Roya',
+                    __typename: 'HumanName'
+                  }
+                ]
+              }
+            },
+            mother: {
+              id: '22aa4ca0-e5ec-49ec-8574-39a799f57a65',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'রোকেয়া',
+                  __typename: 'HumanName'
+                },
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'Rokeya',
+                  __typename: 'HumanName'
+                }
+              ],
+              birthDate: null,
+              maritalStatus: 'MARRIED',
+              dateOfMarriage: null,
+              educationalAttainment: null,
+              nationality: ['BGD'],
+              multipleBirth: 1,
+              identifier: [
+                {
+                  id: '1234567890987',
+                  type: 'NATIONAL_ID',
+                  otherType: null,
+                  __typename: 'IdentityType'
+                }
+              ],
+              address: [
+                {
+                  type: 'PERMANENT',
+                  line: [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                  ],
+                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
+                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                  postalCode: null,
+                  country: 'BGD',
+                  __typename: 'Address'
+                },
+                {
+                  type: 'CURRENT',
+                  line: [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                  ],
+                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
+                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                  postalCode: null,
+                  country: 'BGD',
+                  __typename: 'Address'
+                }
+              ],
+              telecom: null,
+              __typename: 'Person'
+            },
+            primaryCaregiver: {
+              reasonsNotApplying: [
+                {
+                  primaryCaregiverType: 'MOTHER',
+                  reasonNotApplying: '',
+                  isDeceased: true,
+                  __typename: 'ReasonsNotApplying'
+                },
+                {
+                  primaryCaregiverType: 'FATHER',
+                  reasonNotApplying: '',
+                  isDeceased: true,
+                  __typename: 'ReasonsNotApplying'
+                }
+              ],
+              __typename: 'PrimaryCaregiver'
+            },
+            father: {
+              id: '22aa4ca0-e5ec-49ec-8574-39a799f57aw5',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'হাসান',
+                  __typename: 'HumanName'
+                },
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'hasan',
+                  __typename: 'HumanName'
+                }
+              ],
+              birthDate: null,
+              maritalStatus: 'MARRIED',
+              dateOfMarriage: null,
+              educationalAttainment: null,
+              nationality: ['BGD'],
+              multipleBirth: 1,
+              identifier: [
+                {
+                  id: '1234567890934',
+                  type: 'NATIONAL_ID',
+                  otherType: null,
+                  __typename: 'IdentityType'
+                }
+              ],
+              address: [
+                {
+                  type: 'PERMANENT',
+                  line: [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                  ],
+                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
+                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                  postalCode: null,
+                  country: 'BGD',
+                  __typename: 'Address'
+                },
+                {
+                  type: 'CURRENT',
+                  line: [
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'f8816522-0a1a-49ca-aa4e-a886a9b056ec'
+                  ],
+                  district: '68ba789b-0e6c-4528-a400-4422e142e3dd',
+                  state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
+                  postalCode: null,
+                  country: 'BGD',
+                  __typename: 'Address'
+                }
+              ],
+              telecom: null,
+              __typename: 'Person'
+            },
+            registration: {
+              id: '1440d427-7890-4a37-8f36-e9f65d725034',
+              contact: 'MOTHER',
+              contactRelationship: 'Contact Relation',
+              contactPhoneNumber: '01711111111',
+              attachments: null,
+              status: [
+                {
+                  comments: null,
+                  type: 'REGISTERED',
+                  location: {
+                    name: 'Moktarpur Union Parishad',
+                    alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
+                    __typename: 'Location'
+                  },
+                  office: {
+                    name: 'Moktarpur Union Parishad',
+                    alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
+                    address: {
+                      district: 'Gazipur',
+                      state: 'Dhaka',
+                      __typename: 'Address'
+                    },
+                    __typename: 'Location'
+                  },
+                  __typename: 'RegWorkflow'
+                }
+              ],
+              trackingId: 'BWOY6PW',
+              registrationNumber: '2019333494BWOY6PW8',
+              __typename: 'Registration'
+            },
+            attendantAtBirth: null,
+            weightAtBirth: null,
+            birthType: null,
+            eventLocation: null,
+            presentAtBirthRegistration: 'OTHER',
+            __typename: 'BirthRegistration'
+          }
+        }
+      }
+    }
+  ]
+
+  describe('Test collector group', () => {
+    let component: ReactWrapper<{}, {}>
+
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        <CollectorForm
+          location={mockLocation}
+          history={history}
+          match={{
+            params: {
+              registrationId: '6a5fd35d-01ec-4c37-976e-e055107at5674',
+              eventType: 'birth',
+              groupId: 'certCollector'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+      component = testComponent.component
+      await waitForElement(component, '#collector_form')
+    })
+
+    it('father option will not be available', () => {
+      expect(component.find('#type_FATHER').hostNodes()).toHaveLength(0)
+    })
+
+    it('mother option will not be available', () => {
+      expect(component.find('#type_MOTHER').hostNodes()).toHaveLength(0)
     })
   })
 })
