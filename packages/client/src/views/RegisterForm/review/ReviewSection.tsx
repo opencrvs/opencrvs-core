@@ -116,6 +116,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
+import { IValidationResult } from '@client/utils/validate'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -289,6 +290,25 @@ const getCheckBoxGroupFieldValue = (
   return ''
 }
 
+const getFormFieldValue = (
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+): IFormFieldValue => {
+  if (field.name in draftData[sectionId]) {
+    return draftData[sectionId][field.name]
+  }
+
+  let tempField: IFormField
+  for (let key in draftData[sectionId]) {
+    tempField = draftData[sectionId][key] as IFormField
+    return (tempField &&
+      tempField.nestedFields &&
+      tempField.nestedFields[field.name]) as IFormFieldValue
+  }
+  return ''
+}
+
 const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -297,9 +317,7 @@ const renderValue = (
   offlineResources: IOfflineData,
   language: string
 ) => {
-  const value: IFormFieldValue = draftData[sectionId]
-    ? draftData[sectionId][field.name]
-    : ''
+  let value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -708,6 +726,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  getErrorForNestedField(
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ): IValidationResult[] {
+    for (let key in sectionErrors[section.id]) {
+      return sectionErrors[section.id][key].nestedFields[field.name] || []
+    }
+    return []
+  }
+
   getValueOrError = (
     section: IFormSection,
     field: IFormField,
@@ -715,7 +744,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ignoreNestedFieldWrapping?: boolean
   ) => {
     const { intl, draft, offlineResources, language } = this.props
-    const errorsOnField = sectionErrors[section.id][field.name].errors
+
+    const errorsOnField = sectionErrors[section.id][field.name]
+      ? sectionErrors[section.id][field.name].errors
+      : this.getErrorForNestedField(section, field, sectionErrors)
+
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
@@ -811,12 +844,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       visitedTags.push(field.previewGroup)
 
       const baseTag = field.previewGroup
-      const taggedFields = group.fields.filter(
-        field =>
-          this.isVisibleField(field, section) &&
-          !this.isViewOnly(field) &&
-          field.previewGroup === baseTag
-      )
+      const taggedFields: IFormField[] = []
+      group.fields.forEach(field => {
+        if (this.isVisibleField(field, section) && !this.isViewOnly(field)) {
+          if (field.previewGroup === baseTag) {
+            taggedFields.push(field)
+          }
+          for (let index in field.nestedFields) {
+            field.nestedFields[index].forEach(tempField => {
+              if (
+                this.isVisibleField(tempField, section) &&
+                !this.isViewOnly(tempField) &&
+                tempField.previewGroup === baseTag
+              ) {
+                taggedFields.push(tempField)
+              }
+            })
+          }
+        }
+      })
 
       const tagDef =
         (group.previewGroups &&
@@ -887,6 +933,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionErrors: IErrorsBySection
   ) {
     const { draft } = this.props
+    let visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
@@ -903,21 +950,33 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ])) ||
       []
     ).forEach(nestedField => {
-      nestedItems.push(
-        this.getRenderableField(
-          section,
-          group,
-          nestedField.label,
-          nestedField.name,
-          this.getNestedFieldValueOrError(
+      if (nestedField.previewGroup) {
+        nestedItems.push(
+          this.getPreviewGroupsField(
             section,
-            draft.data[section.id][field.name] as IFormData,
+            group,
             nestedField,
-            sectionErrors[section.id][field.name]
-          ),
-          nestedField.readonly
+            visitedTags,
+            sectionErrors
+          )
         )
-      )
+      } else {
+        nestedItems.push(
+          this.getRenderableField(
+            section,
+            group,
+            nestedField.label,
+            nestedField.name,
+            this.getNestedFieldValueOrError(
+              section,
+              draft.data[section.id][field.name] as IFormData,
+              nestedField,
+              sectionErrors[section.id][field.name]
+            ),
+            nestedField.readonly
+          )
+        )
+      }
     })
     return nestedItems
   }
