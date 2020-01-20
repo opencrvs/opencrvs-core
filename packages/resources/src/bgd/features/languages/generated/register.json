@@ -1973,25 +1973,14 @@
         "form.field.label.deceasedFathersFamilyName": "নামের শেষাংশ বাংলায়",
         "form.field.label.deceasedFathersFamilyNameEng": "Last Name(s) in English",
         "form.field.label.deceasedFathersGivenNames": "নামের প্রথমাংশ বাংলায়",
-<<<<<<< HEAD
-        "form.field.label.deceasedFathersGivenNamesEng": "নামের প্রথমাংশ ইংরেজিতে",
+        "form.field.label.deceasedFathersGivenNamesEng": "First Name(s) in English",
         "form.section.deceased.mother.name": "মৃত ব্যক্তির মাতার নাম কি?",
         "form.section.deceased.mother.title": "মৃত ব্যক্তির মাতার নাম কি?",
-=======
-        "form.field.label.deceasedFathersGivenNamesEng": "First Name(s) in English",
-        "form.section.deceased.mother.name": "মৃত বেক্তির মাতার নাম কি ?",
-        "form.section.deceased.mother.title": "মৃত বেক্তির মাতার নাম কি ?",
->>>>>>> 08b5514756c070eda7246e22d883a3793d22e35c
         "form.field.label.deceasedMothersFamilyName": "নামের শেষাংশ বাংলায়",
         "form.field.label.deceasedMothersFamilyNameEng": "Last Name(s) in English",
         "form.field.label.deceasedMothersGivenNames": "নামের প্রথমাংশ বাংলায়",
-<<<<<<< HEAD
-        "form.field.label.deceasedMothersGivenNamesEng": "নামের প্রথমাংশ ইংরেজিতে",
-        "form.section.deceased.spouse.name": "মৃত ব্যক্তির স্বামী/স্ত্রীর নাম কি?",
-=======
         "form.field.label.deceasedMothersGivenNamesEng": "First Name(s) in English",
-        "form.section.deceased.spouse.name": "মৃত বেক্তির স্বামী/স্ত্রীর নাম কি ?",
->>>>>>> 08b5514756c070eda7246e22d883a3793d22e35c
+        "form.section.deceased.spouse.name": "মৃত ব্যক্তির স্বামী/স্ত্রীর নাম কি?",
         "form.section.deceased.spouse.title": "স্বামী/স্ত্রীর বিবরণ",
         "form.section.deceased.hasSpouse": "হ্যাঁ",
         "form.section.deceased.noSpouse": "না / অজানা",
