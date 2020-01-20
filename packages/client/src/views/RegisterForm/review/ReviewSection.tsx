@@ -1235,6 +1235,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         <ResponsiveModal
           title={intl.formatMessage(messages.editApplicationConfirmationTitle)}
           contentHeight={96}
+          responsive={false}
           actions={[
             <TertiaryButton
               id="cancel-btn"
