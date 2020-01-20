@@ -35,19 +35,24 @@ const ScreenBlocker = styled.div`
   background-color: ${({ theme }) => theme.colors.menuBackground};
   opacity: 0.8;
 `
-const ModalContent = styled.div<{ width?: number }>`
+const ModalContent = styled.div<{ width?: number; responsive?: boolean }>`
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
   display: flex;
   flex-direction: column;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-grow: 1;
+    margin: 0 24px;
+  }
+  @media (max-width: ${({ theme, responsive }) =>
+      responsive && theme.grid.breakpoints.lg}px) {
     width: 100%;
     height: 100vh;
   }
 `
-const Header = styled.div`
+const Header = styled.div<{ responsive?: boolean }>`
   ${({ theme }) => theme.fonts.regularFont};
   height: 64px;
   display: flex;
@@ -55,15 +60,23 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0 8px 0px 24px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+  @media (max-width: ${({ theme, responsive }) =>
+      responsive && theme.grid.breakpoints.lg}px) {
     ${({ theme }) => theme.shadows.mistyShadow};
     margin-bottom: 16px;
   }
 `
 const Title = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  }
 `
-const Body = styled.div<{ height?: number; scrollableY?: boolean }>`
+const Body = styled.div<{
+  height?: number
+  scrollableY?: boolean
+  responsive?: boolean
+}>`
   ${({ theme }) => theme.fonts.bodyStyle};
   height: ${({ height }) => (height ? height : 250)}px;
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
@@ -83,14 +96,15 @@ const Body = styled.div<{ height?: number; scrollableY?: boolean }>`
     border-radius: 10px;
   }
 `
-const Footer = styled.div`
+const Footer = styled.div<{ responsive?: boolean }>`
   ${({ theme }) => theme.fonts.buttonStyle};
   padding: 16px 3px;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   border-top: 2px solid ${({ theme }) => theme.colors.dividerLight};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme, responsive }) =>
+      responsive && theme.grid.breakpoints.md}px) {
     flex-direction: column-reverse;
     border-top: 0px;
   }
@@ -108,6 +122,7 @@ interface IProps {
   id?: string
   title: string
   show: boolean
+  responsive?: boolean
   width?: number
   contentHeight?: number
   contentScrollableY?: boolean
@@ -132,6 +147,7 @@ export class ResponsiveModal extends React.Component<IProps> {
     const {
       title,
       show,
+      responsive = true,
       handleClose,
       id,
       actions,
@@ -148,8 +164,8 @@ export class ResponsiveModal extends React.Component<IProps> {
     return (
       <ModalContainer id={id}>
         <ScreenBlocker />
-        <ModalContent width={width}>
-          <Header>
+        <ModalContent width={width} responsive={responsive}>
+          <Header responsive={responsive}>
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>
               <Cross color="currentColor" />
@@ -158,7 +174,7 @@ export class ResponsiveModal extends React.Component<IProps> {
           <Body height={contentHeight} scrollableY={contentScrollableY}>
             {this.props.children}
           </Body>
-          <Footer>
+          <Footer responsive={responsive}>
             {actions.map((action, i) => (
               <Action key={i}>{action}</Action>
             ))}

@@ -20,4 +20,3 @@ export const UPDATE_PASSWORD = '/reset-password'
 export const SUCCESS = '/success'
 
 export const REGISTER_APP = 'register'
-export const PERFORMANCE_APP = 'performance'

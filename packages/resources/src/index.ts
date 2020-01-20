@@ -53,7 +53,8 @@ export async function createServer() {
     host: RESOURCES_HOST,
     port: RESOURCES_PORT,
     routes: {
-      cors: { origin: ['*'] }
+      cors: { origin: ['*'] },
+      payload: { maxBytes: 52428800 }
     }
   })
 
