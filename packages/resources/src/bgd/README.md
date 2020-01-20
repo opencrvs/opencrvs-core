@@ -262,7 +262,7 @@ This object holds sections for birth application forms. All sections are contain
 
     The following address fields function in a similar way as above. When the application environment country is not the same as the default country, these fields appear instead of the above-mentioned fields.
 
-    -  #### `internationalState`
+    -   #### `internationalState`
 
     -   #### `internationalDistrict`
 
@@ -314,43 +314,43 @@ This object holds sections for birth application forms. All sections are contain
   - #### `applicantFamilyNameEng`
     The family name of the informant in English.
 
-Below are the address fields, work similarly like mentioned [earlier](#Address-fields). All these fields stand for the address where the informant resides.
+  Below are the address fields, work similarly like mentioned [earlier](#Address-fields). All these fields stand for the address where the informant resides.
 
-    -   #### `permanentAddress`
+  - #### `permanentAddress`
 
-    -   #### `statePermanent`
+  - #### `statePermanent`
 
-    -   #### `districtPermanent`
+  - #### `districtPermanent`
 
-    -   #### `addressLine4Permanent`
+  - #### `addressLine4Permanent`
 
-    -   #### `addressLine3Permanent`
+  - #### `addressLine3Permanent`
 
-    -   #### `addressLine3CityOptionPermanent`
+  - #### `addressLine3CityOptionPermanent`
 
-    -   #### `addressLine2Permanent`
+  - #### `addressLine2Permanent`
 
-    -   #### `addressLine1CityOptionPermanent`
+  - #### `addressLine1CityOptionPermanent`
 
-    -   #### `postCodeCityOptionPermanent`
+  - #### `postCodeCityOptionPermanent`
 
-    -   #### `addressLine1Permanent`
+  - #### `addressLine1Permanent`
 
-    -   #### `postCodePermanent`
+  - #### `postCodePermanent`
 
-    -   #### `internationalState`
+  - #### `internationalState`
 
-    -   #### `internationalDistrict`
+  - #### `internationalDistrict`
 
-    -   #### `internationalCity`
+  - #### `internationalCity`
 
-    -   #### `internationalAddressLine1`
+  - #### `internationalAddressLine1`
 
-    -   #### `internationalAddressLine2`
+  - #### `internationalAddressLine2`
 
-    -   #### `internationalAddressLine3`
+  - #### `internationalAddressLine3`
 
-    -   #### `internationalPostcode`
+  - #### `internationalPostcode`
 
 4.  ### `primaryCaregiver`
 
