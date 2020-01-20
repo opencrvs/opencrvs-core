@@ -11,78 +11,80 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Tick } from '../../icons'
+import { Tick, TickLarge } from '../../icons'
 
 const Wrapper = styled.li`
   padding-top: 5px;
   padding-bottom: 5px;
   list-style-type: none;
+  display: flex;
+  align-items: center;
 `
 
 const Label = styled.label`
   position: relative;
-  left: 6px;
-  top: -2px;
+  margin-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
-const Check = styled.span`
+const Check = styled.span<{ size?: string }>`
   display: inline-block;
   background: ${({ theme }) => theme.colors.copy};
-  height: 20px;
-  width: 20px;
+  ${({ size }) =>
+    size === 'large'
+      ? `height: 40px;
+    width: 40px;`
+      : ` height: 20px;
+    width: 20px;`}
   transition: border 0.25s linear;
   -webkit-transition: border 0.25s linear;
   position: relative;
+  color: ${({ theme }) => theme.colors.copy};
   z-index: 1;
   &::after {
-    display: block;
-    position: relative;
+    position: absolute;
     content: '';
     background: ${({ theme }) => theme.colors.white};
-    height: 16px;
-    width: 16px;
-    top: -12px;
-    left: 2px;
+    ${({ size }) =>
+      size === 'large'
+        ? `height: 36px;
+    width: 36px;`
+        : ` height: 16px;
+    width: 16px;`}
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     transition: background 0.25s linear;
     -webkit-transition: background 0.25s linear;
+  }
+  &:focus {
+    ${({ size }) =>
+      size === 'large'
+        ? `height: 34px;
+    width: 34px;`
+        : ` height: 14px;
+    width: 14px;`}
   }
 
-  &::before {
-    display: block;
-    position: relative;
-    content: '';
-    border-radius: 2px;
-    background: ${({ theme }) => theme.colors.white};
-    height: 14px;
-    width: 14px;
-    top: 2px;
-    left: 2px;
-    transition: background 0.25s linear;
-    -webkit-transition: background 0.25s linear;
-  }
   svg {
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-left: -5px;
-    margin-top: -3px;
+    transform: translate(-50%, -50%);
     z-index: 1;
   }
 `
 
 const Input = styled.input`
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: ${({ size }) => `${size}px`};
+  height: ${({ size }) => `${size}px`};
   opacity: 0;
   z-index: 2;
   cursor: pointer;
-  /* stylelint-disable */
-  &:checked ~ ${Check}::after {
-    /* stylelint-enable */
-    background: ${({ theme }) => theme.colors.copy};
+  &:focus ~ ${Check} {
+    box-shadow: ${({ theme, disabled }) => theme.colors.focus} 0 0 0 3px;
   }
 `
 
@@ -91,16 +93,24 @@ interface ICheckbox extends React.OptionHTMLAttributes<{}> {
   label: string
   value: string
   selected: boolean
+  size?: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export class Checkbox extends React.Component<ICheckbox> {
   render() {
-    const { name, id, selected, label, value, onChange } = this.props
+    const {
+      name,
+      id,
+      selected,
+      label,
+      value,
+      onChange,
+      size = 'small'
+    } = this.props
     return (
       <Wrapper>
         <Input
-          {...this.props}
           id={id}
           role="checkbox"
           checked={selected}
@@ -108,8 +118,11 @@ export class Checkbox extends React.Component<ICheckbox> {
           name={name}
           value={value}
           onChange={onChange}
+          size={size === 'large' ? 40 : 16}
         />
-        <Check>{selected && <Tick />}</Check>
+        <Check size={size}>
+          {selected && (size === 'large' ? <TickLarge /> : <Tick />)}
+        </Check>
         <Label htmlFor={id}>{label}</Label>
       </Wrapper>
     )
