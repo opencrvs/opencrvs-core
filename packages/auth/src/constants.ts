@@ -52,7 +52,7 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:metrics-user',
   'opencrvs:resources-user'
 ]
-export const HEALTH_API_USER_AUDIENCE = 'opencrvs:health-api-user'
+export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
 export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'

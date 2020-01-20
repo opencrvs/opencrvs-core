@@ -23,7 +23,7 @@ printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
 ```
 
-In addition an API user will need to be created. This is a user with the HEALTH_API_USER role and API_USER type. This can be done through the user management page in the app. The details of this API user must be shared with the integration partner to use to authenticate with OpenCRVS.
+In addition an API user will need to be created. This is a user with the NOTIFICATION_API_USER role and API_USER type. This can be done through the user management page in the app. The details of this API user must be shared with the integration partner to use to authenticate with OpenCRVS.
 
 ## Dev guide
 

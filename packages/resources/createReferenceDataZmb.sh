@@ -19,16 +19,16 @@ fi
 
 if [ -z "$2" ] 
   then
-    echo 'Error: Argument for OpenCRVS Health API user password is required in position 2.'
-    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
-    echo "Script must receive a paramether of Health API user password"
+    echo 'Error: Argument for OpenCRVS Notification API user password is required in position 2.'
+    echo 'Usage: db:populate:zmb {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a paramether of Notification API user password"
     exit 1
 fi
 
 if [ -z "$3" ] 
   then
     echo 'Error: Argument for OpenCRVS Validator API user password is required in position 3.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of Validator API user password"
     exit 1
 fi

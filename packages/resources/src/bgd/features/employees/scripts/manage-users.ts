@@ -41,10 +41,10 @@ export function getScope(role: string, environment: string): string[] {
       )
     case 'LOCAL_SYSTEM_ADMIN':
       return setDemoUser(['sysadmin'], environment)
-    case 'HEALTH_API_USER':
-      return setDemoUser(['declare', 'health-api'], environment)
+    case 'NOTIFICATION_API_USER':
+      return setDemoUser(['declare', 'notification-api'], environment)
     case 'VALIDATOR_API_USER':
-      return setDemoUser(['declare', 'validator-api'], environment)
+      return setDemoUser(['validator-api'], environment)
     default:
       return setDemoUser(['declare'], environment)
   }
@@ -101,9 +101,9 @@ export function createUsers(users: IUserModel[]) {
     active: true
   })
 
-  const healthApiUserRole = new Role({
-    title: 'Health API User',
-    value: 'HEALTH_API_USER',
+  const notificationApiUserRole = new Role({
+    title: 'Notification API User',
+    value: 'NOTIFICATION_API_USER',
     types: ['API_USER'],
     active: true
   })
@@ -123,7 +123,7 @@ export function createUsers(users: IUserModel[]) {
     sysAdminNationalRole,
     performanceOversightRole,
     performanceMgntRole,
-    healthApiUserRole,
+    notificationApiUserRole,
     validatorApiUserRole
   ]
   function onInsert(err: any, values: any) {

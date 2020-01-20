@@ -12,7 +12,7 @@
 if [ -z "$1" ] 
   then
     echo 'Error: Argument for a2i secret is required in position 1.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of a2i secret"
     exit 1
 fi
@@ -20,7 +20,7 @@ fi
 if [ -z "$2" ] 
   then
     echo 'Error: Argument for HRIS client id is required in position 2.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of HRIS client id"
     exit 1
 fi
@@ -28,7 +28,7 @@ fi
 if [ -z "$3" ] 
   then
     echo 'Error: Argument for HRIS token is required in position 3.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of HRIS token"
     exit 1
 fi
@@ -36,23 +36,23 @@ fi
 if [ -z "$4" ] 
   then
     echo 'Error: Argument for test user password is required in position 4.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of test user password"
     exit 1
 fi
 
 if [ -z "$5" ] 
   then
-    echo 'Error: Argument for OpenCRVS Health API user password is required in position 5.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
-    echo "Script must receive a parameter of Health API user password"
+    echo 'Error: Argument for OpenCRVS Notification API user password is required in position 5.'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
+    echo "Script must receive a parameter of Notification API user password"
     exit 1
 fi
 
 if [ -z "$6" ] 
   then
     echo 'Error: Argument for OpenCRVS Validator API user password is required in position 6.'
-    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Health API user password} {OpenCRVS Validator API user password}'
+    echo 'Usage: db:populate:bgd {secret} {HRIS client id} {HRIS token} {Test user password} {OpenCRVS Notification API user password} {OpenCRVS Validator API user password}'
     echo "Script must receive a parameter of Validator API user password"
     exit 1
 fi
