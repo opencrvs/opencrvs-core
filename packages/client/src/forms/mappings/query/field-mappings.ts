@@ -497,7 +497,9 @@ export const bundleFieldToNestedRadioFieldTransformer = (
   sectionId: string,
   field: IFormField
 ) => {
-  transformedData[sectionId][field.name] = {
+  transformedData[sectionId][field.name] = transformedData[sectionId][
+    field.name
+  ] || {
     value: get(queryData, transformedFieldName),
     nestedFields: {}
   }
