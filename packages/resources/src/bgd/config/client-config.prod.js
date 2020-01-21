@@ -19,7 +19,6 @@ window.config = {
   LOGIN_URL: 'https://login.{{hostname}}',
   AUTH_URL: 'https://auth.{{hostname}}',
   API_GATEWAY_URL: 'https://gateway.{{hostname}}/',
-  PERFORMANCE_URL: 'https://performance.{{hostname}}',
   RESOURCES_URL: 'https://resources.{{hostname}}/bgd',
   CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45, // days
   CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825, // 5 years =  (5 * 365) days

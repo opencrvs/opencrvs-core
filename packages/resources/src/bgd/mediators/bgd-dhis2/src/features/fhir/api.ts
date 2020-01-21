@@ -308,15 +308,17 @@ export async function fetchUnionByFullBBSCode(
     )
   }
 
-  return (await fetchHierarchicalBangladeshLocations(
-    {
-      divisionCode,
-      districtCode,
-      upazilaCode,
-      unionCode
-    },
-    authHeader
-  )).union
+  return (
+    await fetchHierarchicalBangladeshLocations(
+      {
+        divisionCode,
+        districtCode,
+        upazilaCode,
+        unionCode
+      },
+      authHeader
+    )
+  ).union
 }
 
 export async function fetchAllAddressLocations(

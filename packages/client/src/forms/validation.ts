@@ -54,7 +54,10 @@ const getValidationErrors = {
       resources,
       drafts
     )
-    if (conditionalActions.includes('hide')) {
+    if (
+      conditionalActions.includes('hide') ||
+      conditionalActions.includes('disable')
+    ) {
       return {
         errors: [],
         nestedFields: {}

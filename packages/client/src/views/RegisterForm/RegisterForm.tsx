@@ -84,9 +84,14 @@ import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transforme
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
+  margin-top: 16px;
+  margin-bottom: 24px;
 `
 const FooterArea = styled.div`
-  margin: 24px 0px 48px;
+  padding-top: 6px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-top: 0px;
+  }
 `
 
 const Notice = styled.div`
@@ -492,11 +497,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const menuItemDeleteOrClose =
       application.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
-            label: 'Delete Application',
+            label: intl.formatMessage(buttonMessages.deleteApplication),
             handler: () => this.onDeleteApplication(application)
           }
         : {
-            label: 'Close Application',
+            label: intl.formatMessage(buttonMessages.closeApplication),
             handler: () => this.onCloseApplication()
           }
 
