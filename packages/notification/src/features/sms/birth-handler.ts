@@ -96,8 +96,7 @@ export async function sendBirthRegistrationConfirmation(
     'birthRegistrationNotification',
     {
       name: payload.name,
-      trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
+      trackingId: payload.trackingId
     }
   )
   return h.response().code(200)
