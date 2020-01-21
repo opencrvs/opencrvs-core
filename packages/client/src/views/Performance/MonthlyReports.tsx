@@ -15,7 +15,11 @@ import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import {
+  ListTable,
+  LocationSearch,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
@@ -27,9 +31,14 @@ import { Header, getMonthDateRange } from '@client/views/Performance/utils'
 import { getToken } from '@client/utils/authUtils'
 import styled from '@client/styledComponents'
 import { Event } from '@client/forms'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { generateLocations } from '@client/utils/locationUtils'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
+  offlineResources: IOfflineData
 }
 
 const Actions = styled.div`
@@ -55,9 +64,17 @@ function downloadAllData() {
 
 type Props = ReportProps & WrappedComponentProps
 
-type State = {}
+interface IState {
+  selectedLocation: ISearchLocation | undefined
+}
 
-class MonthlyReportsComponent extends React.Component<Props, State> {
+class MonthlyReportsComponent extends React.Component<Props, IState> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      selectedLocation: undefined
+    }
+  }
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
     let content = []
@@ -73,12 +90,14 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
+                this.state.selectedLocation!,
                 PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()
               )
             }
+            disabled={!this.state.selectedLocation}
           >
             {title}
           </LinkButton>
@@ -95,11 +114,20 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl } = this.props
+    const { intl, offlineResources } = this.props
 
     return (
       <>
         <Header>{intl.formatMessage(messages.monthlyReportsBodyHeader)}</Header>
+
+        <LocationSearch
+          locationList={generateLocations(offlineResources.locations)}
+          searchHandler={item => {
+            this.setState({
+              selectedLocation: item
+            })
+          }}
+        />
 
         <ListTable
           tableTitle={intl.formatMessage(constantsMessages.birth)}
@@ -158,8 +186,14 @@ class MonthlyReportsComponent extends React.Component<Props, State> {
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  return {
+    offlineResources: getOfflineData(state)
+  }
+}
+
 export const MonthlyReports = connect(
-  null,
+  mapStateToProps,
   {
     goToPerformanceReport
   }

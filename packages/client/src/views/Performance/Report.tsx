@@ -62,6 +62,7 @@ const ReportWrapper = styled.div`
 `
 
 interface ReportProps {
+  selectedLocation: ISearchLocation
   timeRange: { start: Date; end: Date }
   reportType: string
   eventType: Event
@@ -79,6 +80,7 @@ type Props = ReportProps &
     {},
     {},
     {
+      selectedLocation: ISearchLocation
       reportType: string
       eventType: Event
       timeRange: { start: Date; end: Date }
@@ -86,10 +88,9 @@ type Props = ReportProps &
   >
 
 function ReportComponent(props: Props) {
-  const [
-    selectedLocation,
-    setSelectedLocation
-  ] = React.useState<ISearchLocation | null>(null)
+  const [selectedLocation, setSelectedLocation] = React.useState<
+    ISearchLocation
+  >(props.selectedLocation)
   const { reportType, timeRange, intl, eventType } = props
   const { start, end } = timeRange
 
@@ -110,83 +111,79 @@ function ReportComponent(props: Props) {
           setSelectedLocation(item)
         }}
       />
-      {selectedLocation && (
-        <Query
-          query={PERFORMANCE_METRICS}
-          variables={{
-            event: eventType,
-            timeStart: start.toISOString(),
-            timeEnd: end.toISOString(),
-            locationId: selectedLocation.id
-          }}
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: boolean
-            error?: ApolloError
-            data?: IMetricsQueryResult
-          }) => {
-            if (
-              !loading &&
-              isEmpty(
-                get(data, 'fetchRegistrationMetrics.timeFrames.details')
-              ) &&
-              isEmpty(
-                get(data, 'fetchRegistrationMetrics.genderBasisMetrics.details')
-              ) &&
-              isEmpty(get(data, 'fetchRegistrationMetrics.payments.details'))
-            ) {
-              return (
-                <NoResultMessage
-                  id="reports"
-                  searchedLocation={selectedLocation.displayLabel}
+      <Query
+        query={PERFORMANCE_METRICS}
+        variables={{
+          event: eventType,
+          timeStart: start.toISOString(),
+          timeEnd: end.toISOString(),
+          locationId: selectedLocation.id
+        }}
+      >
+        {({
+          loading,
+          error,
+          data
+        }: {
+          loading: boolean
+          error?: ApolloError
+          data?: IMetricsQueryResult
+        }) => {
+          if (
+            !loading &&
+            isEmpty(get(data, 'fetchRegistrationMetrics.timeFrames.details')) &&
+            isEmpty(
+              get(data, 'fetchRegistrationMetrics.genderBasisMetrics.details')
+            ) &&
+            isEmpty(get(data, 'fetchRegistrationMetrics.payments.details'))
+          ) {
+            return (
+              <NoResultMessage
+                id="reports"
+                searchedLocation={selectedLocation.displayLabel}
+              />
+            )
+          } else {
+            return (
+              <ReportWrapper>
+                <GenderBasisReports
+                  eventType={eventType}
+                  loading={loading}
+                  genderBasisMetrics={
+                    (data &&
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
+                    {}
+                  }
                 />
-              )
-            } else {
-              return (
-                <ReportWrapper>
-                  <GenderBasisReports
-                    eventType={eventType}
-                    loading={loading}
-                    genderBasisMetrics={
-                      (data &&
-                        (data.fetchRegistrationMetrics &&
-                          (data.fetchRegistrationMetrics
-                            .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
-                      {}
-                    }
-                  />
-                  <TimeFrameReports
-                    eventType={eventType}
-                    loading={loading}
-                    data={
-                      (data &&
-                        (data.fetchRegistrationMetrics &&
-                          (data.fetchRegistrationMetrics
-                            .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
-                      {}
-                    }
-                  />
-                  <CertificationPaymentReports
-                    eventType={eventType}
-                    loading={loading}
-                    data={
-                      (data &&
-                        (data.fetchRegistrationMetrics &&
-                          (data.fetchRegistrationMetrics
-                            .payments as GQLCertificationPaymentMetrics))) ||
-                      {}
-                    }
-                  />
-                </ReportWrapper>
-              )
-            }
-          }}
-        </Query>
-      )}
+                <TimeFrameReports
+                  eventType={eventType}
+                  loading={loading}
+                  data={
+                    (data &&
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
+                    {}
+                  }
+                />
+                <CertificationPaymentReports
+                  eventType={eventType}
+                  loading={loading}
+                  data={
+                    (data &&
+                      (data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .payments as GQLCertificationPaymentMetrics))) ||
+                    {}
+                  }
+                />
+              </ReportWrapper>
+            )
+          }
+        }}
+      </Query>
     </PerformanceContentWrapper>
   )
 }
@@ -201,6 +198,7 @@ function mapStateToProps(state: IStoreState, props: Props) {
       start: new Date(),
       end: new Date()
     },
+    selectedLocation: props.location.state!.selectedLocation,
     offlineResources: getOfflineData(state)
   }
 }
