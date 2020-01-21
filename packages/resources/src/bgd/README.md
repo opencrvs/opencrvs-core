@@ -107,6 +107,12 @@ We are using some data types and they maintain a hierarchical relation between t
 - 26. **`hideInPreview?:`** Setting this property true hides this field in the review page, although the value still persists in the form data.
 - 27. **`ignoreNestedFieldWrappingInPreview?:`** If it is set to `true`, it ignores nested field wrapping when transforming the value.
 - 28. **`ignoreFieldLabelOnErrorMessage?:`** It is set to `true`, the fields of a preview group do not show their respective error messages if they have, they show a collective error message instead.
+- 29. **`reviewOverrides?:`** This block of configuration is used if we want display a field from one section with another section on the review section. This only affects the review screen, not the section pages view. This configuration consists of total 8 proiperties.
+  - **`residingSection:`** ID of the section the field actually belongs to.
+  - **`reference:`** This is basically the location where we want the field to appear on the review screen. Reference object consist of `sectionID`, `groupID`, `fieldName`.
+  - **`position:`** Optional property, the value of `position` should be either `before` or `after`. It decides either our element appears before the reference element of after.
+  - **`labelAs:`** An optional propoerty, Just incase we want to change the label as well.
+  - **`conditionals:`** Optional property. Same as any other condition, but this condition applies should the element be displayed on the new location or not. It satisfied it will be displayed to the new location other wise it not change it's location.
 
 # Properties of register.json
 
