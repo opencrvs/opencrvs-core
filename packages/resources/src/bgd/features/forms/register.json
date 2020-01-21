@@ -5079,7 +5079,13 @@
                         "defaultMessage": "Legal guardian",
                         "description": "label for Legal guardian radio button",
                         "id": "form.field.label.caregiver.legalGuardian"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "INFORMANT",
