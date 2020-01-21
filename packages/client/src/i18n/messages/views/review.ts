@@ -234,7 +234,7 @@ const messagesToDefine: IReviewMessages = {
     description: 'Header title that shows bgd govt name'
   },
   documentForWhom: {
-    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents'}}`,
+    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents' } parent {Parents' }}`,
     description: 'Describes for whom the document has been uploaded',
     id: 'review.documents.documentForWhom'
   }
