@@ -4723,7 +4723,7 @@
         {
           "id": "primaryCaregiver",
           "viewType": "form",
-          "hasDocumentSection": "true",
+          "hasDocumentSection": true,
           "name": {
             "defaultMessage": "Parents details",
             "description": "Form section name or title for primary caregiver",

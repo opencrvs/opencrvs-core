@@ -30,6 +30,7 @@
                 }
               ],
               "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "applicant",
@@ -89,6 +90,14 @@
                         "defaultMessage": "Other family member",
                         "description": "Option for form field: Other family member",
                         "id": "form.field.label.relationOtherFamilyMember"
+                      }
+                    },
+                    {
+                      "value": "LEGAL_GUARDIAN",
+                      "label": {
+                        "defaultMessage": "Legal guardian",
+                        "description": "Option for form field: Legal guardian",
+                        "id": "register.selectinformant.legalGuardian"
                       }
                     },
                     {
@@ -166,6 +175,7 @@
                         }
                       }
                     ],
+                    "LEGAL_GUARDIAN": [],
                     "INSTITUTION_HEAD_PLACE_OF_BIRTH": [],
                     "HOUSE_OWNER": [],
                     "OPERATOR": [],
@@ -226,6 +236,8 @@
                   "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== \"BOTH_PARENTS\" || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
                 }
               ],
+              "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "fields": [
                 {
                   "name": "paragraph",
@@ -296,13 +308,15 @@
                 "id": "register.SelectContactPoint.heading"
               },
               "conditionals": [],
+              "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "previewGroups": [
                 {
                   "id": "contactPointGroup",
                   "label": {
                     "defaultMessage": "Main Contact",
                     "description": "Label for form field: Place of delivery",
-                    "id": "form.field.label.placeOfBirths"
+                    "id": "form.field.label.application.mainContact"
                   },
                   "required": false,
                   "initialValue": "",
@@ -312,17 +326,71 @@
               "fields": [
                 {
                   "name": "presentAtBirthRegistration",
-                  "type": "TEXT",
+                  "type": "RADIO_GROUP",
                   "required": true,
                   "readonly": true,
                   "hidden": true,
-                  "hideInPreview": true,
+                  "hideInPreview": false,
                   "initialValue": "",
                   "validate": [],
+                  "options": [
+                    {
+                      "value": "MOTHER",
+                      "label": {
+                        "defaultMessage": "Mother",
+                        "description": "Label for option Mother",
+                        "id": "form.field.label.applicantRelation.mother"
+                      }
+                    },
+                    {
+                      "value": "FATHER",
+                      "label": {
+                        "defaultMessage": "Father",
+                        "description": "Label for option Father",
+                        "id": "form.field.label.applicantRelation.father"
+                      }
+                    },
+                    {
+                      "value": "BOTH_PARENTS",
+                      "label": {
+                        "id": "register.selectInformant.parents",
+                        "defaultMessage": "Mother & Father",
+                        "description": "The description that appears when selecting the parent as informant"
+                      }
+                    },
+                    {
+                      "value": "OTHER",
+                      "label": {
+                        "defaultMessage": "Someone else",
+                        "description": "Other Label",
+                        "id": "form.field.label.someoneElse"
+                      }
+                    }
+                  ],
                   "label": {
                     "defaultMessage": "Who is present for the birth registration?",
                     "description": "Form section title for contact point",
                     "id": "form.field.label.application.whoIsPresent"
+                  },
+                  "reviewOverrides": {
+                    "residingSection": "registration",
+                    "reference": {
+                      "sectionID": "registration",
+                      "groupID": "contact-view-group",
+                      "fieldName": "contactPoint"
+                    },
+                    "position": "before",
+                    "labelAs": {
+                      "defaultMessage": "Who is the applicant?",
+                      "description": "Form section title for contact point",
+                      "id": "register.selectInformant.relation"
+                    },
+                    "conditionals": [
+                      {
+                        "action": "hide",
+                        "expression": "(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration === \"OTHER\")"
+                      }
+                    ]
                   },
                   "mapping": {
                     "mutation": {
@@ -383,11 +451,12 @@
                   "label": {
                     "defaultMessage": " ",
                     "description": "Form section title for contact point",
-                    "id": "register.SelectContactPoint.headings"
+                    "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
                   "previewGroup": "contactPointGroup",
-                  "required": false,
+                  "required": true,
+                  "hideHeader": true,
                   "initialValue": "",
                   "validate": [],
                   "size": "large",
@@ -407,7 +476,7 @@
                       "conditionals": [
                         {
                           "action": "hide",
-                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"LEGAL_GUARDIAN\")"
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== \"OTHER\")"
                         }
                       ]
                     },
@@ -417,7 +486,13 @@
                         "defaultMessage": "Mother",
                         "description": "Label for \"Mother\" radio option",
                         "id": "form.field.label.application.whoseContactDetails.mother"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "FATHER",
@@ -425,7 +500,13 @@
                         "defaultMessage": "Father",
                         "description": "Label for \"Father\" radio option",
                         "id": "form.field.label.application.whoseContactDetails.father"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration === \"OTHER\" && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "OTHER",
@@ -585,7 +666,17 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "changeHirerchyMutationTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          },
+                          "query": {
+                            "operation": "changeHirerchyQueryTransformer",
+                            "parameters": ["registration.contactRelationship"]
+                          }
+                        }
                       },
                       {
                         "name": "registrationPhone",
@@ -789,7 +880,7 @@
                   "initialValue": "",
                   "validate": [
                     {
-                      "operation": "isValidBirthDate"
+                      "operation": "isValidChildBirthDate"
                     }
                   ],
                   "mapping": {
@@ -1017,13 +1108,13 @@
                 {
                   "name": "placeOfBirth",
                   "type": "SELECT_WITH_OPTIONS",
+                  "previewGroup": "placeOfBirth",
+                  "ignoreFieldLabelOnErrorMessage": true,
                   "label": {
                     "defaultMessage": "Place of delivery",
                     "description": "Label for form field: Place of delivery",
                     "id": "form.field.label.placeOfBirth"
                   },
-                  "previewGroup": "placeOfBirth",
-                  "ignoreFieldLabelOnErrorMessage": true,
                   "required": true,
                   "initialValue": "",
                   "validate": [],
@@ -1589,6 +1680,263 @@
                     "query": {
                       "operation": "eventLocationQueryTransformer",
                       "parameters": [5]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalState",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "State",
+                    "description": "Title for the international state select",
+                    "id": "form.field.label.internationalState"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "state"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [
+                        0,
+                        "state",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalDistrict",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the international district select",
+                    "id": "form.field.label.internationalDistrict"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "district"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [
+                        0,
+                        "district",
+                        {
+                          "fieldsToIgnoreForLocalAddress": [
+                            "internationalDistrict",
+                            "internationalState"
+                          ],
+                          "fieldsToIgnoreForInternationalAddress": [
+                            "district",
+                            "state"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalCity",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "City / Town",
+                    "description": "Title for the international city select",
+                    "id": "form.field.label.internationalCity"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "city"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "city"]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine1",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 1",
+                    "description": "Title for the international address line 1 select",
+                    "id": "form.field.label.internationalAddressLine1"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [7]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [7]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine2",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 2",
+                    "description": "Title for the international address line 2 select",
+                    "id": "form.field.label.internationalAddressLine2"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [8]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [8]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine3",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 3",
+                    "description": "Title for the international address line 3 select",
+                    "id": "form.field.label.internationalAddressLine3"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [9]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [9]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalPostcode",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Postcode / Zip",
+                    "description": "Title for the international postcode",
+                    "id": "form.field.label.internationalPostcode"
+                  },
+                  "previewGroup": "placeOfBirth",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.country)"
+                    },
+                    {
+                      "action": "hide",
+                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "birthEventLocationMutationTransformer",
+                      "parameters": [0, "postalCode"]
+                    },
+                    "query": {
+                      "operation": "eventLocationQueryTransformer",
+                      "parameters": [0, "postalCode"]
                     }
                   }
                 }
@@ -2358,6 +2706,300 @@
                       ]
                     }
                   }
+                },
+                {
+                  "name": "internationalStatePermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "State",
+                    "description": "Title for the international state select",
+                    "id": "form.field.label.internationalState"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 0, "state"]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 0, "state"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalDistrictPermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "District",
+                    "description": "Title for the international district select",
+                    "id": "form.field.label.internationalDistrict"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 0, "district"]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 0, "district"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalCityPermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "City / Town",
+                    "description": "Title for the international city select",
+                    "id": "form.field.label.internationalCity"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 0, "city"]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 0, "city"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine1Permanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 1",
+                    "description": "Title for the international address line 1 select",
+                    "id": "form.field.label.internationalAddressLine1"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 7]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 7]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine2Permanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 2",
+                    "description": "Title for the international address line 2 select",
+                    "id": "form.field.label.internationalAddressLine2"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 8]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 8]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalAddressLine3Permanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Address Line 3",
+                    "description": "Title for the international address line 3 select",
+                    "id": "form.field.label.internationalAddressLine3"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 9]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 9]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "internationalPostcodePermanent",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Postcode / Zip",
+                    "description": "Title for the international postcode",
+                    "id": "form.field.label.internationalPostcode"
+                  },
+                  "previewGroup": "permanentAddress",
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "isDefaultCountry(values.countryPermanent)"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldValueNestingTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "fieldToAddressTransformer",
+                          "parameters": ["PERMANENT", 0, "postalCode"]
+                        },
+                        "address"
+                      ]
+                    },
+                    "query": {
+                      "operation": "nestedValueToFieldTransformer",
+                      "parameters": [
+                        "individual",
+                        {
+                          "operation": "addressToFieldTransformer",
+                          "parameters": ["PERMANENT", 0, "postalCode"]
+                        }
+                      ]
+                    }
+                  }
                 }
               ],
               "previewGroups": [
@@ -2483,7 +3125,7 @@
                   "name": "reasonMotherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
@@ -2527,6 +3169,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"MOTHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "MOTHER",
                   "required": false,
@@ -2567,7 +3215,7 @@
                   "name": "reasonFatherNotApplying",
                   "conditionals": [
                     {
-                      "action": "hide",
+                      "action": "disable",
                       "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === [\"deceased\"].toString())"
                     }
                   ],
@@ -2611,6 +3259,12 @@
                     "id": "print.certificate.noLabel"
                   },
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === \"FATHER\")"
+                    }
+                  ],
                   "initialValue": [],
                   "extraValue": "FATHER",
                   "required": false,
@@ -2739,7 +3393,13 @@
                         "defaultMessage": "Legal guardian",
                         "description": "label for Legal guardian radio button",
                         "id": "form.field.label.caregiver.legalGuardian"
-                      }
+                      },
+                      "conditionals": [
+                        {
+                          "action": "hide",
+                          "expression": "(draftData && draftData.registration && draftData.registration.applicant && draftData.registration.applicant.value === \"LEGAL_GUARDIAN\")"
+                        }
+                      ]
                     },
                     {
                       "value": "INFORMANT",
@@ -3074,263 +3734,6 @@
                           ]
                         }
                       ]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalState",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "State",
-                    "description": "Title for the international state select",
-                    "id": "form.field.label.internationalState"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [0, "state"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        0,
-                        "state",
-                        {
-                          "fieldsToIgnoreForLocalAddress": [
-                            "internationalDistrict",
-                            "internationalState"
-                          ],
-                          "fieldsToIgnoreForInternationalAddress": [
-                            "district",
-                            "state"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalDistrict",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "District",
-                    "description": "Title for the international district select",
-                    "id": "form.field.label.internationalDistrict"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [0, "district"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [
-                        0,
-                        "district",
-                        {
-                          "fieldsToIgnoreForLocalAddress": [
-                            "internationalDistrict",
-                            "internationalState"
-                          ],
-                          "fieldsToIgnoreForInternationalAddress": [
-                            "district",
-                            "state"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalCity",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "City / Town",
-                    "description": "Title for the international city select",
-                    "id": "form.field.label.internationalCity"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [0, "city"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "city"]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalAddressLine1",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Address Line 1",
-                    "description": "Title for the international address line 1 select",
-                    "id": "form.field.label.internationalAddressLine1"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [8]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [8]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalAddressLine2",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Address Line 2",
-                    "description": "Title for the international address line 2 select",
-                    "id": "form.field.label.internationalAddressLine2"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [9]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [9]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalAddressLine3",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Address Line 3",
-                    "description": "Title for the international address line 3 select",
-                    "id": "form.field.label.internationalAddressLine3"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [10]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [10]
-                    }
-                  }
-                },
-                {
-                  "name": "internationalPostcode",
-                  "type": "TEXT",
-                  "label": {
-                    "defaultMessage": "Postcode / Zip",
-                    "description": "Title for the international postcode",
-                    "id": "form.field.label.internationalPostcode"
-                  },
-                  "previewGroup": "placeOfBirth",
-                  "required": false,
-                  "initialValue": "",
-                  "validate": [],
-                  "conditionals": [
-                    {
-                      "action": "hide",
-                      "expression": "isDefaultCountry(values.country)"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
-                    }
-                  ],
-                  "mapping": {
-                    "mutation": {
-                      "operation": "birthEventLocationMutationTransformer",
-                      "parameters": [0, "postalCode"]
-                    },
-                    "query": {
-                      "operation": "eventLocationQueryTransformer",
-                      "parameters": [0, "postalCode"]
                     }
                   }
                 }
@@ -4986,11 +5389,11 @@
                   "mapping": {
                     "mutation": {
                       "operation": "fieldToAddressTransformer",
-                      "parameters": ["CURRENT", 0, "country"]
+                      "parameters": ["CURRENT"]
                     },
                     "query": {
                       "operation": "addressToFieldTransformer",
-                      "parameters": ["CURRENT", 0, "country"]
+                      "parameters": ["CURRENT"]
                     }
                   }
                 },
@@ -7149,7 +7552,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
                     }
                   ],
                   "mapping": {
@@ -7195,7 +7598,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"FATHER_ONLY\")"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
                     }
                   ],
                   "mapping": {
@@ -7377,6 +7780,8 @@
                   "expression": "(!draftData || !draftData.informant || ![\"OTHER\", \"OFFICER_IN_CHARGE\", \"DRIVER_OF_THE_VEHICLE\", \"OWNER_OF_THE_HOUSE\", \"HEAD_OF_THE_INSTITUTE\"].includes(draftData.informant.relationship))"
                 }
               ],
+              "showExitButtonOnly": true,
+              "preventContinueIfError": true,
               "fields": [
                 {
                   "name": "relationship",
@@ -7489,6 +7894,8 @@
                 "description": "Form section title for contact point",
                 "id": "register.SelectContactPoint.heading"
               },
+              "preventContinueIfError": true,
+              "showExitButtonOnly": true,
               "conditionals": [],
               "fields": [
                 {
@@ -7500,7 +7907,6 @@
                     "id": "register.SelectContactPoint.heading"
                   },
                   "conditionals": [],
-                  "preventContinueIfError": true,
                   "hideHeader": true,
                   "required": true,
                   "initialValue": "",
@@ -10947,6 +11353,349 @@
           }
         },
         {
+          "id": "father",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "What is the deceased's father name?",
+            "description": "Form section name for father section",
+            "id": "form.section.deceased.father.name"
+          },
+          "title": {
+            "defaultMessage": "Father's details",
+            "description": "Form section name for father section",
+            "id": "form.section.deceased.father.title"
+          },
+          "groups": [
+            {
+              "id": "father-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"FATHER\")"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "fatherFirstNamesEng",
+                  "previewGroup": "fatherNameInEnglish",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in English",
+                    "description": "Label for form field: Given names in english",
+                    "id": "form.field.label.deceasedFathersGivenNamesEng"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "fatherFamilyNameEng",
+                  "previewGroup": "fatherNameInEnglish",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in English",
+                    "description": "Label for form field: Family name in english",
+                    "id": "form.field.label.deceasedFathersFamilyNameEng"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "familyName"]
+                    }
+                  }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "fatherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Father's English name",
+                    "description": "Group label for father's name in english",
+                    "id": "form.preview.group.label.father.english.name"
+                  },
+                  "fieldToRedirect": "fatherFamilyNameEng",
+                  "delimiter": " "
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mother",
+          "viewType": "form",
+          "name": {
+            "defaultMessage": "What is the deceased's mother name?",
+            "description": "Form section name for mother section",
+            "id": "form.section.deceased.mother.name"
+          },
+          "title": {
+            "defaultMessage": "Mother's details",
+            "description": "Form section name for mother section",
+            "id": "form.section.deceased.mother.title"
+          },
+          "groups": [
+            {
+              "id": "mother-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"MOTHER\")"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "motherFirstNamesEng",
+                  "previewGroup": "motherNameInEnglish",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "First Name(s) in English",
+                    "description": "Label for form field: Given names in english",
+                    "id": "form.field.label.deceasedMothersGivenNamesEng"
+                  },
+                  "required": false,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "firstNames"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "firstNames"]
+                    }
+                  }
+                },
+                {
+                  "name": "motherFamilyNameEng",
+                  "previewGroup": "motherNameInEnglish",
+                  "type": "TEXT",
+                  "label": {
+                    "defaultMessage": "Last Name(s) in English",
+                    "description": "Label for form field: Family name in english",
+                    "id": "form.field.label.deceasedMothersFamilyNameEng"
+                  },
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [
+                    {
+                      "operation": "englishOnlyNameFormat"
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "fieldToNameTransformer",
+                      "parameters": ["en", "familyName"]
+                    },
+                    "query": {
+                      "operation": "nameToFieldTransformer",
+                      "parameters": ["en", "familyName"]
+                    }
+                  }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "motherNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Mother's English name",
+                    "description": "Group label for mother's name in english",
+                    "id": "form.preview.group.label.mother.english.name"
+                  },
+                  "fieldToRedirect": "motherFamilyNameEng",
+                  "delimiter": " "
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "spouse",
+          "viewType": "form",
+          "title": {
+            "defaultMessage": "Spouse's details",
+            "description": "Form section title for spouse section",
+            "id": "form.section.deceased.spouse.title"
+          },
+          "groups": [
+            {
+              "id": "spouse-view-group",
+              "conditionals": [
+                {
+                  "action": "hide",
+                  "expression": "(draftData && draftData.informant && draftData.informant.relationship === \"SPOUSE\")"
+                }
+              ],
+              "fields": [
+                {
+                  "name": "hasDetails",
+                  "type": "RADIO_GROUP_WITH_NESTED_FIELDS",
+                  "label": {
+                    "defaultMessage": "Does the deceased have a spouse?",
+                    "description": "Form section title for spouse section",
+                    "id": "form.section.deceased.spouse.name"
+                  },
+                  "hideHeader": true,
+                  "size": "large",
+                  "required": true,
+                  "initialValue": "",
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "Yes",
+                      "label": {
+                        "defaultMessage": "Yes",
+                        "description": "Option for form field: Deceased has spouse",
+                        "id": "form.section.deceased.hasSpouse"
+                      }
+                    },
+                    {
+                      "value": "No",
+                      "label": {
+                        "defaultMessage": "No / Unknown",
+                        "description": "Option for form field: Deceased doesn't have spouse",
+                        "id": "form.section.deceased.noSpouse"
+                      }
+                    }
+                  ],
+                  "nestedFields": {
+                    "Yes": [
+                      {
+                        "name": "spouseFirstNamesEng",
+                        "previewGroup": "spouseNameInEnglish",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "First Name(s) in English",
+                          "description": "Label for form field: Given names in english",
+                          "id": "form.field.label.deceasedSpousesGivenNamesEng"
+                        },
+                        "required": false,
+                        "initialValue": "",
+                        "extraValue": "Yes",
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "firstNames"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["en", "firstNames"]
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "spouseFamilyNameEng",
+                        "previewGroup": "spouseNameInEnglish",
+                        "type": "TEXT",
+                        "label": {
+                          "defaultMessage": "Last Name(s) in English",
+                          "description": "Label for form field: Family name in english",
+                          "id": "form.field.label.deceasedSpousesFamilyNameEng"
+                        },
+                        "required": true,
+                        "initialValue": "",
+                        "extraValue": "Yes",
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ],
+                        "mapping": {
+                          "mutation": {
+                            "operation": "nestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "fieldToNameTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          },
+                          "query": {
+                            "operation": "valueToNestedRadioFieldTransformer",
+                            "parameters": [
+                              {
+                                "operation": "nameToFieldTransformer",
+                                "parameters": ["en", "familyName"]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ],
+                    "No": []
+                  },
+                  "ignoreNestedFieldWrappingInPreview": true,
+                  "conditionals": [],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "ignoreFieldTransformer"
+                    },
+                    "query": {
+                      "operation": "hasSpouseDetailsTransformer"
+                    }
+                  }
+                }
+              ],
+              "previewGroups": [
+                {
+                  "id": "spouseNameInEnglish",
+                  "label": {
+                    "defaultMessage": "Spouse's English name",
+                    "description": "Group label for spouse's name in english",
+                    "id": "form.preview.group.label.spouse.english.name"
+                  },
+                  "fieldToRedirect": "spouseFamilyNameEng",
+                  "delimiter": " "
+                }
+              ]
+            }
+          ]
+        },
+        {
           "id": "documents",
           "viewType": "form",
           "name": {
@@ -10973,6 +11722,62 @@
                   },
                   "initialValue": "",
                   "validate": []
+                },
+
+                {
+                  "name": "uploadDocForDeceased",
+                  "type": "DOCUMENT_UPLOADER_WITH_OPTION",
+                  "label": {
+                    "defaultMessage": "Proof of deceased's ID",
+                    "description": "Option for radio group field: Type of Document To Upload",
+                    "id": "form.field.label.deceasedIDProof"
+                  },
+                  "initialValue": "",
+                  "extraValue": "DECEASED_ID_PROOF",
+                  "hideAsterisk": true,
+                  "validate": [],
+                  "options": [
+                    {
+                      "value": "National ID (front)",
+                      "label": {
+                        "defaultMessage": "National ID (Front)",
+                        "description": "Label for select option radio option NID front",
+                        "id": "form.field.label.docTypeNIDFront"
+                      }
+                    },
+                    {
+                      "value": "National ID (back)",
+                      "label": {
+                        "defaultMessage": "National ID (Back)",
+                        "description": "Label for select option radio option NID back",
+                        "id": "form.field.label.docTypeNIDBack"
+                      }
+                    },
+                    {
+                      "value": "Birth Registration",
+                      "label": {
+                        "defaultMessage": "Birth registration certificate",
+                        "description": "Label for select option Birth Registration",
+                        "id": "form.field.label.docTypeBR"
+                      }
+                    },
+                    {
+                      "value": "Passport",
+                      "label": {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "form.field.label.docTypePassport"
+                      }
+                    }
+                  ],
+                  "mapping": {
+                    "mutation": {
+                      "operation": "deathFieldToAttachmentTransformer"
+                    },
+                    "query": {
+                      "operation": "deathAttachmentToFieldTransformer"
+                    }
+                  }
                 },
                 {
                   "name": "uploadDocForApplicant",
@@ -11001,6 +11806,22 @@
                         "defaultMessage": "Back of national ID",
                         "description": "Label for select option radio option NID back",
                         "id": "form.field.label.docTypeNIDBack"
+                      }
+                    },
+                    {
+                      "value": "Birth Registration",
+                      "label": {
+                        "defaultMessage": "Birth registration certificate",
+                        "description": "Label for select option Birth Registration",
+                        "id": "form.field.label.docTypeBR"
+                      }
+                    },
+                    {
+                      "value": "Passport",
+                      "label": {
+                        "defaultMessage": "Passport",
+                        "description": "Label for radio option Passport",
+                        "id": "form.field.label.docTypePassport"
                       }
                     }
                   ],
@@ -11032,6 +11853,54 @@
                         "defaultMessage": "Police brought in dead certificate",
                         "description": "Label for select option Police brought in dead certificate",
                         "id": "form.field.label.docTypePoliceBroughtInDeathCertificate"
+                      }
+                    },
+                    {
+                      "value": "Certified Post Mortem Report",
+                      "label": {
+                        "defaultMessage": "Certified post mortem report",
+                        "description": "Label for select option Post Mortem Report",
+                        "id": "form.field.label.docTypePostMortemReport"
+                      }
+                    },
+                    {
+                      "value": "Hospital Discharge Certificate",
+                      "label": {
+                        "defaultMessage": "Hospital discharge certificate",
+                        "description": "Label for select option Hospital Discharge Certificate",
+                        "id": "form.field.label.docTypeHospitalDischargeCertificate"
+                      }
+                    },
+                    {
+                      "value": "Attested Letter of Death",
+                      "label": {
+                        "defaultMessage": "Attested letter of death",
+                        "description": "Label for select option Attested Letter of Death",
+                        "id": "form.field.label.docTypeLetterOfDeath"
+                      }
+                    },
+                    {
+                      "value": "Attested Certificate of Death",
+                      "label": {
+                        "defaultMessage": "Attested certificate of death",
+                        "description": "Label for select option Attested Certificate of Death",
+                        "id": "form.field.label.docTypeDeathCertificate"
+                      }
+                    },
+                    {
+                      "value": "Certified Copy of Burial Receipt",
+                      "label": {
+                        "defaultMessage": "Certified copy of burial receipt",
+                        "description": "Label for select option Certified Copy of Burial Receipt",
+                        "id": "form.field.label.docTypeCopyOfBurialReceipt"
+                      }
+                    },
+                    {
+                      "value": "Certified Copy of Funeral Receipt",
+                      "label": {
+                        "defaultMessage": "Certified copy of funeral receipt",
+                        "description": "Label for select option Certified Copy of Funeral Receipt",
+                        "id": "form.field.label.docTypeFuneralReceipt"
                       }
                     },
                     {
