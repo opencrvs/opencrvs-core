@@ -460,7 +460,7 @@
         "duplicates.details.notDuplicate": "Not a duplicate?",
         "duplicates.duplicateFoundDescription": "The following application has been flagged as a possible duplicate of an existing registered record.",
         "duplicates.duplicateFoundTitle": "Possible duplicate found",
-        "duplicates.modal.reject": "Are you sure you want to reject this application for being a duplicate ?",
+        "duplicates.modal.reject": "Are you sure you want to reject this application for being a duplicate?",
         "duplicates.notDuplicate.modal.confirmationText": "Are you sure this is not a duplicate application?",
         "duplicates.possibleDuplicateFound": "Possible duplicate",
         "duplicates.queryError": "An error occurred while fetching data",
