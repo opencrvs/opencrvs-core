@@ -13,8 +13,11 @@ import fetch from 'node-fetch'
 import { FHIR_URL } from '@resources/constants'
 import { A2I_LOCATION_REFERENCE_IDENTIFIER } from '@resources/bgd/features/administrative/scripts/service'
 import { internal } from 'boom'
+import {
+  getFromFhir,
+  OPENCRVS_SPECIFICATION_URL
+} from '@resources/utils/fhir-utils'
 
-export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const JURISDICTION_TYPE_DISTRICT = 'district'
 export const JURISDICTION_TYPE_UPAZILA = 'upazila'
 export const JURISDICTION_TYPE_UNION = 'union'
@@ -127,19 +130,6 @@ export function getA2iInternalRefIndentifierOfLocation(
       identifier => identifier.system === A2I_LOCATION_REFERENCE_IDENTIFIER
     )
   )
-}
-export const getFromFhir = (suffix: string) => {
-  return fetch(`${FHIR_URL}${suffix.startsWith('/') ? '' : '/'}${suffix}`, {
-    headers: {
-      'Content-Type': 'application/json+fhir'
-    }
-  })
-    .then(response => {
-      return response.json()
-    })
-    .catch(error => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
 }
 
 export function checkDuplicate(

@@ -10,13 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { OPENCRVS_SPECIFICATION_URL } from '@resources/bgd/features/utils'
-
+import fetch from 'node-fetch'
 export const CHILD_CODE = 'child-details'
 export const DECEASED_CODE = 'deceased-details'
+import { FHIR_URL } from '@resources/constants'
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
+}
+
+export interface ILocation {
+  id?: string
+  name?: string
+  alias?: string
+  physicalType?: string
+  jurisdictionType?: string
+  type?: string
+  partOf?: string
 }
 
 export function getTaskResource(
@@ -169,4 +181,18 @@ export function getSectionEntryBySectionCode(
     )
   }
   return personSection.entry[0]
+}
+
+export const getFromFhir = (suffix: string) => {
+  return fetch(`${FHIR_URL}${suffix.startsWith('/') ? '' : '/'}${suffix}`, {
+    headers: {
+      'Content-Type': 'application/json+fhir'
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
 }

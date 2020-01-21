@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ORG_URL } from '@resources/constants'
-import { getFromFhir, sendToFhir } from '@resources/bgd/features/utils'
+import { sendToFhir } from '@resources/bgd/features/utils'
+import { getFromFhir } from '@resources/utils/fhir-utils'
 import chalk from 'chalk'
 import { logger } from '@resources/logger'
 import User, { IUserModel } from '@opencrvs/user-mgnt/src/model/user'

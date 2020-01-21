@@ -18,9 +18,9 @@ import {
   IOISFLocationResponse,
   ILocation,
   titleCase,
-  getA2iInternalRefIndentifierOfLocation,
-  getFromFhir
+  getA2iInternalRefIndentifierOfLocation
 } from '@resources/bgd/features/utils'
+import { getFromFhir } from '@resources/utils/fhir-utils'
 import chalk from 'chalk'
 
 export const A2I_LOCATION_REFERENCE_IDENTIFIER = `${ORG_URL}/specs/id/a2i-internal-reference`

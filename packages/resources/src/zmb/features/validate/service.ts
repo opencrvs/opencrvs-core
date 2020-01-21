@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { generateRegistrationNumber } from '@resources/bgd/features/generate/service'
+import { generateRegistrationNumber } from '@resources/zmb/features/generate/service'
 import {
   getTaskResource,
   findExtension,
@@ -49,9 +49,6 @@ export async function createWebHookResponseFromBundle(bundle: fhir.Bundle) {
 
   return {
     trackingId,
-    registrationNumber: await generateRegistrationNumber(
-      practitioner.id,
-      bundle
-    )
+    registrationNumber: await generateRegistrationNumber(practitioner.id)
   }
 }

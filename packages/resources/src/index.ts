@@ -45,6 +45,7 @@ import {
 } from '@resources/zmb/features/generate/handler'
 import { bgdValidateRegistrationHandler } from '@resources/bgd/features/validate/handler'
 import { bgdBDRISQueueTriggerHandler } from '@resources/bgd/features/bdris-queue/handler'
+import { zmbValidateRegistrationHandler } from '@resources/zmb/features/validate/handler'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -215,6 +216,17 @@ export async function createServer() {
       tags: ['api'],
       description:
         'Serves definitional metadata like form definitions, language files and pdf templates'
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/zmb/validate/registration',
+    handler: zmbValidateRegistrationHandler,
+    options: {
+      tags: ['api'],
+      description:
+        'Validates a registration and if successful returns a BRN for that record'
     }
   })
 

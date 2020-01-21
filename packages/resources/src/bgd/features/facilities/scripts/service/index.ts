@@ -11,11 +11,8 @@
  */
 import { Response } from 'node-fetch'
 import { ORG_URL } from '@resources/constants'
-import {
-  sendToFhir,
-  ILocation,
-  getFromFhir
-} from '@resources/bgd/features/utils'
+import { sendToFhir, ILocation } from '@resources/bgd/features/utils'
+import { getFromFhir } from '@resources/utils/fhir-utils'
 import chalk from 'chalk'
 import { findBestMatch, BestMatch } from 'string-similarity'
 

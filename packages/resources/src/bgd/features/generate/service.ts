@@ -13,12 +13,14 @@ import {
   getPractitionerLocations,
   getPractitionerLocationId,
   convertNumberToString,
-  OPENCRVS_SPECIFICATION_URL,
   getJurisdictionalLocations,
   getRMOCode
 } from '@resources/bgd/features/utils'
 import { getNextLocationWiseSeqNumber } from '@resources/bgd/features/generate/sequenceNumbers/service'
-import { getEventDateFromBundle } from '@resources/bgd/features/utils/fhir-utils'
+import {
+  getEventDateFromBundle,
+  OPENCRVS_SPECIFICATION_URL
+} from '@resources/utils/fhir-utils'
 
 export async function generateRegistrationNumber(
   practionerId: string,
