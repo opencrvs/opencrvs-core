@@ -166,7 +166,6 @@ class RejectTabComponent extends React.Component<
         (foundApplication && foundApplication.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        // this.userHasRegisterScope() &&
         actions.push({
           actionComponent: (
             <DownloadButton
