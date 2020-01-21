@@ -649,7 +649,7 @@
         "form.field.label.fetchInformantDetails": "VERIFY NATIONAL ID",
         "form.field.label.fetchMotherDetails": "VERIFY NATIONAL ID",
         "form.field.label.fetchPersonByNIDModalErrorText": "National ID not found.  Please enter a valid National ID and date of birth.",
-        "form.field.label.fetchPersonByNIDModalNetworkErrorText": "Could not connect to the server because of low connectivity. Please try again.",
+        "form.field.label.fetchPersonByNIDModalNetworkErrorText": "The request to the NID system was unsuccessful. Please try again with a better connection.",
         "form.field.label.fetchPersonByNIDModalInfo": "National ID",
         "form.field.label.fetchRegistrationModalErrorText": "No registration found for provided BRN",
         "form.field.label.fetchRegistrationModalInfo": "Birth Registration Number",
