@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  TertiaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   ISelectOption as SelectComponentOptions,
@@ -18,7 +22,8 @@ import {
 import {
   DataSection,
   DocumentViewer,
-  IDocumentViewerOptions
+  IDocumentViewerOptions,
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
@@ -105,7 +110,6 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { BIRTH, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { EditConfirmation } from '@client/views/RegisterForm/review/EditConfirmation'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
@@ -1228,17 +1232,37 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             </ResponsiveDocumentViewer>
           </Column>
         </Row>
-        <EditConfirmation
+        <ResponsiveModal
+          title={intl.formatMessage(messages.editApplicationConfirmationTitle)}
+          contentHeight={96}
+          responsive={false}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={this.toggleDisplayDialog}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              id="edit_confirm"
+              key="submit"
+              onClick={() => {
+                this.editLinkClickHandlerForDraft(
+                  this.state.editClickedSectionId!,
+                  this.state.editClickedSectionGroupId,
+                  this.state.editClickFieldName!
+                )
+              }}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </PrimaryButton>
+          ]}
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
-          handleEdit={() => {
-            this.editLinkClickHandlerForDraft(
-              this.state.editClickedSectionId!,
-              this.state.editClickedSectionGroupId,
-              this.state.editClickFieldName!
-            )
-          }}
-        />
+        >
+          {intl.formatMessage(messages.editApplicationConfirmation)}
+        </ResponsiveModal>
       </FullBodyContent>
     )
   }

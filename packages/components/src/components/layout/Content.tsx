@@ -22,8 +22,11 @@ export const Content = styled.section`
 export const BodyContent = styled.div`
   max-width: 940px;
   margin: 64px auto 0;
-  padding: 16px 32px;
+  padding: 40px 32px;
   position: relative;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px 16px;
+  }
 `
 
 export const HomeContent = styled.div`
