@@ -36,7 +36,6 @@ import ScrollToTop from '@client/components/ScrollToTop'
 import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import { ConfirmationScreen } from '@client/views/ConfirmationScreen/ConfirmationScreen'
 import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { Details } from '@client/views/Home/Details'
 import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
@@ -203,10 +202,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.REGISTRAR_HOME_TAB}
                                             component={RegistrationHome}
-                                          />
-                                          <ProtectedRoute
-                                            path={routes.CONFIRMATION_SCREEN}
-                                            component={ConfirmationScreen}
                                           />
                                           <ProtectedRoute
                                             path={routes.SEARCH}
