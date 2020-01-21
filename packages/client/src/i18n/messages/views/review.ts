@@ -14,6 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IReviewMessages {
   additionalComments: MessageDescriptor
   backToPreview: MessageDescriptor
+  editApplicationConfirmationTitle: MessageDescriptor
   editApplicationConfirmation: MessageDescriptor
   editDocuments: MessageDescriptor
   formDataHeader: MessageDescriptor
@@ -83,8 +84,13 @@ const messagesToDefine: IReviewMessages = {
     description: 'Preview button on edit modal',
     id: 'review.edit.modal.backToPreview'
   },
+  editApplicationConfirmationTitle: {
+    defaultMessage: 'Edit application?',
+    description: 'Edit modal confirmation title',
+    id: 'review.edit.modal.confirmationTitle'
+  },
   editApplicationConfirmation: {
-    defaultMessage: 'Are you sure you want to edit the application?',
+    defaultMessage: 'A record will be created of any changes you make.',
     description: 'Edit modal confirmation text',
     id: 'review.edit.modal.confirmationText'
   },

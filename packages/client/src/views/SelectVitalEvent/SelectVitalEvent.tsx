@@ -39,12 +39,16 @@ import {
 } from '@client/utils/constants'
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 24px;
 `
 const Actions = styled.div`
-  padding: 32px 0;
+  padding-bottom: 24px;
   & > div {
     margin-bottom: 16px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-bottom: 16px;
   }
 `
 
