@@ -422,7 +422,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.applicantsDateOfBirth'
   },
   applicantsFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.applicantsFamilyName'
   },
@@ -432,7 +432,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.applicantsFamilyNameEng'
   },
   applicantsGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.applicantsGivenNames'
   },
@@ -610,7 +610,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.childDateOfBirth'
   },
   childFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.childFamilyName'
   },
@@ -620,7 +620,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.childFamilyNameEng'
   },
   childFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First names',
     id: 'form.field.label.childFirstNames'
   },
@@ -825,7 +825,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDoBProof'
   },
   deceasedFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedFamilyName'
   },
@@ -835,7 +835,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedFamilyNameEng'
   },
   deceasedGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedGivenNames'
   },
@@ -1091,7 +1091,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fatherEducationAttainment'
   },
   fatherFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.fatherFamilyName'
   },
@@ -1101,7 +1101,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fatherFamilyNameEng'
   },
   fatherFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First name',
     id: 'form.field.label.fatherFirstNames'
   },
@@ -1168,7 +1168,7 @@ const messagesToDefine: IFormMessages = {
   },
   fetchPersonByNIDModalNetworkErrorText: {
     defaultMessage:
-      'Could not connect to the server because of low connectivity. Please try again.',
+      'The request to the NID system was unsuccessful. Please try again with a better connection.',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
   },
@@ -1378,7 +1378,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.motherEducationAttainment'
   },
   motherFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.motherFamilyName'
   },
@@ -1388,7 +1388,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.motherFamilyNameEng'
   },
   motherFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First names',
     id: 'form.field.label.motherFirstNames'
   },
@@ -2022,7 +2022,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.father.title'
   },
   deceasedFathersFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedFathersFamilyName'
   },
@@ -2032,7 +2032,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedFathersFamilyNameEng'
   },
   deceasedFathersGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedFathersGivenNames'
   },
@@ -2052,7 +2052,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.mother.title'
   },
   deceasedMothersFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedMothersFamilyName'
   },
@@ -2062,7 +2062,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedMothersFamilyNameEng'
   },
   deceasedMothersGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedMothersGivenNames'
   },
@@ -2092,7 +2092,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.noSpouse'
   },
   deceasedSpousesFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedSpousesFamilyName'
   },
@@ -2102,7 +2102,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedSpousesFamilyNameEng'
   },
   deceasedSpousesGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedSpouseGivenNames'
   },

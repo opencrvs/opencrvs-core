@@ -17,13 +17,6 @@ services:
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
 
-  performance:
-    image: jembi/ocrvs-performance:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/performance/Dockerfile
-    restart: unless-stopped
-
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:

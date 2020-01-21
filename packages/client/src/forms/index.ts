@@ -329,6 +329,11 @@ export interface IAttachment {
   description?: string
 }
 
+export enum REVIEW_OVERRIDE_POSITION {
+  BEFORE = 'before',
+  AFTER = 'after'
+}
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -358,6 +363,17 @@ export interface IFormFieldBase {
   readonly?: boolean
   hideInPreview?: boolean
   ignoreNestedFieldWrappingInPreview?: boolean
+  reviewOverrides?: {
+    residingSection: string
+    reference: {
+      sectionID: string
+      groupID: string
+      fieldName: string
+    }
+    position?: REVIEW_OVERRIDE_POSITION
+    labelAs?: MessageDescriptor
+    conditionals?: IConditional[]
+  }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
 }

@@ -19,7 +19,6 @@ interface Window {
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
-    PERFORMANCE_URL: string
     RESOURCES_URL: string
     HEALTH_FACILITY_FILTER: string
     CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
