@@ -79,6 +79,7 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
         id
         type
         registration {
+          contactNumber
           trackingId
           dateOfApplication
           status
