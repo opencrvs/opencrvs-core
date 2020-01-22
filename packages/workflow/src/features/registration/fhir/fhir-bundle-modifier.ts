@@ -114,7 +114,7 @@ export async function markBundleAsValidated(
   return bundle
 }
 
-async function validateRegistration(bundle: fhir.Bundle, token: string) {
+export async function validateRegistration(bundle: fhir.Bundle, token: string) {
   try {
     fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
@@ -149,9 +149,6 @@ export async function markBundleAsWaitingValidation(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
-
-  // validate registration with resource service and set resulting registration number
-  validateRegistration(bundle, token)
 
   return bundle
 }
