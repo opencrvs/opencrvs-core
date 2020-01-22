@@ -26,7 +26,7 @@ export async function zmbValidateRegistrationHandler(
 
     const webHookResponse = await createWebHookResponseFromBundle(bundle)
 
-    // send web hook to workflow service to continue registration, don't wait for response
+    // This fetch can be moved to a custom task when validating externally
     fetch(CONFIRM_REGISTRATION_URL, {
       method: 'POST',
       body: JSON.stringify(webHookResponse),
