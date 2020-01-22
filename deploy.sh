@@ -140,7 +140,7 @@ if [ $3 == "--restore-metadata=yes" ] ; then
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
 fi
 
-if [ $2 == "--update-metadata=yes" ] ; then
+if [ $4 == "--update-metadata=yes" ] ; then
     echo
     echo "Updating existing metadata..."
     echo
