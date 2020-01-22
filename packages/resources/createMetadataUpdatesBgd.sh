@@ -36,9 +36,9 @@ mkdir -p $DIR/src/bgd/updates/jsons
 # This format is needed to restore these data updates
 
 docker run --rm -v $DIR/src/bgd/updates/jsons:/src/bgd/updates/jsons --network=$NETWORK mongo:3.6 bash \
- -c "mongoexport -h=$HOST -d=hearth-dev -c=Practitioner -o=/src/bgd/updates/jsons/hearth-dev_Practitioner_updates.json"
+ -c "mongoexport -h=$HOST -d=hearth-dev -c=Practitioner -q='{id:\"2c974c10-a582-4697-b8a4-31dd538123bd\"}' -o=/src/bgd/updates/jsons/hearth-dev_Practitioner_updates.json"
 docker run --rm -v $DIR/src/bgd/updates/jsons:/src/bgd/updates/jsons --network=$NETWORK mongo:3.6 bash \
- -c "mongoexport -h=$HOST -d=user-mgnt -c=roles -o=/src/bgd/updates/jsons/user-mgnt_roles_updates.json"
+ -c "mongoexport -h=$HOST -d=user-mgnt -c=roles -q='{types:\"API_USER\"}' -o=/src/bgd/updates/jsons/user-mgnt_roles_updates.json"
 docker run --rm -v $DIR/src/bgd/updates/jsons:/src/bgd/updates/jsons --network=$NETWORK mongo:3.6 bash \
- -c "mongoexport -h=$HOST -d=user-mgnt -c=users -o=/src/bgd/updates/jsons/user-mgnt_users_updates.json"
+ -c "mongoexport -h=$HOST -d=user-mgnt -c=users -q='{username:{\$regex:\"api.*\"}}' -o=/src/bgd/updates/jsons/user-mgnt_users_updates.json"
 
