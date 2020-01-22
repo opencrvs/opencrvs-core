@@ -36,25 +36,30 @@ if [ -z "$3" ] || { [ $3 != '--restore-metadata=no' ] && [ $3 != '--restore-meta
     print_usage_and_exit
 fi
 
-if [ -z "$4" ] ; then
-    echo 'Error: Argument HOST is required in postition 4.'
+if [ -z "$4" ] || { [ $4 != '--update-metadata=no' ] && [ $4 != '--update-metadata=yes' ] ;} ; then
+    echo 'Error: Argument --update-metadata is required in postition 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument ENV is required in postition 5.'
+    echo 'Error: Argument HOST is required in postition 5.'
     print_usage_and_exit
 fi
 
 if [ -z "$6" ] ; then
-    echo 'Error: Argument VERSION is required in postition 6.'
+    echo 'Error: Argument ENV is required in postition 6.'
+    print_usage_and_exit
+fi
+
+if [ -z "$7" ] ; then
+    echo 'Error: Argument VERSION is required in postition 7.'
     print_usage_and_exit
 fi
 
 COUNTRY=$1
-HOST=$4
-ENV=$5
-VERSION=$6
+HOST=$5
+ENV=$6
+VERSION=$7
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -71,6 +76,7 @@ echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
 mkdir -p /tmp/compose/infrastructure/default_backups
+mkdir -p /tmp/compose/infrastructure/default_updates
 
 # Copy selected country config to public & infrastructure folder
 cp packages/resources/src/$COUNTRY/config/client-config.prod.js /tmp/compose/infrastructure/client-config.js
@@ -80,6 +86,9 @@ cp packages/resources/src/$COUNTRY/config/login-config.prod.js /tmp/compose/infr
 cp packages/resources/src/$COUNTRY/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
 cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
 cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
+
+# Copy selected country default updates to infrastructure default_updates folder
+[[ -d packages/resources/src/$COUNTRY/updates/jsons ]] && cp packages/resources/src/$COUNTRY/updates/jsons/*.json /tmp/compose/infrastructure/default_updates
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
@@ -110,7 +119,7 @@ else
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.'$COUNTRY'.deploy.yml --with-registry-auth opencrvs'
 fi
 
-if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
+if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] || [ $4 == "--update-metadata=yes" ] ; then
     echo
     echo "Waiting 2 mins for stack to deploy before working with data..."
     echo
@@ -129,4 +138,11 @@ if [ $3 == "--restore-metadata=yes" ] ; then
     echo "Restoring metadata..."
     echo
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
+fi
+
+if [ $2 == "--update-metadata=yes" ] ; then
+    echo
+    echo "Updating existing metadata..."
+    echo
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/update-metadata.sh'
 fi

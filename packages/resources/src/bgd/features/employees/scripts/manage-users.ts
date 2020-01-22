@@ -52,6 +52,20 @@ export function getScope(role: string, environment: string): string[] {
 
 export function createUsers(users: IUserModel[]) {
   mongoose.connect(MONGO_URL)
+  function onInsert(err: any, values: any) {
+    if (!err) {
+      mongoose.disconnect()
+    } else {
+      throw Error(
+        `Cannot save ${JSON.stringify(values)} to user-mgnt db ... ${err}`
+      )
+    }
+  }
+  User.collection.insertMany(users, onInsert)
+}
+
+export function createRoles() {
+  mongoose.connect(MONGO_URL)
   const fieldAgentRole = new Role({
     title: 'Field Agent',
     value: 'FIELD_AGENT',
@@ -136,5 +150,4 @@ export function createUsers(users: IUserModel[]) {
     }
   }
   Role.collection.insertMany(roles, onInsert)
-  User.collection.insertMany(users, onInsert)
 }

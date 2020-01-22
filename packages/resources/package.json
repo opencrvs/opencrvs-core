@@ -21,6 +21,10 @@
     "db:populate:zmb": "bash createReferenceDataZmb.sh",
     "db:backup:create": "DEV=true ./backup-metadata.sh $1",
     "db:backup:restore": "DEV=true ./restore-metadata.sh $1",
+    "db:update:create:bgd": "DEV=true ./createMetadataUpdatesBgd.sh",
+    "db:update:restore:bgd": "DEV=true ./restore-metadata-updates.sh bgd",
+    "db:update:create:zmb": "DEV=true ./createMetadataUpdatesZmb.sh",
+    "db:update:restore:zmb": "DEV=true ./restore-metadata-updates.sh zmb",
     "db:clear:all": "DEV=true ./clear-all-data.sh $1"
   },
   "devDependencies": {

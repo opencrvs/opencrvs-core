@@ -1,0 +1,9 @@
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b1"},"types":["HOSPITAL","CHA"],"active":true,"title":"Field Agent","value":"FIELD_AGENT","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b2"},"types":["ENTREPENEUR","DATA_ENTRY_CLERK"],"active":true,"title":"Registration Agent","value":"REGISTRATION_AGENT","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b3"},"types":["SECRETARY","CHAIRMAN","MAYOR"],"active":true,"title":"Registrar","value":"LOCAL_REGISTRAR","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b4"},"types":["LOCAL_SYSTEM_ADMIN"],"active":true,"title":"System admin (local)","value":"LOCAL_SYSTEM_ADMIN","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b5"},"types":["NATIONAL_SYSTEM_ADMIN"],"active":true,"title":"System admin (national)","value":"NATIONAL_SYSTEM_ADMIN","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b6"},"types":["CABINET_DIVISION","BBS"],"active":true,"title":"Performance Oversight","value":"PERFORMANCE_OVERSIGHT","creationDate":1.578559087596e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b7"},"types":["HEALTH_DIVISION","ORG_DIVISION"],"active":true,"title":"Performance Management","value":"PERFORMANCE_MANAGEMENT","creationDate":1.578559087597e+12}
+{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b8"},"types":["API_USER"],"active":true,"title":"Notification API User","value":"NOTIFICATION_API_USER","creationDate":1.578559087597e+12}
+{"_id":{"$oid":"5e271ab29a3b9a93c7086984"},"types":["API_USER"],"active":true,"title":"Validator API User","value":"VALIDATOR_API_USER","creationDate":1.579621042793e+12,"__v":0}

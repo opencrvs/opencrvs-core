@@ -14,7 +14,7 @@ import { EMPLOYEES_SOURCE } from '@resources/bgd/constants'
 import chalk from 'chalk'
 import { internal } from 'boom'
 import { composeAndSavePractitioners } from '@resources/bgd/features/employees/scripts/service'
-
+import { createRoles } from '@resources/bgd/features/employees/scripts/manage-users'
 const sourceJSON = `${EMPLOYEES_SOURCE}test-employees.json`
 
 export default async function importEmployees() {
@@ -26,6 +26,7 @@ export default async function importEmployees() {
   )
   const employees = JSON.parse(fs.readFileSync(sourceJSON).toString())
   try {
+    createRoles()
     await composeAndSavePractitioners(
       employees,
       process.argv[2],
