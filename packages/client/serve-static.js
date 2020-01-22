@@ -9,26 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const proxy = require('http-proxy-middleware')
-module.exports = function(app) {
-  app.use(
-    '/gateway',
-    proxy({
-      target: 'http://localhost:7070',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/gateway': '/'
-      }
-    })
-  )
-  app.use(
-    '/resources',
-    proxy({
-      target: 'http://localhost:3040/bgd',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/resources': '/'
-      }
-    })
-  )
-}
+const express = require('express')
+const path = require('path')
+const app = express()
+
+app.use(express.static(path.join(__dirname, 'build')))
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
+require('./src/setupProxy.js')(app)
+app.listen(3000)

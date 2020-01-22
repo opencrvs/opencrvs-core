@@ -328,9 +328,14 @@ This is the best way to work and debug service workers and do actual device test
 AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 ```
 
-4. Start the development environment as you normally would
+4. Start the development environment as you normally would, but add `--ignore @opencrvs/client` to the start command. So `yarn start:bgd --ignore @opencrvs/client`
+
 5. Run `yarn start` in the mobile-proxy package
 6. You should now have an ngrok url that can be used remotely on any device. It's still required to be in the same network as the host machine, as some services (login) aren't used through ngrok.
+
+7. Build the client app `NODE_ENV=production yarn build`
+8. Serve the client up in 3000 port by running `yarn serve`
+9. You can now open up the address you got from the mobile proxy in your mobile browser
 
 ## Docker scripts
 
