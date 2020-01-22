@@ -43,6 +43,7 @@ import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { Event } from '@client/forms'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -159,12 +160,14 @@ export function goToPerformanceHome() {
 }
 
 export function goToPerformanceReport(
+  selectedLocation: ISearchLocation,
   reportType: string,
   eventType: Event,
   timeStart: Date,
   timeEnd: Date
 ) {
   return push(PERFORMANCE_REPORT, {
+    selectedLocation,
     reportType,
     timeRange: { start: timeStart, end: timeEnd },
     eventType

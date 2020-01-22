@@ -19,7 +19,7 @@ import { goBack } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { Header } from '@client/views/Performance/utils'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
@@ -57,8 +57,6 @@ const BackButton = styled(TertiaryButton)`
 
 const ReportWrapper = styled.div`
   margin-top: 16px;
-  ${({ theme }) =>
-    `border-top: 1px solid ${theme.colors.chartAreaGradientStart};`}
 `
 
 interface ReportProps {
@@ -88,9 +86,10 @@ type Props = ReportProps &
   >
 
 function ReportComponent(props: Props) {
-  const [selectedLocation, setSelectedLocation] = React.useState<
-    ISearchLocation
-  >(props.selectedLocation)
+  const [selectedLocation, setSelectedLocation] = useState<ISearchLocation>(
+    props.selectedLocation
+  )
+
   const { reportType, timeRange, intl, eventType } = props
   const { start, end } = timeRange
 
@@ -107,6 +106,7 @@ function ReportComponent(props: Props) {
       <Header>{title}</Header>
       <LocationSearch
         locationList={generateLocations(props.offlineResources.locations)}
+        selectedLocation={selectedLocation}
         searchHandler={item => {
           setSelectedLocation(item)
         }}
