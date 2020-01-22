@@ -605,7 +605,7 @@
         "form.field.label.fetchInformantDetails": "Retrieve Informant's Details",
         "form.field.label.fetchMotherDetails": "Retrieve Mother's Details",
         "form.field.label.fetchPersonByNIDModalErrorText": "No person found for provided NID",
-        "form.field.label.fetchPersonByNIDModalNetworkErrorText": "Could not connect to the server because of low connectivity. Please try again.",
+        "form.field.label.fetchPersonByNIDModalNetworkErrorText": "The request to the NID system was unsuccessful. Please try again with a better connection.",
         "form.field.label.fetchPersonByNIDModalInfo": "National ID",
         "form.field.label.fetchRegistrationModalErrorText": "No registration found for provided BRN",
         "form.field.label.fetchRegistrationModalInfo": "Birth Registration Number",

@@ -24,6 +24,8 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   flex-direction: row;
   display: flex;
   align-items: center;
+  margin-top: -20px;
+  margin-bottom: 4px;
 
   ${({ ignoreMediaQuery, theme }) => {
     return !ignoreMediaQuery
@@ -34,7 +36,6 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
   }}
 `
 const StyledParagraph = styled(Paragraph)`
-  margin: 3px 10px;
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   color: ${({ theme }) => theme.colors.error};
 `

@@ -80,8 +80,7 @@ export async function sendDeathRegistrationConfirmation(
     'deathRegistrationNotification',
     {
       name: payload.name,
-      trackingId: payload.trackingId,
-      registrationNumber: payload.registrationNumber
+      trackingId: payload.trackingId
     }
   )
   return h.response().code(200)
