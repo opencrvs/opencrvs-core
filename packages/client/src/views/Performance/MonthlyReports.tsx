@@ -45,6 +45,10 @@ const Actions = styled.div`
   padding: 1em 0;
 `
 
+const StyledDiv = styled.div`
+  margin-top: 16px;
+`
+
 function downloadAllData() {
   fetch(window.config.API_GATEWAY_URL + 'metrics/export', {
     headers: {
@@ -129,53 +133,58 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
           }}
         />
 
-        <ListTable
-          tableTitle={intl.formatMessage(constantsMessages.birth)}
-          isLoading={false}
-          content={this.getContent(Event.BIRTH)}
-          tableHeight={280}
-          pageSize={MONTHS_IN_YEAR}
-          columns={[
-            {
-              label: intl.formatMessage(constantsMessages.month),
-              width: 70,
-              key: 'month',
-              isSortable: true,
-              icon: <ArrowDownBlue />,
-              sortFunction: () => {}
-            },
-            {
-              label: intl.formatMessage(constantsMessages.export),
-              width: 30,
-              key: 'export'
-            }
-          ]}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
-        />
+        <StyledDiv>
+          <ListTable
+            tableTitle={intl.formatMessage(constantsMessages.birth)}
+            isLoading={false}
+            content={this.getContent(Event.BIRTH)}
+            tableHeight={280}
+            pageSize={MONTHS_IN_YEAR}
+            hideBoxShadow={true}
+            columns={[
+              {
+                label: intl.formatMessage(constantsMessages.month),
+                width: 70,
+                key: 'month',
+                isSortable: true,
+                icon: <ArrowDownBlue />,
+                sortFunction: () => {}
+              },
+              {
+                label: intl.formatMessage(constantsMessages.export),
+                width: 30,
+                key: 'export'
+              }
+            ]}
+            noResultText={intl.formatMessage(constantsMessages.noResults)}
+          />
 
-        <ListTable
-          tableTitle={intl.formatMessage(constantsMessages.death)}
-          isLoading={false}
-          content={this.getContent(Event.DEATH)}
-          tableHeight={280}
-          pageSize={MONTHS_IN_YEAR}
-          columns={[
-            {
-              label: intl.formatMessage(constantsMessages.month),
-              width: 70,
-              key: 'month',
-              isSortable: true,
-              icon: <ArrowDownBlue />,
-              sortFunction: () => {}
-            },
-            {
-              label: intl.formatMessage(constantsMessages.export),
-              width: 30,
-              key: 'export'
-            }
-          ]}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
-        />
+          <ListTable
+            tableTitle={intl.formatMessage(constantsMessages.death)}
+            isLoading={false}
+            content={this.getContent(Event.DEATH)}
+            tableHeight={280}
+            pageSize={MONTHS_IN_YEAR}
+            hideBoxShadow={true}
+            columns={[
+              {
+                label: intl.formatMessage(constantsMessages.month),
+                width: 70,
+                key: 'month',
+                isSortable: true,
+                icon: <ArrowDownBlue />,
+                sortFunction: () => {}
+              },
+              {
+                label: intl.formatMessage(constantsMessages.export),
+                width: 30,
+                key: 'export'
+              }
+            ]}
+            noResultText={intl.formatMessage(constantsMessages.noResults)}
+          />
+        </StyledDiv>
+
         <Actions>
           <LinkButton onClick={downloadAllData} id="export-all-button">
             {intl.formatMessage(messages.exportAll)}
