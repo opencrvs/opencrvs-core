@@ -98,3 +98,6 @@ export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
 export const MONTHS_IN_YEAR = 12
+
+export const DECLARED_APPLICATION_SEARCH_QUERY_COUNT =
+  process.env.DECLARED_APPLICATION_SEARCH_QUERY_COUNT || 100

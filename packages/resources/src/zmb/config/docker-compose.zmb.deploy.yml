@@ -22,6 +22,10 @@ services:
       - CLICKATELL_PASSWORD_PATH=/run/secrets/clickatell-password
       - CLICKATELL_API_ID_PATH=/run/secrets/clickatell-api-id
 
+  client:
+    environment:
+      - DECLARED_APPLICATION_SEARCH_QUERY_COUNT = 100
+
   gateway:
     environment:
       - LANGUAGES=en

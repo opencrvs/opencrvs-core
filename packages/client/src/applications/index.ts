@@ -29,6 +29,7 @@ import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
+import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
@@ -527,7 +528,8 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
       variables: {
         userId,
         status: [EVENT_STATUS.DECLARED],
-        locationIds
+        locationIds,
+        count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT
       },
       fetchPolicy: 'no-cache'
     })
