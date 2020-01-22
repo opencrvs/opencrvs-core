@@ -28,6 +28,7 @@ import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
 import { FetchResult } from 'apollo-link'
+import { updateApplicationTaskHistory } from './utils/draftUtils'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -213,6 +214,16 @@ export class SubmissionController {
       if (trackingId) {
         application.trackingId = trackingId
       }
+    }
+    if (application.submissionStatus === SUBMISSION_STATUS.SUBMITTED) {
+      const taskHistory = updateApplicationTaskHistory(
+        application,
+        this.store.getState().profile.userDetails
+      )
+      if (!application.operationHistories) {
+        application.operationHistories = []
+      }
+      application.operationHistories.push(taskHistory)
     }
     await this.store.dispatch(updateRegistrarWorkqueue())
     await this.store.dispatch(modifyApplication(application))

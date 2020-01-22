@@ -16,6 +16,7 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
+import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 
 const getApplicantFullName = (
@@ -155,4 +156,28 @@ export const transformSearchQueryDataToDraft = (
   }
 
   return application
+}
+
+export const updateApplicationTaskHistory = (
+  application: IApplication,
+  userDetails: IUserDetails | null
+): ITaskHistory => {
+  return {
+    operationType: application.submissionStatus,
+    operatedOn:
+      (application.modifiedOn && new Date(application.modifiedOn).toString()) ||
+      '',
+    operatorRole: (userDetails && userDetails.role) || '',
+    operatorName: (userDetails && userDetails.name) || [],
+    operatorOfficeName:
+      (userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.name) ||
+      '',
+    operatorOfficeAlias:
+      (userDetails &&
+        userDetails.primaryOffice &&
+        userDetails.primaryOffice.alias) ||
+      []
+  }
 }
