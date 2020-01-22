@@ -11,7 +11,6 @@
  */
 export * from './Action'
 export * from './Button'
-export * from './CountAction'
 export * from './PrimaryButton'
 export * from './SecondaryButton'
 export * from './ListItemAction'
