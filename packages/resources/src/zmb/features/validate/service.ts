@@ -12,10 +12,7 @@
 import { generateRegistrationNumber } from '@resources/zmb/features/generate/service'
 import {
   getTaskResource,
-  findExtension,
-  getTrackingIdFromTaskResource,
-  OPENCRVS_SPECIFICATION_URL,
-  getFromFhir
+  getTrackingIdFromTaskResource
 } from '@resources/utils/fhir-utils'
 
 export async function createWebHookResponseFromBundle(bundle: fhir.Bundle) {
@@ -28,27 +25,9 @@ export async function createWebHookResponseFromBundle(bundle: fhir.Bundle) {
   }
 
   const trackingId = getTrackingIdFromTaskResource(taskResource)
-  const practitionerRefExt = findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-    taskResource.extension
-  )
-
-  if (
-    !practitionerRefExt ||
-    !practitionerRefExt.valueReference ||
-    !practitionerRefExt.valueReference.reference
-  ) {
-    throw new Error(
-      'Failed to validate registration: practitioner reference not found in task resource'
-    )
-  }
-
-  const practitioner = await getFromFhir(
-    practitionerRefExt.valueReference.reference
-  )
 
   return {
     trackingId,
-    registrationNumber: await generateRegistrationNumber(practitioner.id)
+    registrationNumber: await generateRegistrationNumber(trackingId)
   }
 }
