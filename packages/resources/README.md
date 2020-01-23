@@ -1,11 +1,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [OpenCRVS Resources Module](#opencrvs-resources-module)
 - [Developer commands](#developer-commands)
-    - [Create new factory reset, metadata database backup zips](#create-new-factory-reset-metadata-database-backup-zips)
-    - [Example sequence of scripts that might run when populating reference data for Bangladesh](#example-sequence-of-scripts-that-might-run-when-populating-reference-data-for-bangladesh)
+  - [Create new factory reset, metadata database backup zips](#create-new-factory-reset-metadata-database-backup-zips)
+  - [Example sequence of scripts that might run when populating reference data for Bangladesh](#example-sequence-of-scripts-that-might-run-when-populating-reference-data-for-bangladesh)
 - [Resources package features](#resources-package-features)
   - [Administrative](#administrative)
   - [Assets](#assets)
@@ -17,8 +16,7 @@
     - [Data types](#data-types)
     - [Properties of register.json](#properties-of-registerjson)
     - [registerForm](#registerform)
-    - [birth](#birth)
-          - [](#)
+    - [birth](#birth) - [](#)
     - [death](#death)
   - [Generate](#generate)
   - [Languages](#languages)
@@ -84,6 +82,17 @@ This will have to be done for each country we are supporting:
 8. `yarn db:backup:create <<insert country code>>` will create factory reset zips for your use
 9. Commit and push the new db dump archive files that have been created in your country folder. Travis will automatically restore from these when setting the `--clear-data` & `--restore-metadata` props in deployment yarn commands in root.
 10. The script `yarn db:backup:restore <<insert alpha3 country code>>` can be used to restore from existing zips and is used by Travis for this purpose.
+
+### Create and restore new metadata updates for existing databases
+
+For creating new metadata updates developer should follow below steps:
+
+1. Update `src/bgd/updates/scripts/update-metadata.ts` script with all the new metadata db changes. This script should be safe from data corruption issues on multiple execution.
+2. Update/Add new mongodb export scripts in `createMetadataUpdatesBgd.sh` to ensure your new set of metadata changes are exported properly.
+3. Start the dev environment
+4. Run `yarn db:update:create:bgd` to execute your changes in local db and generate the exportable updated metadata files under `src/bgd/updates/generated/` folder.
+5. Commit and push the new updated metadata files that have been created in your country folder. Travis will automatically apply the new metadata changes from these files when setting the `--update-metadata` props in deployment yarn commands in root.
+6. The script `yarn db:update:restore:bgd` can be used to apply the metadata updates from existing update files under `src/bgd/updates/generated/` folder.
 
 ### Example sequence of scripts that might run when populating reference data for Bangladesh
 
