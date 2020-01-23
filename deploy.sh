@@ -88,7 +88,7 @@ cp packages/resources/src/$COUNTRY/backups/openhim-dev.gz /tmp/compose/infrastru
 cp packages/resources/src/$COUNTRY/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
 
 # Copy selected country default updates to infrastructure default_updates folder
-[[ -d packages/resources/src/$COUNTRY/updates/jsons ]] && cp packages/resources/src/$COUNTRY/updates/jsons/*.json /tmp/compose/infrastructure/default_updates
+[[ -d packages/resources/src/$COUNTRY/updates/generated ]] && cp packages/resources/src/$COUNTRY/updates/generated/*.json /tmp/compose/infrastructure/default_updates
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/

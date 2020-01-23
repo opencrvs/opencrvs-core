@@ -36,13 +36,13 @@ fi
 echo
 echo "Restoring metadata updates..."
 echo
-cd $DIR/src/$COUNTRY/updates/jsons
+cd $DIR/src/$COUNTRY/updates/generated
 for FILE in *.json
 do  
   NAMES=($(echo $FILE | tr "_" "\n"))
   DB=${NAMES[0]]}
   COLLECTION=${NAMES[1]]}
   echo "Updating collection: $COLLECTION of db: $DB"  
-  docker run --rm -v $DIR/src/$COUNTRY/updates/jsons:/src/$COUNTRY/updates/jsons --network=$NETWORK mongo:3.6 bash \
- -c "mongoimport -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/src/$COUNTRY/updates/jsons/$FILE"
+  docker run --rm -v $DIR/src/$COUNTRY/updates/generated:/src/$COUNTRY/updates/generated --network=$NETWORK mongo:3.6 bash \
+ -c "mongoimport -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/src/$COUNTRY/updates/generated/$FILE"
 done  

@@ -12,6 +12,9 @@
 
 import chalk from 'chalk'
 
+/**
+ * Please add your change log here with date
+ */
 export default async function executeUpdates() {
   // tslint:disable-next-line:no-console
   console.log(
