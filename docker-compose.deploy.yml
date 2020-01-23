@@ -180,9 +180,6 @@ services:
 
   # Configure webapps and add traefik config
   client:
-    configs:
-      - source: client-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -207,9 +204,6 @@ services:
       - overlay_net
 
   login:
-    configs:
-      - source: login-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -409,10 +403,6 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  client-config.{{ts}}:
-    file: ./infrastructure/client-config.js
-  login-config.{{ts}}:
-    file: ./infrastructure/login-config.js
   netdata-master-stream.{{ts}}:
     file: ./infrastructure/netdata-master-stream.conf
   netdata-slave.{{ts}}:
