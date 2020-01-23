@@ -192,9 +192,59 @@ describe('FieldAgentHome tests', () => {
                 id: '613da949-db8c-49ad-94b4-631ab0b7503e',
                 type: 'Birth',
                 registration: {
+                  contactNumber: '+8801711111111',
+                  trackingId: 'BZW3T4',
                   dateOfApplication: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
+                operationHistories: [
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-21T08:41:08.551Z',
+                    operationType: 'DECLARED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'FIELD_AGENT',
+                    rejectComment: null,
+                    rejectReason: null,
+                    operatorName: [
+                      {
+                        familyName: 'Al Hasan',
+                        firstNames: 'Shakib',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  },
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-22T12:54:28.369Z',
+                    operationType: 'REJECTED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    rejectComment: 'Spelling mistake',
+                    rejectReason: 'misspelling',
+                    operatorName: [
+                      {
+                        familyName: 'Ashraful',
+                        firstNames: 'Mohammad',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  }
+                ],
                 childName: [
                   {
                     use: 'en',
@@ -273,9 +323,59 @@ describe('FieldAgentHome tests', () => {
                 id: '613da949-db8c-49ad-94b4-631ab0b7503e',
                 type: 'Birth',
                 registration: {
+                  contactNumber: '+8801711111111',
+                  trackingId: 'BZW3T4',
                   dateOfApplication: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
+                operationHistories: [
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-21T08:41:08.551Z',
+                    operationType: 'DECLARED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'FIELD_AGENT',
+                    rejectComment: null,
+                    rejectReason: null,
+                    operatorName: [
+                      {
+                        familyName: 'Al Hasan',
+                        firstNames: 'Shakib',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  },
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-22T12:54:28.369Z',
+                    operationType: 'REJECTED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    rejectComment: 'Spelling mistake',
+                    rejectReason: 'misspelling',
+                    operatorName: [
+                      {
+                        familyName: 'Ashraful',
+                        firstNames: 'Mohammad',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  }
+                ],
                 childName: [
                   {
                     use: 'en',
