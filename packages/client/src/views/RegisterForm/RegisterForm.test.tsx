@@ -787,7 +787,18 @@ describe('when user is in the register form for death event', () => {
               country: 'bgd'
             }
           },
-          error: new Error('boom')
+          result: {
+            data: {
+              queryPersonByNidIdentifier: null
+            },
+            errors: [
+              {
+                message: 'An internal server error occurred',
+                locations: [{ line: 2, column: 3 }],
+                path: ['queryPersonByNidIdentifier']
+              }
+            ]
+          }
         }
       ]
       const testComponent = await createTestComponent(
@@ -862,7 +873,7 @@ describe('when user is in the register form for death event', () => {
               country: 'bgd'
             }
           },
-          error: { networkError: [] }
+          error: new Error('timeout')
         }
       ]
       const testComponent = await createTestComponent(
