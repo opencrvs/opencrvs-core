@@ -108,6 +108,9 @@ describe('Submission Controller', () => {
   it('syncs all ready to submit and network failed applications in the queue', async () => {
     const store = {
       getState: () => ({
+        profile: {
+          userDetails: {}
+        },
         applicationsState: {
           applications: [
             {
