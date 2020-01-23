@@ -87,12 +87,12 @@ This will have to be done for each country we are supporting:
 
 For creating new metadata updates developer should follow below steps:
 
-1. Update `src/bgd/updates/scripts/update-metadata.ts` script with all the new metadata db changes. This script should be safe from data corruption issues on multiple execution.
-2. Update/Add new mongodb export scripts in `createMetadataUpdatesBgd.sh` to ensure your new set of metadata changes are exported properly.
+1. Update `src/<<country code>>/updates/scripts/update-metadata.ts` script with all the new metadata db changes. This script should be safe from data corruption issues on multiple execution.
+2. Update/Add new mongodb export scripts in `createMetadataUpdates<<country code>>.sh` to ensure your new set of metadata changes are exported properly.
 3. Start the dev environment
-4. Run `yarn db:update:create:bgd` to execute your changes in local db and generate the exportable updated metadata files under `src/bgd/updates/generated/` folder.
+4. Run `yarn db:update:create:<<country code>>` to execute your changes in local db and generate the exportable updated metadata files under `src/<<country code>>/updates/generated/` folder.
 5. Commit and push the new updated metadata files that have been created in your country folder. Travis will automatically apply the new metadata changes from these files when setting the `--update-metadata` props in deployment yarn commands in root.
-6. The script `yarn db:update:restore:bgd` can be used to apply the metadata updates from existing update files under `src/bgd/updates/generated/` folder.
+6. The script `yarn db:update:restore:<<country code>>` can be used to apply the metadata updates from existing update files under `src/<<country code>>/updates/generated/` folder.
 
 ### Example sequence of scripts that might run when populating reference data for Bangladesh
 
