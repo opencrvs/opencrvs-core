@@ -62,13 +62,14 @@ services:
     ports:
       - '9090:9090'
 
-  resources:
-    volumes:
-      - '.secrets/public-key.pem:/secrets/public-key.pem'
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
-    ports:
-      - '3040:3040'
+  # @todo this would probably have to be the Zambia reference
+  # resources:
+  #   volumes:
+  #     - '.secrets/public-key.pem:/secrets/public-key.pem'
+  #   environment:
+  #     - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
+  #   ports:
+  #     - '3040:3040'
 
   metrics:
     volumes:

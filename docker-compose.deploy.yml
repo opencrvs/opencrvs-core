@@ -288,22 +288,6 @@ services:
     networks:
       - overlay_net
 
-  resources:
-    secrets:
-      - jwt-public-key.{{ts}}
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
-        - 'traefik.port=3040'
-        - 'traefik.docker.network=opencrvs_overlay_net'
-      replicas: 2
-    networks:
-      - overlay_net
-
   metrics:
     secrets:
       - jwt-public-key.{{ts}}
