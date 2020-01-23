@@ -15,7 +15,8 @@ import {
   ADMIN_STRUCTURE_SOURCE,
   GEO_JSON_SOURCE
 } from '@resources/bgd/constants'
-import { checkDuplicate, getFromFhir } from '@resources/bgd/features/utils'
+import { checkDuplicate } from '@resources/bgd/features/utils'
+import { getFromFhir } from '@resources/utils/fhir-utils'
 import { Feature, GeoJsonProperties } from 'geojson'
 
 // tslint:disable-next-line:no-console
