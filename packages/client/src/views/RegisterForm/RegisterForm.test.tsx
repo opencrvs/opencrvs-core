@@ -831,7 +831,7 @@ describe('when user is in the register form for death event', () => {
       input.hostNodes().props().onChange!({
         target: {
           id: 'iD',
-          value: '1234567897'
+          value: '1234567898'
         }
       })
 
