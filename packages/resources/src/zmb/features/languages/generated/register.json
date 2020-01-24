@@ -6,7 +6,7 @@
       "messages": {
         "birth.form.section.child.name": "Child",
         "birth.form.section.child.title": "Child's details",
-        "buttons.editRecord": "Edit Record",
+        "buttons.editRecord": "Edit record",
         "buttons.apply": "Apply",
         "buttons.approve": "Approve",
         "buttons.back": "Back",
@@ -811,7 +811,7 @@
         "password.mismatch": "Passwords do not match",
         "password.number": "At least one number",
         "password.validation.msg": "Password must have:",
-        "print.certificate.button.confirmPrint": "Confirm and Print",
+        "print.certificate.button.confirmPrint": "Continue and print",
         "print.certificate.review.title": "Are all the details on the {event} certificate correct?",
         "print.certificate.review.description": "Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.",
         "print.certificate.review.modal.title": "Print Certificate?",
