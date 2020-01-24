@@ -15562,11 +15562,7 @@
                   },
                   "required": true,
                   "initialValue": "",
-                  "validate": [
-                    {
-                      "operation": "englishOnlyNameFormat"
-                    }
-                  ], 
+                  "validate": [], 
                   "placeholder": {
                     "defaultMessage": "Select",
                     "description": "Placeholder text for a select",
