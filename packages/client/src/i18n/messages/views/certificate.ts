@@ -331,7 +331,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.whoToCollect'
   },
   confirmAndPrint: {
-    defaultMessage: 'Confirm and Print',
+    defaultMessage: 'Continue and print',
     description: 'The text for Confirm & print button',
     id: 'print.certificate.button.confirmPrint'
   },
