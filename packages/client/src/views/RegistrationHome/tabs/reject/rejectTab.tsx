@@ -255,6 +255,7 @@ class RejectTabComponent extends React.Component<
           clickable={!this.getExpandable()}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}

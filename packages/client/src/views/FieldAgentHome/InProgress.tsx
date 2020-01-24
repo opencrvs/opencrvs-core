@@ -164,6 +164,7 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
           expandable={false}
           clickable={true}
           showPaginated={this.props.showPaginated}
+          loadMoreText={intl.formatMessage(messages.loadMore)}
         />
         <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>

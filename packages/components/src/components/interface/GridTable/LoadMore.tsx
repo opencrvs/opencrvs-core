@@ -16,6 +16,7 @@ import { Button } from '../../buttons/Button'
 interface ILoadMoreCustomProps {
   initialPage: number
   onLoadMore: (page: number) => void
+  loadMoreText: string
 }
 interface IState {
   canNext: boolean
@@ -44,7 +45,7 @@ export class LoadMore extends React.Component<ILoadMoreCustomProps, IState> {
           id="load_more_button"
           onClick={() => this.props.onLoadMore(this.props.initialPage + 1)}
         >
-          Load More
+          {this.props.loadMoreText}
         </StyledButton>
       </LoadMoreContainer>
     )

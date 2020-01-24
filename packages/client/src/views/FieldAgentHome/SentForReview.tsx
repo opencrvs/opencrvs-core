@@ -264,6 +264,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           pageSize={this.pageSize}
           currentPage={this.state.sentForReviewPageNo}
           showPaginated={this.props.showPaginated}
+          loadMoreText={intl.formatMessage(messages.loadMore)}
         />
         <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>
