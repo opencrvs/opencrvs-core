@@ -14,6 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IReviewMessages {
   additionalComments: MessageDescriptor
   backToPreview: MessageDescriptor
+  editApplicationConfirmationTitle: MessageDescriptor
   editApplicationConfirmation: MessageDescriptor
   editDocuments: MessageDescriptor
   formDataHeader: MessageDescriptor
@@ -83,8 +84,13 @@ const messagesToDefine: IReviewMessages = {
     description: 'Preview button on edit modal',
     id: 'review.edit.modal.backToPreview'
   },
+  editApplicationConfirmationTitle: {
+    defaultMessage: 'Edit application?',
+    description: 'Edit modal confirmation title',
+    id: 'review.edit.modal.confirmationTitle'
+  },
   editApplicationConfirmation: {
-    defaultMessage: 'Are you sure you want to edit the application?',
+    defaultMessage: 'A record will be created of any changes you make.',
     description: 'Edit modal confirmation text',
     id: 'review.edit.modal.confirmationText'
   },
@@ -234,7 +240,7 @@ const messagesToDefine: IReviewMessages = {
     description: 'Header title that shows bgd govt name'
   },
   documentForWhom: {
-    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents'}}`,
+    defaultMessage: `{section, select, child {Child's} mother {Mother's} father {Father's} deceased {Deceased's} informant {Applicant's} applicant {Applicant's} primaryCaregiver {Parents' } parent {Parents' }}`,
     description: 'Describes for whom the document has been uploaded',
     id: 'review.documents.documentForWhom'
   }
