@@ -87,13 +87,14 @@ const Input = styled.input`
     box-shadow: ${({ theme, disabled }) => theme.colors.focus} 0 0 0 3px;
   }
 `
+type Size = 'large' | 'small'
 
 interface ICheckbox extends React.OptionHTMLAttributes<{}> {
   name: string
   label: string
   value: string
   selected: boolean
-  size?: string
+  size?: Size
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
