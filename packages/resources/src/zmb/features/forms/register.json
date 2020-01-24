@@ -186,7 +186,11 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": [],
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ], 
                         "mapping": {
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
@@ -585,7 +589,11 @@
                         },
                         "required": true,
                         "initialValue": "",
-                        "validate": []
+                        "validate": [
+                          {
+                            "operation": "englishOnlyNameFormat"
+                          }
+                        ]
                       },
                       {
                         "name": "registrationPhone",
