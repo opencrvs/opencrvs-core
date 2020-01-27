@@ -787,7 +787,93 @@ describe('when user is in the register form for death event', () => {
               country: 'bgd'
             }
           },
-          error: new Error('boom')
+          result: {
+            data: {
+              queryPersonByNidIdentifier: null
+            },
+            errors: [
+              {
+                message: 'An internal server error occurred',
+                locations: [{ line: 2, column: 3 }],
+                path: ['queryPersonByNidIdentifier']
+              }
+            ]
+          }
+        }
+      ]
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+
+      component = testComponent.component
+      await waitForElement(component, '#iDType')
+      selectOption(component, '#iDType', 'National ID')
+
+      const input = component.find('input#iD') as any
+
+      input.hostNodes().props().onChange!({
+        target: {
+          id: 'iD',
+          value: '1234567898'
+        }
+      })
+
+      component.find('input#birthDate-dd').simulate('change', {
+        target: { id: 'birthDate-dd', value: '10' }
+      })
+
+      component.find('input#birthDate-mm').simulate('change', {
+        target: { id: 'birthDate-mm', value: '10' }
+      })
+
+      component.find('input#birthDate-yyyy').simulate('change', {
+        target: { id: 'birthDate-yyyy', value: '1992' }
+      })
+
+      component.update()
+
+      component
+        .find('#fetchButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      const element = await waitForElement(component, '#loader-button-error')
+
+      expect(element.hostNodes()).toHaveLength(1)
+    })
+
+    it('should displays network error message if timeout', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_PERSON_NID,
+            variables: {
+              nid: '1234567898',
+              dob: '1992-10-10',
+              country: 'bgd'
+            }
+          },
+          error: new Error('timeout')
         }
       ]
       const testComponent = await createTestComponent(
