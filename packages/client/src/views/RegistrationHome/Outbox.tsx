@@ -25,7 +25,6 @@ import styled from '@client/styledComponents'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 import { sentenceCase } from '@client/utils/data-formatting'
 import { getDefaultLanguage } from '@client/i18n/utils'
-
 const Container = styled(BodyContent)`
   padding-top: 32px;
 `
@@ -200,6 +199,7 @@ class Outbox extends React.Component<IFullProps, IState> {
           onPageChange={this.onPageChange}
           pageSize={10}
           showPaginated={this.props.showPaginated}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
       </Container>
     )
