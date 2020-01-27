@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [How to Contribute to OpenCRVS](#how-to-contribute-to-opencrvs)
   - [Internal Dev Process - for the core team (Plan, Jembi and DSI)](#internal-dev-process---for-the-core-team-plan-jembi-and-dsi)
@@ -21,7 +22,7 @@ Current Tech Leads:
 - Euan Millar https://github.com/euanmillar
 - Ryan Crichton https://github.com/rcrichton
 - Riku Rouvila https://github.com/rikukissa
-- Anik Mushraful Hoque https://github.com/mushrafulhoque-dsi
+- Mushraful Hoque Anik https://github.com/mushrafulhoque-dsi
 
 We work in 2 week sprints. We will have a meeting day after the end of the previous sprint and before the new sprint starts. This is a time for us to perform the the following sprint ceremonies:
 
