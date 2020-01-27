@@ -541,7 +541,7 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
   return result
 }
 
-function mergeDeclaredApplications(
+export function mergeDeclaredApplications(
   applications: IApplication[],
   declaredApplications: GQLEventSearchSet[]
 ) {

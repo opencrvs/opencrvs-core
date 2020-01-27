@@ -9,35 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
-  createTestComponent,
-  validToken,
-  flushPromises,
-  mockApplicationData,
-  mockUserResponse,
-  getItem
-} from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
-import {
+  createApplication,
   storeApplication,
-  SUBMISSION_STATUS,
-  createApplication
+  SUBMISSION_STATUS
 } from '@client/applications'
-import uuid from 'uuid'
 import { Event } from '@client/forms'
-import { queries } from '@client/profile/queries'
-import { merge } from 'lodash'
-import { createStore } from '@client/store'
 import { checkAuth } from '@client/profile/profileActions'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+import { queries } from '@client/profile/queries'
 import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
 } from '@client/search/queries'
+import { createStore } from '@client/store'
+import {
+  createTestComponent,
+  fieldAgentScopeToken,
+  flushPromises,
+  getItem,
+  mockApplicationData,
+  mockUserResponse
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
+import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+import { ReactWrapper } from 'enzyme'
+import { merge } from 'lodash'
+import * as React from 'react'
+import uuid from 'uuid'
 
 const nameObj = {
   data: {
@@ -82,8 +82,8 @@ describe('FieldAgentHome tests', () => {
 
   beforeAll(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
-    getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth({ '?token': validToken }))
+    getItem.mockReturnValue(fieldAgentScopeToken)
+    await store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
   it('renders loading icon while loading page', async () => {
