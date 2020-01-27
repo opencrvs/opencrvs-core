@@ -259,7 +259,9 @@ export const isValidBirthDate: Validation = (
   drafts?
 ) => {
   const cast = value as string
-  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+  return !cast
+    ? { message: messages.required }
+    : cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? isDateNotAfterDeath(cast, drafts as IFormData)
       ? undefined
       : {
