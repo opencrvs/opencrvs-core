@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`view header component renders without crashing 1`] = `ShallowWrapper {}`;
-
-exports[`view header component with logo renders without crashing 1`] = `ShallowWrapper {}`;
