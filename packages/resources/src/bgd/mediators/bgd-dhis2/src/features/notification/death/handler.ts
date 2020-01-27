@@ -18,6 +18,7 @@ import {
   createDeathComposition,
   createTaskEntry,
   createDeathObservation,
+  getIDFromResponse,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
@@ -226,5 +227,5 @@ export async function deathNotificationHandler(
       .header('Content-Type', 'application/json+openhim')
   }
 
-  return h.response(response).code(201)
+  return h.response({ composition_id: getIDFromResponse(response) }).code(201)
 }

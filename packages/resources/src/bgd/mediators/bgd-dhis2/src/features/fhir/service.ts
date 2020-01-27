@@ -548,3 +548,17 @@ export function dateFormatter(date: string | null, formatString: string) {
   }
   return moment(Number(date)).format(formatString)
 }
+
+export function getIDFromResponse(resBody: fhir.Bundle): string {
+  if (
+    !resBody ||
+    !resBody.entry ||
+    !resBody.entry[0] ||
+    !resBody.entry[0].response ||
+    !resBody.entry[0].response.location
+  ) {
+    throw new Error(`FHIR did not send a valid response`)
+  }
+  // return the Composition's id
+  return resBody.entry[0].response.location.split('/')[3]
+}
