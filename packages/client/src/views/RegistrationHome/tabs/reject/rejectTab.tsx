@@ -128,9 +128,7 @@ class RejectTabComponent extends React.Component<
           key: 'dateOfRejection'
         },
         {
-          label: this.userHasRegisterScope()
-            ? this.props.intl.formatMessage(messages.listItemAction)
-            : '',
+          label: this.props.intl.formatMessage(messages.listItemAction),
           width: 20,
           key: 'actions',
           isActionColumn: true,
@@ -168,38 +166,35 @@ class RejectTabComponent extends React.Component<
         (foundApplication && foundApplication.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        this.userHasRegisterScope() &&
-          actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_APPLICATION
-                }}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
-          })
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_APPLICATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
       } else {
-        if (this.userHasRegisterScope()) {
-          if (reg.duplicates && reg.duplicates.length > 0) {
-            actions.push({
-              label: this.props.intl.formatMessage(constantsMessages.review),
-              handler: () => this.props.goToReviewDuplicate(reg.id)
-            })
-          } else {
-            actions.push({
-              label: this.props.intl.formatMessage(buttonMessages.update),
-              handler: () =>
-                this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event ? reg.event.toLowerCase() : ''
-                )
-            })
-          }
+        if (reg.duplicates && reg.duplicates.length > 0) {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => this.props.goToReviewDuplicate(reg.id)
+          })
+        } else {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.update),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
+          })
         }
       }
       const event =
@@ -255,6 +250,7 @@ class RejectTabComponent extends React.Component<
           clickable={!this.getExpandable()}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}

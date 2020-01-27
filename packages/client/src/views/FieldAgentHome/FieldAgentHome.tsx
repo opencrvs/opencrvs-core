@@ -511,6 +511,9 @@ class FieldAgentHomeView extends React.Component<
                             clickable={true}
                             showPaginated={this.showPaginated}
                             loading={loading}
+                            loadMoreText={intl.formatMessage(
+                              constantsMessages.loadMore
+                            )}
                           />
                           <LoadingIndicator
                             loading={loading}

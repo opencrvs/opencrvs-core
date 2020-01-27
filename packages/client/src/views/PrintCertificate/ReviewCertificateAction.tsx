@@ -13,9 +13,8 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { PDFViewer } from '@opencrvs/components/lib/forms'
 import { Check } from '@opencrvs/components/lib/icons'
 import {
-  Box,
-  EventTopBar,
-  ResponsiveModal
+  ResponsiveModal,
+  ActionPageLight
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
@@ -90,19 +89,20 @@ const ButtonWrapper = styled.div`
   }
 `
 const PdfWrapper = styled.div`
+  ${({ theme }) => theme.shadows.mistyShadow};
   background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
-  height: 90vh;
+  height: 100%;
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
-  overflow: scroll;
 `
 
 const Info = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 30px;
   color: ${({ theme }) => theme.colors.menuBackground};
+  width: 80%;
 `
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
@@ -243,72 +243,57 @@ class ReviewCertificateActionComponent extends React.Component<
     const { goToRegistrarHomeTabAction, intl } = this.props
 
     return (
-      <Container>
-        <EventTopBar
-          title={intl.formatHTMLMessage(
-            certificateMessages.certificateCollectionTitle
-          )}
-          goHome={() => {
-            goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
-          }}
-        />
-        <BodyContent>
-          <FormContainer>
-            <Box>
-              <Title>{this.getTitle()}</Title>
-              <Info>
-                {intl.formatHTMLMessage(certificateMessages.retiewDescription)}
-              </Info>
+      <ActionPageLight
+        id="collector_form"
+        title={intl.formatHTMLMessage(
+          certificateMessages.certificateCollectionTitle
+        )}
+        goBack={() => {
+          goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+        }}
+      >
+        <Title>{this.getTitle()}</Title>
+        <Info>
+          {intl.formatHTMLMessage(certificateMessages.retiewDescription)}
+        </Info>
 
-              <PdfWrapper id="pdfwrapper">
-                <PDFViewer
-                  id="pdfholder"
-                  pdfSource={this.state.certificatePdf}
-                />
-              </PdfWrapper>
+        <PdfWrapper id="pdfwrapper">
+          <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+        </PdfWrapper>
 
-              <ButtonWrapper>
-                <PrimaryButton
-                  align={0}
-                  id="confirm-print"
-                  onClick={this.toggleModal}
-                  icon={() => <Check />}
-                >
-                  {intl.formatHTMLMessage(certificateMessages.confirmAndPrint)}
-                </PrimaryButton>
+        <ButtonWrapper>
+          <PrimaryButton
+            align={0}
+            id="confirm-print"
+            onClick={this.toggleModal}
+            icon={() => <Check />}
+          >
+            {intl.formatHTMLMessage(certificateMessages.confirmAndPrint)}
+          </PrimaryButton>
 
-                <CustomTertiaryButton disabled>
-                  {intl.formatHTMLMessage(buttonMessages.editRecord)}
-                </CustomTertiaryButton>
-              </ButtonWrapper>
-            </Box>
+          <CustomTertiaryButton disabled>
+            {intl.formatHTMLMessage(buttonMessages.editRecord)}
+          </CustomTertiaryButton>
+        </ButtonWrapper>
 
-            <ResponsiveModal
-              id="confirm-print-modal"
-              title={intl.formatMessage(certificateMessages.modalTitle)}
-              actions={[
-                <CustomTertiaryButton
-                  onClick={this.toggleModal}
-                  id="close-modal"
-                >
-                  {intl.formatHTMLMessage(buttonMessages.cancel)}
-                </CustomTertiaryButton>,
-                <PrimaryButton
-                  onClick={this.readyToCertify}
-                  id="print-certificate"
-                >
-                  {intl.formatHTMLMessage(buttonMessages.print)}
-                </PrimaryButton>
-              ]}
-              show={this.state.showConfirmationModal}
-              handleClose={this.toggleModal}
-              contentHeight={100}
-            >
-              {intl.formatHTMLMessage(certificateMessages.modalBody)}
-            </ResponsiveModal>
-          </FormContainer>
-        </BodyContent>
-      </Container>
+        <ResponsiveModal
+          id="confirm-print-modal"
+          title={intl.formatMessage(certificateMessages.modalTitle)}
+          actions={[
+            <CustomTertiaryButton onClick={this.toggleModal} id="close-modal">
+              {intl.formatHTMLMessage(buttonMessages.cancel)}
+            </CustomTertiaryButton>,
+            <PrimaryButton onClick={this.readyToCertify} id="print-certificate">
+              {intl.formatHTMLMessage(buttonMessages.print)}
+            </PrimaryButton>
+          ]}
+          show={this.state.showConfirmationModal}
+          handleClose={this.toggleModal}
+          contentHeight={100}
+        >
+          {intl.formatHTMLMessage(certificateMessages.modalBody)}
+        </ResponsiveModal>
+      </ActionPageLight>
     )
   }
 }

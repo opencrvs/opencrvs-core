@@ -17,8 +17,8 @@ export const TickLarge = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       d="M2 7.192L8.459 15 19 2"
       fillRule="nonzero"
-      stroke="#FFF"
-      strokeWidth={3}
+      stroke="currentColor"
+      strokeWidth={4}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
