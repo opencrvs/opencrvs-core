@@ -261,15 +261,15 @@ export async function fetchHierarchicalBangladeshLocations(
   return result
 }
 
-export async function fetchFacilityByHRISId(
-  hrisId: string,
+export async function fetchFacilityByHRISCode(
+  hrisCode: string,
   authHeader: string
 ) {
   return await fetchLocationByIdentifiers(
     [
       {
-        system: 'http://opencrvs.org/specs/id/hris-internal-id',
-        value: hrisId
+        system: 'http://opencrvs.org/specs/id/hris-code',
+        value: hrisCode
       }
     ],
     'type=HEALTH_FACILITY',

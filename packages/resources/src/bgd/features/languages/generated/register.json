@@ -2157,7 +2157,6 @@
         "register.SelectContactPoint.phoneNoLabel": "ফোন নম্বর",
         "register.SelectContactPoint.title": "জন্ম আবেদন",
         "register.selectInformant.daughter": "কন্যা",
-        "register.selectInformant.deathInformantTitle": "মৃত ব্যক্তির সাথে আবেদনকারীর সম্পর্ক কি?",
         "register.selectInformant.relation": "আবেদনকারী কে?",
         "register.selectInformant.birthErrorMessage": "অনুগ্রহ পূর্বক কারা উপস্থিত এবং আবেদন করছেন নির্বাচন করুন।",
         "register.selectInformant.birthInformantTitle": "কে জন্ম নিবন্ধনের জন্য আবেদন করছে?",

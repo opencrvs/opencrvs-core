@@ -1,5 +1,7 @@
 {
-  "deceased": { // Required!
+  "dhis2_event": "", //Required - unique id of dhis2 event
+  "deceased": {
+    // Required!
     "first_names_en": "ASSHINI",
     "last_name_en": "MOJUMDAR", // Required!
     "first_names_bn": "",
@@ -7,7 +9,7 @@
     "sex": "male | female | unknown",
     "nid": null,
     "nid_spouse": null,
-    "date_birth": "1565097042000"
+    "date_birth": "2019-11-25"
   },
   "father": {
     "first_names_en": "ASSHINI",
@@ -48,19 +50,21 @@
       "id": "1", // These ids must match BBS codes
       "name": "Urban Ward No-04"
     },
-    "union": { // Required!
+    "union": {
+      // Required!
       "id": "4143", // These ids must match BBS codes
       "name": "Alokbali"
     }
   },
   "phone_number": "01928263185", // Required!
-  "death_date": "1565097042000", // Required!
+  "death_date": "2020-01-25", // Required!
   "underlying_cause_of_death": "I64",
   "place_of_death": {
-    "id": "1", // These ids must match Central HRIS MoHFW APU Facility List ids for institution
+    "code": "10000453", // These codes must match Central HRIS MoHFW APU Facility List codes for institution
     "name": "Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar"
   },
-  "union_death_ocurred": { // Required!
+  "union_death_ocurred": {
+    // Required!
     "id": "1", // These ids must match BBS codes - this must be the full union code up until union level - http://203.112.218.65:8008/PageWebMenuContent.aspx?MenuKey=150
     "name": "Alokbali"
   }

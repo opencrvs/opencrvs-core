@@ -1,5 +1,7 @@
 {
-  "child": { // Required!
+  "dhis2_event": "", //Required - unique id of dhis2 event
+  "child": {
+    // Required!
     "first_names_en": "",
     "last_name_en": "", // Required!
     "first_names_bn": "",
@@ -45,18 +47,20 @@
       "id": "1", // These ids must match BBS codes
       "name": "Urban Ward No-04"
     },
-    "union": { // Required!
+    "union": {
+      // Required!
       "id": "4143", // These ids must match BBS codes
       "name": "Alokbali"
     }
   },
   "phone_number": "", // Required!
-  "date_birth": "1565097042000", // Required!
+  "date_birth": "2020-01-25", // Required!
   "place_of_birth": {
-    "id": "1", // These ids must match Central HRIS MoHFW APU Facility List ids for institution
+    "code": "10000453", // These codes must match Central HRIS MoHFW APU Facility List codes for institution
     "name": "Charmadhabpur(bakharnagar) Cc - Narsingdi Sadar"
   },
-  "union_birth_ocurred": { // Required!
+  "union_birth_ocurred": {
+    // Required!
     "id": "1", // These ids must match BBS codes - this must be the full union code up until union level - http://203.112.218.65:8008/PageWebMenuContent.aspx?MenuKey=150
     "name": "Alokbali"
   }
