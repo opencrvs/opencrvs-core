@@ -15,7 +15,6 @@ import {
   fetchCRVSOfficeByParentLocation
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import * as moment from 'moment'
-import { EVENT_DATE_FORMAT } from '@bgd-dhis2-mediator/constants'
 
 export interface IIncomingAddress {
   division: {
@@ -291,9 +290,11 @@ export async function createPersonEntry(
             )
           ]
         : [],*/
-      birthDate: dateFormatter(birthDate, EVENT_DATE_FORMAT),
+      // Date values are expected to YYYY-MM-DD from DHIS2
+      birthDate: birthDate,
       deceasedBoolean: !!deathDate,
-      deceasedDateTime: dateFormatter(deathDate, EVENT_DATE_FORMAT)
+      // Date values are expected to YYYY-MM-DD from DHIS2
+      deceasedDateTime: deathDate
     }
   }
 }
@@ -382,6 +383,7 @@ export async function createTaskEntry(
   eventType: 'BIRTH' | 'DEATH',
   contactPerson: string,
   contactNumber: string,
+  dhis2Identifier: string | undefined,
   authHeader: string
 ) {
   const taskResource: fhir.Task = {
@@ -424,6 +426,14 @@ export async function createTaskEntry(
       }
     })
   }
+  if (dhis2Identifier) {
+    taskResource.identifier = [
+      {
+        system: 'http://opencrvs.org/specs/id/dhis2_event_identifier',
+        value: dhis2Identifier
+      }
+    ]
+  }
   return {
     fullUrl: `urn:uuid:${uuid()}`,
     resource: taskResource
@@ -463,6 +473,41 @@ export function createDeathObservation(
           code: causeOfDeath
         }
       }
+    }
+  }
+}
+
+export function createPresentAtEventObservation(
+  encounterRef: string,
+  presentAtEvent: string
+) {
+  return {
+    fullUrl: `urn:uuid:${uuid()}`,
+    resource: {
+      resourceType: 'Observation',
+      status: 'final',
+      context: {
+        reference: encounterRef
+      },
+      category: {
+        coding: [
+          {
+            system: 'http://hl7.org/fhir/observation-category',
+            code: 'procedure',
+            display: 'Procedure'
+          }
+        ]
+      },
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: 'present-at-birth-reg',
+            display: 'Present at birth registration'
+          }
+        ]
+      },
+      valueString: presentAtEvent
     }
   }
 }

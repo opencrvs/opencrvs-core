@@ -24,7 +24,7 @@ import {
   postBundle,
   // fetchUnionByFullBBSCode,
   getLastRegLocationFromFacility,
-  fetchFacilityByHRISId
+  fetchFacilityByHRISCode
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -33,6 +33,7 @@ import {
 } from '@bgd-dhis2-mediator/constants'
 
 export interface IDeathNotification {
+  dhis2_event: string
   deceased: {
     first_names_en?: [string]
     last_name_en: string
@@ -62,7 +63,7 @@ export interface IDeathNotification {
   death_date: string
   underlying_cause_of_death?: string
   place_of_death?: {
-    id: string
+    code: string
     name: string
   }
   union_death_ocurred: {
@@ -111,8 +112,8 @@ export async function deathNotificationHandler(
   if (!notification.place_of_death) {
     throw new Error('Could not find any place of death')
   }
-  const placeOfDeathFacilityLocation = await fetchFacilityByHRISId(
-    notification.place_of_death.id,
+  const placeOfDeathFacilityLocation = await fetchFacilityByHRISCode(
+    notification.place_of_death.code,
     request.headers.authorization
   )
   if (!placeOfDeathFacilityLocation) {
@@ -174,6 +175,7 @@ export async function deathNotificationHandler(
     'DEATH',
     'APPLICANT',
     notification.phone_number,
+    notification.dhis2_event,
     request.headers.authorization
   )
 
@@ -198,7 +200,7 @@ export async function deathNotificationHandler(
   const bundle = createBundle(entries)
 
   const startTime = new Date().toISOString()
-  await postBundle(bundle, request.headers.authorization)
+  const response = await postBundle(bundle, request.headers.authorization)
   const endTime = new Date().toISOString()
 
   if (RUN_AS_MEDIATOR) {
@@ -224,5 +226,5 @@ export async function deathNotificationHandler(
       .header('Content-Type', 'application/json+openhim')
   }
 
-  return h.response().code(201)
+  return h.response(response).code(201)
 }
