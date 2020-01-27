@@ -113,7 +113,7 @@ class ReviewTabComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map(reg => {
+    return transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundApplication = this.props.outboxApplications.find(
         application => application.id === reg.id
@@ -132,6 +132,7 @@ class ReviewTabComponent extends React.Component<
                   compositionId: reg.id,
                   action: Action.LOAD_REVIEW_APPLICATION
                 }}
+                key={`DownloadButton-${index}`}
                 status={downloadStatus as DOWNLOAD_STATUS}
               />
             )
@@ -157,6 +158,7 @@ class ReviewTabComponent extends React.Component<
                   compositionId: reg.id,
                   action: Action.LOAD_REVIEW_APPLICATION
                 }}
+                key={`DownloadButton-${index}`}
                 status={downloadStatus as DOWNLOAD_STATUS}
               />
             )
