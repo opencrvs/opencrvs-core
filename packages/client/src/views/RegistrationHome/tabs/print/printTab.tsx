@@ -147,7 +147,7 @@ class PrintTabComponent extends React.Component<
     }
 
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map(reg => {
+    return transformedData.map((reg, index) => {
       const foundApplication = this.props.outboxApplications.find(
         application => application.id === reg.id
       )
@@ -164,6 +164,7 @@ class PrintTabComponent extends React.Component<
                 compositionId: reg.id,
                 action: Action.LOAD_CERTIFICATE_APPLICATION
               }}
+              key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
             />
           )
