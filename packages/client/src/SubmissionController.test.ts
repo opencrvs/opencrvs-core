@@ -172,6 +172,11 @@ describe('Submission Controller', () => {
         },
         registerForm: {
           registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
         }
       }),
       dispatch: jest.fn()
