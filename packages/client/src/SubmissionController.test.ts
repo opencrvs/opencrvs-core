@@ -109,7 +109,10 @@ describe('Submission Controller', () => {
     const store = {
       getState: () => ({
         profile: {
-          userDetails: {}
+          userDetails: {},
+          tokenPayload: {
+            scope: ['declare']
+          }
         },
         applicationsState: {
           applications: [
