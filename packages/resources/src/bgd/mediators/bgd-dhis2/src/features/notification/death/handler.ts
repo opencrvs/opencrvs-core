@@ -209,7 +209,12 @@ export async function deathNotificationHandler(
       .response({
         'x-mediator-urn': MEDIATOR_URN,
         status: 'Successful',
-        response: { status: 201 },
+        response: {
+          status: 201,
+          body: {
+            composition_id: getIDFromResponse(response)
+          }
+        },
         orchestrations: [
           {
             name: 'Submit converted birth bundle',
