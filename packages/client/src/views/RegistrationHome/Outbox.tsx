@@ -17,7 +17,10 @@ import {
   Spinner
 } from '@opencrvs/components/lib/interface'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { StatusWaiting } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -99,6 +102,7 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   transformApplicationsReadyToSend = () => {
+    const { intl } = this.props
     const allapplications = this.props.application || []
     return allapplications.map((application, index) => {
       let name
@@ -148,7 +152,12 @@ class Outbox extends React.Component<IFullProps, IState> {
 
       return {
         id: application.id,
-        event: (application.event && sentenceCase(application.event)) || '',
+        event:
+          (application.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[application.event.toLowerCase()]
+            )) ||
+          '',
         name,
         submissionStatus: statusText || '',
         statusIndicator: icon ? [icon()] : null
