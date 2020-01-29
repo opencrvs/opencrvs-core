@@ -10,8 +10,7 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh COUNTRY --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION'
-    echo "  Script must receive a first COUNTRY parameter of 'bgd' or 'zmb' set  as a supported alpha-3 country code e.g.: ./deploy.sh bgd"
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo '  HOST    is the server to deploy to'
@@ -22,46 +21,40 @@ print_usage_and_exit () {
     exit 1
 }
 
-if [ -z "$1" ] || { [ $1 != 'bgd' ] && [ $1 != 'zmb' ] ;} ; then
-    echo 'Error: Argument for COUNTRY is required in position 1.'
+if [ -z "$1" ] || { [ $1 != '--clear-data=no' ] && [ $1 != '--clear-data=yes' ] ;} ; then
+    echo 'Error: Argument --clear-data is required in position 1.'
     print_usage_and_exit
 fi
 
-if [ -z "$2" ] || { [ $2 != '--clear-data=no' ] && [ $2 != '--clear-data=yes' ] ;} ; then
-    echo 'Error: Argument --clear-data is required in position 2.'
+if [ -z "$2" ] || { [ $2 != '--restore-metadata=no' ] && [ $2 != '--restore-metadata=yes' ] ;} ; then
+    echo 'Error: Argument --restore-metadata is required in position 2.'
     print_usage_and_exit
 fi
 
-if [ -z "$3" ] || { [ $3 != '--restore-metadata=no' ] && [ $3 != '--restore-metadata=yes' ] ;} ; then
-    echo 'Error: Argument --restore-metadata is required in position 3.'
+if [ -z "$3" ] ; then
+    echo 'Error: Argument HOST is required in position 3.'
     print_usage_and_exit
 fi
 
 if [ -z "$4" ] ; then
-    echo 'Error: Argument HOST is required in position 4.'
+    echo 'Error: Argument ENV is required in position 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument ENV is required in position 5.'
+    echo 'Error: Argument VERSION is required in position 5.'
     print_usage_and_exit
 fi
 
 if [ -z "$6" ] ; then
-    echo 'Error: Argument VERSION is required in position 6.'
+    echo 'Error: Argument RESOURCES_PATH is required in position 6.'
     print_usage_and_exit
 fi
 
-if [ -z "$7" ] ; then
-    echo 'Error: Argument RESOURCES_PATH is required in position 7.'
-    print_usage_and_exit
-fi
-
-COUNTRY=$1
-HOST=$4
-ENV=$5
-VERSION=$6
-RESOURCES_PATH=$7
+HOST=$3
+ENV=$4
+VERSION=$5
+RESOURCES_PATH=$6
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -88,10 +81,11 @@ cp $RESOURCES_PATH/backups/user-mgnt.gz /tmp/compose/infrastructure/default_back
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
 
 # Copy all country compose files to the server
-rsync -rP $RESOURCES_PATH/docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
+rsync -rP $RESOURCES_PATH/docker-compose.resources* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
 
 # Override configuration files with country specific files
 rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
+
 
 # Prepare docker-compose.deploy.yml and docker-compose.<COUNTRY>.yml file - rotate secrets etc
 if [[ "$ENV" = "development" ]]; then
@@ -106,30 +100,31 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HO
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 elif [[ "$ENV" = "qa" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 else
-    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && COUNTRY='$COUNTRY' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
+    ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 fi
 
-if [ $2 == "--clear-data=yes" ] || [ $3 == "--restore-metadata=yes" ] ; then
+if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Waiting 2 mins for stack to deploy before working with data..."
     echo
     sleep 120
 fi
 
-if [ $2 == "--clear-data=yes" ] ; then
+if [ $1 == "--clear-data=yes" ] ; then
     echo
     echo "Clearing all existing data..."
     echo
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/clear-all-data.sh'
 fi
 
-if [ $3 == "--restore-metadata=yes" ] ; then
+if [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
 fi
+
