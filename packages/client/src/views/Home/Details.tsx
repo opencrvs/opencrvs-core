@@ -791,7 +791,8 @@ function mapStateToProps(
         match.params.applicationId &&
         state.applicationsState.applications.find(
           application =>
-            application.compositionId === match.params.applicationId &&
+            (application.id === match.params.applicationId ||
+              application.compositionId === match.params.applicationId) &&
             (application.submissionStatus ===
               SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT] ||
               application.submissionStatus ===
