@@ -16,6 +16,7 @@ import { createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { MonthlyReports } from './MonthlyReports'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('Monthly report', () => {
   const { store, history } = createStore()
@@ -30,7 +31,37 @@ describe('Monthly report', () => {
     expect(app.find(ListTable)).toHaveLength(2)
   })
 
+  it('redirection to report page is disabled', async () => {
+    const button = app
+      .find(ListTable)
+      .first()
+      .find('#row_0')
+      .hostNodes()
+      .find(Button)
+      .first()
+
+    expect(button.props().disabled).toEqual(true)
+  })
+
   it('redirects to report page', async () => {
+    const locationSearchInput = await waitForElement(
+      app,
+      '#locationSearchInput'
+    )
+
+    locationSearchInput.hostNodes().simulate('change', {
+      target: { id: 'locationSearchInput', value: 'Chittagong' }
+    })
+
+    locationSearchInput.update()
+
+    app
+      .find('#locationOption8cbc862a-b817-4c29-a490-4a8767ff023c')
+      .hostNodes()
+      .simulate('click')
+
+    app.update()
+
     app
       .find(ListTable)
       .first()
