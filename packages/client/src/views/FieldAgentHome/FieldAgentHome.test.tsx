@@ -613,10 +613,10 @@ describe('FieldAgentHome tests', () => {
       store.dispatch(storeApplication(failedApplication))
 
       component.update()
-      expect(component.find('#waiting0').hostNodes()).toHaveLength(1)
-      expect(component.find('#submitting1').hostNodes()).toHaveLength(1)
-      expect(component.find('#submitted2').hostNodes()).toHaveLength(1)
-      expect(component.find('#failed3').hostNodes()).toHaveLength(1)
+      expect(component.find('#failed0').hostNodes()).toHaveLength(1)
+      expect(component.find('#submitted1').hostNodes()).toHaveLength(1)
+      expect(component.find('#submitting2').hostNodes()).toHaveLength(1)
+      expect(component.find('#waiting3').hostNodes()).toHaveLength(1)
     })
 
     it('when offline renders pending submission status', async () => {
