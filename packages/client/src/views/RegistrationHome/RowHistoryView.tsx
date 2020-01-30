@@ -36,6 +36,7 @@ import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 
 const ExpansionContent = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -381,7 +382,9 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
                         <>
                           <LabelValue
                             label={intl.formatMessage(constantsMessages.update)}
-                            value={rejectReasons}
+                            value={this.props.intl.formatMessage(
+                              getRejectionReasonDisplayValue(rejectReasons)
+                            )}
                           />
                           <LabelValue
                             label={intl.formatMessage(

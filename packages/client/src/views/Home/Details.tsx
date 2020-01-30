@@ -77,6 +77,7 @@ import {
 } from '@client/utils/constants'
 import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px 10px 10px;
@@ -627,7 +628,9 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
                 {status.rejectReason && (
                   <LabelValue
                     label={this.props.intl.formatMessage(messages.reason)}
-                    value={status.rejectReason}
+                    value={this.props.intl.formatMessage(
+                      getRejectionReasonDisplayValue(status.rejectReason)
+                    )}
                   />
                 )}
                 {status.rejectComment && (

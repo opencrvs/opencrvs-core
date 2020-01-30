@@ -2174,7 +2174,7 @@
         "register.selectVitalEvent.backToReviewButton": "পর্যালোচনায় ফিরে যান",
         "register.selectVitalEvent.errorMessage": "দয়া করে একটি ইভেন্ট নির্বাচন করুন",
         "register.selectVitalEvent.registerNewEventDesc": "ইভেন্ট নির্বাচন দ্বারা শুরু করুন",
-        "register.selectVitalEvent.registerNewEventHeading": "আপনি কি ধরণের ইভেন্ট তৈরি করতে চান",
+        "register.selectVitalEvent.registerNewEventHeading": "আপনি কি ধরণের ইভেন্ট তৈরি করতে চান?",
         "register.selectVitalEvent.registerNewEventTitle": "নতুন আবেদন",
         "register.sysAdminHome.config": "কনফিগ",
         "register.sysAdminHome.devices": "ডিভাইসেস",
