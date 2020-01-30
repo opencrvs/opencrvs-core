@@ -64,6 +64,11 @@ export enum Event {
   DEATH = 'death'
 }
 
+export enum Sort {
+  ASC = 'asc',
+  DESC = 'desc'
+}
+
 export enum Action {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_APPLICATION = 'approve',

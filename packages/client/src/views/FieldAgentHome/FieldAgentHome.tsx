@@ -582,7 +582,7 @@ const mapStateToProps = (
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       [],
-    applicationsReadyToSend:
+    applicationsReadyToSend: (
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(
           (application: IApplication) =>
@@ -590,6 +590,7 @@ const mapStateToProps = (
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       []
+    ).reverse()
   }
 }
 

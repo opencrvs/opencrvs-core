@@ -14,7 +14,8 @@ import {
   Event,
   IForm,
   IFormData,
-  IFormFieldValue
+  IFormFieldValue,
+  Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
@@ -529,7 +530,8 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
         userId,
         status: [EVENT_STATUS.DECLARED],
         locationIds,
-        count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT
+        count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT,
+        sort: Sort.ASC
       },
       fetchPolicy: 'no-cache'
     })
