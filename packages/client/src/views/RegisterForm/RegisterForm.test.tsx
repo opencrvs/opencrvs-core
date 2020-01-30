@@ -43,7 +43,8 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   HOME,
-  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+  REGISTRAR_HOME
 } from '@opencrvs/client/src/navigation/routes'
 
 import { Event, IFormData } from '@opencrvs/client/src/forms'
@@ -415,6 +416,37 @@ describe('when user is in the register form for death event', () => {
           .hostNodes()
           .text()
       ).toBe('Required for registration')
+    })
+
+    it('after clicking exit, takes back home', async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+      component
+        .find('#exit_top_bar')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+
+      expect(history.location.pathname).toContain(REGISTRAR_HOME)
     })
 
     it('renders loader button when idType is National ID', async () => {
