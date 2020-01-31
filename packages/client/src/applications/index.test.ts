@@ -10,9 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
+  mergeDeclaredApplications,
   filterProcessingApplications,
   filterProcessingApplicationsFromQuery
 } from '.'
+import { Event } from '@client/forms'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingApplications()', () => {
@@ -215,5 +217,37 @@ describe('query result filtering tests', () => {
         }
       })
     })
+  })
+})
+
+describe('Utilty functions', () => {
+  it('fetch declared applications', () => {})
+  it('merges applications', () => {
+    const applications = [
+      {
+        id: '1',
+        data: {},
+        event: Event.BIRTH,
+        compositionId: '1'
+      },
+      {
+        id: '2',
+        data: {},
+        event: Event.DEATH,
+        compositionId: '2'
+      }
+    ]
+    const declaredApplications = [
+      {
+        id: '2'
+      },
+      {
+        id: '3'
+      }
+    ]
+
+    mergeDeclaredApplications(applications, declaredApplications)
+
+    expect(applications).toHaveLength(3)
   })
 })

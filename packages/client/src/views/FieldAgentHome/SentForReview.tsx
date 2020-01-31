@@ -94,6 +94,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         statusText = formatMessage(sending)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
         overwriteStatusIfOffline = false
         iconId = `submitted${index}`
         icon = () => <StatusSubmitted id={iconId} key={iconId} />
