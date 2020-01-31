@@ -9,5 +9,5 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 set -e
 
-sed -i s/THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE/$RESOURCES_URL/g /usr/share/nginx/html/index.html
+sed -i s~THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE~$RESOURCES_URL~g /usr/share/nginx/html/index.html
 nginx -g 'daemon off;'
