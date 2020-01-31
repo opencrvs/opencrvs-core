@@ -773,11 +773,16 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<{
-    applicationId: string
-  }>
+  props: RouteComponentProps<
+    {
+      applicationId: string
+    },
+    {},
+    { forceDetailsQuery?: boolean }
+  >
 ) {
   const { match } = props
+  const { forceDetailsQuery } = props.location.state
   return {
     language: state.i18n.language,
     userDetails: getUserDetails(state),
@@ -785,7 +790,8 @@ function mapStateToProps(
     applicationId: match && match.params && match.params.applicationId,
     outboxApplications: state.applicationsState.applications,
     draft:
-      (state.applicationsState.applications &&
+      (!forceDetailsQuery &&
+        state.applicationsState.applications &&
         match &&
         match.params &&
         match.params.applicationId &&
