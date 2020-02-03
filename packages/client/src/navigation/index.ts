@@ -198,8 +198,13 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToApplicationDetails(applicationId: string) {
-  return push(formatUrl(APPLICATION_DETAIL, { applicationId }))
+export function goToApplicationDetails(
+  applicationId: string,
+  forceDetailsQuery?: boolean
+) {
+  return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
+    forceDetailsQuery
+  })
 }
 
 export function goToBirthRegistrationAsParent(applicationId: string) {

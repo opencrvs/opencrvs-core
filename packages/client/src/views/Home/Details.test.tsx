@@ -177,6 +177,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store
     )
@@ -208,6 +216,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store
@@ -274,6 +290,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store
     )
@@ -302,6 +326,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store
@@ -419,6 +451,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -521,6 +561,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store,
@@ -638,6 +686,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -711,6 +767,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: true
+          }
         }}
       />,
       store,
@@ -1033,6 +1097,14 @@ describe('Registrar tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -1084,6 +1156,14 @@ describe('Registrar tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store,
@@ -1516,6 +1596,14 @@ describe('Registrar tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -1588,6 +1676,12 @@ describe('Registrar tests', () => {
             isExact: true,
             path: '',
             url: ''
+          }}
+          location={{
+            pathname: '',
+            search: '',
+            hash: '',
+            state: {}
           }}
         />,
         store,

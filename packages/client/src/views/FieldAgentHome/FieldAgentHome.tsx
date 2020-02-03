@@ -330,7 +330,7 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationDetails(registrationSearchSet.id)
+              this.props.goToApplicationDetails(registrationSearchSet.id, true)
           }
         ]
       }
