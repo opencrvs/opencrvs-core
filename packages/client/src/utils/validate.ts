@@ -550,7 +550,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
         value.toString(),
         validBirthRegistrationNumberLength.min,
         validBirthRegistrationNumberLength.max
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -561,7 +561,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       return hasValidLength(
         value.toString(),
         validDeathRegistrationNumberLength
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,

@@ -242,7 +242,7 @@ describe('validate', () => {
         message: {
           id: 'validations.validBirthRegistrationNumber',
           defaultMessage:
-            'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
+            'The Birth Registration Number can only be numeric where the length must be within {min} and {max}',
           description:
             'The error message that appears when an invalid value is used as brn'
         },
@@ -254,7 +254,7 @@ describe('validate', () => {
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
     it('Should pass when supplied a good value as Birth Registration Number.', () => {
-      const goodValue = '2019333453BRTVSRJ1'
+      const goodValue = '20193334538255585'
       const typeOfID = 'BIRTH_REGISTRATION_NUMBER'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
@@ -266,7 +266,7 @@ describe('validate', () => {
         message: {
           id: 'validations.validDeathRegistrationNumber',
           defaultMessage:
-            'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+            'The Death Registration Number can only be numeric and must be {validLength} characters long',
           description:
             'The error message that appears when an invalid value is used as drn'
         },
@@ -277,7 +277,7 @@ describe('validate', () => {
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)
     })
     it('Should pass when supplied a good value as Death Registration Number.', () => {
-      const goodValue = '2019333453BRTVSRJ1'
+      const goodValue = '201933345335464654'
       const typeOfID = 'DEATH_REGISTRATION_NUMBER'
       const response = undefined
       expect(validIDNumber(typeOfID)(goodValue)).toEqual(response)
