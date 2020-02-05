@@ -94,6 +94,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         statusText = formatMessage(sending)
         break
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
         overwriteStatusIfOffline = false
         iconId = `submitted${index}`
         icon = () => <StatusSubmitted id={iconId} key={iconId} />
@@ -264,6 +265,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           pageSize={this.pageSize}
           currentPage={this.state.sentForReviewPageNo}
           showPaginated={this.props.showPaginated}
+          loadMoreText={intl.formatMessage(messages.loadMore)}
         />
         <LoadingIndicator loading={false} hasError={false} />
       </HomeContent>

@@ -183,7 +183,7 @@ export class InProgressTabComponent extends React.Component<
     const { intl } = this.props
     const { locale } = intl
 
-    return data.results.map(reg => {
+    return data.results.map((reg, index) => {
       if (!reg) {
         throw new Error('Registration is null')
       }
@@ -230,6 +230,7 @@ export class InProgressTabComponent extends React.Component<
                 compositionId: reg.id,
                 action: Action.LOAD_REVIEW_APPLICATION
               }}
+              key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}
             />
           )
@@ -472,6 +473,7 @@ export class InProgressTabComponent extends React.Component<
           clickable={!this.getExpandable()}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}
@@ -502,6 +504,7 @@ export class InProgressTabComponent extends React.Component<
           clickable={!this.getExpandable()}
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}
@@ -715,6 +718,7 @@ export class InProgressTabComponent extends React.Component<
               clickable={!this.getExpandable()}
               showPaginated={this.props.showPaginated}
               loading={this.props.loading}
+              loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
             />
             <LoadingIndicator
               loading={this.props.loading ? true : false}

@@ -168,14 +168,14 @@ const messagesToDefine: IValidationMessages = {
   },
   validBirthRegistrationNumber: {
     defaultMessage:
-      'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
+      'The Birth Registration Number can only be numeric where the length must be within {min} and {max}',
     description:
       'The error message that appears when an invalid value is used as brn',
     id: 'validations.validBirthRegistrationNumber'
   },
   validDeathRegistrationNumber: {
     defaultMessage:
-      'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+      'The Death Registration Number can only be numeric and must be {validLength} characters long',
     description:
       'The error message that appears when an invalid value is used as drn',
     id: 'validations.validDeathRegistrationNumber'

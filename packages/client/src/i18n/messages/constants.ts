@@ -95,6 +95,7 @@ interface IConstantsMessages {
   over5Years: MessageDescriptor
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
+  loadMore: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -521,6 +522,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.validated',
     defaultMessage: 'validated',
     description: 'A label for validated'
+  },
+  loadMore: {
+    id: 'constants.loadMore',
+    defaultMessage: 'Load more',
+    description: 'A label for load more'
   }
 }
 

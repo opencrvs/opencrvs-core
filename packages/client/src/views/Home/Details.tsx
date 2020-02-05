@@ -9,74 +9,74 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
 import {
+  DOWNLOAD_STATUS,
   IApplication,
-  SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  SUBMISSION_STATUS
 } from '@client/applications'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Query } from '@client/components/Query'
 import {
-  goToPage as goToPageAction,
+  buttonMessages,
+  constantsMessages as messages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
+import {
   goBack as goBackAction,
+  goToPage as goToPageAction,
   goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
-import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
-import { IUserDetails } from '@client/utils/userUtils'
-import {
-  StatusProgress,
-  StatusOrange,
-  StatusGreen,
-  StatusGray,
-  StatusCollected,
-  StatusRejected,
-  StatusFailed
-} from '@opencrvs/components/lib/icons'
-import { SubPage, Spinner } from '@opencrvs/components/lib/interface'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
-import {
-  createNamesMap,
-  extractCommentFragmentValue
-} from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
-import {
-  GQLHumanName,
-  GQLQuery,
-  GQLPerson,
-  GQLRegStatus,
-  GQLComment
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Event, Action } from '@opencrvs/client/src/forms'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { Query } from '@client/components/Query'
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/Home/queries'
-
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { Scope } from '@client/utils/authUtils'
 import {
-  userMessages,
-  constantsMessages as messages,
-  buttonMessages,
-  errorMessages
-} from '@client/i18n/messages'
-import {
-  REJECTED,
-  IN_PROGRESS,
   DECLARED,
-  REJECT_REASON,
-  REJECT_COMMENTS,
+  IN_PROGRESS,
   REGISTERED,
+  REJECTED,
+  REJECT_COMMENTS,
+  REJECT_REASON,
   VALIDATED
 } from '@client/utils/constants'
-import { Scope } from '@client/utils/authUtils'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
+import {
+  createNamesMap,
+  extractCommentFragmentValue
+} from '@client/utils/data-formatting'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { getDraftApplicantFullName } from '@client/utils/draftUtils'
+import { IUserDetails } from '@client/utils/userUtils'
+import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/Home/queries'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+import { Action, Event } from '@opencrvs/client/src/forms'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  StatusCollected,
+  StatusFailed,
+  StatusGray,
+  StatusGreen,
+  StatusOrange,
+  StatusProgress,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
+import { Spinner, SubPage } from '@opencrvs/components/lib/interface'
+import {
+  GQLComment,
+  GQLHumanName,
+  GQLPerson,
+  GQLQuery,
+  GQLRegStatus
+} from '@opencrvs/gateway/src/graphql/schema.d'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
 const HistoryWrapper = styled.div`
   padding: 10px 0px 10px 10px;
@@ -132,6 +132,7 @@ const StatusIcon = styled.div`
 `
 
 enum DraftStatus {
+  DECLARED = 'DECLARED',
   DRAFT_STARTED = 'DRAFT_STARTED',
   DRAFT_MODIFIED = 'DRAFT_MODIFIED',
   FAILED = 'FAILED'
@@ -312,8 +313,79 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
     )
   }
 
+  generateDeclaredApplicationHistorData = (
+    application: IApplication
+  ): IHistoryData => {
+    const history: IStatus[] =
+      (application &&
+        application.operationHistories &&
+        application.operationHistories.map((history, i) => {
+          return generateHistoryEntry(
+            DraftStatus.DECLARED,
+            (history && (history.operatorName as GQLHumanName[])) || null,
+            (history && history.operatedOn) || '',
+            history && history.operatorRole
+              ? this.props.intl.formatMessage(
+                  userMessages[history.operatorRole as string]
+                )
+              : '',
+            this.props.language === 'en'
+              ? (history && history.operatorOfficeName) || ''
+              : (history &&
+                  history.operatorOfficeAlias &&
+                  history.operatorOfficeAlias[0]) ||
+                  '',
+            this.props.language,
+            application && application.trackingId,
+            application &&
+              application.data &&
+              application.data.registration &&
+              application.data.registration.contactPoint &&
+              // @ts-ignore
+              application.data.registration.contactPoint.nestedFields
+                .registrationPhone,
+            history && history.operationType === REJECTED
+              ? history.rejectReason
+              : undefined,
+            history && history.operationType === REJECTED
+              ? history.rejectComment
+              : undefined
+          )
+        })) ||
+      []
+    const applicationState = history.length > 0 ? history[0].type : null
+    const event = application && (application.event as string)
+    const id = application && (application.id as string)
+
+    const foundApplication = this.props.outboxApplications.find(
+      application => application.id === id
+    )
+
+    const downloadStatus =
+      (foundApplication && foundApplication.downloadStatus) || undefined
+    return {
+      title: getDraftApplicantFullName(application, this.props.language) || '',
+      history,
+      action: applicationState
+        ? this.getActionForStateAndScope(
+            event,
+            id,
+            applicationState,
+            downloadStatus
+          )
+        : undefined
+    }
+  }
+
   generateDraftHistoryData = (): IHistoryData => {
     const { draft, userDetails } = this.props
+    if (
+      draft &&
+      (draft.submissionStatus === SUBMISSION_STATUS.SUBMITTED ||
+        draft.submissionStatus === SUBMISSION_STATUS.DECLARED)
+    ) {
+      return this.generateDeclaredApplicationHistorData(draft)
+    }
     const history: IStatus[] = []
     let action: React.ReactElement
     if (
@@ -627,7 +699,9 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
                 {status.rejectReason && (
                   <LabelValue
                     label={this.props.intl.formatMessage(messages.reason)}
-                    value={status.rejectReason}
+                    value={this.props.intl.formatMessage(
+                      getRejectionReasonDisplayValue(status.rejectReason)
+                    )}
                   />
                 )}
                 {status.rejectComment && (
@@ -699,11 +773,16 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<{
-    applicationId: string
-  }>
+  props: RouteComponentProps<
+    {
+      applicationId: string
+    },
+    {},
+    { forceDetailsQuery?: boolean }
+  >
 ) {
   const { match } = props
+  const { forceDetailsQuery } = props.location.state
   return {
     language: state.i18n.language,
     userDetails: getUserDetails(state),
@@ -711,15 +790,21 @@ function mapStateToProps(
     applicationId: match && match.params && match.params.applicationId,
     outboxApplications: state.applicationsState.applications,
     draft:
-      (state.applicationsState.applications &&
+      (!forceDetailsQuery &&
+        state.applicationsState.applications &&
         match &&
         match.params &&
         match.params.applicationId &&
         state.applicationsState.applications.find(
           application =>
-            application.id === match.params.applicationId &&
+            (application.id === match.params.applicationId ||
+              application.compositionId === match.params.applicationId) &&
             (application.submissionStatus ===
               SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT] ||
+              application.submissionStatus ===
+                SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] ||
+              application.submissionStatus ===
+                SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED] ||
               application.submissionStatus ===
                 SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED])
         )) ||

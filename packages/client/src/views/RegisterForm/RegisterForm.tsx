@@ -439,7 +439,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   getEventTopBarPropsForForm = (menuOption: IEventTopBarMenuAction) => {
-    const { intl, application, activeSectionGroup } = this.props
+    const { intl, application, activeSectionGroup, goToHomeTab } = this.props
 
     let eventTopBarProps: IEventTopBarProps = {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
@@ -455,7 +455,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
       eventTopBarProps = {
         ...eventTopBarProps,
         exitAction: {
-          handler: () => this.onDeleteApplication(application),
+          handler: () => {
+            application.submissionStatus === SUBMISSION_STATUS.DRAFT
+              ? this.onDeleteApplication(application)
+              : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+          },
           label: intl.formatMessage(buttonMessages.exitButton)
         }
       }
