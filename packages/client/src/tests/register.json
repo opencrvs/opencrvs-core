@@ -2237,12 +2237,14 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "tooltip": {
+                    
+                    "helperText": {
                       "dependency": "iDType",
-                      "tooltipMapper": {
-                        "operation": "identityTooltipMapper"
+                      "helperTextMapper": {
+                        "operation": "identityHelperTextMapper"
                       }
                     },
+
                     "type": {
                       "kind": "dynamic",
                       "dependency": "iDType",
@@ -5549,10 +5551,10 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "tooltip": {
+                    "helperText": {
                       "dependency": "iDType",
-                      "tooltipMapper": {
-                        "operation": "identityTooltipMapper"
+                      "helperTextMapper": {
+                        "operation": "identityHelperTextMapper"
                       }
                     },
                     "type": {
@@ -7800,10 +7802,10 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "tooltip": {
+                    "helperText": {
                       "dependency": "iDType",
-                      "tooltipMapper": {
-                        "operation": "identityTooltipMapper"
+                      "helperTextMapper": {
+                        "operation": "identityHelperTextMapper"
                       }
                     },
                     "type": {
@@ -11139,10 +11141,10 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "tooltip": {
+                    "helperText": {
                       "dependency": "iDType",
-                      "tooltipMapper": {
-                        "operation": "identityTooltipMapper"
+                      "helperTextMapper": {
+                        "operation": "identityHelperTextMapper"
                       }
                     },
                     "type": {
@@ -15190,10 +15192,10 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    "tooltip": {
+                    "helperText": {
                       "dependency": "iDType",
-                      "tooltipMapper": {
-                        "operation": "identityTooltipMapper"
+                      "helperTextMapper": {
+                        "operation": "identityHelperTextMapper"
                       }
                     },
                     "type": {
