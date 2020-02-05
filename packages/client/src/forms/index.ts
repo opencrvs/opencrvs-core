@@ -117,9 +117,17 @@ export interface IDynamicFormFieldValidators {
   dependencies: string[]
 }
 
-export type IDynamicFormFieldLabelMapper = (key: string) => MessageDescriptor
+export type IDynamicFormFieldLabelMapper = (
+  key: string
+) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldToolTipMapper = (key: string) => MessageDescriptor
+export type IDynamicFormFieldHelperTextMapper = (
+  key: string
+) => MessageDescriptor | undefined
+
+export type IDynamicFormFieldToolTipMapper = (
+  key: string
+) => MessageDescriptor | undefined
 
 export type IDynamicValueMapper = (key: string) => string
 
@@ -129,6 +137,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
+  }
+  helperText?: {
+    dependency: string
+    helperTextMapper: Operation<typeof labels>
   }
   tooltip?: {
     dependency: string
@@ -149,6 +161,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
 
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
+  helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
   type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
@@ -157,6 +170,11 @@ export interface IDynamicFormFieldDefinitions {
 export interface IDynamicFieldLabel {
   dependency: string
   labelMapper: IDynamicFormFieldLabelMapper
+}
+
+export interface IDynamicFieldHelperText {
+  dependency: string
+  helperTextMapper: IDynamicFormFieldHelperTextMapper
 }
 
 export interface IDynamicFieldTooltip {
@@ -345,6 +363,7 @@ export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: MessageDescriptor
+  helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
   validate: validators.Validation[]
   required?: boolean
@@ -845,6 +864,7 @@ export interface Ii18nFormFieldBase {
   name: string
   type: string
   label: string
+  helperText?: string
   tooltip?: string
   description?: string
   validate: validators.Validation[]
