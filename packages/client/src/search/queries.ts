@@ -79,8 +79,26 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
         id
         type
         registration {
+          contactNumber
+          trackingId
           dateOfApplication
           status
+        }
+        operationHistories {
+          operationType
+          operatedOn
+          operatorRole
+          operatorName {
+            firstNames
+            familyName
+            use
+          }
+          operatorOfficeName
+          operatorOfficeAlias
+          notificationFacilityName
+          notificationFacilityAlias
+          rejectReason
+          rejectComment
         }
         ... on BirthEventSearchSet {
           childName {

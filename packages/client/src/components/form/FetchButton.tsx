@@ -150,6 +150,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       show: false,
       loading: false,
       error: false,
+      networkError: false,
       response: undefined
     })
   }
@@ -169,16 +170,12 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
       }
     } catch (error) {
       Sentry.captureException(error)
-      this.setState({ error: true, loading: false, success: false })
-
-      if (Boolean(error.networkError)) {
-        this.setState({
-          error: false,
-          loading: false,
-          success: false,
-          networkError: true
-        })
-      }
+      this.setState({
+        error: true,
+        loading: false,
+        success: false,
+        networkError: Boolean(error.networkError) ? true : false
+      })
     }
   }
 
@@ -236,6 +233,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
                           <StyledSuccess id="loader-button-success" />
                         </>
                       )}
+
                       {error && (
                         <>
                           <Heading>{errorTitle}</Heading>
@@ -243,18 +241,11 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
                           <StyledError id="loader-button-error" />
                           {queryData && (
                             <Info>
-                              {intl.formatMessage(queryData.errorText)}
-                            </Info>
-                          )}
-                        </>
-                      )}
-                      {networkError && (
-                        <>
-                          {this.getModalInfo(intl)}
-                          <StyledError id="loader-button-error" />
-                          {queryData && (
-                            <Info>
-                              {intl.formatMessage(queryData.networkErrorText)}
+                              {!networkError
+                                ? intl.formatMessage(queryData.errorText)
+                                : intl.formatMessage(
+                                    queryData.networkErrorText
+                                  )}
                             </Info>
                           )}
                         </>

@@ -50,25 +50,39 @@ describe('Death handler', () => {
     const code = jest.fn().mockReturnValue({ header })
     const h = { response: () => ({ code }) }
 
-    fetch.mockResponses([JSON.stringify(mockUnionFacility), { status: 200 }])
-    fetch.mockResponses([JSON.stringify(mockUnion), { status: 200 }])
+    fetch.mockResponses(
+      [JSON.stringify(mockUnionFacility), { status: 200 }],
+      [JSON.stringify(mockUnion), { status: 200 }],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              resource: {}
+            }
+          ]
+        }),
+        { status: 201 }
+      ],
+      [
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: {
+                location: '/Composition/_id/1'
+              }
+            }
+          ]
+        }),
+        { status: 201 }
+      ]
+    )
     // 3 x create patient location fetches
     // fetch.mockResponses(...new Array(12).fill(locationTuple))
 
     // Resolve union
     // fetch.mockResponses(...new Array(4).fill(locationTuple))
-
-    // post bundle
-    fetch.mockResponse(
-      JSON.stringify({
-        resourceType: 'Bundle',
-        entry: [
-          {
-            resource: {}
-          }
-        ]
-      })
-    )
 
     // @ts-ignore
     await deathNotificationHandler(request, h)

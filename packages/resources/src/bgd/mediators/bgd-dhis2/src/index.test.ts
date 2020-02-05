@@ -14,11 +14,19 @@ import * as jwt from 'jsonwebtoken'
 import { createServer } from '@bgd-dhis2-mediator/index'
 
 describe('Route authorization', () => {
-  it('blocks requests without a token', async () => {
+  it('tests the health check', async () => {
     const server = await createServer()
     const res = await server.server.inject({
       method: 'GET',
       url: '/ping'
+    })
+    expect(res.result).toEqual('pong')
+  })
+  it('blocks requests without a token', async () => {
+    const server = await createServer()
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/dhis2-notification/birth'
     })
     expect(res.statusCode).toBe(401)
   })
@@ -26,34 +34,13 @@ describe('Route authorization', () => {
   it('blocks requests with an invalid token', async () => {
     const server = await createServer()
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: 'Bearer abc'
       }
     })
     expect(res.statusCode).toBe(401)
-  })
-
-  it('accepts requests with a valid token', async () => {
-    const server = await createServer()
-    const token = jwt.sign(
-      {},
-      readFileSync('../../../../../auth/test/cert.key'),
-      {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:api-user'
-      }
-    )
-    const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(200)
   })
 
   it('blocks requests with a token with invalid signature', async () => {
@@ -68,8 +55,8 @@ describe('Route authorization', () => {
       }
     )
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -95,8 +82,8 @@ describe('Route authorization', () => {
     })
 
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -116,8 +103,8 @@ describe('Route authorization', () => {
       }
     )
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -138,8 +125,8 @@ describe('Route authorization', () => {
       }
     )
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -160,8 +147,8 @@ describe('Route authorization', () => {
       }
     )
     const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping',
+      method: 'POST',
+      url: '/dhis2-notification/birth',
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -16,13 +16,15 @@ import {
   createBundle,
   createTaskEntry,
   createBirthComposition,
+  createPresentAtEventObservation,
+  getIDFromResponse,
   IIncomingAddress
 } from '@bgd-dhis2-mediator/features/fhir/service'
 import {
   postBundle,
   // fetchUnionByFullBBSCode,
   getLastRegLocationFromFacility,
-  fetchFacilityByHRISId
+  fetchFacilityByHRISCode
 } from '@bgd-dhis2-mediator/features/fhir/api'
 import {
   RUN_AS_MEDIATOR,
@@ -31,6 +33,7 @@ import {
 } from '@bgd-dhis2-mediator/constants'
 
 export interface IBirthNotification {
+  dhis2_event: string
   child: {
     first_names_en?: [string]
     last_name_en: string
@@ -56,7 +59,7 @@ export interface IBirthNotification {
   phone_number: string
   date_birth: string
   place_of_birth?: {
-    id: string
+    code: string
     name: string
   }
   union_birth_ocurred: {
@@ -97,6 +100,7 @@ export async function birthNotificationHandler(
     null,
     request.headers.authorization
   )
+
   const father = await createPersonEntry(
     notification.father.nid || null,
     notification.father.first_names_bn || null,
@@ -113,8 +117,9 @@ export async function birthNotificationHandler(
   if (!notification.place_of_birth) {
     throw new Error('Could not find any place of birth')
   }
-  const placeOfBirthFacilityLocation = await fetchFacilityByHRISId(
-    notification.place_of_birth.id,
+
+  const placeOfBirthFacilityLocation = await fetchFacilityByHRISCode(
+    notification.place_of_birth.code,
     request.headers.authorization
   )
   if (!placeOfBirthFacilityLocation) {
@@ -178,6 +183,7 @@ export async function birthNotificationHandler(
     'BIRTH',
     'MOTHER',
     notification.phone_number,
+    notification.dhis2_event,
     request.headers.authorization
   )
 
@@ -188,11 +194,12 @@ export async function birthNotificationHandler(
   entries.push(mother)
   entries.push(father)
   entries.push(encounter)
+  entries.push(createPresentAtEventObservation(encounter.fullUrl, 'MOTHER'))
 
   const bundle = createBundle(entries)
 
   const startTime = new Date().toISOString()
-  await postBundle(bundle, request.headers.authorization)
+  const response = await postBundle(bundle, request.headers.authorization)
   const endTime = new Date().toISOString()
 
   if (RUN_AS_MEDIATOR) {
@@ -200,7 +207,12 @@ export async function birthNotificationHandler(
       .response({
         'x-mediator-urn': MEDIATOR_URN,
         status: 'Successful',
-        response: { status: 201 },
+        response: {
+          status: 201,
+          body: {
+            composition_id: getIDFromResponse(response)
+          }
+        },
         orchestrations: [
           {
             name: 'Submit converted birth bundle',
@@ -218,5 +230,5 @@ export async function birthNotificationHandler(
       .header('Content-Type', 'application/json+openhim')
   }
 
-  return h.response().code(201)
+  return h.response({ composition_id: getIDFromResponse(response) }).code(201)
 }

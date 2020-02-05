@@ -87,6 +87,7 @@ interface IState {
 }
 interface IProps {
   locationList: ISearchLocation[]
+  selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
 }
 export class LocationSearch extends React.Component<IProps, IState> {
@@ -184,6 +185,14 @@ export class LocationSearch extends React.Component<IProps, IState> {
         </DropDownWrapper>
       )
     )
+  }
+
+  componentDidMount() {
+    if (this.props.selectedLocation) {
+      this.setState({
+        selectedText: this.props.selectedLocation.displayLabel
+      })
+    }
   }
 
   render() {

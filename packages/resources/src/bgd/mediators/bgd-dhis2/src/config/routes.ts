@@ -29,6 +29,7 @@ export const getRoutes = () => {
         return 'pong'
       },
       config: {
+        auth: false,
         tags: ['api']
       }
     },

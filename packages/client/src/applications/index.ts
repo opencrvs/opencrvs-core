@@ -14,7 +14,8 @@ import {
   Event,
   IForm,
   IFormData,
-  IFormFieldValue
+  IFormFieldValue,
+  Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
@@ -24,16 +25,24 @@ import {
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { client } from '@client/utils/apolloClient'
+import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
+import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import {
   EVENT_STATUS,
   IQueryData
 } from '@client/views/RegistrationHome/RegistrationHome'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLEventSearchResultSet,
+  GQLEventSearchSet,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
@@ -45,6 +54,7 @@ const WRITE_APPLICATION = 'APPLICATION/WRITE_DRAFT'
 const DELETE_APPLICATION = 'APPLICATION/DELETE_DRAFT'
 const GET_APPLICATIONS_SUCCESS = 'APPLICATION/GET_DRAFTS_SUCCESS'
 const GET_APPLICATIONS_FAILED = 'APPLICATION/GET_DRAFTS_FAILED'
+const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
 const UPDATE_REGISTRAR_WORKQUEUE_SUCCESS =
   'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE_SUCCESS'
 const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
@@ -52,12 +62,18 @@ const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
 const ENQUEUE_DOWNLOAD_APPLICATION = 'APPLICATION/ENQUEUE_DOWNLOAD_APPLICATION'
 const DOWNLOAD_APPLICATION_SUCCESS = 'APPLICATION/DOWNLOAD_APPLICATION_SUCCESS'
 const DOWNLOAD_APPLICATION_FAIL = 'APPLICATION/DOWNLOAD_APPLICATION_FAIL'
-const UPDATE_REGISTRAR_WORKQUEUE = 'APPLICATION/UPDATE_REGISTRAR_WORKQUEUE'
+const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS =
+  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS'
+const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS =
+  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS'
+const UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL =
+  'APPLICATION/UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTING = 'SUBMITTING',
+  DECLARED = 'DECLARED',
   SUBMITTED = 'SUBMITTED',
   READY_TO_APPROVE = 'READY_TO_APPROVE',
   APPROVING = 'APPROVING',
@@ -117,6 +133,19 @@ export interface IVisitedGroupId {
   groupId: string
 }
 
+export interface ITaskHistory {
+  operationType?: string
+  operatedOn?: string
+  operatorRole?: string
+  operatorName?: Array<GQLHumanName | null>
+  operatorOfficeName?: string
+  operatorOfficeAlias?: Array<string | null>
+  notificationFacilityName?: string
+  notificationFacilityAlias?: Array<string | null>
+  rejectReason?: string
+  rejectComment?: string
+}
+
 export interface IApplication {
   id: string
   data: IFormData
@@ -136,6 +165,7 @@ export interface IApplication {
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
+  operationHistories?: ITaskHistory[]
 }
 
 export interface IWorkqueue {
@@ -306,6 +336,17 @@ interface UpdateRegistrarWorkqueueAction {
   }
 }
 
+interface UpdateFieldAgentDeclaredApplicationsAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS
+}
+interface UpdateFieldAgentDeclaredApplicationsSuccessAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS
+  payload: string
+}
+interface UpdateFieldAgentDeclaredApplicationsFailAction {
+  type: typeof UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
+}
+
 interface IApplicationRequestQueue {
   id: string
   action: Action
@@ -326,6 +367,9 @@ export type Action =
   | UpdateRegistrarWorkqueueAction
   | UpdateRegistrarWorkQueueSuccessAction
   | UpdateRegistrarWorkQueueFailAction
+  | UpdateFieldAgentDeclaredApplicationsAction
+  | UpdateFieldAgentDeclaredApplicationsSuccessAction
+  | UpdateFieldAgentDeclaredApplicationsFailAction
 
 export interface IUserData {
   userID: string
@@ -443,17 +487,6 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
   type: GET_APPLICATIONS_FAILED
 })
 
-export const updateRegistrarWorkqueueSuccessActionCreator = (
-  response: string
-): UpdateRegistrarWorkQueueSuccessAction => ({
-  type: UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
-  payload: response
-})
-
-export const updateRegistrarWorkqueueFailActionCreator = (): UpdateRegistrarWorkQueueFailAction => ({
-  type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
-})
-
 export function deleteApplication(
   application: IApplication | IPrintableApplication
 ): IDeleteApplicationAction {
@@ -473,6 +506,101 @@ export async function getCurrentUserID(): Promise<string> {
     return ''
   }
   return (JSON.parse(userDetails) as IUserDetails).userMgntUserID || ''
+}
+
+async function getUserData(userId: string) {
+  const userData = await storage.getItem('USER_DATA')
+  const allUserData: IUserData[] = !userData
+    ? []
+    : (JSON.parse(userData) as IUserData[])
+  const currentUserData = allUserData.find(uData => uData.userID === userId)
+
+  return { allUserData, currentUserData }
+}
+
+async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
+  const userId = userDetails.practitionerId
+  const locationIds = (userDetails && [getUserLocation(userDetails).id]) || []
+
+  let result
+  try {
+    const response = await client.query({
+      query: SEARCH_APPLICATIONS_USER_WISE,
+      variables: {
+        userId,
+        status: [EVENT_STATUS.DECLARED],
+        locationIds,
+        count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT,
+        sort: Sort.ASC
+      },
+      fetchPolicy: 'no-cache'
+    })
+    result = response.data && response.data.searchEvents
+  } catch (exception) {
+    result = undefined
+  }
+
+  return result
+}
+
+export function mergeDeclaredApplications(
+  applications: IApplication[],
+  declaredApplications: GQLEventSearchSet[]
+) {
+  const localApplications = applications.map(
+    application => application.compositionId
+  )
+
+  const transformedDeclaredApplications = declaredApplications
+    .filter(
+      declaredApplication => !localApplications.includes(declaredApplication.id)
+    )
+    .map(app => {
+      return transformSearchQueryDataToDraft(app)
+    })
+
+  applications.push(...transformedDeclaredApplications)
+}
+
+async function updateFieldAgentDeclaredApplicationsByUser(
+  getState: () => IStoreState
+) {
+  const state = getState()
+  const scope = getScope(state)
+
+  if (
+    !state.applicationsState.applications ||
+    state.applicationsState.applications.length !== 0 ||
+    !scope ||
+    !scope.includes('declare')
+  ) {
+    return Promise.reject('Remote declared application merging not applicable')
+  }
+  const userDetails =
+    getUserDetails(state) ||
+    (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
+
+  const uID = userDetails.userMgntUserID || ''
+  let { allUserData, currentUserData } = await getUserData(uID)
+
+  const declaredApplications = await getFieldAgentDeclaredApplications(
+    userDetails
+  )
+
+  if (!currentUserData) {
+    currentUserData = {
+      userID: uID,
+      applications: state.applicationsState.applications
+    }
+    allUserData.push(currentUserData)
+  }
+  mergeDeclaredApplications(
+    currentUserData.applications,
+    declaredApplications.results
+  )
+  storage.setItem('USER_DATA', JSON.stringify(allUserData))
+
+  return JSON.stringify(currentUserData)
 }
 
 export async function getApplicationsOfCurrentUser(): Promise<string> {
@@ -506,16 +634,6 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
     applications: currentUserApplications
   }
   return JSON.stringify(payload)
-}
-
-async function getUserData(userId: string) {
-  const userData = await storage.getItem('USER_DATA')
-  const allUserData: IUserData[] = !userData
-    ? []
-    : (JSON.parse(userData) as IUserData[])
-  const currentUserData = allUserData.find(uData => uData.userID === userId)
-
-  return { allUserData, currentUserData }
 }
 
 export async function writeApplicationByUser(
@@ -636,7 +754,7 @@ export async function writeRegistrarWorkqueueByUser(
     currentUserData = {
       userID: uID,
       applications: [],
-      workqueue: workqueue
+      workqueue
     }
     allUserData.push(currentUserData)
   }
@@ -708,6 +826,34 @@ export function updateRegistrarWorkqueue(
     }
   }
 }
+
+export const updateRegistrarWorkqueueSuccessActionCreator = (
+  response: string
+): UpdateRegistrarWorkQueueSuccessAction => ({
+  type: UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
+  payload: response
+})
+
+export const updateRegistrarWorkqueueFailActionCreator = (): UpdateRegistrarWorkQueueFailAction => ({
+  type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
+})
+
+export function updateFieldAgentDeclaredApplications() {
+  return {
+    type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS
+  }
+}
+
+export const updateFieldAgentDeclaredApplicationsSuccessActionCreator = (
+  response: string
+): UpdateFieldAgentDeclaredApplicationsSuccessAction => ({
+  type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS,
+  payload: response
+})
+
+export const updateFieldAgentDeclaredApplicationsFailActionCreator = (): UpdateFieldAgentDeclaredApplicationsFailAction => ({
+  type: UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_FAIL
+})
 
 function createRequestForApplication(
   application: IApplication,
@@ -1180,6 +1326,27 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           { sequence: true }
         )
       )
+
+    case UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS:
+      return loop(
+        state,
+        Cmd.run(updateFieldAgentDeclaredApplicationsByUser, {
+          successActionCreator: updateFieldAgentDeclaredApplicationsSuccessActionCreator,
+          failActionCreator: updateFieldAgentDeclaredApplicationsFailActionCreator,
+          args: [Cmd.getState]
+        })
+      )
+
+    case UPDATE_FIELD_AGENT_DECLARED_APPLICATIONS_SUCCESS:
+      if (action.payload) {
+        const userData = JSON.parse(action.payload) as IUserData
+
+        return {
+          ...state,
+          applications: userData.applications
+        }
+      }
+      return state
 
     default:
       return state

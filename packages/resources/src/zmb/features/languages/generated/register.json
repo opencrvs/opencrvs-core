@@ -6,7 +6,7 @@
       "messages": {
         "birth.form.section.child.name": "Child",
         "birth.form.section.child.title": "Child's details",
-        "buttons.editRecord": "Edit Record",
+        "buttons.editRecord": "Edit record",
         "buttons.apply": "Apply",
         "buttons.approve": "Approve",
         "buttons.back": "Back",
@@ -101,6 +101,7 @@
         "constants.certified": "certified",
         "constants.validated": "validated",
         "constants.waitingValidated": "Waiting for validation",
+        "constants.loadMore": "Load more",
         "constants.cha": "CHA",
         "constants.chairman": "Chairman",
         "constants.collected": "Collected",

@@ -259,7 +259,9 @@ export const isValidBirthDate: Validation = (
   drafts?
 ) => {
   const cast = value as string
-  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+  return !cast
+    ? { message: messages.required }
+    : cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? isDateNotAfterDeath(cast, drafts as IFormData)
       ? undefined
       : {
@@ -548,7 +550,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
         value.toString(),
         validBirthRegistrationNumberLength.min,
         validBirthRegistrationNumberLength.max
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -559,7 +561,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       return hasValidLength(
         value.toString(),
         validDeathRegistrationNumberLength
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,
