@@ -404,6 +404,14 @@ export async function createTaskEntry(
       {
         url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
         valueString: contactNumber
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/timeLoggedMS',
+        valueInteger: 0
+      },
+      {
+        url: 'http://opencrvs.org/specs/extension/in-complete-fields',
+        valueString: 's' // don't want to populate any list for notifications
       }
     ],
     lastModified: new Date().toISOString()
