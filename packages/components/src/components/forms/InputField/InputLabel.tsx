@@ -12,8 +12,10 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import ReactTooltip from 'react-tooltip'
+import { InputDescriptor } from './InputDescriptor'
 
 export type IInputLabel = {
+  inputDescriptor?: string
   disabled?: boolean
   ignoreMediaQuery?: boolean
   color?: string
@@ -54,13 +56,22 @@ const ToolTipContainer = styled.span`
 
 export class InputLabel extends React.Component<IInputLabel> {
   render() {
-    const { required, hideAsterisk, children, tooltip } = this.props
+    const {
+      inputDescriptor,
+      required,
+      hideAsterisk,
+      children,
+      tooltip
+    } = this.props
     return (
       <StyledInputLabel data-tip={tooltip} {...this.props}>
         {tooltip && <ReactTooltip />}
         {children}
         {required && !hideAsterisk && (
           <Required disabled={this.props.disabled}>&nbsp;*</Required>
+        )}
+        {inputDescriptor && (
+          <InputDescriptor>{inputDescriptor}</InputDescriptor>
         )}
       </StyledInputLabel>
     )
