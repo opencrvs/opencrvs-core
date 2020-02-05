@@ -32,7 +32,8 @@ import {
   getFieldType,
   getQueryData,
   getVisibleOptions,
-  getListOfLocations
+  getListOfLocations,
+  getFieldHelperText
 } from '@client/forms/utils'
 
 import styled, { keyframes } from '@client/styledComponents'
@@ -167,6 +168,7 @@ function GeneratedInputField({
   const inputFieldProps = {
     id: fieldDefinition.name,
     label: fieldDefinition.label,
+    helperText: fieldDefinition.helperText,
     tooltip: fieldDefinition.tooltip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
@@ -727,6 +729,10 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   type: getFieldType(field as IDynamicFormField, values),
                   label: getFieldLabel(field as IDynamicFormField, values),
+                  helperText: getFieldHelperText(
+                    field as IDynamicFormField,
+                    values
+                  ),
                   tooltip: getFieldLabelToolTip(
                     field as IDynamicFormField,
                     values
