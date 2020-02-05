@@ -25,7 +25,7 @@ git clone git@github.com:opencrvs/opencrvs-bangladesh.git
 cd opencrvs-bangladesh
 yarn install
 yarn db:clear:all
-yarn db:backup:restore bgd
+yarn db:backup:restore
 yarn save:testData && cd ..
 
 cd packages/e2e && yarn start

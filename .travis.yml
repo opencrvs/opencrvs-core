@@ -50,7 +50,10 @@ jobs:
     - stage: deploy to staging
       if: branch = master AND type = push
       install: skip
-      script: yarn deploy:staging:bgd
+      script:
+        - cd ..
+        - git clone git@github.com:opencrvs/opencrvs-bangladesh.git
+        - yarn deploy:staging ../opencrvs-bangladesh
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
