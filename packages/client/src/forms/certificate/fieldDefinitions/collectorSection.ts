@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
+  CertificateSection,
+  CHECKBOX_GROUP,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
   IFormSection,
+  IFormSectionGroup,
+  PARAGRAPH,
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
-  TEXT,
-  PARAGRAPH,
-  CHECKBOX_GROUP,
-  IFormSectionGroup,
   SIMPLE_DOCUMENT_UPLOADER,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  CertificateSection
+  TEXT
 } from '@client/forms'
 import {
   birthIdentityOptions,
   deathIdentityOptions,
+  identityHelperTextMapper,
   identityNameMapper,
-  identityTooltipMapper,
   identityTypeMapper
 } from '@client/forms/identity'
 import { conditionals } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
+import { RadioSize } from '@opencrvs/components/lib/forms'
 
 export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup = {
   id: 'certCollector',
@@ -167,7 +167,6 @@ export const collectBirthCertificateFormSection: IFormSection = {
           name: 'iDTypeOther',
           type: TEXT,
           label: formMessages.iDTypeOtherLabel,
-          tooltip: formMessages.tooltipNationalID,
           required: true,
           initialValue: '',
           validate: [],
@@ -181,9 +180,9 @@ export const collectBirthCertificateFormSection: IFormSection = {
               dependency: 'iDType',
               labelMapper: identityNameMapper
             },
-            tooltip: {
+            helperText: {
               dependency: 'iDType',
-              tooltipMapper: identityTooltipMapper
+              helperTextMapper: identityHelperTextMapper
             },
             type: {
               kind: 'dynamic',
