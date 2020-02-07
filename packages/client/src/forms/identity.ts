@@ -25,13 +25,11 @@ export const NO_ID = 'NO_ID'
 export const SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO'
 
 export const birthIdentityOptions = [
-  { value: NATIONAL_ID, label: messages.iDTypeNationalID },
+  { value: NATIONAL_ID, label: messages.nationalIdOption },
   {
     value: BIRTH_REGISTRATION_NUMBER,
-    label: messages.iDTypeBRN
-  },
-  { value: PASSPORT, label: messages.iDTypePassport },
-  { value: OTHER, label: messages.iDTypeOther }
+    label: messages.brnOption
+  }
 ]
 
 export const deathIdentityOptions = [
