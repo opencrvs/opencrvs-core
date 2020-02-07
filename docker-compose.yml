@@ -17,14 +17,14 @@ services:
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
     environment:
-      - RESOURCES_URL=https://resources.opencrvs-staging.jembi.org
+      - RESOURCES_URL=https://resources.${HOSTNAME}
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/login/Dockerfile
     environment:
-      - RESOURCES_URL=https://resources.opencrvs-staging.jembi.org
+      - RESOURCES_URL=https://resources.${HOSTNAME}
     restart: unless-stopped
   styleguide:
     image: jembi/ocrvs-styleguide:${VERSION:-latest}
