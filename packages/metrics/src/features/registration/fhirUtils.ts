@@ -197,7 +197,7 @@ export function getTimeLoggedFromTask(task: fhir.Task) {
     ext => ext.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
   )
 
-  if (!timeLoggedExt || !timeLoggedExt.valueInteger) {
+  if (!timeLoggedExt || timeLoggedExt.valueInteger === undefined) {
     throw new Error(
       `No time logged extension found in task, task ID: ${task.id}`
     )
