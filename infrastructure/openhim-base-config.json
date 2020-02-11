@@ -1756,7 +1756,7 @@
       "responseBody": true,
       "rewriteUrlsConfig": [],
       "name": "Polling validation trigger",
-      "pollingSchedule": "5 minutes",
+      "pollingSchedule": "0 0 * * *",
       "urlPattern": "^/trigger$",
       "matchContentRegex": null,
       "matchContentXpath": null,
