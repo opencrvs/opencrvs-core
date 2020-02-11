@@ -7,33 +7,7 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-version: '3.3'
+set -e
 
-services:
-  gateway:
-    environment:
-      - NODE_ENV=production
-
-  workflow:
-    environment:
-      - NODE_ENV=production
-
-  search:
-    environment:
-      - NODE_ENV=production
-
-  metrics:
-    environment:
-      - NODE_ENV=production
-
-  auth:
-    environment:
-      - NODE_ENV=production
-
-  user-mgnt:
-    environment:
-      - NODE_ENV=production
-
-  notification:
-    environment:
-      - NODE_ENV=production
+sed -i s~THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE~$RESOURCES_URL~g /usr/share/nginx/html/index.html
+nginx -g 'daemon off;'

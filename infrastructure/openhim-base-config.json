@@ -1745,7 +1745,7 @@
           "secured": false,
           "host": "resources",
           "port": 3040,
-          "path": "/bgd/bdris-queue/trigger",
+          "path": "/bdris-queue/trigger",
           "pathTransform": "",
           "primary": true,
           "username": "",

@@ -27,6 +27,7 @@ import { ApolloLink, Observable } from 'apollo-link'
 import { configure, mount, ReactWrapper, shallow } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { readFileSync } from 'fs'
+import { join } from 'path'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
@@ -2428,7 +2429,7 @@ export const mockDeathRegistrationSectionData = {
 
 export const mockOfflineData = {
   forms: JSON.parse(
-    readFileSync('../resources/src/bgd/features/forms/register.json').toString()
+    readFileSync(join(__dirname, './register.json')).toString()
   ) as {
     registerForm: { birth: ISerializedForm; death: ISerializedForm }
     certificateCollectorDefinition: {
@@ -2671,14 +2672,10 @@ export const mockOfflineData = {
     }
   },
   languages: JSON.parse(
-    readFileSync(
-      '../resources/src/bgd/features/languages/generated/register.json'
-    ).toString()
+    readFileSync(join(__dirname, './languages.json')).toString()
   ).data,
   templates: JSON.parse(
-    readFileSync(
-      '../resources/src/bgd/features/templates/register.json'
-    ).toString()
+    readFileSync(join(__dirname, './templates.json')).toString()
   ),
   assets: {
     logo: `data:image;base64,${validImageB64String}`

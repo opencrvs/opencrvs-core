@@ -1,2 +1,0 @@
-{"_id":{"$oid":"5e16e66f0a2b2f1f070c37b8"},"types":["API_USER"],"active":true,"title":"Notification API User","value":"NOTIFICATION_API_USER","creationDate":1.578559087597e+12}
-{"_id":{"$oid":"5e271ab29a3b9a93c7086984"},"types":["API_USER"],"active":true,"title":"Validator API User","value":"VALIDATOR_API_USER","creationDate":1.579621042793e+12,"__v":0}

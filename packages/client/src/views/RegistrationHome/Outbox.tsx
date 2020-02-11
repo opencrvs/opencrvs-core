@@ -17,7 +17,10 @@ import {
   Spinner
 } from '@opencrvs/components/lib/interface'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
 import { StatusWaiting } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
@@ -25,7 +28,6 @@ import styled from '@client/styledComponents'
 import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 import { sentenceCase } from '@client/utils/data-formatting'
 import { getDefaultLanguage } from '@client/i18n/utils'
-
 const Container = styled(BodyContent)`
   padding-top: 32px;
 `
@@ -100,6 +102,7 @@ class Outbox extends React.Component<IFullProps, IState> {
   }
 
   transformApplicationsReadyToSend = () => {
+    const { intl } = this.props
     const allapplications = this.props.application || []
     return allapplications.map((application, index) => {
       let name
@@ -149,7 +152,12 @@ class Outbox extends React.Component<IFullProps, IState> {
 
       return {
         id: application.id,
-        event: (application.event && sentenceCase(application.event)) || '',
+        event:
+          (application.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[application.event.toLowerCase()]
+            )) ||
+          '',
         name,
         submissionStatus: statusText || '',
         statusIndicator: icon ? [icon()] : null
@@ -200,6 +208,7 @@ class Outbox extends React.Component<IFullProps, IState> {
           onPageChange={this.onPageChange}
           pageSize={10}
           showPaginated={this.props.showPaginated}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         />
       </Container>
     )

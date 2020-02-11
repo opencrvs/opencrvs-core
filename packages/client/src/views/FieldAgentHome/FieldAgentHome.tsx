@@ -9,80 +9,81 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import {
+  IApplication,
+  SUBMISSION_STATUS,
+  updateFieldAgentDeclaredApplications
+} from '@client/applications'
+import { Header } from '@client/components/interface/Header/Header'
+import { Query } from '@client/components/Query'
+import {
+  constantsMessages,
+  dynamicConstantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/fieldAgentHome'
+import {
+  goToApplicationDetails,
+  goToEvents as goToEventsAction,
+  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
+} from '@client/navigation'
+import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@client/navigation/routes'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import {
+  COUNT_USER_WISE_APPLICATIONS,
+  SEARCH_APPLICATIONS_USER_WISE
+} from '@client/search/queries'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
+import {
+  EMPTY_STRING,
+  FIELD_AGENT_HOME_TAB_IN_PROGRESS,
+  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
+  FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
+  FIELD_AGENT_ROLES,
+  LANG_EN,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { InProgress } from '@client/views/FieldAgentHome/InProgress'
+import { SentForReview } from '@client/views/FieldAgentHome/SentForReview'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
 import {
-  ISearchInputProps,
+  Button,
+  FloatingActionButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
+import {
+  ApplicationsOrangeAmber,
+  PlusTransparentWhite,
+  StatusOrange,
+  StatusProgress,
+  StatusRejected
+} from '@opencrvs/components/lib/icons'
+import {
   GridTable,
+  ISearchInputProps,
   Loader,
   Spinner,
   TopBar
 } from '@opencrvs/components/lib/interface'
-import {
-  goToEvents as goToEventsAction,
-  goToFieldAgentHomeTab as goToFieldAgentHomeTabAction,
-  goToApplicationDetails
-} from '@client/navigation'
-import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Header } from '@client/components/interface/Header/Header'
-import { IApplication, SUBMISSION_STATUS } from '@client/applications'
-import {
-  FIELD_AGENT_HOME_TAB_IN_PROGRESS,
-  FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
-  FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES,
-  LANG_EN,
-  EMPTY_STRING,
-  APPLICATION_DATE_FORMAT,
-  FIELD_AGENT_ROLES,
-  SYS_ADMIN_ROLES,
-  REGISTRAR_ROLES
-} from '@client/utils/constants'
-import styled, { withTheme, ITheme } from '@client/styledComponents'
-import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@client/navigation/routes'
-import { SentForReview } from '@client/views/FieldAgentHome/SentForReview'
-import { InProgress } from '@client/views/FieldAgentHome/InProgress'
-import {
-  Button,
-  ICON_ALIGNMENT,
-  FloatingActionButton
-} from '@opencrvs/components/lib/buttons'
-import {
-  StatusProgress,
-  StatusOrange,
-  StatusRejected,
-  PlusTransparentWhite,
-  ApplicationsOrangeAmber
-} from '@opencrvs/components/lib/icons'
-import { Query } from '@client/components/Query'
-import {
-  SEARCH_APPLICATIONS_USER_WISE,
-  COUNT_USER_WISE_APPLICATIONS
-} from '@client/search/queries'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
-
 import { HomeContent } from '@opencrvs/components/lib/layout'
-
 import {
-  GQLQuery,
-  GQLEventSearchSet,
   GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchSet,
   GQLHumanName,
-  GQLDeathEventSearchSet
+  GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { messages } from '@client/i18n/messages/views/fieldAgentHome'
-import {
-  constantsMessages,
-  errorMessages,
-  dynamicConstantsMessages
-} from '@client/i18n/messages'
 import moment from 'moment'
-import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { Redirect, RouteComponentProps } from 'react-router'
 
 const IconTab = styled(Button)<{ active: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
@@ -169,6 +170,7 @@ interface IBaseFieldAgentHomeProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToApplicationDetails: typeof goToApplicationDetails
   applicationsReadyToSend: IApplication[]
+  updateFieldAgentDeclaredApplications: typeof updateFieldAgentDeclaredApplications
 }
 
 interface IFieldAgentHomeState {
@@ -209,7 +211,12 @@ class FieldAgentHomeView extends React.Component<
     }
   }
 
+  syncWorkqueue() {
+    this.props.updateFieldAgentDeclaredApplications()
+  }
+
   componentDidMount() {
+    this.syncWorkqueue()
     window.addEventListener('resize', this.recordWindowWidth)
   }
 
@@ -323,7 +330,7 @@ class FieldAgentHomeView extends React.Component<
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToApplicationDetails(registrationSearchSet.id)
+              this.props.goToApplicationDetails(registrationSearchSet.id, true)
           }
         ]
       }
@@ -511,6 +518,9 @@ class FieldAgentHomeView extends React.Component<
                             clickable={true}
                             showPaginated={this.showPaginated}
                             loading={loading}
+                            loadMoreText={intl.formatMessage(
+                              constantsMessages.loadMore
+                            )}
                           />
                           <LoadingIndicator
                             loading={loading}
@@ -572,7 +582,7 @@ const mapStateToProps = (
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       [],
-    applicationsReadyToSend:
+    applicationsReadyToSend: (
       (state.applicationsState.applications &&
         state.applicationsState.applications.filter(
           (application: IApplication) =>
@@ -580,6 +590,7 @@ const mapStateToProps = (
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         )) ||
       []
+    ).reverse()
   }
 }
 
@@ -588,6 +599,7 @@ export const FieldAgentHome = connect(
   {
     goToEvents: goToEventsAction,
     goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
-    goToApplicationDetails
+    goToApplicationDetails,
+    updateFieldAgentDeclaredApplications
   }
 )(injectIntl(withTheme(FieldAgentHomeView)))

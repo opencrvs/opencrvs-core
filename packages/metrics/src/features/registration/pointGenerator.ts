@@ -71,6 +71,13 @@ export const generateInCompleteFieldPoints = async (
   if (!inCompleteFieldExtension || !inCompleteFieldExtension.valueString) {
     throw new Error('In complete field list extension not found on payload')
   }
+  /**
+   * Avoid generating points when value is N/A
+   * Ex: For health birth/death notifications, we will receive N/A as value
+   */
+  if (inCompleteFieldExtension.valueString === 'N/A') {
+    return []
+  }
   if (!task) {
     throw new Error('Task not found')
   }
