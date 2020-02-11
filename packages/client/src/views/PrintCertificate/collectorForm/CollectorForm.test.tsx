@@ -358,12 +358,12 @@ describe('Certificate collector test for a birth registration without father det
     })
 
     it('continue to next group when the mandatory fields are filled', async () => {
-      selectOption(component, '#iDType', 'Passport')
+      selectOption(component, '#iDType', 'National ID number')
 
       component
         .find('#iD')
         .hostNodes()
-        .simulate('change', { target: { value: '123456789', id: 'iD' } })
+        .simulate('change', { target: { value: '1234567890', id: 'iD' } })
 
       component
         .find('#firstName')
