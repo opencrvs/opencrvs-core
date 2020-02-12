@@ -141,5 +141,5 @@ if [ $3 == "--update-metadata=yes" ] ; then
     echo
     echo "Updating existing metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/update-metadata.sh'
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata-updates.sh'
 fi
