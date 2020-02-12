@@ -31,6 +31,7 @@ import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IApplicationCertificate } from '@client/applications'
 import { IOfflineData } from '@client/offline/reducer'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -58,6 +59,7 @@ export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const SEARCH_FIELD = 'SEARCH_FIELD'
+export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 
 export enum Event {
   BIRTH = 'birth',
@@ -489,6 +491,12 @@ export interface ISearchFormField extends IFormFieldBase {
   onCompleted?: (response: string) => void
 }
 
+export interface ILocationSearchInputFormField extends IFormFieldBase {
+  type: typeof LOCATION_SEARCH_INPUT
+  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  locationList: ISearchLocation[]
+}
+
 export interface IWarningField extends IFormFieldBase {
   type: typeof WARNING
 }
@@ -557,6 +565,7 @@ export type IFormField =
   | ILoaderButton
   | ISearchFormField
   | ISimpleDocumentUploaderFormField
+  | ILocationSearchInputFormField
 
 export interface IFormTag {
   id: string
@@ -962,6 +971,12 @@ export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   onCompleted?: (response: string) => void
 }
 
+export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
+  type: typeof LOCATION_SEARCH_INPUT
+  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  locationList: ISearchLocation[]
+}
+
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
   type: typeof WARNING
 }
@@ -1011,6 +1026,7 @@ export type Ii18nFormField =
   | Ii18nLoaderButtonField
   | Ii18nSearchFormField
   | Ii18nSimpleDocumentUploaderFormField
+  | Ii18nLocationSearchInputFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

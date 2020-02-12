@@ -66,8 +66,10 @@ export function generateLocations(locations: { [key: string]: ILocation }) {
 
       if (location.partOf && location.partOf !== 'Location/0') {
         const locRef = location.partOf.split('/')[1]
-        const parent = locations[locRef].name
-        locationName += `, ${parent}`
+        let parent
+        if ((parent = locations[locRef] && locations[locRef].name)) {
+          locationName += `, ${parent}`
+        }
       }
 
       return {

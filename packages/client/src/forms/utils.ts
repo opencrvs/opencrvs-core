@@ -61,6 +61,7 @@ import {
 import moment from 'moment'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
+import { generateLocations } from '@client/utils/locationUtils'
 
 interface IRange {
   start: number
@@ -341,6 +342,15 @@ export function isCityLocation(
 
 export function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
+}
+
+export function getListOfLocations(
+  resource: IOfflineData,
+  resourceType: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+) {
+  return (
+    (resource[resourceType] && generateLocations(resource[resourceType])) || []
+  )
 }
 
 interface IVars {

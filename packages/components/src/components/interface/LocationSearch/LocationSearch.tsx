@@ -23,13 +23,16 @@ const Wrapper = styled.div`
     left: 8px;
   }
 `
-const SearchTextInput = styled.input`
-  width: 312px;
+const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
+  width: 100%;
+  max-width: 312px;
   height: 40px;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.bigBodyStyle};
   padding-left: 36px;
-  border: 2px solid ${({ theme }) => theme.colors.copy};
+  border: 2px solid
+    ${({ theme, error, touched }) =>
+      error && touched ? theme.colors.error : theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
@@ -89,6 +92,8 @@ interface IProps {
   locationList: ISearchLocation[]
   selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
+  error?: boolean
+  touched?: boolean
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -207,6 +212,8 @@ export class LocationSearch extends React.Component<IProps, IState> {
           onClick={() => document.addEventListener('click', this.handler)}
           value={this.state.selectedText || ''}
           onChange={this.onChangeHandler}
+          error={this.props.error}
+          touched={this.props.touched}
         />
         {this.dropdown()}
       </Wrapper>
