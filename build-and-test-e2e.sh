@@ -28,4 +28,4 @@ yarn db:clear:all
 yarn db:backup:restore
 cd ..
 
-cd packages/e2e && yarn start
+cd packages/e2e && yarn start --record
