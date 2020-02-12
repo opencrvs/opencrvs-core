@@ -10,14 +10,14 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION'
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION RESOURCES_PATH'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
+    echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
     echo '  HOST    is the server to deploy to'
     echo "  ENV can be 'production' or 'development' or 'qa'"
     echo "  VERSION can be any docker image tag or 'latest'"
     echo "  RESOURCES_PATH path to where your resources package is located"
-    echo "  PAPERTRAIL can be any papertrail destination URL"
     exit 1
 }
 
@@ -31,30 +31,35 @@ if [ -z "$2" ] || { [ $2 != '--restore-metadata=no' ] && [ $2 != '--restore-meta
     print_usage_and_exit
 fi
 
-if [ -z "$3" ] ; then
-    echo 'Error: Argument HOST is required in position 3.'
+if [ -z "$3" ] || { [ $3 != '--update-metadata=no' ] && [ $3 != '--update-metadata=yes' ] ;} ; then
+    echo 'Error: Argument --update-metadata is required in postition 3.'
     print_usage_and_exit
 fi
 
 if [ -z "$4" ] ; then
-    echo 'Error: Argument ENV is required in position 4.'
+    echo 'Error: Argument HOST is required in position 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument VERSION is required in position 5.'
+    echo 'Error: Argument ENV is required in position 5.'
     print_usage_and_exit
 fi
 
 if [ -z "$6" ] ; then
-    echo 'Error: Argument RESOURCES_PATH is required in position 6.'
+    echo 'Error: Argument VERSION is required in position 6.'
     print_usage_and_exit
 fi
 
-HOST=$3
-ENV=$4
-VERSION=$5
-RESOURCES_PATH=$6
+if [ -z "$7" ] ; then
+    echo 'Error: Argument RESOURCES_PATH is required in position 7.'
+    print_usage_and_exit
+fi
+
+HOST=$4
+ENV=$5
+VERSION=$6
+RESOURCES_PATH=$7
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -71,11 +76,15 @@ echo "Deploying version $VERSION to $SSH_HOST..."
 echo
 
 mkdir -p /tmp/compose/infrastructure/default_backups
+mkdir -p /tmp/compose/infrastructure/default_updates
 
 # Copy selected country default backups to infrastructure default_backups folder
 cp $RESOURCES_PATH/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
 cp $RESOURCES_PATH/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
 cp $RESOURCES_PATH/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
+
+# Copy selected country default updates to infrastructure default_updates folder
+[[ -d $RESOURCES_PATH/updates/generated ]] && cp $RESOURCES_PATH/updates/generated/*.json /tmp/compose/infrastructure/default_updates
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
@@ -107,8 +116,8 @@ else
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.prod-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 fi
 
-if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] ; then
-    echo
+if [ $1 == "--clear-data=yes" ] || [ $2 == "--restore-metadata=yes" ] || [ $3 == "--update-metadata=yes" ] ; then
+    echo 
     echo "Waiting 2 mins for stack to deploy before working with data..."
     echo
     sleep 120
@@ -128,3 +137,9 @@ if [ $2 == "--restore-metadata=yes" ] ; then
     ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/restore-metadata.sh'
 fi
 
+if [ $3 == "--update-metadata=yes" ] ; then
+    echo
+    echo "Updating existing metadata..."
+    echo
+    ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/update-metadata.sh'
+fi
