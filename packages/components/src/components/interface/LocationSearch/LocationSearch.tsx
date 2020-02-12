@@ -24,7 +24,7 @@ const Wrapper = styled.div`
   }
 `
 const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
-  width: 100%;
+  width: calc(100% - 16px);
   max-width: 312px;
   height: 40px;
   border-radius: 2px;
