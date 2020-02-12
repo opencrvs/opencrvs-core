@@ -7,7 +7,6 @@
   "dependencies": {
     "@types/react-select": "^2.0.2",
     "@types/react-stickynode": "^1.4.0",
-    "@types/react-tooltip": "^3.11.0",
     "@types/styled-components": "4.1.8",
     "autoprefixer": "7.1.6",
     "babel-loader": "^7.1.2",
@@ -84,7 +83,7 @@
     "@types/react": "^16.9.4",
     "@types/react-dom": "^16.9.1",
     "@types/react-stickynode": "^1.4.0",
-    "@types/react-tooltip": "^3.9.3",
+    "@types/react-tooltip": "^3.11.0",
     "@types/recharts": "^1.1.1",
     "concurrently": "^3.5.1",
     "dotenv": "^6.1.0",

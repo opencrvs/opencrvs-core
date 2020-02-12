@@ -17,7 +17,80 @@ docker swarm init
 sudo mkdir -p data/elasticsearch
 sudo chown -R 1000:1000 data/elasticsearch
 yarn compose:all &
-wait-on tcp:4040 tcp:3030 tcp:2020 tcp:7070 tcp:5050 tcp:9090 tcp:3040 tcp:1050 http://localhost:3000 http://localhost:3001 http://localhost:3020 tcp:27017 tcp:6379 tcp:9200 http://localhost:9200 tcp:8086 http://localhost:8086/ping tcp:3447 tcp:5001
+echo "wait-on tcp:4040"
+wait-on tcp:4040
+
+echo "wait-on tcp:3030"
+wait-on tcp:3030
+
+echo "wait-on tcp:2020"
+wait-on tcp:2020
+
+echo "wait-on tcp:7070"
+wait-on tcp:7070
+
+echo "wait-on tcp:5050"
+wait-on tcp:5050
+
+
+echo "wait-on tcp:9090"
+wait-on tcp:9090
+
+
+echo "wait-on tcp:3040"
+wait-on tcp:3040
+
+
+echo "wait-on tcp:1050"
+wait-on tcp:1050
+
+
+echo "wait-on tcp:3447"
+wait-on tcp:3447
+
+
+echo "wait-on tcp:5001"
+wait-on tcp:5001
+
+echo "wait-on tcp:27017"
+wait-on tcp:27017
+
+
+echo "wait-on tcp:6379"
+wait-on tcp:6379
+
+
+echo "wait-on tcp:9200"
+wait-on tcp:9200
+
+
+echo "wait-on http://localhost:9200"
+wait-on http://localhost:9200
+
+
+echo "wait-on tcp:8086"
+wait-on tcp:8086
+
+
+echo "wait-on http://localhost:8086/ping"
+http://localhost:8086/ping
+
+
+
+echo "wait-on http://localhost:3000"
+wait-on http://localhost:3000
+
+
+echo "wait-on http://localhost:3001"
+wait-on http://localhost:3001
+
+
+echo "wait-on http://localhost:3020"
+wait-on http://localhost:3020
+
+
+
+
 
 
 # Setup metadata
