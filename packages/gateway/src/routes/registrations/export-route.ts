@@ -26,7 +26,7 @@ export default {
       token: string
     }
 
-    if (!auth.credentials.scope?.includes('api')) {
+    if (!auth.credentials.scope?.includes('sysadmin')) {
       throw unauthorized()
     }
 

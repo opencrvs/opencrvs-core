@@ -32,44 +32,42 @@ import { RESOURCES_URL, FHIR_URL } from '@gateway/constants'
 export const resolvers: GQLResolver = {
   Query: {
     async searchBirthRegistrations(_, { fromDate, toDate }, authHeader) {
-      if (hasScope(authHeader, 'api')) {
-        const res = await fetchFHIR(
-          `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
-          authHeader
-        )
-
-        const compositions: fhir.Composition[] = res.entry.map(
-          ({ resource }: { resource: fhir.Composition }) => resource
-        )
-
-        return compositions.filter(({ type }) =>
-          type.coding?.some(({ code }) => code === 'birth-application')
-        )
-      } else {
+      if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have a sysadmin scope')
         )
       }
+      const res = await fetchFHIR(
+        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
+        authHeader
+      )
+
+      const compositions: fhir.Composition[] = res.entry.map(
+        ({ resource }: { resource: fhir.Composition }) => resource
+      )
+
+      return compositions.filter(({ type }) =>
+        type.coding?.some(({ code }) => code === 'birth-application')
+      )
     },
     async searchDeathRegistrations(_, { fromDate, toDate }, authHeader) {
-      if (hasScope(authHeader, 'api')) {
-        const res = await fetchFHIR(
-          `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
-          authHeader
-        )
-
-        const compositions: fhir.Composition[] = res.entry.map(
-          ({ resource }: { resource: fhir.Composition }) => resource
-        )
-
-        return compositions.filter(({ type }) =>
-          type.coding?.some(({ code }) => code === 'death-application')
-        )
-      } else {
+      if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have a sysadmin scope')
         )
       }
+      const res = await fetchFHIR(
+        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
+        authHeader
+      )
+
+      const compositions: fhir.Composition[] = res.entry.map(
+        ({ resource }: { resource: fhir.Composition }) => resource
+      )
+
+      return compositions.filter(({ type }) =>
+        type.coding?.some(({ code }) => code === 'death-application')
+      )
     },
     async fetchBirthRegistration(_, { id }, authHeader) {
       if (

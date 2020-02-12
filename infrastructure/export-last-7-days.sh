@@ -10,10 +10,9 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./export-last-7-days.sh HOST USERNAME PASSWORD'
-    echo '  HOST      is the server where OpenCRVS is deployed to e.g. opencrvs.qa1.jembi.org'
-    echo "  USERNAME  username of an API user (api scope required)"
-    echo "  PASSWORD  password of the user"
+    echo 'Usage: ./export-last-7-days.sh HOST TOKEN'
+    echo '  HOST   is the server where OpenCRVS is deployed to e.g. gateway.opencrvsbd.org'
+    echo "  TOKEN  of system admin user (sysadmin scope required)"    
     exit 1
 }
 
@@ -23,27 +22,17 @@ if [ -z "$1" ] ; then
 fi
 
 if [ -z "$2" ] ; then
-    echo 'Error: Argument USERNAME is required in postition 2.'
+    echo 'Error: Argument TOKEN is required in postition 2.'
     print_usage_and_exit
 fi
-
-if [ -z "$3" ] ; then
-    echo 'Error: Argument PASSWORD is required in postition 2.'
-    print_usage_and_exit
-fi
-
 
 HOST=$1
-USERNAME=$2
-PASSWORD=$3
+TOKEN=$2
 
 WEEK_AGO=$(date -v-1w +"%Y-%m-%dT%H:%M:%SZ")
 TODAY=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-AUTHENTICATE_URL=http://localhost:4040/authenticate
-TOKEN=$(curl -d "username=$USERNAME&password=$PASSWORD" -X POST $AUTHENTICATE_URL | docker run --rm -i imega/jq -r '.token')
-
-EXPORT_URL="http://localhost:7070/registrations/export?fromDate=$WEEK_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
+EXPORT_URL="http://$HOST/registrations/export?fromDate=$WEEK_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
 
 curl $EXPORT_URL -fo export.zip
 

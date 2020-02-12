@@ -59,6 +59,8 @@ interface IUserMessages {
   settingsTitle: MessageDescriptor
   STATE_REGISTRAR: MessageDescriptor
   API_USER: MessageDescriptor
+  NOTIFICATION_API_USER: MessageDescriptor
+  VALIDATOR_API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
   currentPassword: MessageDescriptor
@@ -270,8 +272,18 @@ const messagesToDefine: IUserMessages = {
   },
   API_USER: {
     defaultMessage: 'API User',
-    description: 'The description for API_USER role',
+    description: 'The description for API_USER type',
     id: 'constants.apiUser'
+  },
+  NOTIFICATION_API_USER: {
+    defaultMessage: 'Notification API User',
+    description: 'The description for NOTIFICATION_API_USER role',
+    id: 'constants.notificationApiUser'
+  },
+  VALIDATOR_API_USER: {
+    defaultMessage: 'Validator API User',
+    description: 'The description for VALIDATOR_API_USER role',
+    id: 'constants.validatorApiUser'
   },
   systemTitle: {
     defaultMessage: 'System',
