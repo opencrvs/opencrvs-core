@@ -21,7 +21,8 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   TEL,
   DeathSection,
-  TEXT
+  TEXT,
+  LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
@@ -44,6 +45,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
+import { formMessages } from '@client/i18n/messages'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -497,5 +499,90 @@ describe('when form has a field that has nested fields in definitions', () => {
         .find('#required_label_registration_applicant')
         .hostNodes()
     ).toHaveLength(1)
+  })
+})
+
+describe('when form has location input field', () => {
+  let reviewSectionComponent: ReactWrapper<{}, {}>
+
+  beforeAll(() => {
+    jest.resetAllMocks()
+  })
+
+  beforeEach(async () => {
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    jest.spyOn(applicationSelectors, 'getRegisterForm').mockReturnValue({
+      birth: {
+        sections: [
+          {
+            id: BirthSection.Child,
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            hasDocumentSection: true,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'birthLocation',
+                    type: LOCATION_SEARCH_INPUT,
+                    searchableResource: 'facilities',
+                    locationList: [],
+                    required: true,
+                    validate: [],
+                    label: formMessages.birthLocation
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      death: {
+        sections: [
+          {
+            id: DeathSection.Deceased,
+            name: formMessages.deceasedTitle,
+            title: formMessages.deceasedTitle,
+            viewType: 'form' as ViewType,
+            groups: []
+          }
+        ]
+      }
+    })
+
+    const data = {
+      child: {
+        birthLocation: '0d8474da-0361-4d32-979e-af91f012340a'
+      }
+    }
+
+    const simpleDraft = createReviewApplication(
+      uuid(),
+      data,
+      ApplicationEvent.BIRTH
+    )
+
+    const testComponent = await createTestComponent(
+      <ReviewSection
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        draft={simpleDraft}
+        rejectApplicationClickEvent={mockHandler}
+        submitClickEvent={mockHandler}
+      />,
+      store
+    )
+    reviewSectionComponent = testComponent.component
+  })
+
+  it('renders selected location label', () => {
+    expect(
+      reviewSectionComponent
+        .find('#Section_child')
+        .hostNodes()
+        .childAt(1)
+        .text()
+    ).toContain('Moktarpur Union Parishad')
   })
 })
