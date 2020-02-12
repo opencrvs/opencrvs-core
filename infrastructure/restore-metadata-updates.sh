@@ -26,8 +26,8 @@ cd /tmp/compose/infrastructure/default_updates
 for FILE in *.json
 do  
   NAMES=($(echo $FILE | tr "_" "\n"))
-  DB=${NAMES[0]]}
-  COLLECTION=${NAMES[1]]}
+  DB=${NAMES[0]}
+  COLLECTION=${NAMES[1]}
   echo "Updating collection: $COLLECTION of db: $DB"  
   docker run --rm -v /tmp/compose/infrastructure/default_updates:/default_updates --network=$NETWORK mongo:3.6 bash \
  -c "mongoimport -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/default_updates/$FILE"
