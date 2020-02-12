@@ -20,7 +20,7 @@
     "lint": "lerna run lint",
     "test": "CI=true lerna run test --stream",
     "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
-    "compose:all": "yarn build:image && docker-compose -p opencrvs -f docker-compose.yml -f docker-compose.deps.yml -f docker-compose.dev-deps.yml -f docker-compose.dev.yml up",
+    "compose:all": "yarn build:image && docker-compose --verbose -p opencrvs -f docker-compose.yml -f docker-compose.deps.yml -f docker-compose.dev-deps.yml -f docker-compose.dev.yml up",
     "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "compose:down:all": "docker-compose -p opencrvs -f docker-compose.yml -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "compose:build": "yarn build:image && docker-compose build",
