@@ -564,6 +564,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     defaultMessage: 'validated',
     description: 'A label for validated'
   },
+  waitingValidation: {
+    id: 'constants.waitingValidation',
+    defaultMessage: 'sent for validation',
+    description: 'A label for waitingValidation'
+  },
   male: {
     id: 'constants.male',
     defaultMessage: 'Male',
