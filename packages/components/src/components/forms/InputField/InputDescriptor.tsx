@@ -9,14 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export {
-  identityNameMapper,
-  identityHelperTextMapper,
-  identityTooltipMapper
-} from '@client/forms/identity'
+import * as React from 'react'
+import styled from 'styled-components'
 
-export {
-  getDateOfMarriageLabel,
-  getMotherDateOfBirthLabel,
-  getFatherDateOfBirthLabel
-} from '@client/forms/register/fieldMappings/birth/staticLabel'
+const StyledInputDescriptor = styled.p`
+  ${({ theme }) => theme.fonts.bigBodyStyle};
+  color: ${({ theme }) => theme.colors.disabled};
+  width: 100%;
+  margin-bottom: 5px;
+  display: inline-block;
+`
+
+export class InputDescriptor extends React.Component<{}, {}> {
+  render() {
+    return <StyledInputDescriptor>{this.props.children}</StyledInputDescriptor>
+  }
+}

@@ -89,6 +89,7 @@ export const internationaliseFieldObject = (
     ...field,
     label:
       field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
+    helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
     description: field.description && intl.formatMessage(field.description),
     placeholder: field.placeholder && intl.formatMessage(field.placeholder)
@@ -184,6 +185,18 @@ export const getFieldLabel = (
   }
   return field.dynamicDefinitions.label.labelMapper(values[
     field.dynamicDefinitions.label.dependency
+  ] as string)
+}
+
+export const getFieldHelperText = (
+  field: IDynamicFormField,
+  values: IFormSectionData
+): MessageDescriptor | undefined => {
+  if (!field.dynamicDefinitions.helperText) {
+    return undefined
+  }
+  return field.dynamicDefinitions.helperText.helperTextMapper(values[
+    field.dynamicDefinitions.helperText.dependency
   ] as string)
 }
 

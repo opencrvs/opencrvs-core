@@ -65,6 +65,17 @@ export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   }
 }
 
+export function identityHelperTextMapper(
+  code: string
+): MessageDescriptor | undefined {
+  switch (code) {
+    case 'NATIONAL_ID':
+      return messages.helperTextNID
+    default:
+      return undefined
+  }
+}
+
 export function identityTooltipMapper(code: string): MessageDescriptor {
   switch (code) {
     case 'NATIONAL_ID':
