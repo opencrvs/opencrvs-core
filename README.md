@@ -316,7 +316,17 @@ We want to see OpenCRVS implemented across the world. We can’t do this alone. 
 
 ## Development environment setup
 
-Pre-requisites:
+OpenCRVS is fully configurable for your country needs and depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
+
+A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free in order to illustrate how this can be done. It contains documentation of how you would configure and deploy your own integrations, customise birth and death registration forms, add your own country specific address structure, and how you would populate OpenCRVS with FHIR standardised reference data. Clone this example and iterate upon it for your needs. You will likely want to keep your custom resources module separate. We have a lot of experience of customising OpenCRVS to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need help, [please get in touch](https://www.opencrvs.org).
+
+The core of OpenCRVS is a monorepo organised using [Lerna](https://github.com/lerna/lerna) packages.
+
+- [auth](https://github.com/jembi/OpenCRVS/tree/master/packages/auth) - is the authentication microservice for OpenCRVS.
+
+- [auth](https://github.com/jembi/OpenCRVS/tree/master/packages/auth) - is the authentication microservice for OpenCRVS.
+
+First, make sure your environment is prepared by installing these pre-requisites:
 
 - [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
 
