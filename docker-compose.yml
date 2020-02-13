@@ -16,12 +16,16 @@ services:
       context: .
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
+    environment:
+      - RESOURCES_URL=http://resources:3040
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
+    environment:
+      - RESOURCES_URL=http://resources:3040
   styleguide:
     image: jembi/ocrvs-styleguide:${VERSION:-latest}
     build:
