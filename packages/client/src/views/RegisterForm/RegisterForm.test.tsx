@@ -377,7 +377,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
@@ -470,7 +470,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
@@ -534,10 +534,10 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
 
       component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '2019333494BQNXOHJ2' }
+        target: { id: 'iD', value: '201933349411111112' }
       })
 
       component.update()
@@ -612,7 +612,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#iD').simulate('change', {
         target: { id: 'iD', value: '1234567898' }
@@ -709,7 +709,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#applicantID').simulate('change', {
         target: { id: 'applicantID', value: '1234567898' }
@@ -786,7 +786,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
 
       const input = component.find('input#iD')
       // @ts-ignore
@@ -798,7 +798,7 @@ describe('when user is in the register form for death event', () => {
           target: {
             // @ts-ignore
             id: 'iD',
-            value: '2019333494BQNXOHJ2'
+            value: '201933349411111112'
           }
         })
       component.update()
@@ -856,7 +856,7 @@ describe('when user is in the register form for death event', () => {
 
       component = testComponent.component
       await waitForElement(component, '#iDType')
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       const input = component.find('input#iD') as any
 
@@ -931,7 +931,7 @@ describe('when user is in the register form for death event', () => {
 
       component = testComponent.component
       await waitForElement(component, '#iDType')
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       const input = component.find('input#iD') as any
 

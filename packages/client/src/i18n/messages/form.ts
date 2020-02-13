@@ -357,6 +357,8 @@ interface IFormMessages {
   deceasedSpousesGivenNames: MessageDescriptor
   deceasedSpousesGivenNamesEng: MessageDescriptor
   certificatePrintInAdvance: MessageDescriptor
+  nationalIdOption: MessageDescriptor
+  brnOption: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -1228,7 +1230,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.iDTypeAlienNumber'
   },
   iDTypeBRN: {
-    defaultMessage: 'Birth Registration Number',
+    defaultMessage: 'Birth registration number (in English)',
     description: 'Option for form field: Type of ID',
     id: 'form.field.label.iDTypeBRN'
   },
@@ -1243,7 +1245,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.iDTypeDRN'
   },
   iDTypeNationalID: {
-    defaultMessage: 'National ID',
+    defaultMessage: 'National ID number (in English)',
     description: 'Option for form field: Type of ID',
     id: 'form.field.label.iDTypeNationalID'
   },
@@ -2115,6 +2117,16 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Print in advance for signatures and collection',
     description: 'Label for certificate collection option',
     id: 'form.field.label.certificatePrintInAdvance'
+  },
+  nationalIdOption: {
+    defaultMessage: 'Birth registration number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.option.iDTypeNationalID'
+  },
+  brnOption: {
+    defaultMessage: 'National ID number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.option.iDTypeBRN'
   }
 }
 

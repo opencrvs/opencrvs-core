@@ -2192,7 +2192,7 @@
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
+                        "id": "form.field.option.iDTypeNationalID"
                       }
                     },
                     {
@@ -2200,7 +2200,7 @@
                       "label": {
                         "defaultMessage": "Birth Registration Number",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
+                        "id": "form.field.option.iDTypeBRN"
                       }
                     }
                   ],
@@ -5516,7 +5516,7 @@
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
+                        "id": "form.field.option.iDTypeNationalID"
                       }
                     },
                     {
@@ -5524,7 +5524,7 @@
                       "label": {
                         "defaultMessage": "Birth Registration Number",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
+                        "id": "form.field.option.iDTypeBRN"
                       }
                     }
                   ],
@@ -7761,7 +7761,7 @@
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
+                        "id": "form.field.option.iDTypeNationalID"
                       }
                     },
                     {
@@ -7769,7 +7769,7 @@
                       "label": {
                         "defaultMessage": "Birth Registration Number",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
+                        "id": "form.field.option.iDTypeBRN"
                       }
                     }
                   ],
@@ -11106,7 +11106,7 @@
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
+                        "id": "form.field.option.iDTypeNationalID"
                       }
                     },
                     {
@@ -11114,7 +11114,7 @@
                       "label": {
                         "defaultMessage": "Birth Registration Number",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
+                        "id": "form.field.option.iDTypeBRN"
                       }
                     }
                   ],
@@ -15145,7 +15145,7 @@
                       "label": {
                         "defaultMessage": "National ID",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeNationalID"
+                        "id": "form.field.option.iDTypeNationalID"
                       }
                     },
                     {
@@ -15153,7 +15153,7 @@
                       "label": {
                         "defaultMessage": "Birth Registration Number",
                         "description": "Option for form field: Type of ID",
-                        "id": "form.field.label.iDTypeBRN"
+                        "id": "form.field.option.iDTypeBRN"
                       }
                     }
                   ],
