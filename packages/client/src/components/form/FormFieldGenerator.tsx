@@ -31,7 +31,8 @@ import {
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData,
-  getVisibleOptions
+  getVisibleOptions,
+  getListOfLocations
 } from '@client/forms/utils'
 
 import styled, { keyframes } from '@client/styledComponents'
@@ -77,7 +78,8 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  Ii18nRadioGroupWithNestedFieldsFormField
+  Ii18nRadioGroupWithNestedFieldsFormField,
+  LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -111,6 +113,7 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
+import { LocationSearch } from '@opencrvs/components/lib/interface'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -423,6 +426,25 @@ function GeneratedInputField({
                 [fieldDefinition.dispatchOptions.payloadKey]: value
               })
             }
+          }}
+        />
+      </InputField>
+    )
+  }
+
+  if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
+    const selectedLocation = fieldDefinition.locationList.find(
+      location => location.id === value
+    )
+
+    return (
+      <InputField {...inputFieldProps}>
+        <LocationSearch
+          {...inputProps}
+          selectedLocation={selectedLocation}
+          locationList={fieldDefinition.locationList}
+          searchHandler={item => {
+            onSetFieldValue(fieldDefinition.name, item.id)
           }}
         />
       </InputField>
@@ -755,6 +777,14 @@ class FormSectionComponent extends React.Component<Props> {
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
+              : field.type === LOCATION_SEARCH_INPUT
+              ? {
+                  ...field,
+                  locationList: getListOfLocations(
+                    resources,
+                    field.searchableResource
+                  )
+                }
               : field
 
           if (

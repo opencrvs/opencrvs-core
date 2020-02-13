@@ -66,7 +66,8 @@ import {
   WARNING,
   REVIEW_OVERRIDE_POSITION,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  IDocumentUploaderWithOptionsFormField
+  IDocumentUploaderWithOptionsFormField,
+  LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import {
   getBirthSection,
@@ -83,7 +84,8 @@ import {
 import {
   getConditionalActionsForField,
   getSectionFields,
-  getVisibleSectionGroupsBasedOnConditions
+  getVisibleSectionGroupsBasedOnConditions,
+  getListOfLocations
 } from '@client/forms/utils'
 import {
   Errors,
@@ -377,6 +379,17 @@ const renderValue = (
 
   if (value && field.type === CHECKBOX_GROUP) {
     return getCheckBoxGroupFieldValue(field, value as string[], intl)
+  }
+
+  if (value && field.type === LOCATION_SEARCH_INPUT) {
+    const searchableListOfLocations = getListOfLocations(
+      offlineResources,
+      field.searchableResource
+    )
+    const selectedLocation = searchableListOfLocations.find(
+      location => location.id === value
+    )
+    return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
   if (typeof value === 'string') {

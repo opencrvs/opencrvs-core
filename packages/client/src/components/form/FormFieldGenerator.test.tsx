@@ -21,7 +21,7 @@ import {
   TEL,
   Event,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  DATE
+  LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
@@ -134,6 +134,72 @@ describe('form component', () => {
         ).toEqual('Bangladesh')
       })
     })
+  })
+})
+
+describe('when field definition has location search input', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraft = jest.fn()
+  beforeEach(async () => {
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="locationForm"
+        setAllFieldsDirty={false}
+        onChange={modifyDraft}
+        fields={[
+          {
+            name: 'placeOfBirth',
+            type: LOCATION_SEARCH_INPUT,
+            required: true,
+            validate: [],
+            label: formMessages.placeOfBirth,
+            initialValue: '',
+            searchableResource: 'facilities',
+            locationList: []
+          }
+        ]}
+      />,
+      store
+    )
+
+    component = testComponent.component
+  })
+
+  it('renders location search input without crashing', async () => {
+    const input = await waitForElement(component, '#placeOfBirth')
+    expect(input.length).toBeGreaterThan(0)
+  })
+
+  it('performs auto complete search among offline data', () => {
+    component
+      .find('#locationSearchInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { value: 'Moktarpur', id: 'locationSearchInput' }
+      })
+
+    const autoCompleteSuggestion = component
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
+      .hostNodes()
+    expect(autoCompleteSuggestion).toHaveLength(1)
+  })
+
+  it('clicking on autocomplete suggestion modifies draft', () => {
+    component
+      .find('#locationSearchInput')
+      .hostNodes()
+      .simulate('change', {
+        target: { value: 'Moktarpur', id: 'locationSearchInput' }
+      })
+
+    const autoCompleteSuggestion = component
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
+      .hostNodes()
+    expect(autoCompleteSuggestion).toHaveLength(1)
+
+    autoCompleteSuggestion.simulate('click')
+    expect(modifyDraft).toHaveBeenCalled()
   })
 })
 
