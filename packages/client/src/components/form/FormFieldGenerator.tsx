@@ -135,6 +135,16 @@ const FieldGroupTitle = styled.div`
   margin-top: 16px;
 `
 
+const LocationSearchFormField = styled(LocationSearch)`
+  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
+    width: 535px;
+  }`}
+
+  & > input {
+    border-radius: 0;
+  }
+`
+
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
@@ -441,7 +451,7 @@ function GeneratedInputField({
 
     return (
       <InputField {...inputFieldProps}>
-        <LocationSearch
+        <LocationSearchFormField
           {...inputProps}
           selectedLocation={selectedLocation}
           locationList={fieldDefinition.locationList}
