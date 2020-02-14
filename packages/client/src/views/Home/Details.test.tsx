@@ -375,7 +375,7 @@ describe('Field Agnet tests', () => {
                 ]
               },
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               deceased: {
                 name: []
               },
@@ -487,7 +487,7 @@ describe('Field Agnet tests', () => {
             fetchRegistration: {
               id: '1',
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [
@@ -618,7 +618,7 @@ describe('Field Agnet tests', () => {
                 ]
               },
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [
@@ -1219,7 +1219,7 @@ describe('Registrar tests', () => {
             fetchRegistration: {
               id: '956281c9-1f47-4c26-948a-970dd23c4094',
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [

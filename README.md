@@ -3,7 +3,7 @@
 <h3 align="center">OpenCRVS</h3>
 <p align="center"> A global solution to civil registration
 <br>
-<a href="https://github.com/jembi/OpenCRVS/issues">Report an issue</a>  ·  <a href="https://www.opencrvs.org/case-studies">Case studies</a>  ·  <a href="https://www.opencrvs.org/implementation">Implementations</a>  ·  <a href="https://www.opencrvs.org/about-us">About us</a></p>
+<a href="https://github.com/opencrvs/opencrvs-core/issues">Report an issue</a>  ·  <a href="https://www.opencrvs.org/case-studies">Case studies</a>  ·  <a href="https://www.opencrvs.org/implementation">Implementations</a>  ·  <a href="https://www.opencrvs.org/about-us">About us</a></p>
 
 [![Build Status](https://travis-ci.com/jembi/OpenCRVS.svg?token=VAkt1HxiHGcBsXWJ7mWy&branch=master)](https://travis-ci.com/jembi/OpenCRVS) [![codecov](https://codecov.io/gh/jembi/OpenCRVS/branch/master/graph/badge.svg?token=ZDi55WmcbB)](https://codecov.io/gh/jembi/OpenCRVS)[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
@@ -73,11 +73,11 @@ OpenCRVS supports any country scale data storage regulatory requirements.
 
 ## How secure is OpenCRVS?
 
-OpenCRVS has been independently security tested to equivalent [U.K. Government I.T. standards](https://www.cyberessentials.ncsc.gov.uk/) by the [CREST](https://www.crest-approved.org/) Certified organisation [MDSec](https://www.mdsec.co.uk/). - Authors of ["The Hacker's Handbook"](https://www.oreilly.com/library/view/the-web-application/9781118026472/).
+OpenCRVS has been independently security tested to equivalent [U.K. Government I.T. standards](https://www.cyberessentials.ncsc.gov.uk/) by the [CREST](https://www.crest-approved.org/) certified organisation [MDSec](https://www.mdsec.co.uk/). - authors of ["The Hacker's Handbook"](https://www.oreilly.com/library/view/the-web-application/9781118026472/).
 
 ## Why OpenCRVS?
 
-Plan International is challenging the current gap in the market for a user-centric and rights-based CRVS system by leading the development of [OpenCRVS](https://www.opencrvs.org), an open-source digital CRVS solution that is free to use, adaptable to the country context, interoperable with other government systems (e.g. health and ID systems), and rights-based to ensure it protects and provides for those most vulnerable.
+[Plan International](https://plan-international.org/) is challenging the current gap in the market for a user-centric and rights-based CRVS system by leading the development of [OpenCRVS](https://www.opencrvs.org), an open-source digital CRVS solution that is free to use, adaptable to the country context, interoperable with other government systems (e.g. health and ID systems), and rights-based to ensure it protects and provides for those most vulnerable.
 
 An estimated 1 billion people around the world cannot officially prove their identity, and 47% of these are children. [World Bank, 2018](https://id4d.worldbank.org/global-dataset)
 
@@ -139,7 +139,7 @@ In order to support endless configuration for limitless country scale, OpenCRVS 
 
 Massively scalable and extensible, [Hearth](https://github.com/jembi/hearth) is an OpenSource NoSQL database server built by the OpenCRVS founding member [Jembi Health Systems](https://www.jembi.org/), using interoperable [Health Level 7](www.hl7.org) [FHIR](https://www.hl7.org/fhir/) v4 ([ANSI](https://www.ansi.org/) Accredited, Fast Healthcare Interoperability Resources) as standard.
 
-We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil registration context. Our civil registration FHIR standard can be contributed to in this [repository](https://github.com/jembi/opencrvs-fhir-templates) at Jembi.
+We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil registration context. Our civil registration FHIR standard can be contributed to in this [repository](https://github.com/opencrvs/opencrvs-core-fhir-templates) at Jembi.
 
 <p align="left">
 
@@ -207,7 +207,7 @@ Each microservice in OpenCRVS has no knowledge of other services or business req
 
 Microservices:
 
-- [auth](https://github.com/jembi/OpenCRVS/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
+- [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
 
 Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
 
@@ -217,9 +217,9 @@ Our client applications are protected by SMS [2-Factor Authentication](https://e
 
 </p>
 
-- [commons](https://github.com/jembi/OpenCRVS/tree/master/packages/commons) - a shared library package for Node methods used by multiple microservices.
+- [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package for Node methods used by multiple microservices.
 
-- [gateway](https://github.com/jembi/OpenCRVS/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
+- [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
 
 Using [GraphQL](https://graphql.org/) allows OpenCRVS to perform much faster and more responsively in remote areas by drastically reducing the number of HTTP requests that are required to render a view in the presentation layer.
 
@@ -231,23 +231,23 @@ Using [GraphQL](https://graphql.org/) allows OpenCRVS to perform much faster and
 
 The OpenCRVS GraphQL Gateway is a JWT protected [Apollo](https://www.apollographql.com/) server that requests and resolves [FHIR](https://www.hl7.org/fhir/) resources from [Hearth](https://github.com/jembi/hearth) via [OpenHIM](https://github.com/jembi/openhim-core-js) into GraphQL, for easy consumption in the client applications.
 
-- [metrics](https://github.com/jembi/OpenCRVS/tree/master/packages/metrics) - the civil registration metrics and analytics microservice using the [Influx](https://www.influxdata.com) time series database.
+- [metrics](https://github.com/opencrvs/opencrvs-core/tree/master/packages/metrics) - the civil registration metrics and analytics microservice using the [Influx](https://www.influxdata.com) time series database.
 
-- [notification](https://github.com/jembi/OpenCRVS/tree/master/packages/notification) - the microservice that manages SMS communications from OpenCRVS, including content management and SMS supplier details.
+- [notification](https://github.com/opencrvs/opencrvs-core/tree/master/packages/notification) - the microservice that manages SMS communications from OpenCRVS, including content management and SMS supplier details.
 
-- [search](https://github.com/jembi/OpenCRVS/tree/master/packages/search) - the search microservice for OpenCRVS using [ElasticSearch](https://www.elastic.co/)
+- [search](https://github.com/opencrvs/opencrvs-core/tree/master/packages/search) - the search microservice for OpenCRVS using [ElasticSearch](https://www.elastic.co/)
 
-- [user-mgnt](https://github.com/jembi/OpenCRVS/tree/master/packages/user-mgnt) - the user management microservice for the OpenCRVS client.
+- [user-mgnt](https://github.com/opencrvs/opencrvs-core/tree/master/packages/user-mgnt) - the user management microservice for the OpenCRVS client.
 
 User permissions and roles can be centrally managed, supporting IT organisations that conform to [ISO27001](https://www.iso.org/isoiec-27001-information-security.html) certification.
 
-- [workflow](https://github.com/jembi/OpenCRVS/tree/master/packages/workflow) - the OpenCRVS business process orchestration microservice, mediating civil registration vital event status and audit updates.
+- [workflow](https://github.com/opencrvs/opencrvs-core/tree/master/packages/workflow) - the OpenCRVS business process orchestration microservice, mediating civil registration vital event status and audit updates.
 
 ### OpenCRVS client application packages
 
-- [login](https://github.com/jembi/OpenCRVS/tree/master/packages/login) - the login UI client built in [React](https://reactjs.org/).
+- [login](https://github.com/opencrvs/opencrvs-core/tree/master/packages/login) - the login UI client built in [React](https://reactjs.org/).
 
-- [client](https://github.com/jembi/OpenCRVS/tree/master/packages/client) - the OpenCRVS UI client for civil registration built in [React](https://reactjs.org/).
+- [client](https://github.com/opencrvs/opencrvs-core/tree/master/packages/client) - the OpenCRVS UI client for civil registration built in [React](https://reactjs.org/).
 
 <p align="left">
 
@@ -283,13 +283,13 @@ In remote areas, registrars can save a configurable number of registrations offl
 
 ### OpenCRVS component library package
 
-- [components](https://github.com/jembi/OpenCRVS/tree/master/packages/components) - a UI component library package for the clients using [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
+- [components](https://github.com/opencrvs/opencrvs-core/tree/master/packages/components) - a UI component library package for the clients using [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
 
 ### OpenCRVS end-to-end and performance testing packages
 
-- [e2e](https://github.com/jembi/OpenCRVS/tree/master/packages/e2e) - automated end to end testing for OpenCRVS using [Cypress](https://www.cypress.io/).
+- [e2e](https://github.com/opencrvs/opencrvs-core/tree/master/packages/e2e) - automated end to end testing for OpenCRVS using [Cypress](https://www.cypress.io/).
 
-* [integration](https://github.com/jembi/OpenCRVS/tree/master/packages/integration) - performance tests for OpenCRVS using the [K6](https://k6.io/) framework.
+* [integration](https://github.com/opencrvs/opencrvs-core/tree/master/packages/integration) - performance tests for OpenCRVS using the [K6](https://k6.io/) framework.
 
 ## How do I set up a development environment?
 
@@ -313,7 +313,7 @@ On Mac you will need:
 
 2. Next, clone this repo! :)
 
-`git clone https://github.com/jembi/OpenCRVS.git`
+`git clone https://github.com/opencrvs/opencrvs-core.git`
 
 3. `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
 
@@ -402,7 +402,7 @@ AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 
 ## How can I set up continuous integration and delivery?
 
-We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/jembi/OpenCRVS/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
+We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
 
 ### How can I install and manage an OpenCRVS server cluster?
 
@@ -410,9 +410,9 @@ OpenCRVS should be deployed on a minimum cluster of 3 nodes, each with the follo
 
 #### 8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64
 
-To prepare your server cluster and manage the Docker Swarm, some pre-requisites and instructions are documented [here](https://github.com/jembi/OpenCRVS/tree/master/infrastructure/server-setup)
+To prepare your server cluster and manage the Docker Swarm, some pre-requisites and instructions are documented [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
-An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/jembi/OpenCRVS/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
+An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
 
 ### Clearing and creating your own reference data
 
@@ -454,7 +454,7 @@ The `yarn compose:*` scripts only setup the dependencies in docker containers an
 
 - `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
 
-A number of other useful Docker commands you will need to manage the swarm are accessible [here](https://github.com/jembi/OpenCRVS/tree/master/infrastructure/server-setup)
+A number of other useful Docker commands you will need to manage the swarm are accessible [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
 ## How can I deploy to a staging environment cluster?
 
@@ -476,17 +476,13 @@ Deploying to Production is much the same as deploying to QA.
 
 ## How do I export recent registrations?
 
-You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh`.
-
-For example running:
-
-`./infrastructure/export-last-7-days.sh opencrvs.qa1.jembi.org api.user test`
+You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh <<insert user>> <<insert user password>>`.
 
 Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
 
 ## How does OpenCRVS back up registration data?
 
-OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/jembi/OpenCRVS/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/jembi/OpenCRVS/tree/master/infrastructure/server-setup)
+OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
 ## How do I configure OpenCRVS for my country needs?
 
@@ -534,9 +530,9 @@ We want to see OpenCRVS implemented across the world. We can’t do this alone. 
 
 ## Contributing
 
-You may view/add issues here: https://github.com/jembi/OpenCRVS/issues
+You may view/add issues here: https://github.com/opencrvs/opencrvs-core/issues
 
-To contribute code, please review the CONTRIBUTING.md file https://github.com/jembi/OpenCRVS/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
+To contribute code, please review the CONTRIBUTING.md file https://github.com/opencrvs/opencrvs-core/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
 
 By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
 
@@ -554,7 +550,7 @@ So you have contributed to core and want to make a new release as an OpenCRVS co
 
 5. Run `git push origin v<version_number>`
 
-6. Create a [new release on Github](https://github.com/jembi/OpenCRVS/releases) using the tag you just pushed and including any release notes.
+6. Create a [new release on Github](https://github.com/opencrvs/opencrvs-core/releases) using the tag you just pushed and including any release notes.
 
 7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`
 
