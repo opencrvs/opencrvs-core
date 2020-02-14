@@ -300,22 +300,24 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
         />
-        <Flex>
-          <Select
-            id={name}
-            options={this.state.dropDownOptions}
-            value={this.state.fields.documentType}
-            onChange={this.onChange}
-          />
+        {this.state.dropDownOptions.length > 0 && (
+          <Flex>
+            <Select
+              id={name}
+              options={this.state.dropDownOptions}
+              value={this.state.fields.documentType}
+              onChange={this.onChange}
+            />
 
-          <DocumentUploader
-            id="upload_document"
-            title={intl.formatMessage(formMessages.addFile)}
-            onClick={e => !this.isValid() && e.preventDefault()}
-            handleFileChange={this.handleFileChange}
-            disabled={this.state.filesBeingProcessed.length > 0}
-          />
-        </Flex>
+            <DocumentUploader
+              id="upload_document"
+              title={intl.formatMessage(formMessages.addFile)}
+              onClick={e => !this.isValid() && e.preventDefault()}
+              handleFileChange={this.handleFileChange}
+              disabled={this.state.filesBeingProcessed.length > 0}
+            />
+          </Flex>
+        )}
 
         {this.state.previewImage && (
           <DocumentPreview
