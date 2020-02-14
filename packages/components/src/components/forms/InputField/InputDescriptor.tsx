@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 const StyledInputDescriptor = styled.p`
   ${({ theme }) => theme.fonts.bigBodyStyle};
-  color: ${({ theme }) => theme.colors.disabled};
+  color: ${({ theme }) => theme.colors.placeholder};
   width: 100%;
   margin-bottom: 5px;
   display: inline-block;
