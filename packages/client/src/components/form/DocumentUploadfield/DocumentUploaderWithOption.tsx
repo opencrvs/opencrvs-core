@@ -73,6 +73,7 @@ type IFullProps = {
   extraValue: IFormFieldValue
   options: ISelectOption[]
   files?: IFileValue[]
+  hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
 } & IntlShapeProps
 
@@ -300,7 +301,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
         />
-        {this.state.dropDownOptions.length > 0 && (
+        {this.props.hideOnEmptyOption &&
+        this.state.dropDownOptions.length === 0 ? null : (
           <Flex>
             <Select
               id={name}

@@ -227,6 +227,7 @@ function GeneratedInputField({
         options={fieldDefinition.options}
         files={value as IFileValue[]}
         extraValue={fieldDefinition.extraValue || ''}
+        hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
         }
