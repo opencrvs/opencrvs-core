@@ -225,6 +225,7 @@ function GeneratedInputField({
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         options={fieldDefinition.options}
+        splitView={fieldDefinition.splitView}
         files={value as IFileValue[]}
         extraValue={fieldDefinition.extraValue || ''}
         hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}

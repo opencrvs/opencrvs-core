@@ -42,9 +42,12 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-const Flex = styled.div`
+const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: ${({ splitView }) => {
+    return splitView ? '10px' : '0px'
+  }};
 `
 export const ErrorMessage = styled.div`
   margin-bottom: 20px;
@@ -72,6 +75,7 @@ type IFullProps = {
   label: string
   extraValue: IFormFieldValue
   options: ISelectOption[]
+  splitView?: boolean
   files?: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
@@ -283,8 +287,52 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.setState({ previewImage: previewImage as IFileValue })
   }
 
+  renderDocumentUploaderWithDocumentTypeBlock = () => {
+    const { name, intl } = this.props
+    return this.props.splitView ? (
+      this.state.dropDownOptions.map((opt, idx) => (
+        <Flex splitView>
+          <Select
+            id={`${name}${idx}`}
+            options={[opt]}
+            value={opt.value}
+            onChange={this.onChange}
+          />
+
+          <DocumentUploader
+            id={`upload_document${idx}`}
+            title={intl.formatMessage(formMessages.addFile)}
+            onClick={e => {
+              this.onChange(opt.value)
+              return !this.isValid() && e.preventDefault()
+            }}
+            handleFileChange={this.handleFileChange}
+            disabled={this.state.filesBeingProcessed.length > 0}
+          />
+        </Flex>
+      ))
+    ) : (
+      <Flex>
+        <Select
+          id={name}
+          options={this.state.dropDownOptions}
+          value={this.state.fields.documentType}
+          onChange={this.onChange}
+        />
+
+        <DocumentUploader
+          id="upload_document"
+          title={intl.formatMessage(formMessages.addFile)}
+          onClick={e => !this.isValid() && e.preventDefault()}
+          handleFileChange={this.handleFileChange}
+          disabled={this.state.filesBeingProcessed.length > 0}
+        />
+      </Flex>
+    )
+  }
+
   render() {
-    const { label, intl, name } = this.props
+    const { label, intl } = this.props
 
     return (
       <UploaderWrapper>
@@ -301,25 +349,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
         />
-        {this.props.hideOnEmptyOption &&
-        this.state.dropDownOptions.length === 0 ? null : (
-          <Flex>
-            <Select
-              id={name}
-              options={this.state.dropDownOptions}
-              value={this.state.fields.documentType}
-              onChange={this.onChange}
-            />
-
-            <DocumentUploader
-              id="upload_document"
-              title={intl.formatMessage(formMessages.addFile)}
-              onClick={e => !this.isValid() && e.preventDefault()}
-              handleFileChange={this.handleFileChange}
-              disabled={this.state.filesBeingProcessed.length > 0}
-            />
-          </Flex>
-        )}
+        {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
+          ? null
+          : this.renderDocumentUploaderWithDocumentTypeBlock()}
 
         {this.state.previewImage && (
           <DocumentPreview
