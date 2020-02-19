@@ -5,7 +5,7 @@
 <br>
 <a href="https://github.com/opencrvs/opencrvs-core/issues">Report an issue</a>  ·  <a href="https://www.opencrvs.org/case-studies">Case studies</a>  ·  <a href="https://www.opencrvs.org/implementation">Implementations</a>  ·  <a href="https://www.opencrvs.org/about-us">About us</a></p>
 
-[![Build Status](https://travis-ci.com/jembi/OpenCRVS.svg?token=VAkt1HxiHGcBsXWJ7mWy&branch=master)](https://travis-ci.com/jembi/OpenCRVS) [![codecov](https://codecov.io/gh/jembi/OpenCRVS/branch/master/graph/badge.svg?token=ZDi55WmcbB)](https://codecov.io/gh/jembi/OpenCRVS)[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+[![Build Status](https://travis-ci.com/opencrvs/opencrvs-core.svg?token=VAkt1HxiHGcBsXWJ7mWy&branch=master)](https://travis-ci.com/opencrvs/opencrvs-core) [![codecov](https://codecov.io/gh/jembi/OpenCRVS/branch/master/graph/badge.svg?token=ZDi55WmcbB)](https://codecov.io/gh/jembi/OpenCRVS)[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -473,6 +473,8 @@ Deploying to QA is much the same as above, however you may specify a version to 
 ## How can I deploy to production?
 
 Deploying to Production is much the same as deploying to QA.
+
+`yarn deploy:prod --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
 
 ## How do I export recent registrations?
 

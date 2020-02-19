@@ -62,9 +62,8 @@ services:
     ports:
       - '9090:9090'
 
-  # @todo this would probably have to be the Zambia reference
   resources:
-    image: jembi/ocrvs-bangladesh:latest
+    image: jembi/ocrvs-zambia:latest
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:

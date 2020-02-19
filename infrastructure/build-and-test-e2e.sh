@@ -21,11 +21,9 @@ yarn build:image && docker-compose --verbose -p opencrvs -f docker-compose.yml -
 
 
 # Setup metadata
-git clone git@github.com:opencrvs/opencrvs-bangladesh.git
-cd opencrvs-bangladesh
+git clone git@github.com:opencrvs/opencrvs-zambia.git
+cd opencrvs-zambia
 yarn install
 yarn db:clear:all
 yarn db:backup:restore
-cd ..
-
-cd packages/e2e && yarn start --record false
+yarn e2e --record false
