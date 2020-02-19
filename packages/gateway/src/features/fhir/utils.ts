@@ -762,6 +762,13 @@ export function findExtension(
   return extension
 }
 
+export function getStatusFromTask(task: fhir.Task) {
+  const statusType = task.businessStatus?.coding?.find(
+    (coding: fhir.Coding) =>
+      coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+  )
+  return (statusType && statusType.code) || null
+}
 export function getMaritalStatusCode(fieldValue: string) {
   switch (fieldValue) {
     case 'SINGLE':
@@ -864,6 +871,28 @@ export const getMetrics = (
     .catch(error => {
       return Promise.reject(
         new Error(`Metrics request failed: ${error.message}`)
+      )
+    })
+}
+
+export const getTimeLoggedByStatusFromMetrics = async (
+  authHeader: IAuthHeader,
+  compositionId: string,
+  status: string
+) => {
+  const params = new URLSearchParams({ compositionId, status })
+  return fetch(`${METRICS_URL}/timeLogged?` + params, {
+    method: 'GET',
+    headers: {
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Time logged from metrics request failed: ${error.message}`)
       )
     })
 }

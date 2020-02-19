@@ -333,6 +333,7 @@ export interface GQLRegWorkflow {
   comments?: Array<GQLComment | null>
   location?: GQLLocation
   office?: GQLLocation
+  timeLogged?: number
 }
 
 export enum GQLRegStatus {
@@ -2084,6 +2085,7 @@ export interface GQLRegWorkflowTypeResolver<TParent = any> {
   comments?: RegWorkflowToCommentsResolver<TParent>
   location?: RegWorkflowToLocationResolver<TParent>
   office?: RegWorkflowToOfficeResolver<TParent>
+  timeLogged?: RegWorkflowToTimeLoggedResolver<TParent>
 }
 
 export interface RegWorkflowToIdResolver<TParent = any, TResult = any> {
@@ -2111,6 +2113,10 @@ export interface RegWorkflowToLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface RegWorkflowToOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegWorkflowToTimeLoggedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
