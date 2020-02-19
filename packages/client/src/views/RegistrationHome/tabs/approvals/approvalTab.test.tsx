@@ -84,7 +84,7 @@ const mockUserData = {
     }
   ],
   // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-  // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
   child: {
     id: 'FAKE_ID',
     name: [
