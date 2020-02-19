@@ -1303,6 +1303,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   <DataSection
                     responsiveContents={
                       <DocumentListPreview
+                        id={sec.id}
                         documents={uploadedDocuments}
                         onSelect={this.selectForPreview}
                         dropdownOptions={selectOptions}

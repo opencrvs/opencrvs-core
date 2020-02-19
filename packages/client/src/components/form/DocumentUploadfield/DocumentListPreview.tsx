@@ -44,6 +44,7 @@ const ProcessingSpinner = styled(Spinner)`
 `
 
 type IProps = {
+  id?: string
   documents?: IFileValue[] | null
   processingDocuments?: Array<{ label: string }>
   attachment?: IAttachmentValue
@@ -62,6 +63,7 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
   }
   render() {
     const {
+      id,
       documents,
       processingDocuments,
       label,
@@ -69,10 +71,17 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
       theme
     } = this.props
     return (
-      <Wrapper>
+      <Wrapper id={`preview-list-${id}`}>
         {documents &&
           documents.map((document: IFileValue, key: number) => (
-            <PreviewLink key={key} onClick={_ => this.props.onSelect(document)}>
+            <PreviewLink
+              id={`document_${(document.optionValues[1] as string).replace(
+                /\s/g,
+                ''
+              )}_link`}
+              key={key}
+              onClick={_ => this.props.onSelect(document)}
+            >
               <PaperClip />
               <span>
                 {this.getFormattedLabelForDocType(document
