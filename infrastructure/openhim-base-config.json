@@ -1807,7 +1807,7 @@
       "responseBody": true,
       "rewriteUrlsConfig": [],
       "name": "Polling validation cleaner",
-      "pollingSchedule": "0 0 14 * *",
+      "pollingSchedule": "0 0 1 * *",
       "urlPattern": "^/cleaner$",
       "matchContentRegex": null,
       "matchContentXpath": null,
