@@ -78,13 +78,14 @@ export class DocumentPreview extends React.Component<IProps> {
     return (
       <PreviewContainer id="preview_image_field">
         <PreviewContainerHeader>
-          <BackButton onClick={goBack}>
+          <BackButton id="preview_back" onClick={goBack}>
             <ArrowBack />
             <Title>{title}</Title>
           </BackButton>
           {!disableDelete && (
             <span>
               <Button
+                id="preview_delete"
                 icon={() => <Delete color="white" />}
                 onClick={() => onDelete(previewImage)}
               />

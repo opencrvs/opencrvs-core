@@ -67,7 +67,8 @@ import {
   REVIEW_OVERRIDE_POSITION,
   DOCUMENT_UPLOADER_WITH_OPTION,
   IDocumentUploaderWithOptionsFormField,
-  LOCATION_SEARCH_INPUT
+  LOCATION_SEARCH_INPUT,
+  IAttachmentValue
 } from '@client/forms'
 import {
   getBirthSection,
@@ -124,6 +125,8 @@ import {
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
 import { IValidationResult } from '@client/utils/validate'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
@@ -226,6 +229,7 @@ type State = {
   editClickedSectionGroupId: string
   editClickFieldName?: string
   activeSection: Section | null
+  previewImage: IFileValue | null
 }
 
 interface IErrorsBySection {
@@ -466,7 +470,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       editClickedSectionGroupId: '',
       editClickFieldName: '',
       editClickedSectionId: null,
-      activeSection: null
+      activeSection: null,
+      previewImage: null
     }
   }
 
@@ -572,7 +577,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   prepSectionDocuments = (
     draft: IApplication,
     activeSection: Section
-  ): IDocumentViewerOptions => {
+  ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
     const { documentsSection, intl } = this.props
 
     const draftItemName = documentsSection.id
@@ -625,7 +630,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     return {
       selectOptions,
-      documentOptions
+      documentOptions,
+      uploadedDocuments
     }
   }
 
@@ -1097,6 +1103,51 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return items
   }
 
+  selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
+    this.setState({ previewImage: previewImage as IFileValue })
+  }
+
+  closePreviewSection = (callBack?: () => void) => {
+    if (typeof callBack === 'function') {
+      this.setState({ previewImage: null }, callBack)
+    } else {
+      this.setState({ previewImage: null })
+    }
+  }
+
+  removeAttachmentFromDraft = (file: IFileValue | IAttachmentValue) => {
+    const { documentsSection, draft, onChangeReviewForm } = this.props
+    if (onChangeReviewForm) {
+      const documentsSectionAllFields = flatten(
+        documentsSection.groups.map(group => group.fields)
+      ).filter(
+        field =>
+          field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
+      )
+
+      const fieldToUpdate = (documentsSectionAllFields.find(
+        field => field.extraValue === (file as IFileValue).optionValues[0]
+      ) as IDocumentUploaderWithOptionsFormField).name
+
+      const updatedValue = (draft.data[documentsSection.id][
+        fieldToUpdate
+      ] as IFileValue[]).filter(
+        eachFile =>
+          eachFile.optionValues[1] !== (file as IFileValue).optionValues[1]
+      )
+
+      onChangeReviewForm(
+        { [fieldToUpdate]: updatedValue },
+        documentsSection,
+        draft
+      )
+    }
+  }
+
+  onDelete = (file: IFileValue | IAttachmentValue) => {
+    this.closePreviewSection(() => this.removeAttachmentFromDraft(file))
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
@@ -1243,9 +1294,27 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   isDraft: draft
                 })}
               </FormDataHeader>
-              {transformedSectionData.map((sec, index) => (
-                <DataSection key={index} {...sec} id={'Section_' + sec.id} />
-              ))}
+              {transformedSectionData.map((sec, index) => {
+                const {
+                  uploadedDocuments,
+                  selectOptions
+                } = this.prepSectionDocuments(application, sec.id)
+                return (
+                  <DataSection
+                    responsiveContents={
+                      <DocumentListPreview
+                        id={sec.id}
+                        documents={uploadedDocuments}
+                        onSelect={this.selectForPreview}
+                        dropdownOptions={selectOptions}
+                      />
+                    }
+                    key={index}
+                    {...sec}
+                    id={'Section_' + sec.id}
+                  />
+                )
+              })}
               {event === BIRTH && (
                 <InputWrapper>
                   <InputField
@@ -1335,6 +1404,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         >
           {intl.formatMessage(messages.editApplicationConfirmation)}
         </ResponsiveModal>
+        {this.state.previewImage && (
+          <DocumentPreview
+            previewImage={this.state.previewImage}
+            title={intl.formatMessage(buttonMessages.preview)}
+            goBack={this.closePreviewSection}
+            onDelete={this.onDelete}
+          />
+        )}
       </FullBodyContent>
     )
   }
