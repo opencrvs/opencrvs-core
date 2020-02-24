@@ -43,7 +43,7 @@ import {
   Warning
 } from '@opencrvs/components/lib/icons'
 import { Box, Chip, Spinner } from '@opencrvs/components/lib/interface'
-import { find, get } from 'lodash'
+import { find, get, camelCase } from 'lodash'
 import * as React from 'react'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -58,7 +58,7 @@ export enum Event {
 export enum Action {
   IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
-  WAITING_VALIDATION = 'WAITING_VALIDATINO',
+  WAITING_VALIDATION = 'WAITING_VALIDATION',
   VALIDATED = 'VALIDATED',
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
@@ -337,7 +337,7 @@ class DuplicateDetailsClass extends React.Component<
                 <b>
                   {intl.formatMessage(constantsMessages.applicationState, {
                     action: intl.formatMessage(
-                      dynamicConstantsMessages[status.action.toLowerCase()]
+                      dynamicConstantsMessages[camelCase(status.action)]
                     )
                   })}
                   :

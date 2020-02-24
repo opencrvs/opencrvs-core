@@ -48,6 +48,7 @@ const InputDescription = styled.p<{
 export interface IInputFieldProps {
   id: string
   label?: string
+  helperText?: string
   tooltip?: string
   description?: string
   required?: boolean
@@ -75,6 +76,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     const {
       id,
       label,
+      helperText,
       tooltip,
       required = true,
       description,
@@ -111,6 +113,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
             {label && (
               <InputLabel
                 id={`${id}_label`}
+                inputDescriptor={helperText}
                 disabled={this.props.disabled}
                 ignoreMediaQuery={ignoreMediaQuery}
                 color={color}

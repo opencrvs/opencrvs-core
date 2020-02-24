@@ -16,28 +16,18 @@ services:
       context: .
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
-
-  performance:
-    image: jembi/ocrvs-performance:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/performance/Dockerfile
-    restart: unless-stopped
-
   login:
     image: jembi/ocrvs-login:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
-
   styleguide:
     image: jembi/ocrvs-styleguide:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/components/Dockerfile
     restart: unless-stopped
-
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
     build:
@@ -55,7 +45,6 @@ services:
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
       - CHECK_INVALID_TOKEN=true
-
   # User facing services
   workflow:
     image: jembi/ocrvs-workflow:${VERSION:-latest}
@@ -67,13 +56,12 @@ services:
       - NODE_ENV=development
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-      - RESOURCE_SERVICE_URL=http://resources:3040/${COUNTRY:-bgd}/
+      - RESOURCE_SERVICE_URL=http://resources:3040/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
-
   search:
     image: jembi/ocrvs-search:${VERSION:-latest}
     build:
@@ -87,7 +75,6 @@ services:
       - HEARTH_URL=http://hearth:3447/fhir
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
-
   metrics:
     image: jembi/ocrvs-metrics:${VERSION:-latest}
     build:
@@ -101,9 +88,7 @@ services:
       - AUTH_URL=http://auth:4040
       - FHIR_URL=http://openhim-core:5001/fhir
       - CHECK_INVALID_TOKEN=true
-
   # END User facing services
-
   auth:
     image: jembi/ocrvs-auth:${VERSION:-latest}
     build:
@@ -116,7 +101,6 @@ services:
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
-
   user-mgnt:
     image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
     build:
@@ -130,7 +114,6 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
-
   notification:
     image: jembi/ocrvs-notification:${VERSION:-latest}
     build:
@@ -141,19 +124,4 @@ services:
       - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
-      - CHECK_INVALID_TOKEN=true
-
-  resources:
-    image: jembi/ocrvs-resources:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/resources/Dockerfile
-    restart: unless-stopped
-    environment:
-      - MONGO_URL=mongodb://mongo1/user-mgnt
-      - NODE_ENV=development
-      - FHIR_URL=http://hearth:3447/fhir
-      - AUTH_URL=http://auth:4040
-      - OPENHIM_URL=http://openhim-core:5001
-      - CONFIRM_REGISTRATION_URL=http://workflow:5050/confirm/registration
       - CHECK_INVALID_TOKEN=true

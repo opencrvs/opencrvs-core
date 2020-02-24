@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL } from '@workflow/constants'
+import { HEARTH_URL, VALIDATING_EXTERNALLY } from '@workflow/constants'
 import { Events, triggerEvent } from '@workflow/features/events/handler'
 import {
   markBundleAsCertified,
@@ -228,6 +228,14 @@ export async function markEventAsRegisteredCallbackHandler(
       logger.info(
         'markEventAsRegisteredCallbackHandler could not send event notification'
       )
+    }
+    // Most nations will desire the opportunity to pilot OpenCRVS alongised a legacy system, or an external data store / validation process
+    // In the absence of an external process, we must wait at least a second before we continue, because Elasticsearch must
+    // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
+    // If an external system is being used, then its processing time will mean a wait is not required.
+    if (!VALIDATING_EXTERNALLY) {
+      // tslint:disable-next-line
+      await new Promise(resolve => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
     await triggerEvent(

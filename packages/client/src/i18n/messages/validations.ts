@@ -22,6 +22,8 @@ interface IValidationMessages {
   greaterThanZero: MessageDescriptor
   isValidBirthDate: MessageDescriptor
   isValidDateOfDeath: MessageDescriptor
+  isDateNotAfterDeath: MessageDescriptor
+  isDateNotBeforeBirth: MessageDescriptor
   maxLength: MessageDescriptor
   minLength: MessageDescriptor
   numberRequired: MessageDescriptor
@@ -104,6 +106,18 @@ const messagesToDefine: IValidationMessages = {
       'The error message appears when the given date of death is not valid',
     id: 'validations.isValidDateOfDeath'
   },
+  isDateNotBeforeBirth: {
+    defaultMessage: 'Date must be after deceased birth date',
+    description:
+      'The error message appears when the given date of death is not valid',
+    id: 'validations.isDateNotBeforeBirth'
+  },
+  isDateNotAfterDeath: {
+    defaultMessage: 'Date must be before decease date',
+    description:
+      'The error message appears when the given date of death is not valid',
+    id: 'validations.isDateNotAfterDeath'
+  },
   maxLength: {
     defaultMessage: 'Must not be more than {max} characters',
     description:
@@ -154,14 +168,14 @@ const messagesToDefine: IValidationMessages = {
   },
   validBirthRegistrationNumber: {
     defaultMessage:
-      'The Birth Registration Number can only contain block character and number where the length must be within {min} and {max}',
+      'The Birth Registration Number can only be numeric where the length must be within {min} and {max}',
     description:
       'The error message that appears when an invalid value is used as brn',
     id: 'validations.validBirthRegistrationNumber'
   },
   validDeathRegistrationNumber: {
     defaultMessage:
-      'The Death Registration Number can only be alpha numeric and must be {validLength} characters long',
+      'The Death Registration Number can only be numeric and must be {validLength} characters long',
     description:
       'The error message that appears when an invalid value is used as drn',
     id: 'validations.validDeathRegistrationNumber'

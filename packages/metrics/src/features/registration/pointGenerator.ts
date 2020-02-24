@@ -23,6 +23,7 @@ import {
   IInProgressApplicationTags,
   ITimeLoggedTags,
   IDurationTags,
+  ILocationTags,
   IPoints,
   IPaymentPoints
 } from '@metrics/features/registration'
@@ -70,14 +71,24 @@ export const generateInCompleteFieldPoints = async (
   if (!inCompleteFieldExtension || !inCompleteFieldExtension.valueString) {
     throw new Error('In complete field list extension not found on payload')
   }
+  /**
+   * Avoid generating points when value is N/A
+   * Ex: For health birth/death notifications, we will receive N/A as value
+   */
+  if (inCompleteFieldExtension.valueString === 'N/A') {
+    return []
+  }
   if (!task) {
     throw new Error('Task not found')
   }
 
   const fields: IInProgressApplicationFields = {
-    compositionId: composition.id,
-    ...(await generatePointLocations(payload, authHeader))
+    compositionId: composition.id
   }
+  const locationTags: ILocationTags = await generatePointLocations(
+    payload,
+    authHeader
+  )
   return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
     const missingFieldIds = missingFieldId.split('/')
     const tags: IInProgressApplicationTags = {
@@ -85,7 +96,8 @@ export const generateInCompleteFieldPoints = async (
       missingFieldGroupId: missingFieldIds[1],
       missingFieldId: missingFieldIds[2],
       eventType: getApplicationType(task) as string,
-      regStatus: 'IN_PROGESS'
+      regStatus: 'IN_PROGESS',
+      ...locationTags
     }
     return {
       measurement: 'in_complete_fields',

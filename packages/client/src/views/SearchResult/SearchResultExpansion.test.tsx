@@ -103,7 +103,7 @@ describe('SearchResult expansion related tests', () => {
                     __typename: 'BirthEventSearchSet',
 
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: []
                   }
@@ -125,7 +125,7 @@ describe('SearchResult expansion related tests', () => {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                 informant: {
                   __typename: 'X',
                   individual: {
@@ -285,7 +285,7 @@ describe('SearchResult expansion related tests', () => {
                     ],
                     __typename: 'BirthEventSearchSet',
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: []
                   }
@@ -404,7 +404,7 @@ describe('SearchResult expansion related tests', () => {
                     ],
                     __typename: 'BirthEventSearchSet',
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: []
                   }
@@ -426,7 +426,7 @@ describe('SearchResult expansion related tests', () => {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                 informant: {
                   __typename: 'X',
                   individual: {
@@ -583,7 +583,7 @@ describe('SearchResult expansion related tests', () => {
                       }
                     ],
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: [],
                     __typename: 'BirthEventSearchSet'
@@ -606,7 +606,7 @@ describe('SearchResult expansion related tests', () => {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                 informant: {
                   __typename: 'X',
                   individual: {
@@ -753,7 +753,7 @@ describe('SearchResult expansion related tests', () => {
                       }
                     ],
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: [],
                     __typename: 'BirthEventSearchSet'
@@ -776,7 +776,7 @@ describe('SearchResult expansion related tests', () => {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                 informant: {
                   __typename: 'X',
                   individual: {
@@ -928,7 +928,7 @@ describe('SearchResult expansion related tests', () => {
                       }
                     ],
                     // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                    // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                    // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                     dateOfDeath: '',
                     deceasedName: [],
                     __typename: 'BirthEventSearchSet'
@@ -951,7 +951,7 @@ describe('SearchResult expansion related tests', () => {
               fetchRegistration: {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
                 // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
                 informant: {
                   __typename: 'X',
                   individual: {

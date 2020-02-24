@@ -28,8 +28,10 @@ context('Certificate Integration Test', () => {
     // DOWNLOAD AND GO FOR PRINT
     cy.downloadFirstApplication()
     cy.get('#ListItemAction-0-Print').click()
+    cy.tick(20000)
 
     // GO FOR CERTIFICATE COLLECTION
+    cy.get('#type_MOTHER', { timeout: 30000 }).should('be.visible')
     cy.get('#type_MOTHER').click()
     cy.get('#confirm_form').click()
     cy.get('#verifyPositive').click()

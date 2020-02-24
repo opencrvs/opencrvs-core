@@ -31,6 +31,7 @@ import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IApplicationCertificate } from '@client/applications'
 import { IOfflineData } from '@client/offline/reducer'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -58,10 +59,16 @@ export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const SEARCH_FIELD = 'SEARCH_FIELD'
+export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 
 export enum Event {
   BIRTH = 'birth',
   DEATH = 'death'
+}
+
+export enum Sort {
+  ASC = 'asc',
+  DESC = 'desc'
 }
 
 export enum Action {
@@ -110,9 +117,17 @@ export interface IDynamicFormFieldValidators {
   dependencies: string[]
 }
 
-export type IDynamicFormFieldLabelMapper = (key: string) => MessageDescriptor
+export type IDynamicFormFieldLabelMapper = (
+  key: string
+) => MessageDescriptor | undefined
 
-export type IDynamicFormFieldToolTipMapper = (key: string) => MessageDescriptor
+export type IDynamicFormFieldHelperTextMapper = (
+  key: string
+) => MessageDescriptor | undefined
+
+export type IDynamicFormFieldToolTipMapper = (
+  key: string
+) => MessageDescriptor | undefined
 
 export type IDynamicValueMapper = (key: string) => string
 
@@ -122,6 +137,10 @@ export interface ISerializedDynamicFormFieldDefinitions {
   label?: {
     dependency: string
     labelMapper: Operation<typeof labels>
+  }
+  helperText?: {
+    dependency: string
+    helperTextMapper: Operation<typeof labels>
   }
   tooltip?: {
     dependency: string
@@ -142,6 +161,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
 
 export interface IDynamicFormFieldDefinitions {
   label?: IDynamicFieldLabel
+  helperText?: IDynamicFieldHelperText
   tooltip?: IDynamicFieldTooltip
   type?: IDynamicFieldType | IStaticFieldType
   validate?: IDynamicFormFieldValidators[]
@@ -150,6 +170,11 @@ export interface IDynamicFormFieldDefinitions {
 export interface IDynamicFieldLabel {
   dependency: string
   labelMapper: IDynamicFormFieldLabelMapper
+}
+
+export interface IDynamicFieldHelperText {
+  dependency: string
+  helperTextMapper: IDynamicFormFieldHelperTextMapper
 }
 
 export interface IDynamicFieldTooltip {
@@ -329,10 +354,16 @@ export interface IAttachment {
   description?: string
 }
 
+export enum REVIEW_OVERRIDE_POSITION {
+  BEFORE = 'before',
+  AFTER = 'after'
+}
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: MessageDescriptor
+  helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
   validate: validators.Validation[]
   required?: boolean
@@ -358,7 +389,19 @@ export interface IFormFieldBase {
   readonly?: boolean
   hideInPreview?: boolean
   ignoreNestedFieldWrappingInPreview?: boolean
+  reviewOverrides?: {
+    residingSection: string
+    reference: {
+      sectionID: string
+      groupID: string
+      fieldName: string
+    }
+    position?: REVIEW_OVERRIDE_POSITION
+    labelAs?: MessageDescriptor
+    conditionals?: IConditional[]
+  }
   ignoreFieldLabelOnErrorMessage?: boolean
+  ignoreBottomMargin?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -453,6 +496,8 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
 export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: ISelectOption[]
+  hideOnEmptyOption?: boolean
+  splitView?: boolean
 }
 export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
@@ -465,6 +510,12 @@ export interface ISearchFormField extends IFormFieldBase {
   dynamicOptions?: IDynamicOptions
   dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
+}
+
+export interface ILocationSearchInputFormField extends IFormFieldBase {
+  type: typeof LOCATION_SEARCH_INPUT
+  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  locationList: ISearchLocation[]
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -484,6 +535,7 @@ export interface IQuery {
   variables?: IDynamicValues
   modalInfoText: MessageDescriptor
   errorText: MessageDescriptor
+  networkErrorText: MessageDescriptor
   responseTransformer: (response: ApolloQueryResult<GQLQuery>) => void
 }
 
@@ -534,6 +586,7 @@ export type IFormField =
   | ILoaderButton
   | ISearchFormField
   | ISimpleDocumentUploaderFormField
+  | ILocationSearchInputFormField
 
 export interface IFormTag {
   id: string
@@ -794,6 +847,7 @@ export interface IFormSectionGroup {
   conditionals?: IConditional[]
   error?: MessageDescriptor
   preventContinueIfError?: boolean
+  showExitButtonOnly?: boolean
 }
 
 export interface IForm {
@@ -812,6 +866,7 @@ export interface Ii18nFormFieldBase {
   name: string
   type: string
   label: string
+  helperText?: string
   tooltip?: string
   description?: string
   validate: validators.Validation[]
@@ -828,6 +883,7 @@ export interface Ii18nFormFieldBase {
   placeholder?: string
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
+  ignoreBottomMargin?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -923,6 +979,8 @@ export interface Ii18nImageUploaderWithOptionsFormField
 export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
+  hideOnEmptyOption?: boolean
+  splitView?: boolean
 }
 export interface Ii18nSimpleDocumentUploaderFormField
   extends Ii18nFormFieldBase {
@@ -935,6 +993,12 @@ export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
   searchableType: string
   dispatchOptions?: IDispatchOptions
   onCompleted?: (response: string) => void
+}
+
+export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
+  type: typeof LOCATION_SEARCH_INPUT
+  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  locationList: ISearchLocation[]
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
@@ -959,6 +1023,7 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   successTitle: string
   errorTitle: string
   errorText: string
+  networkErrorText: string
 }
 
 export type Ii18nFormField =
@@ -985,6 +1050,7 @@ export type Ii18nFormField =
   | Ii18nLoaderButtonField
   | Ii18nSearchFormField
   | Ii18nSimpleDocumentUploaderFormField
+  | Ii18nLocationSearchInputFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

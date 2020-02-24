@@ -9,35 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
 import {
-  createTestComponent,
-  validToken,
-  flushPromises,
-  mockApplicationData,
-  mockUserResponse,
-  getItem
-} from '@client/tests/util'
-import { ReactWrapper } from 'enzyme'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
-import {
+  createApplication,
   storeApplication,
-  SUBMISSION_STATUS,
-  createApplication
+  SUBMISSION_STATUS
 } from '@client/applications'
-import uuid from 'uuid'
 import { Event } from '@client/forms'
-import { queries } from '@client/profile/queries'
-import { merge } from 'lodash'
-import { createStore } from '@client/store'
 import { checkAuth } from '@client/profile/profileActions'
-import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+import { queries } from '@client/profile/queries'
 import {
   COUNT_USER_WISE_APPLICATIONS,
   SEARCH_APPLICATIONS_USER_WISE
 } from '@client/search/queries'
+import { createStore } from '@client/store'
+import {
+  createTestComponent,
+  fieldAgentScopeToken,
+  flushPromises,
+  getItem,
+  mockApplicationData,
+  mockUserResponse
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
+import { EVENT_STATUS } from '@client/views/RegistrationHome/RegistrationHome'
+import { ReactWrapper } from 'enzyme'
+import { merge } from 'lodash'
+import * as React from 'react'
+import uuid from 'uuid'
 
 const nameObj = {
   data: {
@@ -82,8 +82,8 @@ describe('FieldAgentHome tests', () => {
 
   beforeAll(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
-    getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth({ '?token': validToken }))
+    getItem.mockReturnValue(fieldAgentScopeToken)
+    await store.dispatch(checkAuth({ '?token': fieldAgentScopeToken }))
   })
 
   it('renders loading icon while loading page', async () => {
@@ -192,9 +192,59 @@ describe('FieldAgentHome tests', () => {
                 id: '613da949-db8c-49ad-94b4-631ab0b7503e',
                 type: 'Birth',
                 registration: {
+                  contactNumber: '+8801711111111',
+                  trackingId: 'BZW3T4',
                   dateOfApplication: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
+                operationHistories: [
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-21T08:41:08.551Z',
+                    operationType: 'DECLARED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'FIELD_AGENT',
+                    rejectComment: null,
+                    rejectReason: null,
+                    operatorName: [
+                      {
+                        familyName: 'Al Hasan',
+                        firstNames: 'Shakib',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  },
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-22T12:54:28.369Z',
+                    operationType: 'REJECTED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    rejectComment: 'Spelling mistake',
+                    rejectReason: 'misspelling',
+                    operatorName: [
+                      {
+                        familyName: 'Ashraful',
+                        firstNames: 'Mohammad',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  }
+                ],
                 childName: [
                   {
                     use: 'en',
@@ -273,9 +323,59 @@ describe('FieldAgentHome tests', () => {
                 id: '613da949-db8c-49ad-94b4-631ab0b7503e',
                 type: 'Birth',
                 registration: {
+                  contactNumber: '+8801711111111',
+                  trackingId: 'BZW3T4',
                   dateOfApplication: '2019-05-22T10:22:21.840Z',
                   status: 'REJECTED'
                 },
+                operationHistories: [
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-21T08:41:08.551Z',
+                    operationType: 'DECLARED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'FIELD_AGENT',
+                    rejectComment: null,
+                    rejectReason: null,
+                    operatorName: [
+                      {
+                        familyName: 'Al Hasan',
+                        firstNames: 'Shakib',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  },
+                  {
+                    notificationFacilityAlias: null,
+                    notificationFacilityName: null,
+                    operatedOn: '2020-01-22T12:54:28.369Z',
+                    operationType: 'REJECTED',
+                    operatorOfficeName: 'Baniajan Union Parishad',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    rejectComment: 'Spelling mistake',
+                    rejectReason: 'misspelling',
+                    operatorName: [
+                      {
+                        familyName: 'Ashraful',
+                        firstNames: 'Mohammad',
+                        use: 'en'
+                      },
+                      {
+                        familyName: null,
+                        firstNames: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+                  }
+                ],
                 childName: [
                   {
                     use: 'en',
@@ -513,10 +613,10 @@ describe('FieldAgentHome tests', () => {
       store.dispatch(storeApplication(failedApplication))
 
       component.update()
-      expect(component.find('#waiting0').hostNodes()).toHaveLength(1)
-      expect(component.find('#submitting1').hostNodes()).toHaveLength(1)
-      expect(component.find('#submitted2').hostNodes()).toHaveLength(1)
-      expect(component.find('#failed3').hostNodes()).toHaveLength(1)
+      expect(component.find('#failed0').hostNodes()).toHaveLength(1)
+      expect(component.find('#submitted1').hostNodes()).toHaveLength(1)
+      expect(component.find('#submitting2').hostNodes()).toHaveLength(1)
+      expect(component.find('#waiting3').hostNodes()).toHaveLength(1)
     })
 
     it('when offline renders pending submission status', async () => {

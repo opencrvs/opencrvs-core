@@ -171,6 +171,7 @@ interface IFormMessages {
   fetchInformantDetails: MessageDescriptor
   fetchMotherDetails: MessageDescriptor
   fetchPersonByNIDModalErrorText: MessageDescriptor
+  fetchPersonByNIDModalNetworkErrorText: MessageDescriptor
   fetchPersonByNIDModalInfo: MessageDescriptor
   fetchRegistrationModalErrorText: MessageDescriptor
   fetchRegistrationModalInfo: MessageDescriptor
@@ -356,6 +357,9 @@ interface IFormMessages {
   deceasedSpousesGivenNames: MessageDescriptor
   deceasedSpousesGivenNamesEng: MessageDescriptor
   certificatePrintInAdvance: MessageDescriptor
+  nationalIdOption: MessageDescriptor
+  brnOption: MessageDescriptor
+  helperTextNID: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -421,7 +425,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.applicantsDateOfBirth'
   },
   applicantsFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.applicantsFamilyName'
   },
@@ -431,7 +435,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.applicantsFamilyNameEng'
   },
   applicantsGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.applicantsGivenNames'
   },
@@ -588,7 +592,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
@@ -609,7 +613,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.childDateOfBirth'
   },
   childFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.childFamilyName'
   },
@@ -619,7 +623,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.childFamilyNameEng'
   },
   childFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First names',
     id: 'form.field.label.childFirstNames'
   },
@@ -824,7 +828,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedDoBProof'
   },
   deceasedFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedFamilyName'
   },
@@ -834,7 +838,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedFamilyNameEng'
   },
   deceasedGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedGivenNames'
   },
@@ -1090,7 +1094,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fatherEducationAttainment'
   },
   fatherFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.fatherFamilyName'
   },
@@ -1100,7 +1104,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fatherFamilyNameEng'
   },
   fatherFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First name',
     id: 'form.field.label.fatherFirstNames'
   },
@@ -1160,9 +1164,16 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.fetchMotherDetails'
   },
   fetchPersonByNIDModalErrorText: {
-    defaultMessage: 'National ID not found. Please enter valid National ID',
+    defaultMessage:
+      'National ID not found. Please enter a valid National ID and date of birth.',
     description: 'Label for fetch modal error title',
     id: 'form.field.label.fetchPersonByNIDModalErrorText'
+  },
+  fetchPersonByNIDModalNetworkErrorText: {
+    defaultMessage:
+      'The request to the NID system was unsuccessful. Please try again with a better connection.',
+    description: 'Label for fetch modal error title',
+    id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
   },
   fetchPersonByNIDModalInfo: {
     defaultMessage: 'National ID',
@@ -1220,7 +1231,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.iDTypeAlienNumber'
   },
   iDTypeBRN: {
-    defaultMessage: 'Birth Registration Number',
+    defaultMessage: 'Birth registration number (in English)',
     description: 'Option for form field: Type of ID',
     id: 'form.field.label.iDTypeBRN'
   },
@@ -1235,7 +1246,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.iDTypeDRN'
   },
   iDTypeNationalID: {
-    defaultMessage: 'National ID',
+    defaultMessage: 'National ID number (in English)',
     description: 'Option for form field: Type of ID',
     id: 'form.field.label.iDTypeNationalID'
   },
@@ -1370,7 +1381,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.motherEducationAttainment'
   },
   motherFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.motherFamilyName'
   },
@@ -1380,7 +1391,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.motherFamilyNameEng'
   },
   motherFirstNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: First names',
     id: 'form.field.label.motherFirstNames'
   },
@@ -2014,7 +2025,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.father.title'
   },
   deceasedFathersFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedFathersFamilyName'
   },
@@ -2024,7 +2035,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedFathersFamilyNameEng'
   },
   deceasedFathersGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedFathersGivenNames'
   },
@@ -2044,7 +2055,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.mother.title'
   },
   deceasedMothersFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedMothersFamilyName'
   },
@@ -2054,7 +2065,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedMothersFamilyNameEng'
   },
   deceasedMothersGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedMothersGivenNames'
   },
@@ -2084,7 +2095,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.deceased.noSpouse'
   },
   deceasedSpousesFamilyName: {
-    defaultMessage: 'Last Name(s) in Bengali',
+    defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
     id: 'form.field.label.deceasedSpousesFamilyName'
   },
@@ -2094,7 +2105,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedSpousesFamilyNameEng'
   },
   deceasedSpousesGivenNames: {
-    defaultMessage: 'First Name(s) in Bengali',
+    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
     id: 'form.field.label.deceasedSpouseGivenNames'
   },
@@ -2107,6 +2118,22 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Print in advance for signatures and collection',
     description: 'Label for certificate collection option',
     id: 'form.field.label.certificatePrintInAdvance'
+  },
+  nationalIdOption: {
+    defaultMessage: 'Birth registration number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.option.iDTypeNationalID'
+  },
+  brnOption: {
+    defaultMessage: 'National ID number',
+    description: 'Option for form field: Type of ID',
+    id: 'form.field.option.iDTypeBRN'
+  },
+  helperTextNID: {
+    defaultMessage:
+      'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
+    description: 'Helper text for nid input field',
+    id: 'form.field.helpertext.nid'
   }
 }
 

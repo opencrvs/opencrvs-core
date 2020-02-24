@@ -62,11 +62,20 @@ services:
     ports:
       - '9090:9090'
 
+  # @todo this would probably have to be the Zambia reference
   resources:
+    image: jembi/ocrvs-bangladesh:latest
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:
       - CERT_PUBLIC_KEY_PATH=/secrets/public-key.pem
+      - MONGO_URL=mongodb://mongo1/user-mgnt
+      - NODE_ENV=development
+      - FHIR_URL=http://hearth:3447/fhir
+      - AUTH_URL=http://auth:4040
+      - OPENHIM_URL=http://openhim-core:5001
+      - CONFIRM_REGISTRATION_URL=http://workflow:5050/confirm/registration
+      - CHECK_INVALID_TOKEN=true
     ports:
       - '3040:3040'
 
@@ -81,9 +90,7 @@ services:
   client:
     ports:
       - '3000:80'
-  performance:
-    ports:
-      - '3001:80'
+
   login:
     ports:
       - '3020:80'

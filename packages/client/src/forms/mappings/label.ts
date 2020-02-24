@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export { identityNameMapper } from '@client/forms/identity'
-
-export { identityTooltipMapper } from '@client/forms/identity'
+export {
+  identityNameMapper,
+  identityHelperTextMapper,
+  identityTooltipMapper
+} from '@client/forms/identity'
 
 export {
   getDateOfMarriageLabel,

@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  TertiaryButton,
+  PrimaryButton
+} from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   ISelectOption as SelectComponentOptions,
@@ -18,7 +22,8 @@ import {
 import {
   DataSection,
   DocumentViewer,
-  IDocumentViewerOptions
+  IDocumentViewerOptions,
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
@@ -58,7 +63,12 @@ import {
   SELECT_WITH_OPTIONS,
   SUBSECTION,
   TEXTAREA,
-  WARNING
+  WARNING,
+  REVIEW_OVERRIDE_POSITION,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IDocumentUploaderWithOptionsFormField,
+  LOCATION_SEARCH_INPUT,
+  IAttachmentValue
 } from '@client/forms'
 import {
   getBirthSection,
@@ -75,7 +85,8 @@ import {
 import {
   getConditionalActionsForField,
   getSectionFields,
-  getVisibleSectionGroupsBasedOnConditions
+  getVisibleSectionGroupsBasedOnConditions,
+  getListOfLocations
 } from '@client/forms/utils'
 import {
   Errors,
@@ -102,8 +113,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { BIRTH, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftApplicantFullName } from '@client/utils/draftUtils'
-import { EditConfirmation } from '@client/views/RegisterForm/review/EditConfirmation'
-import { flatten, isArray } from 'lodash'
+import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
 import {
@@ -114,10 +124,17 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
+import { IValidationResult } from '@client/utils/validate'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 
 const RequiredField = styled.span`
   color: ${({ theme }) => theme.colors.error};
+  display: inline-block;
   text-transform: lowercase;
+  &::first-letter {
+    text-transform: uppercase;
+  }
 `
 const Row = styled.div`
   display: flex;
@@ -212,6 +229,7 @@ type State = {
   editClickedSectionGroupId: string
   editClickFieldName?: string
   activeSection: Section | null
+  previewImage: IFileValue | null
 }
 
 interface IErrorsBySection {
@@ -287,6 +305,26 @@ const getCheckBoxGroupFieldValue = (
   return ''
 }
 
+const getFormFieldValue = (
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+): IFormFieldValue => {
+  const sectionDraftData = draftData[sectionId] || {}
+  if (field.name in sectionDraftData) {
+    return sectionDraftData[field.name]
+  }
+
+  let tempField: IFormField
+  for (let key in sectionDraftData) {
+    tempField = sectionDraftData[key] as IFormField
+    return (tempField &&
+      tempField.nestedFields &&
+      tempField.nestedFields[field.name]) as IFormFieldValue
+  }
+  return ''
+}
+
 const renderValue = (
   draftData: IFormData,
   sectionId: string,
@@ -295,9 +333,7 @@ const renderValue = (
   offlineResources: IOfflineData,
   language: string
 ) => {
-  const value: IFormFieldValue = draftData[sectionId]
-    ? draftData[sectionId][field.name]
-    : ''
+  let value: IFormFieldValue = getFormFieldValue(draftData, sectionId, field)
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
@@ -347,6 +383,17 @@ const renderValue = (
 
   if (value && field.type === CHECKBOX_GROUP) {
     return getCheckBoxGroupFieldValue(field, value as string[], intl)
+  }
+
+  if (value && field.type === LOCATION_SEARCH_INPUT) {
+    const searchableListOfLocations = getListOfLocations(
+      offlineResources,
+      field.searchableResource
+    )
+    const selectedLocation = searchableListOfLocations.find(
+      location => location.id === value
+    )
+    return (selectedLocation && selectedLocation.displayLabel) || ''
   }
 
   if (typeof value === 'string') {
@@ -423,7 +470,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       editClickedSectionGroupId: '',
       editClickFieldName: '',
       editClickedSectionId: null,
-      activeSection: null
+      activeSection: null,
+      previewImage: null
     }
   }
 
@@ -503,11 +551,34 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
+  getLabelForDocType = (docForWhom: string, docType: string) => {
+    const { intl } = this.props
+    const documentSection = this.props.registerForm[
+      this.props.draft.event
+    ].sections.find(section => section.id == 'documents')
+    const docSectionFields = documentSection && documentSection.groups[0].fields
+    const docFieldsWithOptions =
+      docSectionFields &&
+      (docSectionFields.filter(
+        field =>
+          field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
+      ) as IDocumentUploaderWithOptionsFormField[])
+    let allOptionsForPerson: ISelectOption[][] = []
+    if (docFieldsWithOptions) {
+      for (let i = 0; i < docFieldsWithOptions.length; i++) {
+        allOptionsForPerson.push(docFieldsWithOptions[i].options)
+      }
+    }
+    const matchedOption = allOptionsForPerson
+      .flat()
+      .find(option => option.value === docType)
+    return matchedOption && intl.formatMessage(matchedOption.label)
+  }
   prepSectionDocuments = (
     draft: IApplication,
     activeSection: Section
-  ): IDocumentViewerOptions => {
-    const { documentsSection } = this.props
+  ): IDocumentViewerOptions & { uploadedDocuments: IFileValue[] } => {
+    const { documentsSection, intl } = this.props
 
     const draftItemName = documentsSection.id
     const documentOptions: SelectComponentOptions[] = []
@@ -534,8 +605,15 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       if (
         allowedDocumentType.indexOf(document.optionValues[0]!.toString()) > -1
       ) {
-        const title = sectionTitle[activeSection as keyof typeof sectionMapping]
-        const label = title + ' ' + document.optionValues[1]
+        const title: string =
+          sectionTitle[activeSection as keyof typeof sectionMapping]
+        const label =
+          intl.formatMessage(messages.documentForWhom, {
+            section: title.toLowerCase()
+          }) +
+          ' ' +
+          (this.getLabelForDocType(title, document.optionValues[1] as string) ||
+            document.optionValues[1])
 
         documentOptions.push({
           value: document.data,
@@ -552,7 +630,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
     return {
       selectOptions,
-      documentOptions
+      documentOptions,
+      uploadedDocuments
     }
   }
 
@@ -618,7 +697,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       offlineResources,
       draft.data
     )
-    return !conditionalActions.includes('hide')
+    return (
+      !conditionalActions.includes('hide') &&
+      !conditionalActions.includes('disable')
+    )
   }
 
   isViewOnly(field: IFormField) {
@@ -676,6 +758,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
+  getErrorForNestedField(
+    section: IFormSection,
+    field: IFormField,
+    sectionErrors: IErrorsBySection
+  ): IValidationResult[] {
+    for (let key in sectionErrors[section.id]) {
+      return sectionErrors[section.id][key].nestedFields[field.name] || []
+    }
+    return []
+  }
+
   getValueOrError = (
     section: IFormSection,
     field: IFormField,
@@ -683,7 +776,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     ignoreNestedFieldWrapping?: boolean
   ) => {
     const { intl, draft, offlineResources, language } = this.props
-    const errorsOnField = sectionErrors[section.id][field.name].errors
+
+    const errorsOnField =
+      get(sectionErrors[section.id][field.name], 'errors') ||
+      this.getErrorForNestedField(section, field, sectionErrors)
+
     return errorsOnField.length > 0
       ? this.getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
@@ -779,12 +876,25 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       visitedTags.push(field.previewGroup)
 
       const baseTag = field.previewGroup
-      const taggedFields = group.fields.filter(
-        field =>
-          this.isVisibleField(field, section) &&
-          !this.isViewOnly(field) &&
-          field.previewGroup === baseTag
-      )
+      const taggedFields: IFormField[] = []
+      group.fields.forEach(field => {
+        if (this.isVisibleField(field, section) && !this.isViewOnly(field)) {
+          if (field.previewGroup === baseTag) {
+            taggedFields.push(field)
+          }
+          for (let index in field.nestedFields) {
+            field.nestedFields[index].forEach(tempField => {
+              if (
+                this.isVisibleField(tempField, section) &&
+                !this.isViewOnly(tempField) &&
+                tempField.previewGroup === baseTag
+              ) {
+                taggedFields.push(tempField)
+              }
+            })
+          }
+        }
+      })
 
       const tagDef =
         (group.previewGroups &&
@@ -855,6 +965,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     sectionErrors: IErrorsBySection
   ) {
     const { draft } = this.props
+    let visitedTags: string[] = []
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
@@ -871,23 +982,170 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ])) ||
       []
     ).forEach(nestedField => {
-      nestedItems.push(
-        this.getRenderableField(
-          section,
-          group,
-          nestedField.label,
-          nestedField.name,
-          this.getNestedFieldValueOrError(
+      if (nestedField.previewGroup) {
+        nestedItems.push(
+          this.getPreviewGroupsField(
             section,
-            draft.data[section.id][field.name] as IFormData,
+            group,
             nestedField,
-            sectionErrors[section.id][field.name]
-          ),
-          nestedField.readonly
+            visitedTags,
+            sectionErrors
+          )
         )
-      )
+      } else {
+        nestedItems.push(
+          this.getRenderableField(
+            section,
+            group,
+            nestedField.label,
+            nestedField.name,
+            this.getNestedFieldValueOrError(
+              section,
+              draft.data[section.id][field.name] as IFormData,
+              nestedField,
+              sectionErrors[section.id][field.name]
+            ),
+            nestedField.readonly
+          )
+        )
+      }
     })
     return nestedItems
+  }
+
+  getOverriddenFieldsListForPreview(
+    formSections: IFormSection[]
+  ): IFormField[] {
+    const overriddenFields = formSections
+      .map(section => {
+        return section.groups
+          .map(group => {
+            return group.fields
+              .map(field => {
+                const { draft, offlineResources } = this.props
+                const tempField = clone(field)
+                const residingSection =
+                  get(field.reviewOverrides, 'residingSection') || ''
+                tempField.conditionals =
+                  get(field.reviewOverrides, 'conditionals') ||
+                  field.conditionals ||
+                  []
+
+                const isVisible = !getConditionalActionsForField(
+                  tempField,
+                  draft.data[residingSection] || {},
+                  offlineResources,
+                  draft.data
+                ).includes('hide')
+
+                return isVisible ? field : ({} as IFormField)
+              })
+              .filter(field => !Boolean(field.hideInPreview))
+              .filter(field => Boolean(field.reviewOverrides))
+              .filter(field => this.isVisibleField(field, section))
+          })
+          .filter(item => item.length)
+      })
+      .filter(item => item.length)
+    return flattenDeep(overriddenFields)
+  }
+
+  getOverRiddenPreviewField(
+    section: IFormSection,
+    group: IFormSectionGroup,
+    overriddenField: IFormField,
+    sectionErrors: IErrorsBySection,
+    field: IFormField,
+    items: any[],
+    item: any
+  ) {
+    overriddenField.label =
+      get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
+    const residingSectionId = get(
+      overriddenField,
+      'reviewOverrides.residingSection'
+    )
+    const residingSection = this.props.registerForm.death.sections.find(
+      section => section.id === residingSectionId
+    ) as IFormSection
+
+    const result = this.getSinglePreviewField(
+      residingSection,
+      group,
+      overriddenField,
+      sectionErrors
+    )
+
+    const {
+      sectionID,
+      groupID,
+      fieldName
+    } = overriddenField!.reviewOverrides!.reference
+    if (
+      sectionID === section.id &&
+      groupID === group.id &&
+      fieldName === field.name
+    ) {
+      if (
+        overriddenField!.reviewOverrides!.position ===
+        REVIEW_OVERRIDE_POSITION.BEFORE
+      ) {
+        items = items.concat(result)
+        items = items.concat(item)
+      } else {
+        items = items.concat(item)
+        items = items.concat(result)
+      }
+      return items
+    }
+
+    items = items.concat(item)
+    return items
+  }
+
+  selectForPreview = (previewImage: IFileValue | IAttachmentValue) => {
+    this.setState({ previewImage: previewImage as IFileValue })
+  }
+
+  closePreviewSection = (callBack?: () => void) => {
+    if (typeof callBack === 'function') {
+      this.setState({ previewImage: null }, callBack)
+    } else {
+      this.setState({ previewImage: null })
+    }
+  }
+
+  removeAttachmentFromDraft = (file: IFileValue | IAttachmentValue) => {
+    const { documentsSection, draft, onChangeReviewForm } = this.props
+    if (onChangeReviewForm) {
+      const documentsSectionAllFields = flatten(
+        documentsSection.groups.map(group => group.fields)
+      ).filter(
+        field =>
+          field.extraValue && field.type === DOCUMENT_UPLOADER_WITH_OPTION
+      )
+
+      const fieldToUpdate = (documentsSectionAllFields.find(
+        field => field.extraValue === (file as IFileValue).optionValues[0]
+      ) as IDocumentUploaderWithOptionsFormField).name
+
+      const updatedValue = (draft.data[documentsSection.id][
+        fieldToUpdate
+      ] as IFileValue[]).filter(
+        eachFile =>
+          eachFile.optionValues[1] !== (file as IFileValue).optionValues[1]
+      )
+
+      onChangeReviewForm(
+        { [fieldToUpdate]: updatedValue },
+        documentsSection,
+        draft
+      )
+    }
+  }
+
+  onDelete = (file: IFileValue | IAttachmentValue) => {
+    this.closePreviewSection(() => this.removeAttachmentFromDraft(file))
   }
 
   transformSectionData = (
@@ -895,8 +1153,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     errorsOnFields: IErrorsBySection
   ) => {
     const { intl, draft } = this.props
+    const overriddenFields = this.getOverriddenFieldsListForPreview(
+      formSections
+    )
+    let tempItem: any
 
-    return formSections.map(section => {
+    const initialTransformedSection = formSections.map(section => {
       let items: any[] = []
       let visitedTags: string[] = []
       getVisibleSectionGroupsBasedOnConditions(
@@ -910,30 +1172,45 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               this.isVisibleField(field, section) && !this.isViewOnly(field)
           )
           .filter(field => !Boolean(field.hideInPreview))
+          .filter(field => !Boolean(field.reviewOverrides))
           .forEach(field => {
-            items = items.concat(
-              field.previewGroup
-                ? this.getPreviewGroupsField(
-                    section,
-                    group,
-                    field,
-                    visitedTags,
-                    errorsOnFields
-                  )
-                : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-                ? this.getNestedPreviewField(
-                    section,
-                    group,
-                    field,
-                    errorsOnFields
-                  )
-                : this.getSinglePreviewField(
-                    section,
-                    group,
-                    field,
-                    errorsOnFields
-                  )
-            )
+            tempItem = field.previewGroup
+              ? this.getPreviewGroupsField(
+                  section,
+                  group,
+                  field,
+                  visitedTags,
+                  errorsOnFields
+                )
+              : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
+              ? this.getNestedPreviewField(
+                  section,
+                  group,
+                  field,
+                  errorsOnFields
+                )
+              : this.getSinglePreviewField(
+                  section,
+                  group,
+                  field,
+                  errorsOnFields
+                )
+
+            overriddenFields.forEach(overriddenField => {
+              items = this.getOverRiddenPreviewField(
+                section,
+                group,
+                overriddenField as IFormField,
+                errorsOnFields,
+                field,
+                items,
+                tempItem
+              )
+            })
+
+            if (!overriddenFields.length) {
+              items = items.concat(tempItem)
+            }
           })
       })
       return {
@@ -942,6 +1219,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         items: items.filter(item => item)
       }
     })
+
+    return initialTransformedSection
   }
 
   render() {
@@ -986,7 +1265,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const sectionName = this.state.activeSection || this.docSections[0].id
     const applicantName = getDraftApplicantFullName(application, intl.locale)
     const draft = this.isDraft()
-
+    const transformedSectionData = this.transformSectionData(
+      formSections,
+      errorsOnFields
+    )
     return (
       <FullBodyContent>
         <Row>
@@ -1012,11 +1294,27 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   isDraft: draft
                 })}
               </FormDataHeader>
-              {this.transformSectionData(formSections, errorsOnFields).map(
-                (sec, index) => (
-                  <DataSection key={index} {...sec} id={'Section_' + sec.id} />
+              {transformedSectionData.map((sec, index) => {
+                const {
+                  uploadedDocuments,
+                  selectOptions
+                } = this.prepSectionDocuments(application, sec.id)
+                return (
+                  <DataSection
+                    responsiveContents={
+                      <DocumentListPreview
+                        id={sec.id}
+                        documents={uploadedDocuments}
+                        onSelect={this.selectForPreview}
+                        dropdownOptions={selectOptions}
+                      />
+                    }
+                    key={index}
+                    {...sec}
+                    id={'Section_' + sec.id}
+                  />
                 )
-              )}
+              })}
               {event === BIRTH && (
                 <InputWrapper>
                   <InputField
@@ -1075,17 +1373,45 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             </ResponsiveDocumentViewer>
           </Column>
         </Row>
-        <EditConfirmation
+        <ResponsiveModal
+          title={intl.formatMessage(messages.editApplicationConfirmationTitle)}
+          contentHeight={96}
+          responsive={false}
+          actions={[
+            <TertiaryButton
+              id="cancel-btn"
+              key="cancel"
+              onClick={this.toggleDisplayDialog}
+            >
+              {intl.formatMessage(buttonMessages.cancel)}
+            </TertiaryButton>,
+            <PrimaryButton
+              id="edit_confirm"
+              key="submit"
+              onClick={() => {
+                this.editLinkClickHandlerForDraft(
+                  this.state.editClickedSectionId!,
+                  this.state.editClickedSectionGroupId,
+                  this.state.editClickFieldName!
+                )
+              }}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </PrimaryButton>
+          ]}
           show={this.state.displayEditDialog}
           handleClose={this.toggleDisplayDialog}
-          handleEdit={() => {
-            this.editLinkClickHandlerForDraft(
-              this.state.editClickedSectionId!,
-              this.state.editClickedSectionGroupId,
-              this.state.editClickFieldName!
-            )
-          }}
-        />
+        >
+          {intl.formatMessage(messages.editApplicationConfirmation)}
+        </ResponsiveModal>
+        {this.state.previewImage && (
+          <DocumentPreview
+            previewImage={this.state.previewImage}
+            title={intl.formatMessage(buttonMessages.preview)}
+            goBack={this.closePreviewSection}
+            onDelete={this.onDelete}
+          />
+        )}
       </FullBodyContent>
     )
   }

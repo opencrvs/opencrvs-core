@@ -13,15 +13,16 @@ export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 5050
 export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
+export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
-export const COUNTRY = process.env.COUNTRY || 'bgd'
+
 export const RESOURCE_SERVICE_URL =
-  process.env.RESOURCE_SERVICE_URL || `http://localhost:3040/${COUNTRY}/`
+  process.env.RESOURCE_SERVICE_URL || `http://localhost:3040/`
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
-export const BRN_GENERATOR_CODE = process.env.BRN_GENERATOR_CODE || 'bd'
+
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'

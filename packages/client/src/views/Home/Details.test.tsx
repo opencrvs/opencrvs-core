@@ -29,7 +29,8 @@ import {
   createApplication,
   storeApplication,
   modifyApplication,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  IApplication
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
@@ -162,7 +163,8 @@ describe('Field Agnet tests', () => {
   })
 
   it('loads properly for draft application with create row', async () => {
-    const draft = createApplication(Event.BIRTH)
+    const draft: IApplication = createApplication(Event.BIRTH)
+    draft.compositionId = draft.id
     store.dispatch(storeApplication(draft))
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -174,6 +176,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store
@@ -188,7 +198,8 @@ describe('Field Agnet tests', () => {
   })
 
   it('loads properly for draft application with create and update row', async () => {
-    const draft = createApplication(Event.DEATH)
+    const draft: IApplication = createApplication(Event.DEATH)
+    draft.compositionId = draft.id
     store.dispatch(storeApplication(draft))
     // @ts-ignore
     draft.data.deceased = {
@@ -206,6 +217,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store
     )
@@ -217,8 +236,79 @@ describe('Field Agnet tests', () => {
       testComponent.component.find('#history_row_1_DRAFT_STARTED').hostNodes()
     ).toHaveLength(1)
   })
+  it('loads properly for submitted draft application', async () => {
+    const draft: IApplication = {
+      id: 'bfe0d0da-1328-4fd4-81b7-34666700c587',
+      data: {
+        registration: {
+          contactPoint: {
+            nestedFields: { registrationPhone: '+8801911111111' }
+          }
+        },
+        deceased: {
+          firstNamesEng: '',
+          familyNameEng: 'Abdullah',
+          firstNames: '',
+          familyName: 'আব্দুল্লাহ'
+        }
+      },
+      event: Event.DEATH,
+      trackingId: 'D2CDBTD',
+      submissionStatus: 'SUBMITTED',
+      compositionId: 'bfe0d0da-1328-4fd4-81b7-34666700c587',
+      operationHistories: [
+        {
+          operationType: 'DECLARED',
+          operatedOn: '2020-01-22T08:23:56.942Z',
+          operatorRole: 'FIELD_AGENT',
+          operatorName: [
+            {
+              firstNames: 'Shakib',
+              familyName: 'Al Hasan',
+              use: 'en'
+            },
+            {
+              firstNames: 'সাকিব',
+              familyName: 'আল হাসান',
+              use: 'bn'
+            }
+          ],
+          operatorOfficeName: 'Baniajan Union Parishad',
+          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+        }
+      ]
+    }
+    store.dispatch(storeApplication(draft))
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <Details
+        match={{
+          params: {
+            applicationId: draft.id
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
+      />,
+      store
+    )
+
+    expect(
+      testComponent.component.find('#history_row_0_DECLARED').hostNodes()
+    ).toHaveLength(1)
+  })
   it('loads properly for failed application', async () => {
-    const draft = createApplication(Event.DEATH)
+    const draft: IApplication = createApplication(Event.DEATH)
+    draft.compositionId = draft.id
     store.dispatch(storeApplication(draft))
     // @ts-ignore
     draft.data.deceased = {
@@ -236,6 +326,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store
@@ -277,7 +375,7 @@ describe('Field Agnet tests', () => {
                 ]
               },
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               deceased: {
                 name: []
               },
@@ -353,6 +451,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -381,7 +487,7 @@ describe('Field Agnet tests', () => {
             fetchRegistration: {
               id: '1',
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [
@@ -456,6 +562,14 @@ describe('Field Agnet tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -504,7 +618,7 @@ describe('Field Agnet tests', () => {
                 ]
               },
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [
@@ -571,6 +685,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store,
@@ -645,6 +767,14 @@ describe('Field Agnet tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: true
+          }
         }}
       />,
       store,
@@ -967,6 +1097,14 @@ describe('Registrar tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -1018,6 +1156,14 @@ describe('Registrar tests', () => {
           isExact: true,
           path: '',
           url: ''
+        }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
         }}
       />,
       store,
@@ -1073,7 +1219,7 @@ describe('Registrar tests', () => {
             fetchRegistration: {
               id: '956281c9-1f47-4c26-948a-970dd23c4094',
               // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-              // PR: https://github.com/jembi/OpenCRVS/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+              // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
               child: {
                 id: 'FAKE_ID',
                 name: [
@@ -1450,6 +1596,14 @@ describe('Registrar tests', () => {
           path: '',
           url: ''
         }}
+        location={{
+          pathname: '',
+          search: '',
+          hash: '',
+          state: {
+            forceDetailsQuery: false
+          }
+        }}
       />,
       store,
       graphqlMock
@@ -1522,6 +1676,12 @@ describe('Registrar tests', () => {
             isExact: true,
             path: '',
             url: ''
+          }}
+          location={{
+            pathname: '',
+            search: '',
+            hash: '',
+            state: {}
           }}
         />,
         store,

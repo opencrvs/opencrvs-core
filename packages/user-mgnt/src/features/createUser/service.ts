@@ -71,12 +71,27 @@ export const createFhirPractitionerRole = (
         ]
       }
     ],
-    location: (user.catchmentAreaIds || [])
-      .concat(user.primaryOfficeId)
-      .map(id => ({
-        reference: `Location/${id}`
-      }))
+    location: (user.catchmentAreaIds || []).map(id => ({
+      reference: `Location/${id}`
+    }))
   }
+}
+
+export const getCatchmentAreaIdsByPrimaryOfficeId = async (
+  primaryOfficeId: string,
+  token: string
+): Promise<string[]> => {
+  const catchmentAreaIds: string[] = [primaryOfficeId]
+  let locationRef = `Location/${primaryOfficeId}`
+  let parentLocation: fhir.Location = {}
+  while (locationRef !== 'Location/0') {
+    parentLocation = await getFromFhir(token, `/${locationRef}`)
+    if (parentLocation.id && parentLocation.partOf) {
+      catchmentAreaIds.push(parentLocation.id)
+      locationRef = parentLocation.partOf.reference || 'Location/0'
+    }
+  }
+  return catchmentAreaIds
 }
 
 export const postFhir = async (token: string, resource: fhir.Resource) => {
@@ -102,6 +117,21 @@ export const postFhir = async (token: string, resource: fhir.Resource) => {
   }
 
   return null
+}
+
+export const getFromFhir = (token: string, suffix: string) => {
+  return fetch(`${FHIR_URL}${suffix.startsWith('/') ? '' : '/'}${suffix}`, {
+    headers: {
+      'Content-Type': 'application/json+fhir',
+      Authorization: token
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
+    })
 }
 
 export const deleteFhir = async (

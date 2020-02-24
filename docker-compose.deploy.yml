@@ -180,9 +180,8 @@ services:
 
   # Configure webapps and add traefik config
   client:
-    configs:
-      - source: client-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
+    environment:
+      - RESOURCES_URL=https://resources.{{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -195,15 +194,12 @@ services:
     networks:
       - overlay_net
 
-  performance:
-    configs:
-      - source: performance-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
+  resources:
     deploy:
       labels:
         - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: performance.{{hostname}}'
-        - 'traefik.port=80'
+        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
+        - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
@@ -221,9 +217,8 @@ services:
       - overlay_net
 
   login:
-    configs:
-      - source: login-config.{{ts}}
-        target: /usr/share/nginx/html/config.js
+    environment:
+      - RESOURCES_URL=https://resources.{{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -304,22 +299,6 @@ services:
     environment:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
-      replicas: 2
-    networks:
-      - overlay_net
-
-  resources:
-    secrets:
-      - jwt-public-key.{{ts}}
-    environment:
-      - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: resources.{{hostname}}'
-        - 'traefik.port=3040'
-        - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
@@ -423,12 +402,6 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  client-config.{{ts}}:
-    file: ./infrastructure/client-config.js
-  performance-config.{{ts}}:
-    file: ./infrastructure/performance-config.js
-  login-config.{{ts}}:
-    file: ./infrastructure/login-config.js
   netdata-master-stream.{{ts}}:
     file: ./infrastructure/netdata-master-stream.conf
   netdata-slave.{{ts}}:

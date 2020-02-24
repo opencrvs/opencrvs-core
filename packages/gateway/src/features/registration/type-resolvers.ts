@@ -12,7 +12,9 @@
 import {
   findCompositionSection,
   findExtension,
-  fetchFHIR
+  fetchFHIR,
+  getTimeLoggedByStatusFromMetrics,
+  getStatusFromTask
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -196,6 +198,13 @@ export const typeResolvers: GQLResolver = {
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
+      if (
+        !relatedPerson ||
+        !relatedPerson.patient ||
+        !relatedPerson.patient.reference
+      ) {
+        return
+      }
       if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
         // tslint:disable-next-line
         relatedPerson = await fetchFHIR(
@@ -428,16 +437,7 @@ export const typeResolvers: GQLResolver = {
   },
   RegWorkflow: {
     type: (task: fhir.Task) => {
-      const taskStatus = task.businessStatus
-      const taskStatusCoding = taskStatus && taskStatus.coding
-      const statusType =
-        taskStatusCoding &&
-        taskStatusCoding.find(
-          (coding: fhir.Coding) =>
-            coding.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-        )
-
-      return (statusType && statusType.code) || null
+      return getStatusFromTask(task)
     },
     user: async (task, _, authHeader) => {
       const user = findExtension(
@@ -487,6 +487,16 @@ export const typeResolvers: GQLResolver = {
         `/${taskLocation.valueReference.reference}`,
         authHeader
       )
+    },
+    timeLogged: async (task, _, authHeader) => {
+      const compositionId =
+        (task.focus.reference && task.focus.reference.split('/')[1]) || ''
+      const timeLoggedResponse = await getTimeLoggedByStatusFromMetrics(
+        authHeader,
+        compositionId,
+        getStatusFromTask(task) || ''
+      )
+      return (timeLoggedResponse && timeLoggedResponse.timeSpentEditing) || 0
     }
   },
   Comment: {

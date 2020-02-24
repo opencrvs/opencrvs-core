@@ -26,7 +26,7 @@ export default {
       token: string
     }
 
-    if (!auth.credentials.scope?.includes('api')) {
+    if (!auth.credentials.scope?.includes('sysadmin')) {
       throw unauthorized()
     }
 
@@ -179,6 +179,15 @@ export default {
                   name
                   alias
                 }
+                user {
+                  name {
+                    use
+                    firstNames
+                    familyName
+                  }
+                  role
+                }
+                timeLogged
                 office {
                   name
                   alias
@@ -302,8 +311,32 @@ export default {
                 subject
               }
               status {
+                comments {
+                  comment
+                }
                 type
                 timestamp
+                location {
+                  name
+                  alias
+                }
+                user {
+                  name {
+                    use
+                    firstNames
+                    familyName
+                  }
+                  role
+                }
+                timeLogged
+                office {
+                  name
+                  alias
+                  address {
+                    districtName
+                    stateName
+                  }
+                }
               }
               type
               trackingId
@@ -337,7 +370,6 @@ export default {
     if (response.errors?.length) {
       throw response.errors[0]
     }
-
     const birthRows =
       response?.data?.searchBirthRegistrations?.map(flatten) ?? []
 

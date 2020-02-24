@@ -74,12 +74,16 @@ import { RouteComponentProps, withRouter } from 'react-router'
 
 const Title = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 24px;
 `
 const Actions = styled.div`
-  padding: 32px 0;
+  padding-bottom: 24px;
   & > div {
     margin-bottom: 16px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-bottom: 16px;
   }
 `
 
@@ -322,7 +326,15 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
             ...{
               presentAtBirthRegistration: this.state.informant,
               applicant: {
-                value: this.state.informant,
+                value:
+                  (this.props.application &&
+                    this.props.application.data &&
+                    this.props.application.data[registrationSection.id] &&
+                    this.props.application.data[registrationSection.id]
+                      .applicant &&
+                    (this.props.application.data[registrationSection.id]
+                      .applicant as IFormSectionData).value) ||
+                  '',
                 nestedFields: {}
               }
             }
@@ -365,7 +377,7 @@ export class SelectInformantView extends React.Component<IFullProps, IState> {
         newApplication.data[applicantsSection.id] = {
           ...application.data[applicantsSection.id],
           ...{
-            // Need to empty those bacause next screen will fill this up
+            // Need to empty those because next screen will fill this up
             // TODO: currently contact point is the informant,
             // need to define the difference between informant and contact point on death schema
             relationship: this.state.informant

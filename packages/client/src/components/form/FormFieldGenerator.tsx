@@ -31,7 +31,9 @@ import {
   getFieldOptionsByValueMapper,
   getFieldType,
   getQueryData,
-  getVisibleOptions
+  getVisibleOptions,
+  getListOfLocations,
+  getFieldHelperText
 } from '@client/forms/utils'
 
 import styled, { keyframes } from '@client/styledComponents'
@@ -77,7 +79,8 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  Ii18nRadioGroupWithNestedFieldsFormField
+  Ii18nRadioGroupWithNestedFieldsFormField,
+  LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -111,15 +114,17 @@ import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
+import { LocationSearch } from '@opencrvs/components/lib/interface'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
 `
 
-const FormItem = styled.div`
+const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
   animation: ${fadeIn} 500ms;
-  margin-bottom: 24px;
+  margin-bottom: ${({ ignoreBottomMargin }) =>
+    ignoreBottomMargin ? '0px' : '32px'};
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -128,6 +133,16 @@ const LinkFormField = styled(Link)`
 const FieldGroupTitle = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
   margin-top: 16px;
+`
+
+const LocationSearchFormField = styled(LocationSearch)`
+  ${({ theme }) => `@media (min-width: ${theme.grid.breakpoints.md}px) {
+    width: 535px;
+  }`}
+
+  & > input {
+    border-radius: 0;
+  }
 `
 
 type GeneratedInputFieldProps = {
@@ -163,6 +178,7 @@ function GeneratedInputField({
   const inputFieldProps = {
     id: fieldDefinition.name,
     label: fieldDefinition.label,
+    helperText: fieldDefinition.helperText,
     tooltip: fieldDefinition.tooltip,
     description: fieldDefinition.description,
     required: fieldDefinition.required,
@@ -209,8 +225,10 @@ function GeneratedInputField({
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         options={fieldDefinition.options}
+        splitView={fieldDefinition.splitView}
         files={value as IFileValue[]}
         extraValue={fieldDefinition.extraValue || ''}
+        hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
         onComplete={(files: IFileValue[]) =>
           onSetFieldValue(fieldDefinition.name, files)
         }
@@ -428,6 +446,25 @@ function GeneratedInputField({
     )
   }
 
+  if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
+    const selectedLocation = fieldDefinition.locationList.find(
+      location => location.id === value
+    )
+
+    return (
+      <InputField {...inputFieldProps}>
+        <LocationSearchFormField
+          {...inputProps}
+          selectedLocation={selectedLocation}
+          locationList={fieldDefinition.locationList}
+          searchHandler={item => {
+            onSetFieldValue(fieldDefinition.name, item.id)
+          }}
+        />
+      </InputField>
+    )
+  }
+
   if (fieldDefinition.type === FETCH_BUTTON) {
     return (
       <FetchButtonField
@@ -450,6 +487,7 @@ function GeneratedInputField({
         {...inputProps}
         value={inputProps.value as string}
         maxLength={(fieldDefinition as Ii18nTextFormField).maxLength}
+        isDisabled={disabled}
       />
     </InputField>
   )
@@ -673,6 +711,8 @@ class FormSectionComponent extends React.Component<Props> {
             return null
           }
 
+          const isFieldDisabled = conditionalActions.includes('disable')
+
           if (
             field.type === DATE &&
             touched[`${field.name}-dd`] !== undefined &&
@@ -701,6 +741,10 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   type: getFieldType(field as IDynamicFormField, values),
                   label: getFieldLabel(field as IDynamicFormField, values),
+                  helperText: getFieldHelperText(
+                    field as IDynamicFormField,
+                    values
+                  ),
                   tooltip: getFieldLabelToolTip(
                     field as IDynamicFormField,
                     values
@@ -751,6 +795,14 @@ class FormSectionComponent extends React.Component<Props> {
                     setValues(updatedValues)
                   }
                 } as ILoaderButton)
+              : field.type === LOCATION_SEARCH_INPUT
+              ? {
+                  ...field,
+                  locationList: getListOfLocations(
+                    resources,
+                    field.searchableResource
+                  )
+                }
               : field
 
           if (
@@ -760,7 +812,10 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
           ) {
             return (
-              <FormItem key={`${field.name}`}>
+              <FormItem
+                key={`${field.name}`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
                 <Field name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
@@ -776,7 +831,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
-                      disabled={conditionalActions.includes('disable')}
+                      disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
                     />
                   )}
@@ -815,7 +870,10 @@ class FormSectionComponent extends React.Component<Props> {
                       .nestedFields[nestedField.name]
 
                   return (
-                    <FormItem key={nestedFieldName}>
+                    <FormItem
+                      key={nestedFieldName}
+                      ignoreBottomMargin={field.ignoreBottomMargin}
+                    >
                       <FastField name={nestedFieldName}>
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
@@ -843,7 +901,10 @@ class FormSectionComponent extends React.Component<Props> {
             )
 
             return (
-              <FormItem key={field.name}>
+              <FormItem
+                key={field.name}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
                 <Field name={`${field.name}.value`}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
@@ -869,7 +930,12 @@ class FormSectionComponent extends React.Component<Props> {
             )
           } else {
             return (
-              <FormItem key={`${field.name}${language}`}>
+              <FormItem
+                key={`${field.name}${language}${
+                  isFieldDisabled ? 'disabled' : ''
+                }`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
                 <FastField name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
@@ -883,9 +949,10 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
-                      error={error}
+                      error={isFieldDisabled ? '' : error}
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
+                      disabled={isFieldDisabled}
                     />
                   )}
                 </FastField>

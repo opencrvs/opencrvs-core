@@ -10,6 +10,7 @@
     "declaration": true,
     "jsx": "react",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "rootDir": "src/components",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

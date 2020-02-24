@@ -8,8 +8,9 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 language: node_js
+dist: bionic
 node_js:
-  - '11.15'
+  - 'lts/*'
 env:
   - CI=true
 
@@ -21,18 +22,21 @@ jobs:
         - npm install codecov -g
         - codecov
         - ./node_modules/.bin/bundlesize
+      before_install: npm install -g yarn
     - if: type = pull_request
-      before_install: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       addons:
         apt:
           packages:
             - libgconf-2-4
-      script: ./build-and-test-e2e.sh
+      script:
+        - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+        - ./build-and-test-e2e.sh
+        - kill %1
       env:
-        - OTHER_LERNA_FLAGS="--ignore @opencrvs/performance"
+        - OTHER_LERNA_FLAGS=""
         - CYPRESS_LOGIN_URL=http://localhost:3020/
         - CYPRESS_CLIENT_URL=http://localhost:3000/
-        - CYPRESS_PERFORMANCE_URL=http://localhost:3002/
         - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
         - docker
@@ -50,7 +54,10 @@ jobs:
     - stage: deploy to staging
       if: branch = master AND type = push
       install: skip
-      script: yarn deploy:staging:bgd
+      script:
+        - cd ..
+        - git clone git@github.com:opencrvs/opencrvs-bangladesh.git
+        - yarn deploy:staging ../opencrvs-bangladesh
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
@@ -65,7 +72,6 @@ jobs:
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_CLIENT_URL=https://register.opencrvs-staging.jembi.org/
-        - CYPRESS_PERFORMANCE_URL=https://performance.opencrvs-staging.jembi.org/
         - CYPRESS_AUTH_URL=https://auth.opencrvs-staging.jembi.org/
 
 notifications:

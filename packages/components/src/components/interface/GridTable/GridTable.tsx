@@ -119,6 +119,7 @@ interface IGridTableProps {
   clickable?: boolean
   showPaginated?: boolean
   loading?: boolean
+  loadMoreText: string
 }
 
 interface IGridTableState {
@@ -356,6 +357,7 @@ export class GridTable extends React.Component<
             <LoadMore
               initialPage={currentPage}
               onLoadMore={this.onPageChange}
+              loadMoreText={this.props.loadMoreText}
             />
           )}
 

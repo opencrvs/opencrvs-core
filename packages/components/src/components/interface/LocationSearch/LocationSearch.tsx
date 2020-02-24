@@ -16,6 +16,10 @@ import { Location } from '../../icons'
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
+  width: 312px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: 100%;
+  }
   margin-bottom: 1px;
   position: relative;
   & svg {
@@ -23,16 +27,16 @@ const Wrapper = styled.div`
     left: 8px;
   }
 `
-const SearchTextInput = styled.input`
-  width: 312px;
+const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
+  width: 100%;
   height: 40px;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.bigBodyStyle};
   padding-left: 36px;
-  border: 2px solid ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-  }
+  border: 2px solid
+    ${({ theme, error, touched }) =>
+      error && touched ? theme.colors.error : theme.colors.copy};
+
   &:focus {
     outline: none;
     box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
@@ -43,10 +47,7 @@ const DropDownWrapper = styled.ul`
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
   border-radius: 4px;
   position: absolute;
-  min-width: 312px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-  }
+  width: 100%;
   z-index: 9999;
   list-style: none;
   padding: 0px;
@@ -87,7 +88,11 @@ interface IState {
 }
 interface IProps {
   locationList: ISearchLocation[]
+  selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
+  error?: boolean
+  touched?: boolean
+  className?: string
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   constructor(props: IProps) {
@@ -186,9 +191,17 @@ export class LocationSearch extends React.Component<IProps, IState> {
     )
   }
 
+  componentDidMount() {
+    if (this.props.selectedLocation) {
+      this.setState({
+        selectedText: this.props.selectedLocation.displayLabel
+      })
+    }
+  }
+
   render() {
     return (
-      <Wrapper>
+      <Wrapper className={this.props.className}>
         <Location id="locationSearchIcon" />
         <SearchTextInput
           id="locationSearchInput"
@@ -198,6 +211,8 @@ export class LocationSearch extends React.Component<IProps, IState> {
           onClick={() => document.addEventListener('click', this.handler)}
           value={this.state.selectedText || ''}
           onChange={this.onChangeHandler}
+          error={this.props.error}
+          touched={this.props.touched}
         />
         {this.dropdown()}
       </Wrapper>

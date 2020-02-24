@@ -84,7 +84,6 @@ Cypress.Commands.add('selectOption', (selector, text, option) => {
   cy.get(`${selector} input`)
     .first()
     .click({ force: true })
-    .type(text, { force: true })
     .get(`${selector} .react-select__menu`)
     .contains(option)
     .click()
@@ -116,7 +115,7 @@ Cypress.Commands.add('submitApplication', () => {
   // MODAL
   cy.get('#submit_confirm').click()
   cy.log('Waiting for application to sync...')
-  cy.tick(20000)
+  cy.tick(40000)
   cy.get('#row_0 #submitted0').should('exist')
 })
 Cypress.Commands.add('rejectApplication', () => {

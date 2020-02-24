@@ -230,6 +230,13 @@ export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
     : true
 }
 
+export const isDateNotAfterDeath = (date: string, drafts?: IFormData) => {
+  const deathDate = drafts && drafts.deathEvent && drafts.deathEvent.deathDate
+  return deathDate
+    ? new Date(date) <= new Date(JSON.stringify(deathDate))
+    : true
+}
+
 export const isDateAfter = (first: string, second: string) => {
   return new Date(first) >= new Date(second)
 }
@@ -247,10 +254,19 @@ export const minAgeGapExist = (
   return diff >= minAgeGap
 }
 
-export const isValidBirthDate: Validation = (value: IFormFieldValue) => {
+export const isValidBirthDate: Validation = (
+  value: IFormFieldValue,
+  drafts?
+) => {
   const cast = value as string
-  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
-    ? undefined
+  return !cast
+    ? { message: messages.required }
+    : cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+    ? isDateNotAfterDeath(cast, drafts as IFormData)
+      ? undefined
+      : {
+          message: messages.isDateNotAfterDeath
+        }
     : {
         message: messages.isValidBirthDate
       }
@@ -534,7 +550,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
         value.toString(),
         validBirthRegistrationNumberLength.min,
         validBirthRegistrationNumberLength.max
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
@@ -545,7 +561,7 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       return hasValidLength(
         value.toString(),
         validDeathRegistrationNumberLength
-      ) && isRegexpMatched(value, REGEXP_BLOCK_ALPHA_NUMERIC)
+      )
         ? undefined
         : {
             message: messages.validDeathRegistrationNumber,
@@ -579,11 +595,12 @@ export const isValidDeathOccurrenceDate: Validation = (
 ) => {
   const cast = value && value.toString()
 
-  return cast &&
-    isDateNotInFuture(cast) &&
-    isAValidDateFormat(cast) &&
-    isDateNotBeforeBirth(cast, drafts as IFormData)
-    ? undefined
+  return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
+    ? isDateNotBeforeBirth(cast, drafts as IFormData)
+      ? undefined
+      : {
+          message: messages.isDateNotBeforeBirth
+        }
     : {
         message: messages.isValidDateOfDeath
       }

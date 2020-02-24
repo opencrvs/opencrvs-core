@@ -11,5 +11,4 @@
  */
 export * from '@client/components/form/FormFieldGenerator'
 export * from '@client/components/form/FormTabs'
-export * from '@client/components/form/ViewHeaderWithTabs'
 export * from '@client/components/form/FormList'

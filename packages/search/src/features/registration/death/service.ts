@@ -177,7 +177,7 @@ function createDeceasedIndex(
     deceasedNameLocal.given.join(' ')
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
-  body.deathDate = deceased.deceasedDateTime
+  body.deathDate = deceased && deceased.deceasedDateTime
   body.eventLocationId =
     deathEncounter &&
     deathEncounter.location &&
@@ -280,7 +280,7 @@ function createInformantIndex(
     bundleEntries
   ) as fhir.RelatedPerson
 
-  if (!informantRef) {
+  if (!informantRef || !informantRef.patient) {
     return
   }
 

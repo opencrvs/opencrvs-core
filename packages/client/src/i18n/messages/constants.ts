@@ -95,6 +95,7 @@ interface IConstantsMessages {
   over5Years: MessageDescriptor
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
+  loadMore: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -470,7 +471,7 @@ const messagesToDefine: IConstantsMessages = {
   femaleUnder18: {
     defaultMessage: 'Female Under 18',
     description: 'Label for femaleUnder18',
-    id: 'constants.maleUnder18'
+    id: 'constants.femaleUnder18'
   },
   maleOver18: {
     defaultMessage: 'Male Over 18',
@@ -521,6 +522,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.validated',
     defaultMessage: 'validated',
     description: 'A label for validated'
+  },
+  loadMore: {
+    id: 'constants.loadMore',
+    defaultMessage: 'Load more',
+    description: 'A label for load more'
   }
 }
 
@@ -557,6 +563,11 @@ const dynamicMessagesToDefine: IDynamicConstants = {
     id: 'constants.validated',
     defaultMessage: 'validated',
     description: 'A label for validated'
+  },
+  waitingValidation: {
+    id: 'constants.waitingValidation',
+    defaultMessage: 'sent for validation',
+    description: 'A label for waitingValidation'
   },
   male: {
     id: 'constants.male',

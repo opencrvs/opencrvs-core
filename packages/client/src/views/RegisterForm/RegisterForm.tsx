@@ -23,7 +23,11 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
+import {
+  EventTopBar,
+  IEventTopBarProps,
+  IEventTopBarMenuAction
+} from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
   deleteApplication,
@@ -80,9 +84,14 @@ import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transforme
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
+  margin-top: 16px;
+  margin-bottom: 24px;
 `
 const FooterArea = styled.div`
-  margin: 24px 0px 48px;
+  padding-top: 6px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-top: 0px;
+  }
 `
 
 const Notice = styled.div`
@@ -429,6 +438,44 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
   }
 
+  getEventTopBarPropsForForm = (menuOption: IEventTopBarMenuAction) => {
+    const { intl, application, activeSectionGroup, goToHomeTab } = this.props
+
+    let eventTopBarProps: IEventTopBarProps = {
+      title: intl.formatMessage(messages.newVitalEventRegistration, {
+        event: application.event
+      }),
+      iconColor:
+        application.submissionStatus === SUBMISSION_STATUS.DRAFT
+          ? 'violet'
+          : 'orange'
+    }
+
+    if (!!activeSectionGroup.showExitButtonOnly) {
+      eventTopBarProps = {
+        ...eventTopBarProps,
+        exitAction: {
+          handler: () => {
+            application.submissionStatus === SUBMISSION_STATUS.DRAFT
+              ? this.onDeleteApplication(application)
+              : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+          },
+          label: intl.formatMessage(buttonMessages.exitButton)
+        }
+      }
+    } else {
+      eventTopBarProps = {
+        ...eventTopBarProps,
+        saveAction: {
+          handler: this.onSaveAsDraftClicked,
+          label: intl.formatMessage(buttonMessages.saveExitButton)
+        },
+        menuItems: [menuOption]
+      }
+    }
+    return eventTopBarProps
+  }
+
   render() {
     const {
       intl,
@@ -454,11 +501,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const menuItemDeleteOrClose =
       application.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
-            label: 'Delete Application',
+            label: intl.formatMessage(buttonMessages.deleteApplication),
             handler: () => this.onDeleteApplication(application)
           }
         : {
-            label: 'Close Application',
+            label: intl.formatMessage(buttonMessages.closeApplication),
             handler: () => this.onCloseApplication()
           }
 
@@ -543,22 +590,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               {activeSection.viewType === VIEW_TYPE.FORM && (
                 <>
                   <EventTopBar
-                    title={intl.formatMessage(
-                      messages.newVitalEventRegistration,
-                      {
-                        event: application.event
-                      }
-                    )}
-                    iconColor={
-                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
-                        : 'orange'
-                    }
-                    saveAction={{
-                      handler: this.onSaveAsDraftClicked,
-                      label: intl.formatMessage(buttonMessages.saveExitButton)
-                    }}
-                    menuItems={[menuItemDeleteOrClose]}
+                    {...this.getEventTopBarPropsForForm(menuItemDeleteOrClose)}
                   />
                   <BodyContent id="register_form">
                     <TertiaryButton

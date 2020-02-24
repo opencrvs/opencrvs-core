@@ -20,6 +20,7 @@ export interface ICustomProps {
   hideBorder?: boolean
   autocomplete?: boolean
   isSmallSized?: boolean
+  isDisabled?: boolean
 }
 
 export type ITextInputProps = ICustomProps &
@@ -34,9 +35,10 @@ const StyledInput = styled.input<ITextInputProps>`
   outline: none;
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ isDisabled, theme }) =>
+    isDisabled ? theme.colors.lightGrey : theme.colors.background};
 
-  ${({ hideBorder, error, touched, theme }) =>
+  ${({ hideBorder, error, touched, isDisabled, theme }) =>
     hideBorder
       ? `
       border:none;
@@ -53,7 +55,11 @@ const StyledInput = styled.input<ITextInputProps>`
         `
       : `
       border: 2px solid ${
-        error && touched ? theme.colors.error : theme.colors.copy
+        error && touched
+          ? theme.colors.error
+          : isDisabled
+          ? theme.colors.greyGrey
+          : theme.colors.copy
       };
       &:focus {
         box-shadow: 0 0 0px 3px ${theme.colors.focus};
@@ -123,7 +129,7 @@ export class TextInput extends React.Component<ITextInputProps> {
   }
 
   render() {
-    const { focusInput, maxLength = 250, ...props } = this.props
+    const { focusInput, maxLength = 250, isDisabled, ...props } = this.props
 
     return (
       <StyledInput
@@ -132,6 +138,7 @@ export class TextInput extends React.Component<ITextInputProps> {
         {...this.props}
         autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
+        disabled={isDisabled}
       />
     )
   }

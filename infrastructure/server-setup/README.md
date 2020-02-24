@@ -1,19 +1,22 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [OpenCRVS server setup](#opencrvs-server-setup)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
   - [Emergency Backup & Restore](#emergency-backup--restore)
-  - [How to know when to scale a service](#How to know when to scale a service)
+  - [How to know when to scale a service](#how-to-know-when-to-scale-a-service)
   - [Some useful Docker and Docker Swarm commands](#some-useful-docker-and-docker-swarm-commands)
-    - [You have made a change to OpenHIM base config. Before you deploy, take down the entire stack](#you-have-made-a-change-to-openhim-base-config-before-you-deploy-take-down-the-entire-stack)
     - [To check the status of all running services](#to-check-the-status-of-all-running-services)
-    - [To scale a service that hasn't started, in order to check for bugs](#to-scale-a-service-that-hasn't-started-in-order-to-check-for-bugs)
+    - [To scale a service that hasn't started, in order to check for bugs](#to-scale-a-service-that-hasnt-started-in-order-to-check-for-bugs)
+    - [You want to get all stack information and see if there are any errors](#you-want-to-get-all-stack-information-and-see-if-there-are-any-errors)
     - [To check the logs on a service](#to-check-the-logs-on-a-service)
     - [To check logs or access a specific container](#to-check-logs-or-access-a-specific-container)
     - [You need to check logs on the container](#you-need-to-check-logs-on-the-container)
     - [You need to run commands inside a container](#you-need-to-run-commands-inside-a-container)
+    - [You need to inspect a container to see networking and all other information](#you-need-to-inspect-a-container-to-see-networking-and-all-other-information)
+    - [You need to rollback the changes made to a service](#you-need-to-rollback-the-changes-made-to-a-service)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -124,7 +127,6 @@ gateway.<your_domain>
 login.<your_domain>
 openhim.<your_domain>
 openhim-api.<your_domain>
-performance.<your_domain>
 register.<your_domain>
 resources.<your_domain>
 styleguide.<your_domain>

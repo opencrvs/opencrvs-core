@@ -43,7 +43,8 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   HOME,
-  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+  REGISTRAR_HOME
 } from '@opencrvs/client/src/navigation/routes'
 
 import { Event, IFormData } from '@opencrvs/client/src/forms'
@@ -376,7 +377,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
@@ -417,6 +418,37 @@ describe('when user is in the register form for death event', () => {
       ).toBe('Required for registration')
     })
 
+    it('after clicking exit, takes back home', async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: '' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store
+      )
+      component = testComponent.component
+      component
+        .find('#exit_top_bar')
+        .hostNodes()
+        .simulate('click')
+
+      component.update()
+
+      expect(history.location.pathname).toContain(REGISTRAR_HOME)
+    })
+
     it('renders loader button when idType is National ID', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -438,7 +470,7 @@ describe('when user is in the register form for death event', () => {
         store
       )
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
@@ -502,10 +534,10 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
 
       component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '2019333494BQNXOHJ2' }
+        target: { id: 'iD', value: '201933349411111112' }
       })
 
       component.update()
@@ -580,7 +612,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#iD').simulate('change', {
         target: { id: 'iD', value: '1234567898' }
@@ -677,7 +709,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#applicantID').simulate('change', {
         target: { id: 'applicantID', value: '1234567898' }
@@ -754,7 +786,7 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
-      selectOption(component, '#iDType', 'Birth Registration Number')
+      selectOption(component, '#iDType', 'Birth registration number')
 
       const input = component.find('input#iD')
       // @ts-ignore
@@ -766,7 +798,7 @@ describe('when user is in the register form for death event', () => {
           target: {
             // @ts-ignore
             id: 'iD',
-            value: '2019333494BQNXOHJ2'
+            value: '201933349411111112'
           }
         })
       component.update()
@@ -787,7 +819,18 @@ describe('when user is in the register form for death event', () => {
               country: 'bgd'
             }
           },
-          error: new Error('boom')
+          result: {
+            data: {
+              queryPersonByNidIdentifier: null
+            },
+            errors: [
+              {
+                message: 'An internal server error occurred',
+                locations: [{ line: 2, column: 3 }],
+                path: ['queryPersonByNidIdentifier']
+              }
+            ]
+          }
         }
       ]
       const testComponent = await createTestComponent(
@@ -813,7 +856,82 @@ describe('when user is in the register form for death event', () => {
 
       component = testComponent.component
       await waitForElement(component, '#iDType')
-      selectOption(component, '#iDType', 'National ID')
+      selectOption(component, '#iDType', 'National ID number')
+
+      const input = component.find('input#iD') as any
+
+      input.hostNodes().props().onChange!({
+        target: {
+          id: 'iD',
+          value: '1234567898'
+        }
+      })
+
+      component.find('input#birthDate-dd').simulate('change', {
+        target: { id: 'birthDate-dd', value: '10' }
+      })
+
+      component.find('input#birthDate-mm').simulate('change', {
+        target: { id: 'birthDate-mm', value: '10' }
+      })
+
+      component.find('input#birthDate-yyyy').simulate('change', {
+        target: { id: 'birthDate-yyyy', value: '1992' }
+      })
+
+      component.update()
+
+      component
+        .find('#fetchButton')
+        .hostNodes()
+        .childAt(0)
+        .childAt(0)
+        .childAt(0)
+        .simulate('click')
+
+      const element = await waitForElement(component, '#loader-button-error')
+
+      expect(element.hostNodes()).toHaveLength(1)
+    })
+
+    it('should displays network error message if timeout', async () => {
+      const graphqlMock = [
+        {
+          request: {
+            query: FETCH_PERSON_NID,
+            variables: {
+              nid: '1234567898',
+              dob: '1992-10-10',
+              country: 'bgd'
+            }
+          },
+          error: new Error('timeout')
+        }
+      ]
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <RegisterForm
+          location={mock}
+          scope={mock}
+          history={history}
+          staticContext={mock}
+          registerForm={form}
+          application={draft}
+          pageRoute={DRAFT_DEATH_FORM_PAGE}
+          match={{
+            params: { applicationId: draft.id, pageId: 'deceased' },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMock
+      )
+
+      component = testComponent.component
+      await waitForElement(component, '#iDType')
+      selectOption(component, '#iDType', 'National ID number')
 
       const input = component.find('input#iD') as any
 
