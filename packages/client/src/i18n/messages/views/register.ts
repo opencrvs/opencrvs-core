@@ -18,6 +18,8 @@ interface IRegisterMessages {
   submitDescription: MessageDescriptor
   registerFormQueryError: MessageDescriptor
   backToReviewButton: MessageDescriptor
+  saveApplicationConfirmModalTitle: MessageDescriptor
+  saveApplicationConfirmModalDescription: MessageDescriptor
 }
 
 const messagesToDefine: IRegisterMessages = {
@@ -54,6 +56,17 @@ const messagesToDefine: IRegisterMessages = {
   backToReviewButton: {
     id: 'register.selectVitalEvent.backToReviewButton',
     defaultMessage: 'Back to review'
+  },
+  saveApplicationConfirmModalTitle: {
+    id: 'register.form.saveApplicationConfirmModalTitle',
+    defaultMessage: 'Save your changes?',
+    description: 'Title for save application confirmation modal'
+  },
+  saveApplicationConfirmModalDescription: {
+    id: 'register.form.saveApplicationConfirmModalDescription',
+    defaultMessage:
+      'By clicking save the old information will be deleted and new information will be saved',
+    description: 'Description for save application confirmation modal'
   }
 }
 
