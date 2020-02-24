@@ -58,12 +58,12 @@ const messagesToDefine: IRegisterMessages = {
     defaultMessage: 'Back to review'
   },
   saveApplicationConfirmModalTitle: {
-    id: 'register.form.saveApplicationConfirmModalTitle',
+    id: 'register.form.modal.title.saveApplicationConfirm',
     defaultMessage: 'Save your changes?',
     description: 'Title for save application confirmation modal'
   },
   saveApplicationConfirmModalDescription: {
-    id: 'register.form.saveApplicationConfirmModalDescription',
+    id: 'register.form.modal.desc.saveApplicationConfirm',
     defaultMessage:
       'By clicking save the old information will be deleted and new information will be saved',
     description: 'Description for save application confirmation modal'
