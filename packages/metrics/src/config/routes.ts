@@ -21,6 +21,7 @@ import {
   newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
+import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { exportHandler } from '@metrics/features/export/handler'
 
 export const getRoutes = () => {
@@ -177,6 +178,22 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string().required(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    // Time logged query by application status API
+    {
+      method: 'GET',
+      path: '/timeLogged',
+      handler: getTimeLoggedHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            compositionId: Joi.string().required(),
+            status: Joi.string().required()
           })
         },
         tags: ['api']

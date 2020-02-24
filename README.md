@@ -13,8 +13,8 @@
 
 - [OpenCRVS](#opencrvs)
 - [What is Civil Registration?](#what-is-civil-registration)
-- [How secure is OpenCRVS?](#how-secure-is-opencrvs)
 - [Why OpenCRVS?](#why-opencrvs)
+- [How secure is OpenCRVS?](#how-secure-is-opencrvs)
 - [What is in the OpenCRVS Core repository?](#what-is-in-the-opencrvs-core-repository)
   - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
     - [Hearth MongoDB Database layer](#hearth-mongodb-database-layer)
@@ -32,7 +32,8 @@
   - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
     - [8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64](#8-gb-memory-preferrably-16-gb--160-gb-disk--ubuntu-18043-lts-x64)
   - [Clearing and creating your own reference data](#clearing-and-creating-your-own-reference-data)
-  - [Create a new metadata db dump](#create-a-new-metadata-db-dump)
+  - [Clearing and creating your own reference data in your resources module](#clearing-and-creating-your-own-reference-data-in-your-resources-module)
+  - [Create a new metadata db dump in your resources module](#create-a-new-metadata-db-dump-in-your-resources-module)
 - [Docker scripts](#docker-scripts)
 - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
 - [How can I deploy to a QA environment cluster?](#how-can-i-deploy-to-a-qa-environment-cluster)
@@ -63,6 +64,8 @@
 
 [OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a scalable, offline/low connectivity supporting, full stack, [microservice](https://en.wikipedia.org/wiki/Microservices), [HL7](http://www.hl7.org/index.cfm) - [FHIR standardised](https://www.hl7.org/fhir/) private/public cloud solution for the [civil registration](https://en.wikipedia.org/wiki/Civil_registration)<sup>\*</sup> needs of a country.
 
+<br>
+
 ## What is Civil Registration?
 
 Civil registration is the system by which a government records the vital events (births, marriages, and deaths) of its citizens and residents. The resulting repository or database has different names in different countries. It can be called a civil registry.
@@ -71,9 +74,7 @@ Given the realities of population migration and covering the international scope
 
 OpenCRVS supports any country scale data storage regulatory requirements.
 
-## How secure is OpenCRVS?
-
-OpenCRVS has been independently security tested to equivalent [U.K. Government I.T. standards](https://www.cyberessentials.ncsc.gov.uk/) by the [CREST](https://www.crest-approved.org/) certified organisation [MDSec](https://www.mdsec.co.uk/). - authors of ["The Hacker's Handbook"](https://www.oreilly.com/library/view/the-web-application/9781118026472/).
+<br>
 
 ## Why OpenCRVS?
 
@@ -117,6 +118,14 @@ From the outset we have been committed to the creation of a digital public good 
 
 To create OpenCRVS we have partnered with registration authorities, leading health system providers, human-centered design & software development experts, urban and remote, rural communities in developing nations to design and build a global digital product that will serve the needs of end users and those being registered. We have achieved this by following international standards, digital principles for development and agile methodologies.
 
+<br>
+
+## How secure is OpenCRVS?
+
+OpenCRVS has been independently security tested to equivalent [U.K. Government I.T. standards](https://www.cyberessentials.ncsc.gov.uk/) by the [CREST](https://www.crest-approved.org/) certified organisation [MDSec](https://www.mdsec.co.uk/). - authors of ["The Hacker's Handbook"](https://www.oreilly.com/library/view/the-web-application/9781118026472/).
+
+<br>
+
 ## What is in the OpenCRVS Core repository?
 
 The core of OpenCRVS is a monorepo organised using [Lerna](https://github.com/lerna/lerna) package. Each package is covered by [Jest](https://jestjs.io/) unit tests. Every package is independently scalable in [docker](https://www.docker.com/) containers, and deployed in an automatically "round robin" load balanced cluster using [Docker Swarm](https://docs.docker.com/engine/swarm/).
@@ -129,9 +138,16 @@ Some nations may be located far from a developed world datacentre. Many nations 
 
 Docker Swarm makes it easy to commence service distribution privately and then migrate publically when an organisation is ready to do so.
 
+<br>
+
 ### What are the key OpenSource dependencies of OpenCRVS?
 
 The following dependencies are automatically provisioned alongside the OpenCRVS Core on your infrastructure in [docker](https://www.docker.com/) containers.
+
+<br>
+<p align="left">
+<img src="https://static.wixstatic.com/media/93440e_d04078ae922a4126b8e9dd3f96066505~mv2.png/v1/fill/w_136,h_39,al_c,q_80,usm_0.66_1.00_0.01/FHIR_Foundation.webp" width="136" height="39">
+</p>
 
 #### Hearth MongoDB Database layer
 
@@ -141,10 +157,9 @@ Massively scalable and extensible, [Hearth](https://github.com/jembi/hearth) is 
 
 We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil registration context. Our civil registration FHIR standard can be contributed to in this [repository](https://github.com/opencrvs/opencrvs-core-fhir-templates) at Jembi.
 
+<br>
 <p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_d04078ae922a4126b8e9dd3f96066505~mv2.png/v1/fill/w_136,h_39,al_c,q_80,usm_0.66_1.00_0.01/FHIR_Foundation.webp" width="136" height="39">
-
+<img src="https://static.wixstatic.com/media/93440e_21c72b72ff3a405596448e33f80a719c~mv2_d_3422_1781_s_2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/Elasticsearch-Logo-Color-V.webp" width="136" height="70">
 </p>
 
 #### ElasticSearch
@@ -153,30 +168,29 @@ De-duplication management to ensure data integrity is essential to any respectab
 
 OpenCRVS uses [ElasticSearch](https://www.elastic.co/), an industry standard, NoSQL document orientated, real-time de-duplication & search engine. Lightning fast, intelligent civil registration record returns are possible, even with imprecise, “fuzzy” search parameters.
 
+<br>
 <p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_21c72b72ff3a405596448e33f80a719c~mv2_d_3422_1781_s_2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/Elasticsearch-Logo-Color-V.webp" width="136" height="70">
-
+<img src="https://static.wixstatic.com/media/93440e_7ae07f5f77c6407080656fff4e0cdcd3~mv2.jpg/v1/fill/w_134,h_26,al_c,q_80,usm_0.66_1.00_0.01/influxdata-2.webp" width="134" height="26">
 </p>
 
 #### InfluxData
 
 Hyper efficient and optimised, [Influx](https://www.influxdata.com) is a time series database for big data insights. Millisecond level query times facilitate civil registration statistical queries over months of data, disaggregated by gender, location and configurable operational and statistical parameters.
 
+<br>
 <p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_7ae07f5f77c6407080656fff4e0cdcd3~mv2.jpg/v1/fill/w_134,h_26,al_c,q_80,usm_0.66_1.00_0.01/influxdata-2.webp" width="134" height="26">
-
+<img src="https://static.wixstatic.com/media/93440e_bdd011d5e3744e7b84684e6789c1f5c7~mv2.png/v1/fill/w_136,h_40,al_c,q_80,usm_0.66_1.00_0.01/openhim-logo-green.webp" width="136" height="40">
 </p>
 
 #### OpenHIM enterprise service bus, interoperability Layer
 
 The [OpenHIM (Health Information Mediator)](https://github.com/jembi/openhim-core-js) is a NodeJS enterprise service bus designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
+<br>
 <p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_bdd011d5e3744e7b84684e6789c1f5c7~mv2.png/v1/fill/w_136,h_40,al_c,q_80,usm_0.66_1.00_0.01/openhim-logo-green.webp" width="136" height="40">
-
+<img src="https://static.wixstatic.com/media/93440e_168a1efc9a3d4a47bc9282c5b684df6e~mv2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/typescript.webp" width="70" height="70" hspace="16">
+  <img src="https://static.wixstatic.com/media/93440e_0e7fdde3dc404a8cbafdf70c18cedbc6~mv2.png/v1/fill/w_100,h_70,al_c,q_80,usm_0.66_1.00_0.01/hapi-logo.webp" width="100" height="70" hspace="16">
+  <img src="https://static.wixstatic.com/media/93440e_65930e880f9e4efc822db3d5f3ddeb8a~mv2.png/v1/fill/w_90,h_51,al_c,q_80,usm_0.66_1.00_0.01/node.webp" width="90" height="51" hspace="16">
 </p>
 
 ### OpenCRVS microservice business layer packages
@@ -185,49 +199,28 @@ The OpenCRVS’ back end microservice architecture enables continuous evolution 
 
 The microservices are written in [TypeScript](https://github.com/microsoft/TypeScript) (a strictly typed superset of JavaScript that compiles to JavaScript) and NodeJS using the fully documented [HapiJS](https://github.com/hapijs/hapi) framework.
 
-<p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_168a1efc9a3d4a47bc9282c5b684df6e~mv2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/typescript.webp" width="70" height="70">
-
-</p>
-
-<p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_0e7fdde3dc404a8cbafdf70c18cedbc6~mv2.png/v1/fill/w_100,h_70,al_c,q_80,usm_0.66_1.00_0.01/hapi-logo.webp" width="100" height="70">
-
-</p>
-
-<p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_65930e880f9e4efc822db3d5f3ddeb8a~mv2.png/v1/fill/w_90,h_51,al_c,q_80,usm_0.66_1.00_0.01/node.webp" width="90" height="51">
-
-</p>
-
 Each microservice in OpenCRVS has no knowledge of other services or business requirements in the application, and each exposes it’s capabilities via JWT secured APIs.
 
 Microservices:
 
-- [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
+1. [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
 
-Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
+⋅⋅⋅Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
 
 <p align="left">
-
 <img src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
-
 </p>
 
-- [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package for Node methods used by multiple microservices.
+2. [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package for Node methods used by multiple microservices.
 
-- [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
+3. [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
 
-Using [GraphQL](https://graphql.org/) allows OpenCRVS to perform much faster and more responsively in remote areas by drastically reducing the number of HTTP requests that are required to render a view in the presentation layer.
-
+<br>
 <p align="left">
-
 <img src="https://static.wixstatic.com/media/93440e_d1ec46ba4c2d4c1dbb6afe6b9b7143de~mv2.png/v1/fill/w_133,h_40,al_c,q_80,usm_0.66_1.00_0.01/graphql.webp" width="133" height="40">
-
 </p>
+
+Using [GraphQL](https://graphql.org/) allows OpenCRVS to perform much faster and more responsively in remote areas by drastically reducing the number of HTTP requests that are required to render a view in the presentation layer.⋅⋅
 
 The OpenCRVS GraphQL Gateway is a JWT protected [Apollo](https://www.apollographql.com/) server that requests and resolves [FHIR](https://www.hl7.org/fhir/) resources from [Hearth](https://github.com/jembi/hearth) via [OpenHIM](https://github.com/jembi/openhim-core-js) into GraphQL, for easy consumption in the client applications.
 
@@ -237,53 +230,54 @@ The OpenCRVS GraphQL Gateway is a JWT protected [Apollo](https://www.apollograph
 
 - [search](https://github.com/opencrvs/opencrvs-core/tree/master/packages/search) - the search microservice for OpenCRVS using [ElasticSearch](https://www.elastic.co/)
 
-- [user-mgnt](https://github.com/opencrvs/opencrvs-core/tree/master/packages/user-mgnt) - the user management microservice for the OpenCRVS client.
-
-User permissions and roles can be centrally managed, supporting IT organisations that conform to [ISO27001](https://www.iso.org/isoiec-27001-information-security.html) certification.
+- [user-mgnt](https://github.com/opencrvs/opencrvs-core/tree/master/packages/user-mgnt) - the user management microservice for the OpenCRVS client. User permissions and roles can be centrally managed, supporting IT organisations that conform to [ISO27001](https://www.iso.org/isoiec-27001-information-security.html) certification.
 
 - [workflow](https://github.com/opencrvs/opencrvs-core/tree/master/packages/workflow) - the OpenCRVS business process orchestration microservice, mediating civil registration vital event status and audit updates.
 
+<br>
+
 ### OpenCRVS client application packages
+
+<p align="left">
+<img src="https://static.wixstatic.com/media/93440e_50ed7c9e719e44daa7ca7d3e183f4071~mv2.png/v1/fill/w_121,h_55,al_c,q_80,usm_0.66_1.00_0.01/react.webp" width="122" height="55">
+</p>
 
 - [login](https://github.com/opencrvs/opencrvs-core/tree/master/packages/login) - the login UI client built in [React](https://reactjs.org/).
 
 - [client](https://github.com/opencrvs/opencrvs-core/tree/master/packages/client) - the OpenCRVS UI client for civil registration built in [React](https://reactjs.org/).
 
-<p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_50ed7c9e719e44daa7ca7d3e183f4071~mv2.png/v1/fill/w_121,h_55,al_c,q_80,usm_0.66_1.00_0.01/react.webp" width="122" height="55">
-
-</p>
-
 Client [npm](https://www.npmjs.com/) dependencies and enablers include:
 
-Easy build configuration with [create-react-app](https://github.com/facebook/create-react-app), [craco](https://github.com/gsoft-inc/craco), [typrescript-eslint](https://github.com/typescript-eslint/typescript-eslint)
+- Easy build configuration with [create-react-app](https://github.com/facebook/create-react-app), [craco](https://github.com/gsoft-inc/craco), [typrescript-eslint](https://github.com/typescript-eslint/typescript-eslint)
 
-Multi-lingual content management support using [react-intl](https://github.com/formatjs/react-intl)
+- Multi-lingual content management support using [react-intl](https://github.com/formatjs/react-intl)
 
-ES6 JS component styling using [styled-components](https://styled-components.com/)
+- ES6 JS component styling using [styled-components](https://styled-components.com/)
 
-Fully configurable, high performance form management using [formik](https://github.com/jaredpalmer/formik)
+- Fully configurable, high performance form management using [formik](https://github.com/jaredpalmer/formik)
 
-Pure JavaScript, client side, offline PDF certificate generation using [pdfmake](http://pdfmake.org/)
+- Pure JavaScript, client side, offline PDF certificate generation using [pdfmake](http://pdfmake.org/)
 
-Read-only application state management using [redux](https://github.com/reduxjs/redux)
+- Read-only application state management using [redux](https://github.com/reduxjs/redux)
 
-Unit tests coverage with [Jest](https://jestjs.io/) & [Enzyme](https://airbnb.io/enzyme/) UI component tests.
+- Unit tests coverage with [Jest](https://jestjs.io/) & [Enzyme](https://airbnb.io/enzyme/) UI component tests.
+
+<br>
+<p align="left">
+<img src="https://static.wixstatic.com/media/93440e_8452ed95c717459e86c95ed0e17378ad~mv2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/PWA-Progressive-Web-App-Logo.webp" width="136" height="70">
+</p>
 
 Using an Android [progressive web application](https://developers.google.com/web/progressive-web-apps) for our client app means that we can take advantage of offline functionality and native mobile features using [Workbox](https://developers.google.com/web/tools/workbox), without the [TCO](https://en.wikipedia.org/wiki/Total_cost_of_ownership) overhead of maintaining multiple web and mobile codebases and respective App/Play Store releases.
 
 In remote areas, registrars can save a configurable number of registrations offline on their mobile phone using [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API).
 
-<p align="left">
-
-<img src="https://static.wixstatic.com/media/93440e_8452ed95c717459e86c95ed0e17378ad~mv2.png/v1/fill/w_136,h_70,al_c,q_80,usm_0.66_1.00_0.01/PWA-Progressive-Web-App-Logo.webp" width="136" height="70">
-
-</p>
+<br>
 
 ### OpenCRVS component library package
 
-- [components](https://github.com/opencrvs/opencrvs-core/tree/master/packages/components) - a UI component library package for the clients using [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
+[components](https://github.com/opencrvs/opencrvs-core/tree/master/packages/components) - a UI component library package for the clients using [React Styleguidist](https://github.com/styleguidist/react-styleguidist).
+
+<br>
 
 ### OpenCRVS end-to-end and performance testing packages
 
@@ -291,37 +285,35 @@ In remote areas, registrars can save a configurable number of registrations offl
 
 * [integration](https://github.com/opencrvs/opencrvs-core/tree/master/packages/integration) - performance tests for OpenCRVS using the [K6](https://k6.io/) framework.
 
+<br>
+
 ## How do I set up a development environment?
 
 1. First, make sure your environment is prepared by installing these pre-requisites:
 
-- [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
+   - [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
+   - [Yarn](https://yarnpkg.com/lang/en/docs/install)
+   - [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
 
-- [Yarn](https://yarnpkg.com/lang/en/docs/install)
+   On Linux you will also need to:
 
-- [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
+   - increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+   - increase vm max heap for [ElasticSearch](https://www.elastic.co/) using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 
-On Linux you will also need to:
+   On Mac you will need:
 
-- increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+   - [Docker For Mac](https://docs.docker.com/docker-for-mac/)
 
-- increase vm max heap for [ElasticSearch](https://www.elastic.co/) using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+2) Next, clone this repo! :)
+   `git clone https://github.com/opencrvs/opencrvs-core.git`
 
-On Mac you will need:
+3) `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
 
-- [Docker For Mac](https://docs.docker.com/docker-for-mac/)
+4) Run `yarn` to install deps
 
-2. Next, clone this repo! :)
+5) Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
 
-`git clone https://github.com/opencrvs/opencrvs-core.git`
-
-3. `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
-
-4. Run `yarn` to install deps
-
-5. Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
-
-6. Run `yarn dev` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start`. We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
+6) Run `yarn dev` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start`. We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
 
 **If you are using OSX:**
 
@@ -334,8 +326,6 @@ A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zamb
 `cd ../` back up and clone this example [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module. You can iterate upon it for your needs.
 
 `git clone https://github.com/opencrvs/opencrvs-zambia.git`
-
-NOTE: You will likely want to store your custom resources module in a private repo. We have a lot of experience of customising OpenCRVS resources to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need system integration help, [please get in touch](https://www.opencrvs.org).
 
 8. `cd opencrvs-zambia` into the resources repo and run `yarn` to install deps
 
@@ -350,26 +340,25 @@ Run `yarn db:backup:restore` to populate the database with reference data and te
 **That's it!** You should be running OpenCRVS with test users and test locations. Apps can be found running at the following URLs:
 
 - Login: http://localhost:3020/
+- Client: http://localhost:3000/
+- Styleguide: http://localhost:6060/
 
-You can login using the following [Zambia](https://github.com/opencrvs/opencrvs-zambia) user accounts. In development, the password is "test" and the 2-factor auth SMS code is "000000".
+Login using using the following Zambia user accounts.
+
+- **Field agent:** kalusha.bwalya
+- **Registration Agent:** felix.katongo
+- **Registrar:** kennedy.mweene
+- **System Administrator:** emmanuel.mayuka
+
+In development, the password is "test" and the 2-factor auth SMS code is "000000".
 
 [Please get in touch](https://www.opencrvs.org) with us to find out more about the available business functionality for each user type.
 
-**Field agent:**  kalusha.bwalya
+After logging in you should be redirected to: Client: http://localhost:3000/
 
-**Registration Agent:** felix.katongo
+UI component library will be running here: Styleguide: http://localhost:6060/
 
-**Registrar:** kennedy.mweene
-
-**System Administrator:** emmanuel.mayuka
-
-After logging in you should be redirected to:
-
-- Client: http://localhost:3000/
-
-UI component library will be running here:
-
-- Styleguide: http://localhost:6060/
+<br>
 
 ### How do I configure OpenCRVS?
 
@@ -383,9 +372,11 @@ The "resources" module contains documentation of how you would configure and dep
 
 You can run a PWA on an Android device and connect to OpenCRVS running on your local network. This is the best way to work and debug service workers and do actual device testing.
 
-1. Go to `ngrok.conf` and add an auth token. 1. Register to https://ngrok.com/. The free plan is enough for this.
-2. Run `ngrok start -config infrastructure/ngrok.conf --all` 2. Go to https://dashboard.ngrok.com/auth and get yourself an auth token
-3. Open `https://ocrvs-client.ngrok.io` on your device 3. Create a `.env` file to `packages/mobile-proxy`
+1. Go to `ngrok.conf` and add an auth token. Register to https://ngrok.com/. The free plan is enough for this.
+
+2. Run `ngrok start -config infrastructure/ngrok.conf --all`. Go to https://dashboard.ngrok.com/auth and get yourself an auth token
+
+3. Open `https://ocrvs-client.ngrok.io` on your device. Create a `.env` file to `packages/mobile-proxy`
 
 ```
 AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
@@ -394,11 +385,22 @@ AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 4. Start the development environment as you normally would, but add `--ignore @opencrvs/client` to the start command. So `yarn start:bgd --ignore @opencrvs/client`
 
 5. Run `yarn start` in the mobile-proxy package
+
 6. You should now have an ngrok url that can be used remotely on any device. It's still required to be in the same network as the host machine, as some services (login) aren't used through ngrok.
 
 7. Build the client app `NODE_ENV=production yarn build`
+
 8. Serve the client up in 3000 port by running `yarn serve`
+
 9. You can now open up the address you got from the mobile proxy in your mobile browser
+
+<br>
+
+## How can I set up continuous integration and delivery?
+
+We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
+
+<br>
 
 ### How can I install and manage an OpenCRVS server cluster?
 
@@ -410,9 +412,9 @@ To prepare your server cluster and manage the Docker Swarm, some pre-requisites 
 
 An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
 
-## How can I set up continuous integration and delivery?
+<br>
 
-We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
+### Clearing and creating your own reference data
 
 ### Clearing and creating your own reference data in your resources module
 
@@ -442,6 +444,8 @@ Start the development environment as described above, then:
 
 4. Commit and push the new db dump archive files that have been created in your country folder in resources package to your private repo.
 
+<br>
+
 ## Docker scripts
 
 There are a number of docker scripts available via `yarn`. `yarn dev` is the easiest command to run to get started (see above) but if you need to manage the docker containers some of these scripts may be useful.
@@ -456,6 +460,8 @@ The `yarn compose:*` scripts only setup the dependencies in docker containers an
 
 A number of other useful Docker commands you will need to manage the swarm are accessible [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
+<br>
+
 ## How can I deploy to a staging environment cluster?
 
 To deploy to a staging environment we combine docker-compose files that are used in the docker setup above with a few others to configure the stack.
@@ -464,11 +470,15 @@ The deployment uses Docker Swarm and sets up an OpenCRVS stack containing each s
 
 The deploy is easily executed by just running: `yarn deploy:staging --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>` - you will need ssh access to the server for this to work.
 
+<br>
+
 ## How can I deploy to a QA environment cluster?
 
 Deploying to QA is much the same as above, however you may specify a version to deploy. The version can be any docker image tag. Each time master is build on CI docker images are created for that commit hash. Any of these hashes may be used as the version. In addition any time a git tag is created and pushed all the docker images will automatically build. Once complete the name of this tag can be used to deploy to the QA environment as well.
 
 `yarn deploy:qa --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
+
+<br>
 
 ## How can I deploy to production?
 
@@ -476,26 +486,32 @@ Deploying to Production is much the same as deploying to QA.
 
 `yarn deploy:prod --clear-data=yes --restore-metadata=yes <<insert host>> <<insert version>>`
 
+<br>
+
 ## How do I export recent registrations?
 
 You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh <<insert user>> <<insert user password>>`.
 
 Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
 
+<br>
+
 ## How does OpenCRVS back up registration data?
 
 OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
+
+<br>
 
 ## How do I configure OpenCRVS for my country needs?
 
 Just follow the instructions in the [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources package or [please get in touch](https://www.opencrvs.org) with us for help. We'd love to hear from you!
 
+<br>
+
 ## Meet the people we are building OpenCRVS for
 
 <p align="left">
-
 <img width="98" height="152" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
-
 </p>
 
 #### Samira and Anir, Parents
@@ -503,9 +519,7 @@ Just follow the instructions in the [Zambia](https://github.com/opencrvs/opencrv
 Registering their daughter’s birth is now affordable because they no longer have to skip days of work to make multiple visits to the registration office. The Health Worker comes to them to start the registration process and they can track progress through their mobile phone so they know when and where to collect the birth certificate.
 
 <p align="left">
-
 <img width="110" height="147" src="https://static.wixstatic.com/media/93440e_311346446ec94a47a047541a2982bf80~mv2.png/v1/crop/x_0,y_0,w_636,h_846/fill/w_110,h_147,al_c,q_80,usm_0.66_1.00_0.01/health-worker.webp">
-
 </p>
 
 #### Sophia, Community Health Worker
@@ -513,9 +527,7 @@ Registering their daughter’s birth is now affordable because they no longer ha
 A community health worker (field agent) can easily register the births for all pregnant and lactating mothers in her remote, rural catchment area and provide quality healthcare. This is now possible because she isn’t spending the majority of the consultation filling out paperwork aswell as administering vaccinations, whilst worrying about connectivity.
 
 <p align="left">
-
 <img width="82" height="169" src="https://static.wixstatic.com/media/93440e_1ed34365b7b94424ac0c7c32ae5b5e3c~mv2.png/v1/crop/x_0,y_0,w_443,h_907/fill/w_82,h_169,al_c,q_80,usm_0.66_1.00_0.01/raman.webp">
-
 </p>
 
 #### Raman, Civil Registrar
@@ -524,11 +536,15 @@ Civil registrars can delegate responsibility to registration agents to validate 
 
 Performance management reports can be auto-generated, presenting real-time disaggregated registration rates to government policy makers. This leads to improved national decision making amd planning, saving time and money.
 
+<br>
+
 ## Become part of the OpenCRVS Community
 
 We want to see OpenCRVS implemented across the world. We can’t do this alone. Through the OpenCRVS Community, we are uniting experts in civil registration and other interested parties.
 
 [Join the community](https://www.opencrvs.org)
+
+<br>
 
 ## Contributing
 
@@ -537,6 +553,8 @@ You may view/add issues here: https://github.com/opencrvs/opencrvs-core/issues
 To contribute code, please review the CONTRIBUTING.md file https://github.com/opencrvs/opencrvs-core/blob/master/CONTRIBUTING.md, fork the repository and submit a pull request. The authors will review the code and merge it in if all is well.
 
 By contributing to the OpenCRVS code, you are conforming to the terms of the license below.
+
+<br>
 
 ## How to tag an OpenCRVS release?
 
@@ -555,6 +573,8 @@ So you have contributed to core and want to make a new release as an OpenCRVS co
 6. Create a [new release on Github](https://github.com/opencrvs/opencrvs-core/releases) using the tag you just pushed and including any release notes.
 
 7. Dockerhub should automatically build the images when a new release tag is created in Git. Howver Dockerhub can sometimes timeout and you may need to compose and push the release tagged images locally. To do that, run `yarn compose:push:release`
+
+<br>
 
 ## License
 

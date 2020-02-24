@@ -993,6 +993,13 @@ describe('Registration type resolvers', () => {
       expect(time).toBe('2016-10-31T09:45:05+10:00')
     })
 
+    it('returns timeLogged of the task', async () => {
+      fetch.mockResponseOnce(JSON.stringify({ timeSpentEditing: 0 }))
+      const timeLogged = await typeResolvers.RegWorkflow.timeLogged(mockTask)
+
+      expect(timeLogged).toBe(0)
+    })
+
     it('returns user of the task', async () => {
       const mock = fetch.mockResponseOnce(JSON.stringify({ _id: '1' }))
       // @ts-ignore

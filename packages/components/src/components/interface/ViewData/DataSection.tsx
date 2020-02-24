@@ -23,19 +23,30 @@ const Title = styled.div`
     ${({ theme }) => theme.fonts.h5Style};
   }
 `
+
+const ResponsiveContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
+  }
+`
 interface IProps {
   id?: string
   title: string
   items: IDataProps[]
+  responsiveContents?: React.ReactNode
 }
 
 export class DataSection extends React.Component<IProps> {
   render() {
-    const { id, title, items } = this.props
+    const { id, title, items, responsiveContents } = this.props
 
     return (
       <Container id={id}>
         <Title>{title}</Title>
+        {responsiveContents && (
+          <ResponsiveContainer>{responsiveContents}</ResponsiveContainer>
+        )}
         {items.map((item: IDataProps, index: number) => (
           <DataRow id={item.label.split(' ').join('-')} key={index} {...item} />
         ))}
