@@ -17,8 +17,7 @@ import {
   markEventAsRegistered,
   modifyRegistrationBundle,
   setTrackingId,
-  markBundleAsWaitingValidation,
-  validateRegistration
+  markBundleAsWaitingValidation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -119,13 +118,6 @@ export async function createRegistrationHandler(
       )
     }
     const resBundle = await sendBundleToHearth(payload)
-    if (
-      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
-      event === Events.DEATH_NEW_WAITING_VALIDATION
-    ) {
-      // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
-      validateRegistration(payload, getToken(request))
-    }
     populateCompositionWithID(payload, resBundle)
 
     if (isEventNonNotifiable(event)) {
