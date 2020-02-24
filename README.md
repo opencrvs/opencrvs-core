@@ -321,45 +321,37 @@ On Mac you will need:
 
 5. Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
 
-### How do I configure OpenCRVS?
+6. Run `yarn dev` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start`. We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
 
-6. Next, OpenCRVS depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
-
-A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free in order to illustrate how this can be done. It contains documentation of how you would configure and deploy your own integrations, customise birth and death registration forms, add your own country specific address structure, and how you would populate OpenCRVS with [FHIR](https://www.hl7.org/fhir/) standardised reference data.
-
-`cd ../` back up and clone this example Zambia resources module. You can iterate upon it for your needs.
-
-`git clone https://github.com/opencrvs/opencrvs-zambia.git`
-
-You will likely want to store your custom resources module in a private repo.
-
-We have a lot of experience of customising OpenCRVS resources to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need system integration help, [please get in touch](https://www.opencrvs.org).
-
-7. `cd opencrvs-zambia` into the resources repo and run `yarn` to install deps
-
-8. Run `yarn start` to run the resources module
-
-9. `cd ../opencrvs-core` to return to the core module.
-
-10. Run `yarn dev` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` (services in this repo). We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
-
-**Starting the dev environment (necessary for OSX):**
+**If you are using OSX:**
 
 Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find your local IP address and start the dev environment, replacing the IP address with yours, like this: `LOCAL_IP=192.168.0.5 yarn dev`
 
-11. Populate the database with test data:\*\*
+7. Next, OpenCRVS depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
 
-Once your environment is running, you will now need to populate your database with test data using the Zambia implementation.
+A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free.
 
-`cd ../opencrvs-zambia` to return to the Zambia resources module
+`cd ../` back up and clone this example [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module. You can iterate upon it for your needs.
 
-Run `yarn db:backup:restore` to populate the database with reference data and test users.
+`git clone https://github.com/opencrvs/opencrvs-zambia.git`
+
+NOTE: You will likely want to store your custom resources module in a private repo. We have a lot of experience of customising OpenCRVS resources to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need system integration help, [please get in touch](https://www.opencrvs.org).
+
+8. `cd opencrvs-zambia` into the resources repo and run `yarn` to install deps
+
+9. Run `CERT_PUBLIC_KEY_PATH=<where your core repo is>/.secrets/public-key.pem yarn start` to run the resources module
+
+Once your [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module is running, you will now need to populate your database with test data using the [Zambia](https://github.com/opencrvs/opencrvs-zambia) implementation.
+
+10. Populate the database with test data from your resources module
+
+Run `yarn db:backup:restore` to populate the database with reference data and test users for [Zambia](https://github.com/opencrvs/opencrvs-zambia).
 
 **That's it!** You should be running OpenCRVS with test users and test locations. Apps can be found running at the following URLs:
 
 - Login: http://localhost:3020/
 
-You can login using the following Zambia user accounts. In development, the password is "test" and the 2-factor auth SMS code is "000000".
+You can login using the following [Zambia](https://github.com/opencrvs/opencrvs-zambia) user accounts. In development, the password is "test" and the 2-factor auth SMS code is "000000".
 
 [Please get in touch](https://www.opencrvs.org) with us to find out more about the available business functionality for each user type.
 
@@ -378,6 +370,14 @@ After logging in you should be redirected to:
 UI component library will be running here:
 
 - Styleguide: http://localhost:6060/
+
+### How do I configure OpenCRVS?
+
+OpenCRVS depends upon your own country specific "resources" module of reference data (addresses, employees, offices, facilities), custom configuration of vital event registration forms and your own integrations.
+
+A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zambia) is released for free in order to illustrate how this can be done.
+
+The "resources" module contains documentation of how you would configure and deploy your own integrations, customise birth and death registration forms, add your own country specific address structure, and how you would populate OpenCRVS with [FHIR](https://www.hl7.org/fhir/) standardised reference data for your nation.
 
 ## How can I test OpenCRVS locally on an Android device?
 
@@ -400,10 +400,6 @@ AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 8. Serve the client up in 3000 port by running `yarn serve`
 9. You can now open up the address you got from the mobile proxy in your mobile browser
 
-## How can I set up continuous integration and delivery?
-
-We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
-
 ### How can I install and manage an OpenCRVS server cluster?
 
 OpenCRVS should be deployed on a minimum cluster of 3 nodes, each with the following minimm specification:
@@ -414,9 +410,13 @@ To prepare your server cluster and manage the Docker Swarm, some pre-requisites 
 
 An [Ansible](https://www.ansible.com/) playbook script is provided [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) to automate the vast majority of your server cluster setup.
 
-### Clearing and creating your own reference data
+## How can I set up continuous integration and delivery?
 
-1. `cd ../opencrvs-zambia` to return to the Zambia resources module
+We provide an example [Travis](https://travis-ci.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/.travis.yml) to automate unit and end-to-end testing integration & deployment.
+
+### Clearing and creating your own reference data in your resources module
+
+1. `cd opencrvs-zambia` to return to the [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources module
 
 2. Run `yarn db:clear:all` to delete the entire local database
 
@@ -430,15 +430,15 @@ An [Ansible](https://www.ansible.com/) playbook script is provided [here](https:
 
 7. Test the setup with `curl http://localhost:5001/fhir/Patient/123` you should get some JSON with a 'Not found' error.
 
-### Create a new metadata db dump
+### Create a new metadata db dump in your resources module
 
 Start the development environment as described above, then:
 
 1. Start the dev environment - as explained above.
 
-2. Code reference data for your country requirements following instructions inside the README of your resources package. Then populate the database like this: `cd packages/resource && yarn populate:<<insert alpha3 country code>> && cd ../..`
+2. Code reference data for your country requirements following instructions inside the README of your resources module. Then populate the database like this: `yarn populate:<<insert alpha3 country code>> && cd ../..`
 
-3. Create new backup zip files to act as your baseline. `cd packages/resources && yarn db:backup:create <<insert country code>>`
+3. Create new backup zip files to act as your baseline. `yarn db:backup:create <<insert country code>>`
 
 4. Commit and push the new db dump archive files that have been created in your country folder in resources package to your private repo.
 
