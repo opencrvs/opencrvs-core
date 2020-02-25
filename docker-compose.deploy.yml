@@ -205,17 +205,6 @@ services:
     networks:
       - overlay_net
 
-  styleguide:
-    deploy:
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.frontend.rule=Host: styleguide.{{hostname}}'
-        - 'traefik.port=6060'
-        - 'traefik.docker.network=opencrvs_overlay_net'
-      replicas: 1
-    networks:
-      - overlay_net
-
   login:
     environment:
       - RESOURCES_URL=https://resources.{{hostname}}

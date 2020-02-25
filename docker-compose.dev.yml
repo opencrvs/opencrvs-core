@@ -93,6 +93,3 @@ services:
   login:
     ports:
       - '3020:80'
-  styleguide:
-    ports:
-      - '6060:6060'

@@ -22,12 +22,6 @@ services:
       context: .
       dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
-  styleguide:
-    image: jembi/ocrvs-styleguide:${VERSION:-latest}
-    build:
-      context: .
-      dockerfile: ./packages/components/Dockerfile
-    restart: unless-stopped
   gateway:
     image: jembi/ocrvs-gateway:${VERSION:-latest}
     build:

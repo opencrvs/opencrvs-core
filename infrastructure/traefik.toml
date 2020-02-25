@@ -57,7 +57,6 @@ entryPoint = "http"
     "openhim-api.{{hostname}}",
     "api.{{hostname}}",
     "openhim.{{hostname}}",
-    "styleguide.{{hostname}}",
   ]
 
 [retry]
