@@ -79,7 +79,8 @@ import {
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
   PAGE_TRANSITIONS_EXIT_TIME,
   DECLARED,
-  REJECTED
+  REJECTED,
+  VALIDATED
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -372,10 +373,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { application } = this.props
     const isRegistrarOrRegistrationAgent =
       this.userHasRegisterScope() || this.userHasValidateScope()
-    const isApplicationDeclaredOrRejected =
+    const isConfirmationModalApplicable =
       application.registrationStatus === DECLARED ||
+      application.registrationStatus === VALIDATED ||
       application.registrationStatus === REJECTED
-    if (isRegistrarOrRegistrationAgent && isApplicationDeclaredOrRejected) {
+    if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
       this.toggleConfirmationModal()
     } else {
       this.writeApplicationAndGoToHome()
