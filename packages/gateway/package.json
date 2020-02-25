@@ -4,7 +4,7 @@
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "cross-env LANGUAGES='en' concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\"",
+    "start": "concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\"",
     "start:prod": "node build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
@@ -76,7 +76,6 @@
     "@types/uuid": "^3.4.3",
     "concurrently": "^3.5.1",
     "copyfiles": "^2.1.1",
-    "cross-env": "^5.2.0",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "graphql-schema-typescript": "^1.2.7",

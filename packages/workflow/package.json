@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development LANGUAGES='en' nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "node build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
