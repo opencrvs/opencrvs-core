@@ -26,7 +26,8 @@ import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
   EventTopBar,
   IEventTopBarProps,
-  IEventTopBarMenuAction
+  IEventTopBarMenuAction,
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
@@ -76,7 +77,10 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
-  PAGE_TRANSITIONS_EXIT_TIME
+  PAGE_TRANSITIONS_EXIT_TIME,
+  DECLARED,
+  REJECTED,
+  VALIDATED
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
@@ -218,6 +222,7 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
+  showConfirmationModal: boolean
 }
 
 const fadeFromTop = keyframes`
@@ -244,7 +249,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.state = {
       isDataAltered: false,
       rejectFormOpen: false,
-      hasError: false
+      hasError: false,
+      showConfirmationModal: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -274,6 +280,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   modifyApplication = (
@@ -341,6 +351,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }))
   }
 
+  toggleConfirmationModal = () => {
+    this.setState(prevState => ({
+      showConfirmationModal: !prevState.showConfirmationModal
+    }))
+  }
+
   getEvent() {
     const eventType = this.props.application.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
@@ -354,7 +370,22 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSaveAsDraftClicked = async () => {
-    await this.props.writeApplication(this.props.application)
+    const { application } = this.props
+    const isRegistrarOrRegistrationAgent =
+      this.userHasRegisterScope() || this.userHasValidateScope()
+    const isConfirmationModalApplicable =
+      application.registrationStatus === DECLARED ||
+      application.registrationStatus === VALIDATED ||
+      application.registrationStatus === REJECTED
+    if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
+      this.toggleConfirmationModal()
+    } else {
+      this.writeApplicationAndGoToHome()
+    }
+  }
+
+  writeApplicationAndGoToHome = () => {
+    this.props.writeApplication(this.props.application)
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
@@ -730,6 +761,36 @@ class RegisterFormView extends React.Component<FullProps, State> {
               application={application}
             />
           )}
+          <ResponsiveModal
+            id="save_application_confirmation"
+            title={intl.formatMessage(
+              messages.saveApplicationConfirmModalTitle
+            )}
+            show={this.state.showConfirmationModal}
+            handleClose={this.toggleConfirmationModal}
+            responsive={false}
+            contentHeight={80}
+            actions={[
+              <TertiaryButton
+                id="cancel_save"
+                key="cancel_save"
+                onClick={this.toggleConfirmationModal}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </TertiaryButton>,
+              <PrimaryButton
+                id="confirm_save"
+                key="confirm_save"
+                onClick={this.writeApplicationAndGoToHome}
+              >
+                {intl.formatMessage(buttonMessages.save)}
+              </PrimaryButton>
+            ]}
+          >
+            {intl.formatMessage(
+              messages.saveApplicationConfirmModalDescription
+            )}
+          </ResponsiveModal>
         </StyledContainer>
       </>
     )

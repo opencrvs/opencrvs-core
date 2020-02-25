@@ -61,6 +61,7 @@ import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
+import { DECLARED } from '@client/utils/constants'
 
 describe('when user logs in', () => {
   // Some mock data
@@ -1230,6 +1231,93 @@ describe('when user is in the register form from review edit', () => {
     component.update()
 
     expect(window.location.href).toContain('/progress')
+  })
+})
+
+describe('when user is in the register form from sent for review edit', () => {
+  let component: ReactWrapper<{}, {}>
+  let testAppStore: AppStore
+  beforeEach(async () => {
+    Date.now = jest.fn(() => 1582525224324)
+    const { store, history } = await createTestStore()
+    // @ts-ignore
+    const application = createReviewApplication(
+      uuid(),
+      mockApplicationData,
+      Event.BIRTH,
+      DECLARED
+    )
+    store.dispatch(setInitialApplications())
+    store.dispatch(storeApplication(application))
+    const mock: any = jest.fn()
+    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+
+    const form = await getReviewFormFromStore(store, Event.BIRTH)
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <RegisterForm
+        location={mock}
+        scope={mock}
+        history={history}
+        staticContext={mock}
+        registerForm={form}
+        application={application}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        match={{
+          params: {
+            applicationId: application.id,
+            pageId: 'mother'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    component = testComponent.component
+    testAppStore = testComponent.store
+  })
+
+  it('clicking on save draft opens modal', async () => {
+    const saveDraftButton = await waitForElement(component, '#save_draft')
+    saveDraftButton.hostNodes().simulate('click')
+    component.update()
+    const saveDraftConfirmationModal = await waitForElement(
+      component,
+      '#save_application_confirmation'
+    )
+    expect(saveDraftConfirmationModal.hostNodes()).toHaveLength(1)
+  })
+
+  it('clicking save confirm saves the draft', async () => {
+    const DRAFT_MODIFY_TIME = 1582525379383
+    Date.now = jest.fn(() => DRAFT_MODIFY_TIME)
+    selectOption(component, '#iDType', 'National ID number')
+
+    // Do some modifications
+    component.find('input#iD').simulate('change', {
+      target: { id: 'iD', value: '1234567898' }
+    })
+    const saveDraftButton = await waitForElement(component, '#save_draft')
+    saveDraftButton.hostNodes().simulate('click')
+    component.update()
+    const saveDraftConfirmationModal = await waitForElement(
+      component,
+      '#save_application_confirmation'
+    )
+
+    saveDraftConfirmationModal
+      .find('#confirm_save')
+      .hostNodes()
+      .simulate('click')
+    component.update()
+
+    const modifyTime = testAppStore.getState().applicationsState.applications[0]
+      .modifiedOn
+
+    expect(modifyTime).toBe(DRAFT_MODIFY_TIME)
   })
 })
 
