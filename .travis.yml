@@ -31,7 +31,7 @@ jobs:
             - libgconf-2-4
       script:
         - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-        - ./build-and-test-e2e.sh
+        - ./infrastructure/build-and-test-e2e.sh
         - kill %1
       env:
         - OTHER_LERNA_FLAGS=""
@@ -56,8 +56,8 @@ jobs:
       install: skip
       script:
         - cd ..
-        - git clone git@github.com:opencrvs/opencrvs-bangladesh.git
-        - yarn deploy:staging ../opencrvs-bangladesh
+        - git clone git@github.com:opencrvs/opencrvs-zambia.git
+        - bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development opencrvs-staging.jembi.org latest ../opencrvs-zambia
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
@@ -68,7 +68,7 @@ jobs:
         apt:
           packages:
             - libgconf-2-4
-      script: cd packages/e2e && yarn && yarn start --record false
+      script: ./infrastructure/build-and-test-e2e-on-staging.sh
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_CLIENT_URL=https://register.opencrvs-staging.jembi.org/

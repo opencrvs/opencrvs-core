@@ -1,7 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [OpenCRVS server setup](#opencrvs-server-setup)
   - [Enabling encryption](#enabling-encryption)
   - [Enabling Mongo replica sets](#enabling-mongo-replica-sets)
@@ -66,7 +65,7 @@ Run the Ansible playbook configuration script from your client computer (You mus
 ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token"
 ```
 
-Replace <inventory_file> with the correct inventory file and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node that requires an SSH password). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
+Replace <inventory_file> with the correct inventory file for either you staging, QA or production servers ( Refer to our [example.ini](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/example.ini) file ) and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node that requires an SSH password). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
 
 ## Enabling encryption
 
