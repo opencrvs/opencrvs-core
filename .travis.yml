@@ -23,6 +23,13 @@ env:
 
 jobs:
   include:
+    - stage: tests (unit and integration)
+      script: yarn test && yarn lint
+      after_success:
+        - npm install codecov -g
+        - codecov
+        - ./node_modules/.bin/bundlesize
+      before_install: npm install -g yarn
     - if: type = pull_request
       before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       addons:
@@ -40,6 +47,25 @@ jobs:
         - CYPRESS_AUTH_URL=http://localhost:4040/
       services:
         - docker
+
+    - stage: build and push docker images
+      if: branch = master AND type = push
+      install: skip
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - yarn compose:push
+      sudo: required
+      services:
+        - docker
+
+    - stage: deploy to staging
+      if: branch = master AND type = push
+      install: skip
+      script:
+        - git clone https://github.com/opencrvs/opencrvs-zambia.git
+        - bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development opencrvs-staging.jembi.org latest opencrvs-zambia
+      addons:
+        ssh_known_hosts: opencrvs-staging.jembi.org
 
     - stage: integration tests on staging
       if: branch = master AND type = push
