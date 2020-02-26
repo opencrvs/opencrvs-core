@@ -53,7 +53,7 @@ jobs:
 
     - stage: deploy to staging
       if: branch = master AND type = push
-      install: skip
+      before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       script:
         - cd ..
         - git clone https://github.com/opencrvs/opencrvs-zambia.git
@@ -63,7 +63,7 @@ jobs:
 
     - stage: integration tests on staging
       if: branch = master AND type = push
-      install: skip
+      before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       addons:
         apt:
           packages:
