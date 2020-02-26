@@ -7,6 +7,10 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
+before_install:
+  - openssl aes-256-cbc -K $encrypted_6a4906510c0e_key -iv $encrypted_6a4906510c0e_iv
+    -in deploy_key.enc -out ./deploy_key -d
+  - ssh-add ./deploy_key
 language: node_js
 dist: bionic
 node_js:
