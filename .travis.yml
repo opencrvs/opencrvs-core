@@ -13,6 +13,7 @@ before_install:
   - eval "$(ssh-agent -s)"
   - chmod 600 ./deploy_key
   - ssh-add ./deploy_key
+  - sudo apt-get -y install apache2-utils
 language: node_js
 dist: bionic
 node_js:
