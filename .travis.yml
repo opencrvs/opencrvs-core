@@ -10,7 +10,7 @@
 before_install:
   - openssl aes-256-cbc -K $encrypted_6a4906510c0e_key -iv $encrypted_6a4906510c0e_iv
     -in deploy_key.enc -out ./deploy_key -d
-  - eval "$(ssh-agent -s)
+  - eval "$(ssh-agent -s)"
   - ssh-add ./deploy_key
 language: node_js
 dist: bionic
