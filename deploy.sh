@@ -109,7 +109,6 @@ ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/setup-deploy-config.sh '$HO
 
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
-    ssh $SSH_USER@$SSH_HOST 'docker-compose -f docker-compose.deps.yml -f docker-compose.yml -f docker-compose.deploy.yml -f docker-compose.resources.deploy.yml config'
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
 elif [[ "$ENV" = "qa" ]]; then
     ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && HOSTNAME='$HOST' VERSION='$VERSION' PAPERTRAIL='$PAPERTRAIL' docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c docker-compose.qa-deploy.yml -c docker-compose.resources.deploy.yml --with-registry-auth opencrvs'
