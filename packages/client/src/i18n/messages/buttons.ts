@@ -36,6 +36,7 @@ interface IButtonsMessages {
   rejectApplication: MessageDescriptor
   retry: MessageDescriptor
   review: MessageDescriptor
+  save: MessageDescriptor
   saveExitButton: MessageDescriptor
   deleteApplication: MessageDescriptor
   closeApplication: MessageDescriptor
@@ -179,6 +180,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Review',
     description: 'Review button text',
     id: 'buttons.review'
+  },
+  save: {
+    defaultMessage: 'Save',
+    description: 'Save Button Text',
+    id: 'buttons.save'
   },
   saveExitButton: {
     defaultMessage: 'Save & Exit',
