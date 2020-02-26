@@ -195,7 +195,7 @@ Microservices:
 
 1. [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
 
-⋅⋅⋅Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.  
+⋅⋅⋅Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
 
 <p align="left">
 <img src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
@@ -236,22 +236,21 @@ The OpenCRVS GraphQL Gateway is a JWT protected [Apollo](https://www.apollograph
 
 - [client](https://github.com/opencrvs/opencrvs-core/tree/master/packages/client) - the OpenCRVS UI client for civil registration built in [React](https://reactjs.org/).
 
-
 Client [npm](https://www.npmjs.com/) dependencies and enablers include:
 
- - Easy build configuration with [create-react-app](https://github.com/facebook/create-react-app), [craco](https://github.com/gsoft-inc/craco), [typrescript-eslint](https://github.com/typescript-eslint/typescript-eslint)
+- Easy build configuration with [create-react-app](https://github.com/facebook/create-react-app), [craco](https://github.com/gsoft-inc/craco), [typrescript-eslint](https://github.com/typescript-eslint/typescript-eslint)
 
- - Multi-lingual content management support using [react-intl](https://github.com/formatjs/react-intl)
+- Multi-lingual content management support using [react-intl](https://github.com/formatjs/react-intl)
 
- - ES6 JS component styling using [styled-components](https://styled-components.com/)
+- ES6 JS component styling using [styled-components](https://styled-components.com/)
 
- - Fully configurable, high performance form management using [formik](https://github.com/jaredpalmer/formik)
+- Fully configurable, high performance form management using [formik](https://github.com/jaredpalmer/formik)
 
- - Pure JavaScript, client side, offline PDF certificate generation using [pdfmake](http://pdfmake.org/)
+- Pure JavaScript, client side, offline PDF certificate generation using [pdfmake](http://pdfmake.org/)
 
- - Read-only application state management using [redux](https://github.com/reduxjs/redux)
+- Read-only application state management using [redux](https://github.com/reduxjs/redux)
 
- - Unit tests coverage with [Jest](https://jestjs.io/) & [Enzyme](https://airbnb.io/enzyme/) UI component tests.
+- Unit tests coverage with [Jest](https://jestjs.io/) & [Enzyme](https://airbnb.io/enzyme/) UI component tests.
 
 <br>
 <p align="left">
@@ -282,28 +281,27 @@ In remote areas, registrars can save a configurable number of registrations offl
 
 1. First, make sure your environment is prepared by installing these pre-requisites:
 
-      - [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
-      - [Yarn](https://yarnpkg.com/lang/en/docs/install)
-      - [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
+   - [Node.js](https://nodejs.org/en/download/) - using [node version manager](https://github.com/creationix/nvm) is also useful for installing node.
+   - [Yarn](https://yarnpkg.com/lang/en/docs/install)
+   - [Docker](https://docs.docker.com/install/) - if on linux you will need to make sure docker can be run by your user, not only by root or using sudo - see [here](https://docs.docker.com/install/linux/linux-postinstall/).
 
-    
-      On Linux you will also need to:
-      - increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
-      - increase vm max heap for [ElasticSearch](https://www.elastic.co/) using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+   On Linux you will also need to:
 
-      On Mac you will need:
-      - [Docker For Mac](https://docs.docker.com/docker-for-mac/)
+   - increase your file watch limit using: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
+   - increase vm max heap for [ElasticSearch](https://www.elastic.co/) using: `echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`
 
+   On Mac you will need:
 
-2. Next, clone this repo! :)
-    `git clone https://github.com/opencrvs/opencrvs-core.git`
+   - [Docker For Mac](https://docs.docker.com/docker-for-mac/)
 
-3. `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
+2) Next, clone this repo! :)
+   `git clone https://github.com/opencrvs/opencrvs-core.git`
 
-4. Run `yarn` to install deps
+3) `cd` into the repo and run `chmod 775 data/elasticsearch` from root of the project to allow ElasticSearch access
 
-5. Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
+4) Run `yarn` to install deps
 
+5) Run `docker swarm init` - your localhost has to be a Docker swarm manager in order to use the "overlay" network.
 
 <br>
 
@@ -317,9 +315,9 @@ A test "resources" module for [Zambia](https://github.com/opencrvs/opencrvs-zamb
 
 2. `git clone https://github.com/opencrvs/opencrvs-zambia.git`
 
-    You will likely want to store your custom resources module in a private repo.
+   You will likely want to store your custom resources module in a private repo.
 
-    We have a lot of experience of customising OpenCRVS resources to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need system integration help, [please get in touch](https://www.opencrvs.org).
+   We have a lot of experience of customising OpenCRVS resources to any scale now that OpenCRVS has been deployed in Bangladesh, so if you need system integration help, [please get in touch](https://www.opencrvs.org).
 
 3. `cd opencrvs-zambia` into the resources repo and run `yarn` to install deps
 
@@ -343,17 +341,17 @@ Docker For Mac can affect OpenCRVS ability to find containers on localhost. Find
 
 **That's it!** You should be running OpenCRVS with test users and test locations. Apps can be found running at the following URLs:
 
-  - Login: http://localhost:3020/
-  - Client: http://localhost:3000/
-  - Styleguide: http://localhost:6060/
-   
-   
-Login using using the following Zambia user accounts. 
-  - **Field agent:** kalusha.bwalya
-  - **Registration Agent:** felix.katongo
-  - **Registrar:** kennedy.mweene
-  - **System Administrator:** emmanuel.mayuka
-  
+- Login: http://localhost:3020/
+- Client: http://localhost:3000/
+- Styleguide: http://localhost:6060/
+
+Login using using the following Zambia user accounts.
+
+- **Field agent:** kalusha.bwalya
+- **Registration Agent:** felix.katongo
+- **Registrar:** kennedy.mweene
+- **System Administrator:** emmanuel.mayuka
+
 In development, the password is "test" and the 2-factor auth SMS code is "000000".
 
 [Please get in touch](https://www.opencrvs.org) with us to find out more about the available business functionality for each user type.
@@ -448,11 +446,11 @@ There are a number of docker scripts available via `yarn`. `yarn dev` is the eas
 
 The `yarn compose:*` scripts only setup the dependencies in docker containers and not the applications in this repository.
 
-  - `*:build` scripts which just build the images
+- `*:build` scripts which just build the images
 
-  - `*:up` scripts which just run pre-build images in containers
+- `*:up` scripts which just run pre-build images in containers
 
-  - `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
+- `*:down` scripts which stop and remove the containers (along with data not stored in a volume!)
 
 A number of other useful Docker commands you will need to manage the swarm are accessible [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
 
@@ -484,7 +482,7 @@ Deploying to Production is much the same as deploying to QA.
 
 ## How do I export recent registrations?
 
-You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh <<insert user>> <<insert user password>>`.
+You can export registrations (both death and birth) from the last n days by running a script from `infrastructure/export-registrations.sh <<insert number of days>> <<insert host>> <<insert system admin token>>`.
 
 Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
 
