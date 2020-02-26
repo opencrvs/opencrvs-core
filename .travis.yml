@@ -41,15 +41,6 @@ jobs:
       services:
         - docker
 
-    - stage: deploy to staging
-      if: branch = master AND type = push
-      install: skip
-      script:
-        - git clone https://github.com/opencrvs/opencrvs-zambia.git
-        - bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development opencrvs-staging.jembi.org latest opencrvs-zambia
-      addons:
-        ssh_known_hosts: opencrvs-staging.jembi.org
-
     - stage: integration tests on staging
       if: branch = master AND type = push
       before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
