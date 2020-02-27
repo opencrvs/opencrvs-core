@@ -61,6 +61,7 @@ interface IUserMessages {
   API_USER: MessageDescriptor
   NOTIFICATION_API_USER: MessageDescriptor
   VALIDATOR_API_USER: MessageDescriptor
+  CHATBOT_API_USER: MessageDescriptor
   systemTitle: MessageDescriptor
   FIELD_AGENT: MessageDescriptor
   currentPassword: MessageDescriptor
@@ -284,6 +285,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Validator API User',
     description: 'The description for VALIDATOR_API_USER role',
     id: 'constants.validatorApiUser'
+  },
+  CHATBOT_API_USER: {
+    defaultMessage: 'Chatbot API User',
+    description: 'The description for CHATBOT_API_USER role',
+    id: 'constants.chatbotApiUser'
   },
   systemTitle: {
     defaultMessage: 'System',
