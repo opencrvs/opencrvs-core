@@ -31,7 +31,7 @@ export const roleScopeMapping: IRoleScopeMapping = {
   PERFORMANCE_MANAGEMENT: ['performance'],
   NOTIFICATION_API_USER: ['declare', 'notification-api'],
   VALIDATOR_API_USER: ['validator-api'],
-  CHATBOT_API_USER: ['chatbot-api']
+  CHATBOT_API_USER: ['declare', 'chatbot-api']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {
