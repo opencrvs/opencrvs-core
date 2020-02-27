@@ -11,7 +11,11 @@
  */
 import { client } from '@search/elasticsearch/client'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
-import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
+import {
+  queryBuilder,
+  EMPTY_STRING,
+  selectNameFields
+} from '@search/features/search/utils'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
@@ -27,6 +31,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     type,
     applicationLocationId = EMPTY_STRING,
     name = EMPTY_STRING,
+    specificName = EMPTY_STRING,
     createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
@@ -44,6 +49,7 @@ export const searchComposition = async (params: ISearchQuery) => {
         contactNumber,
         registrationNumber,
         name,
+        selectNameFields(specificName),
         applicationLocationId,
         createdBy,
         { event, status, type }

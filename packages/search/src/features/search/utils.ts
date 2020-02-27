@@ -55,6 +55,27 @@ const allNameFields = [
   'spouseFamilyNameLocal'
 ]
 
+const childNameFields = [
+  'childFirstNames',
+  'childFamilyName',
+  'childFirstNamesLocal',
+  'childFamilyNameLocal'
+]
+
+const motherNameFields = [
+  'motherFirstNames',
+  'motherFamilyName',
+  'motherFirstNamesLocal',
+  'motherFamilyNameLocal'
+]
+
+const fatherNameFields = [
+  'fatherFirstNames',
+  'fatherFamilyName',
+  'fatherFirstNamesLocal',
+  'fatherFamilyNameLocal'
+]
+
 export const EMPTY_STRING = ''
 
 export function queryBuilder(
@@ -63,6 +84,7 @@ export function queryBuilder(
   contactNumber: string,
   registrationNumber: string,
   name: string,
+  nameFields: string[],
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -84,7 +106,7 @@ export function queryBuilder(
     must.push({
       multi_match: {
         query: name,
-        fields: allNameFields,
+        fields: nameFields,
         fuzziness: 'AUTO'
       }
     })
@@ -165,5 +187,18 @@ export function queryBuilder(
       must,
       should
     }
+  }
+}
+
+export function selectNameFields(name: string): string[] {
+  switch (name) {
+    case 'CHILD':
+      return childNameFields
+    case 'FATHER':
+      return fatherNameFields
+    case 'MOTHER':
+      return motherNameFields
+    default:
+      return allNameFields
   }
 }

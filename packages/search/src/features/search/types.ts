@@ -19,6 +19,7 @@ export interface ISearchQuery {
   contactNumber?: string
   registrationNumber?: string
   name?: string
+  specificName?: string
   event?: string
   type?: string[]
   status?: string[]
