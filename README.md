@@ -518,7 +518,7 @@ Deploying to Production is much the same as deploying to QA.
 
 ## How do I export recent registrations?
 
-You can export registrations (both death and birth) from the last 7 days by running a script from `infrastructure/export-last-7-days.sh <<insert user>> <<insert user password>>`.
+You can export registrations (both death and birth) from the last n days by running a script from `infrastructure/export-registrations.sh <<insert number of days>> <<insert host>> <<insert system admin token>>`.
 
 Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can tweak the time period from inside the script if needed.
 

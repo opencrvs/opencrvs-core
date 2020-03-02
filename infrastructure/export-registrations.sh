@@ -10,29 +10,34 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./export-last-7-days.sh HOST TOKEN'
-    echo '  HOST   is the server where OpenCRVS is deployed to e.g. gateway.opencrvsbd.org'
+    echo 'Usage: ./export-registrations.sh HOST TOKEN'
+    echo '  HOST   is the server where OpenCRVS is deployed to e.g. gateway.opencrvsbd.org || localhost:7070'
     echo "  TOKEN  of system admin user (sysadmin scope required)"    
     exit 1
 }
 
 if [ -z "$1" ] ; then
-    echo 'Error: Argument for HOST is required in position 1.'
+    echo 'Error: Argument for Number of Days is required in position 1.'
     print_usage_and_exit
 fi
 
 if [ -z "$2" ] ; then
-    echo 'Error: Argument TOKEN is required in postition 2.'
+    echo 'Error: Argument for HOST is required in position 2.'
     print_usage_and_exit
 fi
 
-HOST=$1
-TOKEN=$2
+if [ -z "$3" ] ; then
+    echo 'Error: Argument TOKEN is required in postition 3.'
+    print_usage_and_exit
+fi
 
-WEEK_AGO=$(date -v-1w +"%Y-%m-%dT%H:%M:%SZ")
+HOST=$2
+TOKEN=$3
+
+DAYS_AGO=$(date -v-$1d +"%Y-%m-%dT%H:%M:%SZ")
 TODAY=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-EXPORT_URL="http://$HOST/registrations/export?fromDate=$WEEK_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
+EXPORT_URL="http://$HOST/registrations/export?fromDate=$DAYS_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
 
 curl $EXPORT_URL -fo export.zip
 
