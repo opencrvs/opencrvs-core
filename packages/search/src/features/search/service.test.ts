@@ -30,120 +30,118 @@ describe('elasticsearch db helper', () => {
     }
     searchComposition(searchQuery)
     expect(searchSpy).toBeCalled()
-    expect(searchSpy).toBeCalledWith(
-      expect.objectContaining({
-        type: 'compositions',
-        from: 0,
-        size: 10,
-        body: {
-          sort: [{ dateOfApplication: 'asc' }],
-          query: {
-            bool: {
-              must: [
-                {
-                  multi_match: {
-                    query: 'some query',
-                    fields: [
-                      'childFirstNames',
-                      'childFamilyName',
-                      'childFirstNamesLocal',
-                      'childFamilyNameLocal',
-                      'deceasedFirstNames',
-                      'deceasedFamilyName',
-                      'deceasedFirstNamesLocal',
-                      'deceasedFamilyNameLocal',
-                      'trackingId',
-                      'registrationNumber',
-                      'contactNumber'
-                    ],
-                    fuzziness: 'AUTO'
-                  }
-                },
-                {
-                  multi_match: {
-                    query: 'some name',
-                    fields: [
-                      'childFirstNames',
-                      'childFamilyName',
-                      'childFirstNamesLocal',
-                      'childFamilyNameLocal',
-                      'motherFirstNames',
-                      'motherFamilyName',
-                      'motherFirstNamesLocal',
-                      'motherFamilyNameLocal',
-                      'fatherFirstNames',
-                      'fatherFamilyName',
-                      'fatherFirstNamesLocal',
-                      'fatherFamilyNameLocal',
-                      'informantFirstNames',
-                      'informantFamilyName',
-                      'informantFirstNamesLocal',
-                      'informantFamilyNameLocal',
-                      'primaryCaregiverFirstNames',
-                      'primaryCaregiverFamilyName',
-                      'primaryCaregiverFirstNamesLocal',
-                      'primaryCaregiverFamilyNameLocal',
-                      'deceasedFirstNames',
-                      'deceasedFamilyName',
-                      'deceasedFirstNamesLocal',
-                      'deceasedFamilyNameLocal',
-                      'spouseFirstNames',
-                      'spouseFamilyName',
-                      'spouseFirstNamesLocal',
-                      'spouseFamilyNameLocal'
-                    ],
-                    fuzziness: 'AUTO'
-                  }
-                },
-                {
-                  term: {
-                    'trackingId.keyword': 'dummy'
-                  }
-                },
-                {
-                  term: {
-                    'contactNumber.keyword': 'dummy'
-                  }
-                },
-                {
-                  term: {
-                    'registrationNumber.keyword': 'dummy'
-                  }
-                },
-                {
-                  term: {
-                    'applicationLocationId.keyword': {
-                      value: 'EMPTY_STRING',
-                      // tslint:disable-next-line
-                      boost: 2.0
-                    }
-                  }
-                },
-                {
-                  term: {
-                    'event.keyword': 'EMPTY_STRING'
-                  }
-                },
-                {
-                  terms: {
-                    'type.keyword': ['DECLARED']
-                  }
-                },
-                {
-                  terms: {
-                    'compositionType.keyword': [
-                      'birth-application',
-                      'death-application'
-                    ]
+    expect(searchSpy).toHaveBeenLastCalledWith({
+      type: 'compositions',
+      from: 0,
+      size: 10,
+      body: {
+        sort: [{ dateOfApplication: 'asc' }],
+        query: {
+          bool: {
+            must: [
+              {
+                multi_match: {
+                  query: 'some query',
+                  fields: [
+                    'childFirstNames',
+                    'childFamilyName',
+                    'childFirstNamesLocal',
+                    'childFamilyNameLocal',
+                    'deceasedFirstNames',
+                    'deceasedFamilyName',
+                    'deceasedFirstNamesLocal',
+                    'deceasedFamilyNameLocal',
+                    'trackingId',
+                    'registrationNumber',
+                    'contactNumber'
+                  ],
+                  fuzziness: 'AUTO'
+                }
+              },
+              {
+                multi_match: {
+                  query: 'some name',
+                  fields: [
+                    'childFirstNames',
+                    'childFamilyName',
+                    'childFirstNamesLocal',
+                    'childFamilyNameLocal',
+                    'motherFirstNames',
+                    'motherFamilyName',
+                    'motherFirstNamesLocal',
+                    'motherFamilyNameLocal',
+                    'fatherFirstNames',
+                    'fatherFamilyName',
+                    'fatherFirstNamesLocal',
+                    'fatherFamilyNameLocal',
+                    'informantFirstNames',
+                    'informantFamilyName',
+                    'informantFirstNamesLocal',
+                    'informantFamilyNameLocal',
+                    'primaryCaregiverFirstNames',
+                    'primaryCaregiverFamilyName',
+                    'primaryCaregiverFirstNamesLocal',
+                    'primaryCaregiverFamilyNameLocal',
+                    'deceasedFirstNames',
+                    'deceasedFamilyName',
+                    'deceasedFirstNamesLocal',
+                    'deceasedFamilyNameLocal',
+                    'spouseFirstNames',
+                    'spouseFamilyName',
+                    'spouseFirstNamesLocal',
+                    'spouseFamilyNameLocal'
+                  ],
+                  fuzziness: 'AUTO'
+                }
+              },
+              {
+                term: {
+                  'trackingId.keyword': 'dummy'
+                }
+              },
+              {
+                term: {
+                  'contactNumber.keyword': 'dummy'
+                }
+              },
+              {
+                term: {
+                  'registrationNumber.keyword': 'dummy'
+                }
+              },
+              {
+                term: {
+                  'applicationLocationId.keyword': {
+                    value: 'EMPTY_STRING',
+                    // tslint:disable-next-line
+                    boost: 2.0
                   }
                 }
-              ],
-              should: []
-            }
+              },
+              {
+                term: {
+                  'event.keyword': 'EMPTY_STRING'
+                }
+              },
+              {
+                terms: {
+                  'type.keyword': ['DECLARED']
+                }
+              },
+              {
+                terms: {
+                  'compositionType.keyword': [
+                    'birth-application',
+                    'death-application'
+                  ]
+                }
+              }
+            ],
+            should: []
           }
         }
-      })
-    )
+      }
+    })
   })
 
   it('should index a composition with minimum configuration', async () => {
