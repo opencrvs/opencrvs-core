@@ -23,7 +23,8 @@ import {
   WEB_USER_JWT_AUDIENCES,
   JWT_ISSUER,
   NOTIFICATION_API_USER_AUDIENCE,
-  VALIDATOR_API_USER_AUDIENCE
+  VALIDATOR_API_USER_AUDIENCE,
+  CHATBOT_API_USER_AUDIENCE
 } from '@auth/constants'
 
 interface IAuthPayload {
@@ -61,9 +62,15 @@ export default async function authenticateHandler(
   const isPendingUser = response.status && response.status === 'pending'
   const isNotificationAPIUser = result.scope.indexOf('notification-api') > -1
   const isValidatorAPIUser = result.scope.indexOf('validator-api') > -1
+  const isChatbotAPIUser = result.scope.indexOf('chatbot-api') > -1
 
-  // directly send the token if the user is pending or a Notification API user or a Validator API user
-  if (isPendingUser || isNotificationAPIUser || isValidatorAPIUser) {
+  // directly send the token if the user is pending or an API user
+  if (
+    isPendingUser ||
+    isNotificationAPIUser ||
+    isValidatorAPIUser ||
+    isChatbotAPIUser
+  ) {
     response.token = await createToken(
       result.userId,
       result.scope,
@@ -71,6 +78,8 @@ export default async function authenticateHandler(
         ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
         : isValidatorAPIUser
         ? WEB_USER_JWT_AUDIENCES.concat([VALIDATOR_API_USER_AUDIENCE])
+        : isChatbotAPIUser
+        ? WEB_USER_JWT_AUDIENCES.concat([CHATBOT_API_USER_AUDIENCE])
         : WEB_USER_JWT_AUDIENCES,
       JWT_ISSUER
     )
