@@ -847,6 +847,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
               reviewSkip: 0,
               rejectSkip: 0,
               approvalSkip: 0,
+              externalValidationSkip: 0,
               printSkip: 0
             }
           },
@@ -857,6 +858,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
               reviewTab: mockReviewTabData,
               rejectTab: { totalItems: 0, results: [] },
               approvalTab: { totalItems: 0, results: [] },
+              externalValidationTab: { totalItems: 0, results: [] },
               printTab: { totalItems: 0, results: [] }
             }
           }
