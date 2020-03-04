@@ -575,7 +575,8 @@ describe('RegistrationHome sent for review tab related tests', () => {
             reviewTab: mockReviewTabData,
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
+            printTab: { totalItems: 0, results: [] },
+            externalValidationTab: { totalItems: 0, results: [] }
           },
           initialSyncDone: true
         })

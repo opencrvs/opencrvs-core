@@ -101,7 +101,8 @@ describe('RegistrationHome related tests', () => {
           reviewTab: { totalItems: 3, results: [] },
           rejectTab: { totalItems: 4, results: [] },
           approvalTab: { totalItems: 0, results: [] },
-          printTab: { totalItems: 1, results: [] }
+          printTab: { totalItems: 1, results: [] },
+          externalValidationTab: { totalItems: 0, results: [] }
         }
       })
       client.query = mockListSyncController
@@ -189,7 +190,8 @@ describe('RegistrationHome related tests', () => {
           reviewTab: { totalItems: 0, results: [] },
           rejectTab: { totalItems: 0, results: [] },
           approvalTab: { totalItems: 0, results: [] },
-          printTab: { totalItems: 0, results: [] }
+          printTab: { totalItems: 0, results: [] },
+          externalValidationTab: { totalItems: 0, results: [] }
         }
       })
       client.query = mockListSyncController
@@ -449,7 +451,8 @@ describe('RegistrationHome related tests', () => {
           reviewTab: { totalItems: 13, results: [] },
           rejectTab: { totalItems: 14, results: [] },
           approvalTab: { totalItems: 10, results: [] },
-          printTab: { totalItems: 11, results: [] }
+          printTab: { totalItems: 11, results: [] },
+          externalValidationTab: { totalItems: 0, results: [] }
         }
       })
       client.query = mockListSyncController
