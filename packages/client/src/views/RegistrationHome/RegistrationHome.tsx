@@ -67,6 +67,8 @@ import { InProgressTab } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/review/reviewTab'
+import { StatusWaitingValidation } from '@opencrvs/components/lib/icons/StatusWaitingValidation'
+import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -81,6 +83,7 @@ export interface IQueryData {
   rejectTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
+  externalValidationTab: GQLEventSearchResultSet
 }
 
 export const IconTab = styled(Button)<IProps>`
@@ -166,6 +169,7 @@ interface IRegistrationHomeState {
   updatesCurrentPage: number
   approvalCurrentPage: number
   printCurrentPage: number
+  externalValidationCurrentPage: number
   showCertificateToast: boolean
 }
 
@@ -179,7 +183,8 @@ const TAB_ID = {
   readyForReview: 'review',
   sentForUpdates: 'updates',
   sentForApproval: 'approvals',
-  readyForPrint: 'print'
+  readyForPrint: 'print',
+  externalValidation: 'waitingValidation'
 }
 
 export const EVENT_STATUS = {
@@ -187,7 +192,8 @@ export const EVENT_STATUS = {
   DECLARED: 'DECLARED',
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
 export class RegistrationHomeView extends React.Component<
   IRegistrationHomeProps,
@@ -204,6 +210,7 @@ export class RegistrationHomeView extends React.Component<
       updatesCurrentPage: 1,
       approvalCurrentPage: 1,
       printCurrentPage: 1,
+      externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.applications.filter(
           item => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
@@ -219,6 +226,8 @@ export class RegistrationHomeView extends React.Component<
       this.state.updatesCurrentPage * this.pageSize,
       this.state.approvalCurrentPage * this.pageSize,
       this.state.printCurrentPage * this.pageSize,
+      this.state.externalValidationCurrentPage * this.pageSize,
+      0,
       0,
       0,
       0,
@@ -296,6 +305,11 @@ export class RegistrationHomeView extends React.Component<
           this.syncWorkqueue()
         })
         break
+      case TAB_ID.externalValidation:
+        this.setState(
+          { externalValidationCurrentPage: newPageNumber },
+          this.syncWorkqueue
+        )
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
     }
@@ -306,7 +320,8 @@ export class RegistrationHomeView extends React.Component<
     reviewCurrentPage: number,
     updatesCurrentPage: number,
     approvalCurrentPage: number,
-    printCurrentPage: number
+    printCurrentPage: number,
+    externalValidationCurrentPage: number
   ) => {
     const {
       workqueue,
@@ -373,6 +388,22 @@ export class RegistrationHomeView extends React.Component<
             {intl.formatMessage(messages.sentForUpdates)} (
             {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
           </IconTab>
+          <IconTab
+            id={`tab_${TAB_ID.externalValidation}`}
+            key={TAB_ID.externalValidation}
+            active={tabId === TAB_ID.externalValidation}
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <StatusWaitingValidation />}
+            onClick={() =>
+              this.props.goToRegistrarHomeTab(TAB_ID.externalValidation)
+            }
+          >
+            {intl.formatMessage(messages.waitingForExternalValidation)} (
+            {!initialSyncDone
+              ? '?'
+              : filteredData.externalValidationTab.totalItems}
+            )
+          </IconTab>
           {this.userHasValidateScope() && (
             <IconTab
               id={`tab_${TAB_ID.sentForApproval}`}
@@ -388,6 +419,7 @@ export class RegistrationHomeView extends React.Component<
               {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
             </IconTab>
           )}
+
           <IconTab
             id={`tab_${TAB_ID.readyForPrint}`}
             key={TAB_ID.readyForPrint}
@@ -444,6 +476,20 @@ export class RegistrationHomeView extends React.Component<
             error={error}
           />
         )}
+
+        {tabId === TAB_ID.externalValidation && (
+          <ExternalValidationTab
+            registrarLocationId={registrarLocationId}
+            queryData={{
+              data: filteredData.externalValidationTab
+            }}
+            showPaginated={this.showPaginated}
+            page={updatesCurrentPage}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
         {tabId === TAB_ID.sentForApproval && (
           <ApprovalTab
             registrarLocationId={registrarLocationId}
@@ -481,7 +527,8 @@ export class RegistrationHomeView extends React.Component<
       reviewCurrentPage,
       updatesCurrentPage,
       approvalCurrentPage,
-      printCurrentPage
+      printCurrentPage,
+      externalValidationCurrentPage
     } = this.state
 
     return (
@@ -493,7 +540,8 @@ export class RegistrationHomeView extends React.Component<
           reviewCurrentPage,
           updatesCurrentPage,
           approvalCurrentPage,
-          printCurrentPage
+          printCurrentPage,
+          externalValidationCurrentPage
         )}
 
         <FABContainer>
