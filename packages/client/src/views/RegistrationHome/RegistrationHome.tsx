@@ -477,19 +477,20 @@ export class RegistrationHomeView extends React.Component<
           />
         )}
 
-        {tabId === TAB_ID.externalValidation && (
-          <ExternalValidationTab
-            registrarLocationId={registrarLocationId}
-            queryData={{
-              data: filteredData.externalValidationTab
-            }}
-            showPaginated={this.showPaginated}
-            page={updatesCurrentPage}
-            onPageChange={this.onPageChange}
-            loading={loading}
-            error={error}
-          />
-        )}
+        {tabId === TAB_ID.externalValidation &&
+          window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+            <ExternalValidationTab
+              registrarLocationId={registrarLocationId}
+              queryData={{
+                data: filteredData.externalValidationTab
+              }}
+              showPaginated={this.showPaginated}
+              page={updatesCurrentPage}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
         {tabId === TAB_ID.sentForApproval && (
           <ApprovalTab
             registrarLocationId={registrarLocationId}
