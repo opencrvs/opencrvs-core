@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFilter } from '@search/features/search/types'
+import { IFilter, INameCombination } from '@search/features/search/types'
 const SEARCHABLE_FIELDS = [
   'childFirstNames',
   'childFamilyName',
@@ -83,8 +83,9 @@ export function queryBuilder(
   trackingId: string,
   contactNumber: string,
   registrationNumber: string,
+  eventLocationId: string,
+  gender: string,
   name: string,
-  nameFields: string[],
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -106,7 +107,7 @@ export function queryBuilder(
     must.push({
       multi_match: {
         query: name,
-        fields: nameFields,
+        fields: allNameFields,
         fuzziness: 'AUTO'
       }
     })
@@ -132,6 +133,26 @@ export function queryBuilder(
     must.push({
       term: {
         'registrationNumber.keyword': registrationNumber
+      }
+    })
+  }
+
+  if (gender !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'gender.keyword': gender
+      }
+    })
+  }
+
+  if (eventLocationId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'eventLocationId.keyword': {
+          value: eventLocationId,
+          // tslint:disable-next-line
+          boost: 2.0
+        }
       }
     })
   }
@@ -190,8 +211,132 @@ export function queryBuilder(
   }
 }
 
-export function selectNameFields(name: string): string[] {
-  switch (name) {
+export function combinationQueryBuilder(
+  trackingId: string,
+  contactNumber: string,
+  registrationNumber: string,
+  eventLocationId: string,
+  gender: string,
+  nameCombinations: INameCombination[],
+  applicationLocationId: string,
+  createdBy: string,
+  filters: IFilter
+) {
+  const must: any[] = []
+  const should: any[] = []
+
+  if (nameCombinations.length > 0) {
+    nameCombinations.forEach((nameCombination: INameCombination) => {
+      must.push({
+        multi_match: {
+          query: nameCombination.name,
+          fields: selectNameFields(nameCombination.fields),
+          fuzziness: 'AUTO'
+        }
+      })
+    })
+  }
+
+  if (trackingId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'trackingId.keyword': trackingId
+      }
+    })
+  }
+
+  if (contactNumber !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'contactNumber.keyword': contactNumber
+      }
+    })
+  }
+
+  if (registrationNumber !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'registrationNumber.keyword': registrationNumber
+      }
+    })
+  }
+
+  if (gender !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'gender.keyword': gender
+      }
+    })
+  }
+
+  if (eventLocationId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'eventLocationId.keyword': {
+          value: eventLocationId,
+          // tslint:disable-next-line
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (applicationLocationId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'applicationLocationId.keyword': {
+          value: applicationLocationId,
+          // tslint:disable-next-line
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (createdBy !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'createdBy.keyword': {
+          value: createdBy
+        }
+      }
+    })
+  }
+
+  if (filters.event !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'event.keyword': filters.event
+      }
+    })
+  }
+
+  if (filters.status) {
+    must.push({
+      terms: {
+        'type.keyword': filters.status
+      }
+    })
+  }
+
+  if (filters.type) {
+    must.push({
+      terms: {
+        'compositionType.keyword': filters.type
+      }
+    })
+  }
+
+  return {
+    bool: {
+      must,
+      should
+    }
+  }
+}
+
+function selectNameFields(fields: string): string[] {
+  switch (fields) {
     case 'CHILD':
       return childNameFields
     case 'FATHER':

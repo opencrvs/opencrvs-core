@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { queryBuilder, selectNameFields } from '@search/features/search/utils'
+import {
+  queryBuilder,
+  combinationQueryBuilder
+} from '@search/features/search/utils'
 
 describe('elasticsearch db helper', () => {
   it('should create a query that searches all name fields', () => {
@@ -18,8 +21,9 @@ describe('elasticsearch db helper', () => {
       'dummy',
       'dummy',
       'dummy',
+      'EMPTY_STRING',
+      'EMPTY_STRING',
       'some name',
-      selectNameFields('EMPTY_STRING'),
       'EMPTY_STRING',
       'EMPTY_STRING',
       {
@@ -103,6 +107,20 @@ describe('elasticsearch db helper', () => {
           },
           {
             term: {
+              'gender.keyword': 'EMPTY_STRING'
+            }
+          },
+          {
+            term: {
+              'eventLocationId.keyword': {
+                value: 'EMPTY_STRING',
+                // tslint:disable-next-line
+                boost: 2.0
+              }
+            }
+          },
+          {
+            term: {
               'applicationLocationId.keyword': {
                 value: 'EMPTY_STRING',
                 // tslint:disable-next-line
@@ -141,14 +159,23 @@ describe('elasticsearch db helper', () => {
     })
   })
 
-  it('should create a query that searches only child name fields', () => {
-    const newQuery = queryBuilder(
-      'some query',
+  it('should create a query that searches child and mother name fields and event location', () => {
+    const newQuery = combinationQueryBuilder(
       'dummy',
       'dummy',
       'dummy',
-      'some name',
-      selectNameFields('CHILD'),
+      'EMPTY_STRING',
+      'EMPTY_STRING',
+      [
+        {
+          name: 'child name',
+          fields: 'CHILD'
+        },
+        {
+          name: 'mother name',
+          fields: 'MOTHER'
+        }
+      ],
       'EMPTY_STRING',
       'EMPTY_STRING',
       {
@@ -162,31 +189,24 @@ describe('elasticsearch db helper', () => {
         must: [
           {
             multi_match: {
-              query: 'some query',
+              query: 'child name',
               fields: [
                 'childFirstNames',
                 'childFamilyName',
                 'childFirstNamesLocal',
-                'childFamilyNameLocal',
-                'deceasedFirstNames',
-                'deceasedFamilyName',
-                'deceasedFirstNamesLocal',
-                'deceasedFamilyNameLocal',
-                'trackingId',
-                'registrationNumber',
-                'contactNumber'
+                'childFamilyNameLocal'
               ],
               fuzziness: 'AUTO'
             }
           },
           {
             multi_match: {
-              query: 'some name',
+              query: 'mother name',
               fields: [
-                'childFirstNames',
-                'childFamilyName',
-                'childFirstNamesLocal',
-                'childFamilyNameLocal'
+                'motherFirstNames',
+                'motherFamilyName',
+                'motherFirstNamesLocal',
+                'motherFamilyNameLocal'
               ],
               fuzziness: 'AUTO'
             }
@@ -204,6 +224,20 @@ describe('elasticsearch db helper', () => {
           {
             term: {
               'registrationNumber.keyword': 'dummy'
+            }
+          },
+          {
+            term: {
+              'gender.keyword': 'EMPTY_STRING'
+            }
+          },
+          {
+            term: {
+              'eventLocationId.keyword': {
+                value: 'EMPTY_STRING',
+                // tslint:disable-next-line
+                boost: 2.0
+              }
             }
           },
           {

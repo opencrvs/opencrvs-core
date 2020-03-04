@@ -13,14 +13,18 @@ import { client } from '@search/elasticsearch/client'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import {
   queryBuilder,
-  EMPTY_STRING,
-  selectNameFields
+  combinationQueryBuilder,
+  EMPTY_STRING
 } from '@search/features/search/utils'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
+  return client.search(formatSearchParams(params))
+}
+
+export function formatSearchParams(params: ISearchQuery) {
   const {
     query = EMPTY_STRING,
     trackingId = EMPTY_STRING,
@@ -30,31 +34,56 @@ export const searchComposition = async (params: ISearchQuery) => {
     status,
     type,
     applicationLocationId = EMPTY_STRING,
+    eventLocationId = EMPTY_STRING,
+    gender = EMPTY_STRING,
     name = EMPTY_STRING,
-    specificName = EMPTY_STRING,
+    ageCheck = EMPTY_STRING,
+    nameCombinations = [],
     createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC
   } = params
-
-  return client.search({
-    type: DEFAULT_SEARCH_TYPE,
-    from,
-    size,
-    body: {
-      query: queryBuilder(
-        query,
-        trackingId,
-        contactNumber,
-        registrationNumber,
-        name,
-        selectNameFields(specificName),
-        applicationLocationId,
-        createdBy,
-        { event, status, type }
-      ),
-      sort: [{ dateOfApplication: sort }]
+  if (ageCheck === 'TRUE' && nameCombinations.length > 0) {
+    return {
+      type: DEFAULT_SEARCH_TYPE,
+      from,
+      size,
+      body: {
+        query: combinationQueryBuilder(
+          trackingId,
+          contactNumber,
+          registrationNumber,
+          eventLocationId,
+          gender,
+          nameCombinations,
+          applicationLocationId,
+          createdBy,
+          { event, status, type }
+        ),
+        sort: [{ dateOfApplication: sort }]
+      }
     }
-  })
+  } else {
+    return {
+      type: DEFAULT_SEARCH_TYPE,
+      from,
+      size,
+      body: {
+        query: queryBuilder(
+          query,
+          trackingId,
+          contactNumber,
+          registrationNumber,
+          eventLocationId,
+          gender,
+          name,
+          applicationLocationId,
+          createdBy,
+          { event, status, type }
+        ),
+        sort: [{ dateOfApplication: sort }]
+      }
+    }
+  }
 }
