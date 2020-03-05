@@ -102,12 +102,12 @@ describe('RegistrationHome related tests', () => {
           rejectTab: { totalItems: 4, results: [] },
           approvalTab: { totalItems: 0, results: [] },
           printTab: { totalItems: 1, results: [] },
-          externalValidationTab: { totalItems: 0, results: [] }
+          externalValidationTab: { totalItems: 6, results: [] }
         }
       })
       client.query = mockListSyncController
     })
-    it('renders page with four tabs', async () => {
+    it('renders page with five tabs', async () => {
       const testComponent = await createTestComponentWithApolloClient(
         // @ts-ignore
         <RegistrationHome match={{ params: { tabId: 'progress' } }} />,
@@ -136,6 +136,10 @@ describe('RegistrationHome related tests', () => {
         .simulate('click')
       app
         .find('#tab_print')
+        .hostNodes()
+        .simulate('click')
+      app
+        .find('#tab_waitingValidation')
         .hostNodes()
         .simulate('click')
     })
@@ -173,6 +177,12 @@ describe('RegistrationHome related tests', () => {
           .hostNodes()
           .text()
       ).toContain('Sent for updates (4)')
+      expect(
+        app
+          .find('#tab_waitingValidation')
+          .hostNodes()
+          .text()
+      ).toContain('Waiting for BRIS (6)')
       expect(
         app
           .find('#tab_print')
@@ -311,6 +321,22 @@ describe('RegistrationHome related tests', () => {
       testComponent.component.update()
       await waitForElement(testComponent.component, '#no-record')
     })
+
+    it('shows no-record message  in externalValidation tab', async () => {
+      const testComponent = await createTestComponentWithApolloClient(
+        // @ts-ignore
+        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        store,
+        client
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.component.update()
+      await waitForElement(testComponent.component, '#no-record')
+    })
   })
 
   describe('shows error message if error occurs while querying', () => {
@@ -440,6 +466,23 @@ describe('RegistrationHome related tests', () => {
         '#search-result-error-text-count'
       )
     })
+    it('shows error message  in externalValidation tab', async () => {
+      const testComponent = await createTestComponentWithApolloClient(
+        // @ts-ignore
+        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        store,
+        client
+      )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      await waitForElement(
+        testComponent.component,
+        '#search-result-error-text-count'
+      )
+    })
   })
 
   describe('when there are items more than 10', () => {
@@ -452,7 +495,7 @@ describe('RegistrationHome related tests', () => {
           rejectTab: { totalItems: 14, results: [] },
           approvalTab: { totalItems: 10, results: [] },
           printTab: { totalItems: 11, results: [] },
-          externalValidationTab: { totalItems: 0, results: [] }
+          externalValidationTab: { totalItems: 11, results: [] }
         }
       })
       client.query = mockListSyncController
@@ -524,6 +567,28 @@ describe('RegistrationHome related tests', () => {
         store,
         client
       )
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      await waitForElement(testComponent.component, '#load_more_button')
+      testComponent.component
+        .find('#load_more_button')
+        .last()
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+    })
+
+    it('shows loadmore in externalValidation tab', async () => {
+      const testComponent = await createTestComponentWithApolloClient(
+        // @ts-ignore
+        <RegistrationHome match={{ params: { tabId: 'waitingValidation' } }} />,
+        store,
+        client
+      )
+
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
         setTimeout(resolve, 100)

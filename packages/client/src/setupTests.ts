@@ -124,6 +124,7 @@ const navigatorMock = {
   COUNTRY: 'bgd',
   COUNTRY_LOGO_FILE: 'logo.png',
   LANGUAGES: 'en,bn',
+  EXTERNAL_VALIDATION_WORKQUEUE: true,
   LOGIN_URL: 'http://localhost:3020',
   RESOURCES_URL: 'http://localhost:3040/bgd',
   HEALTH_FACILITY_FILTER: 'UPAZILA',
