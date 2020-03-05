@@ -488,7 +488,7 @@ export class RegistrationHomeView extends React.Component<
                 data: filteredData.externalValidationTab
               }}
               showPaginated={this.showPaginated}
-              page={updatesCurrentPage}
+              page={externalValidationCurrentPage}
               onPageChange={this.onPageChange}
               loading={loading}
               error={error}
