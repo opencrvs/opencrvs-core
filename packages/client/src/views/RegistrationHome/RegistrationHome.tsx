@@ -310,6 +310,7 @@ export class RegistrationHomeView extends React.Component<
           { externalValidationCurrentPage: newPageNumber },
           this.syncWorkqueue
         )
+        break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
     }
@@ -388,22 +389,24 @@ export class RegistrationHomeView extends React.Component<
             {intl.formatMessage(messages.sentForUpdates)} (
             {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
           </IconTab>
-          <IconTab
-            id={`tab_${TAB_ID.externalValidation}`}
-            key={TAB_ID.externalValidation}
-            active={tabId === TAB_ID.externalValidation}
-            align={ICON_ALIGNMENT.LEFT}
-            icon={() => <StatusWaitingValidation />}
-            onClick={() =>
-              this.props.goToRegistrarHomeTab(TAB_ID.externalValidation)
-            }
-          >
-            {intl.formatMessage(messages.waitingForExternalValidation)} (
-            {!initialSyncDone
-              ? '?'
-              : filteredData.externalValidationTab.totalItems}
-            )
-          </IconTab>
+          {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+            <IconTab
+              id={`tab_${TAB_ID.externalValidation}`}
+              key={TAB_ID.externalValidation}
+              active={tabId === TAB_ID.externalValidation}
+              align={ICON_ALIGNMENT.LEFT}
+              icon={() => <StatusWaitingValidation />}
+              onClick={() =>
+                this.props.goToRegistrarHomeTab(TAB_ID.externalValidation)
+              }
+            >
+              {intl.formatMessage(messages.waitingForExternalValidation)} (
+              {!initialSyncDone
+                ? '?'
+                : filteredData.externalValidationTab.totalItems}
+              )
+            </IconTab>
+          )}
           {this.userHasValidateScope() && (
             <IconTab
               id={`tab_${TAB_ID.sentForApproval}`}

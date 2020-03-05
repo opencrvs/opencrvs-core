@@ -28,6 +28,7 @@ import moment from 'moment'
 import { connect } from 'react-redux'
 import { goToPage, goToApplicationDetails } from '@client/navigation'
 import { RowHistoryView } from '@client/views/RegistrationHome/RowHistoryView'
+import { LoadingIndicator } from '@client/views/RegistrationHome/LoadingIndicator'
 
 const { useState, useEffect } = React
 
@@ -181,6 +182,10 @@ function ExternalValidationTabComponent(props: IProps) {
         loading={props.loading}
         loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
         columns={columns}
+      />
+      <LoadingIndicator
+        loading={Boolean(props.loading)}
+        hasError={Boolean(props.error)}
       />
     </HomeContent>
   )
