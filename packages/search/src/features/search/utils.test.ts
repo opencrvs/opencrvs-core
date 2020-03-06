@@ -169,11 +169,11 @@ describe('elasticsearch db helper', () => {
       [
         {
           name: 'child name',
-          fields: 'CHILD'
+          fields: 'CHILD_FIRST'
         },
         {
           name: 'mother name',
-          fields: 'MOTHER'
+          fields: 'MOTHER_FIRST'
         }
       ],
       'EMPTY_STRING',
@@ -190,24 +190,14 @@ describe('elasticsearch db helper', () => {
           {
             multi_match: {
               query: 'child name',
-              fields: [
-                'childFirstNames',
-                'childFamilyName',
-                'childFirstNamesLocal',
-                'childFamilyNameLocal'
-              ],
+              fields: ['childFirstNames', 'childFirstNamesLocal'],
               fuzziness: 'AUTO'
             }
           },
           {
             multi_match: {
               query: 'mother name',
-              fields: [
-                'motherFirstNames',
-                'motherFamilyName',
-                'motherFirstNamesLocal',
-                'motherFamilyNameLocal'
-              ],
+              fields: ['motherFirstNames', 'motherFirstNamesLocal'],
               fuzziness: 'AUTO'
             }
           },

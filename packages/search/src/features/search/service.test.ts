@@ -230,11 +230,11 @@ describe('elasticsearch params formatter', () => {
       nameCombinations: [
         {
           name: 'child name',
-          fields: 'CHILD'
+          fields: 'CHILD_FAMILY'
         },
         {
           name: 'mother name',
-          fields: 'MOTHER'
+          fields: 'MOTHER_FAMILY'
         }
       ],
       createdBy: 'EMPTY_STRING',
@@ -254,24 +254,14 @@ describe('elasticsearch params formatter', () => {
               {
                 multi_match: {
                   query: 'child name',
-                  fields: [
-                    'childFirstNames',
-                    'childFamilyName',
-                    'childFirstNamesLocal',
-                    'childFamilyNameLocal'
-                  ],
+                  fields: ['childFamilyName', 'childFamilyNameLocal'],
                   fuzziness: 'AUTO'
                 }
               },
               {
                 multi_match: {
                   query: 'mother name',
-                  fields: [
-                    'motherFirstNames',
-                    'motherFamilyName',
-                    'motherFirstNamesLocal',
-                    'motherFamilyNameLocal'
-                  ],
+                  fields: ['motherFamilyName', 'motherFamilyNameLocal'],
                   fuzziness: 'AUTO'
                 }
               },

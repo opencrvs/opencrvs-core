@@ -35,7 +35,8 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  selectObservationEntry
+  selectObservationEntry,
+  findLocation
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from 'hapi'
@@ -150,7 +151,7 @@ async function createIndexBody(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  createChildIndex(body, composition, bundleEntries)
+  await createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
   createInformantIndex(body, composition, bundleEntries)
@@ -160,22 +161,23 @@ async function createIndexBody(
   await createStatusHistory(body, task, authHeader)
 }
 
-function createChildIndex(
+async function createChildIndex(
   body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
+  // console.log('SEARCH COMPOSITION: ', JSON.stringify(composition))
   const child = findEntry(
     CHILD_CODE,
     composition,
     bundleEntries
   ) as fhir.Patient
 
-  const birthEncounter = findEntry(
+  const birthLocation = (await findLocation(
     BIRTH_ENCOUNTER_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Encounter
+    composition
+  )) as fhir.Location
+  // console.log('BIRTH LOCATION: ', birthLocation)
 
   const childName = child && findName(NAME_EN, child.name)
   const childNameLocal = child && findNameLocale(child.name)
@@ -190,10 +192,8 @@ function createChildIndex(
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
   body.eventLocationId =
-    birthEncounter &&
-    birthEncounter.location &&
-    birthEncounter.location[0].location.reference &&
-    birthEncounter.location[0].location.reference.split('/')[1]
+    birthLocation && birthLocation.address && birthLocation.address.district
+  // console.log('eventLocationId: ', body.eventLocationId)
 }
 
 function createMotherIndex(
@@ -399,6 +399,7 @@ async function createApplicationIndex(
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
+  // console.log('TYPE IN SEARCH: ', body.type)
   body.dateOfApplication = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =

@@ -69,6 +69,18 @@ async function sendBundleToHearth(
   return res.json()
 }
 
+function getSectionFromResponse(response: fhir.Bundle, reference: string) {
+  return (
+    response.entry &&
+    response.entry.filter(o => {
+      const res = o.response as fhir.BundleEntryResponse
+      return Object.keys(res).some(k =>
+        res[k].toLowerCase().includes(reference.toLowerCase())
+      )
+    })
+  )
+}
+
 function populateCompositionWithID(
   payload: fhir.Bundle,
   response: fhir.Bundle
@@ -79,15 +91,35 @@ function populateCompositionWithID(
     payload.entry[0].resource &&
     payload.entry[0].resource.resourceType === 'Composition'
   ) {
-    if (!payload.entry[0].resource.id) {
-      payload.entry[0].resource.id =
+    const responseEncounterSection = getSectionFromResponse(
+      response,
+      'Encounter'
+    )
+    const composition = payload.entry[0].resource as fhir.Composition
+    if (
+      composition.section &&
+      composition.section[3] &&
+      composition.section[3].entry &&
+      responseEncounterSection &&
+      responseEncounterSection[0] &&
+      responseEncounterSection[0].response &&
+      responseEncounterSection[0].response.location
+    ) {
+      composition.section[3].entry[0].reference = responseEncounterSection[0].response.location.split(
+        '/'
+      )[3]
+    }
+    if (!composition.id) {
+      composition.id =
         response &&
         response.entry &&
         response.entry[0].response &&
         response.entry[0].response.location &&
         response.entry[0].response.location.split('/')[3]
     }
+    payload.entry[0].resource = composition
   }
+  // console.log('AMENDED PAYLOAD', JSON.stringify(payload))
 }
 
 export async function createRegistrationHandler(

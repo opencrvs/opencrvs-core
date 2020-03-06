@@ -55,26 +55,17 @@ const allNameFields = [
   'spouseFamilyNameLocal'
 ]
 
-const childNameFields = [
-  'childFirstNames',
-  'childFamilyName',
-  'childFirstNamesLocal',
-  'childFamilyNameLocal'
-]
+const childFirstNameFields = ['childFirstNames', 'childFirstNamesLocal']
 
-const motherNameFields = [
-  'motherFirstNames',
-  'motherFamilyName',
-  'motherFirstNamesLocal',
-  'motherFamilyNameLocal'
-]
+const motherFirstNameFields = ['motherFirstNames', 'motherFirstNamesLocal']
 
-const fatherNameFields = [
-  'fatherFirstNames',
-  'fatherFamilyName',
-  'fatherFirstNamesLocal',
-  'fatherFamilyNameLocal'
-]
+const fatherFirstNameFields = ['fatherFirstNames', 'fatherFirstNamesLocal']
+
+const childFamilyNameFields = ['childFamilyName', 'childFamilyNameLocal']
+
+const motherFamilyNameFields = ['motherFamilyName', 'motherFamilyNameLocal']
+
+const fatherFamilyNameFields = ['fatherFamilyName', 'fatherFamilyNameLocal']
 
 export const EMPTY_STRING = ''
 
@@ -337,12 +328,18 @@ export function combinationQueryBuilder(
 
 function selectNameFields(fields: string): string[] {
   switch (fields) {
-    case 'CHILD':
-      return childNameFields
-    case 'FATHER':
-      return fatherNameFields
-    case 'MOTHER':
-      return motherNameFields
+    case 'CHILD_FIRST':
+      return childFirstNameFields
+    case 'CHILD_FAMILY':
+      return childFamilyNameFields
+    case 'FATHER_FIRST':
+      return fatherFirstNameFields
+    case 'FATHER_FAMILY':
+      return fatherFamilyNameFields
+    case 'MOTHER_FIRST':
+      return motherFirstNameFields
+    case 'MOTHER_FAMILY':
+      return motherFamilyNameFields
     default:
       return allNameFields
   }

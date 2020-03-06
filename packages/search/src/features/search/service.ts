@@ -21,7 +21,9 @@ const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
-  return client.search(formatSearchParams(params))
+  const searchParams = formatSearchParams(params)
+  // console.log('SEARCH PARAMS', JSON.stringify(searchParams))
+  return client.search(searchParams)
 }
 
 export function formatSearchParams(params: ISearchQuery) {
