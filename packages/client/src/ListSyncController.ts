@@ -19,11 +19,13 @@ export async function syncRegistrarWorkqueue(
   reviewCount: number,
   rejectCount: number,
   approvalCount: number,
+  externalValidationCount: number,
   printCount: number,
   inProgressSkip: number,
   reviewSkip: number,
   rejectSkip: number,
   approvalSkip: number,
+  externalValidationSkip: number,
   printSkip: number
 ) {
   try {
@@ -36,12 +38,14 @@ export async function syncRegistrarWorkqueue(
         reviewCount,
         rejectCount,
         approvalCount,
+        externalValidationCount,
         printCount,
         reviewStatuses: reviewStatuses,
         inProgressSkip: inProgressSkip,
         reviewSkip: reviewSkip,
         rejectSkip: rejectSkip,
         approvalSkip: approvalSkip,
+        externalValidationSkip: externalValidationSkip,
         printSkip: printSkip
       },
       fetchPolicy: 'no-cache'

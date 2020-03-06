@@ -67,12 +67,14 @@ export const REGISTRATION_HOME_QUERY = gql`
     $reviewCount: Int
     $rejectCount: Int
     $approvalCount: Int
+    $externalValidationCount: Int
     $printCount: Int
     $inProgressSkip: Int
     $reviewStatuses: [String]
     $reviewSkip: Int
     $rejectSkip: Int
     $approvalSkip: Int
+    $externalValidationSkip: Int
     $printSkip: Int
   ) {
     inProgressTab: searchEvents(
@@ -126,6 +128,17 @@ export const REGISTRATION_HOME_QUERY = gql`
       status: ["VALIDATED"]
       count: $approvalCount
       skip: $approvalSkip
+    ) {
+      totalItems
+      results {
+        ${allSearchFields}
+      }
+    }
+    externalValidationTab: searchEvents(
+      locationIds: $locationIds
+      status: ["WAITING_VALIDATION"]
+      count: $externalValidationCount
+      skip: $externalValidationSkip
     ) {
       totalItems
       results {
