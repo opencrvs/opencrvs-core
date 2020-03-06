@@ -17,17 +17,20 @@ import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { MonthlyReports } from './MonthlyReports'
 
-type Props = WrappedComponentProps & { reportType: string }
-
+type Props = WrappedComponentProps & {
+  reportType: string
+} & RouteComponentProps
 type State = {}
 
 class ReportListComponent extends React.Component<Props, State> {
   render() {
-    const { reportType } = this.props
+    const { reportType, history } = this.props
 
     return (
       <PerformanceContentWrapper tabId={reportType}>
-        {reportType === PERFORMANCE_REPORT_TYPE_MONTHLY && <MonthlyReports />}
+        {reportType === PERFORMANCE_REPORT_TYPE_MONTHLY && (
+          <MonthlyReports history={history} />
+        )}
       </PerformanceContentWrapper>
     )
   }
@@ -37,10 +40,11 @@ function mapStateToProps(
   state: State,
   props: RouteComponentProps<{ reportType: string }>
 ) {
-  const { match } = props
+  const { match, history } = props
 
   return {
-    reportType: match.params.reportType || PERFORMANCE_REPORT_TYPE_MONTHLY
+    reportType: match.params.reportType || PERFORMANCE_REPORT_TYPE_MONTHLY,
+    history
   }
 }
 
