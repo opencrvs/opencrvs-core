@@ -18,7 +18,7 @@ import { ReportList } from './ReportList'
 import { MonthlyReports } from './MonthlyReports'
 
 describe('Report list', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   let app: ReactWrapper
 
   describe('Report list with defined param', () => {
@@ -34,6 +34,7 @@ describe('Report list', () => {
             path: '',
             url: ''
           }}
+          history={history}
         />,
         store
       )).component
@@ -49,7 +50,7 @@ describe('Report list', () => {
     beforeAll(async () => {
       app = (await createTestComponent(
         // @ts-ignore
-        <ReportList match={{ params: {} }} />,
+        <ReportList match={{ params: {} }} history={history} />,
         store
       )).component
       app.update()
