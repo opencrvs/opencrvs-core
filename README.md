@@ -88,7 +88,7 @@ As the sole continuous source of population data, it provides the foundation for
 
 </p>
 
-OpenCRVS has the potential to go well beyond the scope of traditional CRVS systems. We see OpenCRVS as a foundational identity and population data system which will support and maintain the integrity of many other service delivery, statistical and identity management functions. In particular, OpenCRVS will ensure that these functions are above all inclusive, providing a digital response to the global call to [“Leave No One Behind”](https://sustainabledevelopment.un.org/content/documents/2754713_July_PM_2._Leaving_no_one_behind_Summary_from_UN_Committee_for_Development_Policy.pdf - U.N. Sustainable Development Goals).
+OpenCRVS has the potential to go well beyond the scope of traditional CRVS systems. We see OpenCRVS as a foundational identity and population data system which will support and maintain the integrity of many other service delivery, statistical and identity management functions. In particular, OpenCRVS will ensure that these functions are above all inclusive, providing a digital response to the global call to [“Leave No One Behind”](https://sustainabledevelopment.un.org/content/documents/2754713_July_PM_2._Leaving_no_one_behind_Summary_from_UN_Committee_for_Development_Policy.pdf) - U.N. Sustainable Development Goals.
 
 We believe in the open source principle and its potential to achieve universal civil registration and advance children’s rights, and equality for girls.
 
