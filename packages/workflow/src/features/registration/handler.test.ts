@@ -223,55 +223,6 @@ describe('Verify handler', () => {
         [upazilaMock, { status: 200 }],
         [unionMock, { status: 200 }],
         [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'requested',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'birth-registration'
-                      }
-                    ]
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/paper-form-id',
-                      value: '12345678'
-                    },
-                    {
-                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                      value: 'B5WGYJE'
-                    }
-                  ],
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/contact-person',
-                      valueString: 'MOTHER'
-                    }
-                  ],
-                  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-                }
-              }
-            ]
-          })
-        ],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -319,45 +270,6 @@ describe('Verify handler', () => {
         [upazilaMock, { status: 200 }],
         [unionMock, { status: 200 }],
         [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            entry: [
-              {
-                fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'requested',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'death-registration'
-                      }
-                    ]
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                      value: 'B5WGYJE'
-                    }
-                  ],
-                  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-                }
-              }
-            ]
-          })
-        ],
         [
           JSON.stringify({
             resourceType: 'Bundle',

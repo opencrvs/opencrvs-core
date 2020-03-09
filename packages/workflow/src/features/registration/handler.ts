@@ -169,7 +169,6 @@ export async function createRegistrationHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-
     if (isEventNonNotifiable(event)) {
       return resBundle
     }

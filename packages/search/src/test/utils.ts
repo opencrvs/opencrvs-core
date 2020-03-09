@@ -3521,6 +3521,19 @@ export const mockUserModelResponse = {
   creationDate: 1574952940762
 }
 
+export const mockEncounterResponse = {
+  resourceType: 'Encounter',
+  status: 'finished',
+  id: 'd3b9f408-a16a-42c2-9cfe-53ad2fbfda99',
+  location: [
+    { location: { reference: 'Location/43f49a50-d8f4-4f30-ba84-6bc7bc181b67' } }
+  ],
+  meta: {
+    lastUpdated: '2020-03-09T10:20:36.532+00:00',
+    versionId: 'e927451f-e19f-40dd-be7b-5b6c50c26d9d'
+  }
+}
+
 export const mockLocationResponse = {
   resourceType: 'Location',
   identifier: [
