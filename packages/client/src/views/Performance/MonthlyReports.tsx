@@ -35,6 +35,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
+import { RouteComponentProps } from 'react-router'
 
 interface ReportProps {
   goToPerformanceReport: typeof goToPerformanceReport
@@ -66,7 +67,9 @@ function downloadAllData() {
     })
 }
 
-type Props = ReportProps & WrappedComponentProps
+type Props = ReportProps &
+  WrappedComponentProps &
+  Pick<RouteComponentProps, 'history'>
 
 interface IState {
   selectedLocation: ISearchLocation | undefined
@@ -76,7 +79,10 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      selectedLocation: undefined
+      selectedLocation:
+        (props.history.location.state &&
+          props.history.location.state.selectedLocation) ||
+        undefined
     }
   }
   getContent(eventType: Event) {
@@ -117,6 +123,26 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
     return content
   }
 
+  pushStateToTheCurrentRoute = (state: object) => {
+    const {
+      push,
+      location: { pathname: currentRoute }
+    } = this.props.history
+    return push(currentRoute, state)
+  }
+
+  onClickSearchResult = (item: ISearchLocation) => {
+    this.setState(
+      {
+        selectedLocation: item
+      },
+      () =>
+        this.pushStateToTheCurrentRoute({
+          selectedLocation: item
+        })
+    )
+  }
+
   render() {
     const { intl, offlineResources } = this.props
 
@@ -125,12 +151,9 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
         <Header>{intl.formatMessage(messages.monthlyReportsBodyHeader)}</Header>
 
         <LocationSearch
+          selectedLocation={this.state.selectedLocation}
           locationList={generateLocations(offlineResources.locations)}
-          searchHandler={item => {
-            this.setState({
-              selectedLocation: item
-            })
-          }}
+          searchHandler={this.onClickSearchResult}
         />
 
         <StyledDiv>
