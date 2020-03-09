@@ -597,7 +597,8 @@ describe('RegistrationHome sent for update tab related tests', () => {
               ]
             },
             approvalTab: { totalItems: 0, results: [] },
-            printTab: { totalItems: 0, results: [] }
+            printTab: { totalItems: 0, results: [] },
+            externalValidationTab: { totalItems: 0, results: [] }
           }
         })
         .mockReturnValueOnce({

@@ -402,7 +402,8 @@ const workqueueInitialState = {
       reviewTab: { totalItems: 0, results: [] },
       rejectTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
-      printTab: { totalItems: 0, results: [] }
+      printTab: { totalItems: 0, results: [] },
+      externalValidationTab: { totalItems: 0, results: [] }
     },
     initialSyncDone: false
   }
@@ -1461,6 +1462,10 @@ export function filterProcessingApplicationsFromQuery(
     ),
     printTab: filterProcessingApplications(
       queryData.printTab,
+      processingApplicationIds
+    ),
+    externalValidationTab: filterProcessingApplications(
+      queryData.externalValidationTab,
       processingApplicationIds
     )
   }
