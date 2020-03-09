@@ -166,7 +166,6 @@ async function createChildIndex(
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  // console.log('SEARCH COMPOSITION: ', JSON.stringify(composition))
   const child = findEntry(
     CHILD_CODE,
     composition,
@@ -177,7 +176,6 @@ async function createChildIndex(
     BIRTH_ENCOUNTER_CODE,
     composition
   )) as fhir.Location
-  // console.log('BIRTH LOCATION: ', birthLocation)
 
   const childName = child && findName(NAME_EN, child.name)
   const childNameLocal = child && findNameLocale(child.name)
@@ -193,7 +191,6 @@ async function createChildIndex(
   body.gender = child && child.gender
   body.eventLocationId =
     birthLocation && birthLocation.address && birthLocation.address.district
-  // console.log('eventLocationId: ', body.eventLocationId)
 }
 
 function createMotherIndex(
@@ -399,7 +396,6 @@ async function createApplicationIndex(
     task.businessStatus &&
     task.businessStatus.coding &&
     task.businessStatus.coding[0].code
-  // console.log('TYPE IN SEARCH: ', body.type)
   body.dateOfApplication = task && task.lastModified
   body.trackingId = trackingIdIdentifier && trackingIdIdentifier.value
   body.registrationNumber =

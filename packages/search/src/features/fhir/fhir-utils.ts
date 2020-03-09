@@ -89,7 +89,6 @@ export async function findLocation(
   const data = await getFromFhir(
     `/Encounter/${encounterSection.entry[0].reference}`
   )
-  // console.log('ENCOUNTER DATA: ', JSON.stringify(data))
 
   if (!data || !data.location || !data.location[0].location) {
     return null
@@ -187,7 +186,6 @@ function existsAsDuplicate(
 }
 
 export const getFromFhir = (suffix: string) => {
-  // console.log('GETTING FROM FHIR: ', `${HEARTH_URL}${suffix}`)
   return fetch(`${HEARTH_URL}${suffix}`, {
     headers: {
       'Content-Type': 'application/json+fhir'
