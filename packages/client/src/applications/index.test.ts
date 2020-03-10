@@ -106,6 +106,10 @@ describe('query result filtering tests', () => {
             { id: 'CERTIFYING' }
           ],
           totalItems: 5
+        },
+        externalValidationTab: {
+          results: [{ id: 'WAITING_FOR_VALIDATION' }],
+          totalItems: 1
         }
       }
 
@@ -214,6 +218,10 @@ describe('query result filtering tests', () => {
         printTab: {
           results: [{ id: 'CERTIFIED' }, { id: 'FAILED' }],
           totalItems: 2
+        },
+        externalValidationTab: {
+          results: [{ id: 'WAITING_FOR_VALIDATION' }],
+          totalItems: 1
         }
       })
     })

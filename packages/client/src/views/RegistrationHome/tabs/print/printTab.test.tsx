@@ -461,7 +461,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
             reviewTab: { totalItems: 0, results: [] },
             rejectTab: { totalItems: 0, results: [] },
             approvalTab: { totalItems: 0, results: [] },
-            printTab: mockPrintTabData
+            printTab: mockPrintTabData,
+            externalValidationTab: { totalItems: 0, results: [] }
           }
         })
         .mockReturnValueOnce({

@@ -24,11 +24,10 @@ const Container = styled.div`
   align-items: center;
   margin-left: 1px;
   padding-left: 8px;
-  min-width: 144px;
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin-left: 0px;
     padding-left: 0px;
-    min-width: 64px;
   }
 `
 const ListItemSingleAction = styled(PrimaryButton)<{
