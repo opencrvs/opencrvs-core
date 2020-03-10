@@ -1677,6 +1677,69 @@ export const deathTaskMock = JSON.stringify({
   id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
 })
 
+export const hearthResponseMock = JSON.stringify({
+  resourceType: 'Bundle',
+  entry: [
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Composition/d10947db-51e1-4f47-a5e1-3f9d1b58eee8/_history/2a70a1cd-fd08-4eab-a134-39769e34d41e'
+      }
+    },
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Encounter/d3b9f408-a16a-42c2-9cfe-53ad2fbfda99/_history/e927451f-e19f-40dd-be7b-5b6c50c26d9d'
+      }
+    },
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Observation/d617505b-047f-459f-b486-9eb7c3fb0a82/_history/e3264e1a-4a74-45e1-891d-7d27c7eb45a4'
+      }
+    },
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Task/fb4a19b4-8f5f-4660-98a5-0a149d1580b3/_history/2482bf54-673a-4d80-a1ce-07c921820efb'
+      }
+    },
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Patient/f814a8d6-abd4-4ccd-8ed9-235e0908edfc/_history/e26f454e-f55f-43fb-92c4-25c9d88d5b2a'
+      }
+    },
+    {
+      response: {
+        status: '200',
+        location:
+          '/fhir/Patient/5de966c5-cc82-47a4-9676-4ea66285c3be/_history/fb4947b8-f541-4afb-a797-7c859d5a7c33'
+      }
+    },
+    {
+      response: {
+        status: '201',
+        location:
+          '/fhir/RelatedPerson/8ca66791-362d-479d-8eb9-13d1929139dc/_history/4a1a9be8-fca4-4b6c-b097-5277c3d15ff3'
+      }
+    },
+    {
+      response: {
+        status: '201',
+        location:
+          '/fhir/Location/43f49a50-d8f4-4f30-ba84-6bc7bc181b67/_history/139f61a3-7a3a-4532-8392-7094de3f1d80'
+      }
+    }
+  ],
+  type: 'transaction-response'
+})
+
 export const relatedPersonMock = JSON.stringify({
   resourceType: 'RelatedPerson',
   relationship: {

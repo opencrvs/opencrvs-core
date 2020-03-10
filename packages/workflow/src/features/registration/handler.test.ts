@@ -32,6 +32,7 @@ import {
   taskResouceMock,
   deathTaskMock,
   relatedPersonMock,
+  hearthResponseMock,
   wrapInBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
@@ -317,11 +318,7 @@ describe('Verify handler', () => {
         [upazilaMock, { status: 200 }],
         [unionMock, { status: 200 }],
         [officeMock, { status: 200 }],
-        [fieldAgentPractitionerRoleMock, { status: 200 }],
-        [districtMock, { status: 200 }],
-        [upazilaMock, { status: 200 }],
-        [unionMock, { status: 200 }],
-        [officeMock, { status: 200 }],
+        [hearthResponseMock, { status: 200 }],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -875,11 +872,7 @@ describe('markEventAsRegisteredHandler handler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
-      [fieldAgentPractitionerRoleMock, { status: 200 }],
-      [districtMock, { status: 200 }],
-      [upazilaMock, { status: 200 }],
-      [unionMock, { status: 200 }],
-      [officeMock, { status: 200 }]
+      [hearthResponseMock, { status: 200 }]
     )
   })
 
