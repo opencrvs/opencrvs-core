@@ -10,7 +10,8 @@
 set -e
 
 print_usage_and_exit () {
-    echo 'Usage: ./export-registrations.sh HOST TOKEN'
+    echo 'Usage: ./export-registrations.sh DAYS_AGO HOST TOKEN'
+    echo "  DAYS_AGO from current date"    
     echo '  HOST   is the server where OpenCRVS is deployed to e.g. gateway.opencrvsbd.org || localhost:7070'
     echo "  TOKEN  of system admin user (sysadmin scope required)"    
     exit 1
@@ -36,8 +37,6 @@ TOKEN=$3
 
 DAYS_AGO=$(date -v-$1d +"%Y-%m-%dT%H:%M:%SZ")
 TODAY=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-EXPORT_URL="http://$HOST/registrations/export?fromDate=$DAYS_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
-
-curl $EXPORT_URL -fo export.zip
+EXPORT_URL="https://gateway.$HOST/registrations/export?fromDate=$DAYS_AGO&toDate=$TODAY&token=Bearer%20$TOKEN"
+curl -k -H "Authorization: Bearer $TOKEN" $EXPORT_URL -fo export.zip
 
