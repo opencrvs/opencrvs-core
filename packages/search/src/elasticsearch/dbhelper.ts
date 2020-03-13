@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { client } from '@search/elasticsearch/client'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
+import { ApiResponse } from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
@@ -52,7 +53,9 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchComposition = async (body: ICompositionBody) => {
+export const searchComposition = async (
+  body: ICompositionBody
+): Promise<ApiResponse<ISearchResponse<any>> | null> => {
   try {
     const response = client.search({
       index: 'ocrvs',
@@ -67,7 +70,9 @@ export const searchComposition = async (body: ICompositionBody) => {
   }
 }
 
-export const searchByCompositionId = async (compositionId: string) => {
+export const searchByCompositionId = async (
+  compositionId: string
+): Promise<ApiResponse<ISearchResponse<any>> | null> => {
   try {
     const response = await client.search({
       index: 'ocrvs',

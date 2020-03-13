@@ -20,7 +20,8 @@ import {
   findTaskExtension,
   getFromFhir
 } from '@search/features/fhir/fhir-utils'
-import { SearchResponse } from 'elasticsearch'
+import { ISearchResponse } from '@search/elasticsearch/client'
+import { ApiResponse } from '@elastic/elasticsearch'
 import fetch from 'node-fetch'
 
 export const enum EVENT {
@@ -142,13 +143,13 @@ export async function detectDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId)
-  const result = results?.hits?.hits?.[0]?._source as ICompositionBody
+  const result = results?.body.hits.hits[0]._source as ICompositionBody
   return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
   const results = await searchByCompositionId(compositionId)
-  const result = results?.hits?.hits?.[0]?._source as ICompositionBody
+  const result = results?.body.hits.hits[0]._source as ICompositionBody
   return result?.operationHistories as IOperationHistory[]
 }
 
@@ -221,9 +222,9 @@ function isNotification(body: ICompositionBody): boolean {
 
 function findDuplicateIds(
   compositionIdentifier: string,
-  results: SearchResponse<unknown> | null
+  results: ApiResponse<ISearchResponse<any>> | null
 ) {
-  const hits = (results && results.hits.hits) || []
+  const hits = (results && results.body.hits.hits) || []
   return hits
     .filter(
       hit =>

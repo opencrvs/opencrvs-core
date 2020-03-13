@@ -85,6 +85,7 @@ describe('elasticsearch params formatter', () => {
     expect(params).toEqual({
       type: 'compositions',
       from: 0,
+      index: 'ocrvs',
       size: 10,
       body: {
         query: {
@@ -246,6 +247,7 @@ describe('elasticsearch params formatter', () => {
     expect(params).toEqual({
       type: 'compositions',
       from: 0,
+      index: 'ocrvs',
       size: 10,
       body: {
         query: {

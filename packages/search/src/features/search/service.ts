@@ -9,19 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { client } from '@search/elasticsearch/client'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import {
   queryBuilder,
   combinationQueryBuilder,
   EMPTY_STRING
 } from '@search/features/search/utils'
+import { internal } from 'boom'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
-  return client.search(formatSearchParams(params))
+  const formattedParams = formatSearchParams(params)
+  let response: ApiResponse<ISearchResponse<any>>
+  try {
+    // NOTE: we are using the destructuring assignment
+    response = await client.search(formattedParams, {
+      ignore: [404]
+    })
+  } catch (err) {
+    if (err.statusCode === 400) {
+      throw internal('Search: bad request')
+    } else {
+      throw internal('Search error: ', err)
+    }
+  }
+  return response
 }
 
 export function formatSearchParams(params: ISearchQuery) {
@@ -46,6 +62,7 @@ export function formatSearchParams(params: ISearchQuery) {
   } = params
   if (ageCheck === 'TRUE' && nameCombinations.length > 0) {
     return {
+      index: 'ocrvs',
       type: DEFAULT_SEARCH_TYPE,
       from,
       size,
@@ -66,6 +83,7 @@ export function formatSearchParams(params: ISearchQuery) {
     }
   } else {
     return {
+      index: 'ocrvs',
       type: DEFAULT_SEARCH_TYPE,
       from,
       size,
