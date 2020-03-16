@@ -66,6 +66,7 @@ export const searchComposition = async (
     })
     return response
   } catch (err) {
+    logger.error(`searchComposition: error: ${err}`)
     return null
   }
 }
@@ -87,6 +88,7 @@ export const searchByCompositionId = async (
     })
     return response
   } catch (err) {
+    logger.error(`searchByCompositionId: error: ${err}`)
     return null
   }
 }

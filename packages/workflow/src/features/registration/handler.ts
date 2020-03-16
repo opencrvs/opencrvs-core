@@ -169,6 +169,7 @@ export async function createRegistrationHandler(
       )
     }
     const resBundle = await sendBundleToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
     if (
       event === Events.BIRTH_NEW_WAITING_VALIDATION ||
       event === Events.DEATH_NEW_WAITING_VALIDATION
@@ -177,7 +178,6 @@ export async function createRegistrationHandler(
       // validate registration with resource service and set resulting registration number
       invokeRegistrationValidation(payload, getToken(request))
     }
-    populateCompositionWithID(payload, resBundle)
     if (isEventNonNotifiable(event)) {
       return resBundle
     }
@@ -325,6 +325,7 @@ export async function markEventAsWaitingValidationHandler(
     )
     const resBundle = await postToHearth(payload)
     populateCompositionWithID(payload, resBundle)
+    invokeRegistrationValidation(payload, getToken(request))
 
     return resBundle
   } catch (error) {
