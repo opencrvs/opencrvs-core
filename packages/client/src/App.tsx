@@ -54,6 +54,7 @@ import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCe
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReportList } from '@client/views/Performance/ReportList'
 import { Report } from '@client/views/Performance/Report'
+import { EventInfo } from '@client/views/EventInfo/EventInfo'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -123,6 +124,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.SELECT_VITAL_EVENT}
                                             component={SelectVitalEvent}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.EVENT_INFO}
+                                            component={EventInfo}
                                           />
                                           <ProtectedRoute
                                             exact
