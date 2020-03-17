@@ -26,7 +26,7 @@
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
-    "hapi-sentry": "^2.1.0",
+    "hapi-sentry": "^3.0.0",
     "influx": "^5.0.7",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
