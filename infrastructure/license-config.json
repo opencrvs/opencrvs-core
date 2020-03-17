@@ -4,6 +4,7 @@
     ".git",
     "**/patches",
     ".secrets",
+    "deploy_key.enc",
     ".vscode",
     ".history",
     "data",

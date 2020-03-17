@@ -16,7 +16,6 @@ COPY lerna.json .
 COPY packages/auth/package.json packages/auth/package.json
 COPY packages/commons/package.json packages/commons/package.json
 COPY packages/components/package.json packages/components/package.json
-COPY packages/e2e/package.json packages/e2e/package.json
 COPY packages/gateway/package.json packages/gateway/package.json
 COPY packages/integration/package.json packages/integration/package.json
 COPY packages/login/package.json packages/login/package.json

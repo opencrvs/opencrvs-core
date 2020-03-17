@@ -14,8 +14,8 @@ print_usage_and_exit () {
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
-    echo '  HOST    is the server to deploy to'
     echo "  ENV can be 'production' or 'development' or 'qa'"
+    echo '  HOST    is the server to deploy to'
     echo "  VERSION can be any docker image tag or 'latest'"
     echo "  RESOURCES_PATH path to where your resources package is located"
     exit 1
@@ -37,12 +37,12 @@ if [ -z "$3" ] || { [ $3 != '--update-metadata=no' ] && [ $3 != '--update-metada
 fi
 
 if [ -z "$4" ] ; then
-    echo 'Error: Argument HOST is required in position 4.'
+    echo 'Error: Argument ENV is required in position 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument ENV is required in position 5.'
+    echo 'Error: Argument HOST is required in position 5.'
     print_usage_and_exit
 fi
 
@@ -56,8 +56,8 @@ if [ -z "$7" ] ; then
     print_usage_and_exit
 fi
 
-HOST=$4
-ENV=$5
+ENV=$4
+HOST=$5
 VERSION=$6
 RESOURCES_PATH=$7
 SSH_USER=${SSH_USER:-root}

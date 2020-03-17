@@ -17,6 +17,18 @@ import * as stringify from 'csv-stringify'
 import * as flatten from 'flat'
 import * as archiver from 'archiver'
 import { unauthorized } from 'boom'
+import { omit } from 'lodash'
+import {
+  GQLBirthRegistration,
+  GQLDeathRegistration,
+  GQLPerson,
+  GQLHumanName,
+  GQLIdentityType,
+  GQLAddress,
+  GQLRegistration,
+  GQLAttachment,
+  GQLRegWorkflow
+} from '@gateway/graphql/schema'
 
 export default {
   method: 'GET',
@@ -65,7 +77,6 @@ export default {
               identifier {
                 id
                 type
-                otherType
               }
               address {
                 type
@@ -96,7 +107,6 @@ export default {
               identifier {
                 id
                 type
-                otherType
               }
               address {
                 type
@@ -119,7 +129,6 @@ export default {
                 identifier {
                   id
                   type
-                  otherType
                 }
                 name {
                   use
@@ -232,7 +241,6 @@ export default {
               identifier {
                 id
                 type
-                otherType
               }
               gender
               deceased {
@@ -255,7 +263,6 @@ export default {
                 identifier {
                   id
                   type
-                  otherType
                 }
                 name {
                   use
@@ -370,26 +377,62 @@ export default {
     if (response.errors?.length) {
       throw response.errors[0]
     }
-    const birthRows =
-      response?.data?.searchBirthRegistrations?.map(flatten) ?? []
 
-    const deathRows =
-      response?.data?.searchDeathRegistrations?.map(flatten) ?? []
+    // Process birth registrations
+    const birthRows = (response?.data?.searchBirthRegistrations ?? []).map(
+      (result: GQLBirthRegistration) => {
+        result.child = flattenPerson(result.child)
+        result.mother = flattenPerson(result.mother)
+        result.father = flattenPerson(result.father)
+        if (result.informant && result.informant.individual) {
+          result.informant.individual = flattenPerson(
+            result.informant.individual
+          )
+        }
+        if (
+          result.primaryCaregiver &&
+          result.primaryCaregiver.primaryCaregiver
+        ) {
+          result.primaryCaregiver.primaryCaregiver = flattenPerson(
+            result.primaryCaregiver.primaryCaregiver
+          )
+        }
+        result.registration = flattenRegistration(result.registration)
 
+        return flatten(result)
+      }
+    )
     const birthCSV = stringify(birthRows, {
       header: true
     })
+
+    // Process death registrations
+    const deathRows = (response?.data?.searchDeathRegistrations ?? []).map(
+      (result: GQLDeathRegistration) => {
+        result.deceased = flattenPerson(result.deceased)
+        result.mother = flattenPerson(result.mother)
+        result.father = flattenPerson(result.father)
+        result.spouse = flattenPerson(result.spouse)
+        if (result.informant && result.informant.individual) {
+          result.informant.individual = flattenPerson(
+            result.informant.individual
+          )
+        }
+        result.registration = flattenRegistration(result.registration)
+        return flatten(result)
+      }
+    )
     const deathCSV = stringify(deathRows, {
       header: true
     })
+
+    // Create the archive
     const archive = archiver('zip', {
       // Sets the compression level.
       zlib: { level: 9 }
     })
-
     archive.append(birthCSV, { name: 'birth-registrations.csv' })
     archive.append(deathCSV, { name: 'death-registrations.csv' })
-
     archive.finalize()
 
     return archive
@@ -406,4 +449,57 @@ export default {
     description:
       'Exports both birth and death registrations from the selected time period as a CSV'
   }
+}
+
+function flattenPerson(personData: GQLPerson | undefined) {
+  if (!personData) {
+    return
+  }
+  return {
+    ...omit(personData, ['name', 'identifier', 'address']),
+    ...flattenArray(personData.name, 'name', 'use'),
+    ...flattenArray(personData.identifier, 'identifier', 'type'),
+    ...flattenArray(personData.address, 'address', 'type')
+  }
+}
+
+function flattenRegistration(registrationData: GQLRegistration | undefined) {
+  if (!registrationData) {
+    return
+  }
+  return {
+    ...omit(registrationData, ['attachments', 'status']),
+    ...flattenArray(registrationData.attachments, 'attachments', 'type'),
+    ...flattenArray(registrationData.status, 'status', 'type')
+  }
+}
+
+function flattenArray(
+  dataArray:
+    | (
+        | GQLHumanName
+        | GQLIdentityType
+        | GQLAddress
+        | GQLAttachment
+        | GQLRegWorkflow
+        | null
+      )[]
+    | undefined,
+  arrayPoperty: string,
+  filterProperty: string
+) {
+  if (!dataArray || dataArray.length <= 0) {
+    return {}
+  }
+  const flattenArrayData: any = {}
+  dataArray.forEach(data => {
+    if (data === null) {
+      return
+    }
+    flattenArrayData[`${arrayPoperty}_${data[filterProperty]}`] = omit(
+      data,
+      filterProperty
+    )
+  })
+  return flattenArrayData
 }

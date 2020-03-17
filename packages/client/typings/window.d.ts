@@ -26,6 +26,7 @@ interface Window {
     CERTIFICATE_PRINT_LOWEST_CHARGE: number
     CERTIFICATE_PRINT_HIGHEST_CHARGE: number
     UI_POLLING_INTERVAL: number
+    EXTERNAL_VALIDATION_WORKQUEUE: boolean
     LOGROCKET: string
     SENTRY: string
   }

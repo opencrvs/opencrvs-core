@@ -1,9 +1,0 @@
-{
-  "chromeWebSecurity": false,
-  "video": true,
-  "projectId": "ayoz3q",
-  "viewportWidth": 1024,
-  "viewportHeight": 768,
-  "defaultCommandTimeout": 60000,
-  "videoCompression": 0
-}

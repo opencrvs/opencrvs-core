@@ -7,6 +7,13 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
+before_install:
+  - openssl aes-256-cbc -K $encrypted_6a4906510c0e_key -iv $encrypted_6a4906510c0e_iv
+    -in deploy_key.enc -out ./deploy_key -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 ./deploy_key
+  - ssh-add ./deploy_key
+  - sudo apt-get -y install apache2-utils
 language: node_js
 dist: bionic
 node_js:
@@ -31,7 +38,7 @@ jobs:
             - libgconf-2-4
       script:
         - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-        - ./build-and-test-e2e.sh
+        - ./infrastructure/build-and-test-e2e.sh
         - kill %1
       env:
         - OTHER_LERNA_FLAGS=""
@@ -55,20 +62,22 @@ jobs:
       if: branch = master AND type = push
       install: skip
       script:
-        - cd ..
-        - git clone git@github.com:opencrvs/opencrvs-bangladesh.git
-        - yarn deploy:staging ../opencrvs-bangladesh
+        - git clone https://github.com/opencrvs/opencrvs-zambia.git
+        - bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development opencrvs-staging.jembi.org latest opencrvs-zambia
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
     - stage: integration tests on staging
       if: branch = master AND type = push
-      install: skip
+      before_install: npm install -g yarn && echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       addons:
         apt:
           packages:
             - libgconf-2-4
-      script: cd packages/e2e && yarn && yarn start --record false
+      script:
+        - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+        - ./infrastructure/build-and-test-e2e-on-staging.sh
+        - kill %1
       env:
         - CYPRESS_LOGIN_URL=https://login.opencrvs-staging.jembi.org/
         - CYPRESS_CLIENT_URL=https://register.opencrvs-staging.jembi.org/

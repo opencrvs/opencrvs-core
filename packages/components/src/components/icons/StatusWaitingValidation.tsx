@@ -9,18 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-function fetchToXhr() {
-  let polyfill
+import * as React from 'react'
 
-  before(() => {
-    cy.readFile('../../node_modules/whatwg-fetch/dist/fetch.umd.js').then(
-      contents => (polyfill = contents)
-    )
-    Cypress.on('window:before:load', win => {
-      delete win.fetch
-      win.eval(polyfill)
-    })
-  })
+export function StatusWaitingValidation(
+  props: React.HTMLAttributes<SVGElement>
+) {
+  return (
+    <svg width={16} height={16} viewBox="0 0 16 16" fill="none" {...props}>
+      <path
+        d="M8 16A8 8 0 108 0a8 8 0 000 16z"
+        fill="#35495D"
+        fillOpacity={0.5}
+      />
+      <path d="M8 12a4 4 0 100-8 4 4 0 000 8z" fill="#35495D" />
+    </svg>
+  )
 }
-
-fetchToXhr()

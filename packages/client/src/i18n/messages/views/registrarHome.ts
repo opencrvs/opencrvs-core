@@ -25,8 +25,10 @@ interface IregistrationHomeMessages {
   registrationNumber: MessageDescriptor
   sentForApprovals: MessageDescriptor
   sentForUpdates: MessageDescriptor
+  sentForExternalValidation: MessageDescriptor
   validatedApplicationTooltipForRegistrar: MessageDescriptor
   validatedApplicationTooltipForRegistrationAgent: MessageDescriptor
+  waitingForExternalValidation: MessageDescriptor
 }
 
 const messagesToDefine: IregistrationHomeMessages = {
@@ -90,6 +92,11 @@ const messagesToDefine: IregistrationHomeMessages = {
     description: 'The title of sent for approvals tab',
     id: 'register.registrationHome.sentForApprovals'
   },
+  sentForExternalValidation: {
+    defaultMessage: 'Sent to BRIS',
+    description: 'The label for external validation waiting duration column',
+    id: 'register.registrationHome.sentForExternalValidation'
+  },
   sentForUpdates: {
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab',
@@ -104,6 +111,11 @@ const messagesToDefine: IregistrationHomeMessages = {
     defaultMessage: 'Application has been validated and waiting for approval',
     description: 'Text to display for validated application as tooltip',
     id: 'register.registrationHome.validated.registrationAgent.tooltip'
+  },
+  waitingForExternalValidation: {
+    defaultMessage: 'Waiting for BRIS',
+    description: 'The title of waiting for external validation',
+    id: 'register.registrationHome.waitingForExternalValidation'
   }
 }
 

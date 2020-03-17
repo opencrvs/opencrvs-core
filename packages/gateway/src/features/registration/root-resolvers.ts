@@ -38,7 +38,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const res = await fetchFHIR(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
+        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
 
@@ -57,7 +57,7 @@ export const resolvers: GQLResolver = {
         )
       }
       const res = await fetchFHIR(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}`,
+        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
         authHeader
       )
 

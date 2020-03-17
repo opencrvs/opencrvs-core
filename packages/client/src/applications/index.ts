@@ -180,12 +180,14 @@ interface IWorkqueuePaginationParams {
   reviewCount: number
   rejectCount: number
   approvalCount: number
+  externalValidationCount: number
   printCount: number
 
   inProgressSkip: number
   reviewSkip: number
   rejectSkip: number
   approvalSkip: number
+  externalValidationSkip: number
   printSkip: number
 }
 
@@ -326,12 +328,14 @@ interface UpdateRegistrarWorkqueueAction {
     reviewCount: number
     rejectCount: number
     approvalCount: number
+    externalValidationCount: number
     printCount: number
 
     inProgressSkip: number
     reviewSkip: number
     rejectSkip: number
     approvalSkip: number
+    externalValidationSkip: number
     printSkip: number
   }
 }
@@ -398,7 +402,8 @@ const workqueueInitialState = {
       reviewTab: { totalItems: 0, results: [] },
       rejectTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
-      printTab: { totalItems: 0, results: [] }
+      printTab: { totalItems: 0, results: [] },
+      externalValidationTab: { totalItems: 0, results: [] }
     },
     initialSyncDone: false
   }
@@ -686,11 +691,13 @@ async function getWorkqueueData(
     reviewCount,
     rejectCount,
     approvalCount,
+    externalValidationCount,
     printCount,
     inProgressSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
+    externalValidationSkip,
     printSkip
   } = workqueuePaginationParams
 
@@ -701,11 +708,13 @@ async function getWorkqueueData(
     reviewCount,
     rejectCount,
     approvalCount,
+    externalValidationCount,
     printCount,
     inProgressSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
+    externalValidationSkip,
     printSkip
   )
 
@@ -801,12 +810,14 @@ export function updateRegistrarWorkqueue(
   reviewCount: number = 10,
   rejectCount: number = 10,
   approvalCount: number = 10,
+  externalValidationCount: number = 10,
   printCount: number = 10,
 
   inProgressSkip: number = 0,
   reviewSkip: number = 0,
   rejectSkip: number = 0,
   approvalSkip: number = 0,
+  externalValidationSkip: number = 0,
   printSkip: number = 0
 ) {
   return {
@@ -816,12 +827,14 @@ export function updateRegistrarWorkqueue(
       reviewCount,
       rejectCount,
       approvalCount,
+      externalValidationCount,
       printCount,
 
       inProgressSkip,
       reviewSkip,
       rejectSkip,
       approvalSkip,
+      externalValidationSkip,
       printSkip
     }
   }
@@ -1449,6 +1462,10 @@ export function filterProcessingApplicationsFromQuery(
     ),
     printTab: filterProcessingApplications(
       queryData.printTab,
+      processingApplicationIds
+    ),
+    externalValidationTab: filterProcessingApplications(
+      queryData.externalValidationTab,
       processingApplicationIds
     )
   }
