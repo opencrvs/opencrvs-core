@@ -85,7 +85,7 @@ function EventInfoComponet(props: IFullProps) {
         props.goToDeathInformant(application.id)
         break
       default:
-        throw new Error(`Unknow eventType ${eventType}`)
+        throw new Error(`Unknown eventType ${eventType}`)
     }
   }
 
@@ -110,7 +110,7 @@ function EventInfoComponet(props: IFullProps) {
   }
 
   return (
-    <Container id={`${eventType}-info`}>
+    <Container id={`${eventType}-info-container`}>
       <EventTopBar
         title={intl.formatMessage(topBarTitle)}
         goHome={props.goToHome}
@@ -124,7 +124,7 @@ function EventInfoComponet(props: IFullProps) {
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
         <Title>{intl.formatMessage(messages.title, { eventType })}</Title>
-        <BulletList items={listItems} />
+        <BulletList id={`${eventType}-info-bullet-list`} items={listItems} />
         <PrimaryButton id="continue" onClick={handleContinue}>
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
