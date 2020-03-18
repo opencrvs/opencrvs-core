@@ -103,7 +103,7 @@
     "@graphql-codegen/typescript": "^1.2.0",
     "@graphql-codegen/typescript-graphql-files-modules": "1.2.0",
     "@graphql-codegen/typescript-operations": "1.2.0",
-    "@graphql-codegen/typescript-react-apollo": "1.2.0",
+    "@graphql-codegen/typescript-react-apollo": "1.13.1",
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/fetch-mock": "^7.3.0",
