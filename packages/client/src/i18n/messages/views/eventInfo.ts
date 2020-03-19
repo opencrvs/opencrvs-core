@@ -27,7 +27,7 @@ const birthBulletListItemsToDefine: object = [
   {
     id: 'register.eventInfo.birth.listItem1',
     defaultMessage:
-      'Once I complete the application, it will be sent to the Union/Pouroshova for review.',
+      'Once I complete the application, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for birth'
   },
   {
@@ -54,7 +54,7 @@ const deathBulletListItemsToDefine: object = [
   {
     id: 'register.eventInfo.death.listItem1',
     defaultMessage:
-      'Once I complete the application, it will be sent to the Union/Pouroshova for review.',
+      'Once I complete the application, it will be sent to the registration office for review.',
     description: 'Event info bullet list item for death'
   },
   {
