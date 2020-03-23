@@ -244,6 +244,11 @@ describe('Report page', () => {
       '#listTable-timeFrames'
     )
 
+    const estimated45DayRegistrationsTable = await waitForElement(
+      testComponent,
+      '#listTable-estimated45DayRegistrations'
+    )
+
     const paymentsTable = await waitForElement(
       testComponent,
       '#listTable-payments'
@@ -251,6 +256,7 @@ describe('Report page', () => {
 
     expect(genderMetricsTable.hostNodes()).toHaveLength(1)
     expect(timeFramesTable.hostNodes()).toHaveLength(1)
+    expect(estimated45DayRegistrationsTable.hostNodes()).toHaveLength(1)
     expect(paymentsTable.hostNodes()).toHaveLength(1)
 
     const totalValueOfGenderMetrics = genderMetricsTable
@@ -265,6 +271,12 @@ describe('Report page', () => {
       .at(5)
       .text()
 
+    const percentageOfEstimatedRegistration = estimated45DayRegistrationsTable
+      .find('#row_0')
+      .find('span')
+      .at(3)
+      .text()
+
     const totalValueOfPayments = paymentsTable
       .find('#row_0')
       .find('span')
@@ -273,6 +285,7 @@ describe('Report page', () => {
 
     expect(totalValueOfGenderMetrics).toBe('2')
     expect(totalValueOfTimeFrames).toBe('2')
+    expect(percentageOfEstimatedRegistration).toBe('2%')
     expect(totalValueOfPayments).toBe('200')
   })
 
