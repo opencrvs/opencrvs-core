@@ -57,6 +57,15 @@ export interface IEstimation {
   estimationYear: number
 }
 
+export interface IBirth45DayEstimation {
+  locationId: string
+  registrationIn45Day: number
+  estimatedRegistration: number
+  estimationYear: number
+  estimationLocationLevel: string
+  estimationPercentage: number
+}
+
 interface ICurrentAndLowerLocationLevels {
   currentLocationLevel: string
   lowerLocationLevel: string
@@ -608,8 +617,7 @@ export async function fetchEstimated45DayMetrics(
                               AND time <= '${timeTo}'
                               AND ${currLocationLevel}='${currLocation}'
                               GROUP BY ${locationLevel}`)
-
-  const dataFromInflux: any[] = []
+  const dataFromInflux: IBirth45DayEstimation[] = []
   for (const point of points) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       point[locationLevel],
@@ -622,27 +630,33 @@ export async function fetchEstimated45DayMetrics(
       estimatedRegistration: estimationOf45Day.estimation,
       estimationYear: estimationOf45Day.estimationYear,
       estimationLocationLevel: estimationOf45Day.locationLevel,
-      estimationPercentage: Math.round(
-        (point.withIn45Day / estimationOf45Day.estimation) * 100
-      )
+      estimationPercentage:
+        point.withIn45Day === 0
+          ? 0
+          : Math.round((point.withIn45Day / estimationOf45Day.estimation) * 100)
     })
   }
-  const placeholder = {
-    registrationIn45Day: 0,
-    estimatedRegistration: 0,
-    estimationYear: 0,
-    estimationLocationLevel: '',
-    estimationPercentage: 0
-  }
 
-  const emptyData = childLocationIds.map(id => ({
-    locationId: id,
-    ...placeholder
-  }))
+  const emptyEstimationData: IBirth45DayEstimation[] = []
+  for (const id of childLocationIds) {
+    const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
+      id,
+      new Date().getFullYear(),
+      authHeader
+    )
+    emptyEstimationData.push({
+      locationId: id,
+      registrationIn45Day: 0,
+      estimatedRegistration: estimationOf45Day.estimation,
+      estimationYear: estimationOf45Day.estimationYear,
+      estimationLocationLevel: estimationOf45Day.locationLevel,
+      estimationPercentage: 0
+    })
+  }
 
   const estimated45DayData = fillEmptyDataArrayByKey(
     dataFromInflux,
-    emptyData,
+    emptyEstimationData,
     'locationId'
   )
   return estimated45DayData
