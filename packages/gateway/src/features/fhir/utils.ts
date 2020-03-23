@@ -57,7 +57,9 @@ import {
   GQLGenderBasisDetailsMetrics,
   GQLGenderBasisTotalCount,
   GQLCertificationPaymentDetailsMetrics,
-  GQLCertificationPaymentTotalCount
+  GQLCertificationPaymentTotalCount,
+  GQLEstimate45DayTotalCount,
+  GQLEstimated45DayMetrics
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1095,6 +1097,33 @@ export function genderBasisTotalCalculator(
         maleOver18,
         femaleOver18,
         total: maleUnder18 + femaleUnder18 + maleOver18 + femaleOver18
+      }
+    },
+    initialValue
+  )
+}
+
+export function estimated45DayMetricsTotalCalculator(
+  estimated45DayMetrics: Array<GQLEstimated45DayMetrics>
+): GQLEstimate45DayTotalCount {
+  const initialValue: GQLEstimate45DayTotalCount = {
+    estimatedRegistration: 0,
+    registrationIn45Day: 0,
+    estimationPercentage: 0
+  }
+  return reduce(
+    estimated45DayMetrics,
+    (accumulator, item) => {
+      const estimatedRegistration =
+        accumulator.estimatedRegistration + item.estimatedRegistration
+      const registrationIn45Day =
+        accumulator.registrationIn45Day + item.registrationIn45Day
+      return {
+        estimatedRegistration,
+        registrationIn45Day,
+        estimationPercentage: Math.round(
+          (registrationIn45Day / estimatedRegistration) * 100
+        )
       }
     },
     initialValue

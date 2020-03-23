@@ -11,6 +11,7 @@
 type RegistrationMetrics {
   genderBasisMetrics: RegistrationGenderBasisMetrics
   timeFrames: RegistrationTimeFrameMetrics
+  estimated45DayMetrics: Registration45DayEstimatedMetrics
   payments: CertificationPaymentMetrics
 }
 
@@ -53,6 +54,26 @@ type CertificationPaymentTotalCount {
 type RegistrationTimeFrameMetrics {
   details: [TimeFrameDetailMetrics!]
   total: TimeFrameTotalCount
+}
+
+type Registration45DayEstimatedMetrics {
+  details: [Estimated45DayMetrics!]
+  total: Estimate45DayTotalCount
+}
+
+type Estimate45DayTotalCount {
+  estimatedRegistration: Int!
+  registrationIn45Day: Int!
+  estimationPercentage: Int!
+}
+
+type Estimated45DayMetrics {
+  locationId: String!
+  estimatedRegistration: Int!
+  registrationIn45Day: Int!
+  estimationYear: Int!
+  estimationLocationLevel: String!
+  estimationPercentage: Int!
 }
 
 type TimeFrameTotalCount {

@@ -21,7 +21,12 @@ describe('fetch birth registration metrics', () => {
   it('returns an array of birth registraiton metrics', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        payments: [],
+        payments: [
+          {
+            locationId: 'fake',
+            total: 0
+          }
+        ],
         timeFrames: [
           {
             locationId: 'fake',
@@ -32,7 +37,24 @@ describe('fetch birth registration metrics', () => {
             total: 0
           }
         ],
-        genderBasisMetrics: []
+        genderBasisMetrics: [
+          {
+            locationId: 'fake',
+            maleUnder18: 0,
+            femaleUnder18: 0,
+            maleOver18: 0,
+            femaleOver18: 0,
+            total: 0
+          }
+        ],
+        estimated45DayMetrics: [
+          {
+            locationId: 'fake',
+            estimatedRegistration: 0,
+            registrationIn45Day: 0,
+            estimationPercentage: 0
+          }
+        ]
       })
     )
 
@@ -49,6 +71,14 @@ describe('fetch birth registration metrics', () => {
     expect(data).toBeDefined()
     expect(data.timeFrames).toBeInstanceOf(Object)
     expect(data.timeFrames.details.length).toBe(1)
+    expect(data.genderBasisMetrics).toBeInstanceOf(Object)
+    expect(data.genderBasisMetrics.details.length).toBe(1)
+    expect(data.payments).toBeInstanceOf(Object)
+    expect(data.payments.details.length).toBe(1)
+    expect(data.genderBasisMetrics).toBeInstanceOf(Object)
+    expect(data.genderBasisMetrics.details.length).toBe(1)
+    expect(data.estimated45DayMetrics).toBeInstanceOf(Object)
+    expect(data.estimated45DayMetrics.details.length).toBe(1)
   })
 
   it('returns an empty array of birth registraiton metrics when error is thrown', async () => {
