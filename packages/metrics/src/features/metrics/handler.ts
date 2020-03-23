@@ -54,7 +54,8 @@ export async function metricsHandler(
     return {
       timeFrames: [],
       payments: [],
-      genderBasisMetrics: []
+      genderBasisMetrics: [],
+      estimated45DayMetrics: []
     }
   }
 
