@@ -14,7 +14,8 @@ import {
   fetchRegWithinTimeFrames,
   getCurrentAndLowerLocationLevels,
   fetchCertificationPayments,
-  fetchGenderBasisMetrics
+  fetchGenderBasisMetrics,
+  fetchEstimated45DayMetrics
 } from '@metrics/features/metrics/metricsGenerator'
 
 import {
@@ -97,5 +98,17 @@ export async function metricsHandler(
     event,
     childLocationIds
   )
-  return { timeFrames, payments, genderBasisMetrics }
+
+  const estimated45DayMetrics = await fetchEstimated45DayMetrics(
+    timeStart,
+    timeEnd,
+    locationId,
+    currentLocationLevel,
+    lowerLocationLevel,
+    event,
+    childLocationIds,
+    authHeader
+  )
+
+  return { timeFrames, payments, genderBasisMetrics, estimated45DayMetrics }
 }
