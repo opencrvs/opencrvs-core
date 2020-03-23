@@ -213,7 +213,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:
-      return initialState
+      return {
+        ...initialState,
+        userForm: state.userForm
+      }
     case SUBMIT_USER_FORM_DATA:
       const {
         client,
