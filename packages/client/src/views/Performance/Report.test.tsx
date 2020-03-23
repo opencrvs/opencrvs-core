@@ -77,6 +77,23 @@ describe('Report page', () => {
                 total: 2
               }
             },
+            estimated45DayMetrics: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  estimatedRegistration: 99,
+                  registrationIn45Day: 2,
+                  estimationYear: 2019,
+                  estimationLocationLevel: 'UNION',
+                  estimationPercentage: 2
+                }
+              ],
+              total: {
+                estimatedRegistration: 99,
+                registrationIn45Day: 2,
+                estimationPercentage: 2
+              }
+            },
             payments: {
               details: [
                 {
@@ -123,6 +140,14 @@ describe('Report page', () => {
                 maleOver18: 0,
                 femaleOver18: 0,
                 total: 0
+              }
+            },
+            estimated45DayMetrics: {
+              details: [],
+              total: {
+                estimatedRegistration: 0,
+                registrationIn45Day: 0,
+                estimationPercentage: 0
               }
             },
             payments: {

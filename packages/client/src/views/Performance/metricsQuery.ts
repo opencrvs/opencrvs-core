@@ -58,6 +58,21 @@ export const PERFORMANCE_METRICS = gql`
           total
         }
       }
+      estimated45DayMetrics {
+        details {
+          locationId
+          estimatedRegistration
+          registrationIn45Day
+          estimationYear
+          estimationLocationLevel
+          estimationPercentage
+        }
+        total {
+          estimatedRegistration
+          registrationIn45Day
+          estimationPercentage
+        }
+      }
       payments {
         details {
           locationId
