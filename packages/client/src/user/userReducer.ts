@@ -9,28 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
-import {
-  IFormSectionData,
-  IForm,
-  IFormSection,
-  UserSection
-} from '@client/forms'
-import { Action } from 'redux'
-import { formMessages as messages } from '@client/i18n/messages'
-import ApolloClient from 'apollo-client'
+import { IForm, IFormSectionData } from '@client/forms'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToHome } from '@client/navigation'
 import {
-  transformRoleDataToDefinitions,
-  alterRolesBasedOnUserRole
-} from '@client/views/SysAdmin/utils'
-import {
-  showSubmitFormSuccessToast,
-  showSubmitFormErrorToast
+  showSubmitFormErrorToast,
+  showSubmitFormSuccessToast
 } from '@client/notification/actions'
+import * as offlineActions from '@client/offline/actions'
 import { SEARCH_USERS } from '@client/sysadmin/user/queries'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import {
+  alterRolesBasedOnUserRole,
+  transformRoleDataToDefinitions
+} from '@client/views/SysAdmin/utils'
+import ApolloClient from 'apollo-client'
+import { Action } from 'redux'
+import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -45,28 +39,8 @@ enum TOAST_MESSAGES {
   FAIL = 'userFormFail'
 }
 
-const previewGroups = () => {
-  return userSection.groups.map(group => {
-    return {
-      id: 'preview-' + group.id,
-      fields: group.fields
-    }
-  })
-}
-
 const initialState: IUserFormState = {
-  userForm: deserializeForm({
-    sections: [
-      userSection,
-      {
-        id: UserSection.Preview,
-        viewType: 'preview' as const,
-        name: messages.userFormReviewTitle,
-        title: messages.userFormTitle,
-        groups: previewGroups()
-      }
-    ]
-  }),
+  userForm: null,
   userFormData: {},
   submitting: false,
   loadingRoles: false,
@@ -169,7 +143,7 @@ type UserFormAction =
   | Action
 
 export interface IUserFormState {
-  userForm: IForm
+  userForm: IForm | null
   userFormData: IFormSectionData
   submitting: boolean
   loadingRoles: boolean
@@ -178,9 +152,22 @@ export interface IUserFormState {
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
   state: IUserFormState = initialState,
-  action: UserFormAction
+  action: UserFormAction | offlineActions.Action
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
+    case offlineActions.READY:
+    case offlineActions.DEFINITIONS_LOADED:
+      const {
+        userForm
+      } = (action as offlineActions.DefinitionsLoadedAction).payload.forms
+      const form = deserializeForm(userForm)
+
+      return {
+        ...state,
+        userForm: {
+          ...form
+        }
+      }
     case PROCESS_ROLES:
       const { primaryOfficeId } = (action as IProcessRoles).payload
       return loop(
@@ -196,7 +183,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case UPDATE_FORM_FIELD_DEFINITIONS:
       const { data } = (action as IUpdateUserFormFieldDefsAction).payload
 
-      const updatedSections = state.userForm.sections
+      const updatedSections = state.userForm!.sections
       updatedSections.forEach(section => {
         section.groups.forEach(group => {
           group.fields = transformRoleDataToDefinitions(
@@ -226,7 +213,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userFormData: (action as IUserFormDataModifyAction).payload.data
       }
     case CLEAR_USER_FORM_DATA:
-      return initialState
+      return {
+        ...initialState,
+        userForm: state.userForm
+      }
     case SUBMIT_USER_FORM_DATA:
       const {
         client,
