@@ -82,6 +82,18 @@ export async function sendUserAuthenticationCode(
   return h.response().code(200)
 }
 
+export async function updateUserName(
+  request: HapiRequest,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = request.payload as IRetrieveUserNamePayload
+  logger.info(`Username: ${payload.username}`)
+  await buildAndSendSMS(request, payload.msisdn, 'updateUserNameNotification', {
+    username: payload.username
+  })
+  return h.response().code(200)
+}
+
 export const userCredentialsNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   username: Joi.string().required(),

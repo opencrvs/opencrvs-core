@@ -29,6 +29,7 @@ import {
 import {
   sendUserCredentials,
   retrieveUserName,
+  updateUserName,
   sendUserAuthenticationCode,
   userCredentialsNotificationSchema,
   retrieveUserNameNotificationSchema,
@@ -250,6 +251,18 @@ export default function getRoutes() {
       config: {
         tags: ['api'],
         description: 'Sends an sms to a user with username',
+        validate: {
+          payload: retrieveUserNameNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateUserNameSMS',
+      handler: updateUserName,
+      config: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with new username',
         validate: {
           payload: retrieveUserNameNotificationSchema
         }
