@@ -17,19 +17,8 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
-import {
-  createApplication,
-  IApplication,
-  setInitialApplications,
-  storeApplication
-} from '@client/applications'
 import { Event } from '@client/forms'
-import {
-  goBack,
-  goToBirthInformant,
-  goToDeathInformant,
-  goToHome
-} from '@client/navigation'
+import { goBack, goToHome, goToEventInfo } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import {
@@ -80,33 +69,16 @@ class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
-    storeApplication: typeof storeApplication
-    goToBirthInformant: typeof goToBirthInformant
-    goToDeathInformant: typeof goToDeathInformant
-    setInitialApplications: typeof setInitialApplications
+    goToEventInfo: typeof goToEventInfo
   }
 > {
   state = {
     goTo: ''
   }
   handleContinue = () => {
-    let application: IApplication
-    switch (this.state.goTo) {
-      case 'birth':
-        application = createApplication(Event.BIRTH)
-        this.props.storeApplication(application)
-        this.props.goToBirthInformant(application.id)
-
-        break
-      case 'death':
-        application = createApplication(Event.DEATH)
-        this.props.storeApplication(application)
-        this.props.goToDeathInformant(application.id)
-        break
-      default:
-        this.setState({ goTo: 'error' })
-    }
+    this.props.goToEventInfo(this.state.goTo as Event)
   }
+
   render() {
     const { intl } = this.props
     return (
@@ -163,9 +135,6 @@ export const SelectVitalEvent = connect(
   {
     goBack,
     goToHome,
-    storeApplication,
-    goToBirthInformant,
-    goToDeathInformant,
-    setInitialApplications
+    goToEventInfo
   }
 )(injectIntl(SelectVitalEventView))

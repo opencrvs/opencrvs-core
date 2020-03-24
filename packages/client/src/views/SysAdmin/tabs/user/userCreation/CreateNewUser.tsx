@@ -14,23 +14,21 @@ import {
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { formMessages } from '@client/i18n/messages'
+import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserReviewForm'
+import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
+import ApolloClient from 'apollo-client'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { withApollo } from 'react-apollo'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import ApolloClient from 'apollo-client'
-import { withApollo } from 'react-apollo'
-import { Spinner, ActionPageLight } from '@opencrvs/components/lib/interface'
-import styled from '@client/styledComponents'
-import { goBack } from '@client/navigation'
-// eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
-import { formMessages } from '@client/i18n/messages'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 
 interface IMatchParams {
   sectionId: string
@@ -132,8 +130,8 @@ function getNextSectionIds(
 
 const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
-    props.match.params.sectionId || state.userForm.userForm.sections[0].id
-  const section = state.userForm.userForm.sections.find(
+    props.match.params.sectionId || state.userForm.userForm!.sections[0].id
+  const section = state.userForm.userForm!.sections.find(
     section => section.id === sectionId
   ) as IFormSection
 
@@ -150,7 +148,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   const fields = replaceInitialValues(group.fields, state.userForm.userFormData)
 
   const nextGroupId = getNextSectionIds(
-    state.userForm.userForm.sections,
+    state.userForm.userForm!.sections,
     section,
     group,
     state.userForm.userFormData
