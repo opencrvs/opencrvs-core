@@ -19,6 +19,8 @@ interface IProps {
 
 const StyledList = styled.ul`
   width: 100%;
+  padding: 24px;
+  overflow: auto;
 `
 const StyledListItem = styled.li`
   margin-bottom: 16px;
