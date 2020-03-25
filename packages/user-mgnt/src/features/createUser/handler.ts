@@ -14,7 +14,7 @@ import {
   createFhirPractitionerRole,
   generateUsername,
   postFhir,
-  rollback,
+  rollbackCreateUser,
   sendCredentialsNotification,
   getCatchmentAreaIdsByPrimaryOfficeId
 } from '@user-mgnt/features/createUser/service'
@@ -94,7 +94,7 @@ export default async function createUser(
 
     user.username = await generateUsername(user.name)
   } catch (err) {
-    await rollback(token, practitionerId, roleId)
+    await rollbackCreateUser(token, practitionerId, roleId)
     logger.error(err)
     // cause an internal server error
     throw err
@@ -106,7 +106,7 @@ export default async function createUser(
     userModelObject = await User.create(user)
   } catch (err) {
     logger.error(err)
-    await rollback(token, practitionerId, roleId)
+    await rollbackCreateUser(token, practitionerId, roleId)
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }

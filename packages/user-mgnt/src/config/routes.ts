@@ -25,6 +25,7 @@ import getUser, {
   getUserRequestSchema
 } from '@user-mgnt/features/getUser/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
+import updateUser from '@user-mgnt/features/updateUser/handler'
 import getRoles, {
   searchRoleSchema
 } from '@user-mgnt/features/getRoles/handler'
@@ -227,6 +228,18 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Creates a new user',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateUser',
+      handler: updateUser,
+      config: {
+        tags: ['api'],
+        description: 'Updates an existing user',
         auth: {
           scope: [RouteScope.SYSADMIN]
         }
