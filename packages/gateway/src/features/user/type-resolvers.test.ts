@@ -29,6 +29,7 @@ describe('User type resolvers', () => {
     username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
+    identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
@@ -52,6 +53,13 @@ describe('User type resolvers', () => {
   it('return userMgntUserID type', () => {
     const res = userTypeResolvers.User.userMgntUserID(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
+  })
+  it('return user identifier', () => {
+    const res = userTypeResolvers.User.identifier(mockResponse)
+    expect(res).toEqual({
+      system: mockResponse.identifiers[0].system,
+      value: mockResponse.identifiers[0].value
+    })
   })
   it('return primaryOffice type', async () => {
     const mockOffice = {
