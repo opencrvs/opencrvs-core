@@ -13953,6 +13953,11 @@ jest-message-util@^24.8.0:
     slash "^2.0.0"
     stack-utils "^1.0.1"
 
+jest-mock-proxy@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/jest-mock-proxy/-/jest-mock-proxy-3.0.0.tgz#f80df2abe4230a9d0f1ccadf88b1226548894991"
+  integrity sha512-IwvZRoV4d115vMMLiFtiUd7B2rE3OfswPCzskFn1g4VI1h4fy+kQxuRP237uOZzfwPNCpQ1/F7Sike5JYBfvgQ==
+
 jest-mock@^22.4.3:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-22.4.3.tgz#f63ba2f07a1511772cdc7979733397df770aabc7"
