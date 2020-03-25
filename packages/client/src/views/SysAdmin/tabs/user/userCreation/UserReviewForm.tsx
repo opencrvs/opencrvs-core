@@ -9,43 +9,41 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  DataSection,
-  IDataProps,
-  ActionPageLight
-} from '@opencrvs/components/lib/interface'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import {
   FIELD_GROUP_TITLE,
+  IAttachmentValue,
   IFormField,
   IFormSection,
   IFormSectionData,
-  SIMPLE_DOCUMENT_UPLOADER,
-  IAttachmentValue,
-  SEARCH_FIELD
+  SEARCH_FIELD,
+  SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
-import { goToCreateUserSection, goBack } from '@client/navigation'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { buttonMessages as messages, userMessages } from '@client/i18n/messages'
+import { goBack, goToCreateUserSection } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { draftToGqlTransformer } from '@client/transformer'
+import { submitUserFormData } from '@client/user/userReducer'
 import {
-  FormTitle,
-  Action
+  Action,
+  FormTitle
 } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Dispatch } from 'redux'
-import { submitUserFormData } from '@client/user/userReducer'
-import ApolloClient from 'apollo-client'
-import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { userMessages, buttonMessages as messages } from '@client/i18n/messages'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import {
+  ActionPageLight,
+  DataSection,
+  IDataProps
+} from '@opencrvs/components/lib/interface'
+import ApolloClient from 'apollo-client'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { Dispatch } from 'redux'
 
 export interface IUserReviewFormProps {
   section: IFormSection
@@ -55,7 +53,8 @@ export interface IUserReviewFormProps {
 
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
-  submitForm: () => void
+  submitForm: (userFormSection: IFormSection) => void
+  userFormSection: IFormSection
   offlineResources: IOfflineData
   goBack: typeof goBack
 }
@@ -71,10 +70,10 @@ class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl } = this.props
+    const { intl, userFormSection } = this.props
     const sections: ISectionData[] = []
     getVisibleSectionGroupsBasedOnConditions(
-      deserializeFormSection(userSection),
+      userFormSection,
       this.props.formData
     ).forEach(group => {
       group.fields.forEach((field: IFormField) => {
@@ -92,7 +91,7 @@ class UserReviewFormComponent extends React.Component<
               label: intl.formatMessage(messages.change),
               handler: () =>
                 this.props.goToCreateUserSection(
-                  userSection.id,
+                  userFormSection.id,
                   group.id,
                   field.name
                 )
@@ -143,7 +142,7 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section } = this.props
+    const { intl, section, userFormSection } = this.props
 
     return (
       <ActionPageLight
@@ -157,7 +156,10 @@ class UserReviewFormComponent extends React.Component<
           <DataSection key={index} {...sec} />
         ))}
         <Action>
-          <PrimaryButton id="submit_user_form" onClick={this.props.submitForm}>
+          <PrimaryButton
+            id="submit_user_form"
+            onClick={() => this.props.submitForm(userFormSection)}
+          >
             {intl.formatMessage(messages.createUser)}
           </PrimaryButton>
         </Action>
@@ -171,9 +173,9 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
       dispatch(goToCreateUserSection(sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
-    submitForm: () => {
+    submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
-        { sections: [deserializeFormSection(userSection)] },
+        { sections: [userFormSection] },
         { user: props.formData }
       )
       dispatch(submitUserFormData(props.client, createUserMutation, variables))
@@ -183,6 +185,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 export const UserReviewForm = connect(
   (store: IStoreState) => {
     return {
+      userFormSection: store.userForm.userForm!.sections[0],
       offlineResources: getOfflineData(store)
     }
   },
