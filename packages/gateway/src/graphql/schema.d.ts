@@ -360,6 +360,7 @@ export interface GQLUser {
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar: GQLLocalRegistrar
+  identifier?: GQLIdentifier
 }
 
 export interface GQLLocalRegistrar {
@@ -2134,6 +2135,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
+  identifier?: UserToIdentifierResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2185,6 +2187,10 @@ export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToIdentifierResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
