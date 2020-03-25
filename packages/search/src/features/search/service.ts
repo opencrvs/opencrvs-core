@@ -32,7 +32,7 @@ export const searchComposition = async (params: ISearchQuery) => {
     } else {
       logger.error('Search error: ', err)
     }
-    return false
+    return undefined
   }
   return response
 }
