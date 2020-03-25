@@ -36,7 +36,7 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   selectObservationEntry,
-  findLocation
+  findEventLocation
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from 'hapi'
@@ -172,7 +172,7 @@ async function createChildIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const birthLocation = (await findLocation(
+  const birthLocation = (await findEventLocation(
     BIRTH_ENCOUNTER_CODE,
     composition
   )) as fhir.Location

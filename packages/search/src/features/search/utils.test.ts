@@ -9,163 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  queryBuilder,
-  combinationQueryBuilder
-} from '@search/features/search/utils'
+import { queryBuilder } from '@search/features/search/utils'
 
 describe('elasticsearch db helper', () => {
-  it('should create a query that searches all name fields', () => {
-    const newQuery = queryBuilder(
-      'some query',
-      'dummy',
-      'dummy',
-      'dummy',
-      'EMPTY_STRING',
-      'EMPTY_STRING',
-      'some name',
-      'EMPTY_STRING',
-      'EMPTY_STRING',
-      {
-        event: 'EMPTY_STRING',
-        status: ['DECLARED'],
-        type: ['birth-application', 'death-application']
-      }
-    )
-    expect(newQuery).toEqual({
-      bool: {
-        must: [
-          {
-            multi_match: {
-              query: 'some query',
-              fields: [
-                'childFirstNames',
-                'childFamilyName',
-                'childFirstNamesLocal',
-                'childFamilyNameLocal',
-                'deceasedFirstNames',
-                'deceasedFamilyName',
-                'deceasedFirstNamesLocal',
-                'deceasedFamilyNameLocal',
-                'trackingId',
-                'registrationNumber',
-                'contactNumber'
-              ],
-              fuzziness: 'AUTO'
-            }
-          },
-          {
-            multi_match: {
-              query: 'some name',
-              fields: [
-                'childFirstNames',
-                'childFamilyName',
-                'childFirstNamesLocal',
-                'childFamilyNameLocal',
-                'motherFirstNames',
-                'motherFamilyName',
-                'motherFirstNamesLocal',
-                'motherFamilyNameLocal',
-                'fatherFirstNames',
-                'fatherFamilyName',
-                'fatherFirstNamesLocal',
-                'fatherFamilyNameLocal',
-                'informantFirstNames',
-                'informantFamilyName',
-                'informantFirstNamesLocal',
-                'informantFamilyNameLocal',
-                'primaryCaregiverFirstNames',
-                'primaryCaregiverFamilyName',
-                'primaryCaregiverFirstNamesLocal',
-                'primaryCaregiverFamilyNameLocal',
-                'deceasedFirstNames',
-                'deceasedFamilyName',
-                'deceasedFirstNamesLocal',
-                'deceasedFamilyNameLocal',
-                'spouseFirstNames',
-                'spouseFamilyName',
-                'spouseFirstNamesLocal',
-                'spouseFamilyNameLocal'
-              ],
-              fuzziness: 'AUTO'
-            }
-          },
-          {
-            term: {
-              'trackingId.keyword': 'dummy'
-            }
-          },
-          {
-            term: {
-              'contactNumber.keyword': 'dummy'
-            }
-          },
-          {
-            term: {
-              'registrationNumber.keyword': 'dummy'
-            }
-          },
-          {
-            term: {
-              'gender.keyword': 'EMPTY_STRING'
-            }
-          },
-          {
-            term: {
-              'eventLocationId.keyword': {
-                value: 'EMPTY_STRING',
-                // tslint:disable-next-line
-                boost: 2.0
-              }
-            }
-          },
-          {
-            term: {
-              'applicationLocationId.keyword': {
-                value: 'EMPTY_STRING',
-                // tslint:disable-next-line
-                boost: 2.0
-              }
-            }
-          },
-          {
-            term: {
-              'createdBy.keyword': {
-                value: 'EMPTY_STRING'
-              }
-            }
-          },
-          {
-            term: {
-              'event.keyword': 'EMPTY_STRING'
-            }
-          },
-          {
-            terms: {
-              'type.keyword': ['DECLARED']
-            }
-          },
-          {
-            terms: {
-              'compositionType.keyword': [
-                'birth-application',
-                'death-application'
-              ]
-            }
-          }
-        ],
-        should: []
-      }
-    })
-  })
-
   it('should create a query that searches child and mother name fields and event location', () => {
-    const newQuery = combinationQueryBuilder(
-      'dummy',
-      'dummy',
-      'dummy',
-      'EMPTY_STRING',
-      'EMPTY_STRING',
+    const newQuery = queryBuilder(
+      '',
+      'trackingId',
+      'contactNumber',
+      'registrationNumber',
+      'eventLocationId',
+      'gender',
       [
         {
           name: 'child name',
@@ -176,8 +30,8 @@ describe('elasticsearch db helper', () => {
           fields: 'MOTHER_FIRST'
         }
       ],
-      'EMPTY_STRING',
-      'EMPTY_STRING',
+      'applicationLocationId',
+      'createdBy',
       {
         event: 'EMPTY_STRING',
         status: ['DECLARED'],
@@ -203,28 +57,28 @@ describe('elasticsearch db helper', () => {
           },
           {
             term: {
-              'trackingId.keyword': 'dummy'
+              'trackingId.keyword': 'trackingId'
             }
           },
           {
             term: {
-              'contactNumber.keyword': 'dummy'
+              'contactNumber.keyword': 'contactNumber'
             }
           },
           {
             term: {
-              'registrationNumber.keyword': 'dummy'
+              'registrationNumber.keyword': 'registrationNumber'
             }
           },
           {
             term: {
-              'gender.keyword': 'EMPTY_STRING'
+              'gender.keyword': 'gender'
             }
           },
           {
             term: {
               'eventLocationId.keyword': {
-                value: 'EMPTY_STRING',
+                value: 'eventLocationId',
                 // tslint:disable-next-line
                 boost: 2.0
               }
@@ -233,7 +87,7 @@ describe('elasticsearch db helper', () => {
           {
             term: {
               'applicationLocationId.keyword': {
-                value: 'EMPTY_STRING',
+                value: 'applicationLocationId',
                 // tslint:disable-next-line
                 boost: 2.0
               }
@@ -242,7 +96,7 @@ describe('elasticsearch db helper', () => {
           {
             term: {
               'createdBy.keyword': {
-                value: 'EMPTY_STRING'
+                value: 'createdBy'
               }
             }
           },

@@ -143,38 +143,14 @@ export async function detectDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId)
-  let result
-  if (
-    results &&
-    results.body &&
-    results.body.hits &&
-    results.body.hits.hits &&
-    results.body.hits.hits[0] &&
-    results.body.hits.hits[0]._source
-  ) {
-    result = results?.body.hits.hits[0]._source as ICompositionBody
-    return result?.createdBy
-  } else {
-    return null
-  }
+  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
+  return result?.createdBy
 }
 
 export const getStatus = async (compositionId: string) => {
   const results = await searchByCompositionId(compositionId)
-  let result
-  if (
-    results &&
-    results.body &&
-    results.body.hits &&
-    results.body.hits.hits &&
-    results.body.hits.hits[0] &&
-    results.body.hits.hits[0]._source
-  ) {
-    result = results?.body.hits.hits[0]._source as ICompositionBody
-    return result?.operationHistories as IOperationHistory[]
-  } else {
-    return null
-  }
+  const result = results?.body?.hits?.hits[0]?._source as ICompositionBody
+  return result?.operationHistories as IOperationHistory[]
 }
 
 export const createStatusHistory = async (

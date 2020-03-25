@@ -76,7 +76,7 @@ export function queryBuilder(
   registrationNumber: string,
   eventLocationId: string,
   gender: string,
-  name: string,
+  nameCombinations: INameCombination[],
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -93,128 +93,6 @@ export function queryBuilder(
       }
     })
   }
-
-  if (name !== EMPTY_STRING) {
-    must.push({
-      multi_match: {
-        query: name,
-        fields: allNameFields,
-        fuzziness: 'AUTO'
-      }
-    })
-  }
-
-  if (trackingId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'trackingId.keyword': trackingId
-      }
-    })
-  }
-
-  if (contactNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'contactNumber.keyword': contactNumber
-      }
-    })
-  }
-
-  if (registrationNumber !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'registrationNumber.keyword': registrationNumber
-      }
-    })
-  }
-
-  if (gender !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'gender.keyword': gender
-      }
-    })
-  }
-
-  if (eventLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'eventLocationId.keyword': {
-          value: eventLocationId,
-          // tslint:disable-next-line
-          boost: 2.0
-        }
-      }
-    })
-  }
-
-  if (applicationLocationId !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'applicationLocationId.keyword': {
-          value: applicationLocationId,
-          // tslint:disable-next-line
-          boost: 2.0
-        }
-      }
-    })
-  }
-
-  if (createdBy !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'createdBy.keyword': {
-          value: createdBy
-        }
-      }
-    })
-  }
-
-  if (filters.event !== EMPTY_STRING) {
-    must.push({
-      term: {
-        'event.keyword': filters.event
-      }
-    })
-  }
-
-  if (filters.status) {
-    must.push({
-      terms: {
-        'type.keyword': filters.status
-      }
-    })
-  }
-
-  if (filters.type) {
-    must.push({
-      terms: {
-        'compositionType.keyword': filters.type
-      }
-    })
-  }
-
-  return {
-    bool: {
-      must,
-      should
-    }
-  }
-}
-
-export function combinationQueryBuilder(
-  trackingId: string,
-  contactNumber: string,
-  registrationNumber: string,
-  eventLocationId: string,
-  gender: string,
-  nameCombinations: INameCombination[],
-  applicationLocationId: string,
-  createdBy: string,
-  filters: IFilter
-) {
-  const must: any[] = []
-  const should: any[] = []
 
   if (nameCombinations.length > 0) {
     nameCombinations.forEach((nameCombination: INameCombination) => {

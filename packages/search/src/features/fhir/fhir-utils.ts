@@ -78,7 +78,7 @@ export function findEntry(
   return findEntryResourceByUrl(reference, bundleEntries)
 }
 
-export async function findLocation(
+export async function findEventLocation(
   code: string,
   composition: fhir.Composition
 ) {

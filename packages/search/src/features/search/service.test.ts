@@ -74,7 +74,6 @@ describe('elasticsearch params formatter', () => {
       eventLocationId: '456',
       gender: 'male',
       name: 'Anik',
-      ageCheck: 'EMPTY_STRING',
       nameCombinations: [],
       createdBy: 'EMPTY_STRING',
       from: 0,
@@ -216,7 +215,7 @@ describe('elasticsearch params formatter', () => {
   })
   it('should prepare search params to search birth applications using specific names against specific fields', () => {
     const params = formatSearchParams({
-      query: 'some query',
+      query: '',
       trackingId: 'myTrackingId',
       contactNumber: '07989898989',
       registrationNumber: 'BHGUGKJH',
@@ -227,7 +226,6 @@ describe('elasticsearch params formatter', () => {
       eventLocationId: '456',
       gender: 'male',
       name: 'EMPTY_STRING',
-      ageCheck: 'TRUE',
       nameCombinations: [
         {
           name: 'child name',
