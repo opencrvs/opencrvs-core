@@ -64,6 +64,7 @@ type User {
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar!
   identifier: Identifier
+  signature: Signature
 }
 
 type SearchUserResult {
