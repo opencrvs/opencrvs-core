@@ -13,7 +13,7 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
-import { internal } from 'boom'
+import { logger } from '@search/logger'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
@@ -28,10 +28,11 @@ export const searchComposition = async (params: ISearchQuery) => {
     })
   } catch (err) {
     if (err.statusCode === 400) {
-      throw internal('Search: bad request')
+      logger.error('Search: bad request')
     } else {
-      throw internal('Search error: ', err)
+      logger.error('Search error: ', err)
     }
+    return false
   }
   return response
 }

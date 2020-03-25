@@ -12,17 +12,8 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/index'
-import { createMockProxy } from 'jest-mock-proxy'
-import * as elasticsearch from '@elastic/elasticsearch'
-
-let client: any
 
 describe('Route authorization', () => {
-  beforeEach(() => {
-    client = createMockProxy<elasticsearch.Client>()
-    client.mockClear()
-  })
-
   it('health check', async () => {
     const server = await createServer()
     const res = await server.server.inject({
@@ -89,7 +80,6 @@ describe('Route authorization', () => {
 
   it('blocks requests with expired token', async () => {
     const server = await createServer()
-    client.search.mockResolvedValue({})
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
