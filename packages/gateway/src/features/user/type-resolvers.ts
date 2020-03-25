@@ -9,14 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLResolver,
-  GQLUserIdentifierInput,
-  GQLSignatureInput
-} from '@gateway/graphql/schema'
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
+import {
+  GQLIdentifier,
+  GQLResolver,
+  GQLSignatureInput,
+  GQLUserIdentifierInput
+} from '@gateway/graphql/schema'
 
 interface IUserModelData {
   _id: string
@@ -30,6 +31,7 @@ interface IUserModelData {
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
+  identifiers: GQLIdentifier
 }
 
 export interface IUserPayload
@@ -41,6 +43,7 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'name'
+    | 'identifiers'
   > {
   identifiers: GQLUserIdentifierInput[]
   name: {
@@ -104,6 +107,9 @@ export const userTypeResolvers: GQLResolver = {
     },
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id
+    },
+    identifier(userModel: IUserModelData) {
+      return userModel.identifiers && userModel.identifiers[0]
     },
     async primaryOffice(userModel: IUserModelData, _, authHeader) {
       return await fetchFHIR(
