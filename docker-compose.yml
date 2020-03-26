@@ -11,19 +11,19 @@ version: '3.3'
 
 services:
   client:
-    image: jembi/ocrvs-client:${VERSION:-latest}
+    image: opencrvs/ocrvs-client:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/client/Dockerfile
     restart: unless-stopped
   login:
-    image: jembi/ocrvs-login:${VERSION:-latest}
+    image: opencrvs/ocrvs-login:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/login/Dockerfile
     restart: unless-stopped
   gateway:
-    image: jembi/ocrvs-gateway:${VERSION:-latest}
+    image: opencrvs/ocrvs-gateway:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/gateway/Dockerfile
@@ -41,7 +41,7 @@ services:
       - CHECK_INVALID_TOKEN=true
   # User facing services
   workflow:
-    image: jembi/ocrvs-workflow:${VERSION:-latest}
+    image: opencrvs/ocrvs-workflow:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/workflow/Dockerfile
@@ -57,7 +57,7 @@ services:
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
   search:
-    image: jembi/ocrvs-search:${VERSION:-latest}
+    image: opencrvs/ocrvs-search:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/search/Dockerfile
@@ -70,7 +70,7 @@ services:
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
   metrics:
-    image: jembi/ocrvs-metrics:${VERSION:-latest}
+    image: opencrvs/ocrvs-metrics:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/metrics/Dockerfile
@@ -84,7 +84,7 @@ services:
       - CHECK_INVALID_TOKEN=true
   # END User facing services
   auth:
-    image: jembi/ocrvs-auth:${VERSION:-latest}
+    image: opencrvs/ocrvs-auth:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/auth/Dockerfile
@@ -96,7 +96,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
   user-mgnt:
-    image: jembi/ocrvs-user-mgnt:${VERSION:-latest}
+    image: opencrvs/ocrvs-user-mgnt:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/user-mgnt/Dockerfile
@@ -109,7 +109,7 @@ services:
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
   notification:
-    image: jembi/ocrvs-notification:${VERSION:-latest}
+    image: opencrvs/ocrvs-notification:${VERSION:-latest}
     build:
       context: .
       dockerfile: ./packages/notification/Dockerfile
