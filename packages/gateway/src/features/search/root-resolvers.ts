@@ -13,6 +13,47 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { postSearch } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
+import { ApiResponse } from '@elastic/elasticsearch'
+
+// Complete definition of the Search response
+interface IShardsResponse {
+  total: number
+  successful: number
+  failed: number
+  skipped: number
+}
+
+interface IExplanation {
+  value: number
+  description: string
+  details: IExplanation[]
+}
+
+export interface ISearchResponse<T> {
+  took: number
+  timed_out: boolean
+  _scroll_id?: string
+  _shards: IShardsResponse
+  hits: {
+    total: number
+    max_score: number
+    hits: Array<{
+      _index: string
+      _type: string
+      _id: string
+      _score: number
+      _source: T
+      _version?: number
+      _explanation?: IExplanation
+      fields?: any
+      highlight?: any
+      inner_hits?: any
+      matched_queries?: string[]
+      sort?: string[]
+    }>
+  }
+  aggregations?: any
+}
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -73,12 +114,21 @@ export const resolvers: GQLResolver = {
         searchCriteria.createdBy = userId
       }
 
-      const searchResult = await postSearch(authHeader, searchCriteria)
+      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
+        authHeader,
+        searchCriteria
+      )
       return {
         totalItems:
-          (searchResult && searchResult.hits && searchResult.hits.total) || 0,
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.total) ||
+          0,
         results:
-          (searchResult && searchResult.hits && searchResult.hits.hits) || []
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.hits) ||
+          []
       }
     }
   }

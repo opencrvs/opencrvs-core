@@ -43,7 +43,6 @@ describe('Route authorization', () => {
     })
     expect(res.statusCode).toBe(401)
   })
-
   it('accepts requests with a valid token', async () => {
     const server = await createServer()
     const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {

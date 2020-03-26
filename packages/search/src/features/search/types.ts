@@ -19,6 +19,10 @@ export interface ISearchQuery {
   contactNumber?: string
   registrationNumber?: string
   name?: string
+  ageCheck?: string
+  nameCombinations?: INameCombination[]
+  eventLocationId?: string
+  gender?: string
   event?: string
   type?: string[]
   status?: string[]
@@ -27,6 +31,11 @@ export interface ISearchQuery {
   from?: number
   size?: number
   sort?: SortOrder
+}
+
+export interface INameCombination {
+  name: string
+  fields: string
 }
 
 export interface IFilter {
