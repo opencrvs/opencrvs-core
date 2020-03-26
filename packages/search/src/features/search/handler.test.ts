@@ -130,7 +130,7 @@ describe('Verify handlers', () => {
           Authorization: `Bearer ${token}`
         }
       })
-      expect(JSON.parse(res.payload)).toHaveProperty('_shards')
+      expect(JSON.parse(res.payload).body).toHaveProperty('_shards')
     })
 
     afterAll(async () => {
