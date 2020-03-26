@@ -2039,60 +2039,64 @@ export const mockComposition: fhir.Composition = {
 }
 
 export const mockSearchResponse = {
-  hits: {
-    total: 2,
-    max_score: 2.7509375,
-    hits: [
-      {
-        _index: 'ocrvs',
-        _type: 'compositions',
-        _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
-        _score: 2.7509375,
-        _source: {
-          childFirstNames: '',
-          childFamilyName: 'sarkar',
-          childFirstNamesLocal: 'test',
-          childFamilyNameLocal: 'সরকার',
-          childDoB: '1990-02-01',
-          motherFirstNames: '',
-          motherFamilyName: 'sarkar',
-          motherFirstNamesLocal: 'চট্টগ্রাম',
-          motherFamilyNameLocal: 'সরকার',
-          motherDoB: '1960-02-01',
-          motherIdentifier: '22123123123123123',
-          createdBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-          updatedBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
+  body: {
+    hits: {
+      total: 2,
+      max_score: 2.7509375,
+      hits: [
+        {
+          _index: 'ocrvs',
+          _type: 'compositions',
+          _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
+          _score: 2.7509375,
+          _source: {
+            childFirstNames: '',
+            childFamilyName: 'sarkar',
+            childFirstNamesLocal: 'test',
+            childFamilyNameLocal: 'সরকার',
+            childDoB: '1990-02-01',
+            motherFirstNames: '',
+            motherFamilyName: 'sarkar',
+            motherFirstNamesLocal: 'চট্টগ্রাম',
+            motherFamilyNameLocal: 'সরকার',
+            motherDoB: '1960-02-01',
+            motherIdentifier: '22123123123123123',
+            createdBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            updatedBy: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 
 export const mockSearchResponseWithoutCreatedBy = {
-  hits: {
-    total: 2,
-    max_score: 2.7509375,
-    hits: [
-      {
-        _index: 'ocrvs',
-        _type: 'compositions',
-        _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
-        _score: 2.7509375,
-        _source: {
-          childFirstNames: '',
-          childFamilyName: 'sarkar',
-          childFirstNamesLocal: 'test',
-          childFamilyNameLocal: 'সরকার',
-          childDoB: '1990-02-01',
-          motherFirstNames: '',
-          motherFamilyName: 'sarkar',
-          motherFirstNamesLocal: 'চট্টগ্রাম',
-          motherFamilyNameLocal: 'সরকার',
-          motherDoB: '1960-02-01',
-          motherIdentifier: '22123123123123123'
+  body: {
+    hits: {
+      total: 2,
+      max_score: 2.7509375,
+      hits: [
+        {
+          _index: 'ocrvs',
+          _type: 'compositions',
+          _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
+          _score: 2.7509375,
+          _source: {
+            childFirstNames: '',
+            childFamilyName: 'sarkar',
+            childFirstNamesLocal: 'test',
+            childFamilyNameLocal: 'সরকার',
+            childDoB: '1990-02-01',
+            motherFirstNames: '',
+            motherFamilyName: 'sarkar',
+            motherFirstNamesLocal: 'চট্টগ্রাম',
+            motherFamilyNameLocal: 'সরকার',
+            motherDoB: '1960-02-01',
+            motherIdentifier: '22123123123123123'
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 
@@ -2567,34 +2571,36 @@ export const mockDeathRejectionTaskBundleWithoutCompositionReference = {
 }
 
 export const mockSearchResult = {
-  took: 1,
-  timed_out: false,
-  _shards: {
-    total: 10,
-    successful: 10,
-    skipped: 0,
-    failed: 0
-  },
-  hits: {
-    total: 6,
-    max_score: 1,
-    hits: [
-      {
-        _index: 'ocrvs',
-        _type: 'compositions',
-        _id: 'BGM9CA2',
-        _score: 1,
-        _source: {
-          childFamilyName: 'Moajjem',
-          childFamilyNameLocal: 'মোয়াজ্জেম',
-          childDoB: '2011-11-11',
-          gender: 'male',
-          motherFamilyName: 'Moajjem',
-          motherFamilyNameLocal: 'মোয়াজ্জেম',
-          motherIdentifier: '11111111111111111'
+  body: {
+    took: 1,
+    timed_out: false,
+    _shards: {
+      total: 10,
+      successful: 10,
+      skipped: 0,
+      failed: 0
+    },
+    hits: {
+      total: 6,
+      max_score: 1,
+      hits: [
+        {
+          _index: 'ocrvs',
+          _type: 'compositions',
+          _id: 'BGM9CA2',
+          _score: 1,
+          _source: {
+            childFamilyName: 'Moajjem',
+            childFamilyNameLocal: 'মোয়াজ্জেম',
+            childDoB: '2011-11-11',
+            gender: 'male',
+            motherFamilyName: 'Moajjem',
+            motherFamilyNameLocal: 'মোয়াজ্জেম',
+            motherIdentifier: '11111111111111111'
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 
@@ -3519,6 +3525,19 @@ export const mockUserModelResponse = {
   securityQuestionAnswers: [],
   identifiers: [],
   creationDate: 1574952940762
+}
+
+export const mockEncounterResponse = {
+  resourceType: 'Encounter',
+  status: 'finished',
+  id: 'd3b9f408-a16a-42c2-9cfe-53ad2fbfda99',
+  location: [
+    { location: { reference: 'Location/43f49a50-d8f4-4f30-ba84-6bc7bc181b67' } }
+  ],
+  meta: {
+    lastUpdated: '2020-03-09T10:20:36.532+00:00',
+    versionId: 'e927451f-e19f-40dd-be7b-5b6c50c26d9d'
+  }
 }
 
 export const mockLocationResponse = {

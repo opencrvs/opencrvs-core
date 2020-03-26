@@ -17,13 +17,13 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "6",
     "@opencrvs/commons": "^1.0.0-alpha.2.0",
     "@types/hapi-pino": "^6.3.0",
     "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "country-data": "^0.0.31",
-    "elasticsearch": "^15.2.0",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
     "@types/boom": "^7.2.0",
-    "@types/elasticsearch": "^5.0.30",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",

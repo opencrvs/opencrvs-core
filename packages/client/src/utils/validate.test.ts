@@ -242,13 +242,12 @@ describe('validate', () => {
         message: {
           id: 'validations.validBirthRegistrationNumber',
           defaultMessage:
-            'The Birth Registration Number can only be numeric where the length must be within {min} and {max}',
+            'The Birth Registration Number can only be numeric and must be {validLength} characters long',
           description:
             'The error message that appears when an invalid value is used as brn'
         },
         props: {
-          min: 17,
-          max: 18
+          validLength: 17
         }
       }
       expect(validIDNumber(typeOfID)(badValue)).toEqual(response)

@@ -46,8 +46,9 @@ describe('when user is selecting the vital event', () => {
           .hostNodes()
           .simulate('click')
       })
-      it('takes user to the informant selection view', () => {
-        expect(app.find('#select_informant_view').hostNodes()).toHaveLength(1)
+      it('takes user to the event info view', () => {
+        console.log(app.debug())
+        expect(app.find('#birth-info-container').hostNodes()).toHaveLength(1)
       })
     })
 

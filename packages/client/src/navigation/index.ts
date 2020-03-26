@@ -37,7 +37,8 @@ import {
   REVIEW_CERTIFICATE,
   PRINT_CERTIFICATE_PAYMENT,
   PERFORMANCE_REPORT_LIST,
-  PERFORMANCE_REPORT
+  PERFORMANCE_REPORT,
+  EVENT_INFO
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -122,6 +123,10 @@ export function goToBirthContactPoint(applicationId: string) {
       applicationId
     })
   )
+}
+
+export function goToEventInfo(eventType: Event) {
+  return push(formatUrl(EVENT_INFO, { eventType }))
 }
 
 export function goToDeathContactPoint(applicationId: string) {
