@@ -2436,6 +2436,7 @@ export const mockOfflineData = {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
+    userForm: ISerializedForm
   },
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {

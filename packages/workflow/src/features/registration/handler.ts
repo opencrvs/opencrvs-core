@@ -17,7 +17,8 @@ import {
   markEventAsRegistered,
   modifyRegistrationBundle,
   setTrackingId,
-  markBundleAsWaitingValidation
+  markBundleAsWaitingValidation,
+  invokeRegistrationValidation
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -69,7 +70,32 @@ async function sendBundleToHearth(
   return res.json()
 }
 
-function populateCompositionWithID(
+function getSectionFromResponse(
+  response: fhir.Bundle,
+  reference: string
+): fhir.BundleEntry[] {
+  return (response.entry &&
+    response.entry.filter(o => {
+      const res = o.response as fhir.BundleEntryResponse
+      return Object.keys(res).some(k =>
+        res[k].toLowerCase().includes(reference.toLowerCase())
+      )
+    })) as fhir.BundleEntry[]
+}
+
+function getSectionIndex(
+  section: fhir.CompositionSection[]
+): number | undefined {
+  let index
+  section.filter((obj: fhir.CompositionSection, i: number) => {
+    if (obj.title && obj.title === 'Birth encounter') {
+      index = i
+    }
+  })
+  return index
+}
+
+export function populateCompositionWithID(
   payload: fhir.Bundle,
   response: fhir.Bundle
 ) {
@@ -79,13 +105,38 @@ function populateCompositionWithID(
     payload.entry[0].resource &&
     payload.entry[0].resource.resourceType === 'Composition'
   ) {
-    if (!payload.entry[0].resource.id) {
-      payload.entry[0].resource.id =
-        response &&
-        response.entry &&
-        response.entry[0].response &&
-        response.entry[0].response.location &&
-        response.entry[0].response.location.split('/')[3]
+    const responseEncounterSection = getSectionFromResponse(
+      response,
+      'Encounter'
+    )
+    const composition = payload.entry[0].resource as fhir.Composition
+    if (composition.section) {
+      const payloadEncounterSectionIndex = getSectionIndex(composition.section)
+      if (
+        payloadEncounterSectionIndex !== undefined &&
+        composition.section[payloadEncounterSectionIndex] &&
+        composition.section[payloadEncounterSectionIndex].entry &&
+        responseEncounterSection &&
+        responseEncounterSection[0] &&
+        responseEncounterSection[0].response &&
+        responseEncounterSection[0].response.location
+      ) {
+        const entry = composition.section[payloadEncounterSectionIndex]
+          .entry as fhir.Reference[]
+        entry[0].reference = responseEncounterSection[0].response.location.split(
+          '/'
+        )[3]
+        composition.section[payloadEncounterSectionIndex].entry = entry
+      }
+      if (!composition.id) {
+        composition.id =
+          response &&
+          response.entry &&
+          response.entry[0].response &&
+          response.entry[0].response.location &&
+          response.entry[0].response.location.split('/')[3]
+      }
+      payload.entry[0].resource = composition
     }
   }
 }
@@ -119,7 +170,14 @@ export async function createRegistrationHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
-
+    if (
+      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
+      event === Events.DEATH_NEW_WAITING_VALIDATION
+    ) {
+      // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
+      // validate registration with resource service and set resulting registration number
+      invokeRegistrationValidation(payload, getToken(request))
+    }
     if (isEventNonNotifiable(event)) {
       return resBundle
     }
@@ -266,6 +324,8 @@ export async function markEventAsWaitingValidationHandler(
       getToken(request)
     )
     const resBundle = await postToHearth(payload)
+    populateCompositionWithID(payload, resBundle)
+    invokeRegistrationValidation(payload, getToken(request))
 
     return resBundle
   } catch (error) {

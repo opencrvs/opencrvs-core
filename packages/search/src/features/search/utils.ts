@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFilter } from '@search/features/search/types'
+import { IFilter, INameCombination } from '@search/features/search/types'
 const SEARCHABLE_FIELDS = [
   'childFirstNames',
   'childFamilyName',
@@ -55,6 +55,18 @@ const allNameFields = [
   'spouseFamilyNameLocal'
 ]
 
+const childFirstNameFields = ['childFirstNames', 'childFirstNamesLocal']
+
+const motherFirstNameFields = ['motherFirstNames', 'motherFirstNamesLocal']
+
+const fatherFirstNameFields = ['fatherFirstNames', 'fatherFirstNamesLocal']
+
+const childFamilyNameFields = ['childFamilyName', 'childFamilyNameLocal']
+
+const motherFamilyNameFields = ['motherFamilyName', 'motherFamilyNameLocal']
+
+const fatherFamilyNameFields = ['fatherFamilyName', 'fatherFamilyNameLocal']
+
 export const EMPTY_STRING = ''
 
 export function queryBuilder(
@@ -62,7 +74,9 @@ export function queryBuilder(
   trackingId: string,
   contactNumber: string,
   registrationNumber: string,
-  name: string,
+  eventLocationId: string,
+  gender: string,
+  nameCombinations: INameCombination[],
   applicationLocationId: string,
   createdBy: string,
   filters: IFilter
@@ -80,13 +94,15 @@ export function queryBuilder(
     })
   }
 
-  if (name !== EMPTY_STRING) {
-    must.push({
-      multi_match: {
-        query: name,
-        fields: allNameFields,
-        fuzziness: 'AUTO'
-      }
+  if (nameCombinations.length > 0) {
+    nameCombinations.forEach((nameCombination: INameCombination) => {
+      must.push({
+        multi_match: {
+          query: nameCombination.name,
+          fields: selectNameFields(nameCombination.fields),
+          fuzziness: 'AUTO'
+        }
+      })
     })
   }
 
@@ -110,6 +126,26 @@ export function queryBuilder(
     must.push({
       term: {
         'registrationNumber.keyword': registrationNumber
+      }
+    })
+  }
+
+  if (gender !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'gender.keyword': gender
+      }
+    })
+  }
+
+  if (eventLocationId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'eventLocationId.keyword': {
+          value: eventLocationId,
+          // tslint:disable-next-line
+          boost: 2.0
+        }
       }
     })
   }
@@ -165,5 +201,24 @@ export function queryBuilder(
       must,
       should
     }
+  }
+}
+
+function selectNameFields(fields: string): string[] {
+  switch (fields) {
+    case 'CHILD_FIRST':
+      return childFirstNameFields
+    case 'CHILD_FAMILY':
+      return childFamilyNameFields
+    case 'FATHER_FIRST':
+      return fatherFirstNameFields
+    case 'FATHER_FAMILY':
+      return fatherFamilyNameFields
+    case 'MOTHER_FIRST':
+      return motherFirstNameFields
+    case 'MOTHER_FAMILY':
+      return motherFamilyNameFields
+    default:
+      return allNameFields
   }
 }
