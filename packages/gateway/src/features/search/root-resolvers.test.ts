@@ -57,7 +57,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for eventType', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -74,7 +76,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for status', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -91,7 +95,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for type', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -108,7 +114,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for locationIds', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -125,7 +133,9 @@ describe('Search root resolvers', () => {
     it('should returns error for not register scope user without location IDs', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
 
@@ -142,7 +152,9 @@ describe('Search root resolvers', () => {
     it('should returns error for invalid locationIds', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
 
@@ -159,7 +171,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for searchContent', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -176,7 +190,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for trackingId', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -193,7 +209,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for registrationNumber', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -210,7 +228,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for contactNumber', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -227,7 +247,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for userId', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -244,7 +266,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results with given count', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -262,7 +286,7 @@ describe('Search root resolvers', () => {
     it('returns total item as 0 and an empty array in-case of invalid result found from elastic', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: null
+          body: { hits: null }
         })
       )
       const result = await resolvers.Query.searchEvents(
@@ -282,7 +306,9 @@ describe('Search root resolvers', () => {
     it('returns an array of composition results for name', async () => {
       fetch.mockResponse(
         JSON.stringify({
-          hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
         })
       )
       const result = await resolvers.Query.searchEvents(

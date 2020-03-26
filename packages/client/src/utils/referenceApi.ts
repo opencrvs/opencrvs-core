@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation } from '@client/offline/reducer'
-import { getToken } from '@client/utils/authUtils'
-import { ILanguage } from '@client/i18n/reducer'
 import { ISerializedForm } from '@client/forms'
-import * as ImageDownloader from 'image-to-base64'
+import { ILanguage } from '@client/i18n/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import { getToken } from '@client/utils/authUtils'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import * as ImageDownloader from 'image-to-base64'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -31,6 +31,7 @@ export interface IDefinitionsResponse {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
+    userForm: ISerializedForm
   }
   templates: {
     receipt?: IPDFTemplate
