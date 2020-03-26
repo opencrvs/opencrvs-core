@@ -35,7 +35,8 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  selectObservationEntry
+  selectObservationEntry,
+  findEventLocation
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from 'hapi'
@@ -150,7 +151,7 @@ async function createIndexBody(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
-  createChildIndex(body, composition, bundleEntries)
+  await createChildIndex(body, composition, bundleEntries)
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
   createInformantIndex(body, composition, bundleEntries)
@@ -160,7 +161,7 @@ async function createIndexBody(
   await createStatusHistory(body, task, authHeader)
 }
 
-function createChildIndex(
+async function createChildIndex(
   body: IBirthCompositionBody,
   composition: fhir.Composition,
   bundleEntries?: fhir.BundleEntry[]
@@ -171,11 +172,10 @@ function createChildIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const birthEncounter = findEntry(
+  const birthLocation = (await findEventLocation(
     BIRTH_ENCOUNTER_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Encounter
+    composition
+  )) as fhir.Location
 
   const childName = child && findName(NAME_EN, child.name)
   const childNameLocal = child && findNameLocale(child.name)
@@ -190,10 +190,7 @@ function createChildIndex(
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
   body.eventLocationId =
-    birthEncounter &&
-    birthEncounter.location &&
-    birthEncounter.location[0].location.reference &&
-    birthEncounter.location[0].location.reference.split('/')[1]
+    birthLocation && birthLocation.address && birthLocation.address.district
 }
 
 function createMotherIndex(
