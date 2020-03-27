@@ -44,8 +44,11 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
+import { RouteComponentProps } from 'react-router'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 export interface IUserReviewFormProps {
+  userId?: string
   section: IFormSection
   formData: IFormSectionData
   client: ApolloClient<unknown>
@@ -64,7 +67,9 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type IFullProps = IUserReviewFormProps & IntlShapeProps
+type IFullProps = IUserReviewFormProps &
+  IntlShapeProps &
+  RouteComponentProps<{ userId?: string }>
 
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
@@ -142,11 +147,15 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section, userFormSection } = this.props
+    const { intl, section, userId, userFormSection } = this.props
 
     return (
       <ActionPageLight
-        title={intl.formatMessage(section.title)}
+        title={
+          userId
+            ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+            : intl.formatMessage(section.title)
+        }
         goBack={this.props.goBack}
       >
         <FormTitle id={`${section.id}_title`}>

@@ -33,6 +33,7 @@ import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -46,6 +47,7 @@ export const Action = styled.div`
 `
 
 type IProps = {
+  userId?: string
   section: IFormSection
   formData: IFormSectionData
   activeGroup: IFormSectionGroup
@@ -97,12 +99,16 @@ class UserFormComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { section, intl, activeGroup } = this.props
+    const { section, intl, activeGroup, userId } = this.props
 
     return (
       <>
         <ActionPageLight
-          title={intl.formatMessage(section.title)}
+          title={
+            userId
+              ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+              : intl.formatMessage(section.title)
+          }
           goBack={this.handleBackAction}
         >
           <FormTitle id="form-title">
