@@ -63,7 +63,7 @@ services:
       - '9090:9090'
 
   resources:
-    image: jembi/ocrvs-zambia:latest
+    image: opencrvs/ocrvs-zambia:latest
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
     environment:

@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
 import {
   IFormSection,
@@ -19,21 +17,22 @@ import {
 } from '@client/forms'
 import {
   getSectionFields,
-  hasFormError,
-  getVisibleGroupFields
+  getVisibleGroupFields,
+  hasFormError
 } from '@client/forms/utils'
-import { goToCreateUserSection, goBack } from '@client/navigation'
-import styled from '@client/styledComponents'
-import { modifyUserFormData, clearUserFormData } from '@client/user/userReducer'
-import { FormikTouched, FormikValues } from 'formik'
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
 import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
-import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import { goBack, goToCreateUserSection } from '@client/navigation'
+import styled from '@client/styledComponents'
+import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { FormikTouched, FormikValues } from 'formik'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h2Style};
@@ -87,7 +86,7 @@ class UserFormComponent extends React.Component<IFullProps> {
 
   handleBackAction = () => {
     this.props.goBack()
-    if (this.props.activeGroup.id === userSection.groups[0].id) {
+    if (this.props.activeGroup.id === this.props.section.groups[0].id) {
       this.props.clearUserFormData()
     }
   }

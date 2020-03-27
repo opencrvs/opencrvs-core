@@ -9,28 +9,42 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { offlineDataReady } from '@client/offline/actions'
+import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
   getFileFromBase64String,
+  mockOfflineData,
   validImageB64String
 } from '@client/tests/util'
-import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
-import { createStore } from '@client/store'
-import { ReactWrapper } from 'enzyme'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
+import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import {
-  mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
+  mockFetchRoleGraphqlOperation,
   mockUserGraphqlOperation
 } from '@client/views/SysAdmin/utils'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
+
+  beforeEach(async () => {
+    await store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities,
+        assets: mockOfflineData.assets
+      })
+    )
+  })
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
@@ -39,8 +53,8 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: userSection.id,
-              groupId: userSection.groups[2].id
+              sectionId: mockOfflineData.forms.userForm.sections[0].id,
+              groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
             },
             isExact: true,
             path: '/createUser',
@@ -130,8 +144,8 @@ describe('signature upload tests', () => {
         <CreateNewUser
           match={{
             params: {
-              sectionId: 'preview',
-              groupId: 'preview-' + userSection.groups[0].id
+              sectionId: mockOfflineData.forms.userForm.sections[1].id,
+              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
             },
             isExact: true,
             path: '/createUser',

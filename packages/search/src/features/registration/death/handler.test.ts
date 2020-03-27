@@ -23,7 +23,8 @@ import {
   mockMinimalDeathFhirBundle,
   mockSearchResponse,
   mockSearchResponseWithoutCreatedBy,
-  mockUserModelResponse
+  mockUserModelResponse,
+  mockEncounterResponse
 } from '@search/test/utils'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
@@ -88,6 +89,8 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
@@ -112,6 +115,8 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 if the some sections is missing too', async () => {
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )
@@ -145,6 +150,8 @@ describe('Verify handlers', () => {
       )
 
       fetch.mockResponses(
+        [JSON.stringify(mockEncounterResponse), { status: 200 }],
+        [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }]
       )

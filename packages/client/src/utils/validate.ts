@@ -519,10 +519,7 @@ const hasValidLength = (value: string, length: number): boolean =>
 
 export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
   const validNationalIDLengths = [10, 17]
-  const validBirthRegistrationNumberLength = {
-    min: 17,
-    max: 18
-  }
+  const validBirthRegistrationNumberLength = 17
   const validDeathRegistrationNumberLength = 18
   const validPassportLength = 9
   const validDrivingLicenseLength = 15
@@ -546,15 +543,14 @@ export const validIDNumber = (typeOfID: string): Validation => (value: any) => {
       }
 
     case BIRTH_REGISTRATION_NUMBER:
-      return isLengthWithinRange(
+      return hasValidLength(
         value.toString(),
-        validBirthRegistrationNumberLength.min,
-        validBirthRegistrationNumberLength.max
+        validBirthRegistrationNumberLength
       )
         ? undefined
         : {
             message: messages.validBirthRegistrationNumber,
-            props: validBirthRegistrationNumberLength
+            props: { validLength: validBirthRegistrationNumberLength }
           }
 
     case DEATH_REGISTRATION_NUMBER:
