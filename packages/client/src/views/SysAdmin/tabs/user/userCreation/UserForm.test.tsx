@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { createTestComponent, mockOfflineData } from '@client/tests/util'
+import { deserializeFormSection } from '@client/forms/mappings/deserializer'
+import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
+import { createTestComponent, mockOfflineData } from '@client/tests/util'
 import { UserForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
-import { deserializeFormSection } from '@client/forms/mappings/deserializer'
-import { offlineDataReady } from '@client/offline/actions'
-import { userSection } from '@client/forms/user/fieldDefinitions/user-section'
+import * as React from 'react'
 
 const { store } = createStore()
 
@@ -37,8 +36,13 @@ describe('Create new user page tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm
-        section={deserializeFormSection(userSection)}
-        activeGroup={deserializeFormSection(userSection).groups[0]}
+        section={deserializeFormSection(
+          mockOfflineData.forms.userForm.sections[0]
+        )}
+        activeGroup={
+          deserializeFormSection(mockOfflineData.forms.userForm.sections[0])
+            .groups[0]
+        }
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,

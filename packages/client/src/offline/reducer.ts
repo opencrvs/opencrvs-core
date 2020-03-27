@@ -57,6 +57,7 @@ export interface IOfflineData {
       birth: ICertificateCollectorDefinition
       death: ICertificateCollectorDefinition
     }
+    userForm: ISerializedForm
   }
   templates: {
     receipt?: IPDFTemplate

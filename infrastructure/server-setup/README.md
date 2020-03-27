@@ -82,14 +82,9 @@ Before the deployment can be done a few secrets need to be manually added to the
 ssh into the leader manager and run the following, replacing the values with the actual secrets:
 
 ```sh
-# For Bangladesh DHIS2 medaitor, allows birth notification API access to the OpenHIM
+# For API integration medaitors, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
-```
-
-```sh
-# For Bangladesh NID API integration
-printf "<oisf-secret>" | docker secret create oisf-secret -
 ```
 
 ssh into the leader manager and run the following, replacing the following values with the actual secrets for your SMS provider of choice:

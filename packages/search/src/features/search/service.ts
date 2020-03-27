@@ -9,14 +9,35 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { client } from '@search/elasticsearch/client'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
+import { logger } from '@search/logger'
 
 const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
+  const formattedParams = formatSearchParams(params)
+  let response: ApiResponse<ISearchResponse<any>>
+  try {
+    // NOTE: we are using the destructuring assignment
+    response = await client.search(formattedParams, {
+      ignore: [404]
+    })
+  } catch (err) {
+    if (err.statusCode === 400) {
+      logger.error('Search: bad request')
+    } else {
+      logger.error('Search error: ', err)
+    }
+    return undefined
+  }
+  return response
+}
+
+export function formatSearchParams(params: ISearchQuery) {
   const {
     query = EMPTY_STRING,
     trackingId = EMPTY_STRING,
@@ -26,14 +47,25 @@ export const searchComposition = async (params: ISearchQuery) => {
     status,
     type,
     applicationLocationId = EMPTY_STRING,
+    eventLocationId = EMPTY_STRING,
+    gender = EMPTY_STRING,
     name = EMPTY_STRING,
+    nameCombinations = [],
     createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC
   } = params
 
-  return client.search({
+  if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
+    nameCombinations.push({
+      name,
+      fields: 'ALL'
+    })
+  }
+
+  return {
+    index: 'ocrvs',
     type: DEFAULT_SEARCH_TYPE,
     from,
     size,
@@ -43,12 +75,14 @@ export const searchComposition = async (params: ISearchQuery) => {
         trackingId,
         contactNumber,
         registrationNumber,
-        name,
+        eventLocationId,
+        gender,
+        nameCombinations,
         applicationLocationId,
         createdBy,
         { event, status, type }
       ),
       sort: [{ dateOfApplication: sort }]
     }
-  })
+  }
 }
