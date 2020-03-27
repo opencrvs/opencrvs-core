@@ -100,6 +100,7 @@ export const generateEmptyBirthKeyFigure = (
 
 export const fetchEstimateByLocation = async (
   locationData: Location,
+  estimationForDays: number,
   estimatedYear: number,
   authHeader: IAuthHeader
 ): Promise<IEstimation> => {
@@ -152,12 +153,15 @@ export const fetchEstimateByLocation = async (
     }
     return await fetchEstimateByLocation(
       await fetchFHIR(locationData.partOf.reference, authHeader),
+      estimationForDays,
       estimatedYear,
       authHeader
     )
   }
   return {
-    estimation: Math.round((crudRate * population) / 1000),
+    estimation: Math.round(
+      ((crudRate * population) / 1000) * (estimationForDays / 365)
+    ),
     locationId: locationData.id,
     estimationYear: actualEstimationYear,
     locationLevel: getLocationLevelFromLocationData(locationData)
@@ -180,15 +184,12 @@ export const fetchEstimateFor45DaysByLocationId = async (
   authHeader: IAuthHeader
 ): Promise<IEstimation> => {
   const locationData: Location = await fetchFHIR(locationId, authHeader)
-  const estimate = await fetchEstimateByLocation(
+  return await fetchEstimateByLocation(
     locationData,
+    45, // For 45 days
     estimatedYear,
     authHeader
   )
-  return {
-    ...estimate,
-    estimation: Math.round(estimate.estimation / 8.111111) // for 45 day
-  }
 }
 
 export const getDistrictLocation = async (

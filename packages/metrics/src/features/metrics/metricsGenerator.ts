@@ -357,15 +357,15 @@ export async function fetchKeyFigures(
   location: Location,
   authHeader: IAuthHeader
 ) {
-  const estimatedFigure = await fetchEstimateByLocation(
+  const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
-    // TODO: need to adjust this when date range is properly introduced
+    45, // For 45 Days
     new Date().getFullYear(),
     authHeader
   )
 
   const keyFigures: IBirthKeyFigures[] = []
-  const queryLocationId = `Location/${estimatedFigure.locationId}`
+  const queryLocationId = `Location/${estimatedFigureFor45Days.locationId}`
 
   /* Populating < 45D data */
   const within45DaysData: IGroupedByGender[] = await query(
@@ -384,10 +384,16 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS,
       within45DaysData,
-      estimatedFigure.estimation
+      estimatedFigureFor45Days.estimation
     )
   )
   /* Populating > 45D and < 365D data */
+  const estimatedFigureFor1Year = await fetchEstimateByLocation(
+    location,
+    365, // For 1 year
+    new Date().getFullYear(),
+    authHeader
+  )
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
       FROM birth_reg
@@ -405,7 +411,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS_TO_1_YEAR,
       within1YearData,
-      estimatedFigure.estimation
+      estimatedFigureFor1Year.estimation
     )
   )
   /* Populating < 365D data */
@@ -420,7 +426,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_1_YEAR,
       fullData,
-      estimatedFigure.estimation
+      estimatedFigureFor1Year.estimation
     )
   )
   return keyFigures
