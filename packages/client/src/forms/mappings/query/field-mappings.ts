@@ -125,6 +125,24 @@ export const identifierToFieldTransformer = (identifierField: string) => (
   return transformedData
 }
 
+export const identifierWithTypeToFieldTransformer = (
+  identifierType: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  let identifier
+  if (
+    (identifier = queryData[sectionId] && queryData[sectionId].identifier) &&
+    identifier.system === identifierType
+  ) {
+    transformedData[sectionId][field.name] = identifier.value
+  }
+  return transformedData
+}
+
 export const identityToFieldTransformer = (
   identifierField: string,
   identityType: string
