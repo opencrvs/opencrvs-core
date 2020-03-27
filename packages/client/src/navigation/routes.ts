@@ -64,6 +64,7 @@ export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const CREATE_USER = '/createUser'
 export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
+export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 
 export const PERFORMANCE_REPORT_LIST = '/performance/reports/:reportType?'
 export const PERFORMANCE_REPORT = '/performance/report'

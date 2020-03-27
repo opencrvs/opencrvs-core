@@ -38,11 +38,12 @@ import {
   PRINT_CERTIFICATE_PAYMENT,
   PERFORMANCE_REPORT_LIST,
   PERFORMANCE_REPORT,
-  EVENT_INFO
+  EVENT_INFO,
+  REVIEW_USER_DETAILS
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
-import { Event } from '@client/forms'
+import { Event, UserSection } from '@client/forms'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 
@@ -87,12 +88,20 @@ type GoToFieldAgentHome = {
     tabId: string
   }
 }
+export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
+type GoToReviewUserDetails = {
+  type: typeof GO_TO_REVIEW_USER_DETAILS
+  payload: {
+    userId: string
+  }
+}
 
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
   | GoToFieldAgentHome
   | GoToSysAdminHome
+  | GoToReviewUserDetails
 export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
 type GoToSysAdminHome = {
   type: typeof GO_TO_SYS_ADMIN_HOME
@@ -323,6 +332,15 @@ export function goToCreateNewUser() {
   return push(CREATE_USER)
 }
 
+export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
+  return {
+    type: GO_TO_REVIEW_USER_DETAILS,
+    payload: {
+      userId
+    }
+  }
+}
+
 export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
@@ -471,6 +489,19 @@ export function navigationReducer(state: INavigationState, action: any) {
               groupId: nextGroupId
             }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
+          )
+        )
+      )
+    case GO_TO_REVIEW_USER_DETAILS:
+      const { userId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
           )
         )
       )

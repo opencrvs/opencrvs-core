@@ -271,6 +271,11 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={routes.REVIEW_USER_DETAILS}
+                                            component={CreateNewUser}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={
                                               routes.PERFORMANCE_REPORT_LIST
                                             }
