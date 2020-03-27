@@ -131,7 +131,7 @@ describe('verify metrics util', () => {
   })
   describe('verify fetchEstimateByLocation', () => {
     it('Returns estimate properly', async () => {
-      const result = await fetchEstimateByLocation(location, 2017, {
+      const result = await fetchEstimateByLocation(location, 365, 2017, {
         Authorization: 'Bearer token'
       })
       expect(result).toEqual({
@@ -143,20 +143,20 @@ describe('verify metrics util', () => {
     })
     it('Throws error if location doesnot have extension', async () => {
       expect(
-        fetchEstimateByLocation({ id: '' }, 2017, {
+        fetchEstimateByLocation({ id: '' }, 365, 2017, {
           Authorization: 'Bearer token'
         })
       ).rejects.toThrowError('Invalid location data found')
     })
     it('Throws error if location is not partOf address', async () => {
       expect(
-        fetchEstimateByLocation({ id: '', extension: [] }, 2017, {
+        fetchEstimateByLocation({ id: '', extension: [] }, 365, 2017, {
           Authorization: 'Bearer token'
         })
       ).rejects.toThrowError('Unable to fetch estimate data from location tree')
     })
     it('Returns the estimatedFigures for right location', async () => {
-      const result = await fetchEstimateByLocation(location, 2017, {
+      const result = await fetchEstimateByLocation(location, 365, 2017, {
         Authorization: 'Bearer token'
       })
       expect(result).toEqual({
