@@ -30,6 +30,7 @@ const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
 const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
+const STORE_USER_FORM_DATA = 'USER_FORM/STORE_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
 const PROCESS_ROLES = 'USER_FORM/PROCESS_ROLES'
@@ -42,6 +43,7 @@ enum TOAST_MESSAGES {
 const initialState: IUserFormState = {
   userForm: null,
   userFormData: {},
+  userDetailsStored: false,
   submitting: false,
   loadingRoles: false,
   submissionError: false
@@ -104,6 +106,13 @@ interface IUserFormDataSubmitAction {
   }
 }
 
+interface IStoreUserFormDataAction {
+  type: typeof STORE_USER_FORM_DATA
+  payload: {
+    formData: IFormSectionData
+  }
+}
+
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
@@ -137,14 +146,27 @@ export function submitFail(): Action {
   }
 }
 
+export function storeUserFormData(
+  formData: IFormSectionData
+): IStoreUserFormDataAction {
+  return {
+    type: STORE_USER_FORM_DATA,
+    payload: {
+      formData
+    }
+  }
+}
+
 type UserFormAction =
   | IUserFormDataModifyAction
   | IUserFormDataSubmitAction
+  | IStoreUserFormDataAction
   | Action
 
 export interface IUserFormState {
   userForm: IForm | null
   userFormData: IFormSectionData
+  userDetailsStored: boolean
   submitting: boolean
   loadingRoles: boolean
   submissionError: boolean
@@ -253,6 +275,16 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         { ...state, submitting: false, submissionError: true },
         Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+      )
+    case STORE_USER_FORM_DATA:
+      const { formData } = (action as IStoreUserFormDataAction).payload
+      return loop(
+        {
+          ...state,
+          userFormData: formData,
+          userDetailsStored: true
+        },
+        Cmd.action(processRoles(formData.primaryOfficeId as string))
       )
     default:
       return state
