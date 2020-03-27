@@ -33,7 +33,7 @@ import * as React from 'react'
 import { Query } from '@client/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { goToCreateNewUser } from '@client/navigation'
+import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
 import { connect } from 'react-redux'
 import {
   userMessages,
@@ -104,6 +104,7 @@ const Status = (statusProps: IStatusProps) => {
 
 interface IProps extends IntlShapeProps {
   goToCreateNewUser: typeof goToCreateNewUser
+  goToReviewUserDetails: typeof goToReviewUserDetails
 }
 
 interface IState {
@@ -120,11 +121,11 @@ class UserTabComponent extends React.Component<IProps, IState> {
     this.state = { usersPageNo: 1 }
   }
 
-  getMenuItems = () => {
+  getMenuItems = (userId: string) => {
     return [
       {
         label: this.props.intl.formatMessage(messages.menuOptionEditDetails),
-        handler: () => {}
+        handler: () => this.props.goToReviewUserDetails(userId)
       }
     ]
   }
@@ -159,7 +160,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
               <ToggleMenu
                 id={`user-item-${index}-menu`}
                 toggleButton={<VerticalThreeDots />}
-                menuItems={this.getMenuItems()}
+                menuItems={this.getMenuItems(user.id as string)}
               />
             )
           }
@@ -270,5 +271,5 @@ class UserTabComponent extends React.Component<IProps, IState> {
 
 export const UserTab = connect(
   null,
-  { goToCreateNewUser }
+  { goToCreateNewUser, goToReviewUserDetails }
 )(injectIntl(UserTabComponent))
