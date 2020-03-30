@@ -20,7 +20,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   CRUD_BIRTH_RATE_SEC,
   TOTAL_POPULATION_SEC,
-  JURISDICTION_TYPE_SEC
+  JURISDICTION_TYPE_SEC,
+  JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
 import { fetchLocation, fetchFHIR } from '@metrics/api'
@@ -99,7 +100,9 @@ export const generateEmptyBirthKeyFigure = (
 
 export const fetchEstimateByLocation = async (
   locationData: Location,
-  estimatedYear: number
+  estimationForDays: number,
+  estimatedYear: number,
+  authHeader: IAuthHeader
 ): Promise<IEstimation> => {
   let crudRate: number = 0
   let population: number = 0
@@ -108,6 +111,7 @@ export const fetchEstimateByLocation = async (
     throw new Error('Invalid location data found')
   }
   let estimateExtensionFound: boolean = false
+  let actualEstimationYear = estimatedYear
   locationData.extension.forEach(extension => {
     if (extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC) {
       estimateExtensionFound = true
@@ -134,6 +138,7 @@ export const fetchEstimateByLocation = async (
         valueArray.forEach(data => {
           if (key in data) {
             population = data[key]
+            actualEstimationYear = key
           }
         })
         if (population > 0) {
@@ -146,12 +151,45 @@ export const fetchEstimateByLocation = async (
     if (!locationData.partOf || !locationData.partOf.reference) {
       throw new Error('Unable to fetch estimate data from location tree')
     }
-    return await fetchEstimateByLocation(locationData, estimatedYear)
+    return await fetchEstimateByLocation(
+      await fetchFHIR(locationData.partOf.reference, authHeader),
+      estimationForDays,
+      estimatedYear,
+      authHeader
+    )
   }
   return {
-    estimation: Math.round((crudRate * population) / 1000),
-    locationId: locationData.id
+    estimation: Math.round(
+      ((crudRate * population) / 1000) * (estimationForDays / 365)
+    ),
+    locationId: locationData.id,
+    estimationYear: actualEstimationYear,
+    locationLevel: getLocationLevelFromLocationData(locationData)
   }
+}
+
+export const getLocationLevelFromLocationData = (locationData: Location) => {
+  return (
+    locationData?.identifier?.find(
+      identifier =>
+        identifier.system ===
+        OPENCRVS_SPECIFICATION_URL + JURISDICTION_TYPE_IDENTIFIER
+    )?.value ?? ''
+  )
+}
+
+export const fetchEstimateFor45DaysByLocationId = async (
+  locationId: string,
+  estimatedYear: number,
+  authHeader: IAuthHeader
+): Promise<IEstimation> => {
+  const locationData: Location = await fetchFHIR(locationId, authHeader)
+  return await fetchEstimateByLocation(
+    locationData,
+    45, // For 45 days
+    estimatedYear,
+    authHeader
+  )
 }
 
 export const getDistrictLocation = async (

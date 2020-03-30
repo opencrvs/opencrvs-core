@@ -96,6 +96,10 @@ interface IConstantsMessages {
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
   loadMore: MessageDescriptor
+  estimated45DayRegistrationTitle: MessageDescriptor
+  estimatedNumberOfRegistartion: MessageDescriptor
+  totalRegisteredIn45Days: MessageDescriptor
+  percentageOfEstimation: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -527,6 +531,26 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.loadMore',
     defaultMessage: 'Load more',
     description: 'A label for load more'
+  },
+  estimated45DayRegistrationTitle: {
+    id: 'constants.estimated45DayRegistrationTitle',
+    defaultMessage: 'Estimated vs total registered in 45 days',
+    description: 'A label for estimated vs total registered in 45 days'
+  },
+  estimatedNumberOfRegistartion: {
+    id: 'constants.estimatedNumberOfRegistartion',
+    defaultMessage: 'Estimated no. of registrations',
+    description: 'A label for estimated no. of registrations'
+  },
+  totalRegisteredIn45Days: {
+    id: 'constants.totalRegisteredIn45Days',
+    defaultMessage: 'Total registered in 45 days',
+    description: 'A label for total registered in 45 days'
+  },
+  percentageOfEstimation: {
+    id: 'constants.percentageOfEstimation',
+    defaultMessage: 'Percentage of estimate',
+    description: 'A label for percentage of estimate'
   }
 }
 
