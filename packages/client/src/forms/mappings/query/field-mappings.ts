@@ -406,6 +406,20 @@ export const eventLocationIDQueryTransformer = () => (
   return transformedData
 }
 
+export const locationIDToFieldTransformer = (transformedName?: string) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedName || field.name
+  if (queryData[sectionId] && queryData[sectionId][fieldName]) {
+    transformedData[sectionId][field.name] = queryData[sectionId][fieldName].id
+  }
+
+  return transformedData
+}
+
 export const nestedValueToFieldTransformer = (
   nestedFieldName: string,
   transformMethod?: IFormFieldQueryMapFunction
