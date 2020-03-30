@@ -38,7 +38,7 @@ const mockUser = ({
       family: 'Doe'
     }
   ],
-  username: 'j.doe1',
+  username: 'jw.doe',
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
@@ -70,6 +70,79 @@ const mockUser = ({
   }
 } as unknown) as IUser & { password: string }
 
+const mockPractitioner = {
+  resourceType: 'Practitioner',
+  identifier: [
+    {
+      use: 'official',
+      system: 'mobile',
+      value: '01711111111'
+    }
+  ],
+  telecom: [
+    {
+      system: 'phone',
+      value: '01711111111'
+    }
+  ],
+  name: [
+    {
+      use: 'en',
+      family: ['Al Hasan'],
+      given: ['Shakib']
+    }
+  ],
+  gender: 'male',
+  extension: [],
+  meta: {
+    lastUpdated: '2020-01-09T08:38:06.547+00:00',
+    versionId: 'fc29499a-d6c9-4db1-b813-c123005e6f7e'
+  },
+  id: '4393c845-0d1c-42c7-a501-f0b4fcb031a2'
+}
+
+const mockPractitionerRole = {
+  resourceType: 'PractitionerRole',
+  practitioner: {
+    reference: 'Practitioner/4393c845-0d1c-42c7-a501-f0b4fcb031a2'
+  },
+  code: [
+    {
+      coding: [
+        {
+          system: 'http://opencrvs.org/specs/roles',
+          code: 'FIELD_AGENT'
+        }
+      ]
+    }
+  ],
+  location: [
+    {
+      reference: 'Location/e7fa94ba-5582-48f9-ba43-cf41d88253c6'
+    },
+    {
+      reference: 'Location/d70fbec1-2b26-474b-adbc-bb83783bdf29'
+    },
+    {
+      reference: 'Location/59a18c46-9a3d-4bfa-a77a-36ad8dcf9ebb'
+    },
+    {
+      reference: 'Location/0fbb6749-8ac3-4e90-89d5-69bad295e0ae'
+    },
+    {
+      reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
+    },
+    {
+      reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
+    }
+  ],
+  meta: {
+    lastUpdated: '2020-01-09T08:38:06.571+00:00',
+    versionId: 'cdfa531b-0aca-4430-a7d1-8919e1a5a6f3'
+  },
+  id: '703112e2-2bbf-42c4-a397-b7bfeb35a625'
+}
+
 describe('updateUser handler', () => {
   let server: any
 
@@ -81,81 +154,8 @@ describe('updateUser handler', () => {
 
   it('update fhir resources and update user using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Practitioner',
-        identifier: [
-          {
-            use: 'official',
-            system: 'mobile',
-            value: '01711111111'
-          }
-        ],
-        telecom: [
-          {
-            system: 'phone',
-            value: '01711111111'
-          }
-        ],
-        name: [
-          {
-            use: 'en',
-            family: ['Al Hasan'],
-            given: ['Shakib']
-          }
-        ],
-        gender: 'male',
-        extension: [],
-        meta: {
-          lastUpdated: '2020-01-09T08:38:06.547+00:00',
-          versionId: 'fc29499a-d6c9-4db1-b813-c123005e6f7e'
-        },
-        id: '4393c845-0d1c-42c7-a501-f0b4fcb031a2'
-      })
-    )
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'PractitionerRole',
-        practitioner: {
-          reference: 'Practitioner/4393c845-0d1c-42c7-a501-f0b4fcb031a2'
-        },
-        code: [
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/roles',
-                code: 'FIELD_AGENT'
-              }
-            ]
-          }
-        ],
-        location: [
-          {
-            reference: 'Location/e7fa94ba-5582-48f9-ba43-cf41d88253c6'
-          },
-          {
-            reference: 'Location/d70fbec1-2b26-474b-adbc-bb83783bdf29'
-          },
-          {
-            reference: 'Location/59a18c46-9a3d-4bfa-a77a-36ad8dcf9ebb'
-          },
-          {
-            reference: 'Location/0fbb6749-8ac3-4e90-89d5-69bad295e0ae'
-          },
-          {
-            reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
-          },
-          {
-            reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
-          }
-        ],
-        meta: {
-          lastUpdated: '2020-01-09T08:38:06.571+00:00',
-          versionId: 'cdfa531b-0aca-4430-a7d1-8919e1a5a6f3'
-        },
-        id: '703112e2-2bbf-42c4-a397-b7bfeb35a625'
-      })
-    )
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
       [
         JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
@@ -207,6 +207,62 @@ describe('updateUser handler', () => {
     })
     expect(res.statusCode).toBe(201)
   })
+  it('update fhir resources and update user without any username change', async () => {
+    mockingoose.resetAll()
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
+    fetch.mockResponses(
+      [
+        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
+        { status: 200 }
+      ],
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+
+    mockingoose(UsernameRecord).toReturn(null, 'findOne')
+    mockingoose(UsernameRecord).toReturn(null, 'save')
+    mockingoose(User).toReturn(mockUser, 'update')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateUser',
+      payload: {
+        id: '12345',
+        name: [
+          {
+            use: 'en',
+            given: ['John', 'William'],
+            family: 'Doe'
+          }
+        ],
+        identifiers: [{ system: 'NID', value: '1234' }],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123111111',
+        type: 'SOME_TYPE',
+        primaryOfficeId: '323',
+        catchmentAreaIds: [],
+        deviceId: 'D444'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
+  })
   it('return an error if no existing user found for given id', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
@@ -238,81 +294,8 @@ describe('updateUser handler', () => {
   })
   it('send 500 if mongoose operation throws error', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'Practitioner',
-        identifier: [
-          {
-            use: 'official',
-            system: 'mobile',
-            value: '01711111111'
-          }
-        ],
-        telecom: [
-          {
-            system: 'phone',
-            value: '01711111111'
-          }
-        ],
-        name: [
-          {
-            use: 'en',
-            family: ['Al Hasan'],
-            given: ['Shakib']
-          }
-        ],
-        gender: 'male',
-        extension: [],
-        meta: {
-          lastUpdated: '2020-01-09T08:38:06.547+00:00',
-          versionId: 'fc29499a-d6c9-4db1-b813-c123005e6f7e'
-        },
-        id: '4393c845-0d1c-42c7-a501-f0b4fcb031a2'
-      })
-    )
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        resourceType: 'PractitionerRole',
-        practitioner: {
-          reference: 'Practitioner/4393c845-0d1c-42c7-a501-f0b4fcb031a2'
-        },
-        code: [
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/roles',
-                code: 'FIELD_AGENT'
-              }
-            ]
-          }
-        ],
-        location: [
-          {
-            reference: 'Location/e7fa94ba-5582-48f9-ba43-cf41d88253c6'
-          },
-          {
-            reference: 'Location/d70fbec1-2b26-474b-adbc-bb83783bdf29'
-          },
-          {
-            reference: 'Location/59a18c46-9a3d-4bfa-a77a-36ad8dcf9ebb'
-          },
-          {
-            reference: 'Location/0fbb6749-8ac3-4e90-89d5-69bad295e0ae'
-          },
-          {
-            reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
-          },
-          {
-            reference: 'Location/258f7b76-3eba-4e5b-91d8-9c90a2422105'
-          }
-        ],
-        meta: {
-          lastUpdated: '2020-01-09T08:38:06.571+00:00',
-          versionId: 'cdfa531b-0aca-4430-a7d1-8919e1a5a6f3'
-        },
-        id: '703112e2-2bbf-42c4-a397-b7bfeb35a625'
-      })
-    )
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
     fetch.mockResponses(
       [
         JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
