@@ -333,4 +333,63 @@ describe('updateUser handler', () => {
     expect(res.statusCode).toBe(500)
     mockingoose.resetAll()
   })
+  it('return 400 if mongoose throws an error for user update ', async () => {
+    mockingoose(User).toReturn(mockUser, 'findOne')
+    fetch.mockResponseOnce(JSON.stringify(mockPractitioner))
+    fetch.mockResponseOnce(JSON.stringify(mockPractitionerRole))
+    fetch.mockResponses(
+      [
+        JSON.stringify({ id: '11', partOf: { reference: 'Location/22' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '22', partOf: { reference: 'Location/33' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '33', partOf: { reference: 'Location/44' } }),
+        { status: 200 }
+      ],
+      [
+        JSON.stringify({ id: '44', partOf: { reference: 'Location/0' } }),
+        { status: 200 }
+      ],
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+
+    mockingoose(UsernameRecord).toReturn(null, 'findOne')
+    mockingoose(UsernameRecord).toReturn(null, 'save')
+    mockingoose(User).toReturn(new Error('Unable to update the user'), 'update')
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/updateUser',
+      payload: {
+        id: '12345',
+        name: [
+          {
+            use: 'en',
+            given: ['Euan', 'Millar'],
+            family: 'Doe'
+          }
+        ],
+        identifiers: [{ system: 'NID', value: '1234' }],
+        email: 'j.doe@gmail.com',
+        mobile: '+880123445568',
+        type: 'SOME_TYPE',
+        primaryOfficeId: '322',
+        catchmentAreaIds: [],
+        deviceId: 'D444'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(400)
+  })
 })
