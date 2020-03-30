@@ -32,8 +32,7 @@ export default async function updateUser(
 ) {
   const user = request.payload as IUser & { id: string }
   const token = request.headers.authorization
-
-  const existingUser: IUserModel | null = await User.findById(user.id)
+  const existingUser: IUserModel | null = await User.findOne({ _id: user.id })
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
@@ -41,18 +40,10 @@ export default async function updateUser(
     token,
     `/Practitioner/${existingUser.practitionerId}`
   )
-  if (!existingPractitioner) {
-    throw new Error(`No existing practioner found for user: ${existingUser.id}`)
-  }
   const existingPractitionerRole = await getFromFhir(
     token,
     `/PractitionerRole?practitioner=${existingUser.practitionerId}`
   )
-  if (!existingPractitionerRole) {
-    throw new Error(
-      `No existing practioner role found for user: ${existingUser.id} and practitioner: ${existingPractitioner.id}`
-    )
-  }
   // Update existing user's fields
   existingUser.name = user.name
   existingUser.identifiers = user.identifiers
