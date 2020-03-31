@@ -32,6 +32,7 @@ interface IUserModelData {
   primaryOfficeId: string
   catchmentAreaIds: string[]
   identifiers: GQLIdentifier
+  device: string
 }
 
 export interface IUserPayload
@@ -45,6 +46,7 @@ export interface IUserPayload
     | 'name'
     | 'identifiers'
   > {
+  id?: string
   identifiers: GQLUserIdentifierInput[]
   name: {
     use: string

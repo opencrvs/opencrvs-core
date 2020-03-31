@@ -9,5 +9,6 @@
   "deathRejectionNotification": "Death registration application for {{name}} ( Tracking ID: {{trackingId}} ) has been rejected. Please visit your local registration office for more information.",
   "authenticationCodeNotification": "Your OpenCRVS authentication code is: {{authCode}}",
   "userCredentialsNotification": "You can login to OpenCRVS with this temporary username: {{username}} and password: {{password}}",
-  "retieveUserNameNotification": "Your username for OpenCRVS is: {{username}}"
+  "retieveUserNameNotification": "Your username for OpenCRVS is: {{username}}",
+  "updateUserNameNotification": "Your OpenCRVS username has been updated to: {{username}}. Your password has not changed."
 }
