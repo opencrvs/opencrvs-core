@@ -21,7 +21,11 @@ import {
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { buttonMessages as messages, userMessages } from '@client/i18n/messages'
+import {
+  buttonMessages as messages,
+  userMessages,
+  buttonMessages
+} from '@client/i18n/messages'
 import {
   goBack,
   goToCreateUserSection,
@@ -36,7 +40,11 @@ import {
   Action,
   FormTitle
 } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  SuccessButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   ActionPageLight,
@@ -50,6 +58,7 @@ import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { RouteComponentProps } from 'react-router'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { Check } from '@opencrvs/components/lib/icons'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -161,30 +170,41 @@ class UserReviewFormComponent extends React.Component<
 
   render() {
     const { intl, section, userId, userFormSection } = this.props
+    let title: string
+    let actionComponent: JSX.Element
 
+    if (userId) {
+      title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+      actionComponent = (
+        <SuccessButton
+          id="verifyPositive"
+          onClick={() => this.props.submitForm(userFormSection)}
+          icon={() => <Check />}
+          align={ICON_ALIGNMENT.LEFT}
+        >
+          {intl.formatMessage(buttonMessages.confirm)}
+        </SuccessButton>
+      )
+    } else {
+      title = intl.formatMessage(section.title)
+      actionComponent = (
+        <PrimaryButton
+          id="submit_user_form"
+          onClick={() => this.props.submitForm(userFormSection)}
+        >
+          {intl.formatMessage(messages.createUser)}
+        </PrimaryButton>
+      )
+    }
     return (
-      <ActionPageLight
-        title={
-          userId
-            ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-            : intl.formatMessage(section.title)
-        }
-        goBack={this.props.goBack}
-      >
+      <ActionPageLight title={title} goBack={this.props.goBack}>
         <FormTitle id={`${section.id}_title`}>
           {intl.formatMessage(section.name)}
         </FormTitle>
         {this.transformSectionData().map((sec, index) => (
           <DataSection key={index} {...sec} />
         ))}
-        <Action>
-          <PrimaryButton
-            id="submit_user_form"
-            onClick={() => this.props.submitForm(userFormSection)}
-          >
-            {intl.formatMessage(messages.createUser)}
-          </PrimaryButton>
-        </Action>
+        <Action>{actionComponent}</Action>
       </ActionPageLight>
     )
   }
@@ -206,6 +226,11 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         { sections: [userFormSection] },
         { user: props.formData }
       )
+      if (variables.user._fhirID) {
+        variables.user.id = variables.user._fhirID
+        delete variables.user._fhirID
+      }
+
       dispatch(
         submitUserFormData(props.client, createOrUpdateUserMutation, variables)
       )
