@@ -39,7 +39,8 @@ import {
   PERFORMANCE_REPORT_LIST,
   PERFORMANCE_REPORT,
   EVENT_INFO,
-  REVIEW_USER_DETAILS
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -352,6 +353,18 @@ type GoToCreateUserSection = {
   }
 }
 
+export const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
+type GoToUserReviewForm = {
+  type: typeof GO_TO_USER_REVIEW_FORM
+  payload: {
+    userId: string
+    sectionId: string
+    nextGroupId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
 export function goToCreateUserSection(
   sectionId: string,
   nextGroupId: string,
@@ -361,6 +374,25 @@ export function goToCreateUserSection(
   return {
     type: GO_TO_CREATE_USER_SECTION,
     payload: {
+      sectionId,
+      nextGroupId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
+}
+
+export function goToUserReviewForm(
+  userId: string,
+  sectionId: string,
+  nextGroupId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToUserReviewForm {
+  return {
+    type: GO_TO_USER_REVIEW_FORM,
+    payload: {
+      userId,
       sectionId,
       nextGroupId,
       userFormFieldNameHash: fieldNameHash,
@@ -489,6 +521,23 @@ export function navigationReducer(state: INavigationState, action: any) {
               groupId: nextGroupId
             }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
+          )
+        )
+      )
+    case GO_TO_USER_REVIEW_FORM:
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_FORM, {
+              userId: action.payload.userId,
+              sectionId: action.payload.sectionId,
+              groupId: action.payload.nextGroupId
+            }) +
+              (action.payload.userFormFieldNameHash
+                ? `#${action.payload.userFormFieldNameHash}`
+                : ''),
+            action.payload.formHistoryState
           )
         )
       )

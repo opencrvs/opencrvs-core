@@ -24,7 +24,11 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
-import { goBack, goToCreateUserSection } from '@client/navigation'
+import {
+  goBack,
+  goToCreateUserSection,
+  goToUserReviewForm
+} from '@client/navigation'
 import styled from '@client/styledComponents'
 import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -59,6 +63,7 @@ type IDispatchProps = {
   goBack: typeof goBack
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
+  goToUserReviewForm: typeof goToUserReviewForm
   clearUserFormData: typeof clearUserFormData
 }
 type IFullProps = IntlShapeProps & IProps & IDispatchProps
@@ -71,10 +76,16 @@ class UserFormComponent extends React.Component<IFullProps> {
     if (hasFormError(activeGroup.fields, formData)) {
       this.showAllValidationErrors()
     } else {
-      this.props.goToCreateUserSection(
-        this.props.nextSectionId,
-        this.props.nextGroupId
-      )
+      this.props.userId
+        ? this.props.goToUserReviewForm(
+            this.props.userId,
+            this.props.nextSectionId,
+            this.props.nextGroupId
+          )
+        : this.props.goToCreateUserSection(
+            this.props.nextSectionId,
+            this.props.nextGroupId
+          )
     }
   }
 
@@ -138,5 +149,11 @@ class UserFormComponent extends React.Component<IFullProps> {
 
 export const UserForm = connect(
   undefined,
-  { modifyUserFormData, goToCreateUserSection, goBack, clearUserFormData }
+  {
+    modifyUserFormData,
+    goToCreateUserSection,
+    goToUserReviewForm,
+    goBack,
+    clearUserFormData
+  }
 )(injectIntl(UserFormComponent))

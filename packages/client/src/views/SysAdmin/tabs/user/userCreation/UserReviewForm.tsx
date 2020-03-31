@@ -22,7 +22,11 @@ import {
 import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { buttonMessages as messages, userMessages } from '@client/i18n/messages'
-import { goBack, goToCreateUserSection } from '@client/navigation'
+import {
+  goBack,
+  goToCreateUserSection,
+  goToUserReviewForm
+} from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -56,6 +60,7 @@ export interface IUserReviewFormProps {
 
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
+  goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (userFormSection: IFormSection) => void
   userFormSection: IFormSection
   offlineResources: IOfflineData
@@ -94,12 +99,20 @@ class UserReviewFormComponent extends React.Component<
             action: {
               id: `btn_change_${field.name}`,
               label: intl.formatMessage(messages.change),
-              handler: () =>
-                this.props.goToCreateUserSection(
-                  userFormSection.id,
-                  group.id,
-                  field.name
-                )
+              handler: () => {
+                this.props.userId
+                  ? this.props.goToUserReviewForm(
+                      this.props.userId,
+                      userFormSection.id,
+                      group.id,
+                      field.name
+                    )
+                  : this.props.goToCreateUserSection(
+                      userFormSection.id,
+                      group.id,
+                      field.name
+                    )
+              }
             }
           })
         }
@@ -181,6 +194,12 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
     goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
       dispatch(goToCreateUserSection(sec, group, fieldName)),
+    goToUserReviewForm: (
+      userId: string,
+      sec: string,
+      group: string,
+      fieldName?: string
+    ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
