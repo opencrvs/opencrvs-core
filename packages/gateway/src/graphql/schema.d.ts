@@ -560,6 +560,7 @@ export interface GQLSearchUserResult {
 export interface GQLRegistrationMetrics {
   genderBasisMetrics?: GQLRegistrationGenderBasisMetrics
   timeFrames?: GQLRegistrationTimeFrameMetrics
+  estimated45DayMetrics?: GQLRegistration45DayEstimatedMetrics
   payments?: GQLCertificationPaymentMetrics
 }
 
@@ -605,6 +606,26 @@ export interface GQLTimeFrameTotalCount {
   regWithin1yrTo5yr: number
   regOver5yr: number
   total: number
+}
+
+export interface GQLRegistration45DayEstimatedMetrics {
+  details?: Array<GQLEstimated45DayMetrics>
+  total?: GQLEstimate45DayTotalCount
+}
+
+export interface GQLEstimated45DayMetrics {
+  locationId: string
+  estimatedRegistration: number
+  registrationIn45Day: number
+  estimationYear: number
+  estimationLocationLevel: string
+  estimationPercentage: number
+}
+
+export interface GQLEstimate45DayTotalCount {
+  estimatedRegistration: number
+  registrationIn45Day: number
+  estimationPercentage: number
 }
 
 export interface GQLCertificationPaymentMetrics {
@@ -1015,6 +1036,9 @@ export interface GQLResolver {
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
   TimeFrameDetailMetrics?: GQLTimeFrameDetailMetricsTypeResolver
   TimeFrameTotalCount?: GQLTimeFrameTotalCountTypeResolver
+  Registration45DayEstimatedMetrics?: GQLRegistration45DayEstimatedMetricsTypeResolver
+  Estimated45DayMetrics?: GQLEstimated45DayMetricsTypeResolver
+  Estimate45DayTotalCount?: GQLEstimate45DayTotalCountTypeResolver
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
   CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
   CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
@@ -2572,6 +2596,9 @@ export interface SearchUserResultToTotalItemsResolver<
 export interface GQLRegistrationMetricsTypeResolver<TParent = any> {
   genderBasisMetrics?: RegistrationMetricsToGenderBasisMetricsResolver<TParent>
   timeFrames?: RegistrationMetricsToTimeFramesResolver<TParent>
+  estimated45DayMetrics?: RegistrationMetricsToEstimated45DayMetricsResolver<
+    TParent
+  >
   payments?: RegistrationMetricsToPaymentsResolver<TParent>
 }
 
@@ -2583,6 +2610,13 @@ export interface RegistrationMetricsToGenderBasisMetricsResolver<
 }
 
 export interface RegistrationMetricsToTimeFramesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationMetricsToEstimated45DayMetricsResolver<
   TParent = any,
   TResult = any
 > {
@@ -2816,6 +2850,119 @@ export interface TimeFrameTotalCountToRegOver5yrResolver<
 }
 
 export interface TimeFrameTotalCountToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRegistration45DayEstimatedMetricsTypeResolver<
+  TParent = any
+> {
+  details?: Registration45DayEstimatedMetricsToDetailsResolver<TParent>
+  total?: Registration45DayEstimatedMetricsToTotalResolver<TParent>
+}
+
+export interface Registration45DayEstimatedMetricsToDetailsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Registration45DayEstimatedMetricsToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEstimated45DayMetricsTypeResolver<TParent = any> {
+  locationId?: Estimated45DayMetricsToLocationIdResolver<TParent>
+  estimatedRegistration?: Estimated45DayMetricsToEstimatedRegistrationResolver<
+    TParent
+  >
+  registrationIn45Day?: Estimated45DayMetricsToRegistrationIn45DayResolver<
+    TParent
+  >
+  estimationYear?: Estimated45DayMetricsToEstimationYearResolver<TParent>
+  estimationLocationLevel?: Estimated45DayMetricsToEstimationLocationLevelResolver<
+    TParent
+  >
+  estimationPercentage?: Estimated45DayMetricsToEstimationPercentageResolver<
+    TParent
+  >
+}
+
+export interface Estimated45DayMetricsToLocationIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimated45DayMetricsToEstimatedRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimated45DayMetricsToRegistrationIn45DayResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimated45DayMetricsToEstimationYearResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimated45DayMetricsToEstimationLocationLevelResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimated45DayMetricsToEstimationPercentageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEstimate45DayTotalCountTypeResolver<TParent = any> {
+  estimatedRegistration?: Estimate45DayTotalCountToEstimatedRegistrationResolver<
+    TParent
+  >
+  registrationIn45Day?: Estimate45DayTotalCountToRegistrationIn45DayResolver<
+    TParent
+  >
+  estimationPercentage?: Estimate45DayTotalCountToEstimationPercentageResolver<
+    TParent
+  >
+}
+
+export interface Estimate45DayTotalCountToEstimatedRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimate45DayTotalCountToRegistrationIn45DayResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface Estimate45DayTotalCountToEstimationPercentageResolver<
   TParent = any,
   TResult = any
 > {

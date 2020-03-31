@@ -20,6 +20,7 @@ import {
   ageIntervals,
   calculateInterval,
   fetchEstimateByLocation,
+  fetchEstimateFor45DaysByLocationId,
   generateEmptyBirthKeyFigure,
   IPoint,
   LABEL_FOMRAT,
@@ -27,6 +28,7 @@ import {
   EVENT_TYPE,
   fillEmptyDataArrayByKey
 } from '@metrics/features/metrics/utils'
+import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
 import * as moment from 'moment'
 
@@ -51,6 +53,17 @@ interface IBirthKeyFiguresData {
 export interface IEstimation {
   estimation: number
   locationId: string
+  locationLevel: string
+  estimationYear: number
+}
+
+export interface IBirth45DayEstimation {
+  locationId: string
+  registrationIn45Day: number
+  estimatedRegistration: number
+  estimationYear: number
+  estimationLocationLevel: string
+  estimationPercentage: number
 }
 
 interface ICurrentAndLowerLocationLevels {
@@ -341,16 +354,18 @@ export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
 export async function fetchKeyFigures(
   timeStart: string,
   timeEnd: string,
-  location: Location
+  location: Location,
+  authHeader: IAuthHeader
 ) {
-  const estimatedFigure = await fetchEstimateByLocation(
+  const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
-    // TODO: need to adjust this when date range is properly introduced
-    new Date().getFullYear()
+    45, // For 45 Days
+    new Date().getFullYear(),
+    authHeader
   )
 
   const keyFigures: IBirthKeyFigures[] = []
-  const queryLocationId = `Location/${estimatedFigure.locationId}`
+  const queryLocationId = `Location/${estimatedFigureFor45Days.locationId}`
 
   /* Populating < 45D data */
   const within45DaysData: IGroupedByGender[] = await query(
@@ -369,10 +384,16 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS,
       within45DaysData,
-      estimatedFigure.estimation
+      estimatedFigureFor45Days.estimation
     )
   )
   /* Populating > 45D and < 365D data */
+  const estimatedFigureFor1Year = await fetchEstimateByLocation(
+    location,
+    365, // For 1 year
+    new Date().getFullYear(),
+    authHeader
+  )
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
       FROM birth_reg
@@ -390,7 +411,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS_TO_1_YEAR,
       within1YearData,
-      estimatedFigure.estimation
+      estimatedFigureFor1Year.estimation
     )
   )
   /* Populating < 365D data */
@@ -405,7 +426,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_1_YEAR,
       fullData,
-      estimatedFigure.estimation
+      estimatedFigureFor1Year.estimation
     )
   )
   return keyFigures
@@ -578,6 +599,73 @@ export async function fetchGenderBasisMetrics(
     'location'
   )
   return genderBasisData
+}
+
+export async function fetchEstimated45DayMetrics(
+  timeFrom: string,
+  timeTo: string,
+  currLocation: string,
+  currLocationLevel: string,
+  locationLevel: string,
+  event: EVENT_TYPE,
+  childLocationIds: Array<string>,
+  authHeader: IAuthHeader
+) {
+  if (event === EVENT_TYPE.DEATH) {
+    // THIS IS ONLY FOR BIRTH ATM
+    return []
+  }
+  const points = await query(`SELECT
+                              COUNT(ageInDays) AS withIn45Day
+                              FROM birth_reg
+                              WHERE ageInDays <= 45
+                              AND time > '${timeFrom}'
+                              AND time <= '${timeTo}'
+                              AND ${currLocationLevel}='${currLocation}'
+                              GROUP BY ${locationLevel}`)
+  const dataFromInflux: IBirth45DayEstimation[] = []
+  for (const point of points) {
+    const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
+      point[locationLevel],
+      new Date().getFullYear(),
+      authHeader
+    )
+    dataFromInflux.push({
+      locationId: point[locationLevel],
+      registrationIn45Day: point.withIn45Day,
+      estimatedRegistration: estimationOf45Day.estimation,
+      estimationYear: estimationOf45Day.estimationYear,
+      estimationLocationLevel: estimationOf45Day.locationLevel,
+      estimationPercentage:
+        point.withIn45Day === 0
+          ? 0
+          : Math.round((point.withIn45Day / estimationOf45Day.estimation) * 100)
+    })
+  }
+
+  const emptyEstimationData: IBirth45DayEstimation[] = []
+  for (const id of childLocationIds) {
+    const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
+      id,
+      new Date().getFullYear(),
+      authHeader
+    )
+    emptyEstimationData.push({
+      locationId: id,
+      registrationIn45Day: 0,
+      estimatedRegistration: estimationOf45Day.estimation,
+      estimationYear: estimationOf45Day.estimationYear,
+      estimationLocationLevel: estimationOf45Day.locationLevel,
+      estimationPercentage: 0
+    })
+  }
+
+  const estimated45DayData = fillEmptyDataArrayByKey(
+    dataFromInflux,
+    emptyEstimationData,
+    'locationId'
+  )
+  return estimated45DayData
 }
 
 function populateGenderBasisMetrics(
