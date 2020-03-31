@@ -33,7 +33,7 @@ import { RouteComponentProps } from 'react-router'
 import { GET_USER } from '@client/sysadmin/user/queries'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { storeUserFormData } from '@client/user/userReducer'
+import { storeUserFormData, clearUserFormData } from '@client/user/userReducer'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 interface IMatchParams {
@@ -57,6 +57,7 @@ type INewUserProps = {
 interface IDispatchProps {
   goBack: typeof goBack
   storeUserFormData: typeof storeUserFormData
+  clearUserFormData: typeof clearUserFormData
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -77,6 +78,10 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
     if (userId) {
       this.fetchAndStoreUserDetails(userId)
     }
+  }
+
+  componentWillUnmount() {
+    this.props.clearUserFormData()
   }
 
   fetchAndStoreUserDetails = async (userId: string) => {
@@ -210,5 +215,5 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(
   mapStateToProps,
-  { goBack, storeUserFormData }
+  { goBack, storeUserFormData, clearUserFormData }
 )(injectIntl(withApollo(CreateNewUserComponent)))
