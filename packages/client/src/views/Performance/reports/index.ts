@@ -12,3 +12,4 @@
 export * from '@client/views/Performance/reports/GenderBasisReports'
 export * from '@client/views/Performance/reports/TimeFrameReports'
 export * from '@client/views/Performance/reports/CertificationPaymentReports'
+export * from '@client/views/Performance/reports/Estimated45DayRegistrationReports'

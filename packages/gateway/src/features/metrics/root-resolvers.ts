@@ -14,7 +14,8 @@ import {
   getMetrics,
   timeFrameTotalCalculator,
   genderBasisTotalCalculator,
-  paymentTotalCalculator
+  paymentTotalCalculator,
+  estimated45DayMetricsTotalCalculator
 } from '@gateway/features/fhir/utils'
 
 export interface ITimeRange {
@@ -48,6 +49,12 @@ export const resolvers: GQLResolver = {
         genderBasisMetrics: {
           details: metricsData.genderBasisMetrics,
           total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
+        },
+        estimated45DayMetrics: {
+          details: metricsData.estimated45DayMetrics,
+          total: estimated45DayMetricsTotalCalculator(
+            metricsData.estimated45DayMetrics
+          )
         },
         payments: {
           details: metricsData.payments,

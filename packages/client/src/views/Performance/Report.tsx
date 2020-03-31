@@ -39,12 +39,14 @@ import {
   GQLCertificationPaymentMetrics,
   GQLRegistrationMetrics,
   GQLRegistrationGenderBasisMetrics,
-  GQLRegistrationTimeFrameMetrics
+  GQLRegistrationTimeFrameMetrics,
+  GQLRegistration45DayEstimatedMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import {
   TimeFrameReports,
   GenderBasisReports,
+  Estimated45DayRegistrationReports,
   CertificationPaymentReports
 } from '@client/views/Performance/reports'
 import moment from 'moment'
@@ -168,6 +170,19 @@ function ReportComponent(props: Props) {
                     {}
                   }
                 />
+                {eventType === Event.BIRTH && (
+                  <Estimated45DayRegistrationReports
+                    eventType={eventType}
+                    loading={loading}
+                    data={
+                      (data &&
+                        (data.fetchRegistrationMetrics &&
+                          (data.fetchRegistrationMetrics
+                            .estimated45DayMetrics as GQLRegistration45DayEstimatedMetrics))) ||
+                      {}
+                    }
+                  />
+                )}
                 <CertificationPaymentReports
                   eventType={eventType}
                   loading={loading}

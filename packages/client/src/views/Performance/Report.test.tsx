@@ -77,6 +77,23 @@ describe('Report page', () => {
                 total: 2
               }
             },
+            estimated45DayMetrics: {
+              details: [
+                {
+                  locationId: 'Location/db5faba3-8143-4924-a44a-8562ed5e0437',
+                  estimatedRegistration: 99,
+                  registrationIn45Day: 2,
+                  estimationYear: 2019,
+                  estimationLocationLevel: 'UNION',
+                  estimationPercentage: 2
+                }
+              ],
+              total: {
+                estimatedRegistration: 99,
+                registrationIn45Day: 2,
+                estimationPercentage: 2
+              }
+            },
             payments: {
               details: [
                 {
@@ -123,6 +140,14 @@ describe('Report page', () => {
                 maleOver18: 0,
                 femaleOver18: 0,
                 total: 0
+              }
+            },
+            estimated45DayMetrics: {
+              details: [],
+              total: {
+                estimatedRegistration: 0,
+                registrationIn45Day: 0,
+                estimationPercentage: 0
               }
             },
             payments: {
@@ -219,6 +244,11 @@ describe('Report page', () => {
       '#listTable-timeFrames'
     )
 
+    const estimated45DayRegistrationsTable = await waitForElement(
+      testComponent,
+      '#listTable-estimated45DayRegistrations'
+    )
+
     const paymentsTable = await waitForElement(
       testComponent,
       '#listTable-payments'
@@ -226,6 +256,7 @@ describe('Report page', () => {
 
     expect(genderMetricsTable.hostNodes()).toHaveLength(1)
     expect(timeFramesTable.hostNodes()).toHaveLength(1)
+    expect(estimated45DayRegistrationsTable.hostNodes()).toHaveLength(1)
     expect(paymentsTable.hostNodes()).toHaveLength(1)
 
     const totalValueOfGenderMetrics = genderMetricsTable
@@ -240,6 +271,12 @@ describe('Report page', () => {
       .at(5)
       .text()
 
+    const percentageOfEstimatedRegistration = estimated45DayRegistrationsTable
+      .find('#row_0')
+      .find('span')
+      .at(3)
+      .text()
+
     const totalValueOfPayments = paymentsTable
       .find('#row_0')
       .find('span')
@@ -248,6 +285,7 @@ describe('Report page', () => {
 
     expect(totalValueOfGenderMetrics).toBe('2')
     expect(totalValueOfTimeFrames).toBe('2')
+    expect(percentageOfEstimatedRegistration).toBe('2%')
     expect(totalValueOfPayments).toBe('200')
   })
 
