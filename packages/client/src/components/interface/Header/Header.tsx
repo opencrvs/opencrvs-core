@@ -48,7 +48,7 @@ import { IStoreState } from '@client/store'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   goToHome,
-  goToPerformanceHome,
+  goToPerformanceReportList,
   goToSearch,
   goToSearchResult,
   goToSettings,
@@ -80,7 +80,7 @@ type IProps = IntlShapeProps & {
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
   goToHomeAction: typeof goToHome
-  goToPerformanceAction: typeof goToPerformanceHome
+  goToPerformanceReportListAction: typeof goToPerformanceReportList
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -148,7 +148,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         label: this.props.intl.formatMessage(
           constantsMessages.performanceTitle
         ),
-        onClick: this.props.goToPerformanceAction
+        onClick: this.props.goToPerformanceReportListAction
       },
       {
         icon: <SettingsBlack />,
@@ -316,7 +316,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails,
       enableMenuSelection = true,
       goToHomeAction,
-      goToPerformanceAction,
+      goToPerformanceReportListAction,
       activeMenuItem
     } = this.props
     const title =
@@ -339,7 +339,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       {
         key: 'performance',
         title: intl.formatMessage(constantsMessages.performanceTitle),
-        onClick: goToPerformanceAction,
+        onClick: goToPerformanceReportListAction,
         selected:
           enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
       }
@@ -426,6 +426,6 @@ export const Header = connect(
     goToSettings,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
-    goToPerformanceAction: goToPerformanceHome
+    goToPerformanceReportListAction: goToPerformanceReportList
   }
 )(injectIntl<'intl', IProps>(HeaderComp))
