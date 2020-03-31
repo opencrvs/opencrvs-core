@@ -12,7 +12,16 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Location } from '../../icons'
+import { PrimaryButton } from '../../buttons'
 
+const SearchButton = styled(PrimaryButton)`
+  height: 40px;
+  margin-left: 4px;
+`
+const LocationSearchContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+`
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
@@ -90,6 +99,7 @@ interface IProps {
   locationList: ISearchLocation[]
   selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
+  searchButtonHandler?: () => void
   error?: boolean
   touched?: boolean
   className?: string
@@ -201,21 +211,28 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <Wrapper className={this.props.className}>
-        <Location id="locationSearchIcon" />
-        <SearchTextInput
-          id="locationSearchInput"
-          type="text"
-          autoComplete="off"
-          onFocus={this.onFocus}
-          onClick={() => document.addEventListener('click', this.handler)}
-          value={this.state.selectedText || ''}
-          onChange={this.onChangeHandler}
-          error={this.props.error}
-          touched={this.props.touched}
-        />
-        {this.dropdown()}
-      </Wrapper>
+      <LocationSearchContainer>
+        <Wrapper className={this.props.className}>
+          <Location id="locationSearchIcon" />
+          <SearchTextInput
+            id="locationSearchInput"
+            type="text"
+            autoComplete="off"
+            onFocus={this.onFocus}
+            onClick={() => document.addEventListener('click', this.handler)}
+            value={this.state.selectedText || ''}
+            onChange={this.onChangeHandler}
+            error={this.props.error}
+            touched={this.props.touched}
+          />
+          {this.dropdown()}
+        </Wrapper>
+        {this.props.searchButtonHandler && (
+          <SearchButton onClick={this.props.searchButtonHandler}>
+            Search
+          </SearchButton>
+        )}
+      </LocationSearchContainer>
     )
   }
 }
