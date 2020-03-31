@@ -1,0 +1,104 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { messages } from '@client/i18n/messages/views/performance'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { generateLocations } from '@client/utils/locationUtils'
+import {
+  ISearchLocation,
+  LocationSearch
+} from '@opencrvs/components/lib/interface'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import styled from 'styled-components'
+import { PerformanceContentWrapper } from './PerformanceContentWrapper'
+import { Header } from './utils'
+
+const MessageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+`
+
+const MessageHeader = styled.span`
+  ${({ theme }) => theme.fonts.bodyStyle};
+  margin-bottom: 10px;
+`
+
+const StyledText = styled.span`
+  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }) => theme.fonts.bodyStyle};
+  margin-bottom: 10px;
+`
+
+type Props = WrappedComponentProps &
+  Pick<RouteComponentProps, 'history'> & {
+    offlineResources: IOfflineData
+  }
+
+interface State {
+  selectedLocation: ISearchLocation | undefined
+}
+
+class PerformanceHomeComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = {
+      selectedLocation: undefined
+    }
+  }
+
+  searchHandler = (item: ISearchLocation) => {
+    this.setState({
+      selectedLocation: item
+    })
+  }
+
+  searchButtonHandler = () => {}
+
+  render() {
+    const { intl, offlineResources } = this.props
+
+    return (
+      <PerformanceContentWrapper hideTopBar>
+        <Header>{intl.formatMessage(messages.sysAdminHomeHeader)}</Header>
+
+        <LocationSearch
+          selectedLocation={this.state.selectedLocation}
+          locationList={generateLocations(offlineResources.locations)}
+          searchHandler={this.searchHandler}
+          searchButtonHandler={this.searchButtonHandler}
+        />
+
+        <MessageContainer>
+          <MessageHeader>Pilot Upazillas</MessageHeader>
+          <StyledText>Bhurungamari Upazilla</StyledText>
+          <StyledText>Narsingdi Upazilla</StyledText>
+        </MessageContainer>
+      </PerformanceContentWrapper>
+    )
+  }
+}
+
+function mapStateToProps(state: IStoreState) {
+  return {
+    offlineResources: getOfflineData(state)
+  }
+}
+
+export const PerformanceHome = connect(
+  mapStateToProps,
+  null
+)(injectIntl(PerformanceHomeComponent))
