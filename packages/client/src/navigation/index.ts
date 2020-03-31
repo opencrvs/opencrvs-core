@@ -38,7 +38,8 @@ import {
   PRINT_CERTIFICATE_PAYMENT,
   PERFORMANCE_REPORT_LIST,
   PERFORMANCE_REPORT,
-  EVENT_INFO
+  EVENT_INFO,
+  PERFORMANCE_HOME
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -154,6 +155,10 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
     ? FIELD_AGENT_HOME_TAB
     : REGISTRAR_HOME_TAB
   return push(formatUrl(path, { tabId, selectorId }))
+}
+
+export function goToPerformanceHome() {
+  return push(PERFORMANCE_HOME)
 }
 
 export function goToPerformanceReportList() {

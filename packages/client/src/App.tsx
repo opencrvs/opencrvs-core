@@ -55,6 +55,7 @@ import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReportList } from '@client/views/Performance/ReportList'
 import { Report } from '@client/views/Performance/Report'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
+import { PerformanceHome } from './views/Performance/Home'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -268,6 +269,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.CREATE_USER_SECTION}
                                             component={CreateNewUser}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.PERFORMANCE_HOME}
+                                            component={PerformanceHome}
                                           />
                                           <ProtectedRoute
                                             exact
