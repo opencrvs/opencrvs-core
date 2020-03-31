@@ -166,7 +166,7 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
   return push(formatUrl(path, { tabId, selectorId }))
 }
 
-export function goToPerformanceHome() {
+export function goToPerformanceReportList() {
   return push(
     formatUrl(PERFORMANCE_REPORT_LIST, {
       reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
