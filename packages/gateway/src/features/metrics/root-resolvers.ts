@@ -18,9 +18,11 @@ import {
   estimated45DayMetricsTotalCalculator
 } from '@gateway/features/fhir/utils'
 
-export interface ITimeRange {
+export interface IMetricsParam {
   timeStart: string
   timeEnd: string
+  locationId: string
+  event?: string
 }
 
 export const resolvers: GQLResolver = {
@@ -30,16 +32,13 @@ export const resolvers: GQLResolver = {
       { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
-      const timeRange: ITimeRange = {
+      const params: IMetricsParam = {
         timeStart,
-        timeEnd
-      }
-      const metricsData = await getMetrics(
-        authHeader,
-        timeRange,
+        timeEnd,
         locationId,
         event
-      )
+      }
+      const metricsData = await getMetrics('/metrics', params, authHeader)
 
       return {
         timeFrames: {
@@ -61,6 +60,21 @@ export const resolvers: GQLResolver = {
           total: paymentTotalCalculator(metricsData.payments)
         }
       }
+    },
+    async getPerformanceMetrics(
+      _,
+      { timeStart, timeEnd, locationId },
+      authHeader
+    ) {
+      return getMetrics(
+        '/areaPerformanceMetrics',
+        {
+          timeStart,
+          timeEnd,
+          locationId
+        },
+        authHeader
+      )
     }
   }
 }

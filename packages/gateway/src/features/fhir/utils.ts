@@ -48,7 +48,7 @@ import {
   DEATH_REG_NO
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
-import { ITimeRange } from '@gateway/features/metrics/root-resolvers'
+import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
 import {
@@ -855,18 +855,19 @@ export const postSearch = (
 }
 
 export const getMetrics = (
-  authHeader: IAuthHeader,
-  timeRange: ITimeRange,
-  locationId: string,
-  event: string
+  prefix: string,
+  params: IMetricsParam,
+  authHeader: IAuthHeader
 ) => {
-  const params = new URLSearchParams({ ...timeRange, locationId, event })
-  return fetch(`${METRICS_URL}/metrics?` + params, {
-    method: 'GET',
-    headers: {
-      ...authHeader
+  return fetch(
+    `${METRICS_URL}${prefix}?` + new URLSearchParams({ ...params }),
+    {
+      method: 'GET',
+      headers: {
+        ...authHeader
+      }
     }
-  })
+  )
     .then(response => {
       return response.json()
     })
