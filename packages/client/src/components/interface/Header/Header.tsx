@@ -52,7 +52,8 @@ import {
   goToSearch,
   goToSearchResult,
   goToSettings,
-  goToEvents as goToEventsAction
+  goToEvents as goToEventsAction,
+  goToPerformanceHome
 } from '@client/navigation'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import {
@@ -80,6 +81,7 @@ type IProps = IntlShapeProps & {
   goToSearch: typeof goToSearch
   goToSettings: typeof goToSettings
   goToHomeAction: typeof goToHome
+  goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
@@ -316,6 +318,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails,
       enableMenuSelection = true,
       goToHomeAction,
+      goToPerformanceHomeAction,
       goToPerformanceReportListAction,
       activeMenuItem
     } = this.props
@@ -381,8 +384,18 @@ class HeaderComp extends React.Component<IProps, IState> {
         {
           key: 'sysadmin',
           title: intl.formatMessage(messages.systemTitle),
-          onClick: goToHome,
-          selected: true
+          onClick: goToHomeAction,
+          selected:
+            enableMenuSelection &&
+            activeMenuItem !== ACTIVE_MENU_ITEM.PERFORMANCE
+        },
+        {
+          key: 'performance',
+          title: intl.formatMessage(constantsMessages.performanceTitle),
+          onClick: goToPerformanceHomeAction,
+          selected:
+            enableMenuSelection &&
+            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         }
       ]
 
@@ -426,6 +439,7 @@ export const Header = connect(
     goToSettings,
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
+    goToPerformanceHomeAction: goToPerformanceHome,
     goToPerformanceReportListAction: goToPerformanceReportList
   }
 )(injectIntl<'intl', IProps>(HeaderComp))
