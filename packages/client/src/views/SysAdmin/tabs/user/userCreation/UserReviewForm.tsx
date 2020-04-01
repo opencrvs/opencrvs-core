@@ -177,7 +177,7 @@ class UserReviewFormComponent extends React.Component<
       title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       actionComponent = (
         <SuccessButton
-          id="verifyPositive"
+          id="submit-edit-user-form"
           onClick={() => this.props.submitForm(userFormSection)}
           icon={() => <Check />}
           align={ICON_ALIGNMENT.LEFT}

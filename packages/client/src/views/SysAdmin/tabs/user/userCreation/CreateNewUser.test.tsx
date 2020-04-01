@@ -13,7 +13,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
-import { userQueries } from '@client/sysadmin/user/queries'
+import { userQueries, GET_USER } from '@client/sysadmin/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -28,6 +28,13 @@ import {
 } from '@client/views/SysAdmin/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import {
+  REVIEW_USER_FORM,
+  REVIEW_USER_DETAILS
+} from '@client/navigation/routes'
+import { UserSection } from '@client/forms'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 export const mockRoles = {
   data: {
     getRoles: [
@@ -356,6 +363,127 @@ describe('create new user tests', () => {
       await flushPromises()
 
       expect(store.getState().userForm.submitting).toBe(false)
+    })
+  })
+})
+
+describe('edit user tests', () => {
+  const { store, history } = createStore()
+  let component: ReactWrapper<{}, {}>
+  const submitMock: jest.Mock = jest.fn()
+
+  beforeEach(() => {
+    store.dispatch(
+      offlineDataReady({
+        languages: mockOfflineData.languages,
+        forms: mockOfflineData.forms,
+        templates: mockOfflineData.templates,
+        locations: mockOfflineData.locations,
+        facilities: mockOfflineData.facilities,
+        assets: mockOfflineData.assets
+      })
+    )
+  })
+
+  describe('when user is in review page', () => {
+    const graphqlMocks = [
+      {
+        request: {
+          query: GET_USER,
+          variables: { userId: '5e835e4d81fbf01e4dc554db' }
+        },
+        result: {
+          data: {
+            getUser: {
+              id: '5e835e4d81fbf01e4dc554db',
+              name: [
+                {
+                  use: 'bn',
+                  firstNames: '',
+                  familyName: 'মায়ের পারিবারিক নাম ',
+                  __typename: 'HumanName'
+                },
+                {
+                  use: 'en',
+                  firstNames: '',
+                  familyName: 'Shakib al Hasan',
+                  __typename: 'HumanName'
+                }
+              ],
+              username: 'shakib1',
+              mobile: '+8801662132163',
+              identifier: {
+                system: 'NATIONAL_ID',
+                value: '1014881922',
+                __typename: 'Identifier'
+              },
+              role: 'VALIDATOR_API_USER',
+              type: 'API_USER',
+              primaryOffice: {
+                id: '29cffb79-523b-4204-b904-4bbdfc8837aa',
+                name: 'Narsingdi Paurasabha',
+                alias: ['নরসিংদী পৌরসভা'],
+                __typename: 'Location'
+              },
+              signature: null,
+              __typename: 'User'
+            }
+          }
+        }
+      }
+    ]
+
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        <CreateNewUser
+          location={{
+            pathname: REVIEW_USER_DETAILS,
+            state: {},
+            hash: '',
+            search: ''
+          }}
+          submitForm={submitMock}
+          match={{
+            // @ts-ignore
+            params: {
+              userId: '5e835e4d81fbf01e4dc554db',
+              sectionId: UserSection.Preview
+            }
+          }}
+        />,
+        store,
+        graphqlMocks
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component = testComponent.component
+    })
+
+    it('loads page without crashing', async () => {
+      const actionPageElement = await waitForElement(component, ActionPageLight)
+      expect(actionPageElement.prop('title')).toBe('Edit details')
+    })
+
+    it('clicking on any change button takes user to form', async () => {
+      const changeButtonOfType = await waitForElement(
+        component,
+        '#btn_change_type'
+      )
+      changeButtonOfType.hostNodes().simulate('click')
+      await flushPromises()
+      expect(history.location.hash).toBe('#type')
+    })
+
+    it('clicking confirm button starts submitting the form', async () => {
+      const submitButton = await waitForElement(
+        component,
+        '#submit-edit-user-form'
+      )
+      submitButton.hostNodes().simulate('click')
+      expect(store.getState().userForm.submitting).toBe(true)
     })
   })
 })
