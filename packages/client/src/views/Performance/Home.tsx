@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
+import { goToOperationalReport } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -43,7 +44,12 @@ const StyledText = styled.span`
   margin-bottom: 10px;
 `
 
-type Props = WrappedComponentProps &
+interface BaseProps {
+  goToOperationalReport: typeof goToOperationalReport
+}
+
+type Props = BaseProps &
+  WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> & {
     offlineResources: IOfflineData
   }
@@ -56,7 +62,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      selectedLocation: undefined
+      selectedLocation:
+        (props.history.location.state &&
+          props.history.location.state.selectedLocation) ||
+        undefined
     }
   }
 
@@ -66,7 +75,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     })
   }
 
-  searchButtonHandler = () => {}
+  searchButtonHandler = () => {
+    const {
+      push,
+      location: { pathname: currentRoute }
+    } = this.props.history
+    push(currentRoute, this.state)
+
+    this.state.selectedLocation &&
+      this.props.goToOperationalReport(
+        this.props.history.location.state.selectedLocation
+      )
+  }
 
   render() {
     const { intl, offlineResources } = this.props
@@ -100,5 +120,7 @@ function mapStateToProps(state: IStoreState) {
 
 export const PerformanceHome = connect(
   mapStateToProps,
-  null
+  {
+    goToOperationalReport
+  }
 )(injectIntl(PerformanceHomeComponent))
