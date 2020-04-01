@@ -47,13 +47,23 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { SysAdminHome } from '@client/views/SysAdmin/SysAdminHome'
 import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import ApolloClient from 'apollo-client'
 import { ConnectedRouter } from 'connected-react-router'
-import { Location } from 'history'
+import { History, Location } from 'history'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
+import { AppStore } from './store'
 import { PerformanceHome } from './views/Performance/Home'
+import { OperationalReport } from './views/Performance/OperationalReport'
+
+interface IAppProps {
+  client?: ApolloClient<{}>
+  store: AppStore
+  history: History
+}
+
 const MainSection = styled.section`
   flex-grow: 8;
   background: ${({ theme }) => theme.colors.background};
@@ -288,6 +298,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.PERFORMANCE_REPORT}
                                             component={Report}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.OPERATIONAL_REPORT}
+                                            component={OperationalReport}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

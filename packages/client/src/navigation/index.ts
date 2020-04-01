@@ -22,6 +22,7 @@ import {
   EVENT_INFO,
   FIELD_AGENT_HOME_TAB,
   HOME,
+  OPERATIONAL_REPORT,
   PERFORMANCE_HOME,
   PERFORMANCE_REPORT,
   PERFORMANCE_REPORT_LIST,
@@ -192,6 +193,14 @@ export function goToPerformanceReport(
     timeRange: { start: timeStart, end: timeEnd },
     eventType
   })
+}
+
+export function goToOperationalReport(locationId: string) {
+  return push(
+    formatUrl(OPERATIONAL_REPORT, {
+      locationId
+    })
+  )
 }
 
 export function goToSearchResult(
