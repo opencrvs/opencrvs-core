@@ -10,43 +10,43 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { push, goBack as back, replace } from 'connected-react-router'
+import { Event } from '@client/forms'
 import {
-  SELECT_BIRTH_INFORMANT,
-  SELECT_DEATH_INFORMANT,
-  HOME,
-  SEARCH_RESULT,
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_APPLICANT_FORM,
-  DRAFT_DEATH_FORM,
-  SELECT_VITAL_EVENT,
-  REVIEW_DUPLICATES,
-  CERTIFICATE_COLLECTOR,
-  REGISTRAR_HOME_TAB,
-  FIELD_AGENT_HOME_TAB,
-  SEARCH,
   APPLICATION_DETAIL,
-  SETTINGS,
-  SYS_ADMIN_HOME_TAB,
+  CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_SECTION,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
-  VERIFY_COLLECTOR,
-  REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE_PAYMENT,
-  PERFORMANCE_REPORT_LIST,
-  PERFORMANCE_REPORT,
+  DRAFT_BIRTH_APPLICANT_FORM,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM,
   EVENT_INFO,
+  FIELD_AGENT_HOME_TAB,
+  HOME,
+  OPERATIONAL_REPORT,
   PERFORMANCE_HOME,
-  OPERATIONAL_REPORT
+  PERFORMANCE_REPORT,
+  PERFORMANCE_REPORT_LIST,
+  PRINT_CERTIFICATE_PAYMENT,
+  REGISTRAR_HOME_TAB,
+  REVIEW_CERTIFICATE,
+  REVIEW_DUPLICATES,
+  SEARCH,
+  SEARCH_RESULT,
+  SELECT_BIRTH_INFORMANT,
+  SELECT_BIRTH_MAIN_CONTACT_POINT,
+  SELECT_BIRTH_PRIMARY_APPLICANT,
+  SELECT_DEATH_INFORMANT,
+  SELECT_DEATH_MAIN_CONTACT_POINT,
+  SELECT_VITAL_EVENT,
+  SETTINGS,
+  SYS_ADMIN_HOME_TAB,
+  VERIFY_COLLECTOR
 } from '@client/navigation/routes'
-import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
-import { Event } from '@client/forms'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { goBack as back, push, replace } from 'connected-react-router'
+import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -185,12 +185,8 @@ export function goToPerformanceReport(
   })
 }
 
-export function goToOperationalReport(locationId: string) {
-  return push(
-    formatUrl(OPERATIONAL_REPORT, {
-      locationId
-    })
-  )
+export function goToOperationalReport(location: ISearchLocation) {
+  return push(OPERATIONAL_REPORT, { location })
 }
 
 export function goToSearchResult(
