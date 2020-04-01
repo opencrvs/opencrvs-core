@@ -56,6 +56,7 @@ import { ReportList } from '@client/views/Performance/ReportList'
 import { Report } from '@client/views/Performance/Report'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { PerformanceHome } from './views/Performance/Home'
+import { OperationalReport } from './views/Performance/OperationalReport'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -286,6 +287,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.PERFORMANCE_REPORT}
                                             component={Report}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.OPERATIONAL_REPORT}
+                                            component={OperationalReport}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

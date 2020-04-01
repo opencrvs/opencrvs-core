@@ -39,7 +39,8 @@ import {
   PERFORMANCE_REPORT_LIST,
   PERFORMANCE_REPORT,
   EVENT_INFO,
-  PERFORMANCE_HOME
+  PERFORMANCE_HOME,
+  OPERATIONAL_REPORT
 } from '@client/navigation/routes'
 import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
@@ -182,6 +183,14 @@ export function goToPerformanceReport(
     timeRange: { start: timeStart, end: timeEnd },
     eventType
   })
+}
+
+export function goToOperationalReport(locationId: string) {
+  return push(
+    formatUrl(OPERATIONAL_REPORT, {
+      locationId
+    })
+  )
 }
 
 export function goToSearchResult(
