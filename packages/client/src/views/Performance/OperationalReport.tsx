@@ -12,8 +12,9 @@
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
 
-type Props = WrappedComponentProps
+type Props = WrappedComponentProps & Pick<RouteComponentProps, 'history'>
 
 interface State {}
 

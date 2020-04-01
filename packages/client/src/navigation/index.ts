@@ -195,12 +195,8 @@ export function goToPerformanceReport(
   })
 }
 
-export function goToOperationalReport(locationId: string) {
-  return push(
-    formatUrl(OPERATIONAL_REPORT, {
-      locationId
-    })
-  )
+export function goToOperationalReport(location: ISearchLocation) {
+  return push(OPERATIONAL_REPORT, { location })
 }
 
 export function goToSearchResult(
