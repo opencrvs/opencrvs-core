@@ -51,13 +51,15 @@ interface IBirthKeyFiguresData {
 }
 
 export interface IEstimation {
-  estimation: number
+  totalEstimation: number
+  maleEstimation: number
+  femaleEstimation: number
   locationId: string
   locationLevel: string
   estimationYear: number
 }
 
-export interface IBirth45DayEstimation {
+export interface IRegistrationIn45DayEstimation {
   locationId: string
   registrationIn45Day: number
   estimatedRegistration: number
@@ -361,6 +363,7 @@ export async function fetchKeyFigures(
     location,
     45, // For 45 Days
     new Date().getFullYear(),
+    EVENT_TYPE.BIRTH,
     authHeader
   )
 
@@ -384,7 +387,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS,
       within45DaysData,
-      estimatedFigureFor45Days.estimation
+      estimatedFigureFor45Days.totalEstimation
     )
   )
   /* Populating > 45D and < 365D data */
@@ -392,6 +395,7 @@ export async function fetchKeyFigures(
     location,
     365, // For 1 year
     new Date().getFullYear(),
+    EVENT_TYPE.BIRTH,
     authHeader
   )
   const within1YearData: IGroupedByGender[] = await query(
@@ -411,7 +415,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_45_DAYS_TO_1_YEAR,
       within1YearData,
-      estimatedFigureFor1Year.estimation
+      estimatedFigureFor1Year.totalEstimation
     )
   )
   /* Populating < 365D data */
@@ -426,7 +430,7 @@ export async function fetchKeyFigures(
     populateBirthKeyFigurePoint(
       WITHIN_1_YEAR,
       fullData,
-      estimatedFigureFor1Year.estimation
+      estimatedFigureFor1Year.totalEstimation
     )
   )
   return keyFigures
@@ -611,49 +615,50 @@ export async function fetchEstimated45DayMetrics(
   childLocationIds: Array<string>,
   authHeader: IAuthHeader
 ) {
-  if (event === EVENT_TYPE.DEATH) {
-    // THIS IS ONLY FOR BIRTH ATM
-    return []
-  }
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
   const points = await query(`SELECT
                               COUNT(ageInDays) AS withIn45Day
-                              FROM birth_reg
+                              FROM ${measurement}
                               WHERE ageInDays <= 45
                               AND time > '${timeFrom}'
                               AND time <= '${timeTo}'
                               AND ${currLocationLevel}='${currLocation}'
                               GROUP BY ${locationLevel}`)
-  const dataFromInflux: IBirth45DayEstimation[] = []
+  const dataFromInflux: IRegistrationIn45DayEstimation[] = []
   for (const point of points) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       point[locationLevel],
       new Date().getFullYear(),
+      event,
       authHeader
     )
     dataFromInflux.push({
       locationId: point[locationLevel],
       registrationIn45Day: point.withIn45Day,
-      estimatedRegistration: estimationOf45Day.estimation,
+      estimatedRegistration: estimationOf45Day.totalEstimation,
       estimationYear: estimationOf45Day.estimationYear,
       estimationLocationLevel: estimationOf45Day.locationLevel,
       estimationPercentage:
-        point.withIn45Day === 0
+        point.withIn45Day === 0 || estimationOf45Day.totalEstimation === 0
           ? 0
-          : Math.round((point.withIn45Day / estimationOf45Day.estimation) * 100)
+          : Math.round(
+              (point.withIn45Day / estimationOf45Day.totalEstimation) * 100
+            )
     })
   }
 
-  const emptyEstimationData: IBirth45DayEstimation[] = []
+  const emptyEstimationData: IRegistrationIn45DayEstimation[] = []
   for (const id of childLocationIds) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       id,
       new Date().getFullYear(),
+      event,
       authHeader
     )
     emptyEstimationData.push({
       locationId: id,
       registrationIn45Day: 0,
-      estimatedRegistration: estimationOf45Day.estimation,
+      estimatedRegistration: estimationOf45Day.totalEstimation,
       estimationYear: estimationOf45Day.estimationYear,
       estimationLocationLevel: estimationOf45Day.locationLevel,
       estimationPercentage: 0
@@ -666,6 +671,73 @@ export async function fetchEstimated45DayMetrics(
     'locationId'
   )
   return estimated45DayData
+}
+
+export async function fetchAreaWisePerformanceMetrics(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const registrationsIn45DaysPoints: IGroupedByGender[] = await query(
+    `SELECT COUNT(ageInDays) AS total
+      FROM ${measurement}
+    WHERE time >= ${timeFrom}
+      AND time <= ${timeTo}
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )
+      AND ageInDays <= 45
+    GROUP BY gender`
+  )
+  let totalRegistrationIn45Day: number = 0
+  let totalMaleRegistrationIn45Day: number = 0
+  let totalFemaleRegistrationIn45Day: number = 0
+  registrationsIn45DaysPoints.forEach(point => {
+    totalRegistrationIn45Day += point.total
+    if (point.gender === 'male') {
+      totalMaleRegistrationIn45Day += point.total
+    } else if (point.gender === 'female') {
+      totalFemaleRegistrationIn45Day += point.total
+    }
+  })
+  const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
+    locationId,
+    new Date().getFullYear(),
+    event,
+    authHeader
+  )
+
+  return {
+    actualRegistration: totalRegistrationIn45Day,
+    estimatedRegistration: estimationOf45Day.totalEstimation,
+    estimatedPercentage:
+      totalRegistrationIn45Day === 0 || estimationOf45Day.totalEstimation === 0
+        ? 0
+        : Math.round(
+            (totalRegistrationIn45Day / estimationOf45Day.totalEstimation) * 100
+          ),
+    malePercentage:
+      totalMaleRegistrationIn45Day === 0 ||
+      estimationOf45Day.maleEstimation === 0
+        ? 0
+        : Math.round(
+            (totalMaleRegistrationIn45Day / estimationOf45Day.maleEstimation) *
+              100
+          ),
+    femalePercentage:
+      totalFemaleRegistrationIn45Day === 0 ||
+      estimationOf45Day.femaleEstimation === 0
+        ? 0
+        : Math.round(
+            (totalFemaleRegistrationIn45Day /
+              estimationOf45Day.femaleEstimation) *
+              100
+          )
+  }
 }
 
 function populateGenderBasisMetrics(

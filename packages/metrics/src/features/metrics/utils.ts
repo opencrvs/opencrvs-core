@@ -20,6 +20,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   CRUD_BIRTH_RATE_SEC,
   TOTAL_POPULATION_SEC,
+  MALE_POPULATION_SEC,
+  FEMALE_POPULATION_SEC,
   JURISDICTION_TYPE_SEC,
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
@@ -102,10 +104,13 @@ export const fetchEstimateByLocation = async (
   locationData: Location,
   estimationForDays: number,
   estimatedYear: number,
+  event: EVENT_TYPE,
   authHeader: IAuthHeader
 ): Promise<IEstimation> => {
   let crudRate: number = 0
-  let population: number = 0
+  let totalPopulation: number = 0
+  let malePopulation: number = 0
+  let femalePopulation: number = 0
 
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
@@ -113,7 +118,10 @@ export const fetchEstimateByLocation = async (
   let estimateExtensionFound: boolean = false
   let actualEstimationYear = estimatedYear
   locationData.extension.forEach(extension => {
-    if (extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC) {
+    if (
+      extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC &&
+      event === EVENT_TYPE.BIRTH
+    ) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
@@ -137,30 +145,75 @@ export const fetchEstimateByLocation = async (
       for (let key = estimatedYear; key > 1; key--) {
         valueArray.forEach(data => {
           if (key in data) {
-            population = data[key]
+            totalPopulation = data[key]
             actualEstimationYear = key
           }
         })
-        if (population > 0) {
+        if (totalPopulation > 0) {
+          break
+        }
+      }
+    } else if (
+      extension.url ===
+      OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
+    ) {
+      const valueArray: [] = JSON.parse(extension.valueString as string)
+      // tslint:disable-next-line
+      for (let key = estimatedYear; key > 1; key--) {
+        valueArray.forEach(data => {
+          if (key in data) {
+            malePopulation = data[key] === '' ? 0 : data[key]
+          }
+        })
+        if (malePopulation > 0) {
+          break
+        }
+      }
+    } else if (
+      extension.url ===
+      OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
+    ) {
+      const valueArray: [] = JSON.parse(extension.valueString as string)
+      // tslint:disable-next-line
+      for (let key = estimatedYear; key > 1; key--) {
+        valueArray.forEach(data => {
+          if (key in data) {
+            femalePopulation = data[key] === '' ? 0 : data[key]
+          }
+        })
+        if (femalePopulation > 0) {
           break
         }
       }
     }
   })
   if (!estimateExtensionFound) {
-    if (!locationData.partOf || !locationData.partOf.reference) {
-      throw new Error('Unable to fetch estimate data from location tree')
+    return {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: locationData.id,
+      estimationYear: actualEstimationYear,
+      locationLevel: getLocationLevelFromLocationData(locationData)
     }
-    return await fetchEstimateByLocation(
-      await fetchFHIR(locationData.partOf.reference, authHeader),
-      estimationForDays,
-      estimatedYear,
-      authHeader
-    )
   }
+  if (event === EVENT_TYPE.DEATH) {
+    // TODO: need to get it from resource url
+    crudRate = 5.1
+  }
+  malePopulation = malePopulation > 0 ? malePopulation : totalPopulation / 2
+  femalePopulation =
+    femalePopulation > 0 ? femalePopulation : totalPopulation / 2
+
   return {
-    estimation: Math.round(
-      ((crudRate * population) / 1000) * (estimationForDays / 365)
+    totalEstimation: Math.round(
+      ((crudRate * totalPopulation) / 1000) * (estimationForDays / 365)
+    ),
+    maleEstimation: Math.round(
+      ((crudRate * malePopulation) / 1000) * (estimationForDays / 365)
+    ),
+    femaleEstimation: Math.round(
+      ((crudRate * femalePopulation) / 1000) * (estimationForDays / 365)
     ),
     locationId: locationData.id,
     estimationYear: actualEstimationYear,
@@ -181,6 +234,7 @@ export const getLocationLevelFromLocationData = (locationData: Location) => {
 export const fetchEstimateFor45DaysByLocationId = async (
   locationId: string,
   estimatedYear: number,
+  event: EVENT_TYPE,
   authHeader: IAuthHeader
 ): Promise<IEstimation> => {
   const locationData: Location = await fetchFHIR(locationId, authHeader)
@@ -188,6 +242,7 @@ export const fetchEstimateFor45DaysByLocationId = async (
     locationData,
     45, // For 45 days
     estimatedYear,
+    event,
     authHeader
   )
 }
