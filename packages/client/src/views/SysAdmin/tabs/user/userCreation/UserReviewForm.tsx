@@ -19,7 +19,7 @@ import {
   SEARCH_FIELD,
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
-import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
+import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { buttonMessages as messages, userMessages } from '@client/i18n/messages'
 import { goBack, goToCreateUserSection } from '@client/navigation'
@@ -178,7 +178,9 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
         { sections: [userFormSection] },
         { user: props.formData }
       )
-      dispatch(submitUserFormData(props.client, createUserMutation, variables))
+      dispatch(
+        submitUserFormData(props.client, createOrUpdateUserMutation, variables)
+      )
     }
   }
 }
