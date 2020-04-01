@@ -24,7 +24,7 @@ const messagesToDefine = {
   },
   sysAdminHomeHeader: {
     id: 'performance.header.sysadmin.home',
-    defaultMessage: 'Search for an administrive area or office',
+    defaultMessage: 'Search for an administrative area or office',
     description: 'Header for system admin performance home page'
   },
   noResultForLocation: {
