@@ -359,6 +359,8 @@ export async function generateApplicationStartedPoint(
     role = 'REGISTRATION_AGENT'
   } else if (status === Events.NEW_WAITING_VALIDATION) {
     role = 'REGISTRAR'
+  } else if (status === Events.NEW_DEC) {
+    role = 'FIELD_AGENT'
   }
 
   if (role === '') {
