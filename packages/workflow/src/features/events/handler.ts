@@ -33,26 +33,26 @@ import * as Hapi from 'hapi'
 import fetch, { RequestInit } from 'node-fetch'
 
 export enum Events {
-  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration',
-  BIRTH_NEW_DEC = '/events/birth/new-declaration',
+  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2 birth in progress
+  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent birth complete
   BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
   BIRTH_WAITING_VALIDATION = '/events/birth/waiting-validation',
-  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation',
+  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation', // Registrar
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
-  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration',
-  DEATH_NEW_DEC = '/events/death/new-declaration',
+  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', // Field agent or DHIS2 death in progress
+  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent death complete
   DEATH_UPDATE_DEC = '/events/death/update-declaration',
   DEATH_WAITING_VALIDATION = '/events/death/waiting-validation',
-  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation',
+  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation', // Registrar
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
-  BIRTH_NEW_VALIDATE = '/events/birth/new-validation',
-  DEATH_NEW_VALIDATE = '/events/death/new-validation',
+  BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new event
+  DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new event
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   UNKNOWN = 'unknown'
 }
