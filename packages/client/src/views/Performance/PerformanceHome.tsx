@@ -84,7 +84,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
     this.state.selectedLocation &&
       this.props.goToOperationalReport(
-        this.props.history.location.state.selectedLocation
+        this.props.history.location.state.selectedLocation.id
       )
   }
 
