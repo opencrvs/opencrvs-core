@@ -13,6 +13,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 
 type Props = WrappedComponentProps & Pick<RouteComponentProps, 'history'>
 
@@ -20,7 +21,7 @@ interface State {}
 
 class OperationalReportComponent extends React.Component<Props, State> {
   render() {
-    return <></>
+    return <PerformanceContentWrapper hideTopBar></PerformanceContentWrapper>
   }
 }
 
