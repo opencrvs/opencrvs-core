@@ -22,7 +22,7 @@ const messagesToDefine = {
     defaultMessage: 'Monthly reports',
     description: 'Header used for the body of monthly reports page'
   },
-  sysAdminHomeHeader: {
+  sysAdminPerformanceHomeHeader: {
     id: 'performance.header.sysadmin.home',
     defaultMessage: 'Search for an administrative area or office',
     description: 'Header for system admin performance home page'
