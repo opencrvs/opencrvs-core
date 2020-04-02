@@ -186,6 +186,14 @@ class HeaderComp extends React.Component<IProps, IState> {
           onClick: this.props.goToHomeAction
         },
         {
+          icon: <StatsBlack />,
+          iconHover: <StatsBlue />,
+          label: this.props.intl.formatMessage(
+            constantsMessages.performanceTitle
+          ),
+          onClick: this.props.goToPerformanceHomeAction
+        },
+        {
           icon: <SettingsBlack />,
           iconHover: <SettingsBlue />,
           label: this.props.intl.formatMessage(messages.settingsTitle),
