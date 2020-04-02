@@ -228,7 +228,10 @@ export class LocationSearch extends React.Component<IProps, IState> {
           {this.dropdown()}
         </Wrapper>
         {this.props.searchButtonHandler && (
-          <SearchButton onClick={this.props.searchButtonHandler}>
+          <SearchButton
+            id="location-search-btn"
+            onClick={this.props.searchButtonHandler}
+          >
             Search
           </SearchButton>
         )}
