@@ -43,4 +43,20 @@ describe('Performance content wrapper', () => {
       ).toBeTruthy()
     })
   })
+
+  describe('No top bar', () => {
+    let app: ReactWrapper
+
+    beforeAll(async () => {
+      app = (await createTestComponent(
+        <PerformanceContentWrapper hideTopBar={true} />,
+        store
+      )).component
+      app.update()
+    })
+
+    it('hides the top bar', () => {
+      expect(app.find('#top-bar').hostNodes()).toHaveLength(0)
+    })
+  })
 })
