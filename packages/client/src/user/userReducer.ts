@@ -234,6 +234,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         ...state,
         loadingRoles: false,
         submitting: false,
+        userDetailsStored: true,
         userForm: {
           sections: updatedSections
         }
@@ -303,8 +304,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       return loop(
         {
           ...state,
-          userFormData: formData,
-          userDetailsStored: true
+          userFormData: formData
         },
         Cmd.action(processRoles(formData.primaryOfficeId as string))
       )

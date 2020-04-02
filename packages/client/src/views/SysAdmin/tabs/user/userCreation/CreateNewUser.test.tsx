@@ -372,6 +372,53 @@ describe('edit user tests', () => {
   let component: ReactWrapper<{}, {}>
   const submitMock: jest.Mock = jest.fn()
 
+  const graphqlMocks = [
+    {
+      request: {
+        query: GET_USER,
+        variables: { userId: '5e835e4d81fbf01e4dc554db' }
+      },
+      result: {
+        data: {
+          getUser: {
+            id: '5e835e4d81fbf01e4dc554db',
+            name: [
+              {
+                use: 'bn',
+                firstNames: '',
+                familyName: 'মায়ের পারিবারিক নাম ',
+                __typename: 'HumanName'
+              },
+              {
+                use: 'en',
+                firstNames: '',
+                familyName: 'Shakib al Hasan',
+                __typename: 'HumanName'
+              }
+            ],
+            username: 'shakib1',
+            mobile: '+8801662132163',
+            identifier: {
+              system: 'NATIONAL_ID',
+              value: '1014881922',
+              __typename: 'Identifier'
+            },
+            role: 'API_USER',
+            type: 'API_USER',
+            primaryOffice: {
+              id: '895cc945-94a9-4195-9a29-22e9310f3385',
+              name: 'Narsingdi Paurasabha',
+              alias: ['নরসিংদী পৌরসভা'],
+              __typename: 'Location'
+            },
+            signature: null,
+            __typename: 'User'
+          }
+        }
+      }
+    }
+  ]
+
   beforeEach(() => {
     store.dispatch(
       offlineDataReady({
@@ -385,54 +432,50 @@ describe('edit user tests', () => {
     )
   })
 
-  describe('when user is in review page', () => {
-    const graphqlMocks = [
-      {
-        request: {
-          query: GET_USER,
-          variables: { userId: '5e835e4d81fbf01e4dc554db' }
-        },
-        result: {
-          data: {
-            getUser: {
-              id: '5e835e4d81fbf01e4dc554db',
-              name: [
-                {
-                  use: 'bn',
-                  firstNames: '',
-                  familyName: 'মায়ের পারিবারিক নাম ',
-                  __typename: 'HumanName'
-                },
-                {
-                  use: 'en',
-                  firstNames: '',
-                  familyName: 'Shakib al Hasan',
-                  __typename: 'HumanName'
-                }
-              ],
-              username: 'shakib1',
-              mobile: '+8801662132163',
-              identifier: {
-                system: 'NATIONAL_ID',
-                value: '1014881922',
-                __typename: 'Identifier'
-              },
-              role: 'VALIDATOR_API_USER',
-              type: 'API_USER',
-              primaryOffice: {
-                id: '29cffb79-523b-4204-b904-4bbdfc8837aa',
-                name: 'Narsingdi Paurasabha',
-                alias: ['নরসিংদী পৌরসভা'],
-                __typename: 'Location'
-              },
-              signature: null,
-              __typename: 'User'
-            }
-          }
-        }
-      }
-    ]
+  describe('when user is in update form page', () => {
+    beforeEach(async () => {
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              userId: '5e835e4d81fbf01e4dc554db',
+              sectionId: UserSection.User,
+              groupId: 'user-view-group'
+            },
+            isExact: true,
+            path: REVIEW_USER_FORM,
+            url: ''
+          }}
+        />,
+        store,
+        graphqlMocks
+      )
 
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.component.update()
+      component = testComponent.component
+    })
+
+    it('clicking on continue button takes user review details page', async () => {
+      const continueButtonElement = await waitForElement(
+        component,
+        '#confirm_form'
+      )
+
+      continueButtonElement.hostNodes().simulate('click')
+      component.update()
+      await flushPromises()
+      expect(history.location.pathname).toContain(
+        '/user/5e835e4d81fbf01e4dc554db/preview/'
+      )
+    })
+  })
+
+  describe('when user is in review page', () => {
     beforeEach(async () => {
       const testComponent = await createTestComponent(
         <CreateNewUser
@@ -460,6 +503,7 @@ describe('edit user tests', () => {
         setTimeout(resolve, 100)
       })
       component = testComponent.component
+      component.update()
     })
 
     it('loads page without crashing', async () => {
