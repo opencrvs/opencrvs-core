@@ -26,7 +26,7 @@ import {
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchFHIR } from '@metrics/api'
+import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
@@ -40,6 +40,10 @@ export const LABEL_FOMRAT = {
 export interface IPoint {
   time: string
   count: number
+}
+
+export interface ICrudeDeathRate {
+  crudeDeathRate: number
 }
 
 export enum EVENT_TYPE {
@@ -198,8 +202,11 @@ export const fetchEstimateByLocation = async (
     }
   }
   if (event === EVENT_TYPE.DEATH) {
-    // TODO: need to get it from resource url
-    crudRate = 5.1
+    const crudeDeathRateResponse: ICrudeDeathRate = await fetchFromResource(
+      'crude-death-rate',
+      authHeader
+    )
+    crudRate = crudeDeathRateResponse.crudeDeathRate
   }
   malePopulation = malePopulation > 0 ? malePopulation : totalPopulation / 2
   femalePopulation =

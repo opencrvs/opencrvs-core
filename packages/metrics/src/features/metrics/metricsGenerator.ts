@@ -641,8 +641,11 @@ export async function fetchEstimated45DayMetrics(
       estimationPercentage:
         point.withIn45Day === 0 || estimationOf45Day.totalEstimation === 0
           ? 0
-          : Math.round(
-              (point.withIn45Day / estimationOf45Day.totalEstimation) * 100
+          : Number(
+              (
+                (point.withIn45Day / estimationOf45Day.totalEstimation) *
+                100
+              ).toFixed(2)
             )
     })
   }
@@ -717,25 +720,33 @@ export async function fetchAreaWisePerformanceMetrics(
     estimatedPercentage:
       totalRegistrationIn45Day === 0 || estimationOf45Day.totalEstimation === 0
         ? 0
-        : Math.round(
-            (totalRegistrationIn45Day / estimationOf45Day.totalEstimation) * 100
+        : Number(
+            (
+              (totalRegistrationIn45Day / estimationOf45Day.totalEstimation) *
+              100
+            ).toFixed(2)
           ),
     malePercentage:
       totalMaleRegistrationIn45Day === 0 ||
       estimationOf45Day.maleEstimation === 0
         ? 0
-        : Math.round(
-            (totalMaleRegistrationIn45Day / estimationOf45Day.maleEstimation) *
+        : Number(
+            (
+              (totalMaleRegistrationIn45Day /
+                estimationOf45Day.maleEstimation) *
               100
+            ).toFixed(2)
           ),
     femalePercentage:
       totalFemaleRegistrationIn45Day === 0 ||
       estimationOf45Day.femaleEstimation === 0
         ? 0
-        : Math.round(
-            (totalFemaleRegistrationIn45Day /
-              estimationOf45Day.femaleEstimation) *
+        : Number(
+            (
+              (totalFemaleRegistrationIn45Day /
+                estimationOf45Day.femaleEstimation) *
               100
+            ).toFixed(2)
           )
   }
 }

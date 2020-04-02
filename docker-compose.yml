@@ -80,6 +80,7 @@ services:
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
       - AUTH_URL=http://auth:4040
+      - RESOURCE_URL=http://resources:3040/
       - FHIR_URL=http://openhim-core:5001/fhir
       - CHECK_INVALID_TOKEN=true
   # END User facing services
