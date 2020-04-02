@@ -94,6 +94,26 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
   return catchmentAreaIds
 }
 
+export const updateFhir = async (token: string, resource: fhir.Resource) => {
+  const res = await fetch(
+    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/fhir+json',
+        Authorization: token
+      },
+      body: JSON.stringify(resource)
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error('Unexpected response received')
+  }
+
+  return res
+}
+
 export const postFhir = async (token: string, resource: fhir.Resource) => {
   const res = await fetch(`${FHIR_URL}/${resource.resourceType}`, {
     method: 'POST',
