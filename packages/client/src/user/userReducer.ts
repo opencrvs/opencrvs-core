@@ -35,8 +35,9 @@ const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
 const SUBMIT_USER_FORM_DATA_FAIL = 'USER_FORM/SUBMIT_USER_FORM_DATA_FAIL'
 const PROCESS_ROLES = 'USER_FORM/PROCESS_ROLES'
 
-enum TOAST_MESSAGES {
+export enum TOAST_MESSAGES {
   SUCCESS = 'userFormSuccess',
+  UPDATE_SUCCESS = 'userFormUpdateSuccess',
   FAIL = 'userFormFail'
 }
 
@@ -103,6 +104,7 @@ interface IUserFormDataSubmitAction {
     client: ApolloClient<unknown>
     mutation: any
     variables: object
+    isUpdate: boolean
   }
 }
 
@@ -113,17 +115,26 @@ interface IStoreUserFormDataAction {
   }
 }
 
+interface ISubmitSuccessAction {
+  type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
+  payload: {
+    isUpdate: boolean
+  }
+}
+
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
-  variables: object
+  variables: object,
+  isUpdate: boolean = false
 ): IUserFormDataSubmitAction {
   return {
     type: SUBMIT_USER_FORM_DATA,
     payload: {
       client,
       mutation,
-      variables
+      variables,
+      isUpdate
     }
   }
 }
@@ -134,9 +145,12 @@ export function clearUserFormData(): Action {
   }
 }
 
-export function submitSuccess(): Action {
+export function submitSuccess(isUpdate: boolean = false): ISubmitSuccessAction {
   return {
-    type: SUBMIT_USER_FORM_DATA_SUCCESS
+    type: SUBMIT_USER_FORM_DATA_SUCCESS,
+    payload: {
+      isUpdate
+    }
   }
 }
 
@@ -161,6 +175,7 @@ type UserFormAction =
   | IUserFormDataModifyAction
   | IUserFormDataSubmitAction
   | IStoreUserFormDataAction
+  | ISubmitSuccessAction
   | Action
 
 export interface IUserFormState {
@@ -243,7 +258,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const {
         client,
         mutation,
-        variables
+        variables,
+        isUpdate
       } = (action as IUserFormDataSubmitAction).payload
       return loop(
         { ...state, submitting: true },
@@ -257,7 +273,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               ]
             }),
           {
-            successActionCreator: submitSuccess,
+            successActionCreator: () => submitSuccess(isUpdate),
             failActionCreator: submitFail
           }
         )
@@ -268,7 +284,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.list([
           Cmd.action(clearUserFormData()),
           Cmd.action(goToHome()),
-          Cmd.action(showSubmitFormSuccessToast(TOAST_MESSAGES.SUCCESS))
+          Cmd.action(
+            showSubmitFormSuccessToast(
+              (action as ISubmitSuccessAction).payload.isUpdate
+                ? TOAST_MESSAGES.UPDATE_SUCCESS
+                : TOAST_MESSAGES.SUCCESS
+            )
+          )
         ])
       )
     case SUBMIT_USER_FORM_DATA_FAIL:

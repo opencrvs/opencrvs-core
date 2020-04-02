@@ -28,6 +28,7 @@ import {
   hideSubmitFormSuccessToast,
   hideSubmitFormErrorToast
 } from '@client/notification/actions'
+import { TOAST_MESSAGES } from '@client/user/userReducer'
 
 type NotificationProps = {
   language?: string
@@ -120,7 +121,9 @@ class Component extends React.Component<
             type={NOTIFICATION_TYPE.SUCCESS}
             callback={this.hideSubmitFormSuccessToast}
           >
-            {intl.formatMessage(messages.userFormSuccess)}
+            {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
+              ? intl.formatMessage(messages.userFormUpdateSuccess)
+              : intl.formatMessage(messages.userFormSuccess)}
           </FloatingNotification>
         )}
 

@@ -198,9 +198,11 @@ class UserReviewFormComponent extends React.Component<
     }
     return (
       <ActionPageLight title={title} goBack={this.props.goBack}>
-        <FormTitle id={`${section.id}_title`}>
-          {intl.formatMessage(section.name)}
-        </FormTitle>
+        {!this.props.userId && (
+          <FormTitle id={`${section.id}_title`}>
+            {intl.formatMessage(section.name)}
+          </FormTitle>
+        )}
         {this.transformSectionData().map((sec, index) => (
           <DataSection key={index} {...sec} />
         ))}
@@ -232,7 +234,12 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       }
 
       dispatch(
-        submitUserFormData(props.client, createOrUpdateUserMutation, variables)
+        submitUserFormData(
+          props.client,
+          createOrUpdateUserMutation,
+          variables,
+          Boolean(props.match.params.userId) // to detect if update or create
+        )
       )
     }
   }
