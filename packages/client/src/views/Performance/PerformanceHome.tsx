@@ -93,7 +93,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
     return (
       <PerformanceContentWrapper hideTopBar>
-        <Header>{intl.formatMessage(messages.sysAdminHomeHeader)}</Header>
+        <Header>
+          {intl.formatMessage(messages.sysAdminPerformanceHomeHeader)}
+        </Header>
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
