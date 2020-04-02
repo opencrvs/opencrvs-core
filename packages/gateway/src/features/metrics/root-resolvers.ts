@@ -67,7 +67,7 @@ export const resolvers: GQLResolver = {
       authHeader
     ) {
       return getMetrics(
-        '/areaPerformanceMetrics',
+        '/eventEstimations',
         {
           timeStart,
           timeEnd,

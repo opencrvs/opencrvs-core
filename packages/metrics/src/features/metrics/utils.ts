@@ -113,14 +113,14 @@ export const fetchEstimateByLocation = async (
 ): Promise<IEstimation> => {
   let crudRate: number = 0
   let totalPopulation: number = 0
-  let malePopulation: number = 0
-  let femalePopulation: number = 0
 
   if (!locationData.extension) {
     throw new Error('Invalid location data found')
   }
   let estimateExtensionFound: boolean = false
   let actualEstimationYear = estimatedYear
+  let malePopulationArray: [] = []
+  let femalePopulationArray: [] = []
   locationData.extension.forEach(extension => {
     if (
       extension.url === OPENCRVS_SPECIFICATION_URL + CRUD_BIRTH_RATE_SEC &&
@@ -161,34 +161,12 @@ export const fetchEstimateByLocation = async (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + MALE_POPULATION_SEC
     ) {
-      const valueArray: [] = JSON.parse(extension.valueString as string)
-      // tslint:disable-next-line
-      for (let key = estimatedYear; key > 1; key--) {
-        valueArray.forEach(data => {
-          if (key in data) {
-            malePopulation = data[key] === '' ? 0 : data[key]
-          }
-        })
-        if (malePopulation > 0) {
-          break
-        }
-      }
+      malePopulationArray = JSON.parse(extension.valueString as string)
     } else if (
       extension.url ===
       OPENCRVS_SPECIFICATION_URL + FEMALE_POPULATION_SEC
     ) {
-      const valueArray: [] = JSON.parse(extension.valueString as string)
-      // tslint:disable-next-line
-      for (let key = estimatedYear; key > 1; key--) {
-        valueArray.forEach(data => {
-          if (key in data) {
-            femalePopulation = data[key] === '' ? 0 : data[key]
-          }
-        })
-        if (femalePopulation > 0) {
-          break
-        }
-      }
+      femalePopulationArray = JSON.parse(extension.valueString as string)
     }
   })
   if (!estimateExtensionFound) {
@@ -208,9 +186,19 @@ export const fetchEstimateByLocation = async (
     )
     crudRate = crudeDeathRateResponse.crudeDeathRate
   }
-  malePopulation = malePopulation > 0 ? malePopulation : totalPopulation / 2
-  femalePopulation =
-    femalePopulation > 0 ? femalePopulation : totalPopulation / 2
+  let populationData =
+    malePopulationArray?.find(
+      data => data[actualEstimationYear] !== undefined
+    )?.[actualEstimationYear] ?? ''
+  const malePopulation: number =
+    populationData === '' ? totalPopulation / 2 : Number(populationData)
+
+  populationData =
+    femalePopulationArray?.find(
+      data => data[actualEstimationYear] !== undefined
+    )?.[actualEstimationYear] ?? ''
+  const femalePopulation: number =
+    populationData === '' ? totalPopulation / 2 : Number(populationData)
 
   return {
     totalEstimation: Math.round(

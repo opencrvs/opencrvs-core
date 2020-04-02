@@ -676,7 +676,7 @@ export async function fetchEstimated45DayMetrics(
   return estimated45DayData
 }
 
-export async function fetchAreaWisePerformanceMetrics(
+export async function fetchLocationWiseEventEstimations(
   timeFrom: string,
   timeTo: string,
   locationId: string,

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import { fetchAreaWisePerformanceMetrics } from '@metrics/features/metrics/metricsGenerator'
+import { fetchLocationWiseEventEstimations } from '@metrics/features/metrics/metricsGenerator'
 
 import {
   TIME_FROM,
@@ -20,7 +20,7 @@ import {
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration/'
 
-export async function areaPerformanceMetricsHandler(
+export async function eventEstimationsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -32,7 +32,7 @@ export async function areaPerformanceMetricsHandler(
   }
   let estimated45DayBirthMetrics
   try {
-    estimated45DayBirthMetrics = await fetchAreaWisePerformanceMetrics(
+    estimated45DayBirthMetrics = await fetchLocationWiseEventEstimations(
       timeStart,
       timeEnd,
       locationId,
@@ -59,7 +59,7 @@ export async function areaPerformanceMetricsHandler(
   }
   let estimated45DayDeathMetrics
   try {
-    estimated45DayDeathMetrics = await fetchAreaWisePerformanceMetrics(
+    estimated45DayDeathMetrics = await fetchLocationWiseEventEstimations(
       timeStart,
       timeEnd,
       locationId,
