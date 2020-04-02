@@ -111,7 +111,15 @@ export const updateFhir = async (token: string, resource: fhir.Resource) => {
     throw new Error('Unexpected response received')
   }
 
-  return res
+  const savedResourceLocation = res.headers.get('Location')
+  if (savedResourceLocation) {
+    const pathParts = savedResourceLocation.split('/')
+    const index = pathParts.indexOf(resource.resourceType || '')
+    // the identifier is after the resourceType
+    return pathParts[index + 1]
+  }
+
+  return null
 }
 
 export const postFhir = async (token: string, resource: fhir.Resource) => {
