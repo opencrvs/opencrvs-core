@@ -55,7 +55,7 @@ import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReportList } from '@client/views/Performance/ReportList'
 import { Report } from '@client/views/Performance/Report'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { PerformanceHome } from './views/Performance/Home'
+import { PerformanceHome } from './views/Performance/PerformanceHome'
 import { OperationalReport } from './views/Performance/OperationalReport'
 
 interface IAppProps {
