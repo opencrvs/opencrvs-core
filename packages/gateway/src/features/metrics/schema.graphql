@@ -117,12 +117,12 @@ type BirthKeyFiguresData {
   value: Int
 }
 
-type PerformanceMetrics {
-  birth45DayMetrics: PerformanceRegistrationMetrics
-  death45DayMetrics: PerformanceRegistrationMetrics
+type EventEstimationMetrics {
+  birth45DayMetrics: EstimationMetrics
+  death45DayMetrics: EstimationMetrics
 }
 
-type PerformanceRegistrationMetrics {
+type EstimationMetrics {
   actualRegistration: Int!
   estimatedRegistration: Int!
   estimatedPercentage: Int!
@@ -137,9 +137,9 @@ type Query {
     locationId: String!
     event: String!
   ): RegistrationMetrics
-  getPerformanceMetrics(
+  getEventEstimationMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): PerformanceMetrics
+  ): EventEstimationMetrics
 }

@@ -88,7 +88,7 @@ describe('fetch birth registration metrics', () => {
     ).rejects.toThrowError('Metrics request failed: error')
   })
 })
-describe('get performance metrics', () => {
+describe('get event estimation metrics', () => {
   it('returns estimated data for both birth and death', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
@@ -109,7 +109,7 @@ describe('get performance metrics', () => {
       })
     )
 
-    const data = await resolvers.Query.getPerformanceMetrics(
+    const data = await resolvers.Query.getEventEstimationMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',

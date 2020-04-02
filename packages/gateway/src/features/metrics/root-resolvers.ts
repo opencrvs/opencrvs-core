@@ -61,7 +61,7 @@ export const resolvers: GQLResolver = {
         }
       }
     },
-    async getPerformanceMetrics(
+    async getEventEstimationMetrics(
       _,
       { timeStart, timeEnd, locationId },
       authHeader
