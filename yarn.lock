@@ -13953,11 +13953,6 @@ jest-message-util@^24.8.0:
     slash "^2.0.0"
     stack-utils "^1.0.1"
 
-jest-mock-proxy@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/jest-mock-proxy/-/jest-mock-proxy-3.0.0.tgz#f80df2abe4230a9d0f1ccadf88b1226548894991"
-  integrity sha512-IwvZRoV4d115vMMLiFtiUd7B2rE3OfswPCzskFn1g4VI1h4fy+kQxuRP237uOZzfwPNCpQ1/F7Sike5JYBfvgQ==
-
 jest-mock@^22.4.3:
   version "22.4.3"
   resolved "https://registry.yarnpkg.com/jest-mock/-/jest-mock-22.4.3.tgz#f63ba2f07a1511772cdc7979733397df770aabc7"
@@ -18787,7 +18782,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@1.18.2, prettier@^1.13.5, prettier@^1.15.2:
+prettier@1.18.2, prettier@^1.15.2:
   version "1.18.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"
   integrity sha512-OeHeMc0JhFE9idD4ZdtNibzY0+TPHSpSSb9h8FqtP+YnoZZ1sl8Vc9b1sasjfymH3SonAF4QcA2+mzHPhMvIiw==

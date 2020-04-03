@@ -9,5 +9,6 @@
   "deathRejectionNotification": "{{name}} এর মৃত্যু নিবন্ধন আবেদনটি (ট্র্যাকিং আইডি: {{trackingId}}) বাতিল করা হয়েছে। পরবর্তী পদক্ষেপের জন্য আপনার স্থানীয় নিবন্ধন অফিসে যান।",
   "authenticationCodeNotification": "আপনার OpenCRVS এর authentication code হল: {{authCode}}",
   "userCredentialsNotification": "OpenCRVS এ লগইন করতে ব্যাবহার করুন, username: {{username}} এবং password: {{password}}",
-  "retieveUserNameNotification": "আপনার OpenCRVS এর username হল: {{username}}"
+  "retieveUserNameNotification": "আপনার OpenCRVS এর username হল: {{username}}",
+  "updateUserNameNotification": "আপনার OpenCRVS এর বদলকৃত username হল: {{username}}। আপনার password এখনো অপরিবর্তিত রয়েছে।"
 }

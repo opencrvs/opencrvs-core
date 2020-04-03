@@ -17,7 +17,7 @@ import {
   Section
 } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
-import { createUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
+import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import {
   getRolesQuery,
   roleQueries
@@ -98,7 +98,7 @@ export const mockDataWithRegistarRoleSelected = {
 
 export const mockUserGraphqlOperation = {
   request: {
-    query: createUserMutation,
+    query: createOrUpdateUserMutation,
     variables: draftToGqlTransformer(
       {
         sections: [
@@ -404,7 +404,9 @@ export const mockUserGraphqlOperation = {
     )
   },
   result: {
-    data: { createUser: { username: 'hossain123', __typename: 'User' } }
+    data: {
+      createOrUpdateUserMutation: { username: 'hossain123', __typename: 'User' }
+    }
   }
 }
 

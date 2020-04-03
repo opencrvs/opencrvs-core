@@ -152,7 +152,7 @@ export const deleteFhir = async (
   }
 }
 
-export const rollback = async (
+export const rollbackCreateUser = async (
   token: string,
   practitionerId: string | null,
   roleId: string | null
@@ -164,6 +164,15 @@ export const rollback = async (
   if (roleId) {
     await deleteFhir(token, 'PractitionerRole', roleId)
   }
+}
+
+export const rollbackUpdateUser = async (
+  token: string,
+  practitioner: fhir.Practitioner,
+  practitionerRole: fhir.PractitionerRole
+) => {
+  await postFhir(token, practitioner)
+  await postFhir(token, practitionerRole)
 }
 
 export async function generateUsername(names: IUserName[]) {
@@ -221,6 +230,31 @@ export async function sendCredentialsNotification(
         msisdn,
         username,
         password
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    })
+  } catch (err) {
+    logger.error(`Unable to send notification for error : ${err}`)
+  }
+}
+
+export async function sendUpdateUsernameNotification(
+  msisdn: string,
+  username: string,
+  authHeader: { Authorization: string }
+) {
+  const url = `${NOTIFICATION_SERVICE_URL}${
+    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
+  }updateUserNameSMS`
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        msisdn,
+        username
       }),
       headers: {
         'Content-Type': 'application/json',

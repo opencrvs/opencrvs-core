@@ -30,6 +30,7 @@ interface IUserModelData {
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
+  device: string
 }
 
 export interface IUserPayload
@@ -42,6 +43,7 @@ export interface IUserPayload
     | 'username'
     | 'name'
   > {
+  id?: string
   identifiers: GQLUserIdentifierInput[]
   name: {
     use: string
