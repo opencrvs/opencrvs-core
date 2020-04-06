@@ -94,37 +94,16 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
   return catchmentAreaIds
 }
 
-export const updateFhir = async (token: string, resource: fhir.Resource) => {
-  const res = await fetch(
-    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/fhir+json',
-        Authorization: token
-      },
-      body: JSON.stringify(resource)
-    }
-  )
-
-  if (!res.ok) {
-    throw new Error('Unexpected response received')
-  }
-
-  const savedResourceLocation = res.headers.get('Location')
-  if (savedResourceLocation) {
-    const pathParts = savedResourceLocation.split('/')
-    const index = pathParts.indexOf(resource.resourceType || '')
-    // the identifier is after the resourceType
-    return pathParts[index + 1]
-  }
-
-  return null
-}
-
 export const postFhir = async (token: string, resource: fhir.Resource) => {
-  const res = await fetch(`${FHIR_URL}/${resource.resourceType}`, {
-    method: 'POST',
+  const shouldUpdateExisting = Boolean(resource.id)
+  const request = shouldUpdateExisting
+    ? {
+        url: `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
+        method: 'PUT'
+      }
+    : { url: `${FHIR_URL}/${resource.resourceType}`, method: 'POST' }
+  const res = await fetch(request.url, {
+    method: request.method,
     headers: {
       'Content-Type': 'application/fhir+json',
       Authorization: token

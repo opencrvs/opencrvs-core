@@ -17,7 +17,7 @@ import {
   createFhirPractitionerRole,
   sendUpdateUsernameNotification,
   getCatchmentAreaIdsByPrimaryOfficeId,
-  updateFhir
+  postFhir
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@user-mgnt/logger'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -76,7 +76,7 @@ export default async function updateUser(
   // Updating practitioner and practitioner role in hearth
   const practitioner = createFhirPractitioner(user)
   practitioner.id = existingPractitioner.id
-  const practitionerId = await updateFhir(token, practitioner)
+  const practitionerId = await postFhir(token, practitioner)
   if (!practitionerId) {
     throw new Error(
       'Practitioner resource not updated correctly, practitioner ID not returned'
@@ -87,7 +87,7 @@ export default async function updateUser(
     existingUser.practitionerId
   )
   practitionerRole.id = existingPractitionerRole.id
-  const practitionerRoleId = await updateFhir(token, practitioner)
+  const practitionerRoleId = await postFhir(token, practitioner)
   if (!practitionerRoleId) {
     throw new Error(
       'PractitionerRole resource not updated correctly, practitionerRole ID not returned'
