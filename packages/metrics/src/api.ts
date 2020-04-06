@@ -11,7 +11,7 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl } from '@metrics/constants'
+import { fhirUrl, RESOURCE_URL } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -53,4 +53,28 @@ export async function fetchParentLocationByLocationID(
 ) {
   const location = await fetchFHIR(locationID, authHeader)
   return location && location.partOf && location.partOf.reference
+}
+
+export function fetchFromResource(
+  suffix: string,
+  authHeader: IAuthHeader,
+  method: string = 'GET',
+  body?: string
+) {
+  const url = [RESOURCE_URL.replace(/\/$/, ''), suffix].join('/')
+  return fetch(url, {
+    method,
+    headers: {
+      ...authHeader
+    },
+    body
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`RESOURCE request failed: ${error.message}`)
+      )
+    })
 }

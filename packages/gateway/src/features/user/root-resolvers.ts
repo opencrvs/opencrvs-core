@@ -95,17 +95,18 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createUser(_, { user }, authHeader) {
+    async createOrUpdateUser(_, { user }, authHeader) {
       // Only sysadmin should be able to create user
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error('Create user is only allowed for sysadmin')
         )
       }
-
-      const res = await fetch(`${USER_MANAGEMENT_URL}createUser`, {
+      const userPayload: IUserPayload = createOrUpdateUserPayload(user)
+      const action = userPayload.id ? 'update' : 'create'
+      const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
         method: 'POST',
-        body: JSON.stringify(createUserPayload(user)),
+        body: JSON.stringify(userPayload),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -115,7 +116,7 @@ export const resolvers: GQLResolver = {
       if (res.status !== 201) {
         return await Promise.reject(
           new Error(
-            "Something went wrong on user-mgnt service. Couldn't create user"
+            `Something went wrong on user-mgnt service. Couldn't ${action} user`
           )
         )
       }
@@ -178,8 +179,8 @@ export const resolvers: GQLResolver = {
   }
 }
 
-function createUserPayload(user: GQLUserInput): IUserPayload {
-  return {
+function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
+  const userPayload: IUserPayload = {
     name: (user.name as GQLHumanNameInput[]).map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName as string,
@@ -191,6 +192,11 @@ function createUserPayload(user: GQLUserInput): IUserPayload {
     primaryOfficeId: user.primaryOffice as string,
     email: user.email || '',
     mobile: user.mobile as string,
+    device: user.device as string,
     signature: user.signature
   }
+  if (user.id) {
+    userPayload.id = user.id
+  }
+  return userPayload
 }

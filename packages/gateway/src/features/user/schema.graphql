@@ -25,6 +25,7 @@ input SignatureInput {
 }
 
 input UserInput {
+  id: ID
   name: [HumanNameInput]
   identifier: [UserIdentifierInput]
   username: String
@@ -91,7 +92,7 @@ type Query {
 }
 
 type Mutation {
-  createUser(user: UserInput!): User!
+  createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
     password: String!

@@ -25,6 +25,7 @@ jest.mock('@metrics/api', () => ({
   __esModule: true,
   fetchTaskHistory: jest.fn(),
   fetchLocation: jest.fn(),
+  fetchFromResource: jest.fn(),
   fetchParentLocationByLocationID: jest.fn(),
   fetchFHIR: jest.fn()
 }))
@@ -36,13 +37,15 @@ beforeEach(() => {
   jest.clearAllMocks()
   const {
     fetchTaskHistory,
-    fetchLocation
+    fetchLocation,
+    fetchFromResource
   }: {
     fetchTaskHistory: jest.Mock
     fetchLocation: jest.Mock
+    fetchFromResource: jest.Mock
   } = require('@metrics/api')
   fetchTaskHistory.mockResolvedValue(taskHistory)
-
+  fetchFromResource.mockResolvedValueOnce({ crudeDeathRate: 5.1 })
   fetchLocation
     .mockResolvedValueOnce({
       resourceType: 'Location',

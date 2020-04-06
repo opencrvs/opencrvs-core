@@ -383,7 +383,7 @@ describe('User root resolvers', () => {
     })
   })
 
-  describe('createUser mutation', () => {
+  describe('createOrUpdateUser mutation', () => {
     let authHeaderSysAdmin: { Authorization: string }
     let authHeaderRegister: { Authorization: string }
     beforeEach(() => {
@@ -435,9 +435,27 @@ describe('User root resolvers', () => {
         { status: 201 }
       )
 
-      const response = await resolvers.Mutation.createUser(
+      const response = await resolvers.Mutation.createOrUpdateUser(
         {},
         { user },
+        authHeaderSysAdmin
+      )
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('updates an user for sysadmin', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+      const response = await resolvers.Mutation.createOrUpdateUser(
+        {},
+        { user: { id: '123', ...user } },
         authHeaderSysAdmin
       )
 
@@ -455,7 +473,7 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createUser({}, { user }, authHeaderRegister)
+        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderRegister)
       ).rejects.toThrowError('Create user is only allowed for sysadmin')
     })
 
@@ -468,7 +486,7 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Mutation.createUser({}, { user }, authHeaderSysAdmin)
+        resolvers.Mutation.createOrUpdateUser({}, { user }, authHeaderSysAdmin)
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't create user"
       )
