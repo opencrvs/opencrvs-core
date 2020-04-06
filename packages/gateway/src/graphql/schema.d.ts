@@ -28,6 +28,7 @@ export interface GQLQuery {
   searchUsers?: GQLSearchUserResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
   getEventEstimationMetrics?: GQLEventEstimationMetrics
+  getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
   searchEvents?: GQLEventSearchResultSet
   getRoles?: Array<GQLRole | null>
 }
@@ -654,6 +655,12 @@ export interface GQLEstimationMetrics {
   femalePercentage: number
 }
 
+export interface GQLApplicationsStartedMetrics {
+  fieldAgentApplications: number
+  hospitalApplications: number
+  officeApplications: number
+}
+
 export interface GQLEventSearchResultSet {
   results?: Array<GQLEventSearchSet | null>
   totalItems?: number
@@ -1057,6 +1064,7 @@ export interface GQLResolver {
   CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
   EventEstimationMetrics?: GQLEventEstimationMetricsTypeResolver
   EstimationMetrics?: GQLEstimationMetricsTypeResolver
+  ApplicationsStartedMetrics?: GQLApplicationsStartedMetricsTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1093,6 +1101,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchUsers?: QueryToSearchUsersResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
+  getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
+    TParent
+  >
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
@@ -1366,6 +1377,23 @@ export interface QueryToGetEventEstimationMetricsResolver<
   (
     parent: TParent,
     args: QueryToGetEventEstimationMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetApplicationsStartedMetricsArgs {
+  timeStart: string
+  timeEnd: string
+  locationId: string
+}
+export interface QueryToGetApplicationsStartedMetricsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetApplicationsStartedMetricsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3101,6 +3129,39 @@ export interface EstimationMetricsToMalePercentageResolver<
 }
 
 export interface EstimationMetricsToFemalePercentageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLApplicationsStartedMetricsTypeResolver<TParent = any> {
+  fieldAgentApplications?: ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
+    TParent
+  >
+  hospitalApplications?: ApplicationsStartedMetricsToHospitalApplicationsResolver<
+    TParent
+  >
+  officeApplications?: ApplicationsStartedMetricsToOfficeApplicationsResolver<
+    TParent
+  >
+}
+
+export interface ApplicationsStartedMetricsToFieldAgentApplicationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationsStartedMetricsToHospitalApplicationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface ApplicationsStartedMetricsToOfficeApplicationsResolver<
   TParent = any,
   TResult = any
 > {

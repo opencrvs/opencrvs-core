@@ -130,6 +130,12 @@ type EstimationMetrics {
   femalePercentage: Int!
 }
 
+type ApplicationsStartedMetrics {
+  fieldAgentApplications: Int!
+  hospitalApplications: Int!
+  officeApplications: Int!
+}
+
 type Query {
   fetchRegistrationMetrics(
     timeStart: String!
@@ -142,4 +148,9 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): EventEstimationMetrics
+  getApplicationsStartedMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+  ): ApplicationsStartedMetrics
 }
