@@ -42,7 +42,7 @@ interface IMatchParams {
   groupId: string
 }
 
-type INewUserProps = {
+type IUserProps = {
   userId?: string
   section: IFormSection
   activeGroup: IFormSectionGroup
@@ -61,7 +61,7 @@ interface IDispatchProps {
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
-  INewUserProps &
+  IUserProps &
   IntlShapeProps
 
 const Container = styled.div`
