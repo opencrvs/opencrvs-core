@@ -21,6 +21,7 @@ import {
   newDeathRegistrationHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
+import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { exportHandler } from '@metrics/features/export/handler'
 
@@ -178,6 +179,23 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string().required(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    // Area wise performance dashboard query API
+    {
+      method: 'GET',
+      path: '/eventEstimations',
+      handler: eventEstimationsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string().required()
           })
         },
         tags: ['api']
