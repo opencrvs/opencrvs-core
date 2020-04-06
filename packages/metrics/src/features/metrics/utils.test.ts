@@ -14,9 +14,11 @@ import {
   fetchEstimateByLocation,
   fetchEstimateFor45DaysByLocationId,
   getDistrictLocation,
-  fillEmptyDataArrayByKey
+  fillEmptyDataArrayByKey,
+  EVENT_TYPE
 } from '@metrics/features/metrics/utils'
 import * as api from '@metrics/api'
+import { cloneDeep } from 'lodash'
 
 const fetchLocation = api.fetchLocation as jest.Mock
 
@@ -130,12 +132,52 @@ describe('verify metrics util', () => {
     })
   })
   describe('verify fetchEstimateByLocation', () => {
-    it('Returns estimate properly', async () => {
-      const result = await fetchEstimateByLocation(location, 365, 2017, {
-        Authorization: 'Bearer token'
-      })
+    it('Returns estimate properly for birth', async () => {
+      const result = await fetchEstimateByLocation(
+        location,
+        365,
+        2017,
+        EVENT_TYPE.BIRTH,
+        {
+          Authorization: 'Bearer token'
+        }
+      )
       expect(result).toEqual({
-        estimation: 51916,
+        totalEstimation: 51916,
+        femaleEstimation: 26068,
+        maleEstimation: 25847,
+        locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
+        locationLevel: 'DISTRICT',
+        estimationYear: 2017
+      })
+    })
+    it('Returns estimate properly for death', async () => {
+      const clonedLocation = cloneDeep(location)
+      // Emptying male population data for latest year
+      clonedLocation.extension[1] = {
+        url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+        valueString:
+          '[{"2007":"1292568"},{"2008":"1250993"},{"2009":"1246376"},{"2010":"1279752"},{"2011":"1293470"},{"2012":"1291684"},{"2013":"1756173"},{"2014":"1788473"},{"2015":"1167891"},{"2016":"1225971"},{"2017":""}]'
+      }
+      // Emptying female population data for latest year
+      clonedLocation.extension[2] = {
+        url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+        valueString:
+          '[{"2007":"1261767"},{"2008":"1221096"},{"2009":"1214677"},{"2010":"1240638"},{"2011":"1257481"},{"2012":"1241730"},{"2013":"1724403"},{"2014":"1758485"},{"2015":"1151860"},{"2016":"1228886"},{"2017":""}]'
+      }
+      const result = await fetchEstimateByLocation(
+        clonedLocation,
+        365,
+        2017,
+        EVENT_TYPE.DEATH,
+        {
+          Authorization: 'Bearer token'
+        }
+      )
+      expect(result).toEqual({
+        totalEstimation: 11873,
+        femaleEstimation: 5937,
+        maleEstimation: 5937,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT',
         estimationYear: 2017
@@ -143,24 +185,38 @@ describe('verify metrics util', () => {
     })
     it('Throws error if location doesnot have extension', async () => {
       expect(
-        fetchEstimateByLocation({ id: '' }, 365, 2017, {
+        fetchEstimateByLocation({ id: '' }, 365, 2017, EVENT_TYPE.BIRTH, {
           Authorization: 'Bearer token'
         })
       ).rejects.toThrowError('Invalid location data found')
     })
     it('Throws error if location is not partOf address', async () => {
       expect(
-        fetchEstimateByLocation({ id: '', extension: [] }, 365, 2017, {
-          Authorization: 'Bearer token'
-        })
+        fetchEstimateByLocation(
+          { id: '', extension: [] },
+          365,
+          2017,
+          EVENT_TYPE.BIRTH,
+          {
+            Authorization: 'Bearer token'
+          }
+        )
       ).rejects.toThrowError('Unable to fetch estimate data from location tree')
     })
     it('Returns the estimatedFigures for right location', async () => {
-      const result = await fetchEstimateByLocation(location, 365, 2017, {
-        Authorization: 'Bearer token'
-      })
+      const result = await fetchEstimateByLocation(
+        location,
+        365,
+        2017,
+        EVENT_TYPE.BIRTH,
+        {
+          Authorization: 'Bearer token'
+        }
+      )
       expect(result).toEqual({
-        estimation: 51916,
+        totalEstimation: 51916,
+        femaleEstimation: 26068,
+        maleEstimation: 25847,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT',
         estimationYear: 2017
@@ -243,12 +299,15 @@ describe('verify metrics util', () => {
       const result = await fetchEstimateFor45DaysByLocationId(
         'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
         2017,
+        EVENT_TYPE.BIRTH,
         {
           Authorization: 'Bearer token'
         }
       )
       expect(result).toEqual({
-        estimation: 6401,
+        femaleEstimation: 3214,
+        maleEstimation: 3187,
+        totalEstimation: 6401,
         locationId: '0eaa73dd-2a21-4998-b1e6-b08430595201',
         locationLevel: 'DISTRICT',
         estimationYear: 2017

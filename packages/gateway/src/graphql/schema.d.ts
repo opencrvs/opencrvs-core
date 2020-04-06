@@ -27,6 +27,7 @@ export interface GQLQuery {
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
+  getEventEstimationMetrics?: GQLEventEstimationMetrics
   searchEvents?: GQLEventSearchResultSet
   getRoles?: Array<GQLRole | null>
 }
@@ -642,6 +643,19 @@ export interface GQLCertificationPaymentTotalCount {
   total: number
 }
 
+export interface GQLEventEstimationMetrics {
+  birth45DayMetrics?: GQLEstimationMetrics
+  death45DayMetrics?: GQLEstimationMetrics
+}
+
+export interface GQLEstimationMetrics {
+  actualRegistration: number
+  estimatedRegistration: number
+  estimatedPercentage: number
+  malePercentage: number
+  femalePercentage: number
+}
+
 export interface GQLEventSearchResultSet {
   results?: Array<GQLEventSearchSet | null>
   totalItems?: number
@@ -1043,6 +1057,8 @@ export interface GQLResolver {
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
   CertificationPaymentDetailsMetrics?: GQLCertificationPaymentDetailsMetricsTypeResolver
   CertificationPaymentTotalCount?: GQLCertificationPaymentTotalCountTypeResolver
+  EventEstimationMetrics?: GQLEventEstimationMetricsTypeResolver
+  EstimationMetrics?: GQLEstimationMetricsTypeResolver
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
@@ -1078,6 +1094,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
+  getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
@@ -1334,6 +1351,23 @@ export interface QueryToFetchRegistrationMetricsResolver<
   (
     parent: TParent,
     args: QueryToFetchRegistrationMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetEventEstimationMetricsArgs {
+  timeStart: string
+  timeEnd: string
+  locationId: string
+}
+export interface QueryToGetEventEstimationMetricsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetEventEstimationMetricsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3015,6 +3049,70 @@ export interface GQLCertificationPaymentTotalCountTypeResolver<TParent = any> {
 }
 
 export interface CertificationPaymentTotalCountToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventEstimationMetricsTypeResolver<TParent = any> {
+  birth45DayMetrics?: EventEstimationMetricsToBirth45DayMetricsResolver<TParent>
+  death45DayMetrics?: EventEstimationMetricsToDeath45DayMetricsResolver<TParent>
+}
+
+export interface EventEstimationMetricsToBirth45DayMetricsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventEstimationMetricsToDeath45DayMetricsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEstimationMetricsTypeResolver<TParent = any> {
+  actualRegistration?: EstimationMetricsToActualRegistrationResolver<TParent>
+  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<
+    TParent
+  >
+  estimatedPercentage?: EstimationMetricsToEstimatedPercentageResolver<TParent>
+  malePercentage?: EstimationMetricsToMalePercentageResolver<TParent>
+  femalePercentage?: EstimationMetricsToFemalePercentageResolver<TParent>
+}
+
+export interface EstimationMetricsToActualRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationMetricsToEstimatedRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationMetricsToEstimatedPercentageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationMetricsToMalePercentageResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationMetricsToFemalePercentageResolver<
   TParent = any,
   TResult = any
 > {
