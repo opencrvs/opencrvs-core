@@ -141,6 +141,17 @@ export interface IPaymentFields {
   compositionId: string
 }
 
+export interface IApplicationsStartedPoints {
+  measurement: string
+  tags: IPointLocation
+  fields: IApplicationsStartedFields
+}
+
+export interface IApplicationsStartedFields {
+  role: string
+  compositionId: string
+}
+
 export type IPoints =
   | IDurationPoints
   | ITimeLoggedPoints
@@ -149,3 +160,4 @@ export type IPoints =
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
   | IPaymentPoints
+  | IApplicationsStartedPoints

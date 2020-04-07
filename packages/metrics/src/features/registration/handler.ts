@@ -17,18 +17,92 @@ import {
   generateDeathRegPoint,
   generateEventDurationPoint,
   generatePaymentPoint,
+  generateApplicationStartedPoint,
   generateTimeLoggedPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
+import { Events } from '@metrics/features/metrics/constants'
 
-export async function baseHandler(
+export async function waitingValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const points = []
   try {
     points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function newValidationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateApplicationStartedPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        Events.NEW_VALIDATE
+      )
+    )
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function newWaitingValidationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateApplicationStartedPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        Events.NEW_WAITING_VALIDATION
+      )
+    )
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function newDeclarationHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const points = []
+  try {
+    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateApplicationStartedPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        Events.NEW_DEC
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -49,6 +123,15 @@ export async function inProgressHandler(
       }
     )
     points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateApplicationStartedPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        Events.IN_PROGRESS_DEC
+      )
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
