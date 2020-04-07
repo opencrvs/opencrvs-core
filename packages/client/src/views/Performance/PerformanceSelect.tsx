@@ -32,15 +32,9 @@ const StyledSelect = styled(Select)`
     background-color: ${({ theme }) => theme.colors.secondary} !important;
     justify-content: center;
     ${({ theme }) => theme.fonts.buttonStyle};
-    outline: none;
 
     &:hover {
-      outline: none;
-      /* TODO: We should add this gradient to theme*/
-      /* stylelint-disable */
-      background: linear-gradient(180deg, #477cd7 0%, #5c91eb 100%);
-      /* stylelint-enable */
-      color: ${({ theme }) => theme.colors.white};
+      ${({ theme }) => theme.gradients.gradientBabyShade}
     }
   }
 
