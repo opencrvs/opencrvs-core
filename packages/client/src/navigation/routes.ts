@@ -67,5 +67,7 @@ export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
 export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'
 export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
 
+export const PERFORMANCE_HOME = '/performance'
 export const PERFORMANCE_REPORT_LIST = '/performance/reports/:reportType?'
 export const PERFORMANCE_REPORT = '/performance/report'
+export const OPERATIONAL_REPORT = '/performance/operations'
