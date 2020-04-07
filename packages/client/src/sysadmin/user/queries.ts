@@ -31,6 +31,37 @@ export const SEARCH_USERS = gql`
     }
   }
 `
+
+export const GET_USER = gql`
+  query($userId: String) {
+    getUser(userId: $userId) {
+      id
+      name {
+        use
+        firstNames
+        familyName
+      }
+      username
+      mobile
+      identifier {
+        system
+        value
+      }
+      role
+      type
+      primaryOffice {
+        id
+        name
+        alias
+      }
+      signature {
+        type
+        data
+      }
+    }
+  }
+`
+
 async function searchUsers(primaryOfficeId: string) {
   return (
     client &&

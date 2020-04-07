@@ -207,6 +207,11 @@ type ContactPoint { # -> ContactPoint
   use: String # -> .use
 }
 
+type Identifier {
+  system: String
+  value: String
+}
+
 input AddressInput {
   use: String
   type: AddressType

@@ -12,7 +12,8 @@
 import {
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup
+  IFormSectionGroup,
+  UserSection
 } from '@client/forms'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
@@ -23,34 +24,44 @@ import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserReviewForm'
 import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
-import ApolloClient from 'apollo-client'
+import ApolloClient, { ApolloQueryResult } from 'apollo-client'
 import * as React from 'react'
 import { withApollo } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { GET_USER } from '@client/sysadmin/user/queries'
+import { gqlToDraftTransformer } from '@client/transformer'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import { storeUserFormData, clearUserFormData } from '@client/user/userReducer'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 interface IMatchParams {
+  userId?: string
   sectionId: string
   groupId: string
 }
 
-type INewUserProps = {
+type IUserProps = {
+  userId?: string
   section: IFormSection
   activeGroup: IFormSectionGroup
   nextSectionId: string
   nextGroupId: string
   formData: IFormSectionData
   submitting: boolean
+  userDetailsStored?: boolean
   client: ApolloClient<unknown>
 }
 
 interface IDispatchProps {
   goBack: typeof goBack
+  storeUserFormData: typeof storeUserFormData
+  clearUserFormData: typeof clearUserFormData
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
-  INewUserProps &
+  IUserProps &
   IntlShapeProps
 
 const Container = styled.div`
@@ -62,11 +73,43 @@ const Container = styled.div`
 `
 
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
+  async componentDidMount() {
+    const { userId } = this.props
+    if (userId) {
+      this.fetchAndStoreUserDetails(userId)
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.clearUserFormData()
+  }
+
+  fetchAndStoreUserDetails = async (userId: string) => {
+    try {
+      const data: ApolloQueryResult<GQLQuery> = await this.props.client.query({
+        query: GET_USER,
+        variables: { userId }
+      })
+      const formData = gqlToDraftTransformer(
+        { sections: [{ ...this.props.section, id: UserSection.User }] },
+        { [UserSection.User]: data.data.getUser }
+      )
+
+      this.props.storeUserFormData(formData.user)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   renderLoadingPage = () => {
-    const { intl } = this.props
+    const { intl, userId } = this.props
     return (
       <ActionPageLight
-        title={intl.formatMessage(formMessages.userFormTitle)}
+        title={
+          userId
+            ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+            : intl.formatMessage(formMessages.userFormTitle)
+        }
         goBack={this.props.goBack}
       >
         <Container>
@@ -77,8 +120,8 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   }
 
   render() {
-    const { section, submitting } = this.props
-    if (submitting) {
+    const { section, submitting, userDetailsStored, userId } = this.props
+    if (submitting || (userId && !userDetailsStored)) {
       return this.renderLoadingPage()
     }
 
@@ -155,10 +198,12 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   ) || { sectionId: '', groupId: '' }
 
   return {
+    userId: props.match.params.userId,
     sectionId: sectionId,
     section,
     formData: state.userForm.userFormData,
     submitting: state.userForm.submitting,
+    userDetailsStored: state.userForm.userDetailsStored,
     activeGroup: {
       ...group,
       fields
@@ -170,5 +215,5 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(
   mapStateToProps,
-  { goBack }
+  { goBack, storeUserFormData, clearUserFormData }
 )(injectIntl(withApollo(CreateNewUserComponent)))

@@ -125,6 +125,24 @@ export const identifierToFieldTransformer = (identifierField: string) => (
   return transformedData
 }
 
+export const identifierWithTypeToFieldTransformer = (
+  identifierType: string
+) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  let identifier
+  if (
+    (identifier = queryData[sectionId] && queryData[sectionId].identifier) &&
+    identifier.system === identifierType
+  ) {
+    transformedData[sectionId][field.name] = identifier.value
+  }
+  return transformedData
+}
+
 export const identityToFieldTransformer = (
   identifierField: string,
   identityType: string
@@ -385,6 +403,20 @@ export const eventLocationIDQueryTransformer = () => (
     transformedData[sectionId][field.name] = queryData._fhirIDMap
       .eventLocation as string
   }
+  return transformedData
+}
+
+export const locationIDToFieldTransformer = (transformedName?: string) => (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  const fieldName = transformedName || field.name
+  if (queryData[sectionId] && queryData[sectionId][fieldName]) {
+    transformedData[sectionId][field.name] = queryData[sectionId][fieldName].id
+  }
+
   return transformedData
 }
 
