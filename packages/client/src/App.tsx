@@ -55,6 +55,8 @@ import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReportList } from '@client/views/Performance/ReportList'
 import { Report } from '@client/views/Performance/Report'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
+import { PerformanceHome } from './views/Performance/PerformanceHome'
+import { OperationalReport } from './views/Performance/OperationalReport'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -271,6 +273,11 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            path={routes.PERFORMANCE_HOME}
+                                            component={PerformanceHome}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={
                                               routes.PERFORMANCE_REPORT_LIST
                                             }
@@ -280,6 +287,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.PERFORMANCE_REPORT}
                                             component={Report}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.OPERATIONAL_REPORT}
+                                            component={OperationalReport}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
