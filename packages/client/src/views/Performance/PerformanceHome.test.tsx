@@ -75,7 +75,11 @@ describe('Performance home test', () => {
       flushPromises()
 
       expect(history.location.state).toEqual({
-        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+        selectedLocation: {
+          displayLabel: 'Dhaka Division',
+          id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+          searchableText: 'Dhaka'
+        }
       })
       expect(history.location.pathname).toContain('operations')
     })

@@ -17,6 +17,7 @@ import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { KeyboardArrowDown } from '@opencrvs/components/lib/icons'
 
 interface IOperationalSelectProps {
+  id?: string
   value: string
   options: ISelectOption[]
 }
@@ -80,6 +81,7 @@ function getSelectedOption(
 export function PerformanceSelect(props: IOperationalSelectProps) {
   return (
     <StyledSelect
+      id={props.id}
       isSearchable={false}
       value={getSelectedOption(props.value, props.options)}
       classNamePrefix="react-select"
