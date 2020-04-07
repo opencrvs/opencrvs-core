@@ -26,11 +26,17 @@ import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { goToPerformanceHome } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
+import { EVENT_ESTIMATION_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
 }
 
+interface IMetricsQueryResult {
+  getEventEstimationMetrics: GQLEventEstimationMetrics
+}
 export enum PERFORMANCE_TYPE {
   OPERATIONAL = 'OPERATIONAL',
   REPORTS = 'REPORTS'
@@ -88,7 +94,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
       }
     } = this.props
 
-    const title = selectedLocation.displayLabel
+    const { displayLabel: title, id: locationId } = selectedLocation
+    const timeEnd = new Date()
+    const timeStart = new Date(timeEnd.getTime())
+    timeStart.setFullYear(timeStart.getFullYear() - 1)
 
     return (
       <PerformanceContentWrapper hideTopBar>
@@ -118,6 +127,27 @@ class OperationalReportComponent extends React.Component<Props, State> {
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>
         </ActionContainer>
+        <Query
+          query={EVENT_ESTIMATION_METRICS}
+          variables={{
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            locationId
+          }}
+        >
+          {({
+            loading,
+            error,
+            data
+          }: {
+            loading: boolean
+            error?: ApolloError
+            data?: IMetricsQueryResult
+          }) => {
+            // Report components might be added here
+            return <div />
+          }}
+        </Query>
       </PerformanceContentWrapper>
     )
   }

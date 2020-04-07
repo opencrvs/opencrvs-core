@@ -85,3 +85,27 @@ export const PERFORMANCE_METRICS = gql`
     }
   }
 `
+export const EVENT_ESTIMATION_METRICS = gql`
+  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
+    getEventEstimationMetrics(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+    ) {
+      birth45DayMetrics {
+        actualRegistration
+        estimatedRegistration
+        estimatedPercentage
+        malePercentage
+        femalePercentage
+      }
+      death45DayMetrics {
+        actualRegistration
+        estimatedRegistration
+        estimatedPercentage
+        malePercentage
+        femalePercentage
+      }
+    }
+  }
+`
