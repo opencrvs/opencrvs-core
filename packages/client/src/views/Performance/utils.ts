@@ -9,12 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import moment from 'moment'
 import styled from '@client/styledComponents'
+import moment from 'moment'
 
-export const Header = styled.h3`
+export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.menuBackground};
   ${({ theme }) => theme.fonts.h4Style};
+`
+
+export const SubHeader = styled.div`
+  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+`
+
+export const Description = styled.div`
+  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyStyle};
 `
 
 export function getMonthDateRange(year: number, month: number) {
