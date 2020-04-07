@@ -55,8 +55,8 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { PerformanceHome } from './views/Performance/Home'
 import { OperationalReport } from './views/Performance/OperationalReport'
+import { PerformanceHome } from './views/Performance/PerformanceHome'
 
 interface IAppProps {
   client?: ApolloClient<{}>
