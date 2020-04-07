@@ -168,8 +168,14 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
   return push(formatUrl(path, { tabId, selectorId }))
 }
 
-export function goToPerformanceHome() {
-  return push(PERFORMANCE_HOME)
+type PerformanceHomeHistoryState = {
+  selectedLocation: ISearchLocation
+}
+
+export function goToPerformanceHome(state?: PerformanceHomeHistoryState) {
+  return state && state.selectedLocation
+    ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
+    : push(PERFORMANCE_HOME)
 }
 
 export function goToPerformanceReportList() {
@@ -195,8 +201,8 @@ export function goToPerformanceReport(
   })
 }
 
-export function goToOperationalReport(locationId: string) {
-  return push(OPERATIONAL_REPORT, { locationId })
+export function goToOperationalReport(selectedLocation: ISearchLocation) {
+  return push(OPERATIONAL_REPORT, { selectedLocation })
 }
 
 export function goToSearchResult(
