@@ -13,7 +13,7 @@ import { createServer } from '@metrics/index'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { fetchLocationWiseApplicationsStarted } from '@metrics/features/applicationsStarted/handler'
+import * as handler from '@metrics/features/applicationsStarted/handler'
 
 const readPoints = influx.query as jest.Mock
 
@@ -103,7 +103,7 @@ describe('verify applicationsStarted handler', () => {
         }
       ])
 
-    const res = await fetchLocationWiseApplicationsStarted(
+    const res = await handler.fetchLocationWiseApplicationsStarted(
       '1552469068679',
       '1554814894419',
       '1490d3dd-71a9-47e8-b143-f9fc64f71294'
@@ -113,6 +113,27 @@ describe('verify applicationsStarted handler', () => {
       fieldAgentApplications: 2,
       hospitalApplications: 2,
       officeApplications: 4
+    })
+  })
+
+  it('returns zero counts on influx error', async () => {
+    jest
+      .spyOn(handler, 'fetchLocationWiseApplicationsStarted')
+      .mockImplementation(() => {
+        throw new Error()
+      })
+    const res = await server.server.inject({
+      method: 'GET',
+      url:
+        '/applicationsStarted?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.result).toEqual({
+      fieldAgentApplications: 0,
+      hospitalApplications: 0,
+      officeApplications: 0
     })
   })
 })
