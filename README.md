@@ -400,26 +400,21 @@ Just follow the instructions in the [Zambia](https://github.com/opencrvs/opencrv
 
 You can run a PWA on an Android device and connect to OpenCRVS running on your local network. This is the best way to work and debug service workers and do actual device testing.
 
-1. Go to `ngrok.conf` and add an auth token. Register to https://ngrok.com/. The free plan is enough for this.
-
-2. Run `ngrok start -config infrastructure/ngrok.conf --all`. Go to https://dashboard.ngrok.com/auth and get yourself an auth token
-
-3. Open `https://ocrvs-client.ngrok.io` on your device. Create a `.env` file to `packages/mobile-proxy`
+1. Register to https://ngrok.com/. The free plan is enough for this.
+2. Go to https://dashboard.ngrok.com/auth and get yourself an auth token
+3. Create a `.env` file to `packages/mobile-proxy`
 
 ```
 AUTH_TOKEN=THE_AUTH_TOKEN_YOU_GOT_HERE
 ```
 
-4. Start the development environment as you normally would, but add `--ignore @opencrvs/client` to the start command. So `yarn start:bgd --ignore @opencrvs/client`
+4. Start the development environment as you normally would, but add `--ignore @opencrvs/client` to the start command. E.G. `yarn start --ignore @opencrvs/client`
 
 5. Run `yarn start` in the mobile-proxy package
-
 6. You should now have an ngrok url that can be used remotely on any device. It's still required to be in the same network as the host machine, as some services (login) aren't used through ngrok.
 
 7. Build the client app `NODE_ENV=production yarn build`
-
 8. Serve the client up in 3000 port by running `yarn serve`
-
 9. You can now open up the address you got from the mobile proxy in your mobile browser
 
 <br>

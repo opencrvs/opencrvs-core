@@ -104,7 +104,7 @@ export default function register(
   onNewContentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   if (
-    process.env.NODE_ENV === 'production' &&
+    (process.env.NODE_ENV === 'production' || !isLocalhost) &&
     'serviceWorker' in navigator &&
     // @ts-ignore
     !window.Cypress // This disables the service workder for our e2e tests
