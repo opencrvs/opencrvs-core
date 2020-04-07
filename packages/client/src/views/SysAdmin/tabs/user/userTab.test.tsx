@@ -14,9 +14,11 @@ import { SEARCH_USERS } from '@client/sysadmin/user/queries'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import * as React from 'react'
 import { UserTab } from './userTab'
+import { ReactWrapper } from 'enzyme'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('User tab tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   describe('Header test', () => {
     it('renders header with user count', async () => {
@@ -144,7 +146,8 @@ describe('User tab tests', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
-    it('renders list of users', async () => {
+    describe('when there is a result from query', () => {
+      let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
           request: {
@@ -235,21 +238,56 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <UserTab />,
-        store,
-        userListMock
-      )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
+      beforeEach(async () => {
+        const testComponent = await createTestComponent(
+          // @ts-ignore
+          <UserTab />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
       })
 
-      testComponent.component.update()
-      const app = testComponent.component
-      expect(app.find('#user_list').hostNodes()).toHaveLength(1)
+      it('renders list of users', () => {
+        expect(component.find('#user_list').hostNodes()).toHaveLength(1)
+      })
+
+      it('clicking on toggleMenu pops up menu options', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-0-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-0-menuItem0'
+        )
+      })
+
+      it('clicking on menu options takes to user review page', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-0-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-0-menuItem0'
+        )
+        menuOptionButton.hostNodes().simulate('click')
+        await flushPromises()
+        expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+      })
     })
   })
 

@@ -107,6 +107,20 @@ export const influx = new Influx.InfluxDB({
         'locationLevel3',
         'locationLevel2'
       ]
+    },
+    {
+      measurement: 'applications_started',
+      fields: {
+        role: Influx.FieldType.STRING,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
     }
   ]
 })

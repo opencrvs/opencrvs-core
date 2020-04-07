@@ -14,6 +14,7 @@ import {
   IDeathRegistrationFields,
   IInProgressApplicationFields,
   ITimeLoggedFields,
+  IApplicationsStartedFields,
   IDurationFields,
   IPaymentFields,
   IPointLocation,
@@ -25,7 +26,8 @@ import {
   IDurationTags,
   ILocationTags,
   IPoints,
-  IPaymentPoints
+  IPaymentPoints,
+  IApplicationsStartedPoints
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -39,6 +41,7 @@ import {
   getApplicationType,
   getPaymentReconciliation,
   getObservationValueByCode,
+  isNotification,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
@@ -48,7 +51,10 @@ import {
   getDurationInSeconds,
   getDurationInDays
 } from '@metrics/features/registration/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  Events
+} from '@metrics/features/metrics/constants'
 import { fetchParentLocationByLocationID } from '@metrics/api'
 
 export const generateInCompleteFieldPoints = async (
@@ -89,6 +95,7 @@ export const generateInCompleteFieldPoints = async (
     payload,
     authHeader
   )
+
   return inCompleteFieldExtension.valueString.split(',').map(missingFieldId => {
     const missingFieldIds = missingFieldId.split('/')
     const tags: IInProgressApplicationTags = {
@@ -321,6 +328,57 @@ export function generateTimeLoggedPoint(payload: fhir.Bundle): IPoints {
 
   return {
     measurement: 'application_time_logged',
+    tags,
+    fields
+  }
+}
+
+export async function generateApplicationStartedPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader,
+  status: string
+): Promise<IApplicationsStartedPoints> {
+  const composition = getComposition(payload)
+  const task = getTask(payload)
+
+  if (!composition) {
+    throw new Error('composition not found')
+  }
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  let role: string = ''
+
+  if (status === Events.IN_PROGRESS_DEC) {
+    isNotification(composition)
+      ? (role = 'NOTIFICATION_API')
+      : (role = 'FIELD_AGENT')
+  } else if (status === Events.NEW_VALIDATE) {
+    role = 'REGISTRATION_AGENT'
+  } else if (status === Events.NEW_WAITING_VALIDATION) {
+    role = 'REGISTRAR'
+  } else if (status === Events.NEW_DEC) {
+    role = 'FIELD_AGENT'
+  }
+
+  if (role === '') {
+    throw new Error('Role not found')
+  }
+
+  const fields: IApplicationsStartedFields = {
+    role,
+    compositionId: composition.id
+  }
+
+  const tags = {
+    eventType: getApplicationType(task),
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  return {
+    measurement: 'applications_started',
     tags,
     fields
   }

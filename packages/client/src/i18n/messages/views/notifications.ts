@@ -24,6 +24,7 @@ interface INotificationsMessages {
   statusWaitingToSubmit: MessageDescriptor
   userFormFail: MessageDescriptor
   userFormSuccess: MessageDescriptor
+  userFormUpdateSuccess: MessageDescriptor
   waitingToRetry: MessageDescriptor
 }
 
@@ -92,6 +93,12 @@ const messagesToDefine: INotificationsMessages = {
     description:
       'The message that appears in notification when a new user is created',
     id: 'notification.userFormSuccess'
+  },
+  userFormUpdateSuccess: {
+    defaultMessage: 'User details have been updated',
+    description:
+      'The message that appears in notification when user details have been updated',
+    id: 'notification.userFormUpdateSuccess'
   },
   waitingToRetry: {
     defaultMessage: 'Waiting to retry',

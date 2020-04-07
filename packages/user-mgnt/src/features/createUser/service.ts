@@ -95,8 +95,15 @@ export const getCatchmentAreaIdsByPrimaryOfficeId = async (
 }
 
 export const postFhir = async (token: string, resource: fhir.Resource) => {
-  const res = await fetch(`${FHIR_URL}/${resource.resourceType}`, {
-    method: 'POST',
+  const shouldUpdateExisting = Boolean(resource.id)
+  const request = shouldUpdateExisting
+    ? {
+        url: `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
+        method: 'PUT'
+      }
+    : { url: `${FHIR_URL}/${resource.resourceType}`, method: 'POST' }
+  const res = await fetch(request.url, {
+    method: request.method,
     headers: {
       'Content-Type': 'application/fhir+json',
       Authorization: token

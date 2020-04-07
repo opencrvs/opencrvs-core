@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event } from '@client/forms'
+import { Event, UserSection } from '@client/forms'
 import {
   APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
@@ -30,6 +30,8 @@ import {
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
   REVIEW_DUPLICATES,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
@@ -89,12 +91,20 @@ type GoToFieldAgentHome = {
     tabId: string
   }
 }
+export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
+type GoToReviewUserDetails = {
+  type: typeof GO_TO_REVIEW_USER_DETAILS
+  payload: {
+    userId: string
+  }
+}
 
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
   | GoToFieldAgentHome
   | GoToSysAdminHome
+  | GoToReviewUserDetails
 export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
 type GoToSysAdminHome = {
   type: typeof GO_TO_SYS_ADMIN_HOME
@@ -333,10 +343,31 @@ export function goToCreateNewUser() {
   return push(CREATE_USER)
 }
 
+export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
+  return {
+    type: GO_TO_REVIEW_USER_DETAILS,
+    payload: {
+      userId
+    }
+  }
+}
+
 export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
+    sectionId: string
+    nextGroupId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
+export const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
+type GoToUserReviewForm = {
+  type: typeof GO_TO_USER_REVIEW_FORM
+  payload: {
+    userId: string
     sectionId: string
     nextGroupId: string
     userFormFieldNameHash?: string
@@ -353,6 +384,25 @@ export function goToCreateUserSection(
   return {
     type: GO_TO_CREATE_USER_SECTION,
     payload: {
+      sectionId,
+      nextGroupId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
+}
+
+export function goToUserReviewForm(
+  userId: string,
+  sectionId: string,
+  nextGroupId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToUserReviewForm {
+  return {
+    type: GO_TO_USER_REVIEW_FORM,
+    payload: {
+      userId,
       sectionId,
       nextGroupId,
       userFormFieldNameHash: fieldNameHash,
@@ -481,6 +531,36 @@ export function navigationReducer(state: INavigationState, action: any) {
               groupId: nextGroupId
             }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
+          )
+        )
+      )
+    case GO_TO_USER_REVIEW_FORM:
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_FORM, {
+              userId: action.payload.userId,
+              sectionId: action.payload.sectionId,
+              groupId: action.payload.nextGroupId
+            }) +
+              (action.payload.userFormFieldNameHash
+                ? `#${action.payload.userFormFieldNameHash}`
+                : ''),
+            action.payload.formHistoryState
+          )
+        )
+      )
+    case GO_TO_REVIEW_USER_DETAILS:
+      const { userId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
           )
         )
       )

@@ -361,6 +361,8 @@ export interface GQLUser {
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar: GQLLocalRegistrar
+  identifier?: GQLIdentifier
+  signature?: GQLSignature
 }
 
 export interface GQLLocalRegistrar {
@@ -2193,6 +2195,8 @@ export interface GQLUserTypeResolver<TParent = any> {
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
+  identifier?: UserToIdentifierResolver<TParent>
+  signature?: UserToSignatureResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2244,6 +2248,14 @@ export interface UserToCatchmentAreaResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToIdentifierResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

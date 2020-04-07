@@ -14,7 +14,11 @@ import {
   AvatarSmall,
   VerticalThreeDots
 } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import {
+  ListTable,
+  ColumnContentAlignment,
+  ToggleMenu
+} from '@opencrvs/components/lib/interface'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import {
@@ -29,7 +33,7 @@ import * as React from 'react'
 import { Query } from '@client/components/Query'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled from 'styled-components'
-import { goToCreateNewUser } from '@client/navigation'
+import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
 import { connect } from 'react-redux'
 import {
   userMessages,
@@ -37,6 +41,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { UserStatus } from '@client/views/SysAdmin/utils'
+import { messages } from '@client/i18n/messages/views/sysAdmin'
 
 const UserTabBodyContent = styled(BodyContent)`
   max-width: 1050px;
@@ -99,6 +104,7 @@ const Status = (statusProps: IStatusProps) => {
 
 interface IProps extends IntlShapeProps {
   goToCreateNewUser: typeof goToCreateNewUser
+  goToReviewUserDetails: typeof goToReviewUserDetails
 }
 
 interface IState {
@@ -115,6 +121,15 @@ class UserTabComponent extends React.Component<IProps, IState> {
     this.state = { usersPageNo: 1 }
   }
 
+  getMenuItems = (userId: string) => {
+    return [
+      {
+        label: this.props.intl.formatMessage(messages.menuOptionEditDetails),
+        handler: () => this.props.goToReviewUserDetails(userId)
+      }
+    ]
+  }
+
   generateUserContents = (data: GQLQuery) => {
     const { intl } = this.props
 
@@ -122,29 +137,37 @@ class UserTabComponent extends React.Component<IProps, IState> {
       return []
     }
 
-    return data.searchUsers.results.map((user: GQLUser | null) => {
-      if (user !== null) {
-        const name =
-          (createNamesMap(user && (user.name as GQLHumanName[]))[
-            this.props.intl.locale
-          ] as string) ||
-          (createNamesMap(user && (user.name as GQLHumanName[]))[
-            LANG_EN
-          ] as string)
-        const status = user.status || 'pending'
+    return data.searchUsers.results.map(
+      (user: GQLUser | null, index: number) => {
+        if (user !== null) {
+          const name =
+            (createNamesMap(user && (user.name as GQLHumanName[]))[
+              this.props.intl.locale
+            ] as string) ||
+            (createNamesMap(user && (user.name as GQLHumanName[]))[
+              LANG_EN
+            ] as string)
+          const status = user.status || 'pending'
 
-        return {
-          photo: <AvatarSmall />,
-          name,
-          username: user.username,
-          role: user.role && intl.formatMessage(userMessages[user.role]),
-          type: user.type && intl.formatMessage(userMessages[user.type]),
-          status: <Status status={status} />,
-          menu: <VerticalThreeDots />
+          return {
+            photo: <AvatarSmall />,
+            name,
+            username: user.username,
+            role: user.role && intl.formatMessage(userMessages[user.role]),
+            type: user.type && intl.formatMessage(userMessages[user.type]),
+            status: <Status status={status} />,
+            menu: (
+              <ToggleMenu
+                id={`user-item-${index}-menu`}
+                toggleButton={<VerticalThreeDots />}
+                menuItems={this.getMenuItems(user.id as string)}
+              />
+            )
+          }
         }
+        return {}
       }
-      return {}
-    })
+    )
   }
 
   onClickAddUser = () => {
@@ -191,6 +214,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
       {
         label: '',
         width: 5,
+        alignment: ColumnContentAlignment.CENTER,
         key: 'menu'
       }
     ]
@@ -247,5 +271,5 @@ class UserTabComponent extends React.Component<IProps, IState> {
 
 export const UserTab = connect(
   null,
-  { goToCreateNewUser }
+  { goToCreateNewUser, goToReviewUserDetails }
 )(injectIntl(UserTabComponent))

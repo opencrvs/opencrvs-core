@@ -158,6 +158,10 @@ export const mockUserGraphqlOperation = {
                       mutation: {
                         operation: 'fieldNameTransformer',
                         parameters: ['primaryOffice']
+                      },
+                      query: {
+                        operation: 'locationIDToFieldTransformer',
+                        parameters: ['primaryOffice']
                       }
                     }
                   }
@@ -193,6 +197,10 @@ export const mockUserGraphqlOperation = {
                       mutation: {
                         operation: 'fieldToNameTransformer',
                         parameters: ['bn']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['bn']
                       }
                     }
                   },
@@ -210,6 +218,10 @@ export const mockUserGraphqlOperation = {
                     mapping: {
                       mutation: {
                         operation: 'fieldToNameTransformer',
+                        parameters: ['bn']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
                         parameters: ['bn']
                       }
                     }
@@ -229,6 +241,10 @@ export const mockUserGraphqlOperation = {
                       mutation: {
                         operation: 'fieldToNameTransformer',
                         parameters: ['en', 'firstNames']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'firstNames']
                       }
                     }
                   },
@@ -247,6 +263,10 @@ export const mockUserGraphqlOperation = {
                       mutation: {
                         operation: 'fieldToNameTransformer',
                         parameters: ['en', 'familyName']
+                      },
+                      query: {
+                        operation: 'nameToFieldTransformer',
+                        parameters: ['en', 'familyName']
                       }
                     }
                   },
@@ -264,6 +284,10 @@ export const mockUserGraphqlOperation = {
                     mapping: {
                       mutation: {
                         operation: 'msisdnTransformer',
+                        parameters: ['user.mobile']
+                      },
+                      query: {
+                        operation: 'localPhoneTransformer',
                         parameters: ['user.mobile']
                       }
                     }
@@ -287,6 +311,10 @@ export const mockUserGraphqlOperation = {
                     mapping: {
                       mutation: {
                         operation: 'fieldToIdentifierWithTypeTransformer',
+                        parameters: ['NATIONAL_ID']
+                      },
+                      query: {
+                        operation: 'identifierWithTypeToFieldTransformer',
                         parameters: ['NATIONAL_ID']
                       }
                     }
@@ -472,7 +500,11 @@ export const transformRoleDataToDefinitions = (
 
   return fields.map(field => {
     if (field.name === 'role') {
-      if (userFormData && userFormData.role) {
+      if (
+        userFormData &&
+        typeof userFormData.role === 'string' &&
+        !userFormData.role
+      ) {
         userFormData.role = ''
       }
       ;(field as ISelectFormFieldWithOptions).options = roles.map(
@@ -483,7 +515,11 @@ export const transformRoleDataToDefinitions = (
       )
       return field
     } else if (field.name === 'type') {
-      if (userFormData && userFormData.type) {
+      if (
+        userFormData &&
+        typeof userFormData.type === 'string' &&
+        !userFormData.type
+      ) {
         userFormData.type = ''
       }
       ;(field as ISelectFormFieldWithDynamicOptions).dynamicOptions.options = roles.reduce(

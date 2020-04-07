@@ -25,3 +25,10 @@ export const WITHIN_45_DAYS = 'DAYS_0_TO_45'
 export const WITHIN_45_DAYS_TO_1_YEAR = 'DAYS_46_TO_365'
 export const WITHIN_1_YEAR = 'DAYS_0_TO_365'
 export const EVENT = 'event'
+export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
+export enum Events {
+  IN_PROGRESS_DEC = 'in-progress-declaration', // Field agent or DHIS2 in progress
+  NEW_DEC = 'new-declaration', // Field agent complete
+  NEW_WAITING_VALIDATION = 'new-waiting-validation', // Registrar
+  NEW_VALIDATE = 'new-validation' // Registration agent new event
+}
