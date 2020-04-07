@@ -9,14 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLResolver,
-  GQLUserIdentifierInput,
-  GQLSignatureInput
-} from '@gateway/graphql/schema'
-import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
+import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
+import { fetchFHIR, findExtension } from '@gateway/features/fhir/utils'
+import {
+  GQLIdentifier,
+  GQLResolver,
+  GQLSignatureInput,
+  GQLUserIdentifierInput
+} from '@gateway/graphql/schema'
 
 interface IUserModelData {
   _id: string
@@ -30,6 +31,7 @@ interface IUserModelData {
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
+  identifiers: GQLIdentifier
   device: string
 }
 
@@ -42,6 +44,7 @@ export interface IUserPayload
     | 'practitionerId'
     | 'username'
     | 'name'
+    | 'identifiers'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
@@ -99,6 +102,15 @@ async function getPractitionerByOfficeId(
   }
 }
 
+function getSignatureExtension(
+  extensions: fhir.Extension[] | undefined
+): fhir.Extension | undefined {
+  return findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+    extensions || []
+  )
+}
+
 export const userTypeResolvers: GQLResolver = {
   User: {
     id(userModel: IUserModelData) {
@@ -106,6 +118,9 @@ export const userTypeResolvers: GQLResolver = {
     },
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id
+    },
+    identifier(userModel: IUserModelData) {
+      return userModel.identifiers && userModel.identifiers[0]
     },
     async primaryOffice(userModel: IUserModelData, _, authHeader) {
       return await fetchFHIR(
@@ -147,10 +162,7 @@ export const userTypeResolvers: GQLResolver = {
         return
       }
 
-      const signatureExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-        practitioner.extension || []
-      )
+      const signatureExtension = getSignatureExtension(practitioner.extension)
 
       const signature = signatureExtension && signatureExtension.valueSignature
       return {
@@ -161,6 +173,22 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       }
+    },
+    async signature(userModel: IUserModelData, _, authHeader) {
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/Practitioner/${userModel.practitionerId}`,
+        authHeader
+      )
+
+      const signatureExtension = getSignatureExtension(practitioner.extension)
+
+      const signature = signatureExtension && signatureExtension.valueSignature
+      return (
+        signature && {
+          type: signature.contentType,
+          data: signature.blob
+        }
+      )
     }
   }
 }

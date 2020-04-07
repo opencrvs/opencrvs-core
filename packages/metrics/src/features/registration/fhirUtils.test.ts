@@ -15,6 +15,7 @@ import {
   getResourceByType,
   getObservationValueByCode,
   getTimeLoggedFromTask,
+  isNotification,
   FHIR_RESOURCE_TYPE,
   CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
@@ -993,6 +994,231 @@ describe('fhirUtils', () => {
     }
     expect(() => getTimeLoggedFromTask(task)).toThrowError(
       'No time logged extension found in task, task ID: undefined'
+    )
+  })
+  it('Returns false if composition is not a notification', () => {
+    const composition = {
+      identifier: { system: 'urn:ietf:rfc:3986', value: 'BMPG0QJ' },
+      resourceType: 'Composition',
+      status: 'preliminary',
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-types',
+            code: 'birth-application'
+          }
+        ],
+        text: 'Birth Application'
+      },
+      class: {
+        coding: [
+          { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+        ],
+        text: 'CRVS Document'
+      },
+      title: 'Birth Application',
+      section: [
+        {
+          title: 'Child details',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'child-details'
+              }
+            ],
+            text: 'Child details'
+          },
+          entry: [
+            { reference: 'urn:uuid:e9ebc455-6737-401a-bbd3-0c76044547db' }
+          ]
+        },
+        {
+          title: "Mother's details",
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'mother-details'
+              }
+            ],
+            text: "Mother's details"
+          },
+          entry: [
+            { reference: 'urn:uuid:cd9b2686-a284-4011-b651-f849565060f6' }
+          ]
+        },
+        {
+          title: 'Birth encounter',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: 'birth-encounter'
+              }
+            ],
+            text: 'Birth encounter'
+          },
+          entry: [
+            { reference: 'urn:uuid:59dd1b65-a64b-481a-9d3e-aae9b2f5b81f' }
+          ]
+        }
+      ],
+      subject: {},
+      date: '2019-11-30T15:48:42.833Z',
+      author: [],
+      id: '9f24f539-8126-4261-baa0-243eea374004'
+    }
+
+    expect(isNotification(composition)).toEqual(false)
+  })
+  it('Returns true if composition is a notification', () => {
+    const composition = {
+      identifier: { system: 'urn:ietf:rfc:3986', value: 'BMPG0QJ' },
+      resourceType: 'Composition',
+      status: 'preliminary',
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/doc-types',
+            code: 'birth-notification'
+          }
+        ],
+        text: 'Birth Application'
+      },
+      class: {
+        coding: [
+          { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+        ],
+        text: 'CRVS Document'
+      },
+      title: 'Birth Application',
+      section: [
+        {
+          title: 'Child details',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'child-details'
+              }
+            ],
+            text: 'Child details'
+          },
+          entry: [
+            { reference: 'urn:uuid:e9ebc455-6737-401a-bbd3-0c76044547db' }
+          ]
+        },
+        {
+          title: "Mother's details",
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'mother-details'
+              }
+            ],
+            text: "Mother's details"
+          },
+          entry: [
+            { reference: 'urn:uuid:cd9b2686-a284-4011-b651-f849565060f6' }
+          ]
+        },
+        {
+          title: 'Birth encounter',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: 'birth-encounter'
+              }
+            ],
+            text: 'Birth encounter'
+          },
+          entry: [
+            { reference: 'urn:uuid:59dd1b65-a64b-481a-9d3e-aae9b2f5b81f' }
+          ]
+        }
+      ],
+      subject: {},
+      date: '2019-11-30T15:48:42.833Z',
+      author: [],
+      id: '9f24f539-8126-4261-baa0-243eea374004'
+    }
+
+    expect(isNotification(composition)).toEqual(true)
+  })
+  it('Throws error if no composition type exists', () => {
+    const composition = {
+      identifier: { system: 'urn:ietf:rfc:3986', value: 'BMPG0QJ' },
+      resourceType: 'Composition',
+      status: 'preliminary',
+      type: {
+        coding: [],
+        text: 'Birth Application'
+      },
+      class: {
+        coding: [
+          { system: 'http://opencrvs.org/doc-classes', code: 'crvs-document' }
+        ],
+        text: 'CRVS Document'
+      },
+      title: 'Birth Application',
+      section: [
+        {
+          title: 'Child details',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'child-details'
+              }
+            ],
+            text: 'Child details'
+          },
+          entry: [
+            { reference: 'urn:uuid:e9ebc455-6737-401a-bbd3-0c76044547db' }
+          ]
+        },
+        {
+          title: "Mother's details",
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/doc-sections',
+                code: 'mother-details'
+              }
+            ],
+            text: "Mother's details"
+          },
+          entry: [
+            { reference: 'urn:uuid:cd9b2686-a284-4011-b651-f849565060f6' }
+          ]
+        },
+        {
+          title: 'Birth encounter',
+          code: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/sections',
+                code: 'birth-encounter'
+              }
+            ],
+            text: 'Birth encounter'
+          },
+          entry: [
+            { reference: 'urn:uuid:59dd1b65-a64b-481a-9d3e-aae9b2f5b81f' }
+          ]
+        }
+      ],
+      subject: {},
+      date: '2019-11-30T15:48:42.833Z',
+      author: [],
+      id: '9f24f539-8126-4261-baa0-243eea374004'
+    }
+
+    expect(() => isNotification(composition)).toThrowError(
+      'Composition has no type codings defined'
     )
   })
 })

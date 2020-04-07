@@ -54,7 +54,7 @@ storage.getItem = jest.fn()
 storage.setItem = jest.fn()
 
 describe('SysAdminHome tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
 
   beforeAll(async () => {
     getItem.mockReturnValue(sysadminToken)
@@ -234,5 +234,32 @@ describe('SysAdminHome tests', () => {
 
     testComponent.component.update()
     expect(window.location.href).toContain('sys-admin-home/config')
+  })
+
+  it('redirects to performance home page', async () => {
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <SysAdminHome
+        match={{
+          params: {
+            tabId: 'overview'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      store
+    )
+    testComponent.component.update()
+
+    testComponent.component
+      .find('#menu-performance')
+      .hostNodes()
+      .simulate('click')
+    await flushPromises()
+    testComponent.component.update()
+
+    expect(history.location.pathname).toContain('/performance')
   })
 })

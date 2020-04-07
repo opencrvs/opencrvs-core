@@ -14,6 +14,7 @@ import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
 import * as i18nActions from '@client/i18n/actions'
+import { TOAST_MESSAGES } from '@client/user/userReducer'
 
 describe('when app notifies the user', () => {
   let app: ReactWrapper
@@ -72,7 +73,9 @@ describe('when app notifies the user', () => {
   describe('When user submits a form', () => {
     describe('In case of successful submission', () => {
       beforeEach(() => {
-        const action = actions.showSubmitFormSuccessToast('userFormSuccess')
+        const action = actions.showSubmitFormSuccessToast(
+          TOAST_MESSAGES.SUCCESS
+        )
         store.dispatch(action)
         app.update()
       })
@@ -88,6 +91,24 @@ describe('when app notifies the user', () => {
           .simulate('click')
         app.update()
         expect(store.getState().notification.submitFormSuccessToast).toBe(null)
+      })
+    })
+
+    describe('In case of successful update submission', () => {
+      beforeEach(() => {
+        const action = actions.showSubmitFormSuccessToast(
+          TOAST_MESSAGES.UPDATE_SUCCESS
+        )
+        store.dispatch(action)
+        app.update()
+      })
+      it('Shows different message for update submission', () => {
+        expect(
+          app
+            .find('#submissionSuccessToast')
+            .hostNodes()
+            .text()
+        ).toBe('User details have been updated')
       })
     })
 

@@ -14,6 +14,7 @@ import { fetchTaskHistory } from '@metrics/api'
 
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
+import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -204,6 +205,23 @@ export function getTimeLoggedFromTask(task: fhir.Task) {
   }
 
   return timeLoggedExt.valueInteger
+}
+
+export function isNotification(composition: fhir.Composition): boolean {
+  const compositionTypeCode =
+    composition.type.coding &&
+    composition.type.coding.find(
+      code => code.system === 'http://opencrvs.org/doc-types'
+    )
+  if (!compositionTypeCode) {
+    throw new Error('Composition has no type codings defined')
+  }
+
+  return (
+    (compositionTypeCode.code &&
+      NOTIFICATION_TYPES.includes(compositionTypeCode.code)) ||
+    false
+  )
 }
 
 export function getObservationValueByCode(

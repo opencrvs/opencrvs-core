@@ -2237,7 +2237,7 @@
                         "operation": "identityNameMapper"
                       }
                     },
-                    
+
                     "helperText": {
                       "dependency": "iDType",
                       "helperTextMapper": {
@@ -18805,7 +18805,7 @@
       }
     }
   },
-  "userForm":{
+  "userForm": {
     "sections": [
       {
         "id": "user",
@@ -18863,6 +18863,10 @@
                   "mutation": {
                     "operation": "fieldNameTransformer",
                     "parameters": ["primaryOffice"]
+                  },
+                  "query": {
+                    "operation": "locationIDToFieldTransformer",
+                    "parameters": ["primaryOffice"]
                   }
                 }
               }
@@ -18898,6 +18902,10 @@
                   "mutation": {
                     "operation": "fieldToNameTransformer",
                     "parameters": ["bn"]
+                  },
+                  "query": {
+                    "operation": "nameToFieldTransformer",
+                    "parameters": ["bn"]
                   }
                 }
               },
@@ -18915,6 +18923,10 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToNameTransformer",
+                    "parameters": ["bn"]
+                  },
+                  "query": {
+                    "operation": "nameToFieldTransformer",
                     "parameters": ["bn"]
                   }
                 }
@@ -18934,6 +18946,10 @@
                   "mutation": {
                     "operation": "fieldToNameTransformer",
                     "parameters": ["en", "firstNames"]
+                  },
+                  "query": {
+                    "operation": "nameToFieldTransformer",
+                    "parameters": ["en", "firstNames"]
                   }
                 }
               },
@@ -18952,6 +18968,10 @@
                   "mutation": {
                     "operation": "fieldToNameTransformer",
                     "parameters": ["en", "familyName"]
+                  },
+                  "query": {
+                    "operation": "nameToFieldTransformer",
+                    "parameters": ["en", "familyName"]
                   }
                 }
               },
@@ -18969,6 +18989,10 @@
                 "mapping": {
                   "mutation": {
                     "operation": "msisdnTransformer",
+                    "parameters": ["user.mobile"]
+                  },
+                  "query": {
+                    "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
                   }
                 }
@@ -18992,6 +19016,10 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToIdentifierWithTypeTransformer",
+                    "parameters": ["NATIONAL_ID"]
+                  },
+                  "query": {
+                    "operation": "identifierWithTypeToFieldTransformer",
                     "parameters": ["NATIONAL_ID"]
                   }
                 }

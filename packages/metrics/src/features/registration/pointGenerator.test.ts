@@ -12,14 +12,17 @@
 import {
   generateBirthRegPoint,
   generateDeathRegPoint,
-  generatePaymentPoint
+  generatePaymentPoint,
+  generateApplicationStartedPoint
 } from '@metrics/features/registration/pointGenerator'
 import {
+  testDeclaration,
   testPayload,
   testDeathPayload,
   testDeathCertPayload
 } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
+import { Events } from '@metrics/features/metrics/constants'
 
 import * as api from '@metrics/api'
 const fetchLocation = api.fetchLocation as jest.Mock
@@ -210,5 +213,138 @@ describe('Verify point generation', () => {
     expect(generatePaymentPoint(payload, AUTH_HEADER)).rejects.toThrowError(
       'Payment reconciliation not found'
     )
+  })
+  it('returns applications started point for field agent', async () => {
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateApplicationStartedPoint(
+      cloneDeep(testDeclaration),
+      AUTH_HEADER,
+      Events.NEW_DEC
+    )
+    expect(point).toEqual({
+      measurement: 'applications_started',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+      },
+      fields: {
+        compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        role: 'FIELD_AGENT'
+      }
+    })
+  })
+  it('returns applications started point for registration agent', async () => {
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateApplicationStartedPoint(
+      cloneDeep(testDeclaration),
+      AUTH_HEADER,
+      Events.NEW_VALIDATE
+    )
+    expect(point).toEqual({
+      measurement: 'applications_started',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+      },
+      fields: {
+        compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        role: 'REGISTRATION_AGENT'
+      }
+    })
+  })
+  it('returns applications started point for registrar', async () => {
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateApplicationStartedPoint(
+      cloneDeep(testDeclaration),
+      AUTH_HEADER,
+      Events.NEW_WAITING_VALIDATION
+    )
+    expect(point).toEqual({
+      measurement: 'applications_started',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+      },
+      fields: {
+        compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        role: 'REGISTRAR'
+      }
+    })
+  })
+  it('returns applications started point for field agent', async () => {
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateApplicationStartedPoint(
+      cloneDeep(testDeclaration),
+      AUTH_HEADER,
+      Events.IN_PROGRESS_DEC
+    )
+    expect(point).toEqual({
+      measurement: 'applications_started',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+      },
+      fields: {
+        compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        role: 'FIELD_AGENT'
+      }
+    })
+  })
+  it('returns applications started point for notification api', async () => {
+    const payload = cloneDeep(testDeclaration)
+    // @ts-ignore
+    payload.entry[0].resource.type?.coding[0].code = 'birth-notification'
+    fetchLocation.mockReset()
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateApplicationStartedPoint(
+      cloneDeep(payload),
+      AUTH_HEADER,
+      Events.IN_PROGRESS_DEC
+    )
+    expect(point).toEqual({
+      measurement: 'applications_started',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
+      },
+      fields: {
+        compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        role: 'NOTIFICATION_API'
+      }
+    })
   })
 })

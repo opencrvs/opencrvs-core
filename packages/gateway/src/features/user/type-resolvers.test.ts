@@ -29,6 +29,7 @@ describe('User type resolvers', () => {
     username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
+    identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
@@ -52,6 +53,13 @@ describe('User type resolvers', () => {
   it('return userMgntUserID type', () => {
     const res = userTypeResolvers.User.userMgntUserID(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
+  })
+  it('return user identifier', () => {
+    const res = userTypeResolvers.User.identifier(mockResponse)
+    expect(res).toEqual({
+      system: mockResponse.identifiers[0].system,
+      value: mockResponse.identifiers[0].value
+    })
   })
   it('return primaryOffice type', async () => {
     const mockOffice = {
@@ -376,6 +384,39 @@ describe('User type resolvers', () => {
         type: 'image/png',
         data: signatureData
       }
+    })
+  })
+  it('return user signature', async () => {
+    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
+    const practitioner = {
+      resourceType: 'Practitioner',
+      extension: [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueSignature: {
+            type: [
+              {
+                system: 'urn:iso-astm:E1762-95:2013',
+                code: '1.2.840.10065.1.12.1.13',
+                display: 'Review Signature'
+              }
+            ],
+            when: '2019-08-22T08:43:43.461Z',
+            contentType: 'image/png',
+            blob: signatureData
+          }
+        }
+      ],
+      id: 'dd78cad3-26dc-469a-bddb-0b45ae489491'
+    }
+
+    fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
+
+    const response = await userTypeResolvers.User.signature(mockResponse)
+
+    expect(response).toEqual({
+      type: 'image/png',
+      data: signatureData
     })
   })
 })

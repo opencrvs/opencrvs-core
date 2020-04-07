@@ -10,41 +10,45 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { push, goBack as back, replace } from 'connected-react-router'
+import { Event, UserSection } from '@client/forms'
 import {
-  SELECT_BIRTH_INFORMANT,
-  SELECT_DEATH_INFORMANT,
-  HOME,
-  SEARCH_RESULT,
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_BIRTH_APPLICANT_FORM,
-  DRAFT_DEATH_FORM,
-  SELECT_VITAL_EVENT,
-  REVIEW_DUPLICATES,
-  CERTIFICATE_COLLECTOR,
-  REGISTRAR_HOME_TAB,
-  FIELD_AGENT_HOME_TAB,
-  SEARCH,
   APPLICATION_DETAIL,
-  SETTINGS,
-  SYS_ADMIN_HOME_TAB,
+  CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_SECTION,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
-  VERIFY_COLLECTOR,
-  REVIEW_CERTIFICATE,
-  PRINT_CERTIFICATE_PAYMENT,
-  PERFORMANCE_REPORT_LIST,
+  DRAFT_BIRTH_APPLICANT_FORM,
+  DRAFT_BIRTH_PARENT_FORM,
+  DRAFT_DEATH_FORM,
+  EVENT_INFO,
+  FIELD_AGENT_HOME_TAB,
+  HOME,
+  OPERATIONAL_REPORT,
+  PERFORMANCE_HOME,
   PERFORMANCE_REPORT,
-  EVENT_INFO
+  PERFORMANCE_REPORT_LIST,
+  PRINT_CERTIFICATE_PAYMENT,
+  REGISTRAR_HOME_TAB,
+  REVIEW_CERTIFICATE,
+  REVIEW_DUPLICATES,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM,
+  SEARCH,
+  SEARCH_RESULT,
+  SELECT_BIRTH_INFORMANT,
+  SELECT_BIRTH_MAIN_CONTACT_POINT,
+  SELECT_BIRTH_PRIMARY_APPLICANT,
+  SELECT_DEATH_INFORMANT,
+  SELECT_DEATH_MAIN_CONTACT_POINT,
+  SELECT_VITAL_EVENT,
+  SETTINGS,
+  SYS_ADMIN_HOME_TAB,
+  VERIFY_COLLECTOR
 } from '@client/navigation/routes'
-import { loop, Cmd } from 'redux-loop'
 import { getCurrentUserScope } from '@client/utils/authUtils'
-import { Event } from '@client/forms'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { goBack as back, push, replace } from 'connected-react-router'
+import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -87,12 +91,20 @@ type GoToFieldAgentHome = {
     tabId: string
   }
 }
+export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
+type GoToReviewUserDetails = {
+  type: typeof GO_TO_REVIEW_USER_DETAILS
+  payload: {
+    userId: string
+  }
+}
 
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
   | GoToFieldAgentHome
   | GoToSysAdminHome
+  | GoToReviewUserDetails
 export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
 type GoToSysAdminHome = {
   type: typeof GO_TO_SYS_ADMIN_HOME
@@ -157,6 +169,10 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
 }
 
 export function goToPerformanceHome() {
+  return push(PERFORMANCE_HOME)
+}
+
+export function goToPerformanceReportList() {
   return push(
     formatUrl(PERFORMANCE_REPORT_LIST, {
       reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
@@ -177,6 +193,10 @@ export function goToPerformanceReport(
     timeRange: { start: timeStart, end: timeEnd },
     eventType
   })
+}
+
+export function goToOperationalReport(locationId: string) {
+  return push(OPERATIONAL_REPORT, { locationId })
 }
 
 export function goToSearchResult(
@@ -323,10 +343,31 @@ export function goToCreateNewUser() {
   return push(CREATE_USER)
 }
 
+export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
+  return {
+    type: GO_TO_REVIEW_USER_DETAILS,
+    payload: {
+      userId
+    }
+  }
+}
+
 export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
   payload: {
+    sectionId: string
+    nextGroupId: string
+    userFormFieldNameHash?: string
+    formHistoryState?: IDynamicValues
+  }
+}
+
+export const GO_TO_USER_REVIEW_FORM = 'navigation/GO_TO_USER_REVIEW_FORM'
+type GoToUserReviewForm = {
+  type: typeof GO_TO_USER_REVIEW_FORM
+  payload: {
+    userId: string
     sectionId: string
     nextGroupId: string
     userFormFieldNameHash?: string
@@ -343,6 +384,25 @@ export function goToCreateUserSection(
   return {
     type: GO_TO_CREATE_USER_SECTION,
     payload: {
+      sectionId,
+      nextGroupId,
+      userFormFieldNameHash: fieldNameHash,
+      formHistoryState: historyState
+    }
+  }
+}
+
+export function goToUserReviewForm(
+  userId: string,
+  sectionId: string,
+  nextGroupId: string,
+  fieldNameHash?: string,
+  historyState?: IDynamicValues
+): GoToUserReviewForm {
+  return {
+    type: GO_TO_USER_REVIEW_FORM,
+    payload: {
+      userId,
       sectionId,
       nextGroupId,
       userFormFieldNameHash: fieldNameHash,
@@ -471,6 +531,36 @@ export function navigationReducer(state: INavigationState, action: any) {
               groupId: nextGroupId
             }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : ''),
             formHistoryState
+          )
+        )
+      )
+    case GO_TO_USER_REVIEW_FORM:
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_FORM, {
+              userId: action.payload.userId,
+              sectionId: action.payload.sectionId,
+              groupId: action.payload.nextGroupId
+            }) +
+              (action.payload.userFormFieldNameHash
+                ? `#${action.payload.userFormFieldNameHash}`
+                : ''),
+            action.payload.formHistoryState
+          )
+        )
+      )
+    case GO_TO_REVIEW_USER_DETAILS:
+      const { userId } = action.payload
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
           )
         )
       )

@@ -19,6 +19,8 @@ interface ISysAdminMessages {
   networkTab: MessageDescriptor
   configTab: MessageDescriptor
   systemTitle: MessageDescriptor
+  menuOptionEditDetails: MessageDescriptor
+  editUserDetailsTitle: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -56,6 +58,17 @@ const messagesToDefine: ISysAdminMessages = {
     id: 'home.header.systemTitle',
     defaultMessage: 'System',
     description: 'System title'
+  },
+  menuOptionEditDetails: {
+    id: 'register.sysAdminHome.users.table.item.menu.item.editDetails',
+    defaultMessage: 'Edit details',
+    description:
+      'Label for menu option Edit Details in SysAdmin home table item '
+  },
+  editUserDetailsTitle: {
+    defaultMessage: 'Edit details',
+    description: 'Title for edit user details',
+    id: 'register.sysAdmin.user.header.'
   }
 }
 

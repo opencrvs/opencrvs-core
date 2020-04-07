@@ -16,9 +16,12 @@ import {
   newBirthRegistrationHandler,
   markCertifiedHandler,
   markValidatedHandler,
-  baseHandler,
+  waitingValidationHandler,
   markDeathRegisteredHandler,
-  newDeathRegistrationHandler
+  newDeathRegistrationHandler,
+  newDeclarationHandler,
+  newWaitingValidationHandler,
+  newValidationHandler
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
 import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
@@ -50,7 +53,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-declaration',
-      handler: baseHandler,
+      handler: newDeclarationHandler,
       config: {
         tags: ['api']
       }
@@ -58,7 +61,25 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-declaration',
-      handler: baseHandler,
+      handler: newDeclarationHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // New validation
+    {
+      method: 'POST',
+      path: '/events/birth/new-validation',
+      handler: newValidationHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/new-validation',
+      handler: newValidationHandler,
       config: {
         tags: ['api']
       }
@@ -68,7 +89,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/waiting-validation',
-      handler: baseHandler,
+      handler: waitingValidationHandler,
       config: {
         tags: ['api']
       }
@@ -76,7 +97,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/waiting-validation',
-      handler: baseHandler,
+      handler: waitingValidationHandler,
       config: {
         tags: ['api']
       }
@@ -84,7 +105,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/birth/new-waiting-validation',
-      handler: baseHandler,
+      handler: newWaitingValidationHandler,
       config: {
         tags: ['api']
       }
@@ -92,7 +113,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/events/death/new-waiting-validation',
-      handler: baseHandler,
+      handler: newWaitingValidationHandler,
       config: {
         tags: ['api']
       }

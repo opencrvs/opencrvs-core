@@ -64,6 +64,8 @@ type User {
   primaryOffice: Location
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar!
+  identifier: Identifier
+  signature: Signature
 }
 
 type SearchUserResult {

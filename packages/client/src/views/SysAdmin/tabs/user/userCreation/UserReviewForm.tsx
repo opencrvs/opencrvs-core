@@ -21,8 +21,16 @@ import {
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { buttonMessages as messages, userMessages } from '@client/i18n/messages'
-import { goBack, goToCreateUserSection } from '@client/navigation'
+import {
+  buttonMessages as messages,
+  userMessages,
+  buttonMessages
+} from '@client/i18n/messages'
+import {
+  goBack,
+  goToCreateUserSection,
+  goToUserReviewForm
+} from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -32,7 +40,11 @@ import {
   Action,
   FormTitle
 } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  SuccessButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
   ActionPageLight,
@@ -44,8 +56,12 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
+import { RouteComponentProps } from 'react-router'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { Check } from '@opencrvs/components/lib/icons'
 
 export interface IUserReviewFormProps {
+  userId?: string
   section: IFormSection
   formData: IFormSectionData
   client: ApolloClient<unknown>
@@ -53,6 +69,7 @@ export interface IUserReviewFormProps {
 
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
+  goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (userFormSection: IFormSection) => void
   userFormSection: IFormSection
   offlineResources: IOfflineData
@@ -64,7 +81,9 @@ interface ISectionData {
   items: IDataProps[]
 }
 
-type IFullProps = IUserReviewFormProps & IntlShapeProps
+type IFullProps = IUserReviewFormProps &
+  IntlShapeProps &
+  RouteComponentProps<{ userId?: string }>
 
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
@@ -89,12 +108,20 @@ class UserReviewFormComponent extends React.Component<
             action: {
               id: `btn_change_${field.name}`,
               label: intl.formatMessage(messages.change),
-              handler: () =>
-                this.props.goToCreateUserSection(
-                  userFormSection.id,
-                  group.id,
-                  field.name
-                )
+              handler: () => {
+                this.props.userId
+                  ? this.props.goToUserReviewForm(
+                      this.props.userId,
+                      userFormSection.id,
+                      group.id,
+                      field.name
+                    )
+                  : this.props.goToCreateUserSection(
+                      userFormSection.id,
+                      group.id,
+                      field.name
+                    )
+              }
             }
           })
         }
@@ -142,27 +169,44 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section, userFormSection } = this.props
+    const { intl, section, userId, userFormSection } = this.props
+    let title: string
+    let actionComponent: JSX.Element
 
+    if (userId) {
+      title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+      actionComponent = (
+        <SuccessButton
+          id="submit-edit-user-form"
+          onClick={() => this.props.submitForm(userFormSection)}
+          icon={() => <Check />}
+          align={ICON_ALIGNMENT.LEFT}
+        >
+          {intl.formatMessage(buttonMessages.confirm)}
+        </SuccessButton>
+      )
+    } else {
+      title = intl.formatMessage(section.title)
+      actionComponent = (
+        <PrimaryButton
+          id="submit_user_form"
+          onClick={() => this.props.submitForm(userFormSection)}
+        >
+          {intl.formatMessage(messages.createUser)}
+        </PrimaryButton>
+      )
+    }
     return (
-      <ActionPageLight
-        title={intl.formatMessage(section.title)}
-        goBack={this.props.goBack}
-      >
-        <FormTitle id={`${section.id}_title`}>
-          {intl.formatMessage(section.name)}
-        </FormTitle>
+      <ActionPageLight title={title} goBack={this.props.goBack}>
+        {!this.props.userId && (
+          <FormTitle id={`${section.id}_title`}>
+            {intl.formatMessage(section.name)}
+          </FormTitle>
+        )}
         {this.transformSectionData().map((sec, index) => (
           <DataSection key={index} {...sec} />
         ))}
-        <Action>
-          <PrimaryButton
-            id="submit_user_form"
-            onClick={() => this.props.submitForm(userFormSection)}
-          >
-            {intl.formatMessage(messages.createUser)}
-          </PrimaryButton>
-        </Action>
+        <Action>{actionComponent}</Action>
       </ActionPageLight>
     )
   }
@@ -172,14 +216,30 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
     goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
       dispatch(goToCreateUserSection(sec, group, fieldName)),
+    goToUserReviewForm: (
+      userId: string,
+      sec: string,
+      group: string,
+      fieldName?: string
+    ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
         { sections: [userFormSection] },
         { user: props.formData }
       )
+      if (variables.user._fhirID) {
+        variables.user.id = variables.user._fhirID
+        delete variables.user._fhirID
+      }
+
       dispatch(
-        submitUserFormData(props.client, createOrUpdateUserMutation, variables)
+        submitUserFormData(
+          props.client,
+          createOrUpdateUserMutation,
+          variables,
+          Boolean(props.match.params.userId) // to detect if update or create
+        )
       )
     }
   }

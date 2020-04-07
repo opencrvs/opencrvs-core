@@ -120,5 +120,6 @@ export default async function updateUser(
       Authorization: request.headers.authorization
     })
   }
-  return h.response().code(201)
+  const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
+  return h.response(resUser).code(201)
 }
