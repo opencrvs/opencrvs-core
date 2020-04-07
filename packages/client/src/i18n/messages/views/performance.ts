@@ -37,6 +37,16 @@ const messagesToDefine = {
     id: 'performance.reports.exportAll',
     defaultMessage: 'Export all performance data',
     description: 'Link text where all performance data is downloaded from'
+  },
+  operational: {
+    id: 'performance.reports.select.item.operational',
+    defaultMessage: 'Operational',
+    description: 'Label for select option Operational'
+  },
+  reports: {
+    id: 'performance.reports.select.item.reports',
+    defaultMessage: 'Reports',
+    description: 'Label for select option Reports'
   }
 }
 
