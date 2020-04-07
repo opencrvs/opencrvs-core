@@ -14,18 +14,116 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
+import styled from '@client/styledComponents'
+import {
+  LinkButton,
+  TertiaryButton,
+  ICON_ALIGNMENT
+} from '@opencrvs/components/lib/buttons'
+import { Activity } from '@opencrvs/components/lib/icons'
+import { buttonMessages } from '@client/i18n/messages'
+import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
+import { goToPerformanceHome } from '@client/navigation'
+import { messages } from '@client/i18n/messages/views/performance'
+import { Query } from '@client/components/Query'
 
-type Props = WrappedComponentProps & Pick<RouteComponentProps, 'history'>
+interface IDispatchProps {
+  goToPerformanceHome: typeof goToPerformanceHome
+}
+
+export enum PERFORMANCE_TYPE {
+  OPERATIONAL = 'OPERATIONAL',
+  REPORTS = 'REPORTS'
+}
+
+type Props = WrappedComponentProps &
+  Pick<RouteComponentProps, 'history'> &
+  IDispatchProps
 
 interface State {}
 
+const Header = styled.h1`
+  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.h2Style};
+`
+
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+
+  & > :first-child {
+    margin-right: 24px;
+  }
+
+  & > :nth-child(2) {
+    position: relative;
+    bottom: 2px;
+  }
+`
+
+const ActionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 0 -40px 0 -40px;
+  padding: 0 40px 8px 40px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+`
+
 class OperationalReportComponent extends React.Component<Props, State> {
+  onChangeLocation = () => {
+    this.props.goToPerformanceHome({
+      selectedLocation: this.props.history.location.state.selectedLocation
+    })
+  }
+
   render() {
-    return <PerformanceContentWrapper hideTopBar></PerformanceContentWrapper>
+    const {
+      intl,
+      history: {
+        location: {
+          state: { selectedLocation }
+        }
+      }
+    } = this.props
+
+    const title = selectedLocation.displayLabel
+
+    return (
+      <PerformanceContentWrapper hideTopBar>
+        <HeaderContainer>
+          <Header>{title}</Header>
+          <LinkButton onClick={this.onChangeLocation}>
+            {intl.formatMessage(buttonMessages.change)}
+          </LinkButton>
+        </HeaderContainer>
+        <ActionContainer>
+          <div>
+            <PerformanceSelect
+              value={PERFORMANCE_TYPE.OPERATIONAL}
+              options={[
+                {
+                  label: intl.formatMessage(messages.operational),
+                  value: PERFORMANCE_TYPE.OPERATIONAL
+                },
+                {
+                  label: intl.formatMessage(messages.reports),
+                  value: PERFORMANCE_TYPE.REPORTS
+                }
+              ]}
+            />
+          </div>
+          <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
+            {intl.formatMessage(buttonMessages.status)}
+          </TertiaryButton>
+        </ActionContainer>
+      </PerformanceContentWrapper>
+    )
   }
 }
 
 export const OperationalReport = connect(
   null,
-  null
+  { goToPerformanceHome }
 )(injectIntl(OperationalReportComponent))
