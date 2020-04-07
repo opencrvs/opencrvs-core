@@ -42,7 +42,7 @@ export async function applicationsStartedHandler(
   return applicationsStartedMetrics
 }
 
-async function fetchLocationWiseApplicationsStarted(
+export async function fetchLocationWiseApplicationsStarted(
   timeFrom: string,
   timeTo: string,
   locationId: string
@@ -96,18 +96,18 @@ async function fetchLocationWiseApplicationsStarted(
   )
 
   const registrarCount =
-    (registrar && registrar.length > 0 && registrar[0].count) || 0
+    (registrar && registrar.length > 0 && registrar[0].role) || 0
   const registrationAgentCount =
     (registrationAgent &&
       registrationAgent.length > 0 &&
-      registrationAgent[0].count) ||
+      registrationAgent[0].role) ||
     0
 
   return {
     fieldAgentApplications:
-      (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].count) || 0,
+      (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].role) || 0,
     hospitalApplications:
-      (hospital && hospital.length > 0 && hospital[0].count) || 0,
+      (hospital && hospital.length > 0 && hospital[0].role) || 0,
     officeApplications: registrarCount + registrationAgentCount
   }
 }
