@@ -16,13 +16,11 @@ import {
   TIME_TO,
   LOCATION_ID
 } from '@metrics/features/metrics/constants'
-import { logger } from '@metrics/logger'
 
 export async function applicationsStartedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  logger.info('metrics service applicationsStartedHandler')
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = 'Location/' + request.query[LOCATION_ID]
