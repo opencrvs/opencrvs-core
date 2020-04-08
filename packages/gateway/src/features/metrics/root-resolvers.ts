@@ -17,6 +17,7 @@ import {
   paymentTotalCalculator,
   estimated45DayMetricsTotalCalculator
 } from '@gateway/features/fhir/utils'
+import { logger } from '@gateway/logger'
 
 export interface IMetricsParam {
   timeStart: string
@@ -81,6 +82,7 @@ export const resolvers: GQLResolver = {
       { timeStart, timeEnd, locationId },
       authHeader
     ) {
+      logger.info('getting metrics')
       return getMetrics(
         '/applicationsStarted',
         {

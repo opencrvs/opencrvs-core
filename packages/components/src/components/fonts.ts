@@ -63,7 +63,7 @@ export const fonts = (language: string): IFonts => {
       line-height: 27px;`,
     bigBodyStyle: `font-family: ${regularFont};
       font-size: 18px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 27px;`,
     bodyStyle: `font-family: ${regularFont};
       font-size: 16px;
@@ -72,11 +72,11 @@ export const fonts = (language: string): IFonts => {
     bodyBoldStyle: `font-family: ${semiBoldFont};
       font-size: 16px;
       line-height: 24px;
-      font-weight: normal;`,
+      font-weight: 600;`,
     subtitleStyle: `font-family: ${semiBoldFont};
       font-size: 14px;
       line-height: 21px;
-      font-weight: normal;`,
+      font-weight: 600;`,
     captionStyle: `font-family: ${regularFont};
       font-size: 12px;
       line-height: 18px;
@@ -88,7 +88,7 @@ export const fonts = (language: string): IFonts => {
       line-height: 31px;`,
     h4Style: `font-family: ${semiBoldFont};
       font-size: 24px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 36px;`,
     h3Style: `font-family: ${regularFont};
       font-size: 27px;
@@ -97,11 +97,11 @@ export const fonts = (language: string): IFonts => {
       letter-spacing: 0.25px;`,
     h2Style: `font-family: ${regularFont};
       font-size: 36px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 54px;`,
     h1Style: `font-family: ${regularFont};
       font-size: 48px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 72px;`,
     heroStyle: `font-family: ${regularFont};
       font-size: 80px;
@@ -111,7 +111,7 @@ export const fonts = (language: string): IFonts => {
     buttonStyle: `font-family: ${semiBoldFont};
       font-size: 16px;
       line-height: 24px;
-      font-weight: normal;
+      font-weight: 600;
       letter-spacing: 1px;
       text-transform: capitalize;`,
     smallButtonStyle: `font-family: ${regularFont};

@@ -9,9 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages } from 'react-intl'
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-const messagesToDefine = {
+interface IPerformanceReportsMessages {
+  monthlyTabTitle: MessageDescriptor
+  monthlyReportsBodyHeader: MessageDescriptor
+  sysAdminPerformanceHomeHeader: MessageDescriptor
+  noResultForLocation: MessageDescriptor
+  exportAll: MessageDescriptor
+  operational: MessageDescriptor
+  reports: MessageDescriptor
+  applicationsStartedTitle: MessageDescriptor
+  applicationsStartedDescription: MessageDescriptor
+  applicationsStartedTotal: MessageDescriptor
+  applicationsStartedFieldAgents: MessageDescriptor
+  applicationsStartedHospitals: MessageDescriptor
+  applicationsStartedOffices: MessageDescriptor
+}
+
+const messagesToDefine: IPerformanceReportsMessages = {
   monthlyTabTitle: {
     id: 'performance.topbar.tab.title.monthly',
     defaultMessage: 'Monthly',
@@ -47,7 +63,40 @@ const messagesToDefine = {
     id: 'performance.reports.select.item.reports',
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
+  },
+  applicationsStartedTitle: {
+    id: 'performance.reports.applicationsStarted.title',
+    defaultMessage: 'Applications started',
+    description: 'Title for applications started in performance reports'
+  },
+  applicationsStartedDescription: {
+    id: 'performance.reports.applicationsStarted.description',
+    defaultMessage:
+      'Total and percentage breakdown of the applications started by source from ',
+    description: 'Description for applications started in performance reports'
+  },
+  applicationsStartedTotal: {
+    id: 'performance.reports.applicationsStarted.total',
+    defaultMessage: 'Total started',
+    description: 'Total applications started title'
+  },
+  applicationsStartedFieldAgents: {
+    id: 'performance.reports.applicationsStarted.fieldAgents',
+    defaultMessage: 'Field agents',
+    description: 'Field agent applications started title'
+  },
+  applicationsStartedOffices: {
+    id: 'performance.reports.applicationsStarted.offices',
+    defaultMessage: 'Registration offices',
+    description: 'Offices applications started title'
+  },
+  applicationsStartedHospitals: {
+    id: 'performance.reports.applicationsStarted.hospitals',
+    defaultMessage: 'Hospitals (DHIS2)',
+    description: 'Hospitals applications started title'
   }
 }
 
-export const messages = defineMessages(messagesToDefine)
+export const messages: IPerformanceReportsMessages = defineMessages(
+  messagesToDefine
+)

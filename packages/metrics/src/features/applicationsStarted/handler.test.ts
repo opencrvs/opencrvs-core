@@ -37,17 +37,17 @@ describe('verify applicationsStarted handler', () => {
     readPoints
       .mockResolvedValueOnce([
         {
-          role: 2
+          count: 2
         }
       ])
       .mockResolvedValueOnce([
         {
-          role: 4
+          count: 4
         }
       ])
       .mockResolvedValueOnce([
         {
-          role: 2
+          count: 2
         }
       ])
 
@@ -79,17 +79,17 @@ describe('verify applicationsStarted handler', () => {
     readPoints
       .mockResolvedValueOnce([
         {
-          role: 2
+          count: 2
         }
       ])
       .mockResolvedValueOnce([
         {
-          role: 4
+          count: 4
         }
       ])
       .mockResolvedValueOnce([
         {
-          role: 2
+          count: 2
         }
       ])
 

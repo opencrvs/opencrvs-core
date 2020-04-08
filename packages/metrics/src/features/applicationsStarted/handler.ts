@@ -16,11 +16,13 @@ import {
   TIME_TO,
   LOCATION_ID
 } from '@metrics/features/metrics/constants'
+import { logger } from '@metrics/logger'
 
 export async function applicationsStartedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  logger.info('metrics service applicationsStartedHandler')
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = 'Location/' + request.query[LOCATION_ID]
@@ -50,44 +52,44 @@ export async function fetchLocationWiseApplicationsStarted(
   const fieldAgent = await query(
     `SELECT COUNT(role)
         FROM applications_started
-      WHERE time >= ${timeFrom}
-        AND time <= ${timeTo}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
         AND ( locationLevel2 = '${locationId}'
             OR locationLevel3 = '${locationId}'
             OR locationLevel4 = '${locationId}'
             OR locationLevel5 = '${locationId}' )
-        AND role == 'FIELD_AGENT'`
+        AND role = 'FIELD_AGENT'`
   )
 
   const office = await query(
     `SELECT COUNT(role)
         FROM applications_started
-      WHERE time >= ${timeFrom}
-        AND time <= ${timeTo}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
         AND ( locationLevel2 = '${locationId}'
             OR locationLevel3 = '${locationId}'
             OR locationLevel4 = '${locationId}'
             OR locationLevel5 = '${locationId}' )
-        AND role == 'REGISTRAR' | role == 'REGISTRATION_AGENT'`
+        AND ( role = 'REGISTRAR' OR role = 'REGISTRATION_AGENT' )`
   )
 
   const hospital = await query(
     `SELECT COUNT(role)
         FROM applications_started
-      WHERE time >= ${timeFrom}
-        AND time <= ${timeTo}
+      WHERE time > '${timeFrom}'
+        AND time <= '${timeTo}'
         AND ( locationLevel2 = '${locationId}'
             OR locationLevel3 = '${locationId}'
             OR locationLevel4 = '${locationId}'
             OR locationLevel5 = '${locationId}' )
-        AND role == 'NOTIFICATION_API'`
+        AND role = 'NOTIFICATION_API'`
   )
 
   return {
     fieldAgentApplications:
-      (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].role) || 0,
+      (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].count) || 0,
     hospitalApplications:
-      (hospital && hospital.length > 0 && hospital[0].role) || 0,
-    officeApplications: (office && office.length > 0 && office[0].role) || 0
+      (hospital && hospital.length > 0 && hospital[0].count) || 0,
+    officeApplications: (office && office.length > 0 && office[0].count) || 0
   }
 }

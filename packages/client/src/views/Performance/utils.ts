@@ -26,3 +26,24 @@ export function getMonthDateRange(year: number, month: number) {
     end
   }
 }
+export const ReportHeader = styled.div`
+  margin: 24px 0px;
+`
+
+export const SubHeader = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+`
+
+export const Description = styled.div`
+  margin: 8px 0px;
+  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+export const Reports = styled.div`
+  display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+  }
+`

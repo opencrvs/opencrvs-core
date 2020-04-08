@@ -109,3 +109,16 @@ export const EVENT_ESTIMATION_METRICS = gql`
     }
   }
 `
+export const APPLICATIONS_STARTED_METRICS = gql`
+  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
+    getApplicationsStartedMetrics(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+    ) {
+      fieldAgentApplications
+      hospitalApplications
+      officeApplications
+    }
+  }
+`
