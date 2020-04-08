@@ -125,3 +125,26 @@ describe('get event estimation metrics', () => {
     expect(data.death45DayMetrics.estimatedPercentage).toBe(0)
   })
 })
+describe('get applications started metrics', () => {
+  it('returns applications started', async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        fieldAgentApplications: 2,
+        hospitalApplications: 2,
+        officeApplications: 4
+      })
+    )
+
+    const data = await resolvers.Query.getApplicationsStartedMetrics(
+      {},
+      {
+        timeStart: '2019-10-24T18:00:00.000Z',
+        timeEnd: '2019-12-24T18:00:00.000Z',
+        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9'
+      }
+    )
+
+    expect(data).toBeDefined()
+    expect(data.fieldAgentApplications).toBe(2)
+  })
+})
