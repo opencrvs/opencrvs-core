@@ -42,12 +42,7 @@ describe('verify applicationsStarted handler', () => {
       ])
       .mockResolvedValueOnce([
         {
-          role: 2
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          role: 2
+          role: 4
         }
       ])
       .mockResolvedValueOnce([
@@ -89,12 +84,7 @@ describe('verify applicationsStarted handler', () => {
       ])
       .mockResolvedValueOnce([
         {
-          role: 2
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          role: 2
+          role: 4
         }
       ])
       .mockResolvedValueOnce([

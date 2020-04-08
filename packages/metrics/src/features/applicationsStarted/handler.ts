@@ -59,7 +59,7 @@ export async function fetchLocationWiseApplicationsStarted(
         AND role == 'FIELD_AGENT'`
   )
 
-  const registrationAgent = await query(
+  const office = await query(
     `SELECT COUNT(role)
         FROM applications_started
       WHERE time >= ${timeFrom}
@@ -68,19 +68,7 @@ export async function fetchLocationWiseApplicationsStarted(
             OR locationLevel3 = '${locationId}'
             OR locationLevel4 = '${locationId}'
             OR locationLevel5 = '${locationId}' )
-        AND role == 'REGISTRATION_AGENT'`
-  )
-
-  const registrar = await query(
-    `SELECT COUNT(role)
-        FROM applications_started
-      WHERE time >= ${timeFrom}
-        AND time <= ${timeTo}
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND role == 'REGISTRAR'`
+        AND role == 'REGISTRAR' | role == 'REGISTRATION_AGENT'`
   )
 
   const hospital = await query(
@@ -95,19 +83,11 @@ export async function fetchLocationWiseApplicationsStarted(
         AND role == 'NOTIFICATION_API'`
   )
 
-  const registrarCount =
-    (registrar && registrar.length > 0 && registrar[0].role) || 0
-  const registrationAgentCount =
-    (registrationAgent &&
-      registrationAgent.length > 0 &&
-      registrationAgent[0].role) ||
-    0
-
   return {
     fieldAgentApplications:
       (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].role) || 0,
     hospitalApplications:
       (hospital && hospital.length > 0 && hospital[0].role) || 0,
-    officeApplications: registrarCount + registrationAgentCount
+    officeApplications: (office && office.length > 0 && office[0].role) || 0
   }
 }
