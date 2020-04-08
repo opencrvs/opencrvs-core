@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { dynamicConstantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/performance'
+import { IStoreState } from '@client/store'
 import {
   Description,
   SubHeader
 } from '@opencrvs/client/src/views/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { GQLEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -67,7 +70,10 @@ const Value = styled.span`
 type Props = WrappedComponentProps & BaseProps
 
 interface BaseProps {
-  data?: GQLEstimationMetrics
+  data?: GQLEventEstimationMetrics
+  loading?: boolean
+  reportTimeFrom: string
+  reportTimeTo: string
 }
 
 interface States {}
@@ -81,41 +87,79 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
       </Pair>
     )
   }
-  getReport() {
+  getReport(data: GQLEventEstimationMetrics) {
+    const { intl, reportTimeFrom, reportTimeTo } = this.props
+    const { birth45DayMetrics, death45DayMetrics } = data
     return (
       <>
         <ReportHeader>
-          <SubHeader>Registration rates</SubHeader>
+          <SubHeader>
+            {intl.formatMessage(messages.registrationRatesReportHeader)}
+          </SubHeader>
           <Description>
-            Rates are based on estimated totals calculated using the crude birth
-            and death rate for October 2019 - October 2020
+            {intl.formatMessage(messages.registrationRatesReportSubHeader, {
+              startTime: reportTimeFrom,
+              endTime: reportTimeTo
+            })}
           </Description>
         </ReportHeader>
 
         <Reports>
           <Report>
             <LinkButton>
-              Birth registration rate within 45 days of event
+              {intl.formatMessage(messages.birthRegistrationRatesReportHeader)}
             </LinkButton>
-            <KeyNumber>23.5%</KeyNumber>
+            <KeyNumber>{`${(birth45DayMetrics &&
+              birth45DayMetrics.estimatedPercentage) ||
+              0}%`}</KeyNumber>
             <KeyNumberDescription>
-              32,000 registered within 45 days out of estimated 136,000
+              {intl.formatMessage(messages.registrationRatesReportDescription, {
+                totalRegistrationNumber:
+                  (birth45DayMetrics && birth45DayMetrics.actualRegistration) ||
+                  0,
+                estimatedRegistrationNumber:
+                  (birth45DayMetrics &&
+                    birth45DayMetrics.estimatedRegistration) ||
+                  0
+              })}
             </KeyNumberDescription>
-            {this.getLabelValuePair('Male', '23.52%')}
-            {this.getLabelValuePair('Female', '22.49%')}
-            {this.getLabelValuePair('Third gender', '23.5%')}
+            {this.getLabelValuePair(
+              intl.formatMessage(dynamicConstantsMessages.male),
+              `${(birth45DayMetrics && birth45DayMetrics.malePercentage) || 0}%`
+            )}
+            {this.getLabelValuePair(
+              intl.formatMessage(dynamicConstantsMessages.female),
+              `${(birth45DayMetrics && birth45DayMetrics.femalePercentage) ||
+                0}%`
+            )}
           </Report>
           <Report>
             <LinkButton>
-              Death registration rate within 45 days of event
+              {intl.formatMessage(messages.deathRegistrationRatesReportHeader)}
             </LinkButton>
-            <KeyNumber>23.5%</KeyNumber>
+            <KeyNumber>{`${(death45DayMetrics &&
+              death45DayMetrics.estimatedPercentage) ||
+              0}%`}</KeyNumber>
             <KeyNumberDescription>
-              32,000 registered within 45 days out of estimated 136,000
+              {intl.formatMessage(messages.registrationRatesReportDescription, {
+                totalRegistrationNumber:
+                  (death45DayMetrics && death45DayMetrics.actualRegistration) ||
+                  0,
+                estimatedRegistrationNumber:
+                  (death45DayMetrics &&
+                    death45DayMetrics.estimatedRegistration) ||
+                  0
+              })}
             </KeyNumberDescription>
-            {this.getLabelValuePair('Male', '23.52%')}
-            {this.getLabelValuePair('Female', '22.49%')}
-            {this.getLabelValuePair('Third gender', '23.5%')}
+            {this.getLabelValuePair(
+              intl.formatMessage(dynamicConstantsMessages.male),
+              `${(death45DayMetrics && death45DayMetrics.malePercentage) || 0}%`
+            )}
+            {this.getLabelValuePair(
+              intl.formatMessage(dynamicConstantsMessages.female),
+              `${(death45DayMetrics && death45DayMetrics.femalePercentage) ||
+                0}%`
+            )}
           </Report>
         </Reports>
       </>
@@ -123,12 +167,11 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
   }
 
   render() {
-    const { data = {}, intl } = this.props
-    return <>{data && this.getReport()}</>
+    const { data } = this.props
+    return <>{data && this.getReport(data)}</>
   }
 }
 
-export const RegistrationRatesReport = connect(
-  null,
-  null
-)(injectIntl(RegistrationRatesReportComponent))
+export const RegistrationRatesReport = injectIntl(
+  RegistrationRatesReportComponent
+)
