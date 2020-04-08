@@ -44,7 +44,9 @@ export const gradients = {
   gradientSkyDark:
     'background: linear-gradient(180deg, #3C55A3 0%, #4C68C1 100%)',
   gradientSkyLight:
-    'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)'
+    'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)',
+  gradientBabyShade:
+    'background: linear-gradient(180deg, #477cd7 0%, #5c91eb 100%);'
 }
 
 export const shadows = {

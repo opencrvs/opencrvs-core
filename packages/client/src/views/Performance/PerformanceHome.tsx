@@ -76,16 +76,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   searchButtonHandler = () => {
-    const {
-      push,
-      location: { pathname: currentRoute }
-    } = this.props.history
-    push(currentRoute, this.state)
-
     this.state.selectedLocation &&
-      this.props.goToOperationalReport(
-        this.props.history.location.state.selectedLocation.id
-      )
+      this.props.goToOperationalReport(this.state.selectedLocation)
   }
 
   render() {

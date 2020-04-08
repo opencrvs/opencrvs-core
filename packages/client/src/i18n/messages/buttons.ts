@@ -48,6 +48,7 @@ interface IButtonsMessages {
   sendForApproval: MessageDescriptor
   settings: MessageDescriptor
   start: MessageDescriptor
+  status: MessageDescriptor
   update: MessageDescriptor
   upload: MessageDescriptor
   yes: MessageDescriptor
@@ -240,6 +241,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Start',
     description: 'Label of start button',
     id: 'buttons.start'
+  },
+  status: {
+    defaultMessage: 'Status',
+    description: 'Label of status button',
+    id: 'buttons.status'
   },
   update: {
     defaultMessage: 'Update',
