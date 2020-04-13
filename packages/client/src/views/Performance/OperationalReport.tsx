@@ -29,6 +29,8 @@ import { Query } from '@client/components/Query'
 import { EVENT_ESTIMATION_METRICS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { RegistrationRatesReport } from './reports/RegistrationRatesReport'
+import moment from 'moment'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -96,9 +98,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.props
 
     const { displayLabel: title, id: locationId } = selectedLocation
-    const timeEnd = new Date()
-    const timeStart = new Date(timeEnd.getTime())
-    timeStart.setFullYear(timeStart.getFullYear() - 1)
+
+    moment.defaultFormat = 'MMMM YYYY'
+    const timeEnd = moment()
+    const timeStart = moment().subtract(1, 'years')
 
     return (
       <PerformanceContentWrapper hideTopBar>
@@ -132,8 +135,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
         <Query
           query={EVENT_ESTIMATION_METRICS}
           variables={{
-            timeStart: timeStart.toISOString(),
-            timeEnd: timeEnd.toISOString(),
+            timeStart: timeStart.valueOf() * 1000000,
+            timeEnd: timeEnd.valueOf() * 1000000,
             locationId
           }}
         >
@@ -146,8 +149,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
             error?: ApolloError
             data?: IMetricsQueryResult
           }) => {
-            // Report components might be added here
-            return <div />
+            return (
+              <RegistrationRatesReport
+                loading={loading}
+                data={data && data.getEventEstimationMetrics}
+                reportTimeFrom={timeStart.format()}
+                reportTimeTo={timeEnd.format()}
+              />
+            )
           }}
         </Query>
       </PerformanceContentWrapper>
