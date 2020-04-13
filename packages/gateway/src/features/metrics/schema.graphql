@@ -62,18 +62,18 @@ type Registration45DayEstimatedMetrics {
 }
 
 type Estimate45DayTotalCount {
-  estimatedRegistration: Int!
+  estimatedRegistration: Float!
   registrationIn45Day: Int!
-  estimationPercentage: Int!
+  estimationPercentage: Float!
 }
 
 type Estimated45DayMetrics {
   locationId: String!
-  estimatedRegistration: Int!
+  estimatedRegistration: Float!
   registrationIn45Day: Int!
   estimationYear: Int!
   estimationLocationLevel: String!
-  estimationPercentage: Int!
+  estimationPercentage: Float!
 }
 
 type TimeFrameTotalCount {
@@ -124,10 +124,10 @@ type EventEstimationMetrics {
 
 type EstimationMetrics {
   actualRegistration: Int!
-  estimatedRegistration: Int!
-  estimatedPercentage: Int!
-  malePercentage: Int!
-  femalePercentage: Int!
+  estimatedRegistration: Float!
+  estimatedPercentage: Float!
+  malePercentage: Float!
+  femalePercentage: Float!
 }
 
 type ApplicationsStartedMetrics {

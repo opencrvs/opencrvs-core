@@ -40,17 +40,32 @@ class Estimated45DayRegistrationReportComponent extends React.Component<
   getContent = () => {
     return (
       (this.props.data.details &&
-        this.props.data.details.map(registrationIn45Day => ({
-          location: getLocationFromPartOfLocationId(
+        this.props.data.details.map(registrationIn45Day => {
+          const location = getLocationFromPartOfLocationId(
             registrationIn45Day.locationId,
             this.props.offlineResources
-          ).name,
-          estimation: String(registrationIn45Day.estimatedRegistration),
-          estimationYear: String(registrationIn45Day.estimationYear),
-          estimationLevel: registrationIn45Day.estimationLocationLevel.toLowerCase(),
-          registrationIn45Day: String(registrationIn45Day.registrationIn45Day),
-          percentage: `${registrationIn45Day.estimationPercentage}%`
-        }))) ||
+          ).name
+          return !registrationIn45Day.estimatedRegistration ||
+            registrationIn45Day.estimatedRegistration <= 0
+            ? {
+                location,
+                estimation: 'No data',
+                estimationYear: String(registrationIn45Day.estimationYear),
+                estimationLevel: registrationIn45Day.estimationLocationLevel.toLowerCase(),
+                registrationIn45Day: 'No data',
+                percentage: 'No data'
+              }
+            : {
+                location,
+                estimation: String(registrationIn45Day.estimatedRegistration),
+                estimationYear: String(registrationIn45Day.estimationYear),
+                estimationLevel: registrationIn45Day.estimationLocationLevel.toLowerCase(),
+                registrationIn45Day: String(
+                  registrationIn45Day.registrationIn45Day
+                ),
+                percentage: `${registrationIn45Day.estimationPercentage}%`
+              }
+        })) ||
       []
     )
   }
