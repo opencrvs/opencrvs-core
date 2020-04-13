@@ -33,7 +33,11 @@ import { RouteComponentProps } from 'react-router'
 import { GET_USER } from '@client/sysadmin/user/queries'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import { storeUserFormData, clearUserFormData } from '@client/user/userReducer'
+import {
+  storeUserFormData,
+  clearUserFormData,
+  fetchAndStoreUserData
+} from '@client/user/userReducer'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 interface IMatchParams {
@@ -58,6 +62,7 @@ interface IDispatchProps {
   goBack: typeof goBack
   storeUserFormData: typeof storeUserFormData
   clearUserFormData: typeof clearUserFormData
+  fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -74,31 +79,14 @@ const Container = styled.div`
 
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   async componentDidMount() {
-    const { userId } = this.props
+    const { userId, client } = this.props
     if (userId) {
-      this.fetchAndStoreUserDetails(userId)
+      this.props.fetchAndStoreUserData(client, GET_USER, { userId })
     }
   }
 
   componentWillUnmount() {
     this.props.clearUserFormData()
-  }
-
-  fetchAndStoreUserDetails = async (userId: string) => {
-    try {
-      const data: ApolloQueryResult<GQLQuery> = await this.props.client.query({
-        query: GET_USER,
-        variables: { userId }
-      })
-      const formData = gqlToDraftTransformer(
-        { sections: [{ ...this.props.section, id: UserSection.User }] },
-        { [UserSection.User]: data.data.getUser }
-      )
-
-      this.props.storeUserFormData(formData.user)
-    } catch (error) {
-      console.log(error)
-    }
   }
 
   renderLoadingPage = () => {
@@ -215,5 +203,5 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(
   mapStateToProps,
-  { goBack, storeUserFormData, clearUserFormData }
+  { goBack, storeUserFormData, clearUserFormData, fetchAndStoreUserData }
 )(injectIntl(withApollo(CreateNewUserComponent)))
