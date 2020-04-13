@@ -11,7 +11,6 @@
  */
 import { dynamicConstantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { IStoreState } from '@client/store'
 import {
   Description,
   SubHeader
@@ -20,26 +19,38 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
 import styled from 'styled-components'
 
 const ReportHeader = styled.div`
   margin: 24px 0px;
 `
 
-const Reports = styled.div`
-  display: flex;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column;
-  }
-`
 const Report = styled.div`
   width: 50%;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
     margin-bottom: 24px;
+  }
+`
+const Reports = styled.div<{ loading?: boolean }>`
+  display: flex;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    flex-direction: column;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ loading }) => {
+      return loading
+        ? `${Report}:nth-child(2) {
+          display: none;
+        }`
+        : `{
+          width: 100%;
+          margin-bottom: 24px;
+        }`
+    }}
   }
 `
 
@@ -67,13 +78,22 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
+const LoaderBox = styled.span<{
+  width?: number
+}>`
+  background: ${({ theme }) => theme.colors.background};
+  display: inline-block;
+  height: 24px;
+  width: ${({ width }) => (width ? `${width}%` : '100%')};
+`
+
 type Props = WrappedComponentProps & BaseProps
 
 interface BaseProps {
   data?: GQLEventEstimationMetrics
   loading?: boolean
-  reportTimeFrom: string
-  reportTimeTo: string
+  reportTimeFrom?: string
+  reportTimeTo?: string
 }
 
 interface States {}
@@ -87,6 +107,48 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
       </Pair>
     )
   }
+
+  getLoader() {
+    const { intl } = this.props
+    return (
+      <>
+        <ReportHeader>
+          <SubHeader>
+            {intl.formatMessage(messages.registrationRatesReportHeader)}
+          </SubHeader>
+          <LoaderBox width={60} />
+        </ReportHeader>
+
+        <Reports loading>
+          <Report>
+            <LoaderBox width={40} />
+            <KeyNumber>
+              <LoaderBox width={10} />
+            </KeyNumber>
+            <KeyNumberDescription>
+              <LoaderBox width={50} />
+            </KeyNumberDescription>
+            <LoaderBox width={20} />
+            <br />
+            <LoaderBox width={20} />
+          </Report>
+          <Report>
+            <LoaderBox width={40} />
+            <KeyNumber>
+              <LoaderBox width={10} />
+            </KeyNumber>
+            <KeyNumberDescription>
+              <LoaderBox width={50} />
+            </KeyNumberDescription>
+            <LoaderBox width={20} />
+            <br />
+            <LoaderBox width={20} />
+          </Report>
+        </Reports>
+      </>
+    )
+  }
+
   getReport(data: GQLEventEstimationMetrics) {
     const { intl, reportTimeFrom, reportTimeTo } = this.props
     const { birth45DayMetrics, death45DayMetrics } = data
@@ -109,9 +171,11 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             <LinkButton>
               {intl.formatMessage(messages.birthRegistrationRatesReportHeader)}
             </LinkButton>
-            <KeyNumber>{`${(birth45DayMetrics &&
-              birth45DayMetrics.estimatedPercentage) ||
-              0}%`}</KeyNumber>
+            <KeyNumber>
+              {`${(birth45DayMetrics &&
+                birth45DayMetrics.estimatedPercentage) ||
+                0}%`}
+            </KeyNumber>
             <KeyNumberDescription>
               {intl.formatMessage(messages.registrationRatesReportDescription, {
                 totalRegistrationNumber:
@@ -137,9 +201,11 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             <LinkButton>
               {intl.formatMessage(messages.deathRegistrationRatesReportHeader)}
             </LinkButton>
-            <KeyNumber>{`${(death45DayMetrics &&
-              death45DayMetrics.estimatedPercentage) ||
-              0}%`}</KeyNumber>
+            <KeyNumber>
+              {`${(death45DayMetrics &&
+                death45DayMetrics.estimatedPercentage) ||
+                0}%`}
+            </KeyNumber>
             <KeyNumberDescription>
               {intl.formatMessage(messages.registrationRatesReportDescription, {
                 totalRegistrationNumber:
@@ -167,8 +233,13 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
   }
 
   render() {
-    const { data } = this.props
-    return <>{data && this.getReport(data)}</>
+    const { data, loading } = this.props
+    return (
+      <>
+        {loading && this.getLoader()}
+        {data && this.getReport(data)}
+      </>
+    )
   }
 }
 
