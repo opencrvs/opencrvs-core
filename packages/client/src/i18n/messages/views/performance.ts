@@ -47,6 +47,33 @@ const messagesToDefine = {
     id: 'performance.reports.select.item.reports',
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
+  },
+  registrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.header',
+    defaultMessage: 'Registration rates',
+    description: 'Header for registration rates report'
+  },
+  registrationRatesReportSubHeader: {
+    id: 'performance.report.registration.rates.subheader',
+    defaultMessage:
+      'Rates are based on estimated totals calculated using the crude birth and death rate for {startTime} - {endTime}',
+    description: 'Sub header for registration rates report'
+  },
+  registrationRatesReportDescription: {
+    id: 'performance.report.registration.rates.description',
+    defaultMessage:
+      '{totalRegistrationNumber} registered withing 45 days out of estimated {estimatedRegistrationNumber}',
+    description: 'Event registration rate report description'
+  },
+  birthRegistrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.birth.header',
+    defaultMessage: 'Birth registration rate withing 45 days of event',
+    description: 'Header for birth registration rates report'
+  },
+  deathRegistrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.death.header',
+    defaultMessage: 'Death registration rate withing 45 days of event',
+    description: 'Header for death registration rates report'
   }
 }
 
