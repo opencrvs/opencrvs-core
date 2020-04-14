@@ -26,22 +26,15 @@ import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { goToPerformanceHome } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
-import {
-  APPLICATIONS_STARTED_METRICS,
-  EVENT_ESTIMATION_METRICS
-} from './metricsQuery'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import {
-  GQLApplicationsStartedMetrics,
-  GQLEventEstimationMetrics
+  GQLEventEstimationMetrics,
+  GQLApplicationsStartedMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
-import {
-  Reports,
-  ReportHeader,
-  SubHeader,
-  Description
-} from '@opencrvs/client/src/views/Performance/utils'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -92,46 +85,6 @@ const ActionContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
-const Report = styled.div<{
-  total?: boolean
-}>`
-  ${({ total, theme }) =>
-    total ? `background: ${theme.colors.background}; border-radius: 2px;` : ''}
-  width: 25%;
-  height: 109px;
-  padding: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 100%;
-    margin-bottom: 24px;
-  }
-`
-
-const KeyNumber = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
-  position: relative;
-  width: 100%;
-  height: 100%;
-`
-
-const KeyPercentage = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  margin: 16px 0px;
-  position: absolute;
-  top: 6px;
-  left: 28px;
-`
-
-const PerformanceLink = styled(LinkButton)`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-`
-
-const ReportTitle = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-`
-
 class OperationalReportComponent extends React.Component<Props, State> {
   onChangeLocation = () => {
     this.props.goToPerformanceHome({
@@ -165,10 +118,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.props
 
     const { displayLabel: title, id: locationId } = selectedLocation
-    const timeEnd = new Date()
-    const timeStart = new Date(timeEnd.getTime())
-    timeStart.setFullYear(timeStart.getFullYear() - 1)
     moment.locale(this.props.intl.locale)
+    moment.defaultFormat = 'MMMM YYYY'
+    const timeEnd = moment()
+    const timeStart = moment().subtract(1, 'years')
 
     return (
       <PerformanceContentWrapper hideTopBar>
@@ -200,7 +153,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </TertiaryButton>
         </ActionContainer>
         <Query
-          query={EVENT_ESTIMATION_METRICS}
+          query={OPERATIONAL_REPORTS_METRICS}
           variables={{
             timeStart: timeStart.toISOString(),
             timeEnd: timeEnd.toISOString(),
@@ -216,152 +169,23 @@ class OperationalReportComponent extends React.Component<Props, State> {
             error?: ApolloError
             data?: IMetricsQueryResult
           }) => {
-            // Report components might be added here
-            return <div />
-          }}
-        </Query>
-        <Query
-          query={APPLICATIONS_STARTED_METRICS}
-          variables={{
-            timeStart: timeStart.toISOString(),
-            timeEnd: timeEnd.toISOString(),
-            locationId
-          }}
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: boolean
-            error?: ApolloError
-            data?: IMetricsQueryResult
-          }) => {
-            if (error) {
-              return <div>{JSON.stringify(error.networkError)}</div>
-            } else {
-              return (
-                <>
-                  <ReportHeader>
-                    <SubHeader>
-                      {intl.formatMessage(messages.applicationsStartedTitle)}
-                    </SubHeader>
-                    <Description>
-                      {intl.formatMessage(
-                        messages.applicationsStartedDescription
-                      )}
-                      {moment(timeStart).format('MMMM YYYY')} -{' '}
-                      {moment(timeEnd).format('MMMM YYYY')}
-                    </Description>
-                  </ReportHeader>
-                  <Reports>
-                    <Report total={true}>
-                      <ReportTitle>
-                        {intl.formatMessage(messages.applicationsStartedTotal)}
-                      </ReportTitle>
-                      <KeyNumber>
-                        {(data &&
-                          (data.getApplicationsStartedMetrics &&
-                            intl.formatNumber(
-                              this.getTotal(data.getApplicationsStartedMetrics)
-                            ))) ||
-                          0}
-                      </KeyNumber>
-                    </Report>
-                    <Report>
-                      <PerformanceLink>
-                        {intl.formatMessage(
-                          messages.applicationsStartedFieldAgents
-                        )}
-                      </PerformanceLink>
-                      <KeyNumber>
-                        {intl.formatNumber(
-                          (data &&
-                            (data.getApplicationsStartedMetrics &&
-                              data.getApplicationsStartedMetrics
-                                .fieldAgentApplications)) ||
-                            0
-                        )}
+            return (
+              <>
+                <RegistrationRatesReport
+                  loading={loading}
+                  data={data && data.getEventEstimationMetrics}
+                  reportTimeFrom={timeStart.format()}
+                  reportTimeTo={timeEnd.format()}
+                />
 
-                        <KeyPercentage>
-                          (
-                          {data &&
-                            (data.getApplicationsStartedMetrics &&
-                              intl.formatNumber(
-                                this.getPercentage(
-                                  data.getApplicationsStartedMetrics,
-                                  data.getApplicationsStartedMetrics
-                                    .fieldAgentApplications
-                                )
-                              ))}
-                          %)
-                        </KeyPercentage>
-                      </KeyNumber>
-                    </Report>
-                    <Report>
-                      <ReportTitle>
-                        {intl.formatMessage(
-                          messages.applicationsStartedHospitals
-                        )}
-                      </ReportTitle>
-                      <KeyNumber>
-                        {intl.formatNumber(
-                          (data &&
-                            (data.getApplicationsStartedMetrics &&
-                              data.getApplicationsStartedMetrics
-                                .hospitalApplications)) ||
-                            0
-                        )}
-
-                        <KeyPercentage>
-                          (
-                          {data &&
-                            (data.getApplicationsStartedMetrics &&
-                              intl.formatNumber(
-                                this.getPercentage(
-                                  data.getApplicationsStartedMetrics,
-                                  data.getApplicationsStartedMetrics
-                                    .hospitalApplications
-                                )
-                              ))}
-                          %)
-                        </KeyPercentage>
-                      </KeyNumber>
-                    </Report>
-                    <Report>
-                      <ReportTitle>
-                        {intl.formatMessage(
-                          messages.applicationsStartedOffices
-                        )}
-                      </ReportTitle>
-                      <KeyNumber>
-                        {intl.formatNumber(
-                          (data &&
-                            (data.getApplicationsStartedMetrics &&
-                              data.getApplicationsStartedMetrics
-                                .officeApplications)) ||
-                            0
-                        )}
-
-                        <KeyPercentage>
-                          (
-                          {data &&
-                            (data.getApplicationsStartedMetrics &&
-                              intl.formatNumber(
-                                this.getPercentage(
-                                  data.getApplicationsStartedMetrics,
-                                  data.getApplicationsStartedMetrics
-                                    .officeApplications
-                                )
-                              ))}
-                          %)
-                        </KeyPercentage>
-                      </KeyNumber>
-                    </Report>
-                  </Reports>
-                </>
-              )
-            }
+                <ApplicationsStartedReport
+                  loading={loading}
+                  data={data && data.getApplicationsStartedMetrics}
+                  reportTimeFrom={timeStart.format()}
+                  reportTimeTo={timeEnd.format()}
+                />
+              </>
+            )
           }}
         </Query>
       </PerformanceContentWrapper>

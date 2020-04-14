@@ -182,7 +182,10 @@ export const rollbackUpdateUser = async (
   await postFhir(token, practitionerRole)
 }
 
-export async function generateUsername(names: IUserName[]) {
+export async function generateUsername(
+  names: IUserName[],
+  existingUserName?: string
+) {
   const { given = [], family = '' } =
     names.find(name => name.use === 'en') || {}
   const initials = given.reduce(
@@ -197,6 +200,10 @@ export async function generateUsername(names: IUserName[]) {
   if (proposedUsername.length < 3) {
     proposedUsername =
       proposedUsername + '0'.repeat(3 - proposedUsername.length)
+  }
+
+  if (existingUserName && existingUserName === proposedUsername) {
+    return proposedUsername
   }
 
   try {

@@ -63,7 +63,7 @@ export const fonts = (language: string): IFonts => {
       line-height: 27px;`,
     bigBodyStyle: `font-family: ${regularFont};
       font-size: 18px;
-      font-weight: 600;
+      font-weight: normal;
       line-height: 27px;`,
     bodyStyle: `font-family: ${regularFont};
       font-size: 16px;

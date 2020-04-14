@@ -96,7 +96,10 @@ export default async function updateUser(
   // Updating user in user-mgnt db
   let userNameChanged: boolean = false
   try {
-    const newUserName = await generateUsername(existingUser.name)
+    const newUserName = await generateUsername(
+      existingUser.name,
+      existingUser.username
+    )
     if (newUserName !== existingUser.username) {
       existingUser.username = newUserName
       userNameChanged = true

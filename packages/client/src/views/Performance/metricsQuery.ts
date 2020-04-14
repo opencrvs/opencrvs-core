@@ -106,7 +106,8 @@ export const OPERATIONAL_REPORTS_METRICS = gql`
         malePercentage
         femalePercentage
       }
-    },
+    }
+
     getApplicationsStartedMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
@@ -116,6 +117,5 @@ export const OPERATIONAL_REPORTS_METRICS = gql`
       hospitalApplications
       officeApplications
     }
-  }
   }
 `

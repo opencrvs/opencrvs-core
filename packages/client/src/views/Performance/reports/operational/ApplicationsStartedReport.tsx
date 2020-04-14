@@ -130,7 +130,7 @@ class ApplicationsStartedReportComponent extends React.Component<
           <LoaderBox width={60} />
         </ReportHeader>
 
-        <Reports id="reports-loader" loading>
+        <Reports id="applications-started-reports-loader" loading>
           <Report total={true}>
             <ReportTitle>
               <LoaderBox width={40} />
@@ -186,12 +186,14 @@ class ApplicationsStartedReportComponent extends React.Component<
             {reportTimeFrom} - {reportTimeTo}
           </Description>
         </ReportHeader>
-        <Reports>
+        <Reports id="applications-started-reports">
           <Report total={true}>
             <ReportTitle>
               {intl.formatMessage(messages.applicationsStartedTotal)}
             </ReportTitle>
-            <KeyNumber>{intl.formatNumber(this.getTotal(data))}</KeyNumber>
+            <KeyNumber id="total-applications">
+              {intl.formatNumber(this.getTotal(data))}
+            </KeyNumber>
           </Report>
           <Report>
             <PerformanceLink>
@@ -200,7 +202,7 @@ class ApplicationsStartedReportComponent extends React.Component<
             <KeyNumber>
               {intl.formatNumber(fieldAgentApplications)}
 
-              <KeyPercentage>
+              <KeyPercentage id="field-agent-percentage">
                 (
                 {intl.formatNumber(
                   this.getPercentage(data, fieldAgentApplications)

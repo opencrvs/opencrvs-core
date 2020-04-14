@@ -25,6 +25,11 @@ interface IPerformanceReportsMessages {
   applicationsStartedFieldAgents: MessageDescriptor
   applicationsStartedHospitals: MessageDescriptor
   applicationsStartedOffices: MessageDescriptor
+  registrationRatesReportHeader: MessageDescriptor
+  registrationRatesReportSubHeader: MessageDescriptor
+  registrationRatesReportDescription: MessageDescriptor
+  birthRegistrationRatesReportHeader: MessageDescriptor
+  deathRegistrationRatesReportHeader: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -94,6 +99,33 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.reports.applicationsStarted.hospitals',
     defaultMessage: 'Hospitals (DHIS2)',
     description: 'Hospitals applications started title'
+  },
+  registrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.header',
+    defaultMessage: 'Registration rates',
+    description: 'Header for registration rates report'
+  },
+  registrationRatesReportSubHeader: {
+    id: 'performance.report.registration.rates.subheader',
+    defaultMessage:
+      'Rates are based on estimated totals calculated using the crude birth and death rate for {startTime} - {endTime}',
+    description: 'Sub header for registration rates report'
+  },
+  registrationRatesReportDescription: {
+    id: 'performance.report.registration.rates.description',
+    defaultMessage:
+      '{totalRegistrationNumber} registered withing 45 days out of estimated {estimatedRegistrationNumber}',
+    description: 'Event registration rate report description'
+  },
+  birthRegistrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.birth.header',
+    defaultMessage: 'Birth registration rate withing 45 days of event',
+    description: 'Header for birth registration rates report'
+  },
+  deathRegistrationRatesReportHeader: {
+    id: 'performance.report.registration.rates.death.header',
+    defaultMessage: 'Death registration rate withing 45 days of event',
+    description: 'Header for death registration rates report'
   }
 }
 
