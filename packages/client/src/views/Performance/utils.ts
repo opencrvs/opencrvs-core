@@ -40,10 +40,3 @@ export const Description = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
-
-export const Reports = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column;
-  }
-`

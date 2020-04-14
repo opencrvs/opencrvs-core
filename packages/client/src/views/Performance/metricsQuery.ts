@@ -85,7 +85,7 @@ export const PERFORMANCE_METRICS = gql`
     }
   }
 `
-export const EVENT_ESTIMATION_METRICS = gql`
+export const OPERATIONAL_REPORTS_METRICS = gql`
   query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
     getEventEstimationMetrics(
       timeStart: $timeStart
@@ -106,11 +106,7 @@ export const EVENT_ESTIMATION_METRICS = gql`
         malePercentage
         femalePercentage
       }
-    }
-  }
-`
-export const APPLICATIONS_STARTED_METRICS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
+    },
     getApplicationsStartedMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
@@ -120,5 +116,6 @@ export const APPLICATIONS_STARTED_METRICS = gql`
       hospitalApplications
       officeApplications
     }
+  }
   }
 `
