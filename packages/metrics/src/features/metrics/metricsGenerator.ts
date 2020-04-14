@@ -687,8 +687,8 @@ export async function fetchLocationWiseEventEstimations(
   const registrationsIn45DaysPoints: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
       FROM ${measurement}
-    WHERE time >= ${timeFrom}
-      AND time <= ${timeTo}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
       AND ( locationLevel2 = '${locationId}'
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
