@@ -42,7 +42,8 @@ import {
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
-  VERIFY_COLLECTOR
+  VERIFY_COLLECTOR,
+  EVENT_REGISTRATION_RATES
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
@@ -347,6 +348,17 @@ export function goToSettings() {
 
 export function goToCreateNewUser() {
   return push(CREATE_USER)
+}
+
+export function goToRegistrationRates(
+  eventType: Event,
+  selectedLocation: ISearchLocation,
+  title: string
+) {
+  return push(formatUrl(EVENT_REGISTRATION_RATES, { eventType }), {
+    selectedLocation,
+    title
+  })
 }
 
 export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
