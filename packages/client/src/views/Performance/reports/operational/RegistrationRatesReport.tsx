@@ -182,6 +182,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
         <Reports id="registration-rates-reports">
           <Report>
             <LinkButton
+              id="birth-registration-detalis-link"
               onClick={() =>
                 onClickEventDetails(Event.BIRTH, birthReportHeader)
               }
@@ -216,6 +217,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
           </Report>
           <Report>
             <LinkButton
+              id="death-registration-detalis-link"
               onClick={() =>
                 onClickEventDetails(Event.DEATH, deathReportHeader)
               }

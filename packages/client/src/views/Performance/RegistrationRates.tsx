@@ -85,7 +85,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
       </NavigationActionContainer>
-      <Header>{title}</Header>
+      <Header id="reg-rates-header">{title}</Header>
 
       <Query
         query={GET_CHILD_LOCATIONS_BY_PARENT_ID}
@@ -99,7 +99,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             const {
               childLocations,
               jurisdictionType
-            } = transformChildLocations(data)
+            } = transformChildLocations(data.locationsByParent)
 
             if (childLocations.length > 0) {
               options.push({
@@ -114,6 +114,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           return (
             <ActionContainer>
               <PerformanceSelect
+                id="base-select"
                 value={base}
                 options={options}
                 onChange={val => setBase(val as REG_RATE_BASE)}

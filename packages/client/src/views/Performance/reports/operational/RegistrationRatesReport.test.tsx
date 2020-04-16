@@ -14,13 +14,19 @@ import { RegistrationRatesReport } from './RegistrationRatesReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
 
 describe('Registration rates report', () => {
   const { store } = createStore()
+  const onDetailsClickMock: jest.Mock = jest.fn()
 
   it('renders loading indicator', async () => {
     const { component } = await createTestComponent(
-      <RegistrationRatesReport loading={true} />,
+      <RegistrationRatesReport
+        loading={true}
+        onClickEventDetails={onDetailsClickMock}
+      />,
       store
     )
 
@@ -32,33 +38,62 @@ describe('Registration rates report', () => {
     ).toHaveLength(0)
   })
 
-  it('renders reports', async () => {
-    const data: GQLEventEstimationMetrics = {
-      birth45DayMetrics: {
-        actualRegistration: 0,
-        estimatedPercentage: 0,
-        estimatedRegistration: 0,
-        malePercentage: 0,
-        femalePercentage: 0
-      },
-      death45DayMetrics: {
-        actualRegistration: 0,
-        estimatedPercentage: 0,
-        estimatedRegistration: 0,
-        malePercentage: 0,
-        femalePercentage: 0
+  describe('when it has data in props', () => {
+    let component: ReactWrapper<{}, {}>
+    beforeEach(async () => {
+      const data: GQLEventEstimationMetrics = {
+        birth45DayMetrics: {
+          actualRegistration: 0,
+          estimatedPercentage: 0,
+          estimatedRegistration: 0,
+          malePercentage: 0,
+          femalePercentage: 0
+        },
+        death45DayMetrics: {
+          actualRegistration: 0,
+          estimatedPercentage: 0,
+          estimatedRegistration: 0,
+          malePercentage: 0,
+          femalePercentage: 0
+        }
       }
-    }
-    const { component } = await createTestComponent(
-      <RegistrationRatesReport data={data} />,
-      store
-    )
+      component = (await createTestComponent(
+        <RegistrationRatesReport
+          data={data}
+          onClickEventDetails={onDetailsClickMock}
+        />,
+        store
+      )).component
+    })
+    it('renders reports', async () => {
+      expect(
+        component.find('#registration-rates-reports-loader').hostNodes()
+      ).toHaveLength(0)
+      expect(
+        component.find('#registration-rates-reports').hostNodes()
+      ).toHaveLength(1)
+    })
 
-    expect(
-      component.find('#registration-rates-reports-loader').hostNodes()
-    ).toHaveLength(0)
-    expect(
-      component.find('#registration-rates-reports').hostNodes()
-    ).toHaveLength(1)
+    it('clicking on the link buttons triggers onDetailsClick', async () => {
+      const birthEventLink = await waitForElement(
+        component,
+        '#birth-registration-detalis-link'
+      )
+
+      birthEventLink.hostNodes().simulate('click')
+      expect(onDetailsClickMock).toBeCalledWith(
+        'birth',
+        'Birth registration rate within 45 days of event'
+      )
+      const deathEventLink = await waitForElement(
+        component,
+        '#death-registration-detalis-link'
+      )
+      deathEventLink.hostNodes().simulate('click')
+      expect(onDetailsClickMock).toBeCalledWith(
+        'death',
+        'Death registration rate within 45 days of event'
+      )
+    })
   })
 })

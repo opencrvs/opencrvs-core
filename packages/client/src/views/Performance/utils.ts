@@ -52,12 +52,13 @@ interface IChildLocations {
   jurisdictionType?: string
 }
 
-type QueryResponse = ApolloQueryResult<GQLQuery>['data']
-export function transformChildLocations(data: QueryResponse): IChildLocations {
+type QueryResponse = Array<GQLLocation | null>
+export function transformChildLocations(
+  locations: QueryResponse
+): IChildLocations {
   const childLocations: GQLLocation[] =
-    (data &&
-      data.locationsByParent &&
-      (data.locationsByParent.filter(
+    (locations &&
+      (locations.filter(
         (location: GQLLocation | null) =>
           location && location.type === 'ADMIN_STRUCTURE'
       ) as GQLLocation[])) ||
