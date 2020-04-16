@@ -11,6 +11,12 @@
  */
 import styled from '@client/styledComponents'
 import moment from 'moment'
+import { ApolloQueryResult } from 'apollo-client'
+import {
+  GQLLocation,
+  GQLQuery,
+  GQLIdentifier
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.menuBackground};
@@ -40,3 +46,40 @@ export const Description = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
+
+interface IChildLocations {
+  childLocations: GQLLocation[]
+  jurisdictionType?: string
+}
+
+type QueryResponse = ApolloQueryResult<GQLQuery>['data']
+export function transformChildLocations(data: QueryResponse): IChildLocations {
+  const childLocations: GQLLocation[] =
+    (data &&
+      data.locationsByParent &&
+      (data.locationsByParent.filter(
+        (location: GQLLocation | null) =>
+          location && location.type === 'ADMIN_STRUCTURE'
+      ) as GQLLocation[])) ||
+    []
+
+  if (childLocations.length > 0) {
+    const jurisdictionTypeIdentifier =
+      childLocations[0].identifier &&
+      (childLocations[0].identifier as GQLIdentifier[]).find(
+        ({ system }: GQLIdentifier) =>
+          system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+      )
+
+    if (jurisdictionTypeIdentifier) {
+      return {
+        childLocations,
+        jurisdictionType: jurisdictionTypeIdentifier.value
+      }
+    }
+  }
+
+  return {
+    childLocations
+  }
+}
