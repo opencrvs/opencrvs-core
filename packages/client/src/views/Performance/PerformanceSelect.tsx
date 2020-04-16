@@ -20,6 +20,7 @@ interface IOperationalSelectProps {
   id?: string
   value: string
   options: ISelectOption[]
+  onChange?: (val: string) => void
 }
 
 const StyledSelect = styled(Select)`
@@ -33,6 +34,7 @@ const StyledSelect = styled(Select)`
     background-color: ${({ theme }) => theme.colors.secondary} !important;
     justify-content: center;
     ${({ theme }) => theme.fonts.buttonStyle};
+    text-transform: none;
 
     &:hover {
       ${({ theme }) => theme.gradients.gradientBabyShade}
@@ -79,6 +81,12 @@ function getSelectedOption(
 }
 
 export function PerformanceSelect(props: IOperationalSelectProps) {
+  function handleChange(item: ISelectOption) {
+    if (props.onChange) {
+      props.onChange(item.value)
+    }
+  }
+
   return (
     <StyledSelect
       id={props.id}
@@ -87,6 +95,7 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
       classNamePrefix="react-select"
       components={{ DropdownIndicator }}
       options={props.options}
+      onChange={handleChange}
     />
   )
 }
