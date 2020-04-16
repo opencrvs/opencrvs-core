@@ -23,7 +23,7 @@ import {
 import { Activity } from '@opencrvs/components/lib/icons'
 import { buttonMessages } from '@client/i18n/messages'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import { goToPerformanceHome } from '@client/navigation'
+import { goToPerformanceHome, goToRegistrationRates } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
@@ -35,9 +35,11 @@ import {
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
+import { Event } from '@client/forms'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
+  goToRegistrationRates: typeof goToRegistrationRates
 }
 
 interface IMetricsQueryResult {
@@ -105,6 +107,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
     value: number
   ): number {
     return Math.round((value / this.getTotal(totalMetrics)) * 100)
+  }
+
+  onClickRegistrationRatesDetails = (event: Event, title: string) => {
+    const { selectedLocation } = this.props.history.location.state
+    this.props.goToRegistrationRates(event, selectedLocation, title)
   }
 
   render() {
@@ -176,6 +183,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   data={data && data.getEventEstimationMetrics}
                   reportTimeFrom={timeStart.format()}
                   reportTimeTo={timeEnd.format()}
+                  onClickEventDetails={this.onClickRegistrationRatesDetails}
                 />
 
                 <ApplicationsStartedReport
@@ -195,5 +203,5 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
 export const OperationalReport = connect(
   null,
-  { goToPerformanceHome }
+  { goToPerformanceHome, goToRegistrationRates }
 )(injectIntl(OperationalReportComponent))
