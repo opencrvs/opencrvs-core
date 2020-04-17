@@ -12,7 +12,12 @@
 
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import { History } from 'history'
+import {
+  createTestComponent,
+  createTestStore,
+  flushPromises
+} from '@client/tests/util'
 import { AppStore } from '@client/store'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
@@ -86,9 +91,12 @@ const graphqlMocks = [
 describe('Registraion Rates tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let history: History<any>
 
   beforeAll(async () => {
-    store = (await createTestStore()).store
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
   })
 
   beforeEach(async () => {
@@ -143,5 +151,15 @@ describe('Registraion Rates tests', () => {
         .childAt(1)
         .text()
     ).toBe('By location')
+  })
+
+  it('clicking on back takes back to operational dashboard with selected location', async () => {
+    const backAction = await waitForElement(component, '#reg-rates-action-back')
+    backAction.hostNodes().simulate('click')
+    await flushPromises()
+    expect(history.location.pathname).toBe('/performance/operations')
+    expect(history.location.state).toEqual({
+      selectedLocation: LOCATION_DHAKA_DIVISION
+    })
   })
 })

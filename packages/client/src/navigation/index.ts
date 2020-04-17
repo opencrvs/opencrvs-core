@@ -353,11 +353,15 @@ export function goToCreateNewUser() {
 export function goToRegistrationRates(
   eventType: Event,
   selectedLocation: ISearchLocation,
-  title: string
+  title: string,
+  timeStart: Date,
+  timeEnd: Date
 ) {
   return push(formatUrl(EVENT_REGISTRATION_RATES, { eventType }), {
     selectedLocation,
-    title
+    title,
+    timeStart,
+    timeEnd
   })
 }
 
