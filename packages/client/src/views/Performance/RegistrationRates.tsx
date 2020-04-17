@@ -26,7 +26,6 @@ import { GET_CHILD_LOCATIONS_BY_PARENT_ID } from './queries'
 import { messages } from '@client/i18n/messages/views/performance'
 import { PerformanceSelect } from './PerformanceSelect'
 import { connect } from 'react-redux'
-import { goBack } from 'connected-react-router'
 import { transformChildLocations } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
 
@@ -54,7 +53,6 @@ enum REG_RATE_BASE {
 }
 
 interface IDispatchProps {
-  goBack: typeof goBack
   goToOperationalReport: typeof goToOperationalReport
 }
 type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
@@ -72,7 +70,6 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     match: {
       params: { eventType }
     },
-    goBack,
     goToOperationalReport
   } = props
   const { title, selectedLocation } = state
@@ -136,5 +133,5 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
 
 export const RegistrationRates = connect(
   null,
-  { goBack, goToOperationalReport }
+  { goToOperationalReport }
 )(injectIntl(RegistrationRatesComponent))
