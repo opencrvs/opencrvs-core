@@ -28,6 +28,7 @@ import { PerformanceSelect } from './PerformanceSelect'
 import { connect } from 'react-redux'
 import { goBack } from 'connected-react-router'
 import { transformChildLocations } from '@client/views/Performance/utils'
+import { goToOperationalReport } from '@client/navigation'
 
 const { useState } = React
 const Header = styled.h1`
@@ -48,12 +49,13 @@ const ActionContainer = styled.div`
   }
 `
 enum REG_RATE_BASE {
-  TIME = 'OVER_TIME',
-  LOCATION = 'BY_UNION'
+  TIME = 'TIME',
+  LOCATION = 'LOCATION'
 }
 
 interface IDispatchProps {
   goBack: typeof goBack
+  goToOperationalReport: typeof goToOperationalReport
 }
 type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
@@ -70,7 +72,8 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     match: {
       params: { eventType }
     },
-    goBack
+    goBack,
+    goToOperationalReport
   } = props
   const { title, selectedLocation } = state
 
@@ -78,9 +81,10 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     <PerformanceContentWrapper hideTopBar>
       <NavigationActionContainer>
         <TertiaryButton
+          id="reg-rates-action-back"
           icon={() => <ArrowBack />}
           align={ICON_ALIGNMENT.LEFT}
-          onClick={goBack}
+          onClick={() => goToOperationalReport(selectedLocation)}
         >
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
@@ -93,7 +97,10 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       >
         {({ data, loading, error }) => {
           let options = [
-            { label: intl.formatMessage(messages.overTime), value: 'OVER_TIME' }
+            {
+              label: intl.formatMessage(messages.overTime),
+              value: REG_RATE_BASE.TIME
+            }
           ]
           if (data) {
             const {
@@ -129,5 +136,5 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
 
 export const RegistrationRates = connect(
   null,
-  { goBack }
+  { goBack, goToOperationalReport }
 )(injectIntl(RegistrationRatesComponent))
