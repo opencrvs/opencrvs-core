@@ -28,6 +28,8 @@ import { PerformanceSelect } from './PerformanceSelect'
 import { connect } from 'react-redux'
 import { transformChildLocations } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
+import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
+import { Event } from '@client/forms'
 
 const { useState } = React
 const Header = styled.h1`
@@ -58,6 +60,93 @@ interface IDispatchProps {
 type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
   IDispatchProps
+
+const mockData = [
+  {
+    time: new Date(2020, 3),
+    total: 10000,
+    regWithin45d: 5000,
+    estimated: 20000,
+    percentage: 23.5
+  },
+  {
+    time: new Date(2020, 2),
+    total: 8000,
+    regWithin45d: 4500,
+    estimated: 20000,
+    percentage: 16
+  },
+  {
+    time: new Date(2020, 1),
+    total: 9000,
+    regWithin45d: 4000,
+    estimated: 20000,
+    percentage: 14
+  },
+  {
+    time: new Date(2020, 0),
+    total: 7000,
+    regWithin45d: 3500,
+    estimated: 20000,
+    percentage: 12.5
+  },
+  {
+    time: new Date(2019, 11),
+    total: 6000,
+    regWithin45d: 3000,
+    estimated: 15000,
+    percentage: 12
+  },
+  {
+    time: new Date(2019, 10),
+    total: 5500,
+    regWithin45d: 2500,
+    estimated: 15000,
+    percentage: 11
+  },
+  {
+    time: new Date(2019, 9),
+    total: 6500,
+    regWithin45d: 2500,
+    estimated: 15000,
+    percentage: 10
+  },
+  {
+    time: new Date(2019, 8),
+    total: 4500,
+    regWithin45d: 2000,
+    estimated: 15000,
+    percentage: 8
+  },
+  {
+    time: new Date(2019, 7),
+    total: 3500,
+    regWithin45d: 1500,
+    estimated: 15000,
+    percentage: 7
+  },
+  {
+    time: new Date(2019, 6),
+    total: 2500,
+    regWithin45d: 500,
+    estimated: 15000,
+    percentage: 7.5
+  },
+  {
+    time: new Date(2019, 5),
+    total: 2000,
+    regWithin45d: 250,
+    estimated: 15000,
+    percentage: 2
+  },
+  {
+    time: new Date(2019, 4),
+    total: 1000,
+    regWithin45d: 100,
+    estimated: 15000,
+    percentage: 1.5
+  }
+]
 
 function RegistrationRatesComponent(props: IRegistrationRateProps) {
   const [base, setBase] = useState<REG_RATE_BASE>(REG_RATE_BASE.TIME)
@@ -127,6 +216,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           )
         }}
       </Query>
+      <Within45DaysTable data={mockData} eventType={eventType as Event} />
     </PerformanceContentWrapper>
   )
 }
