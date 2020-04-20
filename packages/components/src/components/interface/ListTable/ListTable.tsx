@@ -294,6 +294,7 @@ export class ListTable extends React.Component<
                 {columns.map((preference, index) => (
                   <ContentWrapper
                     key={index}
+                    id={`${preference.key}-label`}
                     width={preference.width}
                     alignment={preference.alignment}
                     sortable={preference.isSortable}
