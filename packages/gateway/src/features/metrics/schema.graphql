@@ -136,6 +136,27 @@ type ApplicationsStartedMetrics {
   officeApplications: Int!
 }
 
+type MonthWiseEstimationMetrics {
+  details: [MonthWise45DayEstimation]
+  total: MonthWise45DayEstimationCount
+}
+
+type MonthWise45DayEstimation {
+  actualTotalRegistration: Int!
+  actual45DayRegistration: Int!
+  estimatedRegistration: Float!
+  estimated45DayPercentage: Float!
+  month: String!
+  year: String!
+}
+
+type MonthWise45DayEstimationCount {
+  actualTotalRegistration: Int!
+  actual45DayRegistration: Int!
+  estimatedRegistration: Float!
+  estimated45DayPercentage: Float!
+}
+
 type Query {
   fetchRegistrationMetrics(
     timeStart: String!
@@ -153,4 +174,10 @@ type Query {
     timeEnd: String!
     locationId: String!
   ): ApplicationsStartedMetrics
+  fetchMonthWiseEventMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+    event: String!
+  ): MonthWiseEstimationMetrics
 }
