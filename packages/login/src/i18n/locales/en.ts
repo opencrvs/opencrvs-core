@@ -25,7 +25,7 @@ export const ENGLISH_STATE = {
     'login.mobilePlaceholder': '07123456789',
     'login.passwordLabel': 'Password',
     'login.submit': 'Submit',
-    'login.forgotPassword': 'Forgot password',
+    'login.forgotPassword': "Can't login?",
     'login.submissionError': 'Sorry that Username and password did not work.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
     'login.tooManyLoginAttemptError':

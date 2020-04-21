@@ -24,6 +24,7 @@ export interface GQLQuery {
   queryPersonByNidIdentifier?: GQLPerson
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
+  hasChildLocation?: GQLLocation
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
@@ -1124,6 +1125,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   >
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
+  hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
@@ -1340,6 +1342,18 @@ export interface QueryToLocationByIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToLocationByIdArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToHasChildLocationArgs {
+  parentId?: string
+}
+export interface QueryToHasChildLocationResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToHasChildLocationArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

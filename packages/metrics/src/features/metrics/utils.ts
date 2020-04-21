@@ -114,9 +114,10 @@ export const generateEmptyBirthKeyFigure = (
 export const fetchEstimateByLocation = async (
   locationData: Location,
   estimationForDays: number,
-  estimatedYear: number,
   event: EVENT_TYPE,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  timeFrom: string,
+  timeTo: string
 ): Promise<IEstimation> => {
   let crudRate: number = 0
   let totalPopulation: number = 0
@@ -125,7 +126,10 @@ export const fetchEstimateByLocation = async (
     throw new Error('Invalid location data found')
   }
   let estimateExtensionFound: boolean = false
-  let actualEstimationYear = estimatedYear
+  const fromYear = new Date(timeFrom).getFullYear()
+  const toYear = new Date(timeTo).getFullYear()
+  let selectedCrudYear = new Date(timeTo).getFullYear()
+  let selectedPopYear = new Date(timeTo).getFullYear()
   let malePopulationArray: [] = []
   let femalePopulationArray: [] = []
   locationData.extension.forEach(extension => {
@@ -136,10 +140,11 @@ export const fetchEstimateByLocation = async (
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
-      for (let key = estimatedYear; key > 1; key--) {
+      for (let key = toYear; key > fromYear; key--) {
         valueArray.forEach(data => {
           if (key in data) {
             crudRate = data[key]
+            selectedCrudYear = key
           }
         })
         if (crudRate > 0) {
@@ -153,11 +158,11 @@ export const fetchEstimateByLocation = async (
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
-      for (let key = estimatedYear; key > 1; key--) {
+      for (let key = toYear; key > fromYear; key--) {
         valueArray.forEach(data => {
           if (key in data) {
             totalPopulation = data[key]
-            actualEstimationYear = key
+            selectedPopYear = key
           }
         })
         if (totalPopulation > 0) {
@@ -182,7 +187,7 @@ export const fetchEstimateByLocation = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: locationData.id,
-      estimationYear: actualEstimationYear,
+      estimationYear: toYear,
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
@@ -194,16 +199,16 @@ export const fetchEstimateByLocation = async (
     crudRate = crudeDeathRateResponse.crudeDeathRate
   }
   let populationData =
-    malePopulationArray?.find(
-      data => data[actualEstimationYear] !== undefined
-    )?.[actualEstimationYear] ?? ''
+    malePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
+      selectedPopYear
+    ] ?? ''
   const malePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
   populationData =
-    femalePopulationArray?.find(
-      data => data[actualEstimationYear] !== undefined
-    )?.[actualEstimationYear] ?? ''
+    femalePopulationArray?.find(data => data[selectedPopYear] !== undefined)?.[
+      selectedPopYear
+    ] ?? ''
   const femalePopulation: number =
     populationData === '' ? totalPopulation / 2 : Number(populationData)
 
@@ -218,7 +223,7 @@ export const fetchEstimateByLocation = async (
       ((crudRate * femalePopulation) / 1000) * (estimationForDays / 365)
     ),
     locationId: locationData.id,
-    estimationYear: actualEstimationYear,
+    estimationYear: selectedCrudYear,
     locationLevel: getLocationLevelFromLocationData(locationData)
   }
 }
@@ -235,17 +240,19 @@ export const getLocationLevelFromLocationData = (locationData: Location) => {
 
 export const fetchEstimateFor45DaysByLocationId = async (
   locationId: string,
-  estimatedYear: number,
   event: EVENT_TYPE,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  timeFrom: string,
+  timeTo: string
 ): Promise<IEstimation> => {
   const locationData: Location = await fetchFHIR(locationId, authHeader)
   return await fetchEstimateByLocation(
     locationData,
     45, // For 45 days
-    estimatedYear,
     event,
-    authHeader
+    authHeader,
+    timeFrom,
+    timeTo
   )
 }
 
