@@ -22,11 +22,11 @@ import { buttonMessages } from '@client/i18n/messages'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import { Query } from '@client/components/Query'
-import { GET_CHILD_LOCATIONS_BY_PARENT_ID } from './queries'
+import { HAS_CHILD_LOCATION } from './queries'
 import { messages } from '@client/i18n/messages/views/performance'
 import { PerformanceSelect } from './PerformanceSelect'
 import { connect } from 'react-redux'
-import { transformChildLocations } from '@client/views/Performance/utils'
+import { getJurisidictionType } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
@@ -178,7 +178,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       <Header id="reg-rates-header">{title}</Header>
 
       <Query
-        query={GET_CHILD_LOCATIONS_BY_PARENT_ID}
+        query={HAS_CHILD_LOCATION}
         variables={{ parentId: selectedLocation.id }}
       >
         {({ data, loading, error }) => {
@@ -188,20 +188,18 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
               value: REG_RATE_BASE.TIME
             }
           ]
-          if (data) {
-            const {
-              childLocations,
-              jurisdictionType
-            } = transformChildLocations(data.locationsByParent)
+          if (
+            data.hasChildLocation &&
+            data.hasChildLocation.type === 'ADMIN_STRUCTURE'
+          ) {
+            const jurisdictionType = getJurisidictionType(data.hasChildLocation)
 
-            if (childLocations.length > 0) {
-              options.push({
-                label: intl.formatMessage(messages.byLocation, {
-                  jurisdictionType
-                }),
-                value: REG_RATE_BASE.LOCATION
-              })
-            }
+            options.push({
+              label: intl.formatMessage(messages.byLocation, {
+                jurisdictionType
+              }),
+              value: REG_RATE_BASE.LOCATION
+            })
           }
 
           return (

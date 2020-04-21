@@ -19,6 +19,16 @@ export const resolvers: GQLResolver = {
       const bundle = await fetchFHIR(`/Location?partof=${parentId}`, authHeader)
       return bundle.entry.map((entry: { resource: {} }) => entry.resource)
     },
+    async hasChildLocation(_, { parentId }, authHeader) {
+      const bundle = await fetchFHIR(
+        `/Location?_count=1&partof=${parentId}`,
+        authHeader
+      )
+      const [childLocation] = bundle.entry.map(
+        (entry: { resource: {} }) => entry.resource
+      )
+      return childLocation
+    },
     async locationById(_, { locationId }, authHeader) {
       return fetchFHIR(`${FHIR_URL}/Location/${locationId}`, authHeader)
     }

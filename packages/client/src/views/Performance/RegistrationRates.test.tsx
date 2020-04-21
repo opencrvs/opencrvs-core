@@ -21,7 +21,7 @@ import {
 import { AppStore } from '@client/store'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
-import { GET_CHILD_LOCATIONS_BY_PARENT_ID } from '@client/views/Performance/queries'
+import { HAS_CHILD_LOCATION } from '@client/views/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const LOCATION_DHAKA_DIVISION = {
@@ -33,57 +33,33 @@ const LOCATION_DHAKA_DIVISION = {
 const graphqlMocks = [
   {
     request: {
-      query: GET_CHILD_LOCATIONS_BY_PARENT_ID,
+      query: HAS_CHILD_LOCATION,
       variables: { parentId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b' }
     },
     result: {
       data: {
-        locationsByParent: [
-          {
-            id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
-            type: 'ADMIN_STRUCTURE',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/geo-id',
-                value: '4194'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/bbs-code',
-                value: '11'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'UNION'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-                value: 'division=9&district=30&upazila=233&union=4194'
-              }
-            ]
-          },
-          {
-            id: '78e264aa-e493-430e-9314-594641c5703f',
-            type: 'ADMIN_STRUCTURE',
-            identifier: [
-              {
-                system: 'http://opencrvs.org/specs/id/geo-id',
-                value: '4195'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/bbs-code',
-                value: '23'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-                value: 'UNION'
-              },
-              {
-                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-                value: 'division=9&district=30&upazila=233&union=4195'
-              }
-            ]
-          }
-        ]
+        hasChildLocation: {
+          id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
+          type: 'ADMIN_STRUCTURE',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '4194'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/bbs-code',
+              value: '11'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+              value: 'division=9&district=30&upazila=233&union=4194'
+            }
+          ]
+        }
       }
     }
   }

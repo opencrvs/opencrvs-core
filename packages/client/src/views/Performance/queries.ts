@@ -11,9 +11,9 @@
  */
 import gql from 'graphql-tag'
 
-export const GET_CHILD_LOCATIONS_BY_PARENT_ID = gql`
+export const HAS_CHILD_LOCATION = gql`
   query data($parentId: String!) {
-    locationsByParent(parentId: $parentId) {
+    hasChildLocation(parentId: $parentId) {
       id
       type
       identifier {

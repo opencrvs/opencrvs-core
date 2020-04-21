@@ -116,7 +116,9 @@ class ApplicationsStartedReportComponent extends React.Component<
     totalMetrics: GQLApplicationsStartedMetrics,
     value: number
   ): number {
-    return Math.round((value / this.getTotal(totalMetrics)) * 100)
+    return value && value > 0
+      ? Math.round((value / this.getTotal(totalMetrics)) * 100)
+      : 0
   }
 
   getLoader() {
@@ -130,7 +132,7 @@ class ApplicationsStartedReportComponent extends React.Component<
           <LoaderBox width={60} />
         </ReportHeader>
 
-        <Reports id="applications-started-reports-loader" loading>
+        <Reports id="applications-started-reports-loader">
           <Report total={true}>
             <ReportTitle>
               <LoaderBox width={40} />

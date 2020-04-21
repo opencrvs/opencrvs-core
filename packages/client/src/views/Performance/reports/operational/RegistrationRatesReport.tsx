@@ -121,7 +121,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
           <LoaderBox width={60} />
         </ReportHeader>
 
-        <Reports id="registration-rates-reports-loader" loading>
+        <Reports id="registration-rates-reports-loader">
           <Report>
             <LoaderBox width={40} />
             <KeyNumber>
