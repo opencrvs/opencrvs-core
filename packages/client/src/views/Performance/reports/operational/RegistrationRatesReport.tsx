@@ -20,6 +20,7 @@ import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
+import { Event } from '@client/forms'
 
 const ReportHeader = styled.div`
   margin: 24px 0px;
@@ -94,6 +95,7 @@ interface BaseProps {
   loading?: boolean
   reportTimeFrom?: string
   reportTimeTo?: string
+  onClickEventDetails: (event: Event, title: string) => void
 }
 
 interface States {}
@@ -150,8 +152,19 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
   }
 
   getReport(data: GQLEventEstimationMetrics) {
-    const { intl, reportTimeFrom, reportTimeTo } = this.props
+    const {
+      intl,
+      reportTimeFrom,
+      reportTimeTo,
+      onClickEventDetails
+    } = this.props
     const { birth45DayMetrics, death45DayMetrics } = data
+    const birthReportHeader = intl.formatMessage(
+      messages.birthRegistrationRatesReportHeader
+    )
+    const deathReportHeader = intl.formatMessage(
+      messages.deathRegistrationRatesReportHeader
+    )
     return (
       <>
         <ReportHeader>
@@ -168,8 +181,13 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
 
         <Reports id="registration-rates-reports">
           <Report>
-            <LinkButton>
-              {intl.formatMessage(messages.birthRegistrationRatesReportHeader)}
+            <LinkButton
+              id="birth-registration-detalis-link"
+              onClick={() =>
+                onClickEventDetails(Event.BIRTH, birthReportHeader)
+              }
+            >
+              {birthReportHeader}
             </LinkButton>
             <KeyNumber>
               {`${(birth45DayMetrics &&
@@ -198,8 +216,13 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             )}
           </Report>
           <Report>
-            <LinkButton>
-              {intl.formatMessage(messages.deathRegistrationRatesReportHeader)}
+            <LinkButton
+              id="death-registration-detalis-link"
+              onClick={() =>
+                onClickEventDetails(Event.DEATH, deathReportHeader)
+              }
+            >
+              {deathReportHeader}
             </LinkButton>
             <KeyNumber>
               {`${(death45DayMetrics &&

@@ -17,6 +17,7 @@ import { OperationalReport } from './OperationalReport'
 import { OPERATIONAL_REPORT } from '@client/navigation/routes'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -30,6 +31,7 @@ describe('OperationalReport tests', () => {
   }
 
   beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
@@ -84,5 +86,28 @@ describe('OperationalReport tests', () => {
         .hostNodes()
         .text()
     ).toBe('Operational')
+  })
+
+  it('on details link click will forward time range and location to route', async () => {
+    const registrationRatesReports = await waitForElement(
+      component,
+      RegistrationRatesReport
+    )
+
+    registrationRatesReports.prop('onClickEventDetails')(
+      'birth',
+      'Birth registration rate within 45 days of event'
+    )
+
+    expect(history.location.state).toEqual({
+      selectedLocation: {
+        displayLabel: 'Dhaka Division',
+        id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+        searchableText: 'Dhaka'
+      },
+      timeEnd: new Date(1487076708000),
+      timeStart: new Date(1455454308000),
+      title: 'Birth registration rate within 45 days of event'
+    })
   })
 })
