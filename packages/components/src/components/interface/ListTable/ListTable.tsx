@@ -365,7 +365,7 @@ export class ListTable extends React.Component<
             onPageChange={this.onPageChange}
           />
         )}
-        {content.length <= 0 && (
+        {!isLoading && content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}
       </>
