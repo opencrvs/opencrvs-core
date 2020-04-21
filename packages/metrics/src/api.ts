@@ -79,7 +79,7 @@ export function fetchFromResource(
     })
 }
 
-export const fetchAllFromSearch = (authHeader: IAuthHeader) => {
+export function fetchAllFromSearch(authHeader: IAuthHeader) {
   return fetch(`${SEARCH_URL}search/all`, {
     method: 'POST',
     headers: {
@@ -95,4 +95,33 @@ export const fetchAllFromSearch = (authHeader: IAuthHeader) => {
         new Error(`Search request failed: ${error.message}`)
       )
     })
+}
+
+export const fetchPractitionerRole = async (
+  practitionerId: string,
+  authHeader: IAuthHeader
+) => {
+  const roleBundle: fhir.Bundle = await fetchFHIR(
+    `PractitionerRole?practitioner=${practitionerId}`,
+    authHeader
+  )
+  const practitionerRole =
+    roleBundle &&
+    roleBundle.entry &&
+    roleBundle.entry &&
+    roleBundle.entry.length > 0 &&
+    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+
+  const roleCode =
+    practitionerRole &&
+    practitionerRole.code &&
+    practitionerRole.code.length > 0 &&
+    practitionerRole.code[0].coding &&
+    practitionerRole.code[0].coding[0].code
+
+  if (roleCode) {
+    return roleCode
+  } else {
+    return Promise.reject(new Error(`Role code cannot be found`))
+  }
 }

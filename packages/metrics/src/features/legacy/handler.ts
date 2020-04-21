@@ -13,8 +13,8 @@ import * as Hapi from 'hapi'
 import { internal } from 'boom'
 import {
   fetchAllFromSearch,
-  fetchFHIR,
-  fetchParentLocationByLocationID
+  fetchParentLocationByLocationID,
+  fetchPractitionerRole
 } from '@metrics/api'
 import {
   IAuthHeader,
@@ -22,7 +22,7 @@ import {
   IApplicationsStartedPoints,
   IPointLocation
 } from '@metrics/features/registration'
-import { writePoints } from '@metrics/influxdb/client'
+import { writePoints, query } from '@metrics/influxdb/client'
 
 interface ISearchResult {
   _index: string
@@ -86,6 +86,11 @@ export async function generateLegacyMetricsHandler(
     Authorization: request.headers.authorization
   }
   try {
+    await query('DROP MEASUREMENT applications_started')
+  } catch (err) {
+    throw new Error('Could not clear influx')
+  }
+  try {
     result = await fetchAllFromSearch(authHeader)
   } catch (err) {
     return internal(err)
@@ -108,53 +113,23 @@ export async function generateLegacyMetricsHandler(
   return h.response(totalPoints).code(200)
 }
 
-export async function getRoleFromSearchResult(
-  searchResult: ISearchResult,
-  authHeader: IAuthHeader
-): Promise<any> {
-  const roleBundle: fhir.Bundle = await fetchFHIR(
-    `PractitionerRole?practitioner=${searchResult._source.createdBy}`,
-    authHeader
-  )
-  const practitionerRole =
-    roleBundle &&
-    roleBundle.entry &&
-    roleBundle.entry &&
-    roleBundle.entry.length > 0 &&
-    (roleBundle.entry[0].resource as fhir.PractitionerRole)
-
-  const roleCode =
-    practitionerRole &&
-    practitionerRole.code &&
-    practitionerRole.code.length > 0 &&
-    practitionerRole.code[0].coding &&
-    practitionerRole.code[0].coding[0].code
-
-  if (roleCode) {
-    return roleCode
-  } else {
-    throw new Error('Role code cannot be found')
-  }
-}
-
 const generatePointLocationsFromID = async (
   applicationLocationId: string,
   authHeader: IAuthHeader
 ): Promise<IPointLocation> => {
   const locations: IPointLocation = {}
 
-  const officeBundle: fhir.Location = await fetchFHIR(
+  const officeUnion = await fetchParentLocationByLocationID(
     applicationLocationId,
     authHeader
   )
 
-  const officeUnion = officeBundle && officeBundle.partOf?.reference
-  if (!officeUnion) {
+  if (officeUnion === undefined) {
     throw new Error('Office union cannot be found')
   }
 
   locations.locationLevel5 = officeUnion
-  let locationID: string = locations.locationLevel5
+  let locationID: string = locations.locationLevel5 as string
   // tslint:disable-next-line no-increment-decrement
   for (let index = 4; index > 1; index--) {
     locationID = await fetchParentLocationByLocationID(locationID, authHeader)
@@ -171,8 +146,17 @@ export async function generateApplicationStartedPoint(
   searchResult: ISearchResult,
   authHeader: IAuthHeader
 ): Promise<any> {
+  let role = await fetchPractitionerRole(
+    searchResult._source.createdBy,
+    authHeader
+  )
+
+  if (role.includes('REGISTRAR')) {
+    role = 'REGISTRAR'
+  }
+
   const fields: IApplicationsStartedFields = {
-    role: await getRoleFromSearchResult(searchResult, authHeader),
+    role,
     compositionId: searchResult._id
   }
 
