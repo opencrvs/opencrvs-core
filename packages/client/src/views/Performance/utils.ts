@@ -17,16 +17,6 @@ export const Header = styled.h1`
   ${({ theme }) => theme.fonts.h4Style};
 `
 
-export const SubHeader = styled.div`
-  color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
-
-export const Description = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
-`
-
 export function getMonthDateRange(year: number, month: number) {
   const start = moment([year, month - 1])
   const end = moment(start).endOf('month')
@@ -36,3 +26,17 @@ export function getMonthDateRange(year: number, month: number) {
     end
   }
 }
+export const ReportHeader = styled.div`
+  margin: 24px 0px;
+`
+
+export const SubHeader = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+`
+
+export const Description = styled.div`
+  margin: 8px 0px;
+  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyStyle};
+`

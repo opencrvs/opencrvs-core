@@ -24,8 +24,12 @@ describe('Registration rates report', () => {
       store
     )
 
-    expect(component.find('#reports-loader').hostNodes()).toHaveLength(1)
-    expect(component.find('#reports').hostNodes()).toHaveLength(0)
+    expect(
+      component.find('#registration-rates-reports-loader').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      component.find('#registration-rates-reports').hostNodes()
+    ).toHaveLength(0)
   })
 
   it('renders reports', async () => {
@@ -50,7 +54,11 @@ describe('Registration rates report', () => {
       store
     )
 
-    expect(component.find('#reports-loader').hostNodes()).toHaveLength(0)
-    expect(component.find('#reports').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#registration-rates-reports-loader').hostNodes()
+    ).toHaveLength(0)
+    expect(
+      component.find('#registration-rates-reports').hostNodes()
+    ).toHaveLength(1)
   })
 })

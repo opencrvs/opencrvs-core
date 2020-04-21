@@ -119,7 +119,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
           <LoaderBox width={60} />
         </ReportHeader>
 
-        <Reports id="reports-loader" loading>
+        <Reports id="registration-rates-reports-loader" loading>
           <Report>
             <LoaderBox width={40} />
             <KeyNumber>
@@ -166,7 +166,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
           </Description>
         </ReportHeader>
 
-        <Reports id="reports">
+        <Reports id="registration-rates-reports">
           <Report>
             <LinkButton>
               {intl.formatMessage(messages.birthRegistrationRatesReportHeader)}

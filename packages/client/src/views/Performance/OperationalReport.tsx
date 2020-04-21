@@ -26,10 +26,14 @@ import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { goToPerformanceHome } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
-import { EVENT_ESTIMATION_METRICS } from './metricsQuery'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
-import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
-import { RegistrationRatesReport } from './reports/RegistrationRatesReport'
+import {
+  GQLEventEstimationMetrics,
+  GQLApplicationsStartedMetrics
+} from '@opencrvs/gateway/src/graphql/schema'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
 
 interface IDispatchProps {
@@ -38,6 +42,7 @@ interface IDispatchProps {
 
 interface IMetricsQueryResult {
   getEventEstimationMetrics: GQLEventEstimationMetrics
+  getApplicationsStartedMetrics: GQLApplicationsStartedMetrics
 }
 export enum PERFORMANCE_TYPE {
   OPERATIONAL = 'OPERATIONAL',
@@ -51,7 +56,7 @@ type Props = WrappedComponentProps &
 interface State {}
 
 const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.menuBackground};
+  color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h2Style};
 `
 
@@ -87,6 +92,21 @@ class OperationalReportComponent extends React.Component<Props, State> {
     })
   }
 
+  getTotal(applicationMetrics: GQLApplicationsStartedMetrics): number {
+    return (
+      applicationMetrics.fieldAgentApplications +
+      applicationMetrics.hospitalApplications +
+      applicationMetrics.officeApplications
+    )
+  }
+
+  getPercentage(
+    totalMetrics: GQLApplicationsStartedMetrics,
+    value: number
+  ): number {
+    return Math.round((value / this.getTotal(totalMetrics)) * 100)
+  }
+
   render() {
     const {
       intl,
@@ -98,7 +118,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.props
 
     const { displayLabel: title, id: locationId } = selectedLocation
-
+    moment.locale(this.props.intl.locale)
     moment.defaultFormat = 'MMMM YYYY'
     const timeEnd = moment()
     const timeStart = moment().subtract(1, 'years')
@@ -133,10 +153,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </TertiaryButton>
         </ActionContainer>
         <Query
-          query={EVENT_ESTIMATION_METRICS}
+          query={OPERATIONAL_REPORTS_METRICS}
           variables={{
-            timeStart: timeStart.valueOf() * 1000000,
-            timeEnd: timeEnd.valueOf() * 1000000,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
             locationId
           }}
         >
@@ -150,12 +170,21 @@ class OperationalReportComponent extends React.Component<Props, State> {
             data?: IMetricsQueryResult
           }) => {
             return (
-              <RegistrationRatesReport
-                loading={loading}
-                data={data && data.getEventEstimationMetrics}
-                reportTimeFrom={timeStart.format()}
-                reportTimeTo={timeEnd.format()}
-              />
+              <>
+                <RegistrationRatesReport
+                  loading={loading}
+                  data={data && data.getEventEstimationMetrics}
+                  reportTimeFrom={timeStart.format()}
+                  reportTimeTo={timeEnd.format()}
+                />
+
+                <ApplicationsStartedReport
+                  loading={loading}
+                  data={data && data.getApplicationsStartedMetrics}
+                  reportTimeFrom={timeStart.format()}
+                  reportTimeTo={timeEnd.format()}
+                />
+              </>
             )
           }}
         </Query>
