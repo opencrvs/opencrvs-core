@@ -16,7 +16,7 @@ import * as jwt from 'jsonwebtoken'
 
 const readPoints = influx.query as jest.Mock
 
-describe('verify areaPerformanceMetrics handler', () => {
+describe('verify eventEstimations handler', () => {
   let server: any
   const token = jwt.sign(
     { scope: ['declare'] },
