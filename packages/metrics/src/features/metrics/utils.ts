@@ -133,9 +133,9 @@ export const fetchEstimateByLocation = async (
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
-      for (let key = toYear; key > 1; key--) {
+      for (let key = toYear; key > fromYear; key--) {
         valueArray.forEach(data => {
-          if (key in data && key >= fromYear) {
+          if (key in data) {
             crudRate = data[key]
             selectedCrudYear = key
           }
@@ -151,9 +151,9 @@ export const fetchEstimateByLocation = async (
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
-      for (let key = toYear; key > 1; key--) {
+      for (let key = toYear; key > fromYear; key--) {
         valueArray.forEach(data => {
-          if (key in data && key >= fromYear) {
+          if (key in data) {
             totalPopulation = data[key]
             selectedPopYear = key
           }
