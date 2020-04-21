@@ -362,9 +362,10 @@ export async function fetchKeyFigures(
   const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
     45, // For 45 Days
-    new Date().getFullYear(),
     EVENT_TYPE.BIRTH,
-    authHeader
+    authHeader,
+    timeStart,
+    timeEnd
   )
 
   const keyFigures: IBirthKeyFigures[] = []
@@ -394,9 +395,10 @@ export async function fetchKeyFigures(
   const estimatedFigureFor1Year = await fetchEstimateByLocation(
     location,
     365, // For 1 year
-    new Date().getFullYear(),
     EVENT_TYPE.BIRTH,
-    authHeader
+    authHeader,
+    timeStart,
+    timeEnd
   )
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
@@ -628,9 +630,10 @@ export async function fetchEstimated45DayMetrics(
   for (const point of points) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       point[locationLevel],
-      new Date().getFullYear(),
       event,
-      authHeader
+      authHeader,
+      timeFrom,
+      timeTo
     )
     dataFromInflux.push({
       locationId: point[locationLevel],
@@ -654,9 +657,10 @@ export async function fetchEstimated45DayMetrics(
   for (const id of childLocationIds) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       id,
-      new Date().getFullYear(),
       event,
-      authHeader
+      authHeader,
+      timeFrom,
+      timeTo
     )
     emptyEstimationData.push({
       locationId: id,
@@ -709,9 +713,10 @@ export async function fetchLocationWiseEventEstimations(
   })
   const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
     locationId,
-    new Date().getFullYear(),
     event,
-    authHeader
+    authHeader,
+    timeFrom,
+    timeTo
   )
 
   return {
