@@ -11,10 +11,8 @@
  */
 import styled from '@client/styledComponents'
 import moment from 'moment'
-import { ApolloQueryResult } from 'apollo-client'
 import {
   GQLLocation,
-  GQLQuery,
   GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
 
@@ -47,40 +45,20 @@ export const Description = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
-interface IChildLocations {
-  childLocations: GQLLocation[]
-  jurisdictionType?: string
-}
-
-type QueryResponse = Array<GQLLocation | null>
-export function transformChildLocations(
-  locations: QueryResponse
-): IChildLocations {
-  const childLocations: GQLLocation[] =
-    (locations &&
-      (locations.filter(
-        (location: GQLLocation | null) =>
-          location && location.type === 'ADMIN_STRUCTURE'
-      ) as GQLLocation[])) ||
-    []
-
-  if (childLocations.length > 0) {
+export function getJurisidictionType(location: GQLLocation): string | null {
+  let jurisdictionType = null
+  if (location.type === 'ADMIN_STRUCTURE') {
     const jurisdictionTypeIdentifier =
-      childLocations[0].identifier &&
-      (childLocations[0].identifier as GQLIdentifier[]).find(
+      location.identifier &&
+      (location.identifier as GQLIdentifier[]).find(
         ({ system }: GQLIdentifier) =>
           system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
       )
 
     if (jurisdictionTypeIdentifier) {
-      return {
-        childLocations,
-        jurisdictionType: jurisdictionTypeIdentifier.value
-      }
+      jurisdictionType = jurisdictionTypeIdentifier.value as string
     }
   }
 
-  return {
-    childLocations
-  }
+  return jurisdictionType
 }

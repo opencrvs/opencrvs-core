@@ -60,4 +60,5 @@ type Location { # -> Location (mostly the same property name except:)
 type Query {
   locationsByParent(parentId: String, type: String): [Location] # if parentId is not provided, return level 1 locations
   locationById(locationId: String): Location
+  hasChildLocation(parentId: String): Location
 }
