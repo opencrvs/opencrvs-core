@@ -99,7 +99,10 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
               value: REG_RATE_BASE.TIME
             }
           ]
-          if (data.hasChildLocation) {
+          if (
+            data.hasChildLocation &&
+            data.hasChildLocation.type === 'ADMIN_STRUCTURE'
+          ) {
             const jurisdictionType = getJurisidictionType(data.hasChildLocation)
 
             options.push({

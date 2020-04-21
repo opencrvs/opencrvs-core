@@ -47,17 +47,16 @@ export const Description = styled.div`
 
 export function getJurisidictionType(location: GQLLocation): string | null {
   let jurisdictionType = null
-  if (location.type === 'ADMIN_STRUCTURE') {
-    const jurisdictionTypeIdentifier =
-      location.identifier &&
-      (location.identifier as GQLIdentifier[]).find(
-        ({ system }: GQLIdentifier) =>
-          system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
-      )
 
-    if (jurisdictionTypeIdentifier) {
-      jurisdictionType = jurisdictionTypeIdentifier.value as string
-    }
+  const jurisdictionTypeIdentifier =
+    location.identifier &&
+    (location.identifier as GQLIdentifier[]).find(
+      ({ system }: GQLIdentifier) =>
+        system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+    )
+
+  if (jurisdictionTypeIdentifier) {
+    jurisdictionType = jurisdictionTypeIdentifier.value as string
   }
 
   return jurisdictionType
