@@ -46,6 +46,13 @@ export interface ICrudeDeathRate {
   crudeDeathRate: number
 }
 
+export interface IMonthRangeFilter {
+  startOfMonthTime: string
+  endOfMonthTime: string
+  month: string
+  year: string
+}
+
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
@@ -323,4 +330,38 @@ export async function fetchChildLocationIdsByParentId(
     )
   }
   return [`Location/${parentLocationId}`]
+}
+
+export function getMonthRangeFilterListFromTimeRage(
+  timeStart: string,
+  timeEnd: string
+): IMonthRangeFilter[] {
+  const startDateMonth = new Date(timeStart).getMonth()
+  const startDateYear = new Date(timeStart).getFullYear()
+  const endDateMonth = new Date(timeEnd).getMonth()
+  const endDateYear = new Date(timeEnd).getFullYear()
+
+  const monthFilterList: IMonthRangeFilter[] = []
+  const monthDiffs =
+    (endDateYear - startDateYear) * 12 + (endDateMonth - startDateMonth)
+  for (let index = 0; index <= monthDiffs; index += 1) {
+    const filterDate = new Date(timeStart)
+    filterDate.setMonth(filterDate.getMonth() + index)
+    monthFilterList.push({
+      month: filterDate.toLocaleString('en-us', { month: 'long' }),
+      year: String(filterDate.getFullYear()),
+      startOfMonthTime: new Date(
+        filterDate.getFullYear(),
+        filterDate.getMonth(),
+        1
+      ).toISOString(),
+      endOfMonthTime: new Date(
+        filterDate.getFullYear(),
+        filterDate.getMonth() + 1,
+        1
+      ).toISOString()
+    })
+  }
+
+  return monthFilterList
 }
