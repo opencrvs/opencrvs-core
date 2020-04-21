@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import { internal } from 'boom'
 import {
   fetchAllFromSearch,
   fetchParentLocationByLocationID,
@@ -93,7 +92,7 @@ export async function generateLegacyMetricsHandler(
   try {
     result = await fetchAllFromSearch(authHeader)
   } catch (err) {
-    return internal(err)
+    throw new Error('Could not resolve values from search')
   }
   const totalPoints: IApplicationsStartedPoints[] = []
   if (result.body.hits.total !== result.body.hits.hits.length) {

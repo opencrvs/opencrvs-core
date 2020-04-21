@@ -12,6 +12,9 @@
 import { createServer } from '@metrics/index'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import * as influx from '@metrics/influxdb/client'
+
+const clearPoints = influx.query as jest.Mock
 
 const response = [
   {
@@ -682,5 +685,36 @@ describe('verify applicationsStarted handler', () => {
 
     expect(res.statusCode).toBe(200)
     expect(res.result).toEqual(response)
+  })
+})
+
+describe('applicationsStarted errors', () => {
+  let server: any
+  const token = jwt.sign(
+    { scope: ['declare'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:metrics-user'
+    }
+  )
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('Throws error on influx fault', async () => {
+    clearPoints.mockRejectedValueOnce('error')
+    server = await createServer()
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/generate',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(500)
   })
 })
