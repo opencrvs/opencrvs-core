@@ -51,7 +51,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',
     defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for two upazillas:',
+      'No data for {searchedLocation}. We are currently piloting for two upazilas:',
     description: 'Message to show if no data is found for a location'
   },
   exportAll: {

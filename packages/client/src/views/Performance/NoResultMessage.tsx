@@ -49,8 +49,8 @@ class NoResultMessageComponent extends React.Component<Props, State> {
             searchedLocation
           })}
         </StyledHeader>
-        <StyledText>Bhurungamari Upazilla</StyledText>
-        <StyledText>Narsingdi Upazilla</StyledText>
+        <StyledText>Bhurungamari Upazila</StyledText>
+        <StyledText>Narsingdi Upazila</StyledText>
       </MessageContainer>
     )
   }
