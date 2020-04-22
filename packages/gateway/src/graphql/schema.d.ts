@@ -677,6 +677,8 @@ export interface GQLMonthWise45DayEstimation {
   estimated45DayPercentage: number
   month: string
   year: string
+  startOfMonth: string
+  endOfMonth: string
 }
 
 export interface GQLMonthWise45DayEstimationCount {
@@ -3274,6 +3276,8 @@ export interface GQLMonthWise45DayEstimationTypeResolver<TParent = any> {
   >
   month?: MonthWise45DayEstimationToMonthResolver<TParent>
   year?: MonthWise45DayEstimationToYearResolver<TParent>
+  startOfMonth?: MonthWise45DayEstimationToStartOfMonthResolver<TParent>
+  endOfMonth?: MonthWise45DayEstimationToEndOfMonthResolver<TParent>
 }
 
 export interface MonthWise45DayEstimationToActualTotalRegistrationResolver<
@@ -3312,6 +3316,20 @@ export interface MonthWise45DayEstimationToMonthResolver<
 }
 
 export interface MonthWise45DayEstimationToYearResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MonthWise45DayEstimationToStartOfMonthResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface MonthWise45DayEstimationToEndOfMonthResolver<
   TParent = any,
   TResult = any
 > {

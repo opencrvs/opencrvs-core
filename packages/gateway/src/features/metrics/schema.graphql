@@ -148,6 +148,8 @@ type MonthWise45DayEstimation {
   estimated45DayPercentage: Float!
   month: String!
   year: String!
+  startOfMonth: String!
+  endOfMonth: String!
 }
 
 type MonthWise45DayEstimationCount {

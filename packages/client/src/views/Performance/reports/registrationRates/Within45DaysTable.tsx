@@ -26,6 +26,7 @@ interface IMonthWiseEstimationCount {
 interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
   month: string
   year: string
+  startOfMonth: string
 }
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
@@ -42,11 +43,11 @@ enum SORT_ORDER {
 }
 
 interface SortMap {
-  index: SORT_ORDER
+  startTime: SORT_ORDER
 }
 
 const INITIAL_SORT_MAP = {
-  index: SORT_ORDER.ASCENDING
+  startTime: SORT_ORDER.DESCENDING
 }
 
 function Within45DaysTableComponent(props: ITableProps) {
@@ -56,8 +57,8 @@ function Within45DaysTableComponent(props: ITableProps) {
   const content =
     (props.data &&
       props.data.details &&
-      props.data.details.map((item, index) => ({
-        index: String(index),
+      props.data.details.map(item => ({
+        startTime: item.startOfMonth,
         month: `${item.month} ${item.year}`,
         totalRegistered: String(item.actualTotalRegistration),
         registeredWithin45d: String(item.actual45DayRegistration),
@@ -110,7 +111,7 @@ function Within45DaysTableComponent(props: ITableProps) {
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
   }
 
-  const sortedContent = orderBy(content, ['index'], [sortOrder.index])
+  const sortedContent = orderBy(content, ['startTime'], [sortOrder.startTime])
 
   return (
     <ListTable
@@ -122,7 +123,7 @@ function Within45DaysTableComponent(props: ITableProps) {
           label: intl.formatMessage(constantsMessages.timePeriod),
           width: 30,
           isSortable: true,
-          sortFunction: () => toggleSort('index'),
+          sortFunction: () => toggleSort('startTime'),
           icon: <ArrowDownBlue />
         },
         {

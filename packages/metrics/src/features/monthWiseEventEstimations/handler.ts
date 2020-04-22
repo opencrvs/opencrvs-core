@@ -33,6 +33,8 @@ interface IMonthWiseEstimation {
   estimated45DayPercentage: number
   month: string
   year: string
+  startOfMonth: string
+  endOfMonth: string
 }
 
 export async function monthWiseEventEstimationsHandler(
@@ -61,6 +63,8 @@ export async function monthWiseEventEstimationsHandler(
     )
 
     estimations.push({
+      startOfMonth: monthFilter.startOfMonthTime,
+      endOfMonth: monthFilter.endOfMonthTime,
       actualTotalRegistration: await getTotalNumberOfRegistrations(
         monthFilter.startOfMonthTime,
         monthFilter.endOfMonthTime,

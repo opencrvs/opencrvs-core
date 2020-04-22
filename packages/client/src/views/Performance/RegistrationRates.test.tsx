@@ -21,7 +21,10 @@ import {
 import { AppStore } from '@client/store'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
-import { HAS_CHILD_LOCATION } from '@client/views/Performance/queries'
+import {
+  HAS_CHILD_LOCATION,
+  FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+} from '@client/views/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const LOCATION_DHAKA_DIVISION = {
@@ -35,6 +38,41 @@ const graphqlMocks = [
     request: {
       query: HAS_CHILD_LOCATION,
       variables: { parentId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b' }
+    },
+    result: {
+      data: {
+        hasChildLocation: {
+          id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
+          type: 'ADMIN_STRUCTURE',
+          identifier: [
+            {
+              system: 'http://opencrvs.org/specs/id/geo-id',
+              value: '4194'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/bbs-code',
+              value: '11'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+              value: 'UNION'
+            },
+            {
+              system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+              value: 'division=9&district=30&upazila=233&union=4194'
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+      variables: {
+        event: 'BIRTH',
+        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+      }
     },
     result: {
       data: {

@@ -44,6 +44,7 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
         estimated45DayPercentage
         month
         year
+        startOfMonth
       }
       total {
         actualTotalRegistration
