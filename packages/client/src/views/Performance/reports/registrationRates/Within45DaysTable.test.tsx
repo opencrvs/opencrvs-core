@@ -22,22 +22,34 @@ describe('Within45DaysTable tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
 
-  const mockData = [
-    {
-      time: new Date(2020, 3),
-      total: 10000,
-      regWithin45d: 5000,
-      estimated: 20000,
-      percentage: 23.5
-    },
-    {
-      time: new Date(2020, 2),
-      total: 8000,
-      regWithin45d: 4500,
-      estimated: 20000,
-      percentage: 16
+  const mockData = {
+    details: [
+      {
+        actualTotalRegistration: 20,
+        actual45DayRegistration: 9,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 4.5,
+        month: 'April',
+        year: '2020',
+        startOfMonth: '2020-03-30T18:00:00.000Z'
+      },
+      {
+        actualTotalRegistration: 10,
+        actual45DayRegistration: 0,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 0,
+        month: 'March',
+        year: '2020',
+        startOfMonth: '2020-02-29T18:00:00.000Z'
+      }
+    ],
+    total: {
+      actualTotalRegistration: 30,
+      actual45DayRegistration: 9,
+      estimatedRegistration: 45,
+      estimated45DayPercentage: 2.25
     }
-  ]
+  }
 
   beforeAll(async () => {
     store = (await createTestStore()).store
@@ -45,7 +57,11 @@ describe('Within45DaysTable tests', () => {
 
   beforeEach(async () => {
     component = (await createTestComponent(
-      <Within45DaysTable eventType={Event.BIRTH} data={mockData} />,
+      <Within45DaysTable
+        loading={false}
+        eventType={Event.BIRTH}
+        data={mockData}
+      />,
       store
     )).component
   })

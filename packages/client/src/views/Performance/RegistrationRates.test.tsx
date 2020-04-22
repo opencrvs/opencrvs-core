@@ -32,6 +32,8 @@ const LOCATION_DHAKA_DIVISION = {
   id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
   searchableText: 'Dhaka'
 }
+const timeStart = new Date(2019, 11, 6)
+const timeEnd = new Date(2019, 11, 13)
 
 const graphqlMocks = [
   {
@@ -71,32 +73,40 @@ const graphqlMocks = [
       query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
       variables: {
         event: 'BIRTH',
-        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+        timeStart: timeStart.toISOString(),
+        timeEnd: timeEnd.toISOString()
       }
     },
     result: {
       data: {
-        hasChildLocation: {
-          id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
-          type: 'ADMIN_STRUCTURE',
-          identifier: [
+        fetchMonthWiseEventMetrics: {
+          details: [
             {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '4194'
+              actualTotalRegistration: 20,
+              actual45DayRegistration: 9,
+              estimatedRegistration: 45,
+              estimated45DayPercentage: 4.5,
+              month: 'April',
+              year: '2020',
+              startOfMonth: '2020-03-30T18:00:00.000Z'
             },
             {
-              system: 'http://opencrvs.org/specs/id/bbs-code',
-              value: '11'
-            },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION'
-            },
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-              value: 'division=9&district=30&upazila=233&union=4194'
+              actualTotalRegistration: 10,
+              actual45DayRegistration: 0,
+              estimatedRegistration: 45,
+              estimated45DayPercentage: 0,
+              month: 'March',
+              year: '2020',
+              startOfMonth: '2020-02-29T18:00:00.000Z'
             }
-          ]
+          ],
+          total: {
+            actualTotalRegistration: 30,
+            actual45DayRegistration: 9,
+            estimatedRegistration: 45,
+            estimated45DayPercentage: 2.25
+          }
         }
       }
     }
@@ -127,7 +137,9 @@ describe('Registraion Rates tests', () => {
           location: {
             state: {
               title: 'Birth registration rate within 45 days of event',
-              selectedLocation: LOCATION_DHAKA_DIVISION
+              selectedLocation: LOCATION_DHAKA_DIVISION,
+              timeEnd: new Date(1487076708000),
+              timeStart: new Date(1455454308000)
             },
             pathname: EVENT_REGISTRATION_RATES,
             search: '',
