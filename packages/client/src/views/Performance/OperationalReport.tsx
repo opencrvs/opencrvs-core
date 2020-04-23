@@ -36,6 +36,7 @@ import { RegistrationRatesReport } from './reports/operational/RegistrationRates
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
 import { Event } from '@client/forms'
+import { DateRangePicker } from '@client/components/DateRangePicker'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -77,6 +78,15 @@ const HeaderContainer = styled.div`
   & > :nth-child(2) {
     position: relative;
     bottom: 2px;
+  }
+`
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-shrink: 0;
+
+  & > :first-child {
+    margin-right: 8px;
   }
 `
 
@@ -158,7 +168,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <div>
+          <FilterContainer>
             <PerformanceSelect
               id="operational-select"
               value={PERFORMANCE_TYPE.OPERATIONAL}
@@ -173,7 +183,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 }
               ]}
             />
-          </div>
+            <DateRangePicker
+              startDate={timeStart.toDate()}
+              endDate={timeEnd.toDate()}
+              onDatesChange={() => {}}
+            />
+          </FilterContainer>
           <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>
