@@ -148,3 +148,41 @@ describe('get applications started metrics', () => {
     expect(data.fieldAgentApplications).toBe(2)
   })
 })
+describe('get month wise event estimation metrics', () => {
+  it('returns estimated data for both birth', async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify([
+        {
+          actualTotalRegistration: 120,
+          actual45DayRegistration: 50,
+          estimatedRegistration: 356,
+          estimated45DayPercentage: 14,
+          month: 'January',
+          year: '2020'
+        },
+        {
+          actualTotalRegistration: 10,
+          actual45DayRegistration: 0,
+          estimatedRegistration: 356,
+          estimated45DayPercentage: 0,
+          month: 'February',
+          year: '2020'
+        }
+      ])
+    )
+
+    const data = await resolvers.Query.fetchMonthWiseEventMetrics(
+      {},
+      {
+        timeStart: '2019-10-24T18:00:00.000Z',
+        timeEnd: '2019-12-24T18:00:00.000Z',
+        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
+        event: 'birth'
+      }
+    )
+
+    expect(data).toBeDefined()
+    expect(data.details.length).toBe(2)
+    expect(data.total.actualTotalRegistration).toBe(130)
+  })
+})

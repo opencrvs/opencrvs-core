@@ -12,15 +12,29 @@
 import * as React from 'react'
 import { ListTable } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
-import moment from 'moment'
 import { WrappedComponentProps, injectIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
 
+interface IMonthWiseEstimationCount {
+  actualTotalRegistration: number
+  actual45DayRegistration: number
+  estimatedRegistration: number
+  estimated45DayPercentage: number
+}
+interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
+  month: string
+  year: string
+  startOfMonth: string
+}
 interface ITableProps extends WrappedComponentProps {
+  loading: boolean
   eventType: Event
-  data: Array<any>
+  data: {
+    details: IMonthWiseEstimation[]
+    total: IMonthWiseEstimationCount
+  }
 }
 
 enum SORT_ORDER {
@@ -29,51 +43,65 @@ enum SORT_ORDER {
 }
 
 interface SortMap {
-  time: SORT_ORDER
+  startTime: SORT_ORDER
 }
 
 const INITIAL_SORT_MAP = {
-  time: SORT_ORDER.DESCENDING
+  startTime: SORT_ORDER.DESCENDING
 }
 
 function Within45DaysTableComponent(props: ITableProps) {
-  const { intl, eventType } = props
+  const { intl, loading, eventType } = props
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
-  moment.locale(intl.locale)
-  moment.defaultFormat = 'MMMM YYYY'
+  const content =
+    (props.data &&
+      props.data.details &&
+      props.data.details.map(item => ({
+        startTime: item.startOfMonth,
+        month: `${item.month} ${item.year}`,
+        totalRegistered: String(item.actualTotalRegistration),
+        registeredWithin45d: String(item.actual45DayRegistration),
+        estimated: String(item.estimatedRegistration),
+        rateOfRegistrationWithin45d: `${item.estimated45DayPercentage}%`
+      }))) ||
+    []
 
-  const content = props.data.map(item => ({
-    time: String((item.time as Date).getTime()),
-    month: moment(item.time).format(),
-    totalRegistered: item.total,
-    registeredWithin45d: item.regWithin45d,
-    estimated: item.estimated,
-    rateOfRegistrationWithin45d: `${Number(item.percentage).toFixed(1)}%`
-  }))
-
-  const sumData = props.data.reduce(
-    (totalItem, item) => ({
-      total: (totalItem.total || 0) + item.total,
-      regWithin45d: (totalItem.regWithin45d || 0) + item.regWithin45d,
-      estimated: (totalItem.estimated || 0) + item.estimated,
-      percentage: (totalItem.percentage || 0) + item.percentage
-    }),
-    {}
-  )
-
-  const footerColumns = [
-    { label: props.intl.formatMessage(constantsMessages.total), width: 30 },
-    { label: sumData.total, width: 15 },
-    { label: sumData.regWithin45d, width: 15 },
-    { label: sumData.estimated, width: 15 },
-    {
-      label: intl.formatMessage(constantsMessages.averageRateOfRegistrations, {
-        amount: (sumData.percentage / props.data.length).toFixed(1)
-      }),
-      width: 25
-    }
-  ]
+  function getFooterColumns() {
+    const {
+      actualTotalRegistration = 0,
+      actual45DayRegistration = 0,
+      estimatedRegistration = 0,
+      estimated45DayPercentage = 0
+    } = (props.data && props.data.total) || {}
+    return [
+      {
+        label: props.intl.formatMessage(constantsMessages.total),
+        width: 30
+      },
+      {
+        label: String(actualTotalRegistration),
+        width: 15
+      },
+      {
+        label: String(actual45DayRegistration),
+        width: 20
+      },
+      {
+        label: String(estimatedRegistration),
+        width: 15
+      },
+      {
+        label: intl.formatMessage(
+          constantsMessages.averageRateOfRegistrations,
+          {
+            amount: estimated45DayPercentage
+          }
+        ),
+        width: 20
+      }
+    ]
+  }
 
   function toggleSort(key: keyof SortMap) {
     const invertedOrder =
@@ -83,19 +111,19 @@ function Within45DaysTableComponent(props: ITableProps) {
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
   }
 
-  const sortedContent = orderBy(content, ['time'], [sortOrder.time])
+  const sortedContent = orderBy(content, ['startTime'], [sortOrder.startTime])
 
   return (
     <ListTable
       noResultText={intl.formatMessage(constantsMessages.noResults)}
-      hideBoxShadow={true}
+      isLoading={loading}
       columns={[
         {
           key: 'month',
           label: intl.formatMessage(constantsMessages.timePeriod),
           width: 30,
           isSortable: true,
-          sortFunction: () => toggleSort('time'),
+          sortFunction: () => toggleSort('startTime'),
           icon: <ArrowDownBlue />
         },
         {
@@ -106,7 +134,7 @@ function Within45DaysTableComponent(props: ITableProps) {
         {
           key: 'registeredWithin45d',
           label: intl.formatMessage(constantsMessages.registeredWithin45d),
-          width: 15
+          width: 20
         },
         {
           key: 'estimated',
@@ -120,12 +148,13 @@ function Within45DaysTableComponent(props: ITableProps) {
           label: intl.formatMessage(
             constantsMessages.rateOfRegistrationWithin45d
           ),
-          width: 25
+          width: 20
         }
       ]}
       pageSize={sortedContent.length}
       content={sortedContent}
-      footerColumns={footerColumns}
+      footerColumns={getFooterColumns()}
+      hideBoxShadow={true}
     />
   )
 }

@@ -59,7 +59,9 @@ import {
   GQLCertificationPaymentDetailsMetrics,
   GQLCertificationPaymentTotalCount,
   GQLEstimate45DayTotalCount,
-  GQLEstimated45DayMetrics
+  GQLEstimated45DayMetrics,
+  GQLMonthWise45DayEstimation,
+  GQLMonthWise45DayEstimationCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1141,5 +1143,43 @@ export function paymentTotalCalculator(
       total: accumulator.total + item.total
     }),
     { total: 0 }
+  )
+}
+
+export function monthWise45DayEstimationCalculator(
+  monthWise45DayEstimations: Array<GQLMonthWise45DayEstimation>
+): GQLMonthWise45DayEstimationCount {
+  const initialValue: GQLMonthWise45DayEstimationCount = {
+    actualTotalRegistration: 0,
+    actual45DayRegistration: 0,
+    estimatedRegistration: 0,
+    estimated45DayPercentage: 0
+  }
+  return reduce(
+    monthWise45DayEstimations,
+    (accumulator, item) => {
+      const actualTotalRegistration =
+        accumulator.actualTotalRegistration + item.actualTotalRegistration
+      const actual45DayRegistration =
+        accumulator.actual45DayRegistration + item.actual45DayRegistration
+      const estimatedRegistration =
+        accumulator.estimatedRegistration + item.estimatedRegistration
+
+      return {
+        actualTotalRegistration,
+        actual45DayRegistration,
+        estimatedRegistration,
+        estimated45DayPercentage:
+          actual45DayRegistration === 0 || estimatedRegistration === 0
+            ? 0
+            : Number(
+                (
+                  (actual45DayRegistration / estimatedRegistration) *
+                  100
+                ).toFixed(2)
+              )
+      }
+    },
+    initialValue
   )
 }

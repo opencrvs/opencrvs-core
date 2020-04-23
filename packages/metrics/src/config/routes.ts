@@ -25,6 +25,7 @@ import {
 } from '@metrics/features/registration/handler'
 import { metricsHandler } from '@metrics/features/metrics/handler'
 import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
+import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 import { applicationsStartedHandler } from '@metrics/features/applicationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { exportHandler } from '@metrics/features/export/handler'
@@ -235,6 +236,23 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             locationId: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'GET',
+      path: '/monthWiseEventEstimations',
+      handler: monthWiseEventEstimationsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string().required(),
+            event: Joi.string().required()
           })
         },
         tags: ['api']
