@@ -35,7 +35,8 @@ const colorDictionary = {
   nightshadeDark: '#42506B',
   nightshadeLight: '#485F88',
   darkSteel: '#707C80',
-  lightGrey: '#F9F9F9'
+  lightGrey: '#F9F9F9',
+  mercury: '#E5E5E5'
 }
 
 export const gradients = {
@@ -70,6 +71,7 @@ export const colors = {
   white: colorDictionary.white,
   black: colorDictionary.black,
   focus: colorDictionary.yellowFocus,
+  smallButtonFocus: colorDictionary.mercury,
 
   // Exceptions - Try to use one of the above before creating exceptions
   chartAreaGradientStart: colorDictionary.greySmoky,
