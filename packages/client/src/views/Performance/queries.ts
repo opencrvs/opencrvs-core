@@ -55,3 +55,34 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
     }
   }
 `
+
+export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
+  query data(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String!
+    $event: String!
+  ) {
+    fetchLocationWiseEventMetrics(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+    ) {
+      details {
+        actualTotalRegistration
+        actual45DayRegistration
+        estimatedRegistration
+        estimated45DayPercentage
+        locationId
+        locationName
+      }
+      total {
+        actualTotalRegistration
+        actual45DayRegistration
+        estimatedRegistration
+        estimated45DayPercentage
+      }
+    }
+  }
+`
