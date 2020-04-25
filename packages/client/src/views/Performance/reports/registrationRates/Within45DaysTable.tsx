@@ -16,6 +16,11 @@ import { WrappedComponentProps, injectIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
+import {
+  REG_RATE_BASE,
+  IEstimationBase
+} from '@client/views/Performance/RegistrationRates'
+import { messages } from '@client/i18n/messages/views/performance'
 
 interface IMonthWiseEstimationCount {
   actualTotalRegistration: number
@@ -24,13 +29,15 @@ interface IMonthWiseEstimationCount {
   estimated45DayPercentage: number
 }
 interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
-  month: string
-  year: string
-  startOfMonth: string
+  month?: string
+  year?: string
+  startOfMonth?: string
+  locationName?: string
 }
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
   eventType: Event
+  base: IEstimationBase
   data: {
     details: IMonthWiseEstimation[]
     total: IMonthWiseEstimationCount
@@ -44,20 +51,23 @@ enum SORT_ORDER {
 
 interface SortMap {
   startTime: SORT_ORDER
+  location: SORT_ORDER
 }
 
 const INITIAL_SORT_MAP = {
-  startTime: SORT_ORDER.DESCENDING
+  startTime: SORT_ORDER.DESCENDING,
+  location: SORT_ORDER.ASCENDING
 }
 
 function Within45DaysTableComponent(props: ITableProps) {
-  const { intl, loading, eventType } = props
+  const { intl, loading, eventType, base } = props
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
   const content =
     (props.data &&
       props.data.details &&
       props.data.details.map(item => ({
+        location: item.locationName,
         startTime: item.startOfMonth,
         month: `${item.month} ${item.year}`,
         totalRegistered: String(item.actualTotalRegistration),
@@ -111,19 +121,40 @@ function Within45DaysTableComponent(props: ITableProps) {
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
   }
 
-  const sortedContent = orderBy(content, ['startTime'], [sortOrder.startTime])
-
+  const sortedContent = orderBy(
+    content,
+    ['startTime', 'location'],
+    [sortOrder.startTime, sortOrder.location]
+  )
+  let firstColProp: {
+    dataKey: string
+    label: string
+    sortKey: keyof SortMap
+  } = {
+    dataKey: 'month',
+    label: intl.formatMessage(constantsMessages.timePeriod),
+    sortKey: 'startTime'
+  }
+  if (base.baseType === REG_RATE_BASE.LOCATION) {
+    firstColProp = {
+      dataKey: 'location',
+      label: intl.formatMessage(messages.locationTitle, {
+        jurisdictionType: base.locationJurisdictionType
+      }),
+      sortKey: 'location'
+    }
+  }
   return (
     <ListTable
       noResultText={intl.formatMessage(constantsMessages.noResults)}
       isLoading={loading}
       columns={[
         {
-          key: 'month',
-          label: intl.formatMessage(constantsMessages.timePeriod),
+          key: firstColProp.dataKey,
+          label: firstColProp.label,
           width: 30,
           isSortable: true,
-          sortFunction: () => toggleSort('startTime'),
+          sortFunction: () => toggleSort(firstColProp.sortKey),
           icon: <ArrowDownBlue />
         },
         {
