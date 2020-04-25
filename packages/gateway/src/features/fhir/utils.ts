@@ -61,7 +61,8 @@ import {
   GQLEstimate45DayTotalCount,
   GQLEstimated45DayMetrics,
   GQLMonthWise45DayEstimation,
-  GQLMonthWise45DayEstimationCount
+  GQLLocationWise45DayEstimation,
+  GQLEventIn45DayEstimationCount
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
@@ -1146,17 +1147,19 @@ export function paymentTotalCalculator(
   )
 }
 
-export function monthWise45DayEstimationCalculator(
-  monthWise45DayEstimations: Array<GQLMonthWise45DayEstimation>
-): GQLMonthWise45DayEstimationCount {
-  const initialValue: GQLMonthWise45DayEstimationCount = {
+export function eventIn45DayEstimationCalculator(
+  eventIn45DayEstimations: Array<
+    GQLMonthWise45DayEstimation | GQLLocationWise45DayEstimation
+  >
+): GQLEventIn45DayEstimationCount {
+  const initialValue: GQLEventIn45DayEstimationCount = {
     actualTotalRegistration: 0,
     actual45DayRegistration: 0,
     estimatedRegistration: 0,
     estimated45DayPercentage: 0
   }
   return reduce(
-    monthWise45DayEstimations,
+    eventIn45DayEstimations,
     (accumulator, item) => {
       const actualTotalRegistration =
         accumulator.actualTotalRegistration + item.actualTotalRegistration
