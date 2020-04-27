@@ -13,7 +13,10 @@ import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { createTestStore, createTestComponent } from '@client/tests/util'
 import { AppStore } from '@client/store'
-import { OperationalReport } from './OperationalReport'
+import {
+  OperationalReport,
+  OPERATIONAL_REPORT_SECTION
+} from './OperationalReport'
 import { OPERATIONAL_REPORT } from '@client/navigation/routes'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
@@ -44,7 +47,8 @@ describe('OperationalReport tests', () => {
         history={{
           location: {
             state: {
-              selectedLocation: LOCATION_DHAKA_DIVISION
+              selectedLocation: LOCATION_DHAKA_DIVISION,
+              sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL
             },
             pathname: OPERATIONAL_REPORT,
             search: '',

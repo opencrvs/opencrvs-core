@@ -37,6 +37,7 @@ import { getJurisidictionType } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 
 const { useState } = React
 const Header = styled.h1`
@@ -97,7 +98,12 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           id="reg-rates-action-back"
           icon={() => <ArrowBack />}
           align={ICON_ALIGNMENT.LEFT}
-          onClick={() => goToOperationalReport(selectedLocation)}
+          onClick={() =>
+            goToOperationalReport(
+              selectedLocation,
+              OPERATIONAL_REPORT_SECTION.OPERATIONAL
+            )
+          }
         >
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>

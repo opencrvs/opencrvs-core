@@ -185,6 +185,7 @@ describe('Registraion Rates tests', () => {
     await flushPromises()
     expect(history.location.pathname).toBe('/performance/operations')
     expect(history.location.state).toEqual({
+      sectionId: 'OPERATIONAL',
       selectedLocation: LOCATION_DHAKA_DIVISION
     })
   })

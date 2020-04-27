@@ -215,14 +215,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
         <ActionContainer>
           <div>
             <PerformanceSelect
-              onChange={(selectedValue: string) =>
+              onChange={option =>
                 this.props.goToOperationalReport(
                   selectedLocation,
-                  selectedValue as OPERATIONAL_REPORT_SECTION
+                  option.value as OPERATIONAL_REPORT_SECTION
                 )
               }
               id="operational-select"
-              value={OPERATIONAL_REPORT_SECTION.OPERATIONAL}
+              value={sectionId || OPERATIONAL_REPORT_SECTION.OPERATIONAL}
               options={[
                 {
                   label: intl.formatMessage(messages.operational),
