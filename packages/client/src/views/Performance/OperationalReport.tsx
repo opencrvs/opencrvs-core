@@ -213,14 +213,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <div>
+          <div id="operational-report-view">
             <PerformanceSelect
-              onChange={option =>
+              onChange={option => {
                 this.props.goToOperationalReport(
                   selectedLocation,
                   option.value as OPERATIONAL_REPORT_SECTION
                 )
-              }
+              }}
               id="operational-select"
               value={sectionId || OPERATIONAL_REPORT_SECTION.OPERATIONAL}
               options={[
@@ -279,7 +279,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </Query>
         )}
         {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
-          <MonthlyReportsList>
+          <MonthlyReportsList id="report-lists">
             <ListTable
               tableTitle={intl.formatMessage(constantsMessages.birth)}
               isLoading={false}

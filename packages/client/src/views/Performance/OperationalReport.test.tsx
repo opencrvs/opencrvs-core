@@ -11,7 +11,11 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { createTestStore, createTestComponent } from '@client/tests/util'
+import {
+  createTestStore,
+  createTestComponent,
+  flushPromises
+} from '@client/tests/util'
 import { AppStore } from '@client/store'
 import {
   OperationalReport,
@@ -90,6 +94,9 @@ describe('OperationalReport tests', () => {
         .hostNodes()
         .text()
     ).toBe('Operational')
+    expect(
+      component.find('#registration-rates-reports-loader').hostNodes()
+    ).toHaveLength(0)
   })
 
   it('on details link click will forward time range and location to route', async () => {
@@ -113,5 +120,61 @@ describe('OperationalReport tests', () => {
       timeStart: new Date(1455454308000),
       title: 'Birth registration rate within 45 days of event'
     })
+  })
+
+  it('performance select updates history when changed', async () => {
+    const performanceSelect = await waitForElement(
+      component,
+      '#operational-select'
+    )
+    performanceSelect.prop('onChange')({ label: 'Reports', value: 'REPORTS' })
+    component.update()
+    expect(history.location.state).toEqual({
+      selectedLocation: LOCATION_DHAKA_DIVISION,
+      sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
+    })
+  })
+})
+describe('OperationalReport reports tests', () => {
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History<any>
+
+  const LOCATION_DHAKA_DIVISION = {
+    displayLabel: 'Dhaka Division',
+    id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+    searchableText: 'Dhaka'
+  }
+
+  beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
+  })
+
+  beforeEach(async () => {
+    const testComponent = await createTestComponent(
+      <OperationalReport
+        // @ts-ignore
+        history={{
+          location: {
+            state: {
+              selectedLocation: LOCATION_DHAKA_DIVISION,
+              sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
+            },
+            pathname: OPERATIONAL_REPORT,
+            search: '',
+            hash: ''
+          }
+        }}
+      />,
+      store
+    )
+    component = testComponent.component
+  })
+
+  it('renders report lists', async () => {
+    expect(component.find('#report-lists').hostNodes()).toHaveLength(1)
   })
 })
