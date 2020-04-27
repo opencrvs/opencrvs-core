@@ -55,8 +55,9 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { OperationalReport } from './views/Performance/OperationalReport'
-import { PerformanceHome } from './views/Performance/PerformanceHome'
+import { OperationalReport } from '@client/views/Performance/OperationalReport'
+import { PerformanceHome } from '@client/views/Performance/PerformanceHome'
+import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -303,6 +304,13 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.OPERATIONAL_REPORT}
                                             component={OperationalReport}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.EVENT_REGISTRATION_RATES
+                                            }
+                                            component={RegistrationRates}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

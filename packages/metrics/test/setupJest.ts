@@ -25,6 +25,7 @@ jest.mock('@metrics/api', () => ({
   __esModule: true,
   fetchTaskHistory: jest.fn(),
   fetchLocation: jest.fn(),
+  fetchChildLocationsByParentId: jest.fn(),
   fetchFromResource: jest.fn(),
   fetchAllFromSearch: jest.fn(),
   fetchParentLocationByLocationID: jest.fn(),
@@ -40,18 +41,74 @@ beforeEach(() => {
   const {
     fetchTaskHistory,
     fetchLocation,
+    fetchChildLocationsByParentId,
     fetchFromResource,
     fetchAllFromSearch,
     fetchPractitionerRole
   }: {
     fetchTaskHistory: jest.Mock
     fetchLocation: jest.Mock
+    fetchChildLocationsByParentId: jest.Mock
     fetchFromResource: jest.Mock
     fetchAllFromSearch: jest.Mock
     fetchPractitionerRole: jest.Mock
-    fetchParentLocationByLocationID: jest.Mock
   } = require('@metrics/api')
   fetchTaskHistory.mockResolvedValue(taskHistory)
+  fetchFromResource.mockResolvedValueOnce({ crudeDeathRate: 5.1 })
+  fetchChildLocationsByParentId.mockResolvedValueOnce([
+    {
+      resourceType: 'Location',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/internal-id',
+          value: 'FACILITY000002'
+        }
+      ],
+      name: 'Moktarpur Union Parishad',
+      alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
+      status: 'active',
+      mode: 'instance',
+      partOf: {
+        reference: 'Location/9e7ce1b1-a28e-46fd-9aad-8a9cd215b15c'
+      },
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/location-type',
+            code: 'CRVS_OFFICE'
+          }
+        ]
+      },
+      physicalType: {
+        coding: [
+          {
+            code: 'bu',
+            display: 'Building'
+          }
+        ]
+      },
+      telecom: [
+        {
+          system: 'phone',
+          value: ''
+        },
+        {
+          system: 'email',
+          value: ''
+        }
+      ],
+      address: {
+        line: ['Moktarpur', 'Kaliganj'],
+        district: 'Gazipur',
+        state: 'Dhaka'
+      },
+      meta: {
+        lastUpdated: '2019-09-05T14:13:52.662+00:00',
+        versionId: '7907e8b8-83dd-4837-a088-1c77a320ecca'
+      },
+      id: 'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5'
+    }
+  ])
   fetchLocation
     .mockResolvedValueOnce({
       resourceType: 'Location',
@@ -300,7 +357,6 @@ beforeEach(() => {
         versionId: '6feda4ca-6168-4f6e-b47e-2a2b81916668'
       }
     })
-  fetchFromResource.mockResolvedValueOnce({ crudeDeathRate: 5.1 })
   fetchAllFromSearch.mockResolvedValueOnce({
     body: {
       took: 19,

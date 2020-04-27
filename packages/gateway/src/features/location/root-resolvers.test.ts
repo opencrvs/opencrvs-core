@@ -41,4 +41,24 @@ describe('Location root resolvers', () => {
       expect(composition).toBeDefined()
     })
   })
+  describe('hasChildLocation()', () => {
+    it('returns a location object if found', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {}
+            }
+          ]
+        })
+      )
+      // @ts-ignore
+      const composition = await resolvers.Query.hasChildLocation(
+        {},
+        { parentId: '1' }
+      )
+
+      expect(composition).toBeDefined()
+    })
+  })
 })
