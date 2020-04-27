@@ -17,8 +17,9 @@ import { createTestStore, createTestComponent } from '@client/tests/util'
 import { Within45DaysTable } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { REG_RATE_BASE } from '@client/views/Performance/RegistrationRates'
 
-describe('Within45DaysTable tests', () => {
+describe('Within45DaysTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
 
@@ -59,6 +60,7 @@ describe('Within45DaysTable tests', () => {
     component = (await createTestComponent(
       <Within45DaysTable
         loading={false}
+        base={{ baseType: REG_RATE_BASE.TIME }}
         eventType={Event.BIRTH}
         data={mockData}
       />,
@@ -68,6 +70,7 @@ describe('Within45DaysTable tests', () => {
 
   it('runs without crashing', async () => {
     const firstRowElement = await waitForElement(component, '#row_0')
+    expect(firstRowElement).toBeDefined()
   })
 
   it('toggles sorting order of the list', async () => {
@@ -91,5 +94,83 @@ describe('Within45DaysTable tests', () => {
         .childAt(0)
         .text()
     ).toBe('March 2020')
+  })
+})
+describe('Within45DaysTable tests for by location option', () => {
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+
+  const mockData = {
+    details: [
+      {
+        actualTotalRegistration: 20,
+        actual45DayRegistration: 9,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 4.5,
+        locationName: 'Atpara Sadar',
+        locationId: '123'
+      },
+      {
+        actualTotalRegistration: 10,
+        actual45DayRegistration: 0,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 0,
+        locationName: 'Baniajan',
+        locationId: '456'
+      }
+    ],
+    total: {
+      actualTotalRegistration: 30,
+      actual45DayRegistration: 9,
+      estimatedRegistration: 45,
+      estimated45DayPercentage: 2.25
+    }
+  }
+
+  beforeAll(async () => {
+    store = (await createTestStore()).store
+  })
+
+  beforeEach(async () => {
+    component = (await createTestComponent(
+      <Within45DaysTable
+        loading={false}
+        base={{
+          baseType: REG_RATE_BASE.LOCATION,
+          locationJurisdictionType: 'UNION'
+        }}
+        eventType={Event.BIRTH}
+        data={mockData}
+      />,
+      store
+    )).component
+  })
+
+  it('runs without crashing', async () => {
+    const firstRowElement = await waitForElement(component, '#row_0')
+    expect(firstRowElement).toBeDefined()
+  })
+
+  it('toggles sorting order of the list', async () => {
+    const firstRowElement = await waitForElement(component, '#row_0')
+    const toggleSortActionElement = await waitForElement(
+      component,
+      '#location-label'
+    )
+    expect(
+      firstRowElement
+        .hostNodes()
+        .childAt(0)
+        .text()
+    ).toBe('Atpara Sadar')
+
+    toggleSortActionElement.hostNodes().simulate('click')
+
+    expect(
+      firstRowElement
+        .hostNodes()
+        .childAt(0)
+        .text()
+    ).toBe('Baniajan')
   })
 })

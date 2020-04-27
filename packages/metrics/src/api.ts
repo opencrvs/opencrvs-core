@@ -55,6 +55,16 @@ export async function fetchParentLocationByLocationID(
   return location && location.partOf && location.partOf.reference
 }
 
+export async function fetchChildLocationsByParentId(
+  locationId: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(
+    `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`,
+    authHeader
+  )
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,

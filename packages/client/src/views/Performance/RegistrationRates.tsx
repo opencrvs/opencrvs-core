@@ -24,10 +24,14 @@ import styled from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import {
   HAS_CHILD_LOCATION,
-  FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+  FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+  FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
 } from './queries'
 import { messages } from '@client/i18n/messages/views/performance'
-import { PerformanceSelect } from './PerformanceSelect'
+import {
+  PerformanceSelect,
+  IPerformanceSelectOption
+} from './PerformanceSelect'
 import { connect } from 'react-redux'
 import { getJurisidictionType } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
@@ -52,7 +56,7 @@ const ActionContainer = styled.div`
     margin-right: 0;
   }
 `
-enum REG_RATE_BASE {
+export enum REG_RATE_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'
 }
@@ -64,8 +68,15 @@ type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
   IDispatchProps
 
+export interface IEstimationBase {
+  baseType: REG_RATE_BASE
+  locationJurisdictionType?: string
+}
+
 function RegistrationRatesComponent(props: IRegistrationRateProps) {
-  const [base, setBase] = useState<REG_RATE_BASE>(REG_RATE_BASE.TIME)
+  const [base, setBase] = useState<IEstimationBase>({
+    baseType: REG_RATE_BASE.TIME
+  })
 
   const {
     intl,
@@ -98,7 +109,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
         variables={{ parentId: selectedLocation.id }}
       >
         {({ data, loading, error }) => {
-          let options = [
+          let options: IPerformanceSelectOption[] = [
             {
               label: intl.formatMessage(messages.overTime),
               value: REG_RATE_BASE.TIME
@@ -114,7 +125,8 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
               label: intl.formatMessage(messages.byLocation, {
                 jurisdictionType
               }),
-              value: REG_RATE_BASE.LOCATION
+              value: REG_RATE_BASE.LOCATION,
+              type: jurisdictionType || ''
             })
           }
 
@@ -122,16 +134,25 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             <ActionContainer>
               <PerformanceSelect
                 id="base-select"
-                value={base}
+                value={base.baseType}
                 options={options}
-                onChange={val => setBase(val as REG_RATE_BASE)}
+                onChange={option =>
+                  setBase({
+                    baseType: option.value as REG_RATE_BASE,
+                    locationJurisdictionType: option.type
+                  })
+                }
               />
             </ActionContainer>
           )
         }}
       </Query>
       <Query
-        query={FETCH_MONTH_WISE_EVENT_ESTIMATIONS}
+        query={
+          base.baseType === REG_RATE_BASE.TIME
+            ? FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+            : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
+        }
         variables={{
           event: eventType.toUpperCase(),
           timeStart: timeStart.toISOString(),
@@ -147,7 +168,12 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             return (
               <Within45DaysTable
                 loading={loading}
-                data={data && data.fetchMonthWiseEventMetrics}
+                base={base}
+                data={
+                  data &&
+                  (data.fetchMonthWiseEventMetrics ||
+                    data.fetchLocationWiseEventMetrics)
+                }
                 eventType={eventType as Event}
               />
             )
