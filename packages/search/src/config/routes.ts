@@ -11,7 +11,10 @@
  */
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
-import { searchDeclaration } from '@search/features/search/handler'
+import {
+  searchDeclaration,
+  getAllDocumentsHandler
+} from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 
 const enum RouteScope {
@@ -89,6 +92,18 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Marks the application as not a duplicate'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/search/all',
+      handler: getAllDocumentsHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+        },
+        description: 'Returns all the documents in the index'
       }
     }
   ]

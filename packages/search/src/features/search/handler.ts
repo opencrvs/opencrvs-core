@@ -14,6 +14,7 @@ import { logger } from '@search/logger'
 import { internal } from 'boom'
 import { searchComposition } from '@search/features/search/service'
 import { ISearchQuery } from '@search/features/search/types'
+import { client } from '@search/elasticsearch/client'
 
 export async function searchDeclaration(
   request: Hapi.Request,
@@ -25,5 +26,28 @@ export async function searchDeclaration(
   } catch (error) {
     logger.error(`Search/searchDeclarationHandler: error: ${error}`)
     return internal(error)
+  }
+}
+
+export async function getAllDocumentsHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const allDocuments = await client.search(
+      {
+        index: 'ocrvs',
+        body: {
+          query: { match_all: {} },
+          sort: [{ dateOfApplication: 'asc' }]
+        }
+      },
+      {
+        ignore: [404]
+      }
+    )
+    return h.response(allDocuments).code(200)
+  } catch (err) {
+    return internal(err)
   }
 }

@@ -30,6 +30,7 @@ import { locationWiseEventEstimationsHandler } from '@metrics/features/locationW
 import { applicationsStartedHandler } from '@metrics/features/applicationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { exportHandler } from '@metrics/features/export/handler'
+import { generateLegacyMetricsHandler } from '@metrics/features/legacy/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -297,6 +298,16 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/export',
       handler: exportHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Generate metrics from legacy data
+    {
+      method: 'GET',
+      path: '/generate',
+      handler: generateLegacyMetricsHandler,
       config: {
         tags: ['api']
       }

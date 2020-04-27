@@ -11,7 +11,7 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, RESOURCE_URL } from '@metrics/constants'
+import { fhirUrl, RESOURCE_URL, SEARCH_URL } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -87,4 +87,51 @@ export function fetchFromResource(
         new Error(`RESOURCE request failed: ${error.message}`)
       )
     })
+}
+
+export function fetchAllFromSearch(authHeader: IAuthHeader) {
+  return fetch(`${SEARCH_URL}search/all`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+export const fetchPractitionerRole = async (
+  practitionerId: string,
+  authHeader: IAuthHeader
+) => {
+  const roleBundle: fhir.Bundle = await fetchFHIR(
+    `PractitionerRole?practitioner=${practitionerId}`,
+    authHeader
+  )
+  const practitionerRole =
+    roleBundle &&
+    roleBundle.entry &&
+    roleBundle.entry &&
+    roleBundle.entry.length > 0 &&
+    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+
+  const roleCode =
+    practitionerRole &&
+    practitionerRole.code &&
+    practitionerRole.code.length > 0 &&
+    practitionerRole.code[0].coding &&
+    practitionerRole.code[0].coding[0].code
+
+  if (roleCode) {
+    return roleCode
+  } else {
+    return Promise.reject(new Error(`Role code cannot be found`))
+  }
 }
