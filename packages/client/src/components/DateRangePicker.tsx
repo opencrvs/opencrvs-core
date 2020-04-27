@@ -18,19 +18,22 @@ import {
   ChevronLeft,
   ChevronRight
 } from '@opencrvs/components/lib/icons'
-import {
-  CircleButton,
-  PrimaryButton,
-  Button
-} from '@opencrvs/components/lib/buttons'
+import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import moment from 'moment'
 
 const { useState } = React
 
-interface IDateRangePickerProps extends WrappedComponentProps {
+interface IDateRange {
   startDate: Date
   endDate: Date
+}
+interface IPresetDateRange extends IDateRange {
+  label: string
+  selected?: boolean
+}
+
+interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({
     startDate,
     endDate
@@ -78,6 +81,7 @@ const ModalContainer = styled.div`
   transform: translate(-16px, -42px);
   ${({ theme }) => theme.shadows.thickShadow};
   border-radius: 4px;
+  color: ${({ theme }) => theme.colors.copy};
 `
 const ModalHeader = styled.div`
   display: flex;
@@ -90,7 +94,6 @@ const TitleContent = styled.div`
   display: flex;
   align-items: center;
   ${({ theme }) => theme.fonts.buttonStyle}
-  color:  ${({ theme }) => theme.colors.copy};
   text-transform: none;
 
   & > :first-child {
@@ -111,7 +114,6 @@ const PresetContainer = styled.div`
 const LabelContainer = styled.div`
   padding: 8px;
   ${({ theme }) => theme.fonts.smallButtonBoldStyle}
-  color: ${({ theme }) => theme.colors.copy};
 `
 const MonthContainer = styled.div`
   flex: 1;
@@ -129,11 +131,43 @@ const MonthButtonsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
 `
-const MonthButton = styled(Button)`
+const PresetRangeButton = styled.button<{ selected?: boolean }>`
+  ${({ theme }) => theme.fonts.bodyStyle}
+  padding: 8px 16px;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+  }
+  ${({ theme, selected }) =>
+    selected
+      ? `background: ${theme.colors.secondary};
+  color: ${theme.colors.white};`
+      : `background: none;
+  color: ${theme.colors.copy};`}
+`
+const MonthButton = styled.button<{ selected?: boolean }>`
   ${({ theme }) => theme.fonts.smallButtonStyle}
   height: 40px;
   width: 64px;
-  color: ${({ theme }) => theme.colors.copy};
+  border: 0;
+  ${({ theme, selected }) =>
+    selected
+      ? `background: ${theme.colors.secondary};
+  color: ${theme.colors.white};`
+      : `background: none;
+  color: ${theme.colors.copy};`}
+
+  cursor: pointer;
+  &:focus {
+    outline: none;
+  }
+  &:disabled {
+    color: ${({ theme }) => theme.colors.dateDisabled};
+    cursor: default;
+  }
 `
 const ModalFooter = styled.div`
   display: flex;
@@ -149,43 +183,140 @@ const CancelableArea = styled.div`
   left: 0;
   z-index: 1;
 `
-
 const StyledPrimaryButton = styled(PrimaryButton)`
   padding: 8px 16px;
   height: auto;
 `
-
 function DateRangePickerComponent(props: IDateRangePickerProps) {
   const [modalVisible, setModalVisible] = useState<boolean>(false)
   const { intl } = props
-  moment.locale(intl.locale)
-  const [startDate, setStartDate] = useState<Date>(props.startDate)
-  const [endDate, setEndDate] = useState<Date>(props.endDate)
 
-  function MonthSelector({ date, label }: { date: Date; label: string }) {
-    const dateMoment = moment(date)
+  moment.locale(intl.locale)
+  const startDateFromProps = moment(props.startDate)
+  const endDateFromProps = moment(props.endDate)
+  const [startDate, setStartDate] = useState<moment.Moment>(startDateFromProps)
+  const [endDate, setEndDate] = useState<moment.Moment>(endDateFromProps)
+
+  const todaysDateMoment = moment()
+
+  function generatePresetOptions(): IPresetDateRange[] {
+    const currentYear = todaysDateMoment.year()
+    const dateToday = todaysDateMoment.toDate()
+    const date30DaysBack = todaysDateMoment
+      .clone()
+      .subtract(30, 'days')
+      .toDate()
+    const date12MonthsBack = todaysDateMoment
+      .clone()
+      .subtract(12, 'months')
+      .toDate()
+    const lastYearMoment = moment([currentYear - 1])
+    const last2YearMoment = moment([currentYear - 2])
+    const last3YearMoment = moment([currentYear - 3])
+
+    return [
+      {
+        label: 'Last 30 days',
+        startDate: date30DaysBack,
+        endDate: dateToday,
+        selected: false
+      },
+      {
+        label: 'Last 12 months',
+        startDate: date12MonthsBack,
+        endDate: dateToday,
+        selected: false
+      },
+      {
+        label: lastYearMoment.format('YYYY'),
+        startDate: lastYearMoment.toDate(),
+        endDate: lastYearMoment.endOf('year').toDate(),
+        selected: false
+      },
+      {
+        label: last2YearMoment.format('YYYY'),
+        startDate: last2YearMoment.toDate(),
+        endDate: last2YearMoment.endOf('year').toDate(),
+        selected: false
+      },
+      {
+        label: last3YearMoment.format('YYYY'),
+        startDate: last3YearMoment.toDate(),
+        endDate: last3YearMoment.endOf('year').toDate(),
+        selected: false
+      }
+    ]
+  }
+
+  const presetOptions = generatePresetOptions()
+
+  const selectedPresetIndexFromProps = presetOptions.findIndex(
+    preset =>
+      moment(preset.startDate).isSame(startDateFromProps, 'month') &&
+      moment(preset.endDate).isSame(endDateFromProps, 'month')
+  )
+
+  const [selectedPresetIndex, selectPresetByIndex] = useState<number>(
+    selectedPresetIndexFromProps
+  )
+
+  presetOptions[selectedPresetIndex].selected = true
+  function MonthSelector({
+    date,
+    label,
+    onSelectDate,
+    hideSelection
+  }: {
+    date: moment.Moment
+    label: string
+    onSelectDate: (date: moment.Moment) => void
+    hideSelection?: boolean
+  }) {
     const months = moment.monthsShort()
+    const year = date.year().toString()
 
     return (
       <MonthContainer>
         <LabelContainer>
-          {date ? `${label}: ${dateMoment.format('MMMM YYYY')}` : label}
+          {date ? `${label}: ${date.format('MMMM YYYY')}` : label}
         </LabelContainer>
         <NavigatorContainer>
           <CircleButton>
             <ChevronLeft />
           </CircleButton>
-          <LabelContainer>{dateMoment.format('YYYY')}</LabelContainer>
+          <LabelContainer>{date.format('YYYY')}</LabelContainer>
           <CircleButton>
             <ChevronRight />
           </CircleButton>
         </NavigatorContainer>
         <MonthButtonsContainer>
-          {months.map((month, index) => (
-            <MonthButton key={index}>{month}</MonthButton>
-          ))}
+          {months.map((month, index) => {
+            const monthDate = moment(`${month}-${year}`, 'MMM-YYYY')
+            return (
+              <MonthButton
+                key={index}
+                disabled={monthDate.isAfter(todaysDateMoment)}
+                selected={!hideSelection && monthDate.isSame(date, 'month')}
+                onClick={() => onSelectDate(monthDate)}
+              >
+                {month}
+              </MonthButton>
+            )
+          })}
         </MonthButtonsContainer>
       </MonthContainer>
+    )
+  }
+
+  function PresetSelector() {
+    return (
+      <PresetContainer>
+        {presetOptions.map((item, index) => (
+          <PresetRangeButton key={index} selected={item.selected}>
+            {item.label}
+          </PresetRangeButton>
+        ))}
+      </PresetContainer>
     )
   }
 
@@ -193,7 +324,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     <div>
       <PickerButton onClick={() => setModalVisible(true)}>
         <ContentWrapper>
-          <span>Last 12 months</span>
+          <span>
+            {selectedPresetIndexFromProps > 0
+              ? presetOptions[selectedPresetIndexFromProps].label
+              : `${startDateFromProps.format(
+                  'MMMM YYYY'
+                )} - ${endDateFromProps.format('MMMM YYYY')}`}
+          </span>
           <Calendar />
         </ContentWrapper>
       </PickerButton>
@@ -214,9 +351,17 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               </CircleButton>
             </ModalHeader>
             <ModalBody>
-              <PresetContainer />
-              <MonthSelector date={startDate} label="From" />
-              <MonthSelector date={endDate} label="To" />
+              <PresetSelector />
+              <MonthSelector
+                date={startDate}
+                label="From"
+                onSelectDate={setStartDate}
+              />
+              <MonthSelector
+                date={endDate}
+                label="To"
+                onSelectDate={setEndDate}
+              />
             </ModalBody>
             <ModalFooter>
               <StyledPrimaryButton>Select</StyledPrimaryButton>

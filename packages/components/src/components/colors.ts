@@ -71,7 +71,6 @@ export const colors = {
   white: colorDictionary.white,
   black: colorDictionary.black,
   focus: colorDictionary.yellowFocus,
-  smallButtonFocus: colorDictionary.mercury,
 
   // Exceptions - Try to use one of the above before creating exceptions
   chartAreaGradientStart: colorDictionary.greySmoky,
@@ -82,6 +81,8 @@ export const colors = {
   gradientLight: colorDictionary.nightshadeLight,
   secondaryLabel: colorDictionary.darkSteel,
   previewBackground: colorDictionary.greyBlackMetal,
+  smallButtonFocus: colorDictionary.mercury,
+  dateDisabled: colorDictionary.greySteel,
 
   // Grey Scrollbar
   scrollBarGrey: colorDictionary.greySteel,
