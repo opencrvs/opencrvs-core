@@ -26,6 +26,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { Header } from './utils'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 
 const MessageContainer = styled.div`
   display: flex;
@@ -77,7 +78,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   searchButtonHandler = () => {
     this.state.selectedLocation &&
-      this.props.goToOperationalReport(this.state.selectedLocation)
+      this.props.goToOperationalReport(
+        this.state.selectedLocation,
+        OPERATIONAL_REPORT_SECTION.OPERATIONAL
+      )
   }
 
   render() {
