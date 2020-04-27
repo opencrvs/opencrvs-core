@@ -101,9 +101,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         />
 
         <MessageContainer>
-          <MessageHeader>Pilot Upazillas</MessageHeader>
-          <StyledText>Bhurungamari Upazilla</StyledText>
-          <StyledText>Narsingdi Upazilla</StyledText>
+          <MessageHeader>Pilot Upazilas</MessageHeader>
+          <StyledText>Bhurungamari Upazila</StyledText>
+          <StyledText>Narsingdi Upazila</StyledText>
         </MessageContainer>
       </PerformanceContentWrapper>
     )

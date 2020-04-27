@@ -16,10 +16,14 @@ import styled from '@client/styledComponents'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { KeyboardArrowDown } from '@opencrvs/components/lib/icons'
 
+export interface IPerformanceSelectOption extends ISelectOption {
+  type?: string
+}
 interface IOperationalSelectProps {
   id?: string
   value: string
-  options: ISelectOption[]
+  options: IPerformanceSelectOption[]
+  onChange?: (selectedOption: IPerformanceSelectOption) => void
 }
 
 const StyledSelect = styled(Select)`
@@ -33,6 +37,7 @@ const StyledSelect = styled(Select)`
     background-color: ${({ theme }) => theme.colors.secondary} !important;
     justify-content: center;
     ${({ theme }) => theme.fonts.buttonStyle};
+    text-transform: none;
 
     &:hover {
       ${({ theme }) => theme.gradients.gradientBabyShade}
@@ -45,6 +50,7 @@ const StyledSelect = styled(Select)`
 
   .react-select__menu {
     min-width: 160px;
+    ${({ theme }) => theme.fonts.bodyStyle};
   }
 
   .react-select__single-value {
@@ -68,9 +74,11 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 function getSelectedOption(
   value: string,
-  options: ISelectOption[]
-): ISelectOption | null {
-  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  options: IPerformanceSelectOption[]
+): IPerformanceSelectOption | null {
+  const selectedOption = options.find(
+    (x: IPerformanceSelectOption) => x.value === value
+  )
   if (selectedOption) {
     return selectedOption
   }
@@ -79,6 +87,12 @@ function getSelectedOption(
 }
 
 export function PerformanceSelect(props: IOperationalSelectProps) {
+  function handleChange(item: IPerformanceSelectOption) {
+    if (props.onChange) {
+      props.onChange(item)
+    }
+  }
+
   return (
     <StyledSelect
       id={props.id}
@@ -87,6 +101,7 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
       classNamePrefix="react-select"
       components={{ DropdownIndicator }}
       options={props.options}
+      onChange={handleChange}
     />
   )
 }

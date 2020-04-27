@@ -11,6 +11,10 @@
  */
 import styled from '@client/styledComponents'
 import moment from 'moment'
+import {
+  GQLLocation,
+  GQLIdentifier
+} from '@opencrvs/gateway/src/graphql/schema'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.menuBackground};
@@ -40,3 +44,20 @@ export const Description = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
 `
+
+export function getJurisidictionType(location: GQLLocation): string | null {
+  let jurisdictionType = null
+
+  const jurisdictionTypeIdentifier =
+    location.identifier &&
+    (location.identifier as GQLIdentifier[]).find(
+      ({ system }: GQLIdentifier) =>
+        system && system === 'http://opencrvs.org/specs/id/jurisdiction-type'
+    )
+
+  if (jurisdictionTypeIdentifier) {
+    jurisdictionType = jurisdictionTypeIdentifier.value as string
+  }
+
+  return jurisdictionType
+}

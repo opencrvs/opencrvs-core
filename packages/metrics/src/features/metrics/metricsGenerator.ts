@@ -362,9 +362,10 @@ export async function fetchKeyFigures(
   const estimatedFigureFor45Days = await fetchEstimateByLocation(
     location,
     45, // For 45 Days
-    new Date().getFullYear(),
     EVENT_TYPE.BIRTH,
-    authHeader
+    authHeader,
+    timeStart,
+    timeEnd
   )
 
   const keyFigures: IBirthKeyFigures[] = []
@@ -394,9 +395,10 @@ export async function fetchKeyFigures(
   const estimatedFigureFor1Year = await fetchEstimateByLocation(
     location,
     365, // For 1 year
-    new Date().getFullYear(),
     EVENT_TYPE.BIRTH,
-    authHeader
+    authHeader,
+    timeStart,
+    timeEnd
   )
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
@@ -628,9 +630,10 @@ export async function fetchEstimated45DayMetrics(
   for (const point of points) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       point[locationLevel],
-      new Date().getFullYear(),
       event,
-      authHeader
+      authHeader,
+      timeFrom,
+      timeTo
     )
     dataFromInflux.push({
       locationId: point[locationLevel],
@@ -654,9 +657,10 @@ export async function fetchEstimated45DayMetrics(
   for (const id of childLocationIds) {
     const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
       id,
-      new Date().getFullYear(),
       event,
-      authHeader
+      authHeader,
+      timeFrom,
+      timeTo
     )
     emptyEstimationData.push({
       locationId: id,
@@ -674,6 +678,30 @@ export async function fetchEstimated45DayMetrics(
     'locationId'
   )
   return estimated45DayData
+}
+
+type Registration = {
+  total: number
+}
+
+export async function getTotalNumberOfRegistrations(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE
+) {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const totalRegistrationPoint: Registration[] = await query(
+    `SELECT COUNT(ageInDays) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )`
+  )
+  return totalRegistrationPoint?.[0]?.total ?? 0
 }
 
 export async function fetchLocationWiseEventEstimations(
@@ -696,6 +724,7 @@ export async function fetchLocationWiseEventEstimations(
       AND ageInDays <= 45
     GROUP BY gender`
   )
+
   let totalRegistrationIn45Day: number = 0
   let totalMaleRegistrationIn45Day: number = 0
   let totalFemaleRegistrationIn45Day: number = 0
@@ -709,9 +738,10 @@ export async function fetchLocationWiseEventEstimations(
   })
   const estimationOf45Day: IEstimation = await fetchEstimateFor45DaysByLocationId(
     locationId,
-    new Date().getFullYear(),
     event,
-    authHeader
+    authHeader,
+    timeFrom,
+    timeTo
   )
 
   return {

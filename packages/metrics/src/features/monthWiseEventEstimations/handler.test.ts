@@ -16,7 +16,7 @@ import * as jwt from 'jsonwebtoken'
 
 const readPoints = influx.query as jest.Mock
 
-describe('verify eventEstimations handler', () => {
+describe('verify monthWiseEventEstimations handler', () => {
   let server: any
   const token = jwt.sign(
     { scope: ['declare'] },
@@ -56,29 +56,15 @@ describe('verify eventEstimations handler', () => {
       })
     readPoints.mockResolvedValueOnce([
       {
-        gender: 'male',
-        total: 3
-      },
-      {
-        gender: 'female',
-        total: 1
+        total: 12
       }
     ])
-    jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
-      .mockReturnValue({
-        totalEstimation: 50,
-        maleEstimation: 30,
-        femaleEstimation: 20,
-        locationId: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
-        locationLevel: 'DISTRICT',
-        estimationYear: 2017
-      })
 
     const res = await server.server.inject({
       method: 'GET',
       url:
-        '/eventEstimations?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        '/monthWiseEventEstimations?timeStart=2020-03-01T18:00:00.000Z&timeEnd=2020-03-30T17:59:59.999Z' +
+        '&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294&event=BIRTH',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -90,7 +76,7 @@ describe('verify eventEstimations handler', () => {
   it('returns 400 for required params', async () => {
     const res = await server.server.inject({
       method: 'GET',
-      url: '/eventEstimations',
+      url: '/monthWiseEventEstimations',
       headers: {
         Authorization: `Bearer ${token}`
       }

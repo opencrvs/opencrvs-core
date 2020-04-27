@@ -15,7 +15,8 @@ import {
   timeFrameTotalCalculator,
   genderBasisTotalCalculator,
   paymentTotalCalculator,
-  estimated45DayMetricsTotalCalculator
+  estimated45DayMetricsTotalCalculator,
+  eventIn45DayEstimationCalculator
 } from '@gateway/features/fhir/utils'
 
 export interface IMetricsParam {
@@ -90,6 +91,46 @@ export const resolvers: GQLResolver = {
         },
         authHeader
       )
+    },
+    async fetchMonthWiseEventMetrics(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      const metricsData = await getMetrics(
+        '/monthWiseEventEstimations',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
+      return {
+        details: metricsData,
+        total: eventIn45DayEstimationCalculator(metricsData)
+      }
+    },
+    async fetchLocationWiseEventMetrics(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      const metricsData = await getMetrics(
+        '/locationWiseEventEstimations',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
+      return {
+        details: metricsData,
+        total: eventIn45DayEstimationCalculator(metricsData)
+      }
     }
   }
 }

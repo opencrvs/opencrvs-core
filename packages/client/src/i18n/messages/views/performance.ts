@@ -30,6 +30,9 @@ interface IPerformanceReportsMessages {
   registrationRatesReportDescription: MessageDescriptor
   birthRegistrationRatesReportHeader: MessageDescriptor
   deathRegistrationRatesReportHeader: MessageDescriptor
+  overTime: MessageDescriptor
+  byLocation: MessageDescriptor
+  locationTitle: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -51,7 +54,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',
     defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for two upazillas:',
+      'No data for {searchedLocation}. We are currently piloting for two upazilas:',
     description: 'Message to show if no data is found for a location'
   },
   exportAll: {
@@ -114,18 +117,33 @@ const messagesToDefine: IPerformanceReportsMessages = {
   registrationRatesReportDescription: {
     id: 'performance.report.registration.rates.description',
     defaultMessage:
-      '{totalRegistrationNumber} registered withing 45 days out of estimated {estimatedRegistrationNumber}',
+      '{totalRegistrationNumber} registered within 45 days out of estimated {estimatedRegistrationNumber}',
     description: 'Event registration rate report description'
   },
   birthRegistrationRatesReportHeader: {
     id: 'performance.report.registration.rates.birth.header',
-    defaultMessage: 'Birth registration rate withing 45 days of event',
+    defaultMessage: 'Birth registration rate within 45 days of event',
     description: 'Header for birth registration rates report'
   },
   deathRegistrationRatesReportHeader: {
     id: 'performance.report.registration.rates.death.header',
-    defaultMessage: 'Death registration rate withing 45 days of event',
+    defaultMessage: 'Death registration rate within 45 days of event',
     description: 'Header for death registration rates report'
+  },
+  overTime: {
+    id: 'performance.regRates.select.item.overTime',
+    defaultMessage: 'Over time',
+    description: 'Label for select option Over time'
+  },
+  byLocation: {
+    id: 'performance.regRates.select.item.byLocation',
+    defaultMessage: 'By location',
+    description: 'Label for select option By location'
+  },
+  locationTitle: {
+    id: 'performance.regRates.column.location',
+    defaultMessage: 'Locations',
+    description: 'Title for location column on estimation table'
   }
 }
 

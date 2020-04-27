@@ -20,7 +20,11 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
 
-type Props = WrappedComponentProps & { tabId?: string; hideTopBar?: boolean }
+type Props = WrappedComponentProps & {
+  tabId?: string
+  hideTopBar?: boolean
+  children?: React.ReactNode
+}
 
 type State = {}
 

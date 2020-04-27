@@ -26,7 +26,8 @@ import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import {
   goToPerformanceHome,
   goToOperationalReport,
-  goToPerformanceReport
+  goToPerformanceReport,
+  goToRegistrationRates
 } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
@@ -51,6 +52,7 @@ interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToOperationalReport: typeof goToOperationalReport
   goToPerformanceReport: typeof goToPerformanceReport
+  goToRegistrationRates: typeof goToRegistrationRates
 }
 
 interface IMetricsQueryResult {
@@ -66,7 +68,10 @@ type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> &
   IDispatchProps
 
-interface State {}
+interface State {
+  timeStart: moment.Moment
+  timeEnd: moment.Moment
+}
 
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -103,6 +108,19 @@ const MonthlyReportsList = styled.div`
 `
 
 class OperationalReportComponent extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    moment.locale(this.props.intl.locale)
+    moment.defaultFormat = 'MMMM YYYY'
+    const timeEnd = moment()
+    const timeStart = moment().subtract(1, 'years')
+
+    this.state = {
+      timeStart,
+      timeEnd
+    }
+  }
+
   onChangeLocation = () => {
     this.props.goToPerformanceHome({
       selectedLocation: this.props.history.location.state.selectedLocation
@@ -162,6 +180,18 @@ class OperationalReportComponent extends React.Component<Props, State> {
     return Math.round((value / this.getTotal(totalMetrics)) * 100)
   }
 
+  onClickRegistrationRatesDetails = (event: Event, title: string) => {
+    const { selectedLocation } = this.props.history.location.state
+    const { timeStart, timeEnd } = this.state
+    this.props.goToRegistrationRates(
+      event,
+      selectedLocation,
+      title,
+      timeStart.toDate(),
+      timeEnd.toDate()
+    )
+  }
+
   render() {
     const {
       intl,
@@ -173,11 +203,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.props
 
     const { displayLabel: title, id: locationId } = selectedLocation
-    moment.locale(this.props.intl.locale)
-    moment.defaultFormat = 'MMMM YYYY'
-    const timeEnd = moment()
-    const timeStart = moment().subtract(1, 'years')
-
+    const { timeStart, timeEnd } = this.state
     return (
       <PerformanceContentWrapper hideTopBar>
         <HeaderContainer>
@@ -238,6 +264,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     data={data && data.getEventEstimationMetrics}
                     reportTimeFrom={timeStart.format()}
                     reportTimeTo={timeEnd.format()}
+                    onClickEventDetails={this.onClickRegistrationRatesDetails}
                   />
 
                   <ApplicationsStartedReport
@@ -311,5 +338,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
 export const OperationalReport = connect(
   null,
-  { goToPerformanceHome, goToOperationalReport, goToPerformanceReport }
+  {
+    goToPerformanceHome,
+    goToOperationalReport,
+    goToPerformanceReport,
+    goToRegistrationRates
+  }
 )(injectIntl(OperationalReportComponent))

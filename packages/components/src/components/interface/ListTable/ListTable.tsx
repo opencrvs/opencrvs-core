@@ -294,6 +294,7 @@ export class ListTable extends React.Component<
                 {columns.map((preference, index) => (
                   <ContentWrapper
                     key={index}
+                    id={`${preference.key}-label`}
                     width={preference.width}
                     alignment={preference.alignment}
                     sortable={preference.isSortable}
@@ -364,7 +365,7 @@ export class ListTable extends React.Component<
             onPageChange={this.onPageChange}
           />
         )}
-        {content.length <= 0 && (
+        {!isLoading && content.length <= 0 && (
           <ErrorText id="no-record">{noResultText}</ErrorText>
         )}
       </>

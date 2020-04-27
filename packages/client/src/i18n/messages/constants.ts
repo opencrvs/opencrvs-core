@@ -100,6 +100,12 @@ interface IConstantsMessages {
   estimatedNumberOfRegistartion: MessageDescriptor
   totalRegisteredIn45Days: MessageDescriptor
   percentageOfEstimation: MessageDescriptor
+  averageRateOfRegistrations: MessageDescriptor
+  estimatedNumberOfEvents: MessageDescriptor
+  rateOfRegistrationWithin45d: MessageDescriptor
+  registeredWithin45d: MessageDescriptor
+  timePeriod: MessageDescriptor
+  totalRegistered: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -551,6 +557,37 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.percentageOfEstimation',
     defaultMessage: 'Percentage of estimate',
     description: 'A label for percentage of estimate'
+  },
+  totalRegistered: {
+    id: 'constants.totalRegistered',
+    defaultMessage: 'Total registered',
+    description: 'A label for Total registered'
+  },
+  averageRateOfRegistrations: {
+    id: 'constants.averageRateOfRegistrations',
+    defaultMessage: 'avg. {amount}%',
+    description: 'A label for Average rate of registrations'
+  },
+  estimatedNumberOfEvents: {
+    id: 'constants.estimatedNumberOfEvents',
+    defaultMessage:
+      'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
+    description: 'A label for Estimated number of events'
+  },
+  rateOfRegistrationWithin45d: {
+    id: 'constants.rateOfRegistrationWithin45d',
+    defaultMessage: 'Rate within 45 days of event',
+    description: 'A label for Rate within 45 days of event'
+  },
+  registeredWithin45d: {
+    id: 'constants.registeredWithin45d',
+    defaultMessage: 'Registered within 45 days of event',
+    description: 'A label for Registered within 45 days of event'
+  },
+  timePeriod: {
+    id: 'constants.timePeriod',
+    defaultMessage: 'Time period',
+    description: 'A label for Time period'
   }
 }
 
