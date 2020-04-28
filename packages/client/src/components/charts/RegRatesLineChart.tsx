@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { TriLineChart } from '@opencrvs/components/lib/charts'
-import { ITheme } from '@opencrvs/components/src/components/theme'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 
