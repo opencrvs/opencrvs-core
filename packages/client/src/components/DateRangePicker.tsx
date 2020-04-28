@@ -22,7 +22,7 @@ import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import moment from 'moment'
 
-const { useState } = React
+const { useState, useEffect } = React
 
 interface IDateRange {
   startDate: Date
@@ -30,7 +30,6 @@ interface IDateRange {
 }
 interface IPresetDateRange extends IDateRange {
   label: string
-  selected?: boolean
 }
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
@@ -198,69 +197,56 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   const [endDate, setEndDate] = useState<moment.Moment>(endDateFromProps)
 
   const todaysDateMoment = moment()
+  const [presetOptions, updatePresetOptions] = useState<IPresetDateRange[]>([])
 
-  function generatePresetOptions(): IPresetDateRange[] {
-    const currentYear = todaysDateMoment.year()
-    const dateToday = todaysDateMoment.toDate()
-    const date30DaysBack = todaysDateMoment
-      .clone()
-      .subtract(30, 'days')
-      .toDate()
-    const date12MonthsBack = todaysDateMoment
-      .clone()
-      .subtract(12, 'months')
-      .toDate()
-    const lastYearMoment = moment([currentYear - 1])
-    const last2YearMoment = moment([currentYear - 2])
-    const last3YearMoment = moment([currentYear - 3])
+  useEffect(() => {
+    function generatePresetOptions(): IPresetDateRange[] {
+      const currentYear = todaysDateMoment.year()
+      const dateToday = todaysDateMoment.toDate()
+      const date30DaysBack = todaysDateMoment
+        .clone()
+        .subtract(30, 'days')
+        .toDate()
+      const date12MonthsBack = todaysDateMoment
+        .clone()
+        .subtract(12, 'months')
+        .toDate()
+      const lastYearMoment = moment([currentYear - 1])
+      const last2YearMoment = moment([currentYear - 2])
+      const last3YearMoment = moment([currentYear - 3])
 
-    return [
-      {
-        label: 'Last 30 days',
-        startDate: date30DaysBack,
-        endDate: dateToday,
-        selected: false
-      },
-      {
-        label: 'Last 12 months',
-        startDate: date12MonthsBack,
-        endDate: dateToday,
-        selected: false
-      },
-      {
-        label: lastYearMoment.format('YYYY'),
-        startDate: lastYearMoment.toDate(),
-        endDate: lastYearMoment.endOf('year').toDate(),
-        selected: false
-      },
-      {
-        label: last2YearMoment.format('YYYY'),
-        startDate: last2YearMoment.toDate(),
-        endDate: last2YearMoment.endOf('year').toDate(),
-        selected: false
-      },
-      {
-        label: last3YearMoment.format('YYYY'),
-        startDate: last3YearMoment.toDate(),
-        endDate: last3YearMoment.endOf('year').toDate(),
-        selected: false
-      }
-    ]
-  }
+      return [
+        {
+          label: 'Last 30 days',
+          startDate: date30DaysBack,
+          endDate: dateToday
+        },
+        {
+          label: 'Last 12 months',
+          startDate: date12MonthsBack,
+          endDate: dateToday
+        },
+        {
+          label: lastYearMoment.format('YYYY'),
+          startDate: lastYearMoment.toDate(),
+          endDate: lastYearMoment.endOf('year').toDate()
+        },
+        {
+          label: last2YearMoment.format('YYYY'),
+          startDate: last2YearMoment.toDate(),
+          endDate: last2YearMoment.endOf('year').toDate()
+        },
+        {
+          label: last3YearMoment.format('YYYY'),
+          startDate: last3YearMoment.toDate(),
+          endDate: last3YearMoment.endOf('year').toDate()
+        }
+      ]
+    }
 
-  const presetOptions = generatePresetOptions()
+    updatePresetOptions(generatePresetOptions())
+  }, [todaysDateMoment])
 
-  const selectedPresetIndexFromProps = presetOptions.findIndex(
-    preset =>
-      moment(preset.startDate).isSame(startDateFromProps, 'month') &&
-      moment(preset.endDate).isSame(endDateFromProps, 'month')
-  )
-
-  const [selectedPresetIndex, selectPresetByIndex] = useState<number>(
-    selectedPresetIndexFromProps
-  )
-
-  presetOptions[selectedPresetIndex].selected = true
   function MonthSelector({
     date,
     label,
@@ -312,7 +298,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     return (
       <PresetContainer>
         {presetOptions.map((item, index) => (
-          <PresetRangeButton key={index} selected={item.selected}>
+          <PresetRangeButton
+            key={index}
+            selected={
+              moment(item.startDate).isSame(startDate, 'month') &&
+              moment(item.endDate).isSame(endDate, 'month')
+            }
+          >
             {item.label}
           </PresetRangeButton>
         ))}
@@ -320,13 +312,18 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     )
   }
 
+  const selectedPresetFromProps = presetOptions.find(
+    item =>
+      moment(item.startDate).isSame(startDateFromProps, 'month') &&
+      moment(item.endDate).isSame(endDateFromProps, 'month')
+  )
   return (
     <div>
       <PickerButton onClick={() => setModalVisible(true)}>
         <ContentWrapper>
           <span>
-            {selectedPresetIndexFromProps > 0
-              ? presetOptions[selectedPresetIndexFromProps].label
+            {selectedPresetFromProps
+              ? selectedPresetFromProps.label
               : `${startDateFromProps.format(
                   'MMMM YYYY'
                 )} - ${endDateFromProps.format('MMMM YYYY')}`}
