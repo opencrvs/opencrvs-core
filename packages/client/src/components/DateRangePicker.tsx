@@ -267,11 +267,22 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           {date ? `${label}: ${date.format('MMMM YYYY')}` : label}
         </LabelContainer>
         <NavigatorContainer>
-          <CircleButton>
+          <CircleButton
+            onClick={() => onSelectDate(date.clone().subtract(1, 'years'))}
+          >
             <ChevronLeft />
           </CircleButton>
           <LabelContainer>{date.format('YYYY')}</LabelContainer>
-          <CircleButton>
+          <CircleButton
+            onClick={() => {
+              const nextDate = date.clone().add(1, 'years')
+              const finalDateNavigateTo = nextDate.isAfter(todaysDateMoment)
+                ? todaysDateMoment
+                : nextDate
+              onSelectDate(finalDateNavigateTo)
+            }}
+            disabled={date.isSame(todaysDateMoment, 'year')}
+          >
             <ChevronRight />
           </CircleButton>
         </NavigatorContainer>
@@ -297,17 +308,25 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   function PresetSelector() {
     return (
       <PresetContainer>
-        {presetOptions.map((item, index) => (
-          <PresetRangeButton
-            key={index}
-            selected={
-              moment(item.startDate).isSame(startDate, 'month') &&
-              moment(item.endDate).isSame(endDate, 'month')
-            }
-          >
-            {item.label}
-          </PresetRangeButton>
-        ))}
+        {presetOptions.map((item, index) => {
+          const presetStartDateMoment = moment(item.startDate)
+          const presetEndDateMoment = moment(item.endDate)
+          return (
+            <PresetRangeButton
+              key={index}
+              selected={
+                presetStartDateMoment.isSame(startDate, 'month') &&
+                presetEndDateMoment.isSame(endDate, 'month')
+              }
+              onClick={() => {
+                setStartDate(presetStartDateMoment)
+                setEndDate(presetEndDateMoment)
+              }}
+            >
+              {item.label}
+            </PresetRangeButton>
+          )
+        })}
       </PresetContainer>
     )
   }
