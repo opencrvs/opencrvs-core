@@ -22,7 +22,6 @@ import {
   IPointLocation
 } from '@metrics/features/registration'
 import { writePoints, query } from '@metrics/influxdb/client'
-import { logger } from '@metrics/logger'
 
 interface ISearchResult {
   _index: string
@@ -93,14 +92,9 @@ export async function generateLegacyMetricsHandler(
   try {
     result = await fetchAllFromSearch(authHeader)
   } catch (err) {
-    logger.info(`err: ${JSON.stringify(err)}`)
     throw new Error('Could not resolve values from search')
   }
   const totalPoints: IApplicationsStartedPoints[] = []
-  logger.info(`result.body.hits.total: ${result.body.hits.total}`)
-  logger.info(`result.body.hits.hits.length: ${result.body.hits.hits.length}`)
-  logger.info(`result: ${JSON.stringify(result)}`)
-
   if (result.body.hits.total !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'

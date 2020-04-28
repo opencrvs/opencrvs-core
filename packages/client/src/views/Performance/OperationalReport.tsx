@@ -82,6 +82,7 @@ const HeaderContainer = styled.div`
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
+  margin-top: -32px;
 
   & > :first-child {
     margin-right: 24px;
