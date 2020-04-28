@@ -1,3 +1,5 @@
+import SingleValue from 'react-select/lib/components/SingleValue'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -37,6 +39,10 @@ const colorDictionary = {
   darkSteel: '#707C80',
   lightGrey: '#F9F9F9',
   mercury: '#E5E5E5'
+  silverSand: '#C1C7C9',
+  swansDown: '#D3EEE4',
+  fountainBlue: '#4CC1BA',
+  ronchi: '#EDC55E'
 }
 
 export const gradients = {
@@ -95,5 +101,11 @@ export const colors = {
   lightGreyBackground: colorDictionary.lightGrey,
 
   // Deep sea light background
-  blueDeepSeaLight: colorDictionary.blueDeepSeaLight
+  blueDeepSeaLight: colorDictionary.blueDeepSeaLight,
+
+  // Tri Line chart lines
+  silverSand: colorDictionary.silverSand,
+  swansDown: colorDictionary.swansDown,
+  fountainBlue: colorDictionary.fountainBlue,
+  ronchi: colorDictionary.ronchi
 }
