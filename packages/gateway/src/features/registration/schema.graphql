@@ -434,6 +434,16 @@ type RegistrationCount {
   rejected: Int
 }
 
+type StatusWiseRegistrationCount {
+  status: String!
+  count: Int!
+}
+
+type RegistrationCountResult {
+  results: [StatusWiseRegistrationCount]
+  total: Int!
+}
+
 type CreatedIds {
   compositionId: String
   trackingId: String
@@ -459,6 +469,10 @@ type Query {
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
+  fetchRegistrationCounts(
+    locationId: ID!
+    statuses: [String]
+  ): RegistrationCountResult
 }
 
 type Mutation {

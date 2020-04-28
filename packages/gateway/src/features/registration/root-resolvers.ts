@@ -27,7 +27,7 @@ import {
 import { hasScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { RESOURCES_URL, FHIR_URL } from '@gateway/constants'
+import { RESOURCES_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -166,6 +166,33 @@ export const resolvers: GQLResolver = {
         } else {
           return response.data
         }
+      } else {
+        return await Promise.reject(
+          new Error('User does not have enough scope')
+        )
+      }
+    },
+    async fetchRegistrationCounts(_, { locationId, statuses }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare') ||
+        hasScope(authHeader, 'sysadmin')
+      ) {
+        const payload: { locationId: string; statuses?: string[] } = {
+          locationId
+        }
+        if (statuses) {
+          payload.statuses = statuses as string[]
+        }
+        return await fetch(`${SEARCH_URL}/statusWiseRegistrationCount`, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader
+          }
+        }).then(data => data.json())
       } else {
         return await Promise.reject(
           new Error('User does not have enough scope')
