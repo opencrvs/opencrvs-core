@@ -20,10 +20,15 @@ import {
   TertiaryButton,
   ICON_ALIGNMENT
 } from '@opencrvs/components/lib/buttons'
-import { Activity } from '@opencrvs/components/lib/icons'
-import { buttonMessages } from '@client/i18n/messages'
+import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import { goToPerformanceHome, goToRegistrationRates } from '@client/navigation'
+import {
+  goToPerformanceHome,
+  goToOperationalReport,
+  goToPerformanceReport,
+  goToRegistrationRates
+} from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
 import { Query } from '@client/components/Query'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
@@ -35,10 +40,18 @@ import {
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
+import { ListTable } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
+import {
+  PERFORMANCE_REPORT_TYPE_MONTHLY,
+  MONTHS_IN_YEAR
+} from '@client/utils/constants'
+import { getMonthDateRange } from '@client/views/Performance/utils'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
+  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceReport: typeof goToPerformanceReport
   goToRegistrationRates: typeof goToRegistrationRates
 }
 
@@ -46,7 +59,7 @@ interface IMetricsQueryResult {
   getEventEstimationMetrics: GQLEventEstimationMetrics
   getApplicationsStartedMetrics: GQLApplicationsStartedMetrics
 }
-export enum PERFORMANCE_TYPE {
+export enum OPERATIONAL_REPORT_SECTION {
   OPERATIONAL = 'OPERATIONAL',
   REPORTS = 'REPORTS'
 }
@@ -90,6 +103,10 @@ const ActionContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
+const MonthlyReportsList = styled.div`
+  margin-top: 16px;
+`
+
 class OperationalReportComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -118,6 +135,44 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
 
+  getContent(eventType: Event) {
+    moment.locale(this.props.intl.locale)
+    let content = []
+
+    const currentYear = moment().year()
+    let currentMonth = 1
+
+    while (currentMonth <= 12) {
+      const { start, end } = getMonthDateRange(currentYear, currentMonth)
+      const title = start.format('MMMM YYYY')
+      content.push({
+        month: (
+          <LinkButton
+            onClick={() =>
+              this.props.goToPerformanceReport(
+                this.props.history.location.state.selectedLocation!,
+                PERFORMANCE_REPORT_TYPE_MONTHLY,
+                eventType,
+                start.toDate(),
+                end.toDate()
+              )
+            }
+            disabled={!this.props.history.location.state.selectedLocation}
+          >
+            {title}
+          </LinkButton>
+        ),
+        export: (
+          <>
+            <LinkButton>CSV</LinkButton> <LinkButton>PDF</LinkButton>
+          </>
+        )
+      })
+      currentMonth++
+    }
+    return content
+  }
+
   getPercentage(
     totalMetrics: GQLApplicationsStartedMetrics,
     value: number
@@ -142,7 +197,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       intl,
       history: {
         location: {
-          state: { selectedLocation }
+          state: { selectedLocation, sectionId }
         }
       }
     } = this.props
@@ -158,18 +213,24 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <div>
+          <div id="operational-report-view">
             <PerformanceSelect
+              onChange={option => {
+                this.props.goToOperationalReport(
+                  selectedLocation,
+                  option.value as OPERATIONAL_REPORT_SECTION
+                )
+              }}
               id="operational-select"
-              value={PERFORMANCE_TYPE.OPERATIONAL}
+              value={sectionId || OPERATIONAL_REPORT_SECTION.OPERATIONAL}
               options={[
                 {
                   label: intl.formatMessage(messages.operational),
-                  value: PERFORMANCE_TYPE.OPERATIONAL
+                  value: OPERATIONAL_REPORT_SECTION.OPERATIONAL
                 },
                 {
                   label: intl.formatMessage(messages.reports),
-                  value: PERFORMANCE_TYPE.REPORTS
+                  value: OPERATIONAL_REPORT_SECTION.REPORTS
                 }
               ]}
             />
@@ -178,43 +239,98 @@ class OperationalReportComponent extends React.Component<Props, State> {
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>
         </ActionContainer>
-        <Query
-          query={OPERATIONAL_REPORTS_METRICS}
-          variables={{
-            timeStart: timeStart.toISOString(),
-            timeEnd: timeEnd.toISOString(),
-            locationId
-          }}
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: boolean
-            error?: ApolloError
-            data?: IMetricsQueryResult
-          }) => {
-            return (
-              <>
-                <RegistrationRatesReport
-                  loading={loading}
-                  data={data && data.getEventEstimationMetrics}
-                  reportTimeFrom={timeStart.format()}
-                  reportTimeTo={timeEnd.format()}
-                  onClickEventDetails={this.onClickRegistrationRatesDetails}
-                />
+        {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
+          <Query
+            query={OPERATIONAL_REPORTS_METRICS}
+            variables={{
+              timeStart: timeStart.toISOString(),
+              timeEnd: timeEnd.toISOString(),
+              locationId
+            }}
+          >
+            {({
+              loading,
+              error,
+              data
+            }: {
+              loading: boolean
+              error?: ApolloError
+              data?: IMetricsQueryResult
+            }) => {
+              return (
+                <>
+                  <RegistrationRatesReport
+                    loading={loading}
+                    data={data && data.getEventEstimationMetrics}
+                    reportTimeFrom={timeStart.format()}
+                    reportTimeTo={timeEnd.format()}
+                    onClickEventDetails={this.onClickRegistrationRatesDetails}
+                  />
 
-                <ApplicationsStartedReport
-                  loading={loading}
-                  data={data && data.getApplicationsStartedMetrics}
-                  reportTimeFrom={timeStart.format()}
-                  reportTimeTo={timeEnd.format()}
-                />
-              </>
-            )
-          }}
-        </Query>
+                  <ApplicationsStartedReport
+                    loading={loading}
+                    data={data && data.getApplicationsStartedMetrics}
+                    reportTimeFrom={timeStart.format()}
+                    reportTimeTo={timeEnd.format()}
+                  />
+                </>
+              )
+            }}
+          </Query>
+        )}
+        {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
+          <MonthlyReportsList id="report-lists">
+            <ListTable
+              tableTitle={intl.formatMessage(constantsMessages.birth)}
+              isLoading={false}
+              content={this.getContent(Event.BIRTH)}
+              tableHeight={280}
+              pageSize={MONTHS_IN_YEAR}
+              hideBoxShadow={true}
+              columns={[
+                {
+                  label: intl.formatMessage(constantsMessages.month),
+                  width: 70,
+                  key: 'month',
+                  isSortable: true,
+                  icon: <ArrowDownBlue />,
+                  sortFunction: () => {}
+                },
+                {
+                  label: intl.formatMessage(constantsMessages.export),
+                  width: 30,
+                  key: 'export'
+                }
+              ]}
+              noResultText={intl.formatMessage(constantsMessages.noResults)}
+            />
+
+            <ListTable
+              tableTitle={intl.formatMessage(constantsMessages.death)}
+              isLoading={false}
+              content={this.getContent(Event.DEATH)}
+              tableHeight={280}
+              pageSize={MONTHS_IN_YEAR}
+              hideBoxShadow={true}
+              columns={[
+                {
+                  label: intl.formatMessage(constantsMessages.month),
+                  width: 70,
+                  key: 'month',
+                  isSortable: true,
+                  icon: <ArrowDownBlue />,
+                  sortFunction: () => {}
+                },
+                {
+                  label: intl.formatMessage(constantsMessages.export),
+                  width: 30,
+                  key: 'export'
+                }
+              ]}
+              noResultText={intl.formatMessage(constantsMessages.noResults)}
+            />
+          </MonthlyReportsList>
+        )}
       </PerformanceContentWrapper>
     )
   }
@@ -222,5 +338,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
 export const OperationalReport = connect(
   null,
-  { goToPerformanceHome, goToRegistrationRates }
+  {
+    goToPerformanceHome,
+    goToOperationalReport,
+    goToPerformanceReport,
+    goToRegistrationRates
+  }
 )(injectIntl(OperationalReportComponent))

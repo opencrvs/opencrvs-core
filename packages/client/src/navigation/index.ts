@@ -50,6 +50,7 @@ import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import { Cmd, loop } from 'redux-loop'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -202,8 +203,11 @@ export function goToPerformanceReport(
   })
 }
 
-export function goToOperationalReport(selectedLocation: ISearchLocation) {
-  return push(OPERATIONAL_REPORT, { selectedLocation })
+export function goToOperationalReport(
+  selectedLocation: ISearchLocation,
+  sectionId: OPERATIONAL_REPORT_SECTION
+) {
+  return push(OPERATIONAL_REPORT, { selectedLocation, sectionId })
 }
 
 export function goToSearchResult(

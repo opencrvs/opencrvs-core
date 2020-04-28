@@ -166,7 +166,6 @@ describe('Registraion Rates tests', () => {
   it('because of more than one child locations from the query, by location option arrives in dropdown', async () => {
     const select = await waitForElement(component, '#base-select')
     select
-      .hostNodes()
       .find('.react-select__control')
       .simulate('keyDown', { key: 'ArrowDown', keyCode: 40 })
     component.update()
@@ -185,6 +184,7 @@ describe('Registraion Rates tests', () => {
     await flushPromises()
     expect(history.location.pathname).toBe('/performance/operations')
     expect(history.location.state).toEqual({
+      sectionId: 'OPERATIONAL',
       selectedLocation: LOCATION_DHAKA_DIVISION
     })
   })
