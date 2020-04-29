@@ -47,6 +47,7 @@ export function formatSearchParams(params: ISearchQuery) {
     status,
     type,
     applicationLocationId = EMPTY_STRING,
+    applicationLocationHirarchyId = EMPTY_STRING,
     eventLocationId = EMPTY_STRING,
     gender = EMPTY_STRING,
     name = EMPTY_STRING,
@@ -79,6 +80,7 @@ export function formatSearchParams(params: ISearchQuery) {
         gender,
         nameCombinations,
         applicationLocationId,
+        applicationLocationHirarchyId,
         createdBy,
         { event, status, type }
       ),
