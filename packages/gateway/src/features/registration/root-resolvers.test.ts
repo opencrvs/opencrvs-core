@@ -2302,23 +2302,24 @@ describe('Registration root resolvers', () => {
   })
 
   describe('fetchRegistrationCounts()', () => {
-    const response = {
-      results: [
-        {
-          IN_PROGRESS: 5
-        },
-        {
-          DECLARED: 3
-        },
-        {
-          VALIDATED: 2
-        },
-        {
-          REGISTERED: 5
-        }
-      ],
-      total: 15
-    }
+    const response = [
+      {
+        status: 'IN_PROGRESS',
+        count: 5
+      },
+      {
+        status: 'DECLARED',
+        count: 3
+      },
+      {
+        status: 'VALIDATED',
+        count: 2
+      },
+      {
+        status: 'REGISTERED',
+        count: 5
+      }
+    ]
 
     it('returns status wise registration counts', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
@@ -2331,7 +2332,7 @@ describe('Registration root resolvers', () => {
         authHeaderRegCert
       )
       expect(data).toBeDefined()
-      expect(data.results).toEqual(response.results)
+      expect(data.results).toEqual(response)
       expect(data.total).toBe(15)
     })
 

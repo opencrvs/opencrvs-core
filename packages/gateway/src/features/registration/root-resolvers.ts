@@ -25,7 +25,10 @@ import {
   updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
-import { GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLStatusWiseRegistrationCount
+} from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { RESOURCES_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 
@@ -179,20 +182,41 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'declare') ||
         hasScope(authHeader, 'sysadmin')
       ) {
-        const payload: { locationId: string; statuses?: string[] } = {
-          locationId
+        const payload: {
+          applicationLocationHirarchyId: string
+          status?: string[]
+        } = {
+          applicationLocationHirarchyId: locationId
         }
         if (statuses) {
-          payload.statuses = statuses as string[]
+          payload.status = statuses as string[]
         }
-        return await fetch(`${SEARCH_URL}/statusWiseRegistrationCount`, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
+        const results: GQLStatusWiseRegistrationCount[] = await fetch(
+          `${SEARCH_URL}/statusWiseRegistrationCount`,
+          {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeader
+            }
           }
-        }).then(data => data.json())
+        ).then(data => data.json())
+        let total = 0
+        if (results && results.length > 0) {
+          total = results.reduce(
+            (totalCount, statusCount) => ({
+              count: totalCount.count + statusCount.count
+            }),
+            {
+              count: total
+            }
+          ).count
+        }
+        return {
+          results,
+          total
+        }
       } else {
         return await Promise.reject(
           new Error('User does not have enough scope')
