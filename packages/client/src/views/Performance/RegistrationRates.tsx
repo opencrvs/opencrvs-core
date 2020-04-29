@@ -71,6 +71,7 @@ export interface IEstimationBase {
 
 function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
   return (
+    data &&
     data.details &&
     data.details.reduce(
       (chartData: any[], dataDetails: GQLMonthWise45DayEstimation | null) => {
@@ -190,14 +191,14 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           } else {
             return (
               <>
-                {data &&
-                  data.fetchMonthWiseEventMetrics &&
-                  base.baseType === REG_RATE_BASE.TIME && (
-                    <RegRatesLineChart
-                      loading={loading}
-                      data={prepareChartData(data.fetchMonthWiseEventMetrics)}
-                    />
-                  )}
+                {base.baseType === REG_RATE_BASE.TIME && (
+                  <RegRatesLineChart
+                    loading={loading}
+                    data={prepareChartData(
+                      data && data.fetchMonthWiseEventMetrics
+                    )}
+                  />
+                )}
                 <Within45DaysTable
                   loading={loading}
                   base={base}
