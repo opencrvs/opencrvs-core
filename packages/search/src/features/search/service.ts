@@ -15,7 +15,7 @@ import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
 import { logger } from '@search/logger'
 
-const DEFAULT_SIZE = 10
+export const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export const searchComposition = async (params: ISearchQuery) => {
