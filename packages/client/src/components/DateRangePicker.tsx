@@ -21,8 +21,11 @@ import {
 import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import moment from 'moment'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 
 const { useState, useEffect } = React
+
+const LIMIT_YEAR_PAST_RECORDS = 1900
 
 interface IDateRange {
   startDate: Date
@@ -247,12 +250,20 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     updatePresetOptions(generatePresetOptions())
   }, [])
 
+  useEffect(() => {
+    if (!modalVisible) {
+      setStartDate(startDateFromProps)
+      setEndDate(endDateFromProps)
+    }
+  }, [endDateFromProps, modalVisible, startDateFromProps])
+
   function MonthSelector({
     date,
     label,
     onSelectDate,
     maxDate
   }: MonthSelectorProps) {
+    const limitDate = moment([LIMIT_YEAR_PAST_RECORDS])
     const months = moment.monthsShort()
     const year = date.year().toString()
 
@@ -264,6 +275,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         <NavigatorContainer>
           <CircleButton
             onClick={() => onSelectDate(date.clone().subtract(1, 'years'))}
+            disabled={date.isSame(limitDate, 'year')}
           >
             <ChevronLeft />
           </CircleButton>
@@ -350,7 +362,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             <ModalHeader>
               <TitleContent>
                 <CalendarGrey />
-                <span>Time period</span>
+                <span>{intl.formatMessage(constantsMessages.timePeriod)}</span>
               </TitleContent>
               <CircleButton
                 id="close-btn"
@@ -384,8 +396,9 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                   })
                   setModalVisible(false)
                 }}
+                disabled={startDate.isAfter(endDate)}
               >
-                Select
+                {intl.formatMessage(buttonMessages.select)}
               </StyledPrimaryButton>
             </ModalFooter>
           </ModalContainer>
