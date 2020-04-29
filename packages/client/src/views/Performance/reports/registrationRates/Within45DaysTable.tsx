@@ -87,7 +87,7 @@ function Within45DaysTableComponent(props: ITableProps) {
     return [
       {
         label: props.intl.formatMessage(constantsMessages.total),
-        width: 30
+        width: 40
       },
       {
         label: String(actualTotalRegistration),
@@ -95,7 +95,7 @@ function Within45DaysTableComponent(props: ITableProps) {
       },
       {
         label: String(actual45DayRegistration),
-        width: 20
+        width: 15
       },
       {
         label: String(estimatedRegistration),
@@ -108,7 +108,7 @@ function Within45DaysTableComponent(props: ITableProps) {
             amount: estimated45DayPercentage
           }
         ),
-        width: 20
+        width: 15
       }
     ]
   }
@@ -152,34 +152,43 @@ function Within45DaysTableComponent(props: ITableProps) {
         {
           key: firstColProp.dataKey,
           label: firstColProp.label,
-          width: 30,
+          width: 40,
           isSortable: true,
           sortFunction: () => toggleSort(firstColProp.sortKey),
           icon: <ArrowDownBlue />
         },
         {
           key: 'totalRegistered',
-          label: intl.formatMessage(constantsMessages.totalRegistered),
+          label: intl.formatMessage(constantsMessages.totalRegistered, {
+            lineBreak: <br key={'totalRegistered-break'} />
+          }),
           width: 15
         },
         {
           key: 'registeredWithin45d',
-          label: intl.formatMessage(constantsMessages.registeredWithin45d),
-          width: 20
+
+          label: intl.formatMessage(constantsMessages.registeredWithin45d, {
+            lineBreak: <br key={'registeredWithin45d-break'} />
+          }),
+          width: 15
         },
         {
           key: 'estimated',
           label: intl.formatMessage(constantsMessages.estimatedNumberOfEvents, {
-            eventType
+            eventType,
+            lineBreak: <br key={'estimated-break'} />
           }),
           width: 15
         },
         {
           key: 'rateOfRegistrationWithin45d',
           label: intl.formatMessage(
-            constantsMessages.rateOfRegistrationWithin45d
+            constantsMessages.rateOfRegistrationWithin45d,
+            {
+              lineBreak: <br key={'rateOfRegistrationWithin45d-break'} />
+            }
           ),
-          width: 20
+          width: 15
         }
       ]}
       pageSize={sortedContent.length}

@@ -35,6 +35,9 @@ const TAB_ID = {
 const Content = styled(BodyContent)`
   padding: 0px;
   margin: 32px auto 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 0px 16px;
+  }
 `
 
 class PerformanceContentWrapperComponent extends React.Component<Props, State> {
