@@ -16,11 +16,14 @@ import styled from '@client/styledComponents'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { KeyboardArrowDown } from '@opencrvs/components/lib/icons'
 
+export interface IPerformanceSelectOption extends ISelectOption {
+  type?: string
+}
 interface IOperationalSelectProps {
   id?: string
   value: string
-  options: ISelectOption[]
-  onChange?: (val: string) => void
+  options: IPerformanceSelectOption[]
+  onChange?: (selectedOption: IPerformanceSelectOption) => void
 }
 
 const StyledSelect = styled(Select)`
@@ -56,6 +59,10 @@ const StyledSelect = styled(Select)`
     padding: 0 8px;
   }
 
+  .react-select__menu {
+    ${({ theme }) => theme.fonts.bodyStyle};
+  }
+
   .react-select__single-value {
     margin: 0;
     color: ${({ theme }) => theme.colors.white};
@@ -78,9 +85,11 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 function getSelectedOption(
   value: string,
-  options: ISelectOption[]
-): ISelectOption | null {
-  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  options: IPerformanceSelectOption[]
+): IPerformanceSelectOption | null {
+  const selectedOption = options.find(
+    (x: IPerformanceSelectOption) => x.value === value
+  )
   if (selectedOption) {
     return selectedOption
   }
@@ -89,15 +98,14 @@ function getSelectedOption(
 }
 
 export function PerformanceSelect(props: IOperationalSelectProps) {
-  function handleChange(item: ISelectOption) {
+  function handleChange(item: IPerformanceSelectOption) {
     if (props.onChange) {
-      props.onChange(item.value)
+      props.onChange(item)
     }
   }
 
   return (
     <StyledSelect
-      id={props.id}
       isSearchable={false}
       value={getSelectedOption(props.value, props.options)}
       classNamePrefix="react-select"

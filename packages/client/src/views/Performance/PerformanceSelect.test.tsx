@@ -20,7 +20,7 @@ describe('PerformanceSelect tests', () => {
         value="OPTION1"
         options={[
           { label: 'Option 1', value: 'OPTION1' },
-          { label: 'Option 2', value: 'OPTION2' }
+          { label: 'Option 2', value: 'OPTION2', type: 'TYPE' }
         ]}
       />
     )

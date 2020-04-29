@@ -75,6 +75,7 @@ describe('Performance home test', () => {
       flushPromises()
 
       expect(history.location.state).toEqual({
+        sectionId: 'OPERATIONAL',
         selectedLocation: {
           displayLabel: 'Dhaka Division',
           id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',

@@ -21,7 +21,10 @@ import {
 import { AppStore } from '@client/store'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
-import { HAS_CHILD_LOCATION } from '@client/views/Performance/queries'
+import {
+  HAS_CHILD_LOCATION,
+  FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+} from '@client/views/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const LOCATION_DHAKA_DIVISION = {
@@ -29,6 +32,8 @@ const LOCATION_DHAKA_DIVISION = {
   id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
   searchableText: 'Dhaka'
 }
+const timeStart = new Date(2019, 11, 6)
+const timeEnd = new Date(2019, 11, 13)
 
 const graphqlMocks = [
   {
@@ -62,6 +67,49 @@ const graphqlMocks = [
         }
       }
     }
+  },
+  {
+    request: {
+      query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+      variables: {
+        event: 'BIRTH',
+        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+        timeStart: timeStart.toISOString(),
+        timeEnd: timeEnd.toISOString()
+      }
+    },
+    result: {
+      data: {
+        fetchMonthWiseEventMetrics: {
+          details: [
+            {
+              actualTotalRegistration: 20,
+              actual45DayRegistration: 9,
+              estimatedRegistration: 45,
+              estimated45DayPercentage: 4.5,
+              month: 'April',
+              year: '2020',
+              startOfMonth: '2020-03-30T18:00:00.000Z'
+            },
+            {
+              actualTotalRegistration: 10,
+              actual45DayRegistration: 0,
+              estimatedRegistration: 45,
+              estimated45DayPercentage: 0,
+              month: 'March',
+              year: '2020',
+              startOfMonth: '2020-02-29T18:00:00.000Z'
+            }
+          ],
+          total: {
+            actualTotalRegistration: 30,
+            actual45DayRegistration: 9,
+            estimatedRegistration: 45,
+            estimated45DayPercentage: 2.25
+          }
+        }
+      }
+    }
   }
 ]
 describe('Registraion Rates tests', () => {
@@ -89,7 +137,9 @@ describe('Registraion Rates tests', () => {
           location: {
             state: {
               title: 'Birth registration rate within 45 days of event',
-              selectedLocation: LOCATION_DHAKA_DIVISION
+              selectedLocation: LOCATION_DHAKA_DIVISION,
+              timeEnd: new Date(1487076708000),
+              timeStart: new Date(1455454308000)
             },
             pathname: EVENT_REGISTRATION_RATES,
             search: '',
@@ -116,7 +166,6 @@ describe('Registraion Rates tests', () => {
   it('because of more than one child locations from the query, by location option arrives in dropdown', async () => {
     const select = await waitForElement(component, '#base-select')
     select
-      .hostNodes()
       .find('.react-select__control')
       .simulate('keyDown', { key: 'ArrowDown', keyCode: 40 })
     component.update()
@@ -135,6 +184,7 @@ describe('Registraion Rates tests', () => {
     await flushPromises()
     expect(history.location.pathname).toBe('/performance/operations')
     expect(history.location.state).toEqual({
+      sectionId: 'OPERATIONAL',
       selectedLocation: LOCATION_DHAKA_DIVISION
     })
   })

@@ -32,6 +32,7 @@ interface IPerformanceReportsMessages {
   deathRegistrationRatesReportHeader: MessageDescriptor
   overTime: MessageDescriptor
   byLocation: MessageDescriptor
+  locationTitle: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -138,6 +139,11 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.regRates.select.item.byLocation',
     defaultMessage: 'By location',
     description: 'Label for select option By location'
+  },
+  locationTitle: {
+    id: 'performance.regRates.column.location',
+    defaultMessage: 'Locations',
+    description: 'Title for location column on estimation table'
   }
 }
 

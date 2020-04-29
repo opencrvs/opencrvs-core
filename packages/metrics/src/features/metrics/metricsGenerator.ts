@@ -680,6 +680,30 @@ export async function fetchEstimated45DayMetrics(
   return estimated45DayData
 }
 
+type Registration = {
+  total: number
+}
+
+export async function getTotalNumberOfRegistrations(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE
+) {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const totalRegistrationPoint: Registration[] = await query(
+    `SELECT COUNT(ageInDays) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )`
+  )
+  return totalRegistrationPoint?.[0]?.total ?? 0
+}
+
 export async function fetchLocationWiseEventEstimations(
   timeFrom: string,
   timeTo: string,
@@ -700,6 +724,7 @@ export async function fetchLocationWiseEventEstimations(
       AND ageInDays <= 45
     GROUP BY gender`
   )
+
   let totalRegistrationIn45Day: number = 0
   let totalMaleRegistrationIn45Day: number = 0
   let totalFemaleRegistrationIn45Day: number = 0

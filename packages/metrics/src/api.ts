@@ -11,7 +11,7 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, RESOURCE_URL } from '@metrics/constants'
+import { fhirUrl, RESOURCE_URL, SEARCH_URL } from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -55,6 +55,16 @@ export async function fetchParentLocationByLocationID(
   return location && location.partOf && location.partOf.reference
 }
 
+export async function fetchChildLocationsByParentId(
+  locationId: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(
+    `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`,
+    authHeader
+  )
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,
@@ -77,4 +87,51 @@ export function fetchFromResource(
         new Error(`RESOURCE request failed: ${error.message}`)
       )
     })
+}
+
+export function fetchAllFromSearch(authHeader: IAuthHeader) {
+  return fetch(`${SEARCH_URL}search/all`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Search request failed: ${error.message}`)
+      )
+    })
+}
+
+export const fetchPractitionerRole = async (
+  practitionerId: string,
+  authHeader: IAuthHeader
+) => {
+  const roleBundle: fhir.Bundle = await fetchFHIR(
+    `PractitionerRole?practitioner=${practitionerId}`,
+    authHeader
+  )
+  const practitionerRole =
+    roleBundle &&
+    roleBundle.entry &&
+    roleBundle.entry &&
+    roleBundle.entry.length > 0 &&
+    (roleBundle.entry[0].resource as fhir.PractitionerRole)
+
+  const roleCode =
+    practitionerRole &&
+    practitionerRole.code &&
+    practitionerRole.code.length > 0 &&
+    practitionerRole.code[0].coding &&
+    practitionerRole.code[0].coding[0].code
+
+  if (roleCode) {
+    return roleCode
+  } else {
+    return Promise.reject(new Error(`Role code cannot be found`))
+  }
 }

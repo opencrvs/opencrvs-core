@@ -46,6 +46,13 @@ export interface ICrudeDeathRate {
   crudeDeathRate: number
 }
 
+export interface IMonthRangeFilter {
+  startOfMonthTime: string
+  endOfMonthTime: string
+  month: string
+  year: string
+}
+
 export enum EVENT_TYPE {
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
@@ -119,7 +126,6 @@ export const fetchEstimateByLocation = async (
     throw new Error('Invalid location data found')
   }
   let estimateExtensionFound: boolean = false
-  const fromYear = new Date(timeFrom).getFullYear()
   const toYear = new Date(timeTo).getFullYear()
   let selectedCrudYear = new Date(timeTo).getFullYear()
   let selectedPopYear = new Date(timeTo).getFullYear()
@@ -132,8 +138,10 @@ export const fetchEstimateByLocation = async (
     ) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
+      // Checking upto fromYear is risky as most of the time we won't
+      // have any estimation data for recent years
       // tslint:disable-next-line
-      for (let key = toYear; key > fromYear; key--) {
+      for (let key = toYear; key > 1; key--) {
         valueArray.forEach(data => {
           if (key in data) {
             crudRate = data[key]
@@ -151,7 +159,7 @@ export const fetchEstimateByLocation = async (
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // tslint:disable-next-line
-      for (let key = toYear; key > fromYear; key--) {
+      for (let key = toYear; key > 1; key--) {
         valueArray.forEach(data => {
           if (key in data) {
             totalPopulation = data[key]
@@ -330,4 +338,38 @@ export async function fetchChildLocationIdsByParentId(
     )
   }
   return [`Location/${parentLocationId}`]
+}
+
+export function getMonthRangeFilterListFromTimeRage(
+  timeStart: string,
+  timeEnd: string
+): IMonthRangeFilter[] {
+  const startDateMonth = new Date(timeStart).getMonth()
+  const startDateYear = new Date(timeStart).getFullYear()
+  const endDateMonth = new Date(timeEnd).getMonth()
+  const endDateYear = new Date(timeEnd).getFullYear()
+
+  const monthFilterList: IMonthRangeFilter[] = []
+  const monthDiffs =
+    (endDateYear - startDateYear) * 12 + (endDateMonth - startDateMonth)
+  for (let index = 0; index <= monthDiffs; index += 1) {
+    const filterDate = new Date(timeStart)
+    filterDate.setMonth(filterDate.getMonth() + index)
+    monthFilterList.push({
+      month: filterDate.toLocaleString('en-us', { month: 'long' }),
+      year: String(filterDate.getFullYear()),
+      startOfMonthTime: new Date(
+        filterDate.getFullYear(),
+        filterDate.getMonth(),
+        1
+      ).toISOString(),
+      endOfMonthTime: new Date(
+        filterDate.getFullYear(),
+        filterDate.getMonth() + 1,
+        1
+      ).toISOString()
+    })
+  }
+
+  return monthFilterList
 }

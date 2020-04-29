@@ -25,9 +25,12 @@ jest.mock('@metrics/api', () => ({
   __esModule: true,
   fetchTaskHistory: jest.fn(),
   fetchLocation: jest.fn(),
+  fetchChildLocationsByParentId: jest.fn(),
   fetchFromResource: jest.fn(),
+  fetchAllFromSearch: jest.fn(),
   fetchParentLocationByLocationID: jest.fn(),
-  fetchFHIR: jest.fn()
+  fetchFHIR: jest.fn(),
+  fetchPractitionerRole: jest.fn()
 }))
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
@@ -38,14 +41,74 @@ beforeEach(() => {
   const {
     fetchTaskHistory,
     fetchLocation,
-    fetchFromResource
+    fetchChildLocationsByParentId,
+    fetchFromResource,
+    fetchAllFromSearch,
+    fetchPractitionerRole
   }: {
     fetchTaskHistory: jest.Mock
     fetchLocation: jest.Mock
+    fetchChildLocationsByParentId: jest.Mock
     fetchFromResource: jest.Mock
+    fetchAllFromSearch: jest.Mock
+    fetchPractitionerRole: jest.Mock
   } = require('@metrics/api')
   fetchTaskHistory.mockResolvedValue(taskHistory)
   fetchFromResource.mockResolvedValueOnce({ crudeDeathRate: 5.1 })
+  fetchChildLocationsByParentId.mockResolvedValueOnce([
+    {
+      resourceType: 'Location',
+      identifier: [
+        {
+          system: 'http://opencrvs.org/specs/id/internal-id',
+          value: 'FACILITY000002'
+        }
+      ],
+      name: 'Moktarpur Union Parishad',
+      alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
+      status: 'active',
+      mode: 'instance',
+      partOf: {
+        reference: 'Location/9e7ce1b1-a28e-46fd-9aad-8a9cd215b15c'
+      },
+      type: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/location-type',
+            code: 'CRVS_OFFICE'
+          }
+        ]
+      },
+      physicalType: {
+        coding: [
+          {
+            code: 'bu',
+            display: 'Building'
+          }
+        ]
+      },
+      telecom: [
+        {
+          system: 'phone',
+          value: ''
+        },
+        {
+          system: 'email',
+          value: ''
+        }
+      ],
+      address: {
+        line: ['Moktarpur', 'Kaliganj'],
+        district: 'Gazipur',
+        state: 'Dhaka'
+      },
+      meta: {
+        lastUpdated: '2019-09-05T14:13:52.662+00:00',
+        versionId: '7907e8b8-83dd-4837-a088-1c77a320ecca'
+      },
+      id: 'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5'
+    }
+  ])
   fetchLocation
     .mockResolvedValueOnce({
       resourceType: 'Location',
@@ -294,4 +357,470 @@ beforeEach(() => {
         versionId: '6feda4ca-6168-4f6e-b47e-2a2b81916668'
       }
     })
+  fetchAllFromSearch.mockResolvedValueOnce({
+    body: {
+      took: 19,
+      timed_out: false,
+      _shards: { total: 5, successful: 5, skipped: 0, failed: 0 },
+      hits: {
+        total: 6,
+        max_score: null,
+        hits: [
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: '0299daa0-fa97-439b-92ed-652d7db186c7',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384348363',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:05:30.001Z',
+                  operatorFirstNames: 'Shakib',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Al Hasan',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'DECLARED',
+                  operatorRole: 'FIELD_AGENT'
+                },
+                {
+                  operatedOn: '2020-04-20T12:05:48.163Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'WAITING_VALIDATION',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                },
+                {
+                  operatedOn: '2020-04-20T12:05:48.163Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REGISTERED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFamilyName: 'Spivak',
+              childFamilyNameLocal: 'স্পিভক',
+              childDoB: '2018-10-17',
+              gender: 'female',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              motherFamilyName: 'Begum',
+              motherFamilyNameLocal: 'বেগম',
+              motherDoB: '1900-07-08',
+              motherIdentifier: '14982808347893336',
+              informantFamilyName: 'Begum',
+              informantFamilyNameLocal: 'বেগম',
+              contactNumber: '+8801529148197',
+              type: 'REGISTERED',
+              dateOfApplication: '2020-04-20T12:05:48.163Z',
+              trackingId: 'BYW6MFW',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              modifiedAt: '1587384350751',
+              registrationNumber: '20187210411000112'
+            },
+            sort: [1587384348163]
+          },
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: 'ca09dfa9-9e31-40ed-8aa6-9446b4ceb71a',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384430106',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:06:49.935Z',
+                  operatorFirstNames: 'Shakib',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Al Hasan',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'DECLARED',
+                  operatorRole: 'FIELD_AGENT'
+                },
+                {
+                  operatedOn: '2020-04-20T12:07:10.000Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'WAITING_VALIDATION',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                },
+                {
+                  operatedOn: '2020-04-20T12:07:10.000Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REGISTERED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFirstNames: 'Maruf',
+              childFamilyName: 'Hossain',
+              childFirstNamesLocal: 'মারুফ',
+              childFamilyNameLocal: 'হোসাইন',
+              childDoB: '1994-10-22',
+              gender: 'male',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              motherFirstNames: 'Habiba',
+              motherFamilyName: 'Aktar',
+              motherFirstNamesLocal: 'হাবিবা',
+              motherFamilyNameLocal: 'আক্তার',
+              motherDoB: '1971-10-23',
+              motherIdentifier: '19922613235317496',
+              fatherFirstNames: 'Borhan',
+              fatherFamilyName: 'Uddin',
+              fatherFirstNamesLocal: 'বোরহান',
+              fatherFamilyNameLocal: 'উদ্দিন',
+              fatherDoB: '1966-08-01',
+              fatherIdentifier: '19988273235317496',
+              informantFirstNames: 'Habiba',
+              informantFamilyName: 'Aktar',
+              informantFirstNamesLocal: 'হাবিবা',
+              informantFamilyNameLocal: 'আক্তার',
+              contactNumber: '+8801526972106',
+              type: 'REGISTERED',
+              dateOfApplication: '2020-04-20T12:07:10.000Z',
+              trackingId: 'BPWW3PW',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              modifiedAt: '1587384432456',
+              registrationNumber: '19947210411000113'
+            },
+            sort: [1587384430000]
+          },
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: '1a0dbdfd-550f-4113-ac23-e650596c7bea',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384453470',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:07:33.230Z',
+                  operatorFirstNames: 'Shakib',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Al Hasan',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'DECLARED',
+                  operatorRole: 'FIELD_AGENT'
+                },
+                {
+                  operatedOn: '2020-04-20T12:07:49.162Z',
+                  operatorFirstNames: 'Mohammad',
+                  rejectReason: 'other',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  rejectComment:
+                    'Lack of information, please notify informant about it.',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REJECTED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFamilyName: 'Chowdhury',
+              childFamilyNameLocal: 'চৌধুরী',
+              childDoB: '1991-10-22',
+              gender: 'male',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              motherFamilyName: 'Aktar',
+              motherFamilyNameLocal: 'আক্তার',
+              motherDoB: '1971-10-23',
+              motherIdentifier: '19988010143317496',
+              informantFamilyName: 'Aktar',
+              informantFamilyNameLocal: 'আক্তার',
+              contactNumber: '+8801526972106',
+              type: 'REJECTED',
+              dateOfApplication: '2020-04-20T12:07:33.230Z',
+              trackingId: 'B5DU8KU',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              rejectReason: 'other',
+              modifiedAt: '1587384469376',
+              rejectComment:
+                'Lack of information, please notify informant about it.'
+            },
+            sort: [1587384453230]
+          },
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: '9867aaef-b994-4744-b5b3-abdd3f520793',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384532791',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:08:52.456Z',
+                  operatorFirstNames: 'Shakib',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Al Hasan',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'DECLARED',
+                  operatorRole: 'FIELD_AGENT'
+                },
+                {
+                  operatedOn: '2020-04-20T12:09:16.255Z',
+                  operatorFirstNames: 'Mohammad',
+                  rejectReason: 'other',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  rejectComment:
+                    'Lack of information, please notify informant about it.',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REJECTED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFirstNames: 'Tahmid',
+              childFamilyName: 'Rahman',
+              childFirstNamesLocal: 'তাহ্মিদ',
+              childFamilyNameLocal: 'রহমান',
+              childDoB: '1989-01-01',
+              gender: 'male',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              motherFirstNames: 'Namisa',
+              motherFamilyName: 'Begum',
+              motherFirstNamesLocal: 'নমিসা',
+              motherFamilyNameLocal: 'বেগম',
+              motherDoB: '1961-12-02',
+              motherIdentifier: '19988010143317496',
+              fatherFirstNames: 'Hamidur',
+              fatherFamilyName: 'Rahman',
+              fatherFirstNamesLocal: 'হামিদুর',
+              fatherFamilyNameLocal: 'রহমান',
+              fatherDoB: '1959-05-01',
+              fatherIdentifier: '19988010143317496',
+              informantFirstNames: 'Namisa',
+              informantFamilyName: 'Begum',
+              informantFirstNamesLocal: 'নমিসা',
+              informantFamilyNameLocal: 'বেগম',
+              contactNumber: '+8801526972106',
+              type: 'REJECTED',
+              dateOfApplication: '2020-04-20T12:08:52.456Z',
+              trackingId: 'BQOPG9I',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              rejectReason: 'other',
+              modifiedAt: '1587384556491',
+              rejectComment:
+                'Lack of information, please notify informant about it.'
+            },
+            sort: [1587384532456]
+          },
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: 'b25ca75b-af0a-4cf4-94a8-359d1a7e190f',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384621467',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:10:21.368Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'WAITING_VALIDATION',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                },
+                {
+                  operatedOn: '2020-04-20T12:10:21.368Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REGISTERED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFirstNames: 'Maruf',
+              childFamilyName: 'Hossain',
+              childFirstNamesLocal: 'মারুফ',
+              childFamilyNameLocal: 'হোসাইন',
+              childDoB: '1994-10-22',
+              gender: 'male',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              motherFirstNames: 'Habiba',
+              motherFamilyName: 'Aktar',
+              motherFirstNamesLocal: 'হাবিবা',
+              motherFamilyNameLocal: 'আক্তার',
+              motherDoB: '1971-10-23',
+              motherIdentifier: '19988010143317496',
+              fatherFirstNames: 'Borhan',
+              fatherFamilyName: 'Uddin',
+              fatherFirstNamesLocal: 'বোরহান',
+              fatherFamilyNameLocal: 'উদ্দিন',
+              fatherDoB: '1966-08-01',
+              fatherIdentifier: '19988010143317496',
+              informantFirstNames: 'Habiba',
+              informantFamilyName: 'Aktar',
+              informantFirstNamesLocal: 'হাবিবা',
+              informantFamilyNameLocal: 'আক্তার',
+              contactNumber: '+8801526972106',
+              type: 'REGISTERED',
+              dateOfApplication: '2020-04-20T12:10:21.368Z',
+              trackingId: 'BEDYGYJ',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              relatesTo: ['ca09dfa9-9e31-40ed-8aa6-9446b4ceb71a'],
+              modifiedAt: '1587384624163',
+              registrationNumber: '19947210411000114'
+            },
+            sort: [1587384621368]
+          },
+          {
+            _index: 'ocrvs',
+            _type: 'compositions',
+            _id: 'b8779830-49ca-48ed-8a21-fd43121e65ce',
+            _score: null,
+            _source: {
+              event: 'Birth',
+              createdAt: '1587384661428',
+              operationHistories: [
+                {
+                  operatedOn: '2020-04-20T12:10:46.015Z',
+                  operatorFirstNames: 'Shakib',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Al Hasan',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'DECLARED',
+                  operatorRole: 'FIELD_AGENT'
+                },
+                {
+                  operatedOn: '2020-04-20T12:11:01.315Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'WAITING_VALIDATION',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                },
+                {
+                  operatedOn: '2020-04-20T12:11:01.315Z',
+                  operatorFirstNames: 'Mohammad',
+                  operatorFamilyNameLocale: '',
+                  operatorFamilyName: 'Ashraful',
+                  operatorFirstNamesLocale: '',
+                  operatorOfficeName: 'Baniajan Union Parishad',
+                  operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+                  operationType: 'REGISTERED',
+                  operatorRole: 'LOCAL_REGISTRAR'
+                }
+              ],
+              childFamilyName: 'Bobita',
+              childFamilyNameLocal: 'ববিতা',
+              childDoB: '2018-08-01',
+              gender: 'female',
+              eventLocationId: 'c5ef7007-3100-45d1-99b9-cfe90021c758',
+              informantFamilyName: 'Begum',
+              informantFamilyNameLocal: 'বেগম',
+              contactNumber: '+8801526972106',
+              type: 'REGISTERED',
+              dateOfApplication: '2020-04-20T12:11:01.315Z',
+              trackingId: 'BFY2ECB',
+              applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+              compositionType: 'birth-application',
+              createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
+              updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
+              modifiedAt: '1587384663775',
+              registrationNumber: '20187210411000115'
+            },
+            sort: [1587384661315]
+          }
+        ]
+      }
+    },
+    statusCode: 200,
+    headers: {
+      'content-type': 'application/json; charset=UTF-8',
+      'content-length': '12943'
+    },
+    warnings: null,
+    meta: {
+      context: null,
+      request: {
+        params: {
+          method: 'POST',
+          path: '/ocrvs/_search',
+          body:
+            '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
+          querystring: '',
+          headers: {
+            'User-Agent':
+              'elasticsearch-js/6.8.5 (darwin 18.7.0-x64; Node.js v13.5.0)',
+            'Content-Type': 'application/json',
+            'Content-Length': '63'
+          },
+          timeout: 30000
+        },
+        options: { ignore: [404], warnings: null },
+        id: 269
+      },
+      name: 'elasticsearch-js',
+      connection: {
+        url: 'http://localhost:9200/',
+        id: 'http://localhost:9200/',
+        headers: {},
+        deadCount: 0,
+        resurrectTimeout: 0,
+        _openRequests: 0,
+        status: 'alive',
+        roles: { master: true, data: true, ingest: true, ml: false }
+      },
+      attempts: 0,
+      aborted: false
+    }
+  })
+  fetchPractitionerRole.mockResolvedValue('FIELD_AGENT')
 })

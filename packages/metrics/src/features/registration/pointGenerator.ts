@@ -353,7 +353,7 @@ export async function generateApplicationStartedPoint(
 
   if (status === Events.IN_PROGRESS_DEC) {
     isNotification(composition)
-      ? (role = 'NOTIFICATION_API')
+      ? (role = 'NOTIFICATION_API_USER')
       : (role = 'FIELD_AGENT')
   } else if (status === Events.NEW_VALIDATE) {
     role = 'REGISTRATION_AGENT'

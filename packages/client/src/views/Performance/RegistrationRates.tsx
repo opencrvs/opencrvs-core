@@ -22,14 +22,22 @@ import { buttonMessages } from '@client/i18n/messages'
 import { ArrowBack } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import { Query } from '@client/components/Query'
-import { HAS_CHILD_LOCATION } from './queries'
+import {
+  HAS_CHILD_LOCATION,
+  FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+  FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
+} from './queries'
 import { messages } from '@client/i18n/messages/views/performance'
-import { PerformanceSelect } from './PerformanceSelect'
+import {
+  PerformanceSelect,
+  IPerformanceSelectOption
+} from './PerformanceSelect'
 import { connect } from 'react-redux'
 import { getJurisidictionType } from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 
 const { useState } = React
 const Header = styled.h1`
@@ -49,7 +57,7 @@ const ActionContainer = styled.div`
     margin-right: 0;
   }
 `
-enum REG_RATE_BASE {
+export enum REG_RATE_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'
 }
@@ -61,95 +69,15 @@ type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
   IDispatchProps
 
-const mockData = [
-  {
-    time: new Date(2020, 3),
-    total: 10000,
-    regWithin45d: 5000,
-    estimated: 20000,
-    percentage: 23.5
-  },
-  {
-    time: new Date(2020, 2),
-    total: 8000,
-    regWithin45d: 4500,
-    estimated: 20000,
-    percentage: 16
-  },
-  {
-    time: new Date(2020, 1),
-    total: 9000,
-    regWithin45d: 4000,
-    estimated: 20000,
-    percentage: 14
-  },
-  {
-    time: new Date(2020, 0),
-    total: 7000,
-    regWithin45d: 3500,
-    estimated: 20000,
-    percentage: 12.5
-  },
-  {
-    time: new Date(2019, 11),
-    total: 6000,
-    regWithin45d: 3000,
-    estimated: 15000,
-    percentage: 12
-  },
-  {
-    time: new Date(2019, 10),
-    total: 5500,
-    regWithin45d: 2500,
-    estimated: 15000,
-    percentage: 11
-  },
-  {
-    time: new Date(2019, 9),
-    total: 6500,
-    regWithin45d: 2500,
-    estimated: 15000,
-    percentage: 10
-  },
-  {
-    time: new Date(2019, 8),
-    total: 4500,
-    regWithin45d: 2000,
-    estimated: 15000,
-    percentage: 8
-  },
-  {
-    time: new Date(2019, 7),
-    total: 3500,
-    regWithin45d: 1500,
-    estimated: 15000,
-    percentage: 7
-  },
-  {
-    time: new Date(2019, 6),
-    total: 2500,
-    regWithin45d: 500,
-    estimated: 15000,
-    percentage: 7.5
-  },
-  {
-    time: new Date(2019, 5),
-    total: 2000,
-    regWithin45d: 250,
-    estimated: 15000,
-    percentage: 2
-  },
-  {
-    time: new Date(2019, 4),
-    total: 1000,
-    regWithin45d: 100,
-    estimated: 15000,
-    percentage: 1.5
-  }
-]
+export interface IEstimationBase {
+  baseType: REG_RATE_BASE
+  locationJurisdictionType?: string
+}
 
 function RegistrationRatesComponent(props: IRegistrationRateProps) {
-  const [base, setBase] = useState<REG_RATE_BASE>(REG_RATE_BASE.TIME)
+  const [base, setBase] = useState<IEstimationBase>({
+    baseType: REG_RATE_BASE.TIME
+  })
 
   const {
     intl,
@@ -161,7 +89,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     },
     goToOperationalReport
   } = props
-  const { title, selectedLocation } = state
+  const { title, selectedLocation, timeStart, timeEnd } = state
 
   return (
     <PerformanceContentWrapper hideTopBar>
@@ -170,7 +98,12 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           id="reg-rates-action-back"
           icon={() => <ArrowBack />}
           align={ICON_ALIGNMENT.LEFT}
-          onClick={() => goToOperationalReport(selectedLocation)}
+          onClick={() =>
+            goToOperationalReport(
+              selectedLocation,
+              OPERATIONAL_REPORT_SECTION.OPERATIONAL
+            )
+          }
         >
           {intl.formatMessage(buttonMessages.back)}
         </TertiaryButton>
@@ -182,7 +115,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
         variables={{ parentId: selectedLocation.id }}
       >
         {({ data, loading, error }) => {
-          let options = [
+          let options: IPerformanceSelectOption[] = [
             {
               label: intl.formatMessage(messages.overTime),
               value: REG_RATE_BASE.TIME
@@ -198,7 +131,8 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
               label: intl.formatMessage(messages.byLocation, {
                 jurisdictionType
               }),
-              value: REG_RATE_BASE.LOCATION
+              value: REG_RATE_BASE.LOCATION,
+              type: jurisdictionType || ''
             })
           }
 
@@ -206,15 +140,52 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             <ActionContainer>
               <PerformanceSelect
                 id="base-select"
-                value={base}
+                value={base.baseType}
                 options={options}
-                onChange={val => setBase(val as REG_RATE_BASE)}
+                onChange={option =>
+                  setBase({
+                    baseType: option.value as REG_RATE_BASE,
+                    locationJurisdictionType: option.type
+                  })
+                }
               />
             </ActionContainer>
           )
         }}
       </Query>
-      <Within45DaysTable data={mockData} eventType={eventType as Event} />
+      <Query
+        query={
+          base.baseType === REG_RATE_BASE.TIME
+            ? FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+            : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
+        }
+        variables={{
+          event: eventType.toUpperCase(),
+          timeStart: timeStart.toISOString(),
+          timeEnd: timeEnd.toISOString(),
+          locationId: selectedLocation.id
+        }}
+      >
+        {({ data, loading, error }) => {
+          if (error) {
+            // TODO: need error view here
+            return <></>
+          } else {
+            return (
+              <Within45DaysTable
+                loading={loading}
+                base={base}
+                data={
+                  data &&
+                  (data.fetchMonthWiseEventMetrics ||
+                    data.fetchLocationWiseEventMetrics)
+                }
+                eventType={eventType as Event}
+              />
+            )
+          }
+        }}
+      </Query>
     </PerformanceContentWrapper>
   )
 }

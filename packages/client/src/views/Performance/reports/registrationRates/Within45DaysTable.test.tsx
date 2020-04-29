@@ -17,27 +17,40 @@ import { createTestStore, createTestComponent } from '@client/tests/util'
 import { Within45DaysTable } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { REG_RATE_BASE } from '@client/views/Performance/RegistrationRates'
 
-describe('Within45DaysTable tests', () => {
+describe('Within45DaysTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
 
-  const mockData = [
-    {
-      time: new Date(2020, 3),
-      total: 10000,
-      regWithin45d: 5000,
-      estimated: 20000,
-      percentage: 23.5
-    },
-    {
-      time: new Date(2020, 2),
-      total: 8000,
-      regWithin45d: 4500,
-      estimated: 20000,
-      percentage: 16
+  const mockData = {
+    details: [
+      {
+        actualTotalRegistration: 20,
+        actual45DayRegistration: 9,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 4.5,
+        month: 'April',
+        year: '2020',
+        startOfMonth: '2020-03-30T18:00:00.000Z'
+      },
+      {
+        actualTotalRegistration: 10,
+        actual45DayRegistration: 0,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 0,
+        month: 'March',
+        year: '2020',
+        startOfMonth: '2020-02-29T18:00:00.000Z'
+      }
+    ],
+    total: {
+      actualTotalRegistration: 30,
+      actual45DayRegistration: 9,
+      estimatedRegistration: 45,
+      estimated45DayPercentage: 2.25
     }
-  ]
+  }
 
   beforeAll(async () => {
     store = (await createTestStore()).store
@@ -45,13 +58,19 @@ describe('Within45DaysTable tests', () => {
 
   beforeEach(async () => {
     component = (await createTestComponent(
-      <Within45DaysTable eventType={Event.BIRTH} data={mockData} />,
+      <Within45DaysTable
+        loading={false}
+        base={{ baseType: REG_RATE_BASE.TIME }}
+        eventType={Event.BIRTH}
+        data={mockData}
+      />,
       store
     )).component
   })
 
   it('runs without crashing', async () => {
     const firstRowElement = await waitForElement(component, '#row_0')
+    expect(firstRowElement).toBeDefined()
   })
 
   it('toggles sorting order of the list', async () => {
@@ -75,5 +94,83 @@ describe('Within45DaysTable tests', () => {
         .childAt(0)
         .text()
     ).toBe('March 2020')
+  })
+})
+describe('Within45DaysTable tests for by location option', () => {
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+
+  const mockData = {
+    details: [
+      {
+        actualTotalRegistration: 20,
+        actual45DayRegistration: 9,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 4.5,
+        locationName: 'Atpara Sadar',
+        locationId: '123'
+      },
+      {
+        actualTotalRegistration: 10,
+        actual45DayRegistration: 0,
+        estimatedRegistration: 45,
+        estimated45DayPercentage: 0,
+        locationName: 'Baniajan',
+        locationId: '456'
+      }
+    ],
+    total: {
+      actualTotalRegistration: 30,
+      actual45DayRegistration: 9,
+      estimatedRegistration: 45,
+      estimated45DayPercentage: 2.25
+    }
+  }
+
+  beforeAll(async () => {
+    store = (await createTestStore()).store
+  })
+
+  beforeEach(async () => {
+    component = (await createTestComponent(
+      <Within45DaysTable
+        loading={false}
+        base={{
+          baseType: REG_RATE_BASE.LOCATION,
+          locationJurisdictionType: 'UNION'
+        }}
+        eventType={Event.BIRTH}
+        data={mockData}
+      />,
+      store
+    )).component
+  })
+
+  it('runs without crashing', async () => {
+    const firstRowElement = await waitForElement(component, '#row_0')
+    expect(firstRowElement).toBeDefined()
+  })
+
+  it('toggles sorting order of the list', async () => {
+    const firstRowElement = await waitForElement(component, '#row_0')
+    const toggleSortActionElement = await waitForElement(
+      component,
+      '#location-label'
+    )
+    expect(
+      firstRowElement
+        .hostNodes()
+        .childAt(0)
+        .text()
+    ).toBe('Atpara Sadar')
+
+    toggleSortActionElement.hostNodes().simulate('click')
+
+    expect(
+      firstRowElement
+        .hostNodes()
+        .childAt(0)
+        .text()
+    ).toBe('Baniajan')
   })
 })

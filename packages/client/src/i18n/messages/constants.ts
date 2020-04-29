@@ -565,7 +565,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   averageRateOfRegistrations: {
     id: 'constants.averageRateOfRegistrations',
-    defaultMessage: 'Avg. {amount}%',
+    defaultMessage: 'avg. {amount}%',
     description: 'A label for Average rate of registrations'
   },
   estimatedNumberOfEvents: {
