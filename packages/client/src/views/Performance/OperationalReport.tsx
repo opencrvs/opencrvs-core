@@ -186,7 +186,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
             <DateRangePicker
               startDate={timeStart.toDate()}
               endDate={timeEnd.toDate()}
-              onDatesChange={() => {}}
+              onDatesChange={({ startDate, endDate }) => {
+                this.setState({
+                  timeStart: moment(startDate),
+                  timeEnd: moment(endDate)
+                })
+              }}
             />
           </FilterContainer>
           <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>

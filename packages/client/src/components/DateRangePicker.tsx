@@ -28,18 +28,22 @@ interface IDateRange {
   startDate: Date
   endDate: Date
 }
-interface IPresetDateRange extends IDateRange {
+interface IPresetDateRange {
   label: string
+  startDate: moment.Moment
+  endDate: moment.Moment
 }
 
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
-  onDatesChange: ({
-    startDate,
-    endDate
-  }: {
-    startDate: Date
-    endDate: Date
-  }) => void
+  onDatesChange: ({ startDate, endDate }: IDateRange) => void
+}
+
+interface MonthSelectorProps {
+  date: moment.Moment
+  label: string
+  onSelectDate: (date: moment.Moment) => void
+  minDate?: moment.Moment
+  maxDate: moment.Moment
 }
 
 const PickerButton = styled.button`
@@ -201,16 +205,12 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   useEffect(() => {
     function generatePresetOptions(): IPresetDateRange[] {
-      const currentYear = todaysDateMoment.year()
-      const dateToday = todaysDateMoment.toDate()
-      const date30DaysBack = todaysDateMoment
-        .clone()
-        .subtract(30, 'days')
-        .toDate()
-      const date12MonthsBack = todaysDateMoment
-        .clone()
-        .subtract(12, 'months')
-        .toDate()
+      const today = moment()
+      const currentYear = today.year()
+      const date30DaysBack = today.clone().subtract(30, 'days')
+
+      const date12MonthsBack = today.clone().subtract(12, 'months')
+
       const lastYearMoment = moment([currentYear - 1])
       const last2YearMoment = moment([currentYear - 2])
       const last3YearMoment = moment([currentYear - 3])
@@ -219,45 +219,40 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         {
           label: 'Last 30 days',
           startDate: date30DaysBack,
-          endDate: dateToday
+          endDate: today
         },
         {
           label: 'Last 12 months',
           startDate: date12MonthsBack,
-          endDate: dateToday
+          endDate: today
         },
         {
           label: lastYearMoment.format('YYYY'),
-          startDate: lastYearMoment.toDate(),
-          endDate: lastYearMoment.endOf('year').toDate()
+          startDate: lastYearMoment,
+          endDate: lastYearMoment.clone().endOf('year')
         },
         {
           label: last2YearMoment.format('YYYY'),
-          startDate: last2YearMoment.toDate(),
-          endDate: last2YearMoment.endOf('year').toDate()
+          startDate: last2YearMoment,
+          endDate: last2YearMoment.clone().endOf('year')
         },
         {
           label: last3YearMoment.format('YYYY'),
-          startDate: last3YearMoment.toDate(),
-          endDate: last3YearMoment.endOf('year').toDate()
+          startDate: last3YearMoment,
+          endDate: last3YearMoment.clone().endOf('year')
         }
       ]
     }
 
     updatePresetOptions(generatePresetOptions())
-  }, [todaysDateMoment])
+  }, [])
 
   function MonthSelector({
     date,
     label,
     onSelectDate,
-    hideSelection
-  }: {
-    date: moment.Moment
-    label: string
-    onSelectDate: (date: moment.Moment) => void
-    hideSelection?: boolean
-  }) {
+    maxDate
+  }: MonthSelectorProps) {
     const months = moment.monthsShort()
     const year = date.year().toString()
 
@@ -292,8 +287,8 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             return (
               <MonthButton
                 key={index}
-                disabled={monthDate.isAfter(todaysDateMoment)}
-                selected={!hideSelection && monthDate.isSame(date, 'month')}
+                disabled={monthDate.isAfter(maxDate)}
+                selected={monthDate.isSame(date, 'month')}
                 onClick={() => onSelectDate(monthDate)}
               >
                 {month}
@@ -309,18 +304,16 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     return (
       <PresetContainer>
         {presetOptions.map((item, index) => {
-          const presetStartDateMoment = moment(item.startDate)
-          const presetEndDateMoment = moment(item.endDate)
           return (
             <PresetRangeButton
               key={index}
               selected={
-                presetStartDateMoment.isSame(startDate, 'month') &&
-                presetEndDateMoment.isSame(endDate, 'month')
+                item.startDate.isSame(startDate, 'month') &&
+                item.endDate.isSame(endDate, 'month')
               }
               onClick={() => {
-                setStartDate(presetStartDateMoment)
-                setEndDate(presetEndDateMoment)
+                setStartDate(item.startDate)
+                setEndDate(item.endDate)
               }}
             >
               {item.label}
@@ -333,9 +326,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   const selectedPresetFromProps = presetOptions.find(
     item =>
-      moment(item.startDate).isSame(startDateFromProps, 'month') &&
-      moment(item.endDate).isSame(endDateFromProps, 'month')
+      item.startDate.isSame(startDateFromProps, 'month') &&
+      item.endDate.isSame(endDateFromProps, 'month')
   )
+
   return (
     <div>
       <PickerButton onClick={() => setModalVisible(true)}>
@@ -372,15 +366,27 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 date={startDate}
                 label="From"
                 onSelectDate={setStartDate}
+                maxDate={endDate.clone().subtract(1, 'days')}
               />
               <MonthSelector
                 date={endDate}
                 label="To"
                 onSelectDate={setEndDate}
+                maxDate={todaysDateMoment}
               />
             </ModalBody>
             <ModalFooter>
-              <StyledPrimaryButton>Select</StyledPrimaryButton>
+              <StyledPrimaryButton
+                onClick={() => {
+                  props.onDatesChange({
+                    startDate: startDate.toDate(),
+                    endDate: endDate.toDate()
+                  })
+                  setModalVisible(false)
+                }}
+              >
+                Select
+              </StyledPrimaryButton>
             </ModalFooter>
           </ModalContainer>
           <CancelableArea onClick={() => setModalVisible(false)} />
