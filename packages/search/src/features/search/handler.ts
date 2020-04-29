@@ -51,3 +51,31 @@ export async function getAllDocumentsHandler(
     return internal(err)
   }
 }
+
+interface ICountQueryParam {
+  applicationLocationHirarchyId: string
+  status: string[]
+}
+
+export async function getStatusWiseRegistrationCount(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = request.payload as ICountQueryParam
+    const countResult: { status: string; count: number }[] = []
+    for (const regStatus of payload.status) {
+      const searchResult = await searchComposition({
+        applicationLocationHirarchyId: payload.applicationLocationHirarchyId,
+        status: [regStatus]
+      })
+      countResult.push({
+        status: regStatus,
+        count: searchResult?.body?.hits?.total || 0
+      })
+    }
+    return h.response(countResult).code(200)
+  } catch (err) {
+    return internal(err)
+  }
+}
