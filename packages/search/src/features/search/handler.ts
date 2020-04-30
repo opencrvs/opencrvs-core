@@ -146,7 +146,10 @@ export async function populateHierarchicalLocationIdsHandler(
           body.applicationLocationId
         )
         await updateComposition(composition._id, body)
-        if (composition._source.event === EVENT.DEATH) {
+        if (
+          body.event &&
+          body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
+        ) {
           updatedCompositionCounts.death += 1
         } else {
           updatedCompositionCounts.birth += 1

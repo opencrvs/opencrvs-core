@@ -2590,9 +2590,28 @@ export const mockSearchResult = {
           _id: 'BGM9CA2',
           _score: 1,
           _source: {
+            event: 'BIRTH',
             childFamilyName: 'Moajjem',
             childFamilyNameLocal: 'মোয়াজ্জেম',
+            applicationLocationId: '123',
             childDoB: '2011-11-11',
+            gender: 'male',
+            motherFamilyName: 'Moajjem',
+            motherFamilyNameLocal: 'মোয়াজ্জেম',
+            motherIdentifier: '11111111111111111'
+          }
+        },
+        {
+          _index: 'ocrvs',
+          _type: 'compositions',
+          _id: 'DGM9CA2',
+          _score: 1,
+          _source: {
+            event: 'DEATH',
+            deceasedFamilyName: 'Moajjem',
+            deceasedFamilyNameLocal: 'মোয়াজ্জেম',
+            applicationLocationId: '123',
+            deceasedDoB: '2011-11-11',
             gender: 'male',
             motherFamilyName: 'Moajjem',
             motherFamilyNameLocal: 'মোয়াজ্জেম',
