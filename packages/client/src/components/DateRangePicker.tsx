@@ -251,11 +251,15 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   }, [])
 
   useEffect(() => {
-    if (!modalVisible) {
-      setStartDate(startDateFromProps)
-      setEndDate(endDateFromProps)
+    function getDerivedStateFromProps() {
+      if (!modalVisible) {
+        setStartDate(moment(props.startDate))
+        setEndDate(moment(props.endDate))
+      }
     }
-  }, [endDateFromProps, modalVisible, startDateFromProps])
+
+    getDerivedStateFromProps()
+  }, [modalVisible, props.endDate, props.startDate])
 
   function MonthSelector({
     date,
