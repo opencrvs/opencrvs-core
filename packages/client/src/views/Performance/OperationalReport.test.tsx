@@ -11,11 +11,7 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import {
-  createTestStore,
-  createTestComponent,
-  flushPromises
-} from '@client/tests/util'
+import { createTestStore, createTestComponent } from '@client/tests/util'
 import { AppStore } from '@client/store'
 import {
   OperationalReport,
@@ -132,6 +128,60 @@ describe('OperationalReport tests', () => {
     expect(history.location.state).toEqual({
       selectedLocation: LOCATION_DHAKA_DIVISION,
       sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
+    })
+  })
+
+  describe('date range picker tests', () => {
+    beforeEach(async () => {
+      const dateRangePickerElement = await waitForElement(
+        component,
+        '#date-range-picker-action'
+      )
+      dateRangePickerElement.hostNodes().simulate('click')
+    })
+
+    it('modal shows up', async () => {
+      const pickerModalElement = await waitForElement(
+        component,
+        '#picker-modal'
+      )
+    })
+
+    it('clicking on close button dismisses the modal', async () => {
+      const cancelButtonElement = await waitForElement(component, '#close-btn')
+      cancelButtonElement.hostNodes().simulate('click')
+
+      expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
+    })
+
+    it('clicking on outside dismisses the modal', async () => {
+      const cancelButtonElement = await waitForElement(
+        component,
+        '#cancelable-area'
+      )
+      cancelButtonElement.hostNodes().simulate('click')
+
+      expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
+    })
+
+    it('clicking on any other preset range changes date along with label', async () => {
+      const dateRangePickerElement = await waitForElement(
+        component,
+        '#date-range-picker-action'
+      )
+      expect(dateRangePickerElement.hostNodes().text()).toBe('Last 12 months')
+
+      const last30DaysPresetButtonElement = await waitForElement(
+        component,
+        '#last30Days'
+      )
+      last30DaysPresetButtonElement.hostNodes().simulate('click')
+      const confirmButtonElement = await waitForElement(
+        component,
+        '#date-range-confirm-action'
+      )
+      confirmButtonElement.hostNodes().simulate('click')
+      expect(dateRangePickerElement.hostNodes().text()).toBe('Last 30 days')
     })
   })
 })

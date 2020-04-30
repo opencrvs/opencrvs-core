@@ -32,6 +32,7 @@ interface IDateRange {
   endDate: Date
 }
 interface IPresetDateRange {
+  key: string
   label: string
   startDate: moment.Moment
   endDate: moment.Moment
@@ -220,26 +221,31 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
       return [
         {
+          key: 'last30Days',
           label: intl.formatMessage(constantsMessages.last30Days),
           startDate: date30DaysBack,
           endDate: today
         },
         {
+          key: 'last12Months',
           label: intl.formatMessage(constantsMessages.last12Months),
           startDate: date12MonthsBack,
           endDate: today
         },
         {
+          key: 'lastYear',
           label: lastYearMoment.format('YYYY'),
           startDate: lastYearMoment,
           endDate: lastYearMoment.clone().endOf('year')
         },
         {
+          key: 'previousOfLastYear',
           label: last2YearMoment.format('YYYY'),
           startDate: last2YearMoment,
           endDate: last2YearMoment.clone().endOf('year')
         },
         {
+          key: 'previousOfLast2Years',
           label: last3YearMoment.format('YYYY'),
           startDate: last3YearMoment,
           endDate: last3YearMoment.clone().endOf('year')
@@ -319,10 +325,11 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   function PresetSelector() {
     return (
       <PresetContainer>
-        {presetOptions.map((item, index) => {
+        {presetOptions.map(item => {
           return (
             <PresetRangeButton
-              key={index}
+              id={item.key}
+              key={item.key}
               selected={
                 item.startDate.isSame(startDate, 'month') &&
                 item.endDate.isSame(endDate, 'month')
@@ -348,7 +355,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   return (
     <div>
-      <PickerButton onClick={() => setModalVisible(true)}>
+      <PickerButton
+        id="date-range-picker-action"
+        onClick={() => setModalVisible(true)}
+      >
         <ContentWrapper>
           <span>
             {selectedPresetFromProps
@@ -362,7 +372,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       </PickerButton>
       {modalVisible && (
         <>
-          <ModalContainer>
+          <ModalContainer id="picker-modal">
             <ModalHeader>
               <TitleContent>
                 <CalendarGrey />
@@ -393,6 +403,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             </ModalBody>
             <ModalFooter>
               <StyledPrimaryButton
+                id="date-range-confirm-action"
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate.toDate(),
@@ -406,7 +417,10 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               </StyledPrimaryButton>
             </ModalFooter>
           </ModalContainer>
-          <CancelableArea onClick={() => setModalVisible(false)} />
+          <CancelableArea
+            id="cancelable-area"
+            onClick={() => setModalVisible(false)}
+          />
         </>
       )}
     </div>
