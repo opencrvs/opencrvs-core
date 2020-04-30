@@ -220,12 +220,12 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
       return [
         {
-          label: 'Last 30 days',
+          label: intl.formatMessage(constantsMessages.last30Days),
           startDate: date30DaysBack,
           endDate: today
         },
         {
-          label: 'Last 12 months',
+          label: intl.formatMessage(constantsMessages.last12Months),
           startDate: date12MonthsBack,
           endDate: today
         },
@@ -248,7 +248,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     }
 
     updatePresetOptions(generatePresetOptions())
-  }, [])
+  }, [intl])
 
   useEffect(() => {
     function getDerivedStateFromProps() {
@@ -380,13 +380,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               <PresetSelector />
               <MonthSelector
                 date={startDate}
-                label="From"
+                label={intl.formatMessage(constantsMessages.from)}
                 onSelectDate={setStartDate}
                 maxDate={endDate.clone().subtract(1, 'days')}
               />
               <MonthSelector
                 date={endDate}
-                label="To"
+                label={intl.formatMessage(constantsMessages.toCapitalized)}
                 onSelectDate={setEndDate}
                 maxDate={todaysDateMoment}
               />
