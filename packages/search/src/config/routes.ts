@@ -15,7 +15,8 @@ import { deathEventHandler } from '@search/features/registration/death/handler'
 import {
   searchDeclaration,
   getAllDocumentsHandler,
-  getStatusWiseRegistrationCount
+  getStatusWiseRegistrationCountHandler,
+  populateHierarchicalLocationIdsHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 
@@ -112,7 +113,7 @@ export const getRoutes = () => {
     {
       method: 'POST',
       path: '/statusWiseRegistrationCount',
-      handler: getStatusWiseRegistrationCount,
+      handler: getStatusWiseRegistrationCountHandler,
       config: {
         tags: ['api'],
         auth: {
@@ -130,6 +131,19 @@ export const getRoutes = () => {
           })
         },
         description: 'Returns all the documents in the index'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/populateHierarchicalLocationIds',
+      handler: populateHierarchicalLocationIdsHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        description:
+          'Populates hierarchical location ids for the legacy indexes'
       }
     }
   ]
