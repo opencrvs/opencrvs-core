@@ -30,7 +30,7 @@ export const grid: IGrid = {
     xs: 0,
     sm: 359,
     md: 599,
-    lg: 1140,
+    lg: 1023,
     xl: 1279
   },
   columns: 12,
