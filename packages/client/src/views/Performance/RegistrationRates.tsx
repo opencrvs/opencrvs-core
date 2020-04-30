@@ -197,6 +197,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                     data={prepareChartData(
                       data && data.fetchMonthWiseEventMetrics
                     )}
+                    eventType={eventType as Event}
                   />
                 )}
                 <Within45DaysTable

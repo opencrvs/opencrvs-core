@@ -9,15 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { constantsMessages } from '@client/i18n/messages'
 import { TriLineChart } from '@opencrvs/components/lib/charts'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
+import { Event } from '@client/forms'
 
-interface IProps {
+interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
+  eventType: Event
 }
 
 interface IActiveState {
@@ -136,6 +140,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       activeTotalRegistered,
       activeTotalEstimate
     } = this.state
+    const { intl, eventType } = this.props
     return (
       <CustomLegendContainer>
         <LegendHeader>{activeLabel}</LegendHeader>
@@ -144,7 +149,11 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             <LegendDot color={activeTotalEstimate.stroke} />
           </div>
           <LegendData>
-            <LegendDataLabel>Estimated no. of births</LegendDataLabel>
+            <LegendDataLabel>
+              {intl.formatMessage(constantsMessages.estimatedNumberOfEvents, {
+                eventType
+              })}
+            </LegendDataLabel>
             <br />
             <LegendDataValue>{activeTotalEstimate.value}</LegendDataValue>
           </LegendData>
@@ -154,7 +163,9 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             <LegendDot color={activeTotalRegistered.stroke} />
           </div>
           <LegendData>
-            <LegendDataLabel>Total registered</LegendDataLabel>
+            <LegendDataLabel>
+              {intl.formatMessage(constantsMessages.totalRegistered)}
+            </LegendDataLabel>
             <br />
             <LegendDataValue>{activeTotalRegistered.value}</LegendDataValue>
           </LegendData>
@@ -164,7 +175,9 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             <LegendDot color={activeRegisteredIn45Day.stroke} />
           </div>
           <LegendData>
-            <LegendDataLabel>Registered in 45 days</LegendDataLabel>
+            <LegendDataLabel>
+              {intl.formatMessage(constantsMessages.registeredIn45d)}
+            </LegendDataLabel>
             <br />
             <LegendDataValue>{activeRegisteredIn45Day.value}</LegendDataValue>
           </LegendData>
@@ -280,4 +293,6 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
   }
 }
 
-export const RegRatesLineChart = withTheme(RegRatesLineChartComponent)
+export const RegRatesLineChart = withTheme(
+  injectIntl(RegRatesLineChartComponent)
+)
