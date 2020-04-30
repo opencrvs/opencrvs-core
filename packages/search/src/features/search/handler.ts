@@ -12,7 +12,10 @@
 import * as Hapi from 'hapi'
 import { logger } from '@search/logger'
 import { internal } from 'boom'
-import { searchComposition } from '@search/features/search/service'
+import {
+  searchComposition,
+  DEFAULT_SIZE
+} from '@search/features/search/service'
 import { ISearchQuery } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
 
@@ -34,12 +37,32 @@ export async function getAllDocumentsHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    const allDocumentsCountCheck = await client.search(
+      {
+        index: 'ocrvs',
+        body: {
+          query: { match_all: {} },
+          sort: [{ dateOfApplication: 'asc' }],
+          size: DEFAULT_SIZE
+        }
+      },
+      {
+        ignore: [404]
+      }
+    )
+    const count: number = allDocumentsCountCheck.body.hits.total
+    if (count > 5000) {
+      return internal(
+        'Elastic contains over 5000 results.  It is risky to return all without pagination.'
+      )
+    }
     const allDocuments = await client.search(
       {
         index: 'ocrvs',
         body: {
           query: { match_all: {} },
-          sort: [{ dateOfApplication: 'asc' }]
+          sort: [{ dateOfApplication: 'asc' }],
+          size: count
         }
       },
       {
