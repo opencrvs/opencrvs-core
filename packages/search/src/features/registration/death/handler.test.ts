@@ -121,7 +121,8 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it.skip('should return status code 200 if the some sections is missing too', async () => {
+    it('should return status code 200 if the some sections is missing too', async () => {
+      fetch.resetMocks()
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
         any
@@ -162,7 +163,8 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it.skip('should return status code 200 if the composition indexed correctly', async () => {
+    it('should return status code 200 if the composition indexed correctly', async () => {
+      fetch.resetMocks()
       const mockedIndexComposition = indexComposition as jest.Mocked<any>
       const mockedSearchByCompositionId = searchByCompositionId as jest.Mocked<
         any
@@ -205,7 +207,7 @@ describe('Verify handlers', () => {
       expect(res.statusCode).toBe(200)
     })
 
-    it.skip('should return status code 200 if the event data is updated with task', async () => {
+    it('should return status code 200 if the event data is updated with task', async () => {
       ;(updateComposition as jest.Mock).mockReturnValue({})
 
       const token = jwt.sign({}, readFileSync('../auth/test/cert.key'), {
