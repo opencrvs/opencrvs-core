@@ -54,6 +54,14 @@ describe('Verify handlers', () => {
       mockedSearchByCompositionId.mockReturnValue(mockSearchResponse)
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
         [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],
@@ -95,6 +103,14 @@ describe('Verify handlers', () => {
       )
       mockedUpdateComposition.mockReturnValue({})
       fetch.mockResponses(
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
         [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockCompositionResponse), { status: 200 }],

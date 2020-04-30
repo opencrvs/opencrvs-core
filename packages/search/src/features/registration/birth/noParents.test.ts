@@ -35,6 +35,14 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 while father and mother sections is not present', async () => {
       fetch.mockResponses(
+        [
+          JSON.stringify({ partOf: { reference: 'Location/123' } }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({ partOf: { reference: 'Location/0' } }),
+          { status: 200 }
+        ],
         [JSON.stringify(mockEncounterResponse), { status: 200 }],
         [JSON.stringify(mockLocationResponse), { status: 200 }],
         [JSON.stringify(mockUserModelResponse), { status: 200 }],
