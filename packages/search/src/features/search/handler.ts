@@ -37,6 +37,8 @@ export async function getAllDocumentsHandler(
   h: Hapi.ResponseToolkit
 ) {
   try {
+    // Before retrieving all documents, we need to check the total count to make sure that the query will no tbe too large
+    // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
     const allDocumentsCountCheck = await client.search(
       {
         index: 'ocrvs',
@@ -56,6 +58,7 @@ export async function getAllDocumentsHandler(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
       )
     }
+    // If total count is less than 5000, then proceed.
     const allDocuments = await client.search(
       {
         index: 'ocrvs',
