@@ -28,6 +28,7 @@ interface IConstantsMessages {
   applicationValidatedOn: MessageDescriptor
   applicationWaitingForValidationOn: MessageDescriptor
   birth: MessageDescriptor
+  births: MessageDescriptor
   by: MessageDescriptor
   certificationPaymentTitle: MessageDescriptor
   certified: MessageDescriptor
@@ -36,6 +37,7 @@ interface IConstantsMessages {
   comment: MessageDescriptor
   dateOfApplication: MessageDescriptor
   death: MessageDescriptor
+  deaths: MessageDescriptor
   declared: MessageDescriptor
   dob: MessageDescriptor
   dod: MessageDescriptor
@@ -195,6 +197,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label from the birth event',
     id: 'constants.birth'
   },
+  births: {
+    defaultMessage: 'Births',
+    description: 'A label from the births event',
+    id: 'constants.births'
+  },
   by: {
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)',
@@ -235,6 +242,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Death',
     description: 'A label from the death event',
     id: 'constants.death'
+  },
+  deaths: {
+    defaultMessage: 'Deaths',
+    description: 'A label from the deaths event',
+    id: 'constants.deaths'
   },
   declared: {
     defaultMessage: 'submitted',
@@ -581,7 +593,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   registeredWithin45d: {
     id: 'constants.registeredWithin45d',
-    defaultMessage: 'Registered within 45 days of event',
+    defaultMessage: 'Registered within\n45 days of event',
     description: 'A label for Registered within 45 days of event'
   },
   timePeriod: {

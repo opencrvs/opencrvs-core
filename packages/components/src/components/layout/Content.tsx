@@ -20,7 +20,7 @@ export const Content = styled.section`
 `
 
 export const BodyContent = styled.div`
-  max-width: 940px;
+  max-width: 1140px;
   margin: 64px auto 0;
   padding: 40px 32px;
   position: relative;
@@ -30,7 +30,7 @@ export const BodyContent = styled.div`
 `
 
 export const HomeContent = styled.div`
-  max-width: 1021px;
+  max-width: 1140px;
   margin: 0 auto 64px auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
     margin: 24px auto 64px auto;
@@ -39,7 +39,7 @@ export const HomeContent = styled.div`
     margin: 24px auto 64px auto;
     max-width: 100%;
   }
-  @media (max-width: 1050px) and (min-width: ${({ theme }) =>
+  @media (max-width: 1140px) and (min-width: ${({ theme }) =>
       theme.grid.breakpoints.lg}px) {
     max-width: calc(100% - 48px);
   }
