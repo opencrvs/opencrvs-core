@@ -5,7 +5,7 @@
   title="Sample Title"
   color="red"
   totalPoints={900}
-  currentPoints={500}
+  currentPoints={200}
   onClick={e => alert('clicked')}
 />
 ```

@@ -16,10 +16,11 @@ import { Line } from 'rc-progress'
 const HeaderWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0 2px 0 2px;
+  padding-bottom: 5px;
 `
 
 const TitleLink = styled.div`
+  cursor: pointer;
   ${({ theme }) => theme.fonts.bodyStyle};
   color: ${({ theme }) => theme.colors.primary};
   text-decoration: underline;
@@ -31,9 +32,13 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
+type ProgressBarShape = 'square' | 'round' | 'butt'
+
 interface IProgressBarProps {
   title?: string
   color?: string
+  width?: number
+  shape?: ProgressBarShape
   totalPoints: number
   currentPoints: number
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
@@ -48,6 +53,8 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
     const {
       title = '',
       color = 'blue',
+      width = 1.5,
+      shape = 'square',
       totalPoints,
       currentPoints
     } = this.props
@@ -65,7 +72,13 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
             <Value>{currentPoints}</Value> ({percentage}%)
           </ValueHolder>
         </HeaderWrapper>
-        <Line percent={percentage} strokeColor={color} />
+        <Line
+          percent={percentage}
+          strokeWidth={width}
+          trailWidth={width}
+          strokeLinecap={shape}
+          strokeColor={color}
+        />
       </>
     )
   }
