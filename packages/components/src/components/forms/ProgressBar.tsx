@@ -53,7 +53,7 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
     const {
       title = '',
       color = 'blue',
-      width = 1.5,
+      width = 2,
       shape = 'square',
       totalPoints,
       currentPoints
