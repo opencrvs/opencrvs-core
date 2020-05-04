@@ -47,6 +47,7 @@ interface IConstantsMessages {
   startedBy: MessageDescriptor
   export: MessageDescriptor
   failedToSend: MessageDescriptor
+  from: MessageDescriptor
   gender: MessageDescriptor
   id: MessageDescriptor
   issuedBy: MessageDescriptor
@@ -55,6 +56,8 @@ interface IConstantsMessages {
   labelPhone: MessageDescriptor
   labelPin: MessageDescriptor
   labelRole: MessageDescriptor
+  last30Days: MessageDescriptor
+  last12Months: MessageDescriptor
   lastEdited: MessageDescriptor
   month: MessageDescriptor
   name: MessageDescriptor
@@ -77,6 +80,7 @@ interface IConstantsMessages {
   submissionStatus: MessageDescriptor
   timeFramesTitle: MessageDescriptor
   to: MessageDescriptor
+  toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
   type: MessageDescriptor
   update: MessageDescriptor
@@ -293,6 +297,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for application status Failed',
     id: 'constants.failedToSend'
   },
+  from: {
+    defaultMessage: 'From',
+    description: 'Label for text From',
+    id: 'constants.from'
+  },
   gender: {
     defaultMessage: 'Gender',
     description: 'Gender label',
@@ -332,6 +341,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Role',
     description: 'Role label',
     id: 'constants.role'
+  },
+  last30Days: {
+    defaultMessage: 'Last 30 days',
+    description: 'Label for  preset date range Last 30 days',
+    id: 'constants.last30Days'
+  },
+  last12Months: {
+    defaultMessage: 'Last 12 months',
+    description: 'Label for preset date range Last 12 months',
+    id: 'constants.last12Months'
   },
   lastEdited: {
     defaultMessage: 'Last edited',
@@ -449,6 +468,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'to',
     description: 'Used in sentence',
     id: 'constants.to'
+  },
+  toCapitalized: {
+    defaultMessage: 'To',
+    description: 'Label for To',
+    id: 'constants.toCapitalized'
   },
   trackingId: {
     defaultMessage: 'Tracking ID',

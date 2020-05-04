@@ -22,13 +22,13 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
   justify-content: center;
   transition: background-color 0.3s ease;
   border-radius: 100%;
-  &:hover {
+  &:hover:not([disabled]) {
     ${({ theme, dark }) =>
       dark
         ? theme.gradients.gradientSkyDark
         : 'background-color: ' + theme.colors.dropdownHover};
   }
-  &:not([data-focus-visible-added]):hover {
+  &:not([data-focus-visible-added]):not([disabled]):hover {
     ${({ theme, dark }) =>
       dark
         ? theme.gradients.gradientSkyDark
@@ -41,15 +41,21 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
     background: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};
   }
-  &:not([data-focus-visible-added]) {
+  &:not([data-focus-visible-added]):not([disabled]) {
     background: none;
     outline: none;
     color: ${({ color = '#4C68C1' }) => color};
   }
-  &:active:not([data-focus-visible-added]) {
+  &:active:not([data-focus-visible-added]):not([disabled]) {
     outline: none;
     background: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};
   }
   padding: 0 8px;
+  &:disabled {
+    cursor: default;
+    path {
+      stroke: ${({ theme }) => theme.colors.disabled};
+    }
+  }
 `
