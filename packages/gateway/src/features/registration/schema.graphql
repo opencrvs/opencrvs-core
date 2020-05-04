@@ -440,7 +440,7 @@ type StatusWiseRegistrationCount {
 }
 
 type RegistrationCountResult {
-  results: [StatusWiseRegistrationCount]
+  results: [StatusWiseRegistrationCount]!
   total: Int!
 }
 
@@ -470,7 +470,7 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: ID!
+    locationId: String!
     status: [String]!
   ): RegistrationCountResult
 }

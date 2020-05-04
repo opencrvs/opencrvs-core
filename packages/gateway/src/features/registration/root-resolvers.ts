@@ -194,7 +194,7 @@ export const resolvers: GQLResolver = {
           status: status as string[]
         }
         const results: GQLStatusWiseRegistrationCount[] = await fetch(
-          `${SEARCH_URL}/statusWiseRegistrationCount`,
+          `${SEARCH_URL}statusWiseRegistrationCount`,
           {
             method: 'POST',
             body: JSON.stringify(payload),

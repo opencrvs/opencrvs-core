@@ -559,7 +559,7 @@ export interface GQLBirthRegResultSet {
 }
 
 export interface GQLRegistrationCountResult {
-  results?: Array<GQLStatusWiseRegistrationCount | null>
+  results: Array<GQLStatusWiseRegistrationCount | null>
   total: number
 }
 
