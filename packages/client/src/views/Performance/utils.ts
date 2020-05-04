@@ -55,6 +55,13 @@ export const ActionContainer = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
+export const FilterContainer = styled.div`
+  display: flex;
+
+  & > :first-child {
+    margin-right: 8px;
+  }
+`
 export function getJurisidictionType(location: GQLLocation): string | null {
   let jurisdictionType = null
 

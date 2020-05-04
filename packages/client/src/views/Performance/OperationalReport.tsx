@@ -49,7 +49,8 @@ import {
 } from '@client/utils/constants'
 import {
   getMonthDateRange,
-  ActionContainer
+  ActionContainer,
+  FilterContainer
 } from '@client/views/Performance/utils'
 
 interface IDispatchProps {
@@ -98,13 +99,6 @@ const HeaderContainer = styled.div`
   }
 `
 
-const FilterContainer = styled.div`
-  display: flex;
-
-  & > :first-child {
-    margin-right: 8px;
-  }
-`
 const MonthlyReportsList = styled.div`
   margin-top: 16px;
 `
