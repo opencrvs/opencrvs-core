@@ -27,36 +27,29 @@ interface IOperationalSelectProps {
 }
 
 const StyledSelect = styled(Select)`
-  width: auto;
-
   .react-select__container {
     border-radius: 2px;
     ${({ theme }) => theme.fonts.bodyStyle};
   }
 
   .react-select__control {
-    min-width: 136px;
-    min-height: 36px;
-
+    min-width: 160px;
     background-color: ${({ theme }) => theme.colors.secondary} !important;
     justify-content: center;
-    ${({ theme }) => theme.fonts.smallButtonBoldStyle};
-    border: none;
+    ${({ theme }) => theme.fonts.buttonStyle};
+    text-transform: none;
+
     &:hover {
       ${({ theme }) => theme.gradients.gradientBabyShade}
     }
-  }
-
-  .react-select__indicator {
-    padding: 0 8px;
   }
 
   .react-select__indicator-separator {
     display: none;
   }
 
-  .react-select__value-container {
-    padding: 0 8px;
+  .react-select__menu {
+    min-width: 160px;
   }
 
   .react-select__menu {
@@ -64,7 +57,6 @@ const StyledSelect = styled(Select)`
   }
 
   .react-select__single-value {
-    margin: 0;
     color: ${({ theme }) => theme.colors.white};
   }
   .react-select__control--is-focused {
