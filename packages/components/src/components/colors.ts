@@ -35,7 +35,8 @@ const colorDictionary = {
   nightshadeDark: '#42506B',
   nightshadeLight: '#485F88',
   darkSteel: '#707C80',
-  lightGrey: '#F9F9F9'
+  lightGrey: '#F9F9F9',
+  mercury: '#E5E5E5'
 }
 
 export const gradients = {
@@ -80,6 +81,8 @@ export const colors = {
   gradientLight: colorDictionary.nightshadeLight,
   secondaryLabel: colorDictionary.darkSteel,
   previewBackground: colorDictionary.greyBlackMetal,
+  smallButtonFocus: colorDictionary.mercury,
+  dateDisabled: colorDictionary.greySteel,
 
   // Grey Scrollbar
   scrollBarGrey: colorDictionary.greySteel,

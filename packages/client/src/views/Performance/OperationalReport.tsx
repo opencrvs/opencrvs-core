@@ -42,13 +42,15 @@ import { ApplicationsStartedReport } from './reports/operational/ApplicationsSta
 import moment from 'moment'
 import { ListTable } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
+import { DateRangePicker } from '@client/components/DateRangePicker'
 import {
   PERFORMANCE_REPORT_TYPE_MONTHLY,
   MONTHS_IN_YEAR
 } from '@client/utils/constants'
 import {
   getMonthDateRange,
-  ActionContainer
+  ActionContainer,
+  FilterContainer
 } from '@client/views/Performance/utils'
 
 interface IDispatchProps {
@@ -207,7 +209,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <div id="operational-report-view">
+          <FilterContainer id="operational-report-view">
             <PerformanceSelect
               onChange={option => {
                 this.props.goToOperationalReport(
@@ -228,7 +230,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 }
               ]}
             />
-          </div>
+            <DateRangePicker
+              startDate={timeStart.toDate()}
+              endDate={timeEnd.toDate()}
+              onDatesChange={({ startDate, endDate }) => {
+                this.setState({
+                  timeStart: moment(startDate),
+                  timeEnd: moment(endDate)
+                })
+              }}
+            />
+          </FilterContainer>
           <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>
