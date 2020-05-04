@@ -43,13 +43,11 @@ import {
 import { UserStatus } from '@client/views/SysAdmin/utils'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 
-const UserTabBodyContent = styled(BodyContent)`
-  max-width: 1050px;
+const UserTable = styled(BodyContent)`
+  padding: 0px;
+  margin: 32px auto 0;
 `
 
-const UserTable = styled.div`
-  margin-top: 30px;
-`
 const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -235,32 +233,26 @@ class UserTabComponent extends React.Component<IProps, IState> {
             )
           }
           return (
-            <UserTable>
-              <UserTabBodyContent id="user_list">
-                <TableHeader>
-                  Users (
-                  {(data && data.searchUsers && data.searchUsers.totalItems) ||
-                    0}
-                  )
-                  <AddUserContainer
-                    id="add-user"
-                    onClick={this.onClickAddUser}
-                  />
-                </TableHeader>
-                <ListTable
-                  content={this.generateUserContents(data) as IDynamicValues[]}
-                  columns={columns}
-                  noResultText="No result to display"
-                  onPageChange={(currentPage: number) => {
-                    this.onPageChange(currentPage)
-                  }}
-                  pageSize={this.pageSize}
-                  totalItems={
-                    data && data.searchUsers && data.searchUsers.totalItems
-                  }
-                  currentPage={this.state.usersPageNo}
-                />
-              </UserTabBodyContent>
+            <UserTable id="user_list">
+              <TableHeader>
+                Users (
+                {(data && data.searchUsers && data.searchUsers.totalItems) || 0}
+                )
+                <AddUserContainer id="add-user" onClick={this.onClickAddUser} />
+              </TableHeader>
+              <ListTable
+                content={this.generateUserContents(data) as IDynamicValues[]}
+                columns={columns}
+                noResultText="No result to display"
+                onPageChange={(currentPage: number) => {
+                  this.onPageChange(currentPage)
+                }}
+                pageSize={this.pageSize}
+                totalItems={
+                  data && data.searchUsers && data.searchUsers.totalItems
+                }
+                currentPage={this.state.usersPageNo}
+              />
             </UserTable>
           )
         }}

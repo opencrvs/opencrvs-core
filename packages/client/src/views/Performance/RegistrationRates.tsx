@@ -33,30 +33,21 @@ import {
   IPerformanceSelectOption
 } from './PerformanceSelect'
 import { connect } from 'react-redux'
-import { getJurisidictionType } from '@client/views/Performance/utils'
+import {
+  getJurisidictionType,
+  Header,
+  ActionContainer
+} from '@client/views/Performance/utils'
 import { goToOperationalReport } from '@client/navigation'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 import { Event } from '@client/forms'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 
 const { useState } = React
-const Header = styled.h1`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
-`
 const NavigationActionContainer = styled.div`
   margin-top: 24px;
 `
-const ActionContainer = styled.div`
-  display: flex;
-  & > button {
-    margin-right: 8px;
-  }
 
-  & > :last-child {
-    margin-right: 0;
-  }
-`
 export enum REG_RATE_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'

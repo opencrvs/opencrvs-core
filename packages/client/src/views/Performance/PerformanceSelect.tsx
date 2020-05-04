@@ -26,18 +26,20 @@ interface IOperationalSelectProps {
   onChange?: (selectedOption: IPerformanceSelectOption) => void
 }
 
-const StyledSelect = styled(Select)`
+const StyledSelect = styled(Select)<{ defaultWidth: number }>`
   .react-select__container {
     border-radius: 2px;
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
   }
 
   .react-select__control {
-    min-width: 160px;
+    ${({ defaultWidth }) =>
+      defaultWidth ? `min-width: ${defaultWidth}px` : 'min-width: 160px'};
     background-color: ${({ theme }) => theme.colors.secondary} !important;
     justify-content: center;
-    ${({ theme }) => theme.fonts.buttonStyle};
+    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
     text-transform: none;
+    max-height: 32px;
 
     &:hover {
       ${({ theme }) => theme.gradients.gradientBabyShade}
@@ -48,13 +50,19 @@ const StyledSelect = styled(Select)`
     display: none;
   }
 
+  .react-select__dropdown-indicator {
+    padding-top: 6px;
+  }
+
   .react-select__menu {
-    min-width: 160px;
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ defaultWidth }) =>
+      defaultWidth ? `min-width: ${defaultWidth}` : 'min-width: 160px'};
+    ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
   }
 
   .react-select__single-value {
     color: ${({ theme }) => theme.colors.white};
+    margin-top: -3px;
   }
   .react-select__control--is-focused {
     background: ${({ theme }) => theme.colors.secondary};
@@ -93,6 +101,11 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
     }
   }
 
+  const selectedOption: IPerformanceSelectOption = getSelectedOption(
+    props.value,
+    props.options
+  ) as IPerformanceSelectOption
+
   return (
     <StyledSelect
       isSearchable={false}
@@ -101,6 +114,7 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
       components={{ DropdownIndicator }}
       options={props.options}
       onChange={handleChange}
+      defaultWidth={selectedOption.label.length * 8 + 50}
     />
   )
 }

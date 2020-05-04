@@ -45,6 +45,16 @@ export const Description = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 
+export const ActionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 0 -40px 0 -40px;
+  padding: 0 40px 16px 40px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+`
+
 export function getJurisidictionType(location: GQLLocation): string | null {
   let jurisdictionType = null
 

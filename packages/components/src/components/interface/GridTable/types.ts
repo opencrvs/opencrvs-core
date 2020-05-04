@@ -11,6 +11,7 @@
  */
 import { IAction } from '../ListItem'
 import { ColumnContentAlignment } from './GridTable'
+import * as React from 'react'
 export { IAction, IActionObject } from '../ListItem'
 
 enum GQLRegStatus {
@@ -28,8 +29,11 @@ export interface IStatus {
   officeName: string | Array<string | null> | null
 }
 
+type ReactText = string | number
+type ReactChild = React.ReactNodeArray | ReactText
+
 export interface IColumn {
-  label?: string
+  label?: string | ReactChild
   width: number
   key: string
   errorValue?: string
