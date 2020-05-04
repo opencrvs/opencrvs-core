@@ -98,6 +98,13 @@ const HeaderContainer = styled.div`
   }
 `
 
+const FilterContainer = styled.div`
+  display: flex;
+
+  & > :first-child {
+    margin-right: 8px;
+  }
+`
 const MonthlyReportsList = styled.div`
   margin-top: 16px;
 `
@@ -208,7 +215,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <div id="operational-report-view">
+          <FilterContainer id="operational-report-view">
             <PerformanceSelect
               onChange={option => {
                 this.props.goToOperationalReport(
@@ -239,7 +246,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 })
               }}
             />
-          </div>
+          </FilterContainer>
           <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>

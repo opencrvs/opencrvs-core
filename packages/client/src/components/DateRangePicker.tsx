@@ -60,7 +60,7 @@ const PickerButton = styled.button`
     background: ${({ theme }) => theme.colors.smallButtonFocus};
   }
   padding: 0;
-  height: 36px;
+  height: 38px;
   background: transparent;
   & > div {
     padding: 0 8px;
