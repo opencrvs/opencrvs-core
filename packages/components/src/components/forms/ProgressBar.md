@@ -4,6 +4,7 @@
 <ProgressBar
   title="Sample Title"
   color="red"
+  shape="butt"
   totalPoints={900}
   currentPoints={200}
   onClick={e => alert('clicked')}

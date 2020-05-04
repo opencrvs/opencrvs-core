@@ -31,16 +31,25 @@ const ValueHolder = styled.div`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
+const LoaderBox = styled.span<{
+  width?: number
+}>`
+  background: ${({ theme }) => theme.colors.background};
+  display: inline-block;
+  height: 24px;
+  width: ${({ width }) => (width ? `${width}%` : '100%')};
+`
 
 type ProgressBarShape = 'square' | 'round' | 'butt'
 
 interface IProgressBarProps {
+  loading?: boolean
   title?: string
   color?: string
   width?: number
   shape?: ProgressBarShape
-  totalPoints: number
-  currentPoints: number
+  totalPoints?: number
+  currentPoints?: number
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
@@ -52,11 +61,12 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
   render() {
     const {
       title = '',
-      color = 'blue',
+      color,
       width = 2,
       shape = 'square',
-      totalPoints,
-      currentPoints
+      totalPoints = 0,
+      currentPoints = 0,
+      loading = false
     } = this.props
     const percentage =
       totalPoints === 0 || currentPoints === 0
@@ -64,20 +74,27 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
         : Number(((currentPoints / totalPoints) * 100).toFixed(2))
     return (
       <>
-        <HeaderWrapper>
-          <TitleLink onClick={this.props.onClick || this.defaultClickHadler}>
-            {title}
-          </TitleLink>
-          <ValueHolder>
-            <Value>{currentPoints}</Value> ({percentage}%)
-          </ValueHolder>
-        </HeaderWrapper>
+        {(!loading && (
+          <HeaderWrapper>
+            <TitleLink onClick={this.props.onClick || this.defaultClickHadler}>
+              {title}
+            </TitleLink>
+            <ValueHolder>
+              <Value>{currentPoints}</Value> ({percentage}%)
+            </ValueHolder>
+          </HeaderWrapper>
+        )) || (
+          <HeaderWrapper>
+            <LoaderBox width={35} />
+            <LoaderBox width={15} />
+          </HeaderWrapper>
+        )}
         <Line
           percent={percentage}
           strokeWidth={width}
           trailWidth={width}
           strokeLinecap={shape}
-          strokeColor={color}
+          strokeColor={percentage > 0 ? color : ''}
         />
       </>
     )
