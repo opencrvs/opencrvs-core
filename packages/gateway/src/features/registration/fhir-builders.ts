@@ -2582,6 +2582,10 @@ const builders: IFieldBuilders = {
         primaryCaregiver.id = fieldValue as string
       },
       name: createNameBuilder(PRIMARY_CAREGIVER_CODE, PRIMARY_CAREGIVER_TITLE),
+      identifier: createIDBuilder(
+        PRIMARY_CAREGIVER_CODE,
+        PRIMARY_CAREGIVER_TITLE
+      ),
       telecom: createTelecomBuilder(
         PRIMARY_CAREGIVER_CODE,
         PRIMARY_CAREGIVER_TITLE
