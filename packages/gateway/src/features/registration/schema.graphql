@@ -469,9 +469,9 @@ type Query {
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
-  fetchRegistrationCounts(
+  fetchRegistrationCountByStatus(
     locationId: ID!
-    statuses: [String]
+    status: [String]!
   ): RegistrationCountResult
 }
 

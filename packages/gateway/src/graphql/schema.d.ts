@@ -22,7 +22,7 @@ export interface GQLQuery {
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
-  fetchRegistrationCounts?: GQLRegistrationCountResult
+  fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -1155,7 +1155,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
     TParent
   >
-  fetchRegistrationCounts?: QueryToFetchRegistrationCountsResolver<TParent>
+  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<
+    TParent
+  >
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
@@ -1355,17 +1357,17 @@ export interface QueryToQueryPersonByNidIdentifierResolver<
   ): TResult
 }
 
-export interface QueryToFetchRegistrationCountsArgs {
+export interface QueryToFetchRegistrationCountByStatusArgs {
   locationId: string
-  statuses?: Array<string | null>
+  status: Array<string | null>
 }
-export interface QueryToFetchRegistrationCountsResolver<
+export interface QueryToFetchRegistrationCountByStatusResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: QueryToFetchRegistrationCountsArgs,
+    args: QueryToFetchRegistrationCountByStatusArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

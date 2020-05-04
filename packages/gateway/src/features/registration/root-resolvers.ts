@@ -175,7 +175,11 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async fetchRegistrationCounts(_, { locationId, statuses }, authHeader) {
+    async fetchRegistrationCountByStatus(
+      _,
+      { locationId, status },
+      authHeader
+    ) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
@@ -184,12 +188,10 @@ export const resolvers: GQLResolver = {
       ) {
         const payload: {
           applicationLocationHirarchyId: string
-          status?: string[]
+          status: string[]
         } = {
-          applicationLocationHirarchyId: locationId
-        }
-        if (statuses) {
-          payload.status = statuses as string[]
+          applicationLocationHirarchyId: locationId,
+          status: status as string[]
         }
         const results: GQLStatusWiseRegistrationCount[] = await fetch(
           `${SEARCH_URL}/statusWiseRegistrationCount`,

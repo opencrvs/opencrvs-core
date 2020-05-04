@@ -2323,11 +2323,11 @@ describe('Registration root resolvers', () => {
 
     it('returns status wise registration counts', async () => {
       fetch.mockResponseOnce(JSON.stringify(response))
-      const data = await resolvers.Query.fetchRegistrationCounts(
+      const data = await resolvers.Query.fetchRegistrationCountByStatus(
         {},
         {
           locationId: '123',
-          statuses: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
+          status: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
         },
         authHeaderRegCert
       )
@@ -2338,11 +2338,11 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have required scope", async () => {
       expect(
-        resolvers.Query.fetchRegistrationCounts(
+        resolvers.Query.fetchRegistrationCountByStatus(
           {},
           {
             locationId: '123',
-            statuses: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
+            status: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
           },
           authHeaderCertify
         )
