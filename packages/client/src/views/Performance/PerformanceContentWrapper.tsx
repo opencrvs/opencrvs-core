@@ -15,7 +15,7 @@ import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { IconTab } from '@client/views/RegistrationHome/RegistrationHome'
 import { ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { TopBar } from '@opencrvs/components/lib/interface'
-import { Container } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/layout'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
@@ -32,8 +32,12 @@ const TAB_ID = {
   monthly: PERFORMANCE_REPORT_TYPE_MONTHLY
 }
 
-const Content = styled.div`
-  margin: 0 80px;
+const Content = styled(BodyContent)`
+  padding: 0px;
+  margin: 32px auto 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 0px 16px;
+  }
 `
 
 class PerformanceContentWrapperComponent extends React.Component<Props, State> {

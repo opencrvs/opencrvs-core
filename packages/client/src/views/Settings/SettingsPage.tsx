@@ -45,9 +45,9 @@ const Container = styled.div`
   ${({ theme }) => theme.shadows.mistyShadow};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
-  padding: 40px 80px;
+  padding: 40px 77px;
   margin: 36px auto;
-  width: 1156px;
+  width: 1140px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     margin: 0;
     padding: 24px 0;

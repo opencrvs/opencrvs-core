@@ -33,55 +33,68 @@ const TableTitleLoading = styled.span`
   display: block;
   margin-bottom: 10px;
 `
-const TableHeader = styled.div`
+const TableHeader = styled.div<{
+  isSortable?: boolean
+}>`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.captionStyle};
   padding: 10px 0px;
-  box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+
+  & span:first-child {
+    padding-left: 12px;
+  }
 
   & span:last-child {
     text-align: right;
-    padding-right: 0px;
+    padding-right: 12px;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
-const TableFooter = styled(TableHeader)`
-  background: ${({ theme }) => theme.colors.background};
-  border-top: 2px solid ${({ theme }) => theme.colors.disabled};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-
-  & span {
-    color: ${({ theme }) => theme.colors.copy};
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
-  }
-  & span:last-child {
-    padding-right: 10px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: block;
-  }
+const TableHeaderText = styled.div<{
+  isSortable?: boolean
+}>`
+  ${({ isSortable, theme }) =>
+    isSortable ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
 `
-const TableBody = styled.div`
+
+const TableBody = styled.div<{ footerColumns: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.bodyStyle};
+  & div:last-of-type {
+    ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
+  }
 `
 const RowWrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  min-height: 50px;
-  box-shadow: rgba(53, 67, 93, 0.32) 0 2px 2px -2px;
+  min-height: 48px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+
+  & span:first-child {
+    padding-left: 12px;
+  }
 
   & span:last-child {
     text-align: right;
-    padding-right: 0px;
+    padding-right: 12px;
     display: inline-block;
   }
 `
+const TableFooter = styled(RowWrapper)`
+  padding-right: 10px;
+  background: ${({ theme }) => theme.colors.background};
+  border-top: 2px solid ${({ theme }) => theme.colors.disabled};
+  border-bottom: none;
+  & span {
+    color: ${({ theme }) => theme.colors.copy};
+    ${({ theme }) => theme.fonts.bodyBoldStyle};
+  }
+`
+
 const ContentWrapper = styled.span<{
   width: number
   alignment?: string
@@ -116,7 +129,9 @@ const ErrorText = styled.div`
   margin-top: 100px;
 `
 const H3 = styled.div`
-  ${({ theme }) => theme.fonts.h5Style};
+  padding-left: 12px;
+  margin-bottom: 30px;
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
 `
 const LoadingGrey = styled.span<{
   width?: number
@@ -305,15 +320,17 @@ export class ListTable extends React.Component<
                       preference.sortFunction(preference.key)
                     }
                   >
-                    {preference.label}
-                    <ToggleSortIcon
-                      toggle={
-                        this.state.sortIconInverted &&
-                        this.state.sortKey === preference.key
-                      }
-                    >
-                      {preference.icon}
-                    </ToggleSortIcon>
+                    <TableHeaderText isSortable={preference.isSortable}>
+                      {preference.label}
+                      <ToggleSortIcon
+                        toggle={
+                          this.state.sortIconInverted &&
+                          this.state.sortKey === preference.key
+                        }
+                      >
+                        {preference.icon}
+                      </ToggleSortIcon>
+                    </TableHeaderText>
                   </ContentWrapper>
                 ))}
               </TableHeader>
@@ -321,7 +338,11 @@ export class ListTable extends React.Component<
           )}
           {!isLoading && (
             <TableScroller height={tableHeight}>
-              <TableBody>
+              <TableBody
+                footerColumns={
+                  (footerColumns && footerColumns.length > 0) || false
+                }
+              >
                 {this.getDisplayItems(currentPage, pageSize, content).map(
                   (item, index) => {
                     return (

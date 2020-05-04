@@ -72,7 +72,7 @@ const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
-  ${({ theme }) => theme.fonts.smallButtonBoldStyle};
+  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
   color: ${({ theme }) => theme.colors.tertiary};
 
   & > svg {
@@ -120,7 +120,7 @@ const PresetContainer = styled.div`
 `
 const LabelContainer = styled.div`
   padding: 8px;
-  ${({ theme }) => theme.fonts.smallButtonBoldStyle}
+  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
 `
 const MonthContainer = styled.div`
   flex: 1;

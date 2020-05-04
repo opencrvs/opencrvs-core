@@ -47,7 +47,10 @@ import {
   PERFORMANCE_REPORT_TYPE_MONTHLY,
   MONTHS_IN_YEAR
 } from '@client/utils/constants'
-import { getMonthDateRange } from '@client/views/Performance/utils'
+import {
+  getMonthDateRange,
+  ActionContainer
+} from '@client/views/Performance/utils'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -83,6 +86,7 @@ const HeaderContainer = styled.div`
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
+  margin-top: -32px;
 
   & > :first-child {
     margin-right: 24px;
@@ -92,25 +96,6 @@ const HeaderContainer = styled.div`
     position: relative;
     bottom: 2px;
   }
-`
-
-const FilterContainer = styled.div`
-  display: flex;
-  flex-shrink: 0;
-
-  & > :first-child {
-    margin-right: 8px;
-  }
-`
-
-const ActionContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  margin: 0 -40px 0 -40px;
-  padding: 0 40px 16px 40px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
 const MonthlyReportsList = styled.div`
@@ -223,7 +208,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         </HeaderContainer>
         <ActionContainer>
-          <FilterContainer id="operational-report-view">
+          <div id="operational-report-view">
             <PerformanceSelect
               onChange={option => {
                 this.props.goToOperationalReport(
@@ -254,7 +239,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 })
               }}
             />
-          </FilterContainer>
+          </div>
           <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
             {intl.formatMessage(buttonMessages.status)}
           </TertiaryButton>
@@ -301,7 +286,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
         {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
           <MonthlyReportsList id="report-lists">
             <ListTable
-              tableTitle={intl.formatMessage(constantsMessages.birth)}
+              tableTitle={intl.formatMessage(constantsMessages.births)}
               isLoading={false}
               content={this.getContent(Event.BIRTH)}
               tableHeight={280}
@@ -326,7 +311,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
             />
 
             <ListTable
-              tableTitle={intl.formatMessage(constantsMessages.death)}
+              tableTitle={intl.formatMessage(constantsMessages.deaths)}
               isLoading={false}
               content={this.getContent(Event.DEATH)}
               tableHeight={280}
