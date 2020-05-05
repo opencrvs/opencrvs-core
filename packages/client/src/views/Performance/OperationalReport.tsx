@@ -305,6 +305,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
             </FilterContainer>
             {!expandStatusWindow && (
               <TertiaryButton
+                id="btn-status"
                 align={ICON_ALIGNMENT.LEFT}
                 icon={() => <Activity />}
                 onClick={this.statusButtonClickHandler}

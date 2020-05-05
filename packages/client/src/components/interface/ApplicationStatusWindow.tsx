@@ -60,10 +60,13 @@ const Title = styled.div``
 class ApplicationStatusWindowComponent extends React.Component<IProps> {
   render() {
     return (
-      <Window width={this.props.width}>
+      <Window id="status-window" width={this.props.width}>
         <TopBar>
           <Title>{this.props.title}</Title>
-          <Cross onClick={this.props.crossClickHandler} />
+          <Cross
+            id="btn-sts-wnd-cross"
+            onClick={this.props.crossClickHandler}
+          />
         </TopBar>
         {this.props.children}
       </Window>
