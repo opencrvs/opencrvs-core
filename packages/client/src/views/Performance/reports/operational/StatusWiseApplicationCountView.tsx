@@ -39,6 +39,10 @@ interface BaseProps {
   statusMapping: IStatusMapping
 }
 
+const ContentHolder = styled.div`
+  padding: 0px 25px;
+`
+
 const StatusHeader = styled.div`
   margin: 30px 0px;
 `
@@ -63,7 +67,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
 > {
   getLoader() {
     return (
-      <>
+      <ContentHolder>
         <StatusHeader id="status-header-loader">
           <LoaderBox width={20} />
           <LoaderBox width={100} />
@@ -89,7 +93,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
         <StatusListFooter>
           <p>&nbsp;</p>
         </StatusListFooter>
-      </>
+      </ContentHolder>
     )
   }
 
@@ -97,7 +101,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
     const { intl, statusMapping } = this.props
     const { results, total } = data
     return (
-      <>
+      <ContentHolder>
         <StatusHeader id="status-header">
           <SubHeader>
             {intl.formatMessage(constantsMessages.applicationTitle)}
@@ -131,7 +135,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
           <p>{intl.formatMessage(constantsMessages.total)}</p>
           <p>{total}</p>
         </StatusListFooter>
-      </>
+      </ContentHolder>
     )
   }
 

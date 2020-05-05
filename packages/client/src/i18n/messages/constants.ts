@@ -627,7 +627,7 @@ const messagesToDefine: IConstantsMessages = {
     description: 'A label for Time period'
   },
   viewAll: {
-    id: 'countries.viewAll',
+    id: 'constants.viewAll',
     defaultMessage: 'View all',
     description: 'Label for view all link'
   }
