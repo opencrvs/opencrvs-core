@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
-import { ExpandableSideWindow } from '@client/components/interface/ApplicationStatusWindow'
+import { ApplicationStatusWindow } from '@client/components/interface/ApplicationStatusWindow'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
@@ -407,13 +407,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
           )}
         </Container>
         {expandStatusWindow && (
-          <ExpandableSideWindow
+          <ApplicationStatusWindow
             width={statusWindowWidth}
             crossClickHandler={this.statusWindowCrossClickHandler}
             title={this.getStatusWindowTitle()}
           >
             {/* Todo Status window contents */}
-          </ExpandableSideWindow>
+          </ApplicationStatusWindow>
         )}
       </PerformanceContentWrapper>
     )

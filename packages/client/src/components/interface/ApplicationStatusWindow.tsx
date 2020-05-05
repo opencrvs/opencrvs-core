@@ -57,7 +57,7 @@ const TopBar = styled.div`
 
 const Title = styled.div``
 
-class ExpandableSideWindowComponent extends React.Component<IProps> {
+class ApplicationStatusWindowComponent extends React.Component<IProps> {
   render() {
     return (
       <ExpandableWindow width={this.props.width}>
@@ -71,4 +71,6 @@ class ExpandableSideWindowComponent extends React.Component<IProps> {
   }
 }
 
-export const ExpandableSideWindow = withTheme(ExpandableSideWindowComponent)
+export const ApplicationStatusWindow = withTheme(
+  ApplicationStatusWindowComponent
+)
