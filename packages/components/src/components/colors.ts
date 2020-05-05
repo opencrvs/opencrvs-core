@@ -38,7 +38,7 @@ const colorDictionary = {
   nightshadeLight: '#485F88',
   darkSteel: '#707C80',
   lightGrey: '#F9F9F9',
-  mercury: '#E5E5E5'
+  mercury: '#E5E5E5',
   silverSand: '#C1C7C9',
   swansDown: '#D3EEE4',
   fountainBlue: '#4CC1BA',
