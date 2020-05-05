@@ -370,6 +370,7 @@ export function goToCreateNewUser() {
 
 export function goToRegistrationRates(
   eventType: Event,
+  title: string,
   locationId: string,
   timeStart: Date,
   timeEnd: Date
@@ -378,6 +379,7 @@ export function goToRegistrationRates(
     pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
     search: querystring.stringify({
       locationId,
+      title,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
     })

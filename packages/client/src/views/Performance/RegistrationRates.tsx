@@ -48,11 +48,6 @@ import { Event } from '@client/forms'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import querystring from 'query-string'
-import { generateLocations } from '@client/utils/locationUtils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 
 const { useState } = React
 const NavigationActionContainer = styled.div`
@@ -64,16 +59,12 @@ export enum REG_RATE_BASE {
   LOCATION = 'LOCATION'
 }
 
-interface IConnectProps {
-  offlineLocations: IOfflineData['locations']
-}
 interface IDispatchProps {
   goToOperationalReport: typeof goToOperationalReport
   goToRegistrationRates: typeof goToRegistrationRates
 }
 type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
-  IConnectProps &
   IDispatchProps
 
 export interface IEstimationBase {
@@ -82,6 +73,7 @@ export interface IEstimationBase {
 }
 
 interface ISearchParams {
+  title: string
   locationId: string
   timeStart: string
   timeEnd: string
@@ -100,18 +92,13 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     },
     goToOperationalReport
   } = props
-  const { locationId, timeStart, timeEnd } = (querystring.parse(
+  const { locationId, timeStart, timeEnd, title } = (querystring.parse(
     search
   ) as unknown) as ISearchParams
-  const searchableLocations = generateLocations(props.offlineLocations)
-  const selectedLocation = searchableLocations.find(
-    ({ id }) => id === locationId
-  ) as ISearchLocation
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
 
-  const title = selectedLocation.displayLabel
   return (
     <PerformanceContentWrapper hideTopBar>
       <NavigationActionContainer>
@@ -121,7 +108,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           align={ICON_ALIGNMENT.LEFT}
           onClick={() =>
             goToOperationalReport(
-              selectedLocation.id,
+              locationId,
               OPERATIONAL_REPORT_SECTION.OPERATIONAL,
               dateStart,
               dateEnd
@@ -133,10 +120,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       </NavigationActionContainer>
       <Header id="reg-rates-header">{title}</Header>
 
-      <Query
-        query={HAS_CHILD_LOCATION}
-        variables={{ parentId: selectedLocation.id }}
-      >
+      <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
         {({ data, loading, error }) => {
           let options: IPerformanceSelectOption[] = [
             {
@@ -179,6 +163,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   onDatesChange={({ startDate, endDate }) =>
                     props.goToRegistrationRates(
                       eventType as Event,
+                      title,
                       locationId as string,
                       startDate,
                       endDate
@@ -200,7 +185,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           event: eventType.toUpperCase(),
           timeStart: timeStart,
           timeEnd: timeEnd,
-          locationId: selectedLocation.id
+          locationId: locationId
         }}
       >
         {({ data, loading, error }) => {
@@ -228,8 +213,6 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
 }
 
 export const RegistrationRates = connect(
-  (state: IStoreState) => ({
-    offlineLocations: getOfflineData(state).locations
-  }),
+  null,
   { goToOperationalReport, goToRegistrationRates }
 )(injectIntl(RegistrationRatesComponent))

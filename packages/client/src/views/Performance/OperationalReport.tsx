@@ -217,6 +217,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     const { selectedLocation, timeStart, timeEnd } = this.state
     this.props.goToRegistrationRates(
       event,
+      title,
       selectedLocation.id,
       timeStart.toDate(),
       timeEnd.toDate()

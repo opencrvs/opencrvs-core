@@ -111,7 +111,8 @@ describe('OperationalReport tests', () => {
     expect(querystring.parse(history.location.search)).toEqual({
       locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
       timeEnd: new Date(1487076708000).toISOString(),
-      timeStart: new Date(1455454308000).toISOString()
+      timeStart: new Date(1455454308000).toISOString(),
+      title: 'Birth registration rate within 45 days of event'
     })
   })
 
