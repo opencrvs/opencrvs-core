@@ -389,6 +389,21 @@ export class RegistrationHomeView extends React.Component<
             {intl.formatMessage(messages.sentForUpdates)} (
             {!initialSyncDone ? '?' : filteredData.rejectTab.totalItems})
           </IconTab>
+          {this.userHasValidateScope() && (
+            <IconTab
+              id={`tab_${TAB_ID.sentForApproval}`}
+              key={TAB_ID.sentForApproval}
+              active={tabId === TAB_ID.sentForApproval}
+              align={ICON_ALIGNMENT.LEFT}
+              icon={() => <StatusGray />}
+              onClick={() =>
+                this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
+              }
+            >
+              {intl.formatMessage(messages.sentForApprovals)} (
+              {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
+            </IconTab>
+          )}
           {window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
             <IconTab
               id={`tab_${TAB_ID.externalValidation}`}
@@ -407,22 +422,6 @@ export class RegistrationHomeView extends React.Component<
               )
             </IconTab>
           )}
-          {this.userHasValidateScope() && (
-            <IconTab
-              id={`tab_${TAB_ID.sentForApproval}`}
-              key={TAB_ID.sentForApproval}
-              active={tabId === TAB_ID.sentForApproval}
-              align={ICON_ALIGNMENT.LEFT}
-              icon={() => <StatusGray />}
-              onClick={() =>
-                this.props.goToRegistrarHomeTab(TAB_ID.sentForApproval)
-              }
-            >
-              {intl.formatMessage(messages.sentForApprovals)} (
-              {!initialSyncDone ? '?' : filteredData.approvalTab.totalItems})
-            </IconTab>
-          )}
-
           <IconTab
             id={`tab_${TAB_ID.readyForPrint}`}
             key={TAB_ID.readyForPrint}
