@@ -81,6 +81,7 @@ interface State {
   timeEnd: moment.Moment
   expandStatusWindow: boolean
   statusWindowWidth: number
+  mainWindowRightMargin: number
 }
 
 const Header = styled.h1`
@@ -140,7 +141,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart,
       timeEnd,
       expandStatusWindow: false,
-      statusWindowWidth: 0
+      statusWindowWidth: 0,
+      mainWindowRightMargin: 0
     }
   }
 
@@ -219,7 +221,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: true,
-      statusWindowWidth: 400
+      statusWindowWidth: 400,
+      mainWindowRightMargin: 100
     })
   }
 
@@ -227,7 +230,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: false,
-      statusWindowWidth: 0
+      statusWindowWidth: 0,
+      mainWindowRightMargin: 0
     })
   }
 
@@ -256,11 +260,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart,
       timeEnd,
       expandStatusWindow,
-      statusWindowWidth
+      statusWindowWidth,
+      mainWindowRightMargin
     } = this.state
     return (
       <PerformanceContentWrapper hideTopBar>
-        <Container marginRight={statusWindowWidth}>
+        <Container marginRight={mainWindowRightMargin}>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
             <LinkButton
