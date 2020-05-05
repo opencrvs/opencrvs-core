@@ -51,6 +51,8 @@ import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import { Cmd, loop } from 'redux-loop'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
+import querystring from 'query-string'
+import moment from 'moment'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -204,10 +206,22 @@ export function goToPerformanceReport(
 }
 
 export function goToOperationalReport(
-  selectedLocation: ISearchLocation,
-  sectionId: OPERATIONAL_REPORT_SECTION
+  locationId: string,
+  sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+  timeStart: Date = moment()
+    .subtract(1, 'years')
+    .toDate(),
+  timeEnd: Date = moment().toDate()
 ) {
-  return push(OPERATIONAL_REPORT, { selectedLocation, sectionId })
+  return push({
+    pathname: OPERATIONAL_REPORT,
+    search: querystring.stringify({
+      sectionId,
+      locationId,
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString()
+    })
+  })
 }
 
 export function goToSearchResult(
@@ -356,16 +370,17 @@ export function goToCreateNewUser() {
 
 export function goToRegistrationRates(
   eventType: Event,
-  selectedLocation: ISearchLocation,
-  title: string,
+  locationId: string,
   timeStart: Date,
   timeEnd: Date
 ) {
-  return push(formatUrl(EVENT_REGISTRATION_RATES, { eventType }), {
-    selectedLocation,
-    title,
-    timeStart,
-    timeEnd
+  return push({
+    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
+    search: querystring.stringify({
+      locationId,
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString()
+    })
   })
 }
 

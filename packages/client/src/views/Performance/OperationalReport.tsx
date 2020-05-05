@@ -40,7 +40,7 @@ import {
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import { ListTable, ISearchLocation } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import {
@@ -52,6 +52,14 @@ import {
   ActionContainer,
   FilterContainer
 } from '@client/views/Performance/utils'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { generateLocations } from '@client/utils/locationUtils'
+import querystring from 'query-string'
+import { IStoreState } from '@client/store'
+interface IConnectProps {
+  offlineLocations: IOfflineData['locations']
+}
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -69,11 +77,21 @@ export enum OPERATIONAL_REPORT_SECTION {
   REPORTS = 'REPORTS'
 }
 
+interface ISearchParams {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  locationId: string
+  timeStart: string
+  timeEnd: string
+}
+
 type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> &
+  RouteComponentProps &
+  IConnectProps &
   IDispatchProps
 
 interface State {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  selectedLocation: ISearchLocation
   timeStart: moment.Moment
   timeEnd: moment.Moment
 }
@@ -104,22 +122,41 @@ const MonthlyReportsList = styled.div`
 `
 
 class OperationalReportComponent extends React.Component<Props, State> {
+  static transformPropsToState(props: Props) {
+    const {
+      location: { search }
+    } = props
+    const { timeStart, timeEnd, locationId, sectionId } = (querystring.parse(
+      search
+    ) as unknown) as ISearchParams
+    const searchableLocations = generateLocations(props.offlineLocations)
+    const selectedLocation = searchableLocations.find(
+      ({ id }) => id === locationId
+    ) as ISearchLocation
+
+    return {
+      sectionId,
+      selectedLocation,
+      timeStart: moment(timeStart),
+      timeEnd: moment(timeEnd)
+    }
+  }
+
   constructor(props: Props) {
     super(props)
     moment.locale(this.props.intl.locale)
     moment.defaultFormat = 'MMMM YYYY'
-    const timeEnd = moment()
-    const timeStart = moment().subtract(1, 'years')
 
-    this.state = {
-      timeStart,
-      timeEnd
-    }
+    this.state = OperationalReportComponent.transformPropsToState(props)
+  }
+
+  static getDerivedStateFromProps(props: Props) {
+    return OperationalReportComponent.transformPropsToState(props)
   }
 
   onChangeLocation = () => {
     this.props.goToPerformanceHome({
-      selectedLocation: this.props.history.location.state.selectedLocation
+      selectedLocation: this.state.selectedLocation
     })
   }
 
@@ -146,14 +183,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
-                this.props.history.location.state.selectedLocation!,
+                this.state.selectedLocation!,
                 PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()
               )
             }
-            disabled={!this.props.history.location.state.selectedLocation}
+            disabled={!this.state.selectedLocation}
           >
             {title}
           </LinkButton>
@@ -177,29 +214,20 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   onClickRegistrationRatesDetails = (event: Event, title: string) => {
-    const { selectedLocation } = this.props.history.location.state
-    const { timeStart, timeEnd } = this.state
+    const { selectedLocation, timeStart, timeEnd } = this.state
     this.props.goToRegistrationRates(
       event,
-      selectedLocation,
-      title,
+      selectedLocation.id,
       timeStart.toDate(),
       timeEnd.toDate()
     )
   }
 
   render() {
-    const {
-      intl,
-      history: {
-        location: {
-          state: { selectedLocation, sectionId }
-        }
-      }
-    } = this.props
+    const { intl } = this.props
 
+    const { timeStart, timeEnd, sectionId, selectedLocation } = this.state
     const { displayLabel: title, id: locationId } = selectedLocation
-    const { timeStart, timeEnd } = this.state
     return (
       <PerformanceContentWrapper hideTopBar>
         <HeaderContainer>
@@ -213,8 +241,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
             <PerformanceSelect
               onChange={option => {
                 this.props.goToOperationalReport(
-                  selectedLocation,
-                  option.value as OPERATIONAL_REPORT_SECTION
+                  selectedLocation.id,
+                  option.value as OPERATIONAL_REPORT_SECTION,
+                  timeStart.toDate(),
+                  timeEnd.toDate()
                 )
               }}
               id="operational-select"
@@ -234,10 +264,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
               startDate={timeStart.toDate()}
               endDate={timeEnd.toDate()}
               onDatesChange={({ startDate, endDate }) => {
-                this.setState({
-                  timeStart: moment(startDate),
-                  timeEnd: moment(endDate)
-                })
+                this.props.goToOperationalReport(
+                  selectedLocation.id,
+                  sectionId,
+                  startDate,
+                  endDate
+                )
               }}
             />
           </FilterContainer>
@@ -342,8 +374,15 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  const offlineResources = getOfflineData(state)
+  return {
+    offlineLocations: offlineResources.locations
+  }
+}
+
 export const OperationalReport = connect(
-  null,
+  mapStateToProps,
   {
     goToPerformanceHome,
     goToOperationalReport,
