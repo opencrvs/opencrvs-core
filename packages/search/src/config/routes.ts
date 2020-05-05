@@ -105,7 +105,12 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
         },
         description: 'Returns all the documents in the index'
       }

@@ -465,7 +465,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   'REGISTERED'
                 ]
               }}
-              fetchPolicy="no-cache"
             >
               {({
                 loading,
