@@ -19,6 +19,13 @@ import {
 } from 'react-intl'
 import styled from 'styled-components'
 import { ProgressBar } from '@opencrvs/components/lib/forms'
+import {
+  Description,
+  SubHeader
+} from '@opencrvs/client/src/views/Performance/utils'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
+import { LoaderBox } from '@client/views/Performance/reports/operational/RegistrationRatesReport'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -31,6 +38,10 @@ interface BaseProps {
   loading?: boolean
   statusMapping: IStatusMapping
 }
+
+const StatusHeader = styled.div`
+  margin: 30px 0px;
+`
 
 const StatusProgressBarWrapper = styled.div`
   margin-top: 20px;
@@ -46,10 +57,17 @@ const StatusListFooter = styled.div`
   border-bottom: none;
 `
 
-class StatusWiseCountViewComponent extends React.Component<Props, {}> {
+class StatusWiseApplicationCountViewComponent extends React.Component<
+  Props,
+  {}
+> {
   getLoader() {
     return (
-      <div id="status-wise-count-loader">
+      <>
+        <StatusHeader id="status-header-loader">
+          <LoaderBox width={20} />
+          <LoaderBox width={100} />
+        </StatusHeader>
         <StatusProgressBarWrapper>
           <ProgressBar loading={true} />
         </StatusProgressBarWrapper>
@@ -71,7 +89,7 @@ class StatusWiseCountViewComponent extends React.Component<Props, {}> {
         <StatusListFooter>
           <p>&nbsp;</p>
         </StatusListFooter>
-      </div>
+      </>
     )
   }
 
@@ -79,7 +97,20 @@ class StatusWiseCountViewComponent extends React.Component<Props, {}> {
     const { intl, statusMapping } = this.props
     const { results, total } = data
     return (
-      <div id="status-wise-count-view">
+      <>
+        <StatusHeader id="status-header">
+          <SubHeader>
+            {intl.formatMessage(constantsMessages.applicationTitle)}
+          </SubHeader>
+          <Description>
+            {intl.formatMessage(
+              performanceMessages.applicationCountByStatusDescription
+            )}{' '}
+            <LinkButton>
+              {intl.formatMessage(constantsMessages.viewAll)}
+            </LinkButton>
+          </Description>
+        </StatusHeader>
         {results.map((statusCount, index) => {
           return (
             statusCount && (
@@ -91,7 +122,6 @@ class StatusWiseCountViewComponent extends React.Component<Props, {}> {
                   color={statusMapping[statusCount.status].color}
                   totalPoints={total}
                   currentPoints={statusCount.count}
-                  formattedCurrentPoints={intl.formatNumber(statusCount.count)}
                 />
               </StatusProgressBarWrapper>
             )
@@ -99,9 +129,9 @@ class StatusWiseCountViewComponent extends React.Component<Props, {}> {
         })}
         <StatusListFooter>
           <p>{intl.formatMessage(constantsMessages.total)}</p>
-          <p>{intl.formatNumber(total)}</p>
+          <p>{total}</p>
         </StatusListFooter>
-      </div>
+      </>
     )
   }
 
@@ -116,4 +146,6 @@ class StatusWiseCountViewComponent extends React.Component<Props, {}> {
   }
 }
 
-export const StatusWiseCountView = injectIntl(StatusWiseCountViewComponent)
+export const StatusWiseApplicationCountView = injectIntl(
+  StatusWiseApplicationCountViewComponent
+)

@@ -50,13 +50,12 @@ interface IProgressBarProps {
   shape?: ProgressBarShape
   totalPoints?: number
   currentPoints?: number
-  formattedCurrentPoints?: string
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
 export class ProgressBar extends React.Component<IProgressBarProps, {}> {
   defaultClickHadler() {
-    alert('No handler has been defired')
+    // do nothing
   }
 
   render() {
@@ -67,7 +66,6 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
       shape = 'square',
       totalPoints = 0,
       currentPoints = 0,
-      formattedCurrentPoints = String(currentPoints),
       loading = false
     } = this.props
     const percentage =
@@ -82,7 +80,7 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
               {title}
             </TitleLink>
             <ValueHolder>
-              <Value>{formattedCurrentPoints}</Value> ({percentage}%)
+              <Value>{currentPoints}</Value> ({percentage}%)
             </ValueHolder>
           </HeaderWrapper>
         )) || (

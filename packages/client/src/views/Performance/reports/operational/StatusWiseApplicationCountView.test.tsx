@@ -10,12 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createTestComponent } from '@client/tests/util'
-import { StatusWiseCountView } from '@client/views/Performance/reports/operational/StatusWiseCountView'
+import { StatusWiseApplicationCountView } from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
 import { StatusMapping } from '@client/views/Performance/OperationalReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 
 describe('Status wise registration count', () => {
@@ -23,16 +22,15 @@ describe('Status wise registration count', () => {
 
   it('renders loading indicator', async () => {
     const { component } = await createTestComponent(
-      <StatusWiseCountView loading={true} statusMapping={StatusMapping} />,
+      <StatusWiseApplicationCountView
+        loading={true}
+        statusMapping={StatusMapping}
+      />,
       store
     )
 
-    expect(
-      component.find('#status-wise-count-loader').hostNodes()
-    ).toHaveLength(1)
-    expect(component.find('#status-wise-count-view').hostNodes()).toHaveLength(
-      0
-    )
+    expect(component.find('#status-header-loader').hostNodes()).toHaveLength(1)
+    expect(component.find('#status-header').hostNodes()).toHaveLength(0)
   })
 
   describe('when it has data in props', () => {
@@ -50,17 +48,18 @@ describe('Status wise registration count', () => {
         total: 15
       }
       component = (await createTestComponent(
-        <StatusWiseCountView data={data} statusMapping={StatusMapping} />,
+        <StatusWiseApplicationCountView
+          data={data}
+          statusMapping={StatusMapping}
+        />,
         store
       )).component
     })
     it('renders status count view with progress bars', async () => {
-      expect(
-        component.find('#status-wise-count-loader').hostNodes()
-      ).toHaveLength(0)
-      expect(
-        component.find('#status-wise-count-view').hostNodes()
-      ).toHaveLength(1)
+      expect(component.find('#status-header-loader').hostNodes()).toHaveLength(
+        0
+      )
+      expect(component.find('#status-header').hostNodes()).toHaveLength(1)
     })
   })
 })
