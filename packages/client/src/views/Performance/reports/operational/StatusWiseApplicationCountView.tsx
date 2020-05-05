@@ -70,6 +70,8 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
       <ContentHolder>
         <StatusHeader id="status-header-loader">
           <LoaderBox width={20} />
+          <br />
+          <br />
           <LoaderBox width={100} />
         </StatusHeader>
         <StatusProgressBarWrapper>

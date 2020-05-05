@@ -62,13 +62,10 @@ const KeyNumber = styled.div`
   height: 100%;
 `
 
-const KeyPercentage = styled.div`
+const KeyPercentage = styled.span`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
-  margin: 16px 0px;
-  position: absolute;
-  top: 6px;
-  left: 28px;
+  margin: 16px 10px;
 `
 
 const PerformanceLink = styled(LinkButton)`

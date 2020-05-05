@@ -31,6 +31,9 @@ const ValueHolder = styled.div`
 const Value = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
+const Percentage = styled.span`
+  color: ${({ theme }) => theme.colors.placeholder};
+`
 const LoaderBox = styled.span<{
   width?: number
 }>`
@@ -80,7 +83,8 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
               {title}
             </TitleLink>
             <ValueHolder>
-              <Value>{currentPoints}</Value> ({percentage}%)
+              <Value>{currentPoints}</Value>{' '}
+              <Percentage>({percentage}%)</Percentage>
             </ValueHolder>
           </HeaderWrapper>
         )) || (
