@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createTestStore, createTestComponent } from '@client/tests/util'
+import { OPERATIONAL_REPORT } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
+import { createTestComponent, createTestStore } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
+import * as React from 'react'
 import {
   OperationalReport,
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
-import { OPERATIONAL_REPORT } from '@client/navigation/routes'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 describe('OperationalReport tests', () => {
@@ -128,6 +128,32 @@ describe('OperationalReport tests', () => {
     expect(history.location.state).toEqual({
       selectedLocation: LOCATION_DHAKA_DIVISION,
       sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
+    })
+  })
+
+  describe('status window test', () => {
+    beforeEach(() => {
+      component
+        .find('#btn-status')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+    })
+
+    it('expands status window and hide status button', () => {
+      expect(component.find('#status-window').hostNodes()).toHaveLength(1)
+      expect(component.find('#btn-status').hostNodes()).toHaveLength(0)
+    })
+
+    it('closes status window and show status button', () => {
+      component
+        .find('#btn-sts-wnd-cross')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      expect(component.find('#status-window').hostNodes()).toHaveLength(0)
+      expect(component.find('#btn-status').hostNodes()).toHaveLength(1)
     })
   })
 

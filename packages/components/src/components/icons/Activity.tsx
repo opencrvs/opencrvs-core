@@ -11,14 +11,16 @@
  */
 import * as React from 'react'
 
-export function Activity(props: React.HTMLAttributes<SVGElement>) {
+export function Activity(
+  props: React.HTMLAttributes<SVGElement> & { stroke?: string }
+) {
   return (
     <svg
       width={24}
       height={24}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#4C68C1"
+      stroke={props.stroke ? props.stroke : '#4C68C1'}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

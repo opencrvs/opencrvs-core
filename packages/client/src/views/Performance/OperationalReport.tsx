@@ -9,49 +9,52 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import { ApplicationStatusWindow } from '@client/components/interface/ApplicationStatusWindow'
+import { Query } from '@client/components/Query'
+import { Event } from '@client/forms'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/performance'
+import {
+  goToOperationalReport,
+  goToPerformanceHome,
+  goToPerformanceReport,
+  goToRegistrationRates
+} from '@client/navigation'
+import styled from '@client/styledComponents'
+import {
+  MONTHS_IN_YEAR,
+  PERFORMANCE_REPORT_TYPE_MONTHLY
+} from '@client/utils/constants'
+import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
+import {
+  ActionContainer,
+  FilterContainer,
+  getMonthDateRange
+} from '@client/views/Performance/utils'
+import {
+  ICON_ALIGNMENT,
+  LinkButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { ListTable } from '@opencrvs/components/lib/interface'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import {
+  GQLApplicationsStartedMetrics,
+  GQLEventEstimationMetrics
+} from '@opencrvs/gateway/src/graphql/schema'
+import { ApolloError } from 'apollo-client'
+import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import styled from '@client/styledComponents'
-import {
-  LinkButton,
-  TertiaryButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import {
-  goToPerformanceHome,
-  goToOperationalReport,
-  goToPerformanceReport,
-  goToRegistrationRates
-} from '@client/navigation'
-import { messages } from '@client/i18n/messages/views/performance'
-import { Query } from '@client/components/Query'
+import { withTheme } from 'styled-components'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
-import { ApolloError } from 'apollo-client'
-import {
-  GQLEventEstimationMetrics,
-  GQLApplicationsStartedMetrics
-} from '@opencrvs/gateway/src/graphql/schema'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
-import moment from 'moment'
-import { ListTable } from '@opencrvs/components/lib/interface'
-import { Event } from '@client/forms'
-import { DateRangePicker } from '@client/components/DateRangePicker'
-import {
-  PERFORMANCE_REPORT_TYPE_MONTHLY,
-  MONTHS_IN_YEAR
-} from '@client/utils/constants'
-import {
-  getMonthDateRange,
-  ActionContainer,
-  FilterContainer
-} from '@client/views/Performance/utils'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -71,11 +74,14 @@ export enum OPERATIONAL_REPORT_SECTION {
 
 type Props = WrappedComponentProps &
   Pick<RouteComponentProps, 'history'> &
-  IDispatchProps
+  IDispatchProps & { theme: ITheme }
 
 interface State {
   timeStart: moment.Moment
   timeEnd: moment.Moment
+  expandStatusWindow: boolean
+  statusWindowWidth: number
+  mainWindowRightMargin: number
 }
 
 const Header = styled.h1`
@@ -99,8 +105,28 @@ const HeaderContainer = styled.div`
   }
 `
 
+const Container = styled.div<{
+  marginRight: number
+}>`
+  margin-right: ${({ marginRight }) => `${marginRight}px`};
+`
+
 const MonthlyReportsList = styled.div`
   margin-top: 16px;
+`
+
+const StatusTitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  margin-left: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyBoldStyle}
+  }
 `
 
 class OperationalReportComponent extends React.Component<Props, State> {
@@ -113,7 +139,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
     this.state = {
       timeStart,
-      timeEnd
+      timeEnd,
+      expandStatusWindow: false,
+      statusWindowWidth: 0,
+      mainWindowRightMargin: 0
     }
   }
 
@@ -188,6 +217,34 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
 
+  statusButtonClickHandler = () => {
+    this.setState({
+      ...this.state,
+      expandStatusWindow: true,
+      statusWindowWidth: 400,
+      mainWindowRightMargin: 100
+    })
+  }
+
+  statusWindowCrossClickHandler = () => {
+    this.setState({
+      ...this.state,
+      expandStatusWindow: false,
+      statusWindowWidth: 0,
+      mainWindowRightMargin: 0
+    })
+  }
+
+  getStatusWindowTitle = () => {
+    const { intl, theme } = this.props
+    return (
+      <StatusTitleContainer>
+        <Activity stroke={theme.colors.copy} />{' '}
+        <Title>{intl.formatMessage(buttonMessages.status)}</Title>
+      </StatusTitleContainer>
+    )
+  }
+
   render() {
     const {
       intl,
@@ -199,143 +256,170 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.props
 
     const { displayLabel: title, id: locationId } = selectedLocation
-    const { timeStart, timeEnd } = this.state
+    const {
+      timeStart,
+      timeEnd,
+      expandStatusWindow,
+      statusWindowWidth,
+      mainWindowRightMargin
+    } = this.state
     return (
       <PerformanceContentWrapper hideTopBar>
-        <HeaderContainer>
-          <Header id="header-location-name">{title}</Header>
-          <LinkButton id="change-location-link" onClick={this.onChangeLocation}>
-            {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
-        </HeaderContainer>
-        <ActionContainer>
-          <FilterContainer id="operational-report-view">
-            <PerformanceSelect
-              onChange={option => {
-                this.props.goToOperationalReport(
-                  selectedLocation,
-                  option.value as OPERATIONAL_REPORT_SECTION
+        <Container marginRight={mainWindowRightMargin}>
+          <HeaderContainer>
+            <Header id="header-location-name">{title}</Header>
+            <LinkButton
+              id="change-location-link"
+              onClick={this.onChangeLocation}
+            >
+              {intl.formatMessage(buttonMessages.change)}
+            </LinkButton>
+          </HeaderContainer>
+          <ActionContainer>
+            <FilterContainer id="operational-report-view">
+              <PerformanceSelect
+                onChange={option => {
+                  this.props.goToOperationalReport(
+                    selectedLocation,
+                    option.value as OPERATIONAL_REPORT_SECTION
+                  )
+                }}
+                id="operational-select"
+                value={sectionId || OPERATIONAL_REPORT_SECTION.OPERATIONAL}
+                options={[
+                  {
+                    label: intl.formatMessage(messages.operational),
+                    value: OPERATIONAL_REPORT_SECTION.OPERATIONAL
+                  },
+                  {
+                    label: intl.formatMessage(messages.reports),
+                    value: OPERATIONAL_REPORT_SECTION.REPORTS
+                  }
+                ]}
+              />
+              <DateRangePicker
+                startDate={timeStart.toDate()}
+                endDate={timeEnd.toDate()}
+                onDatesChange={({ startDate, endDate }) => {
+                  this.setState({
+                    timeStart: moment(startDate),
+                    timeEnd: moment(endDate)
+                  })
+                }}
+              />
+            </FilterContainer>
+            {!expandStatusWindow && (
+              <TertiaryButton
+                id="btn-status"
+                align={ICON_ALIGNMENT.LEFT}
+                icon={() => <Activity />}
+                onClick={this.statusButtonClickHandler}
+              >
+                {intl.formatMessage(buttonMessages.status)}
+              </TertiaryButton>
+            )}
+          </ActionContainer>
+          {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
+            <Query
+              query={OPERATIONAL_REPORTS_METRICS}
+              variables={{
+                timeStart: timeStart.toISOString(),
+                timeEnd: timeEnd.toISOString(),
+                locationId
+              }}
+            >
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: boolean
+                error?: ApolloError
+                data?: IMetricsQueryResult
+              }) => {
+                return (
+                  <>
+                    <RegistrationRatesReport
+                      loading={loading}
+                      data={data && data.getEventEstimationMetrics}
+                      reportTimeFrom={timeStart.format()}
+                      reportTimeTo={timeEnd.format()}
+                      onClickEventDetails={this.onClickRegistrationRatesDetails}
+                    />
+
+                    <ApplicationsStartedReport
+                      loading={loading}
+                      data={data && data.getApplicationsStartedMetrics}
+                      reportTimeFrom={timeStart.format()}
+                      reportTimeTo={timeEnd.format()}
+                    />
+                  </>
                 )
               }}
-              id="operational-select"
-              value={sectionId || OPERATIONAL_REPORT_SECTION.OPERATIONAL}
-              options={[
-                {
-                  label: intl.formatMessage(messages.operational),
-                  value: OPERATIONAL_REPORT_SECTION.OPERATIONAL
-                },
-                {
-                  label: intl.formatMessage(messages.reports),
-                  value: OPERATIONAL_REPORT_SECTION.REPORTS
-                }
-              ]}
-            />
-            <DateRangePicker
-              startDate={timeStart.toDate()}
-              endDate={timeEnd.toDate()}
-              onDatesChange={({ startDate, endDate }) => {
-                this.setState({
-                  timeStart: moment(startDate),
-                  timeEnd: moment(endDate)
-                })
-              }}
-            />
-          </FilterContainer>
-          <TertiaryButton align={ICON_ALIGNMENT.LEFT} icon={() => <Activity />}>
-            {intl.formatMessage(buttonMessages.status)}
-          </TertiaryButton>
-        </ActionContainer>
-        {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
-          <Query
-            query={OPERATIONAL_REPORTS_METRICS}
-            variables={{
-              timeStart: timeStart.toISOString(),
-              timeEnd: timeEnd.toISOString(),
-              locationId
-            }}
+            </Query>
+          )}
+          {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
+            <MonthlyReportsList id="report-lists">
+              <ListTable
+                tableTitle={intl.formatMessage(constantsMessages.births)}
+                isLoading={false}
+                content={this.getContent(Event.BIRTH)}
+                tableHeight={280}
+                pageSize={MONTHS_IN_YEAR}
+                hideBoxShadow={true}
+                columns={[
+                  {
+                    label: intl.formatMessage(constantsMessages.month),
+                    width: 70,
+                    key: 'month',
+                    isSortable: true,
+                    icon: <ArrowDownBlue />,
+                    sortFunction: () => {}
+                  },
+                  {
+                    label: intl.formatMessage(constantsMessages.export),
+                    width: 30,
+                    key: 'export'
+                  }
+                ]}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+              />
+
+              <ListTable
+                tableTitle={intl.formatMessage(constantsMessages.deaths)}
+                isLoading={false}
+                content={this.getContent(Event.DEATH)}
+                tableHeight={280}
+                pageSize={MONTHS_IN_YEAR}
+                hideBoxShadow={true}
+                columns={[
+                  {
+                    label: intl.formatMessage(constantsMessages.month),
+                    width: 70,
+                    key: 'month',
+                    isSortable: true,
+                    icon: <ArrowDownBlue />,
+                    sortFunction: () => {}
+                  },
+                  {
+                    label: intl.formatMessage(constantsMessages.export),
+                    width: 30,
+                    key: 'export'
+                  }
+                ]}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+              />
+            </MonthlyReportsList>
+          )}
+        </Container>
+        {expandStatusWindow && (
+          <ApplicationStatusWindow
+            width={statusWindowWidth}
+            crossClickHandler={this.statusWindowCrossClickHandler}
+            title={this.getStatusWindowTitle()}
           >
-            {({
-              loading,
-              error,
-              data
-            }: {
-              loading: boolean
-              error?: ApolloError
-              data?: IMetricsQueryResult
-            }) => {
-              return (
-                <>
-                  <RegistrationRatesReport
-                    loading={loading}
-                    data={data && data.getEventEstimationMetrics}
-                    reportTimeFrom={timeStart.format()}
-                    reportTimeTo={timeEnd.format()}
-                    onClickEventDetails={this.onClickRegistrationRatesDetails}
-                  />
-
-                  <ApplicationsStartedReport
-                    loading={loading}
-                    data={data && data.getApplicationsStartedMetrics}
-                    reportTimeFrom={timeStart.format()}
-                    reportTimeTo={timeEnd.format()}
-                  />
-                </>
-              )
-            }}
-          </Query>
-        )}
-        {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
-          <MonthlyReportsList id="report-lists">
-            <ListTable
-              tableTitle={intl.formatMessage(constantsMessages.births)}
-              isLoading={false}
-              content={this.getContent(Event.BIRTH)}
-              tableHeight={280}
-              pageSize={MONTHS_IN_YEAR}
-              hideBoxShadow={true}
-              columns={[
-                {
-                  label: intl.formatMessage(constantsMessages.month),
-                  width: 70,
-                  key: 'month',
-                  isSortable: true,
-                  icon: <ArrowDownBlue />,
-                  sortFunction: () => {}
-                },
-                {
-                  label: intl.formatMessage(constantsMessages.export),
-                  width: 30,
-                  key: 'export'
-                }
-              ]}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
-            />
-
-            <ListTable
-              tableTitle={intl.formatMessage(constantsMessages.deaths)}
-              isLoading={false}
-              content={this.getContent(Event.DEATH)}
-              tableHeight={280}
-              pageSize={MONTHS_IN_YEAR}
-              hideBoxShadow={true}
-              columns={[
-                {
-                  label: intl.formatMessage(constantsMessages.month),
-                  width: 70,
-                  key: 'month',
-                  isSortable: true,
-                  icon: <ArrowDownBlue />,
-                  sortFunction: () => {}
-                },
-                {
-                  label: intl.formatMessage(constantsMessages.export),
-                  width: 30,
-                  key: 'export'
-                }
-              ]}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
-            />
-          </MonthlyReportsList>
+            {/* Todo Status window contents */}
+          </ApplicationStatusWindow>
         )}
       </PerformanceContentWrapper>
     )
@@ -350,4 +434,4 @@ export const OperationalReport = connect(
     goToPerformanceReport,
     goToRegistrationRates
   }
-)(injectIntl(OperationalReportComponent))
+)(withTheme(injectIntl(OperationalReportComponent)))
