@@ -22,7 +22,7 @@ interface IProps {
   theme: ITheme
 }
 
-const ExpandableWindow = styled.div<{
+const Window = styled.div<{
   width: number
 }>`
   position: fixed;
@@ -60,13 +60,13 @@ const Title = styled.div``
 class ApplicationStatusWindowComponent extends React.Component<IProps> {
   render() {
     return (
-      <ExpandableWindow width={this.props.width}>
+      <Window width={this.props.width}>
         <TopBar>
           <Title>{this.props.title}</Title>
           <Cross onClick={this.props.crossClickHandler} />
         </TopBar>
         {this.props.children}
-      </ExpandableWindow>
+      </Window>
     )
   }
 }
