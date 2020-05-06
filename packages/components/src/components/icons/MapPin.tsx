@@ -11,19 +11,20 @@
  */
 import * as React from 'react'
 
-export function Calendar(props: React.SVGProps<SVGSVGElement>) {
+export function MapPin(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" {...props}>
+    <svg width={18} height={20} viewBox="0 0 18 20" fill="none" {...props}>
       <path
         clipRule="evenodd"
-        d="M2.25 5a2 2 0 012-2h9.5a2 2 0 012 2v9.5a2 2 0 01-2 2h-9.5a2 2 0 01-2-2V5z"
+        d="M15.75 8.5c0 5.25-6.75 9.75-6.75 9.75s-6.75-4.5-6.75-9.75a6.75 6.75 0 0113.5 0v0z"
         stroke="#4C68C1"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M12 1.5v3M6 1.5v3M2.25 7.5h13.5"
+        clipRule="evenodd"
+        d="M9 10.75a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z"
         stroke="#4C68C1"
         strokeWidth={2}
         strokeLinecap="round"
