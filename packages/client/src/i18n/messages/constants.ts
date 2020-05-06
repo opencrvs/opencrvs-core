@@ -110,6 +110,7 @@ interface IConstantsMessages {
   estimatedNumberOfEvents: MessageDescriptor
   rateOfRegistrationWithin45d: MessageDescriptor
   registeredWithin45d: MessageDescriptor
+  registeredIn45d: MessageDescriptor
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
 }
@@ -619,6 +620,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registeredWithin45d',
     defaultMessage: 'Registered within\n45 days of event',
     description: 'A label for Registered within 45 days of event'
+  },
+  registeredIn45d: {
+    id: 'constants.registeredIn45d',
+    defaultMessage: 'Registered in 45 days',
+    description: 'A label for Registered in 45 days'
   },
   timePeriod: {
     id: 'constants.timePeriod',

@@ -9,43 +9,47 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { RouteComponentProps } from 'react-router'
-
-import { PerformanceContentWrapper } from '@client/views/Performance/PerformanceContentWrapper'
-import {
-  TertiaryButton,
-  ICON_ALIGNMENT
-} from '@opencrvs/components/lib/buttons'
-import { WrappedComponentProps, injectIntl } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
-import { ArrowBack } from '@opencrvs/components/lib/icons'
-import styled from '@client/styledComponents'
+import { RegRatesLineChart } from '@client/components/charts/RegRatesLineChart'
 import { Query } from '@client/components/Query'
-import {
-  HAS_CHILD_LOCATION,
-  FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
-  FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
-} from './queries'
+import { Event } from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import {
-  PerformanceSelect,
-  IPerformanceSelectOption
-} from './PerformanceSelect'
-import { connect } from 'react-redux'
-import {
-  getJurisidictionType,
-  Header,
-  ActionContainer,
-  FilterContainer
-} from '@client/views/Performance/utils'
 import {
   goToOperationalReport,
   goToRegistrationRates
 } from '@client/navigation'
-import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
-import { Event } from '@client/forms'
+import styled from '@client/styledComponents'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
+import { PerformanceContentWrapper } from '@client/views/Performance/PerformanceContentWrapper'
+import {
+  ActionContainer,
+  getJurisidictionType,
+  Header,
+  FilterContainer
+} from '@client/views/Performance/utils'
+import {
+  ICON_ALIGNMENT,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { ArrowBack } from '@opencrvs/components/lib/icons'
+import {
+  GQLMonthWise45DayEstimation,
+  GQLMonthWiseEstimationMetrics
+} from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import {
+  IPerformanceSelectOption,
+  PerformanceSelect
+} from './PerformanceSelect'
+import {
+  FETCH_LOCATION_WISE_EVENT_ESTIMATIONS,
+  FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+  HAS_CHILD_LOCATION
+} from './queries'
+import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import querystring from 'query-string'
 
@@ -57,6 +61,12 @@ const NavigationActionContainer = styled.div`
 export enum REG_RATE_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'
+}
+interface ISearchParams {
+  title: string
+  locationId: string
+  timeStart: string
+  timeEnd: string
 }
 
 interface IDispatchProps {
@@ -72,11 +82,26 @@ export interface IEstimationBase {
   locationJurisdictionType?: string
 }
 
-interface ISearchParams {
-  title: string
-  locationId: string
-  timeStart: string
-  timeEnd: string
+function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
+  return (
+    data &&
+    data.details &&
+    data.details.reduce(
+      (chartData: any[], dataDetails: GQLMonthWise45DayEstimation | null) => {
+        if (dataDetails !== null) {
+          chartData.push({
+            label: `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`,
+            registeredIn45Days: dataDetails.actual45DayRegistration,
+            totalRegistered: dataDetails.actualTotalRegistration,
+            totalEstimate: dataDetails.estimatedRegistration,
+            registrationPercentage: `${dataDetails.estimated45DayPercentage}%`
+          })
+        }
+        return chartData
+      },
+      []
+    )
+  )
 }
 
 function RegistrationRatesComponent(props: IRegistrationRateProps) {
@@ -129,6 +154,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             }
           ]
           if (
+            data &&
             data.hasChildLocation &&
             data.hasChildLocation.type === 'ADMIN_STRUCTURE'
           ) {
@@ -194,16 +220,27 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
             return <></>
           } else {
             return (
-              <Within45DaysTable
-                loading={loading}
-                base={base}
-                data={
-                  data &&
-                  (data.fetchMonthWiseEventMetrics ||
-                    data.fetchLocationWiseEventMetrics)
-                }
-                eventType={eventType as Event}
-              />
+              <>
+                {base.baseType === REG_RATE_BASE.TIME && (
+                  <RegRatesLineChart
+                    loading={loading}
+                    data={prepareChartData(
+                      data && data.fetchMonthWiseEventMetrics
+                    )}
+                    eventType={eventType as Event}
+                  />
+                )}
+                <Within45DaysTable
+                  loading={loading}
+                  base={base}
+                  data={
+                    data &&
+                    (data.fetchMonthWiseEventMetrics ||
+                      data.fetchLocationWiseEventMetrics)
+                  }
+                  eventType={eventType as Event}
+                />
+              </>
             )
           }
         }}
