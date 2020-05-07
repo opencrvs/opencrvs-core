@@ -61,6 +61,14 @@ export const FilterContainer = styled.div`
   & > :first-child {
     margin-right: 8px;
   }
+
+  & > :nth-child(2) {
+    margin-right: 8px;
+  }
+
+  & > :last-child {
+    margin-right: 0;
+  }
 `
 export function getJurisidictionType(location: GQLLocation): string | null {
   let jurisdictionType = null
