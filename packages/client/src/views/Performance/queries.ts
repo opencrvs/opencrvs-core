@@ -86,3 +86,15 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
     }
   }
 `
+
+export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
+  query data($locationId: String!, $status: [String]!) {
+    fetchRegistrationCountByStatus(locationId: $locationId, status: $status) {
+      results {
+        status
+        count
+      }
+      total
+    }
+  }
+`

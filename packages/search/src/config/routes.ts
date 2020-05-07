@@ -9,11 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as Joi from 'joi'
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
 import {
   searchDeclaration,
-  getAllDocumentsHandler
+  getAllDocumentsHandler,
+  getStatusWiseRegistrationCountHandler,
+  populateHierarchicalLocationIdsHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 
@@ -21,6 +24,7 @@ const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
+  SYSADMIN = 'sysadmin',
   CERTIFY = 'certify'
 }
 
@@ -101,9 +105,50 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
         },
         description: 'Returns all the documents in the index'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/statusWiseRegistrationCount',
+      handler: getStatusWiseRegistrationCountHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
+        },
+        validate: {
+          payload: Joi.object({
+            applicationLocationHirarchyId: Joi.string().required(),
+            status: Joi.array().required()
+          })
+        },
+        description: 'Returns all the documents in the index'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/populateHierarchicalLocationIds',
+      handler: populateHierarchicalLocationIdsHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        description:
+          'Populates hierarchical location ids for the legacy indexes'
       }
     }
   ]

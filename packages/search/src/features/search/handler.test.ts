@@ -14,6 +14,10 @@ import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/index'
 import { searchComposition } from '@search/features/search/service'
 import { mockSearchResult } from '@search/test/utils'
+import { client } from '@search/elasticsearch/client'
+import * as fetchMock from 'jest-fetch-mock'
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 jest.mock('./service.ts')
 
@@ -73,7 +77,7 @@ describe('Verify handlers', () => {
     })
     it('should return status code 500', async () => {
       ;(searchComposition as jest.Mock).mockImplementation(() => {
-        throw 'dead'
+        throw new Error('dead')
       })
       const token = jwt.sign(
         {
@@ -121,7 +125,7 @@ describe('Verify handlers', () => {
       )
     })
 
-    it('Should return a valid response as expected', async () => {
+    it('/search should return a valid response as expected', async () => {
       const res = await server.server.inject({
         method: 'POST',
         url: '/search',
@@ -132,7 +136,104 @@ describe('Verify handlers', () => {
       })
       expect(JSON.parse(res.payload).body).toHaveProperty('_shards')
     })
+    describe('/statusWiseRegistrationCount', () => {
+      it('Should return 200 for valid payload', async () => {
+        const res = await server.server.inject({
+          method: 'POST',
+          url: '/statusWiseRegistrationCount',
+          payload: {
+            applicationLocationHirarchyId: '123',
+            status: ['REGISTED']
+          },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        expect(res.statusCode).toBe(200)
+      })
+      it('Should return 500 for an error', async () => {
+        ;(searchComposition as jest.Mock).mockImplementation(() => {
+          throw new Error('error')
+        })
+        const res = await server.server.inject({
+          method: 'POST',
+          url: '/statusWiseRegistrationCount',
+          payload: {
+            applicationLocationHirarchyId: '123',
+            status: ['REGISTED']
+          },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        expect(res.statusCode).toBe(500)
+      })
+    })
+    describe('/populateHierarchicalLocationIds', () => {
+      beforeEach(async () => {
+        token = jwt.sign(
+          {
+            scope: ['sysadmin']
+          },
+          readFileSync('../auth/test/cert.key'),
+          {
+            algorithm: 'RS256',
+            issuer: 'opencrvs:auth-service',
+            audience: 'opencrvs:search-user'
+          }
+        )
+      })
+      it('Should return right number of updated registrations for valid payload', async () => {
+        // @ts-ignore
+        jest.spyOn(client, 'search').mockResolvedValueOnce(mockSearchResult)
 
+        fetch.mockResponses(
+          [
+            JSON.stringify({ partOf: { reference: 'Location/123' } }),
+            { status: 200 }
+          ],
+          [
+            JSON.stringify({ partOf: { reference: 'Location/0' } }),
+            { status: 200 }
+          ],
+          [
+            JSON.stringify({ partOf: { reference: 'Location/123' } }),
+            { status: 200 }
+          ],
+          [
+            JSON.stringify({ partOf: { reference: 'Location/0' } }),
+            { status: 200 }
+          ]
+        )
+        const res = await server.server.inject({
+          method: 'POST',
+          url: '/populateHierarchicalLocationIds',
+          payload: {},
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        expect(res.statusCode).toBe(200)
+        expect(res.result.birth).toBe(1)
+        expect(res.result.death).toBe(1)
+      })
+      it('Should return 500 when elastic search throws error', async () => {
+        // @ts-ignore
+        jest.spyOn(client, 'search').mockImplementation(() => {
+          throw new Error('error')
+        })
+
+        const res = await server.server.inject({
+          method: 'POST',
+          url: '/populateHierarchicalLocationIds',
+          payload: {},
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        expect(res.statusCode).toBe(500)
+      })
+    })
     afterAll(async () => {
       jest.clearAllMocks()
     })

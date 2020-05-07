@@ -103,6 +103,14 @@ export const colors = {
   // Deep sea light background
   blueDeepSeaLight: colorDictionary.blueDeepSeaLight,
 
+  // Colors for applicatin statuses
+  inProgress: colorDictionary.purpleDrafty,
+  readyForReview: colorDictionary.orangeAmber,
+  sentForUpdate: colorDictionary.redDanger,
+  waitingForApproval: colorDictionary.greySteel,
+  waitingForExternalValidation: colorDictionary.greyRaven,
+  readyToPrint: colorDictionary.greenPeaPea,
+
   // Tri Line chart lines
   silverSand: colorDictionary.silverSand,
   swansDown: colorDictionary.swansDown,

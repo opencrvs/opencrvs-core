@@ -22,6 +22,16 @@ import {
   goToRegistrationRates
 } from '@client/navigation'
 import styled from '@client/styledComponents'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import {
+  GQLEventEstimationMetrics,
+  GQLApplicationsStartedMetrics,
+  GQLRegistrationCountResult
+} from '@opencrvs/gateway/src/graphql/schema'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
+import moment from 'moment'
 import {
   MONTHS_IN_YEAR,
   PERFORMANCE_REPORT_TYPE_MONTHLY
@@ -40,21 +50,19 @@ import {
 import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import { ListTable, ISearchLocation } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLApplicationsStartedMetrics,
-  GQLEventEstimationMetrics
-} from '@opencrvs/gateway/src/graphql/schema'
-import { ApolloError } from 'apollo-client'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
+import {
+  StatusWiseApplicationCountView,
+  IStatusMapping
+} from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
+import { colors } from '@opencrvs/components/lib/colors'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { generateLocations } from '@client/utils/locationUtils'
 import querystring from 'query-string'
@@ -74,6 +82,7 @@ interface IDispatchProps {
 interface IMetricsQueryResult {
   getEventEstimationMetrics: GQLEventEstimationMetrics
   getApplicationsStartedMetrics: GQLApplicationsStartedMetrics
+  fetchRegistrationCountByStatus: GQLRegistrationCountResult
 }
 export enum OPERATIONAL_REPORT_SECTION {
   OPERATIONAL = 'OPERATIONAL',
@@ -146,6 +155,33 @@ const Title = styled.div`
     ${({ theme }) => theme.fonts.bodyBoldStyle}
   }
 `
+
+export const StatusMapping: IStatusMapping = {
+  IN_PROGRESS: {
+    labelDescriptor: statusMessages.inProgress,
+    color: colors.inProgress
+  },
+  DECLARED: {
+    labelDescriptor: statusMessages.readyForReview,
+    color: colors.readyForReview
+  },
+  REJECTED: {
+    labelDescriptor: statusMessages.sentForUpdates,
+    color: colors.sentForUpdate
+  },
+  VALIDATED: {
+    labelDescriptor: statusMessages.sentForApprovals,
+    color: colors.waitingForApproval
+  },
+  WAITING_VALIDATION: {
+    labelDescriptor: statusMessages.sentForExternalValidation,
+    color: colors.waitingForExternalValidation
+  },
+  REGISTERED: {
+    labelDescriptor: statusMessages.readyToPrint,
+    color: colors.readyToPrint
+  }
+}
 
 class OperationalReportComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
@@ -260,7 +296,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: true,
-      statusWindowWidth: 400,
+      statusWindowWidth: 450,
       mainWindowRightMargin: 100
     })
   }
@@ -382,7 +418,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       reportTimeTo={timeEnd.format()}
                       onClickEventDetails={this.onClickRegistrationRatesDetails}
                     />
-
                     <ApplicationsStartedReport
                       loading={loading}
                       data={data && data.getApplicationsStartedMetrics}
@@ -420,7 +455,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 ]}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               />
-
               <ListTable
                 tableTitle={intl.formatMessage(constantsMessages.deaths)}
                 isLoading={false}
@@ -454,7 +488,38 @@ class OperationalReportComponent extends React.Component<Props, State> {
             crossClickHandler={this.statusWindowCrossClickHandler}
             title={this.getStatusWindowTitle()}
           >
-            {/* Todo Status window contents */}
+            <Query
+              query={FETCH_STATUS_WISE_REGISTRATION_COUNT}
+              variables={{
+                locationId,
+                status: [
+                  'IN_PROGRESS',
+                  'DECLARED',
+                  'REJECTED',
+                  'VALIDATED',
+                  'WAITING_VALIDATION',
+                  'REGISTERED'
+                ]
+              }}
+            >
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: boolean
+                error?: ApolloError
+                data?: IMetricsQueryResult
+              }) => {
+                return (
+                  <StatusWiseApplicationCountView
+                    loading={loading}
+                    data={data && data.fetchRegistrationCountByStatus}
+                    statusMapping={StatusMapping}
+                  />
+                )
+              }}
+            </Query>
           </ApplicationStatusWindow>
         )}
       </PerformanceContentWrapper>

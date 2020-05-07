@@ -22,6 +22,7 @@ export interface GQLQuery {
   fetchEventRegistration?: GQLEventRegistration
   fetchRegistration?: GQLEventRegistration
   queryPersonByNidIdentifier?: GQLPerson
+  fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
@@ -557,6 +558,16 @@ export interface GQLBirthRegResultSet {
   totalItems?: number
 }
 
+export interface GQLRegistrationCountResult {
+  results: Array<GQLStatusWiseRegistrationCount | null>
+  total: number
+}
+
+export interface GQLStatusWiseRegistrationCount {
+  status: string
+  count: number
+}
+
 export interface GQLSearchUserResult {
   results?: Array<GQLUser | null>
   totalItems?: number
@@ -1090,6 +1101,8 @@ export interface GQLResolver {
   ReasonsNotApplying?: GQLReasonsNotApplyingTypeResolver
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
+  RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
+  StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
   RegistrationMetrics?: GQLRegistrationMetricsTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
@@ -1140,6 +1153,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchEventRegistration?: QueryToFetchEventRegistrationResolver<TParent>
   fetchRegistration?: QueryToFetchRegistrationResolver<TParent>
   queryPersonByNidIdentifier?: QueryToQueryPersonByNidIdentifierResolver<
+    TParent
+  >
+  fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<
     TParent
   >
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
@@ -1336,6 +1352,22 @@ export interface QueryToQueryPersonByNidIdentifierResolver<
   (
     parent: TParent,
     args: QueryToQueryPersonByNidIdentifierArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRegistrationCountByStatusArgs {
+  locationId: string
+  status: Array<string | null>
+}
+export interface QueryToFetchRegistrationCountByStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRegistrationCountByStatusArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2731,6 +2763,44 @@ export interface BirthRegResultSetToResultsResolver<
 }
 
 export interface BirthRegResultSetToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLRegistrationCountResultTypeResolver<TParent = any> {
+  results?: RegistrationCountResultToResultsResolver<TParent>
+  total?: RegistrationCountResultToTotalResolver<TParent>
+}
+
+export interface RegistrationCountResultToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationCountResultToTotalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLStatusWiseRegistrationCountTypeResolver<TParent = any> {
+  status?: StatusWiseRegistrationCountToStatusResolver<TParent>
+  count?: StatusWiseRegistrationCountToCountResolver<TParent>
+}
+
+export interface StatusWiseRegistrationCountToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface StatusWiseRegistrationCountToCountResolver<
   TParent = any,
   TResult = any
 > {

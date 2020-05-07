@@ -238,3 +238,24 @@ export function selectObservationEntry(
       })
     : undefined
 }
+
+export async function getLocationHirarchyIDs(applicationLocationId?: string) {
+  if (!applicationLocationId) {
+    return []
+  }
+  const locationHirarchyIds = [applicationLocationId]
+  let locationId = `Location/${applicationLocationId}`
+  while (locationId) {
+    locationId = await fetchParentLocationByLocationID(locationId)
+    if (locationId === 'Location/0') {
+      break
+    }
+    locationHirarchyIds.push(locationId.split('/')[1])
+  }
+  return locationHirarchyIds
+}
+
+export async function fetchParentLocationByLocationID(locationID: string) {
+  const location = await getFromFhir(`/${locationID}`)
+  return location && location.partOf && location.partOf.reference
+}

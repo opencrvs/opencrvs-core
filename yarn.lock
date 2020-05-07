@@ -3758,6 +3758,13 @@
   dependencies:
     query-string "*"
 
+"@types/rc-progress@^2.4.3":
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@types/rc-progress/-/rc-progress-2.4.3.tgz#a9515edff72cc656befa2d31ae26a133a2a927da"
+  integrity sha512-yM7whW8e66q2UoFsJZsb8j7NLf7PgxSYM1aXrSaWxDBvy5q5y4VPSw6w0cRNlrvuJzoGj1y37sVpgTMPnS5MRQ==
+  dependencies:
+    rc-progress "*"
+
 "@types/react-dom@*":
   version "16.8.4"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.8.4.tgz#7fb7ba368857c7aa0f4e4511c4710ca2c5a12a88"
@@ -19337,6 +19344,14 @@ rc-menu@^7.4.13:
     rc-trigger "^2.3.0"
     rc-util "^4.1.0"
     resize-observer-polyfill "^1.5.0"
+
+rc-progress@*, rc-progress@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/rc-progress/-/rc-progress-2.5.2.tgz#ab01ba4e5d2fa36fc9f6f058b10b720e7315560c"
+  integrity sha512-ajI+MJkbBz9zYDuE9GQsY5gsyqPF7HFioZEDZ9Fmc+ebNZoiSeSJsTJImPFCg0dW/5WiRGUy2F69SX1aPtSJgA==
+  dependencies:
+    babel-runtime "6.x"
+    prop-types "^15.5.8"
 
 rc-trigger@^2.3.0:
   version "2.6.3"
