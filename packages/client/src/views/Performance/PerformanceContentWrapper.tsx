@@ -17,16 +17,12 @@ import { ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { TopBar } from '@opencrvs/components/lib/interface'
 import { Container, BodyContent } from '@opencrvs/components/lib/layout'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-
-type Props = WrappedComponentProps & {
-  tabId?: string
-  hideTopBar?: boolean
-  children?: React.ReactNode
-}
-
-type State = {}
+import {
+  PerformanceContentWrapperProps,
+  PerformancePageVariant
+} from '@client/views/Performance/commonTypes'
 
 const TAB_ID = {
   monthly: PERFORMANCE_REPORT_TYPE_MONTHLY
@@ -40,9 +36,12 @@ const Content = styled(BodyContent)`
   }
 `
 
-class PerformanceContentWrapperComponent extends React.Component<Props, State> {
-  renderTopBar() {
-    const { tabId, intl } = this.props
+export function PerformanceContentWrapper(
+  props: PerformanceContentWrapperProps
+) {
+  const intl = useIntl()
+  function renderTopBar() {
+    const { tabId } = props
 
     return (
       <TopBar id="top-bar">
@@ -57,18 +56,12 @@ class PerformanceContentWrapperComponent extends React.Component<Props, State> {
       </TopBar>
     )
   }
-  render() {
-    return (
-      <Container>
-        <Header />
-        {!this.props.hideTopBar && this.renderTopBar()}
+  return (
+    <Container>
+      <Header />
+      {!props.hideTopBar && renderTopBar()}
 
-        <Content>{this.props.children}</Content>
-      </Container>
-    )
-  }
+      <Content>{props.children}</Content>
+    </Container>
+  )
 }
-
-export const PerformanceContentWrapper = injectIntl(
-  PerformanceContentWrapperComponent
-)
