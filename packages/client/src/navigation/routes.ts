@@ -73,3 +73,4 @@ export const PERFORMANCE_REPORT = '/performance/report'
 export const OPERATIONAL_REPORT = '/performance/operations'
 export const EVENT_REGISTRATION_RATES =
   '/performance/operations/regestrationRates/:eventType'
+export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'

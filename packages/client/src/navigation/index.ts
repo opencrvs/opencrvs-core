@@ -43,7 +43,8 @@ import {
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
   VERIFY_COLLECTOR,
-  EVENT_REGISTRATION_RATES
+  EVENT_REGISTRATION_RATES,
+  WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
@@ -53,6 +54,7 @@ import { Cmd, loop } from 'redux-loop'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 import querystring from 'query-string'
 import moment from 'moment'
+import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -386,6 +388,24 @@ export function goToRegistrationRates(
   })
 }
 
+export function goToWorkflowStatus(
+  sectionId: string,
+  locationId: string,
+  timeStart: Date,
+  timeEnd: Date,
+  events: Event[] = [Event.BIRTH, Event.DEATH]
+) {
+  return push({
+    pathname: WORKFLOW_STATUS,
+    search: querystring.stringify({
+      events,
+      sectionId,
+      locationId,
+      timeStart,
+      timeEnd
+    })
+  })
+}
 export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
   return {
     type: GO_TO_REVIEW_USER_DETAILS,

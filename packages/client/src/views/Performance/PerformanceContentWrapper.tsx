@@ -78,7 +78,8 @@ const SubPageHeaderContainer = styled.div`
 const SubPageHeaderBody = styled.div`
   display: flex;
   align-items: center;
-  padding: 16px 24px;
+  max-height: 56px;
+  padding: 16px;
   ${({ theme }) => theme.fonts.bodyBoldStyle}
   text-overflow: ellipsis;
   & > :first-child {

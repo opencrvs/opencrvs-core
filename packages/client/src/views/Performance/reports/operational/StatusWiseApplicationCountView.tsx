@@ -37,6 +37,7 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   loading?: boolean
   statusMapping: IStatusMapping
+  onClickStatusDetails: () => void
 }
 
 const ContentHolder = styled.div`
@@ -112,7 +113,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             {intl.formatMessage(
               performanceMessages.applicationCountByStatusDescription
             )}{' '}
-            <LinkButton>
+            <LinkButton onClick={this.props.onClickStatusDetails}>
               {intl.formatMessage(constantsMessages.viewAll)}
             </LinkButton>
           </Description>
