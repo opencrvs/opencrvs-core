@@ -392,13 +392,11 @@ export function goToWorkflowStatus(
   sectionId: string,
   locationId: string,
   timeStart: Date,
-  timeEnd: Date,
-  events: Event[] = [Event.BIRTH, Event.DEATH]
+  timeEnd: Date
 ) {
   return push({
     pathname: WORKFLOW_STATUS,
     search: querystring.stringify({
-      events,
       sectionId,
       locationId,
       timeStart,

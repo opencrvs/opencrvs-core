@@ -90,12 +90,11 @@ const ToolbarContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  flex-wrap: wrap;
-  margin: 0 32px;
+  margin: 0 24px;
   padding: 0 40px 16px 40px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 0 -8px;
+    margin: 0 -16px;
   }
 `
 
