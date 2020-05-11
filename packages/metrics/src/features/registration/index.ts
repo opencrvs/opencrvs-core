@@ -83,11 +83,16 @@ export interface ILocationTags {
 export interface ITimeLoggedFields {
   timeSpentEditing: number
   compositionId: string
+  practitionerId?: string
 }
 
 export interface ITimeLoggedTags {
   currentStatus: string
   eventType: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
 }
 
 export interface IDurationFields {
