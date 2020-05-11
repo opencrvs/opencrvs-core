@@ -43,7 +43,8 @@ import {
   getObservationValueByCode,
   isNotification,
   MANNER_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_CODE
+  CAUSE_OF_DEATH_CODE,
+  getPractionerIdFromTask
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -369,6 +370,8 @@ export async function generateApplicationStartedPoint(
 
   const fields: IApplicationsStartedFields = {
     role,
+    status: getApplicationStatus(task),
+    practitionerId: getPractionerIdFromTask(task),
     compositionId: composition.id
   }
 
