@@ -44,6 +44,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   ) as unknown) as ISearchParams
   return (
     <PerformanceContentWrapper
+      id="workflow-status"
       type={PerformancePageVariant.SUBPAGE}
       headerTitle={intl.formatMessage(messages.workflowStatusHeader)}
       backActionHandler={() =>

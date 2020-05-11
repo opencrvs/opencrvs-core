@@ -37,7 +37,7 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   loading?: boolean
   statusMapping: IStatusMapping
-  onClickStatusDetails: () => void
+  onClickStatusDetails?: () => void
 }
 
 const ContentHolder = styled.div`
