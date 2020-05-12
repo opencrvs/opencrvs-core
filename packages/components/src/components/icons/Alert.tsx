@@ -12,20 +12,22 @@
 import * as React from 'react'
 
 export const Alert = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width="28" height="24" fill="none" {...props}>
+  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
     <path
       clipRule="evenodd"
-      d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12z"
-      stroke="#FFFFFF"
-      strokeWidth="{2}"
+      d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+      stroke="#fff"
+      strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
-      d="M12 5.778v7.11M12 17.333v.89"
+      d="M12 8v4"
       stroke="#fff"
-      strokeWidth={2.772}
+      strokeWidth={2}
       strokeLinecap="round"
+      strokeLinejoin="round"
     />
+    <circle cx={12} cy={16} r={0.5} fill="#fff" stroke="#fff" />
   </svg>
 )
