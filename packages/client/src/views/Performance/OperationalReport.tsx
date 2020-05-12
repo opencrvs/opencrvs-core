@@ -11,10 +11,15 @@
  */
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ApplicationStatusWindow } from '@client/components/interface/ApplicationStatusWindow'
+import {
+  NOTIFICATION_TYPE,
+  ToastNotification
+} from '@client/components/interface/ToastNotification'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import {
   goToOperationalReport,
   goToPerformanceHome,
@@ -22,23 +27,21 @@ import {
   goToRegistrationRates,
   goToWorkflowStatus
 } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
-import { ApolloError } from 'apollo-client'
-import {
-  GQLEventEstimationMetrics,
-  GQLApplicationsStartedMetrics,
-  GQLRegistrationCountResult,
-  GQLRegStatus
-} from '@opencrvs/gateway/src/graphql/schema'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
-import moment from 'moment'
 import {
   MONTHS_IN_YEAR,
   PERFORMANCE_REPORT_TYPE_MONTHLY
 } from '@client/utils/constants'
+import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
+import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
+import {
+  IStatusMapping,
+  StatusWiseApplicationCountView
+} from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
 import {
   ActionContainer,
   FilterContainer,
@@ -49,27 +52,27 @@ import {
   LinkButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
+import { colors } from '@opencrvs/components/lib/colors'
 import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ListTable, ISearchLocation } from '@opencrvs/components/lib/interface'
+import { ISearchLocation, ListTable } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
+import {
+  GQLApplicationsStartedMetrics,
+  GQLEventEstimationMetrics,
+  GQLRegistrationCountResult
+} from '@opencrvs/gateway/src/graphql/schema'
+import { ApolloError } from 'apollo-client'
+import moment from 'moment'
+import querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
-import {
-  StatusWiseApplicationCountView,
-  IStatusMapping
-} from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
-import { colors } from '@opencrvs/components/lib/colors'
-import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
-import { IOfflineData } from '@client/offline/reducer'
-import { generateLocations } from '@client/utils/locationUtils'
-import querystring from 'query-string'
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
+import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 
 interface IConnectProps {
   offlineLocations: IOfflineData['locations']
@@ -402,6 +405,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 timeEnd: timeEnd.toISOString(),
                 locationId
               }}
+              fetchPolicy="no-cache"
             >
               {({
                 loading,
@@ -412,23 +416,35 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 error?: ApolloError
                 data?: IMetricsQueryResult
               }) => {
-                return (
-                  <>
-                    <RegistrationRatesReport
-                      loading={loading}
-                      data={data && data.getEventEstimationMetrics}
-                      reportTimeFrom={timeStart.format()}
-                      reportTimeTo={timeEnd.format()}
-                      onClickEventDetails={this.onClickRegistrationRatesDetails}
-                    />
-                    <ApplicationsStartedReport
-                      loading={loading}
-                      data={data && data.getApplicationsStartedMetrics}
-                      reportTimeFrom={timeStart.format()}
-                      reportTimeTo={timeEnd.format()}
-                    />
-                  </>
-                )
+                if (error) {
+                  return (
+                    <>
+                      <RegistrationRatesReport loading={true} />
+                      <ApplicationsStartedReport loading={true} />
+                      <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                    </>
+                  )
+                } else {
+                  return (
+                    <>
+                      <RegistrationRatesReport
+                        loading={loading}
+                        data={data && data.getEventEstimationMetrics}
+                        reportTimeFrom={timeStart.format()}
+                        reportTimeTo={timeEnd.format()}
+                        onClickEventDetails={
+                          this.onClickRegistrationRatesDetails
+                        }
+                      />
+                      <ApplicationsStartedReport
+                        loading={loading}
+                        data={data && data.getApplicationsStartedMetrics}
+                        reportTimeFrom={timeStart.format()}
+                        reportTimeTo={timeEnd.format()}
+                      />
+                    </>
+                  )
+                }
               }}
             </Query>
           )}
@@ -514,6 +530,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 error?: ApolloError
                 data?: IMetricsQueryResult
               }) => {
+                if (error) {
+                  return (
+                    <>
+                      <StatusWiseApplicationCountView loading={true} />
+                      <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                    </>
+                  )
+                }
                 return (
                   <StatusWiseApplicationCountView
                     loading={loading}
