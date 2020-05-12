@@ -20,7 +20,10 @@ import {
 } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
-import { PerformanceContentWrapper } from '@client/views/Performance/PerformanceContentWrapper'
+import {
+  PerformanceContentWrapper,
+  PerformancePageVariant
+} from '@client/views/Performance/PerformanceContentWrapper'
 import {
   ActionContainer,
   getJurisidictionType,
@@ -98,6 +101,7 @@ const PickerButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.smallButtonFocus};
   }
+  white-space: nowrap;
   padding: 0;
   height: 38px;
   background: transparent;
@@ -181,52 +185,47 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   const dateEnd = new Date(timeEnd)
 
   return (
-    <PerformanceContentWrapper hideTopBar>
-      <NavigationActionContainer>
-        <TertiaryButton
-          id="reg-rates-action-back"
-          icon={() => <ArrowBack />}
-          align={ICON_ALIGNMENT.LEFT}
-          onClick={() =>
-            goToOperationalReport(
-              locationId,
-              OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-              dateStart,
-              dateEnd
-            )
-          }
-        >
-          {intl.formatMessage(buttonMessages.back)}
-        </TertiaryButton>
-      </NavigationActionContainer>
-      <Header id="reg-rates-header">{title}</Header>
+    <PerformanceContentWrapper
+      id="reg-rates"
+      hideTopBar
+      type={PerformancePageVariant.SUBPAGE}
+      backActionHandler={() =>
+        goToOperationalReport(
+          locationId,
+          OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+          dateStart,
+          dateEnd
+        )
+      }
+      headerTitle={title}
+      toolbarComponent={
+        <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
+          {({ data, loading, error }) => {
+            let options: IPerformanceSelectOption[] = [
+              {
+                label: intl.formatMessage(messages.overTime),
+                value: REG_RATE_BASE.TIME
+              }
+            ]
+            if (
+              data &&
+              data.hasChildLocation &&
+              data.hasChildLocation.type === 'ADMIN_STRUCTURE'
+            ) {
+              const jurisdictionType = getJurisidictionType(
+                data.hasChildLocation
+              )
 
-      <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
-        {({ data, loading, error }) => {
-          let options: IPerformanceSelectOption[] = [
-            {
-              label: intl.formatMessage(messages.overTime),
-              value: REG_RATE_BASE.TIME
+              options.push({
+                label: intl.formatMessage(messages.byLocation, {
+                  jurisdictionType
+                }),
+                value: REG_RATE_BASE.LOCATION,
+                type: jurisdictionType || ''
+              })
             }
-          ]
-          if (
-            data &&
-            data.hasChildLocation &&
-            data.hasChildLocation.type === 'ADMIN_STRUCTURE'
-          ) {
-            const jurisdictionType = getJurisidictionType(data.hasChildLocation)
 
-            options.push({
-              label: intl.formatMessage(messages.byLocation, {
-                jurisdictionType
-              }),
-              value: REG_RATE_BASE.LOCATION,
-              type: jurisdictionType || ''
-            })
-          }
-
-          return (
-            <ActionContainer>
+            return (
               <FilterContainer>
                 <PerformanceSelect
                   id="base-select"
@@ -256,10 +255,11 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   }
                 />
               </FilterContainer>
-            </ActionContainer>
-          )
-        }}
-      </Query>
+            )
+          }}
+        </Query>
+      }
+    >
       <Query
         query={
           base.baseType === REG_RATE_BASE.TIME

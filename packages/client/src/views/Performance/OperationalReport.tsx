@@ -19,7 +19,8 @@ import {
   goToOperationalReport,
   goToPerformanceHome,
   goToPerformanceReport,
-  goToRegistrationRates
+  goToRegistrationRates,
+  goToWorkflowStatus
 } from '@client/navigation'
 import styled from '@client/styledComponents'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
@@ -27,7 +28,8 @@ import { ApolloError } from 'apollo-client'
 import {
   GQLEventEstimationMetrics,
   GQLApplicationsStartedMetrics,
-  GQLRegistrationCountResult
+  GQLRegistrationCountResult,
+  GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
@@ -77,6 +79,7 @@ interface IDispatchProps {
   goToOperationalReport: typeof goToOperationalReport
   goToPerformanceReport: typeof goToPerformanceReport
   goToRegistrationRates: typeof goToRegistrationRates
+  goToWorkflowStatus: typeof goToWorkflowStatus
 }
 
 interface IMetricsQueryResult {
@@ -516,6 +519,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     loading={loading}
                     data={data && data.fetchRegistrationCountByStatus}
                     statusMapping={StatusMapping}
+                    onClickStatusDetails={() =>
+                      this.props.goToWorkflowStatus(
+                        sectionId,
+                        locationId,
+                        timeStart.toDate(),
+                        timeEnd.toDate()
+                      )
+                    }
                   />
                 )
               }}
@@ -540,6 +551,7 @@ export const OperationalReport = connect(
     goToPerformanceHome,
     goToOperationalReport,
     goToPerformanceReport,
-    goToRegistrationRates
+    goToRegistrationRates,
+    goToWorkflowStatus
   }
 )(withTheme(injectIntl(OperationalReportComponent)))
