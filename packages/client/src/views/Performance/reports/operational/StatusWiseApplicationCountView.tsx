@@ -10,22 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { constantsMessages } from '@client/i18n/messages'
-import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
-import * as React from 'react'
-import {
-  injectIntl,
-  WrappedComponentProps,
-  MessageDescriptor
-} from 'react-intl'
-import styled from 'styled-components'
-import { ProgressBar } from '@opencrvs/components/lib/forms'
+import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
+import { LoaderBox } from '@client/views/Performance/reports/operational/RegistrationRatesReport'
 import {
   Description,
   SubHeader
 } from '@opencrvs/client/src/views/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import { LoaderBox } from '@client/views/Performance/reports/operational/RegistrationRatesReport'
+import { ProgressBar } from '@opencrvs/components/lib/forms'
+import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
+import {
+  injectIntl,
+  MessageDescriptor,
+  WrappedComponentProps
+} from 'react-intl'
+import styled from 'styled-components'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -36,7 +36,7 @@ export interface IStatusMapping {
 interface BaseProps {
   data?: GQLRegistrationCountResult
   loading?: boolean
-  statusMapping: IStatusMapping
+  statusMapping?: IStatusMapping
   onClickStatusDetails?: () => void
 }
 
@@ -124,9 +124,9 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
               <StatusProgressBarWrapper key={index}>
                 <ProgressBar
                   title={intl.formatMessage(
-                    statusMapping[statusCount.status].labelDescriptor
+                    statusMapping![statusCount.status].labelDescriptor
                   )}
-                  color={statusMapping[statusCount.status].color}
+                  color={statusMapping![statusCount.status].color}
                   totalPoints={total}
                   currentPoints={statusCount.count}
                 />

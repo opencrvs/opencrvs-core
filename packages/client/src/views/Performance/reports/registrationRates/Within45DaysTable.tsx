@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { ListTable } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
-import { WrappedComponentProps, injectIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { orderBy } from 'lodash'
-import {
-  REG_RATE_BASE,
-  IEstimationBase
-} from '@client/views/Performance/RegistrationRates'
 import { messages } from '@client/i18n/messages/views/performance'
+import {
+  IEstimationBase,
+  REG_RATE_BASE
+} from '@client/views/Performance/RegistrationRates'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { ListTable } from '@opencrvs/components/lib/interface'
+import { orderBy } from 'lodash'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 
 interface IMonthWiseEstimationCount {
   actualTotalRegistration: number
@@ -36,9 +36,9 @@ interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
 }
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
-  eventType: Event
-  base: IEstimationBase
-  data: {
+  eventType?: Event
+  base?: IEstimationBase
+  data?: {
     details: IMonthWiseEstimation[]
     total: IMonthWiseEstimationCount
   }
@@ -135,7 +135,7 @@ function Within45DaysTableComponent(props: ITableProps) {
     label: intl.formatMessage(constantsMessages.timePeriod),
     sortKey: 'startTime'
   }
-  if (base.baseType === REG_RATE_BASE.LOCATION) {
+  if (base && base.baseType === REG_RATE_BASE.LOCATION) {
     firstColProp = {
       dataKey: 'location',
       label: intl.formatMessage(messages.locationTitle, {

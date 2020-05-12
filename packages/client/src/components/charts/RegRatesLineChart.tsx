@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Event } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { TriLineChart } from '@opencrvs/components/lib/charts'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
-import { Event } from '@client/forms'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
-  eventType: Event
+  eventType?: Event
 }
 
 interface IActiveState {
