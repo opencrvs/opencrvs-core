@@ -30,7 +30,11 @@ export async function waitingValidationHandler(
 ) {
   const points = []
   try {
-    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
     await writePoints(points)
   } catch (err) {
     return internal(err)
@@ -45,7 +49,11 @@ export async function newValidationHandler(
 ) {
   const points = []
   try {
-    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
@@ -69,7 +77,11 @@ export async function newWaitingValidationHandler(
 ) {
   const points = []
   try {
-    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
@@ -93,7 +105,11 @@ export async function newDeclarationHandler(
 ) {
   const points = []
   try {
-    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
@@ -122,7 +138,11 @@ export async function inProgressHandler(
         Authorization: request.headers.authorization
       }
     )
-    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle))
+    points.push(
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
     points.push(
       await generateApplicationStartedPoint(
         request.payload as fhir.Bundle,
@@ -154,7 +174,9 @@ export async function newBirthRegistrationHandler(
           Authorization: request.headers.authorization
         }
       ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
     )
     await writePoints(points)
   } catch (err) {
@@ -185,7 +207,9 @@ export async function markBirthRegisteredHandler(
       generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
         Authorization: request.headers.authorization
       }),
-      generateTimeLoggedPoint(bundle)
+      generateTimeLoggedPoint(bundle, {
+        Authorization: request.headers.authorization
+      })
     ])
 
     await writePoints(points)
@@ -209,7 +233,9 @@ export async function newDeathRegistrationHandler(
           Authorization: request.headers.authorization
         }
       ),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
     )
     await writePoints(points)
   } catch (err) {
@@ -239,7 +265,9 @@ export async function markDeathRegisteredHandler(
       generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
         Authorization: request.headers.authorization
       }),
-      generateTimeLoggedPoint(bundle)
+      generateTimeLoggedPoint(bundle, {
+        Authorization: request.headers.authorization
+      })
     ])
 
     await writePoints(points)
@@ -285,7 +313,9 @@ export async function markValidatedHandler(
       generateEventDurationPoint(request.payload as fhir.Bundle, ['DECLARED'], {
         Authorization: request.headers.authorization
       }),
-      generateTimeLoggedPoint(request.payload as fhir.Bundle)
+      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
     ])
 
     await writePoints(points)

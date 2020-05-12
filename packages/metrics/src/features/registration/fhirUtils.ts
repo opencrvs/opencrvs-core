@@ -55,6 +55,7 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
 }
 
 export type APPLICATION_STATUS =
+  | 'IN_PROGRESS'
   | 'DECLARED'
   | 'REGISTERED'
   | 'VALIDATED'
@@ -114,6 +115,12 @@ export async function getPreviousTask(
 ) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
   return findPreviousTask(taskHistory, allowedPreviousStates)
+}
+
+export function getPractionerIdFromTask(task: fhir.Task) {
+  return task?.extension
+    ?.find(ext => ext.url === 'http://opencrvs.org/specs/extension/regLastUser')
+    ?.valueReference?.reference?.split('/')?.[1]
 }
 
 export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {

@@ -1,3 +1,5 @@
+import { APPLICATION_STATUS } from '@metrics/features/registration/fhirUtils'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -81,11 +83,16 @@ export interface ILocationTags {
 export interface ITimeLoggedFields {
   timeSpentEditing: number
   compositionId: string
+  practitionerId?: string
 }
 
 export interface ITimeLoggedTags {
   currentStatus: string
   eventType: string
+  locationLevel5?: string
+  locationLevel4?: string
+  locationLevel3?: string
+  locationLevel2?: string
 }
 
 export interface IDurationFields {
@@ -149,7 +156,9 @@ export interface IApplicationsStartedPoints {
 
 export interface IApplicationsStartedFields {
   role: string
+  status?: APPLICATION_STATUS | null
   compositionId: string
+  practitionerId?: string
 }
 
 export type IPoints =
