@@ -223,7 +223,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
   }
   getLoadingIndicator() {
     return (
-      <LoadingIndicator>
+      <LoadingIndicator id="reg-rates-line-chart-loader">
         <ChartLoadingIndicator />
         <LegendLoadingIndicator>
           <CustomLegendContainer>
