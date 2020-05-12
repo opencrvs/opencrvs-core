@@ -55,10 +55,12 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
 }
 
 export type APPLICATION_STATUS =
+  | 'IN_PROGRESS'
   | 'DECLARED'
   | 'REGISTERED'
   | 'VALIDATED'
   | 'WAITING_VALIDATION'
+  | 'REJECTED'
 
 export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
 
@@ -142,6 +144,31 @@ export function getApplicationType(task: Task): APPLICATION_TYPE | null {
     return null
   }
   return coding.code as APPLICATION_TYPE
+}
+
+export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
+  const previousTask = findPreviousTask(taskHistory, [
+    'DECLARED',
+    'IN_PROGRESS'
+  ])
+
+  if (!previousTask) {
+    throw new Error('Task not found!')
+  }
+
+  const regLastUserExtension =
+    previousTask.extension &&
+    previousTask.extension.find(
+      extension =>
+        extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
+    )
+
+  const regLastUser =
+    regLastUserExtension &&
+    regLastUserExtension.valueReference &&
+    regLastUserExtension.valueReference.reference
+
+  return regLastUser as string
 }
 
 export function getRegLastLocation(bundle: fhir.Bundle) {

@@ -18,11 +18,13 @@ import {
   generateEventDurationPoint,
   generatePaymentPoint,
   generateApplicationStartedPoint,
-  generateTimeLoggedPoint
+  generateTimeLoggedPoint,
+  generateRejectedPoints
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from 'boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
+import { IPoints } from '@metrics/features/registration'
 
 export async function waitingValidationHandler(
   request: Hapi.Request,
@@ -132,6 +134,26 @@ export async function inProgressHandler(
         Events.IN_PROGRESS_DEC
       )
     )
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function markRejectedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points: IPoints[] = []
+    points.push(
+      await generateRejectedPoints(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      })
+    )
+    points.push(generateTimeLoggedPoint(request.payload as fhir.Bundle, true))
     await writePoints(points)
   } catch (err) {
     return internal(err)

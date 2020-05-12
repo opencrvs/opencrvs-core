@@ -1,0 +1,93 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "http://localhost:3447/fhir/Task/77124886-8e45-4506-b38a-cc21f75b8dde/_history/213a40a2-a084-42c8-b32c-5e3f946aea7f",
+      "resource": {
+        "resourceType": "Task",
+        "status": "draft",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/81278acf-6105-435e-b1c2-91619c8cf6e1"
+        },
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "6e12ccc4-081e-45fc-a26b-7d439ca2ba89"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BHZA7SV"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+8801916546544"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 16757
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/in-complete-fields",
+            "valueString": "child/child-view-group/childBirthDate,child/child-view-group/familyName,child/child-view-group/familyNameEng,child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/iDType,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePermanent,father/father-view-group/iDType,father/father-view-group/familyName,father/father-view-group/familyNameEng,father/father-view-group/state,father/father-view-group/statePermanent"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/2da11e94-1a0d-4a77-8ab0-19f29f57a41a"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155"
+            }
+          }
+        ],
+        "lastModified": "2020-05-11T12:15:29.739Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REJECTED"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2020-05-11T12:14:51.678+00:00",
+          "versionId": "213a40a2-a084-42c8-b32c-5e3f946aea7f"
+        },
+        "id": "77124886-8e45-4506-b38a-cc21f75b8dde",
+        "note": [
+          {
+            "text": "reason=missing_supporting_doc&comment=fdfdfz",
+            "time": "Mon, 11 May 2020 12:15:29 GMT",
+            "authorString": "Practitioner/2da11e94-1a0d-4a77-8ab0-19f29f57a41a"
+          }
+        ]
+      },
+      "request": { "method": "POST", "url": "Task" }
+    }
+  ]
+}
