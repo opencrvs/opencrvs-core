@@ -218,7 +218,10 @@ class ApplicationsStartedReportComponent extends React.Component<
               {intl.formatNumber(hospitalApplications)}
 
               <KeyPercentage>
-                ({intl.formatNumber(hospitalApplications)}
+                (
+                {intl.formatNumber(
+                  this.getPercentage(data, hospitalApplications)
+                )}
                 %)
               </KeyPercentage>
             </KeyNumber>

@@ -15,6 +15,7 @@ import {
   IInProgressApplicationFields,
   ITimeLoggedFields,
   IApplicationsStartedFields,
+  IRejectedFields,
   IDurationFields,
   IPaymentFields,
   IPointLocation,
@@ -27,7 +28,8 @@ import {
   ILocationTags,
   IPoints,
   IPaymentPoints,
-  IApplicationsStartedPoints
+  IApplicationsStartedPoints,
+  IRejectedPoints
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -39,6 +41,7 @@ import {
   getApplicationStatus,
   getTimeLoggedFromTask,
   getApplicationType,
+  getStartedByFieldAgent,
   getPaymentReconciliation,
   getObservationValueByCode,
   isNotification,
@@ -56,7 +59,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Events
 } from '@metrics/features/metrics/constants'
-import { fetchParentLocationByLocationID } from '@metrics/api'
+import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
 
 export const generateInCompleteFieldPoints = async (
   payload: fhir.Bundle,
@@ -305,14 +308,27 @@ export async function generateEventDurationPoint(
 
 export async function generateTimeLoggedPoint(
   payload: fhir.Bundle,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  fromTask?: boolean
 ): Promise<IPoints> {
-  const composition = getComposition(payload)
   const currentTask = getTask(payload)
-
-  if (!composition) {
-    throw new Error('Composition not found')
+  let compositionId
+  if (!fromTask) {
+    const composition = getComposition(payload)
+    if (!composition) {
+      throw new Error('composition not found')
+    }
+    compositionId = composition.id
+  } else {
+    if (currentTask && currentTask.focus && currentTask.focus.reference) {
+      compositionId = currentTask.focus.reference.split('/')[1]
+    }
   }
+
+  if (!compositionId) {
+    throw new Error('compositionId not found')
+  }
+
   if (!currentTask) {
     throw new Error('Current task not found')
   }
@@ -323,7 +339,7 @@ export async function generateTimeLoggedPoint(
   const fields: ITimeLoggedFields = {
     timeSpentEditing: timeLoggedInSeconds,
     practitionerId: getPractionerIdFromTask(currentTask),
-    compositionId: composition.id
+    compositionId
   }
 
   const tags: ITimeLoggedTags = {
@@ -387,6 +403,40 @@ export async function generateApplicationStartedPoint(
 
   return {
     measurement: 'applications_started',
+    tags,
+    fields
+  }
+}
+
+export async function generateRejectedPoints(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+): Promise<IRejectedPoints> {
+  const task = getTask(payload)
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+  const taskHistory = await fetchTaskHistory(task.id, authHeader)
+  let compositionId
+  if (task && task.focus && task.focus.reference) {
+    compositionId = task.focus.reference.split('/')[1]
+  }
+  if (!compositionId) {
+    throw new Error('compositionId not found')
+  }
+  const fields: IRejectedFields = {
+    startedBy: getStartedByFieldAgent(taskHistory),
+    compositionId
+  }
+
+  const tags = {
+    eventType: getApplicationType(task),
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  return {
+    measurement: 'applications_rejected',
     tags,
     fields
   }

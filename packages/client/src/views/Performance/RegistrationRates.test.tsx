@@ -27,6 +27,7 @@ import {
 } from '@client/views/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import queryString from 'query-string'
+import { GraphQLError } from 'graphql'
 
 const LOCATION_DHAKA_DIVISION = {
   displayLabel: 'Dhaka Division',
@@ -36,84 +37,84 @@ const LOCATION_DHAKA_DIVISION = {
 const timeStart = new Date(2019, 11, 6)
 const timeEnd = new Date(2019, 11, 13)
 
-const graphqlMocks = [
-  {
-    request: {
-      query: HAS_CHILD_LOCATION,
-      variables: { parentId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b' }
-    },
-    result: {
-      data: {
-        hasChildLocation: {
-          id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
-          type: 'ADMIN_STRUCTURE',
-          identifier: [
-            {
-              system: 'http://opencrvs.org/specs/id/geo-id',
-              value: '4194'
-            },
-            {
-              system: 'http://opencrvs.org/specs/id/bbs-code',
-              value: '11'
-            },
-            {
-              system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-              value: 'UNION'
-            },
-            {
-              system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
-              value: 'division=9&district=30&upazila=233&union=4194'
-            }
-          ]
+describe('Registraion Rates tests', () => {
+  const graphqlMocks = [
+    {
+      request: {
+        query: HAS_CHILD_LOCATION,
+        variables: { parentId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b' }
+      },
+      result: {
+        data: {
+          hasChildLocation: {
+            id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
+            type: 'ADMIN_STRUCTURE',
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/geo-id',
+                value: '4194'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/bbs-code',
+                value: '11'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                value: 'UNION'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                value: 'division=9&district=30&upazila=233&union=4194'
+              }
+            ]
+          }
         }
       }
-    }
-  },
-  {
-    request: {
-      query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
-      variables: {
-        event: 'BIRTH',
-        locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-        timeStart: timeStart.toISOString(),
-        timeEnd: timeEnd.toISOString()
-      }
     },
-    result: {
-      data: {
-        fetchMonthWiseEventMetrics: {
-          details: [
-            {
-              actualTotalRegistration: 20,
+    {
+      request: {
+        query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+        variables: {
+          event: 'BIRTH',
+          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+          timeStart: timeStart.toISOString(),
+          timeEnd: timeEnd.toISOString()
+        }
+      },
+      result: {
+        data: {
+          fetchMonthWiseEventMetrics: {
+            details: [
+              {
+                actualTotalRegistration: 20,
+                actual45DayRegistration: 9,
+                estimatedRegistration: 45,
+                estimated45DayPercentage: 4.5,
+                month: 'April',
+                year: '2020',
+                startOfMonth: '2020-03-30T18:00:00.000Z'
+              },
+              {
+                actualTotalRegistration: 10,
+                actual45DayRegistration: 0,
+                estimatedRegistration: 45,
+                estimated45DayPercentage: 0,
+                month: 'March',
+                year: '2020',
+                startOfMonth: '2020-02-29T18:00:00.000Z'
+              }
+            ],
+            total: {
+              actualTotalRegistration: 30,
               actual45DayRegistration: 9,
               estimatedRegistration: 45,
-              estimated45DayPercentage: 4.5,
-              month: 'April',
-              year: '2020',
-              startOfMonth: '2020-03-30T18:00:00.000Z'
-            },
-            {
-              actualTotalRegistration: 10,
-              actual45DayRegistration: 0,
-              estimatedRegistration: 45,
-              estimated45DayPercentage: 0,
-              month: 'March',
-              year: '2020',
-              startOfMonth: '2020-02-29T18:00:00.000Z'
+              estimated45DayPercentage: 2.25
             }
-          ],
-          total: {
-            actualTotalRegistration: 30,
-            actual45DayRegistration: 9,
-            estimatedRegistration: 45,
-            estimated45DayPercentage: 2.25
           }
         }
       }
     }
-  }
-]
-describe('Registraion Rates tests', () => {
+  ]
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
@@ -206,5 +207,104 @@ describe('Registraion Rates tests', () => {
     )
     confirmButtonElement.hostNodes().simulate('click')
     expect(history.location.search).not.toBe(previousQueryParams)
+  })
+})
+
+describe('Registraion Rates error state tests', () => {
+  const graphqlMocks = [
+    {
+      request: {
+        query: HAS_CHILD_LOCATION,
+        variables: { parentId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b' }
+      },
+      result: {
+        data: {
+          hasChildLocation: {
+            id: 'd70fbec1-2b26-474b-adbc-bb83783bdf29',
+            type: 'ADMIN_STRUCTURE',
+            identifier: [
+              {
+                system: 'http://opencrvs.org/specs/id/geo-id',
+                value: '4194'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/bbs-code',
+                value: '11'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+                value: 'UNION'
+              },
+              {
+                system: 'http://opencrvs.org/specs/id/a2i-internal-reference',
+                value: 'division=9&district=30&upazila=233&union=4194'
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
+        variables: {
+          event: 'BIRTH',
+          locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+          timeStart: timeStart.toISOString(),
+          timeEnd: timeEnd.toISOString()
+        }
+      },
+      result: {
+        errors: [new GraphQLError('Error!')]
+      }
+    }
+  ]
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History<any>
+
+  beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
+  })
+
+  beforeEach(async () => {
+    component = (await createTestComponent(
+      <RegistrationRates
+        match={{
+          params: { eventType: 'birth' },
+          isExact: true,
+          path: EVENT_REGISTRATION_RATES,
+          url: ''
+        }}
+        // @ts-ignore
+        location={{
+          search: queryString.stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      store,
+      graphqlMocks
+    )).component
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    component.update()
+  })
+
+  it('renders the error toast notification and component loader', async () => {
+    await waitForElement(component, '#error-toast')
+    expect(component.find('#error-toast').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#reg-rates-line-chart-loader').hostNodes()
+    ).toHaveLength(1)
   })
 })

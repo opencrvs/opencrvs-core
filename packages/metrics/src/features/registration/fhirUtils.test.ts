@@ -16,6 +16,7 @@ import {
   getObservationValueByCode,
   getTimeLoggedFromTask,
   isNotification,
+  getStartedByFieldAgent,
   FHIR_RESOURCE_TYPE,
   CAUSE_OF_DEATH_CODE
 } from '@metrics/features/registration/fhirUtils'
@@ -1219,6 +1220,21 @@ describe('fhirUtils', () => {
 
     expect(() => isNotification(composition)).toThrowError(
       'Composition has no type codings defined'
+    )
+  })
+  it('returns practitioner who started the application', () => {
+    const taskHistory = require('./test-data/task-history.json')
+
+    expect(getStartedByFieldAgent(taskHistory)).toEqual(
+      'Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df'
+    )
+  })
+  it('throws error if no task associated with declared or in progress application ', () => {
+    const taskHistory = require('./test-data/task-history.json')
+    taskHistory.entry[1].resource.businessStatus.coding[0].code = ''
+
+    expect(() => getStartedByFieldAgent(taskHistory)).toThrowError(
+      'Task not found!'
     )
   })
 })
