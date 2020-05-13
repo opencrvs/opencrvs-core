@@ -23,7 +23,6 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
 
-const MIGRATION_QUERY_SIZE = 100
 export async function searchDeclaration(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -120,10 +119,36 @@ export async function populateHierarchicalLocationIdsHandler(
       birth: 0,
       death: 0
     }
-    let form = 0
-    const size = MIGRATION_QUERY_SIZE
-
-    let allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
+    // Before retrieving all documents, we need to check the total count to make sure that the query will no tbe too large
+    // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
+    const resultCountCheck = await client.search(
+      {
+        index: 'ocrvs',
+        body: {
+          query: {
+            bool: {
+              must_not: {
+                exists: {
+                  field: 'applicationLocationHirarchyIds'
+                }
+              }
+            }
+          },
+          size: DEFAULT_SIZE
+        }
+      },
+      {
+        ignore: [404]
+      }
+    )
+    const count: number = resultCountCheck.body.hits.total
+    if (count > 5000) {
+      return internal(
+        'Elastic contains over 5000 results.  It is risky to return all without pagination.'
+      )
+    }
+    // If total count is less than 5000, then proceed.
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
       ICompositionBody
     >> = await client.search(
       {
@@ -138,59 +163,34 @@ export async function populateHierarchicalLocationIdsHandler(
               }
             }
           },
-          form,
-          size
+          size: count
         }
       },
       {
         ignore: [404]
       }
     )
-    let compositions =
+    const compositions =
       allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
 
-    while (compositions && compositions.length > 0) {
-      for (const composition of compositions) {
-        const body: ICompositionBody = composition._source
-        if (body && body.applicationLocationId) {
-          body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
-            body.applicationLocationId
-          )
-          await updateComposition(composition._id, body)
-          if (
-            body.event &&
-            body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
-          ) {
-            updatedCompositionCounts.death += 1
-          } else {
-            updatedCompositionCounts.birth += 1
-          }
+    for (const composition of compositions) {
+      const body: ICompositionBody = composition._source
+      if (body && body.applicationLocationId) {
+        body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
+          body.applicationLocationId
+        )
+        await updateComposition(composition._id, body)
+        if (
+          body.event &&
+          body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
+        ) {
+          updatedCompositionCounts.death += 1
+        } else {
+          updatedCompositionCounts.birth += 1
         }
       }
-      form = form + size
-      allDocumentsWithoutHierarchicalLocations = await client.search(
-        {
-          index: 'ocrvs',
-          body: {
-            query: {
-              bool: {
-                must_not: {
-                  exists: {
-                    field: 'applicationLocationHirarchyIds'
-                  }
-                }
-              }
-            },
-            form,
-            size
-          }
-        },
-        {
-          ignore: [404]
-        }
-      )
-      compositions = allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
     }
+
     return h.response(updatedCompositionCounts).code(200)
   } catch (err) {
     return internal(err)

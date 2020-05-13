@@ -186,6 +186,8 @@ describe('Verify handlers', () => {
       it('Should return right number of updated registrations for valid payload', async () => {
         // @ts-ignore
         jest.spyOn(client, 'search').mockResolvedValueOnce(mockSearchResult)
+        // @ts-ignore
+        jest.spyOn(client, 'search').mockResolvedValueOnce(mockSearchResult)
 
         fetch.mockResponses(
           [
@@ -205,8 +207,6 @@ describe('Verify handlers', () => {
             { status: 200 }
           ]
         )
-        // @ts-ignore
-        jest.spyOn(client, 'search').mockResolvedValueOnce({})
 
         const res = await server.server.inject({
           method: 'POST',
