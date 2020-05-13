@@ -29,6 +29,7 @@ interface IErrorMessages {
   loadingApplications: MessageDescriptor
   noApplication: MessageDescriptor
   waitingForConnection: MessageDescriptor
+  pageLoadFailed: MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
@@ -119,6 +120,11 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: 'Reconnect to load applications',
     description: 'The text when there is no connectivity',
     id: 'search.waitingForConnection'
+  },
+  pageLoadFailed: {
+    defaultMessage: "Sorry, we couldn't laod the content for this page",
+    description: 'Error message when page failed to load',
+    id: 'error.page.load.failed'
   }
 }
 

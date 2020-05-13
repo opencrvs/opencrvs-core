@@ -10,6 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { RegRatesLineChart } from '@client/components/charts/RegRatesLineChart'
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import {
+  NOTIFICATION_TYPE,
+  ToastNotification
+} from '@client/components/interface/ToastNotification'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
@@ -18,7 +23,10 @@ import {
   goToOperationalReport,
   goToRegistrationRates
 } from '@client/navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { generateLocations } from '@client/utils/locationUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 import {
   PerformanceContentWrapper,
@@ -26,19 +34,21 @@ import {
 } from '@client/views/Performance/PerformanceContentWrapper'
 import {
   ActionContainer,
+  FilterContainer,
   getJurisidictionType,
-  Header,
-  FilterContainer
+  Header
 } from '@client/views/Performance/utils'
 import {
   ICON_ALIGNMENT,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { ArrowBack, MapPin } from '@opencrvs/components/lib/icons'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   GQLMonthWise45DayEstimation,
   GQLMonthWiseEstimationMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
+import querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -53,12 +63,6 @@ import {
   HAS_CHILD_LOCATION
 } from './queries'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
-import { DateRangePicker } from '@client/components/DateRangePicker'
-import querystring from 'query-string'
-import { getOfflineData } from '@client/offline/selectors'
-import { IStoreState } from '@client/store'
-import { generateLocations } from '@client/utils/locationUtils'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
 
 const { useState } = React
 const NavigationActionContainer = styled.div`
@@ -275,8 +279,15 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       >
         {({ data, loading, error }) => {
           if (error) {
-            // TODO: need error view here
-            return <></>
+            return (
+              <>
+                {base.baseType === REG_RATE_BASE.TIME && (
+                  <RegRatesLineChart loading={true} />
+                )}
+                <Within45DaysTable loading={true} />
+                <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+              </>
+            )
           } else {
             return (
               <>

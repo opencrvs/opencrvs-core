@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Event } from '@client/forms'
 import { dynamicConstantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
@@ -20,7 +21,6 @@ import { GQLEventEstimationMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
-import { Event } from '@client/forms'
 
 const ReportHeader = styled.div`
   margin: 24px 0px;
@@ -95,7 +95,7 @@ interface BaseProps {
   loading?: boolean
   reportTimeFrom?: string
   reportTimeTo?: string
-  onClickEventDetails: (event: Event, title: string) => void
+  onClickEventDetails?: (event: Event, title: string) => void
 }
 
 interface States {}
@@ -184,7 +184,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             <LinkButton
               id="birth-registration-detalis-link"
               onClick={() =>
-                onClickEventDetails(Event.BIRTH, birthReportHeader)
+                onClickEventDetails!(Event.BIRTH, birthReportHeader)
               }
             >
               {birthReportHeader}
@@ -219,7 +219,7 @@ class RegistrationRatesReportComponent extends React.Component<Props, States> {
             <LinkButton
               id="death-registration-detalis-link"
               onClick={() =>
-                onClickEventDetails(Event.DEATH, deathReportHeader)
+                onClickEventDetails!(Event.DEATH, deathReportHeader)
               }
             >
               {deathReportHeader}

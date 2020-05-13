@@ -22,6 +22,8 @@ import {
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import querystring from 'query-string'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import { GraphQLError } from 'graphql'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -42,6 +44,47 @@ describe('OperationalReport tests', () => {
   })
 
   beforeEach(async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: OPERATIONAL_REPORTS_METRICS,
+          variables: {
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          }
+        },
+        result: {
+          data: {
+            getEventEstimationMetrics: {
+              birth45DayMetrics: {
+                actualRegistration: 4,
+                estimatedRegistration: 0,
+                estimatedPercentage: 0,
+                malePercentage: 0,
+                femalePercentage: 0,
+                __typename: 'EstimationMetrics'
+              },
+              death45DayMetrics: {
+                actualRegistration: 0,
+                estimatedRegistration: 0,
+                estimatedPercentage: 0,
+                malePercentage: 0,
+                femalePercentage: 0,
+                __typename: 'EstimationMetrics'
+              },
+              __typename: 'EventEstimationMetrics'
+            },
+            getApplicationsStartedMetrics: {
+              fieldAgentApplications: 0,
+              hospitalApplications: 0,
+              officeApplications: 6,
+              __typename: 'ApplicationsStartedMetrics'
+            }
+          }
+        }
+      }
+    ]
     const testComponent = await createTestComponent(
       <OperationalReport
         // @ts-ignore
@@ -54,7 +97,8 @@ describe('OperationalReport tests', () => {
           })
         }}
       />,
-      store
+      store,
+      graphqlMock
     )
     component = testComponent.component
   })
@@ -245,5 +289,69 @@ describe('OperationalReport reports tests', () => {
 
   it('renders report lists', async () => {
     expect(component.find('#report-lists').hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('Test error toast notification', () => {
+  let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History<any>
+
+  const LOCATION_DHAKA_DIVISION = {
+    displayLabel: 'Dhaka Division',
+    id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+    searchableText: 'Dhaka'
+  }
+
+  beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
+  })
+
+  beforeEach(async () => {
+    const graphqlMock = [
+      {
+        request: {
+          query: OPERATIONAL_REPORTS_METRICS,
+          variables: {
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          }
+        },
+        result: {
+          errors: [new GraphQLError('ERROR!')]
+        }
+      }
+    ]
+    const testComponent = await createTestComponent(
+      <OperationalReport
+        // @ts-ignore
+        location={{
+          search: querystring.stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
+        }}
+      />,
+      store,
+      graphqlMock
+    )
+    component = testComponent.component
+  })
+
+  it('renders the error toast notification and component loader', async () => {
+    await waitForElement(component, '#error-toast')
+    expect(component.find('#error-toast').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#registration-rates-reports-loader').hostNodes()
+    ).toHaveLength(1)
+    expect(
+      component.find('#applications-started-reports-loader').hostNodes()
+    ).toHaveLength(1)
   })
 })
