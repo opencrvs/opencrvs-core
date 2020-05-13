@@ -28,16 +28,12 @@ import { ApolloError } from 'apollo-client'
 import {
   GQLEventEstimationMetrics,
   GQLApplicationsStartedMetrics,
-  GQLRegistrationCountResult,
-  GQLRegStatus
+  GQLRegistrationCountResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import moment from 'moment'
-import {
-  MONTHS_IN_YEAR,
-  PERFORMANCE_REPORT_TYPE_MONTHLY
-} from '@client/utils/constants'
+import { MONTHS_IN_YEAR } from '@client/utils/constants'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import {
   ActionContainer,
@@ -255,7 +251,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
-                PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()

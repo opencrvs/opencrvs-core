@@ -23,7 +23,10 @@ import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { PerformanceContentWrapper } from './PerformanceContentWrapper'
+import {
+  PerformanceContentWrapper,
+  PerformancePageVariant
+} from './PerformanceContentWrapper'
 import { NoResultMessage } from './NoResultMessage'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
@@ -64,7 +67,6 @@ const ReportWrapper = styled.div`
 interface ReportProps {
   selectedLocation: ISearchLocation
   timeRange: { start: Date; end: Date }
-  reportType: string
   eventType: Event
   goBack: typeof goBack
   offlineResources: IOfflineData
@@ -81,7 +83,6 @@ type Props = ReportProps &
     {},
     {
       selectedLocation: ISearchLocation
-      reportType: string
       eventType: Event
       timeRange: { start: Date; end: Date }
     }
@@ -92,27 +93,18 @@ function ReportComponent(props: Props) {
     props.selectedLocation
   )
 
-  const { reportType, timeRange, intl, eventType } = props
+  const { timeRange, intl, eventType } = props
   const { start, end } = timeRange
 
   const title = moment(start).format('MMMM YYYY')
   return (
-    <PerformanceContentWrapper tabId={reportType}>
-      <BackButton
-        align={ICON_ALIGNMENT.LEFT}
-        icon={() => <BackArrow />}
-        onClick={props.goBack}
-      >
-        {intl.formatMessage(buttonMessages.back)}
-      </BackButton>
-      <Header>{title}</Header>
-      <LocationSearch
-        locationList={generateLocations(props.offlineResources.locations)}
-        selectedLocation={selectedLocation}
-        searchHandler={item => {
-          setSelectedLocation(item)
-        }}
-      />
+    <PerformanceContentWrapper
+      id="reports"
+      hideTopBar
+      type={PerformancePageVariant.SUBPAGE}
+      backActionHandler={props.goBack}
+      headerTitle={title}
+    >
       <Query
         query={PERFORMANCE_METRICS}
         variables={{
@@ -205,9 +197,6 @@ function ReportComponent(props: Props) {
 
 function mapStateToProps(state: IStoreState, props: Props) {
   return {
-    reportType:
-      (props.location.state && props.location.state.reportType) ||
-      PERFORMANCE_REPORT_TYPE_MONTHLY,
     eventType: props.location.state && props.location.state.eventType,
     timeRange: (props.location.state && props.location.state.timeRange) || {
       start: new Date(),
