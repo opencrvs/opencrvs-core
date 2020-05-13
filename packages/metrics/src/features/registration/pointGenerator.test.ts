@@ -13,7 +13,8 @@ import {
   generateBirthRegPoint,
   generateDeathRegPoint,
   generatePaymentPoint,
-  generateApplicationStartedPoint
+  generateApplicationStartedPoint,
+  generateRejectedPoints
 } from '@metrics/features/registration/pointGenerator'
 import {
   testDeclaration,
@@ -27,6 +28,7 @@ import { Events } from '@metrics/features/metrics/constants'
 import * as api from '@metrics/api'
 const fetchLocation = api.fetchLocation as jest.Mock
 const fetchParentLocationByLocationID = api.fetchParentLocationByLocationID as jest.Mock
+const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
 
 const AUTH_HEADER = {
   Authorization: 'Bearer mock-token'
@@ -354,6 +356,32 @@ describe('Verify point generation', () => {
         status: 'DECLARED',
         practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'NOTIFICATION_API_USER'
+      }
+    })
+  })
+  it('returns rejected ppint', async () => {
+    const payload = require('./test-data/rejected.json')
+    const taskHistory = require('./test-data/task-history.json')
+    // @ts-ignore
+    fetchLocation.mockReset()
+    fetchTaskHistory.mockResolvedValueOnce(taskHistory)
+    fetchParentLocationByLocationID
+      .mockResolvedValueOnce('Location/4')
+      .mockResolvedValueOnce('Location/3')
+      .mockResolvedValueOnce('Location/2')
+    const point = await generateRejectedPoints(payload, AUTH_HEADER)
+    expect(point).toEqual({
+      measurement: 'applications_rejected',
+      tags: {
+        eventType: 'BIRTH',
+        locationLevel4: 'Location/4',
+        locationLevel3: 'Location/3',
+        locationLevel2: 'Location/2',
+        locationLevel5: 'Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8'
+      },
+      fields: {
+        compositionId: '81278acf-6105-435e-b1c2-91619c8cf6e1',
+        startedBy: 'Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df'
       }
     })
   })

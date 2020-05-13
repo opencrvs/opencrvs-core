@@ -1268,4 +1268,37 @@ describe('When an in-progress application is received', () => {
     })
     expect(res.statusCode).toBe(500)
   })
+
+  it('writes the rejected points to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/rejected.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/mark-voided',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const rejectedPoints = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'applications_rejected'
+    )
+
+    expect(res.statusCode).toBe(200)
+    expect(rejectedPoints).toMatchSnapshot()
+  })
+  it('returns 500 for payload without task resource', async () => {
+    const payload = require('./test-data/rejected.json')
+    payload.entry = []
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/mark-voided',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    expect(res.statusCode).toBe(500)
+  })
 })

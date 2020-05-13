@@ -161,6 +161,17 @@ export interface IApplicationsStartedFields {
   practitionerId?: string
 }
 
+export interface IRejectedFields {
+  compositionId: string
+  startedBy: string
+}
+
+export interface IRejectedPoints {
+  measurement: string
+  tags: IPointLocation
+  fields: IRejectedFields
+}
+
 export type IPoints =
   | IDurationPoints
   | ITimeLoggedPoints
@@ -170,3 +181,4 @@ export type IPoints =
   | IDeathRegistrationPoints
   | IPaymentPoints
   | IApplicationsStartedPoints
+  | IRejectedPoints

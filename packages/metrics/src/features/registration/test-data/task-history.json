@@ -1,0 +1,182 @@
+{
+  "resourceType": "Bundle",
+  "id": "98b3a25b-fb08-4d42-80b3-fdfd1c13d1d5",
+  "meta": { "lastUpdated": "2020-05-12T07:14:31.008+00:00" },
+  "type": "history",
+  "total": 2,
+  "link": [
+    { "relation": "self", "url": "http://localhost:3447/fhir/_history" }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://localhost:3447/fhir/Task/723621be-3f14-45fd-b045-2cf92a9643b6/_history/6baa2a7e-7f6e-4fa2-b015-7c5717c56486",
+      "resource": {
+        "resourceType": "Task",
+        "status": "draft",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/d2a51773-c7c9-4c56-a37e-72452ae7df4f"
+        },
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "e7a58397-a49c-4344-bf07-968ffbf89633"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BP3LIIM"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+8801919815654"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 49361
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/in-complete-fields",
+            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePermanent"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/2da11e94-1a0d-4a77-8ab0-19f29f57a41a"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155"
+            }
+          }
+        ],
+        "lastModified": "2020-05-12T07:14:30.726Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REJECTED"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2020-05-12T07:14:30.935+00:00",
+          "versionId": "6baa2a7e-7f6e-4fa2-b015-7c5717c56486"
+        },
+        "id": "723621be-3f14-45fd-b045-2cf92a9643b6",
+        "note": [
+          {
+            "text": "reason=misspelling&comment=blah",
+            "time": "Tue, 12 May 2020 07:14:30 GMT",
+            "authorString": "Practitioner/2da11e94-1a0d-4a77-8ab0-19f29f57a41a"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Task/723621be-3f14-45fd-b045-2cf92a9643b6"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:3447/fhir/Task/723621be-3f14-45fd-b045-2cf92a9643b6/_history/d6dcd32a-8b85-4dd1-b77f-1bbf7168c92f",
+      "resource": {
+        "resourceType": "Task",
+        "status": "draft",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/d2a51773-c7c9-4c56-a37e-72452ae7df4f"
+        },
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "e7a58397-a49c-4344-bf07-968ffbf89633"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BP3LIIM"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+8801919815654"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 49361
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/in-complete-fields",
+            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePermanent"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/2a520dc1-0a9a-48a1-a4b8-66f3075a9155"
+            }
+          }
+        ],
+        "lastModified": "2020-05-12T07:11:22.273Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "IN_PROGRESS"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2020-05-12T07:11:22.533+00:00",
+          "versionId": "d6dcd32a-8b85-4dd1-b77f-1bbf7168c92f"
+        },
+        "id": "723621be-3f14-45fd-b045-2cf92a9643b6"
+      },
+      "request": { "method": "POST", "url": "Task" }
+    }
+  ]
+}

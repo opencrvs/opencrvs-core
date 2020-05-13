@@ -853,6 +853,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Birth Rejection",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "requestBody": true,
@@ -1334,6 +1348,20 @@
           "path": "",
           "pathTransform": "",
           "primary": true,
+          "username": "",
+          "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics -> Death Rejection",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
           "username": "",
           "password": ""
         }
