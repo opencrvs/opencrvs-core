@@ -185,23 +185,17 @@ export function goToPerformanceHome(state?: PerformanceHomeHistoryState) {
 }
 
 export function goToPerformanceReportList() {
-  return push(
-    formatUrl(PERFORMANCE_REPORT_LIST, {
-      reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
-    })
-  )
+  return push(PERFORMANCE_REPORT_LIST)
 }
 
 export function goToPerformanceReport(
   selectedLocation: ISearchLocation,
-  reportType: string,
   eventType: Event,
   timeStart: Date,
   timeEnd: Date
 ) {
   return push(PERFORMANCE_REPORT, {
     selectedLocation,
-    reportType,
     timeRange: { start: timeStart, end: timeEnd },
     eventType
   })

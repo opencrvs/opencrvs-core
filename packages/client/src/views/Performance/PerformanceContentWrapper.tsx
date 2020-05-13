@@ -10,20 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Header } from '@client/components/interface/Header/Header'
-import { messages } from '@client/i18n/messages/views/performance'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
-import { IconTab } from '@client/views/RegistrationHome/RegistrationHome'
-import { ICON_ALIGNMENT, CircleButton } from '@opencrvs/components/lib/buttons'
-import { TopBar } from '@opencrvs/components/lib/interface'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { Container, BodyContent } from '@opencrvs/components/lib/layout'
 import * as React from 'react'
-import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
-
-const TAB_ID = {
-  monthly: PERFORMANCE_REPORT_TYPE_MONTHLY
-}
 
 const Content = styled(BodyContent)`
   padding: 0px;
@@ -105,7 +96,7 @@ const HeaderText = styled.span`
 `
 function SubPageHeader(props: HeaderProps) {
   return (
-    <SubPageHeaderContainer>
+    <SubPageHeaderContainer id="sub-page-header">
       <SubPageHeaderBody>
         <CircleButton
           id={`${props.id}-action-back`}
@@ -123,23 +114,6 @@ function SubPageHeader(props: HeaderProps) {
 }
 
 export function PerformanceContentWrapper(props: PerformancePage) {
-  const intl = useIntl()
-  function renderTopBar() {
-    const { tabId } = props
-
-    return (
-      <TopBar id="top-bar">
-        <IconTab
-          id={`tab_${TAB_ID.monthly}`}
-          key={TAB_ID.monthly}
-          active={tabId === TAB_ID.monthly}
-          align={ICON_ALIGNMENT.LEFT}
-        >
-          {intl.formatMessage(messages.monthlyTabTitle)}
-        </IconTab>
-      </TopBar>
-    )
-  }
   let pageHeader: JSX.Element
   let pageContent: JSX.Element
   if (isSubPage(props)) {
@@ -161,7 +135,6 @@ export function PerformanceContentWrapper(props: PerformancePage) {
   return (
     <Container>
       {pageHeader}
-      {!props.hideTopBar && renderTopBar()}
       {pageContent}
     </Container>
   )

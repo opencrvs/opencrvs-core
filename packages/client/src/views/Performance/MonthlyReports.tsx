@@ -23,10 +23,7 @@ import {
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToPerformanceReport } from '@client/navigation'
-import {
-  PERFORMANCE_REPORT_TYPE_MONTHLY,
-  MONTHS_IN_YEAR
-} from '@client/utils/constants'
+import { MONTHS_IN_YEAR } from '@client/utils/constants'
 import { Header, getMonthDateRange } from '@client/views/Performance/utils'
 import { getToken } from '@client/utils/authUtils'
 import styled from '@client/styledComponents'
@@ -101,7 +98,6 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
-                PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()
