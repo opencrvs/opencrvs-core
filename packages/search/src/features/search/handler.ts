@@ -23,6 +23,7 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
 
+const MIGRATION_QUERY_SIZE = 100
 export async function searchDeclaration(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -119,7 +120,10 @@ export async function populateHierarchicalLocationIdsHandler(
       birth: 0,
       death: 0
     }
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
+    let form = 0
+    const size = MIGRATION_QUERY_SIZE
+
+    let allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
       ICompositionBody
     >> = await client.search(
       {
@@ -133,31 +137,59 @@ export async function populateHierarchicalLocationIdsHandler(
                 }
               }
             }
-          }
+          },
+          form,
+          size
         }
       },
       {
         ignore: [404]
       }
     )
-    const compositions =
-      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits ?? []
-    for (const composition of compositions) {
-      const body: ICompositionBody = composition._source
-      if (body && body.applicationLocationId) {
-        body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
-          body.applicationLocationId
-        )
-        await updateComposition(composition._id, body)
-        if (
-          body.event &&
-          body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
-        ) {
-          updatedCompositionCounts.death += 1
-        } else {
-          updatedCompositionCounts.birth += 1
+    let compositions =
+      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
+
+    while (compositions && compositions.length > 0) {
+      for (const composition of compositions) {
+        const body: ICompositionBody = composition._source
+        if (body && body.applicationLocationId) {
+          body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
+            body.applicationLocationId
+          )
+          await updateComposition(composition._id, body)
+          if (
+            body.event &&
+            body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
+          ) {
+            updatedCompositionCounts.death += 1
+          } else {
+            updatedCompositionCounts.birth += 1
+          }
         }
       }
+      form = form + size
+      allDocumentsWithoutHierarchicalLocations = await client.search(
+        {
+          index: 'ocrvs',
+          body: {
+            query: {
+              bool: {
+                must_not: {
+                  exists: {
+                    field: 'applicationLocationHirarchyIds'
+                  }
+                }
+              }
+            },
+            form,
+            size
+          }
+        },
+        {
+          ignore: [404]
+        }
+      )
+      compositions = allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
     }
     return h.response(updatedCompositionCounts).code(200)
   } catch (err) {

@@ -205,6 +205,9 @@ describe('Verify handlers', () => {
             { status: 200 }
           ]
         )
+        // @ts-ignore
+        jest.spyOn(client, 'search').mockResolvedValueOnce({})
+
         const res = await server.server.inject({
           method: 'POST',
           url: '/populateHierarchicalLocationIds',
