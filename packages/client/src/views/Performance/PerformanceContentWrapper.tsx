@@ -96,7 +96,7 @@ const HeaderText = styled.span`
 `
 function SubPageHeader(props: HeaderProps) {
   return (
-    <SubPageHeaderContainer>
+    <SubPageHeaderContainer id="sub-page-header">
       <SubPageHeaderBody>
         <CircleButton
           id={`${props.id}-action-back`}
