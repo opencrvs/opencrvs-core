@@ -80,7 +80,7 @@ export async function fetchLocationWiseApplicationsStarted(
             OR locationLevel3 = '${locationId}'
             OR locationLevel4 = '${locationId}'
             OR locationLevel5 = '${locationId}' )
-        AND role = 'NOTIFICATION_API_USER' OR role = 'API_USER'`
+        AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`
   )
 
   return {
