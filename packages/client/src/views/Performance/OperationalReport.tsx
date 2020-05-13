@@ -533,7 +533,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <StatusWiseApplicationCountView loading={true} />
+                      <StatusWiseApplicationCountView
+                        loading={true}
+                        intl={intl}
+                        locationId={locationId}
+                      />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
                   )
@@ -541,6 +545,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 return (
                   <StatusWiseApplicationCountView
                     loading={loading}
+                    locationId={locationId}
+                    intl={intl}
                     data={data && data.fetchRegistrationCountByStatus}
                     statusMapping={StatusMapping}
                     onClickStatusDetails={() =>

@@ -25,6 +25,10 @@ window.config = {
   CERTIFICATE_PRINT_LOWEST_CHARGE: 25, // taka
   CERTIFICATE_PRINT_HIGHEST_CHARGE: 50, // taka
   UI_POLLING_INTERVAL: 5000,
+  FIELD_AGENT_AUDIT_LOCATIONS:
+    'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
+  APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+  EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh'
 }

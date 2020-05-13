@@ -26,6 +26,10 @@ import {
   WrappedComponentProps
 } from 'react-intl'
 import styled from 'styled-components'
+import { getOfflineData } from '@client/offline/selectors'
+import { connect } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { getJurisidictionType } from '@client/utils/locationUtils'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -38,6 +42,8 @@ interface BaseProps {
   loading?: boolean
   statusMapping?: IStatusMapping
   onClickStatusDetails?: () => void
+  jurisdictionType?: string
+  locationId: string
 }
 
 const ContentHolder = styled.div`
@@ -113,9 +119,12 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             {intl.formatMessage(
               performanceMessages.applicationCountByStatusDescription
             )}{' '}
-            <LinkButton onClick={this.props.onClickStatusDetails}>
-              {intl.formatMessage(constantsMessages.viewAll)}
-            </LinkButton>
+            {window.config.APPLICATION_AUDIT_LOCATIONS.includes(this.props
+              .jurisdictionType as string) && (
+              <LinkButton onClick={this.props.onClickStatusDetails}>
+                {intl.formatMessage(constantsMessages.viewAll)}
+              </LinkButton>
+            )}
           </Description>
         </StatusHeader>
         {results.map((statusCount, index) => {
@@ -128,6 +137,10 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
                   )}
                   color={statusMapping![statusCount.status].color}
                   totalPoints={total}
+                  disabled={
+                    !window.config.APPLICATION_AUDIT_LOCATIONS.includes(this
+                      .props.jurisdictionType as string)
+                  }
                   currentPoints={statusCount.count}
                 />
               </StatusProgressBarWrapper>
@@ -153,6 +166,17 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
   }
 }
 
-export const StatusWiseApplicationCountView = injectIntl(
-  StatusWiseApplicationCountViewComponent
-)
+export const StatusWiseApplicationCountView = connect(
+  (state: IStoreState, ownProps: Props) => {
+    const offlineLocations = getOfflineData(state).locations
+    const jurisdictionType = getJurisidictionType(
+      offlineLocations,
+      ownProps.locationId
+    )
+    return {
+      ...ownProps,
+      jurisdictionType
+    }
+  },
+  null
+)(injectIntl(StatusWiseApplicationCountViewComponent))

@@ -27,6 +27,8 @@ interface Window {
     CERTIFICATE_PRINT_HIGHEST_CHARGE: number
     UI_POLLING_INTERVAL: number
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
+    FIELD_AGENT_AUDIT_LOCATIONS: string
+    APPLICATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
   }
