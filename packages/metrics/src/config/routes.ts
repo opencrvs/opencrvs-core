@@ -16,6 +16,7 @@ import {
   newBirthRegistrationHandler,
   markCertifiedHandler,
   markValidatedHandler,
+  markRejectedHandler,
   waitingValidationHandler,
   markDeathRegisteredHandler,
   newDeathRegistrationHandler,
@@ -187,6 +188,24 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/events/death/mark-certified',
       handler: markCertifiedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
+    // Mark rejected
+    {
+      method: 'POST',
+      path: '/events/birth/mark-voided',
+      handler: markRejectedHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/mark-voided',
+      handler: markRejectedHandler,
       config: {
         tags: ['api']
       }
