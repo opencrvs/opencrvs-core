@@ -119,6 +119,35 @@ export async function populateHierarchicalLocationIdsHandler(
       birth: 0,
       death: 0
     }
+    // Before retrieving all documents, we need to check the total count to make sure that the query will no tbe too large
+    // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
+    const resultCountCheck = await client.search(
+      {
+        index: 'ocrvs',
+        body: {
+          query: {
+            bool: {
+              must_not: {
+                exists: {
+                  field: 'applicationLocationHirarchyIds'
+                }
+              }
+            }
+          },
+          size: DEFAULT_SIZE
+        }
+      },
+      {
+        ignore: [404]
+      }
+    )
+    const count: number = resultCountCheck.body.hits.total
+    if (count > 5000) {
+      return internal(
+        'Elastic contains over 5000 results.  It is risky to return all without pagination.'
+      )
+    }
+    // If total count is less than 5000, then proceed.
     const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
       ICompositionBody
     >> = await client.search(
@@ -133,7 +162,8 @@ export async function populateHierarchicalLocationIdsHandler(
                 }
               }
             }
-          }
+          },
+          size: count
         }
       },
       {
@@ -141,7 +171,8 @@ export async function populateHierarchicalLocationIdsHandler(
       }
     )
     const compositions =
-      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits ?? []
+      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits
+
     for (const composition of compositions) {
       const body: ICompositionBody = composition._source
       if (body && body.applicationLocationId) {
@@ -159,6 +190,7 @@ export async function populateHierarchicalLocationIdsHandler(
         }
       }
     }
+
     return h.response(updatedCompositionCounts).code(200)
   } catch (err) {
     return internal(err)
