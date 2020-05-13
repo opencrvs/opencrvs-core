@@ -113,6 +113,7 @@ interface IConstantsMessages {
   registeredIn45d: MessageDescriptor
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
+  viewAll: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   applicantContactNumber: {
@@ -630,6 +631,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.timePeriod',
     defaultMessage: 'Time period',
     description: 'A label for Time period'
+  },
+  viewAll: {
+    id: 'constants.viewAll',
+    defaultMessage: 'View all',
+    description: 'Label for view all link'
   }
 }
 

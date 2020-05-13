@@ -238,6 +238,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        status: 'DECLARED',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'FIELD_AGENT'
       }
     })
@@ -264,6 +266,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        status: 'DECLARED',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'REGISTRATION_AGENT'
       }
     })
@@ -290,6 +294,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        status: 'DECLARED',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'REGISTRAR'
       }
     })
@@ -316,6 +322,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        status: 'DECLARED',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'FIELD_AGENT'
       }
     })
@@ -345,6 +353,8 @@ describe('Verify point generation', () => {
       },
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
+        status: 'DECLARED',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'NOTIFICATION_API_USER'
       }
     })

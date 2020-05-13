@@ -33,6 +33,8 @@ interface IPerformanceReportsMessages {
   overTime: MessageDescriptor
   byLocation: MessageDescriptor
   locationTitle: MessageDescriptor
+  applicationCountByStatusDescription: MessageDescriptor
+  workflowStatusHeader: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -144,6 +146,17 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.regRates.column.location',
     defaultMessage: 'Locations',
     description: 'Title for location column on estimation table'
+  },
+  applicationCountByStatusDescription: {
+    id: 'performance.operational.statusWiseCount.description',
+    defaultMessage:
+      'Current status of all applications being processed for your selected administrative area.',
+    description: 'Description of the status wise application count view'
+  },
+  workflowStatusHeader: {
+    id: 'performance.operational.workflowStatus.header',
+    defaultMessage: 'Current applications in workflow',
+    description: 'Header title for work flow status page'
   }
 }
 

@@ -60,6 +60,7 @@ export interface ICompositionBody {
   registrationNumber?: string
   eventLocationId?: string
   applicationLocationId?: string
+  applicationLocationHirarchyIds?: string[]
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]

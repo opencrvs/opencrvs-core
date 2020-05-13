@@ -36,7 +36,8 @@ import {
   updateInHearth,
   findEntryResourceByUrl,
   selectObservationEntry,
-  findEventLocation
+  findEventLocation,
+  getLocationHirarchyIDs
 } from '@search/features/fhir/fhir-utils'
 import { logger } from '@search/logger'
 import * as Hapi from 'hapi'
@@ -405,6 +406,9 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
+    body.applicationLocationId
+  )
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'birth-application'
 

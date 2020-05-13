@@ -118,6 +118,12 @@ export async function getPreviousTask(
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
+export function getPractionerIdFromTask(task: fhir.Task) {
+  return task?.extension
+    ?.find(ext => ext.url === 'http://opencrvs.org/specs/extension/regLastUser')
+    ?.valueReference?.reference?.split('/')?.[1]
+}
+
 export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
   if (!task.businessStatus || !task.businessStatus.coding) {
     return null

@@ -19,9 +19,21 @@ import {
   goToOperationalReport,
   goToPerformanceHome,
   goToPerformanceReport,
-  goToRegistrationRates
+  goToRegistrationRates,
+  goToWorkflowStatus
 } from '@client/navigation'
 import styled from '@client/styledComponents'
+import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import {
+  GQLEventEstimationMetrics,
+  GQLApplicationsStartedMetrics,
+  GQLRegistrationCountResult,
+  GQLRegStatus
+} from '@opencrvs/gateway/src/graphql/schema'
+import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
+import moment from 'moment'
 import {
   MONTHS_IN_YEAR,
   PERFORMANCE_REPORT_TYPE_MONTHLY
@@ -38,45 +50,63 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import { ListTable, ISearchLocation } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import {
-  GQLApplicationsStartedMetrics,
-  GQLEventEstimationMetrics
-} from '@opencrvs/gateway/src/graphql/schema'
-import { ApolloError } from 'apollo-client'
-import moment from 'moment'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
+import {
+  StatusWiseApplicationCountView,
+  IStatusMapping
+} from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
+import { colors } from '@opencrvs/components/lib/colors'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
+import { IOfflineData } from '@client/offline/reducer'
+import { generateLocations } from '@client/utils/locationUtils'
+import querystring from 'query-string'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 
+interface IConnectProps {
+  offlineLocations: IOfflineData['locations']
+}
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToOperationalReport: typeof goToOperationalReport
   goToPerformanceReport: typeof goToPerformanceReport
   goToRegistrationRates: typeof goToRegistrationRates
+  goToWorkflowStatus: typeof goToWorkflowStatus
 }
 
 interface IMetricsQueryResult {
   getEventEstimationMetrics: GQLEventEstimationMetrics
   getApplicationsStartedMetrics: GQLApplicationsStartedMetrics
+  fetchRegistrationCountByStatus: GQLRegistrationCountResult
 }
 export enum OPERATIONAL_REPORT_SECTION {
   OPERATIONAL = 'OPERATIONAL',
   REPORTS = 'REPORTS'
 }
 
+interface ISearchParams {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  locationId: string
+  timeStart: string
+  timeEnd: string
+}
+
 type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> &
+  RouteComponentProps &
+  IConnectProps &
   IDispatchProps & { theme: ITheme }
 
 interface State {
+  sectionId: OPERATIONAL_REPORT_SECTION
+  selectedLocation: ISearchLocation
   timeStart: moment.Moment
   timeEnd: moment.Moment
   expandStatusWindow: boolean
@@ -129,26 +159,75 @@ const Title = styled.div`
   }
 `
 
+export const StatusMapping: IStatusMapping = {
+  IN_PROGRESS: {
+    labelDescriptor: statusMessages.inProgress,
+    color: colors.inProgress
+  },
+  DECLARED: {
+    labelDescriptor: statusMessages.readyForReview,
+    color: colors.readyForReview
+  },
+  REJECTED: {
+    labelDescriptor: statusMessages.sentForUpdates,
+    color: colors.sentForUpdate
+  },
+  VALIDATED: {
+    labelDescriptor: statusMessages.sentForApprovals,
+    color: colors.waitingForApproval
+  },
+  WAITING_VALIDATION: {
+    labelDescriptor: statusMessages.sentForExternalValidation,
+    color: colors.waitingForExternalValidation
+  },
+  REGISTERED: {
+    labelDescriptor: statusMessages.readyToPrint,
+    color: colors.readyToPrint
+  }
+}
+
 class OperationalReportComponent extends React.Component<Props, State> {
+  static transformPropsToState(props: Props, state?: State) {
+    const {
+      location: { search }
+    } = props
+    const { timeStart, timeEnd, locationId, sectionId } = (querystring.parse(
+      search
+    ) as unknown) as ISearchParams
+    const searchableLocations = generateLocations(props.offlineLocations)
+    const selectedLocation = searchableLocations.find(
+      ({ id }) => id === locationId
+    ) as ISearchLocation
+
+    return {
+      sectionId,
+      selectedLocation,
+      timeStart: moment(timeStart),
+      timeEnd: moment(timeEnd),
+      expandStatusWindow: state ? state.expandStatusWindow : false,
+      statusWindowWidth: state ? state.statusWindowWidth : 0,
+      mainWindowRightMargin: state ? state.mainWindowRightMargin : 0
+    }
+  }
+
   constructor(props: Props) {
     super(props)
     moment.locale(this.props.intl.locale)
     moment.defaultFormat = 'MMMM YYYY'
-    const timeEnd = moment()
-    const timeStart = moment().subtract(1, 'years')
 
-    this.state = {
-      timeStart,
-      timeEnd,
-      expandStatusWindow: false,
-      statusWindowWidth: 0,
-      mainWindowRightMargin: 0
-    }
+    this.state = OperationalReportComponent.transformPropsToState(
+      props,
+      undefined
+    )
+  }
+
+  static getDerivedStateFromProps(props: Props, state: State) {
+    return OperationalReportComponent.transformPropsToState(props, state)
   }
 
   onChangeLocation = () => {
     this.props.goToPerformanceHome({
-      selectedLocation: this.props.history.location.state.selectedLocation
+      selectedLocation: this.state.selectedLocation
     })
   }
 
@@ -175,14 +254,14 @@ class OperationalReportComponent extends React.Component<Props, State> {
           <LinkButton
             onClick={() =>
               this.props.goToPerformanceReport(
-                this.props.history.location.state.selectedLocation!,
+                this.state.selectedLocation!,
                 PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()
               )
             }
-            disabled={!this.props.history.location.state.selectedLocation}
+            disabled={!this.state.selectedLocation}
           >
             {title}
           </LinkButton>
@@ -206,12 +285,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   onClickRegistrationRatesDetails = (event: Event, title: string) => {
-    const { selectedLocation } = this.props.history.location.state
-    const { timeStart, timeEnd } = this.state
+    const { selectedLocation, timeStart, timeEnd } = this.state
     this.props.goToRegistrationRates(
       event,
-      selectedLocation,
       title,
+      selectedLocation.id,
       timeStart.toDate(),
       timeEnd.toDate()
     )
@@ -221,7 +299,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: true,
-      statusWindowWidth: 400,
+      statusWindowWidth: 450,
       mainWindowRightMargin: 100
     })
   }
@@ -246,23 +324,18 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      intl,
-      history: {
-        location: {
-          state: { selectedLocation, sectionId }
-        }
-      }
-    } = this.props
+    const { intl } = this.props
 
-    const { displayLabel: title, id: locationId } = selectedLocation
     const {
+      selectedLocation,
+      sectionId,
       timeStart,
       timeEnd,
       expandStatusWindow,
       statusWindowWidth,
       mainWindowRightMargin
     } = this.state
+    const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <PerformanceContentWrapper hideTopBar>
         <Container marginRight={mainWindowRightMargin}>
@@ -280,7 +353,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
               <PerformanceSelect
                 onChange={option => {
                   this.props.goToOperationalReport(
-                    selectedLocation,
+                    selectedLocation.id,
                     option.value as OPERATIONAL_REPORT_SECTION
                   )
                 }}
@@ -301,10 +374,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 startDate={timeStart.toDate()}
                 endDate={timeEnd.toDate()}
                 onDatesChange={({ startDate, endDate }) => {
-                  this.setState({
-                    timeStart: moment(startDate),
-                    timeEnd: moment(endDate)
-                  })
+                  this.props.goToOperationalReport(
+                    selectedLocation.id,
+                    sectionId,
+                    startDate,
+                    endDate
+                  )
                 }}
               />
             </FilterContainer>
@@ -346,7 +421,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       reportTimeTo={timeEnd.format()}
                       onClickEventDetails={this.onClickRegistrationRatesDetails}
                     />
-
                     <ApplicationsStartedReport
                       loading={loading}
                       data={data && data.getApplicationsStartedMetrics}
@@ -384,7 +458,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 ]}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               />
-
               <ListTable
                 tableTitle={intl.formatMessage(constantsMessages.deaths)}
                 isLoading={false}
@@ -418,7 +491,46 @@ class OperationalReportComponent extends React.Component<Props, State> {
             crossClickHandler={this.statusWindowCrossClickHandler}
             title={this.getStatusWindowTitle()}
           >
-            {/* Todo Status window contents */}
+            <Query
+              query={FETCH_STATUS_WISE_REGISTRATION_COUNT}
+              variables={{
+                locationId,
+                status: [
+                  'IN_PROGRESS',
+                  'DECLARED',
+                  'REJECTED',
+                  'VALIDATED',
+                  'WAITING_VALIDATION',
+                  'REGISTERED'
+                ]
+              }}
+            >
+              {({
+                loading,
+                error,
+                data
+              }: {
+                loading: boolean
+                error?: ApolloError
+                data?: IMetricsQueryResult
+              }) => {
+                return (
+                  <StatusWiseApplicationCountView
+                    loading={loading}
+                    data={data && data.fetchRegistrationCountByStatus}
+                    statusMapping={StatusMapping}
+                    onClickStatusDetails={() =>
+                      this.props.goToWorkflowStatus(
+                        sectionId,
+                        locationId,
+                        timeStart.toDate(),
+                        timeEnd.toDate()
+                      )
+                    }
+                  />
+                )
+              }}
+            </Query>
           </ApplicationStatusWindow>
         )}
       </PerformanceContentWrapper>
@@ -426,12 +538,20 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 }
 
+function mapStateToProps(state: IStoreState) {
+  const offlineResources = getOfflineData(state)
+  return {
+    offlineLocations: offlineResources.locations
+  }
+}
+
 export const OperationalReport = connect(
-  null,
+  mapStateToProps,
   {
     goToPerformanceHome,
     goToOperationalReport,
     goToPerformanceReport,
-    goToRegistrationRates
+    goToRegistrationRates,
+    goToWorkflowStatus
   }
 )(withTheme(injectIntl(OperationalReportComponent)))

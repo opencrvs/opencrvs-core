@@ -31,6 +31,7 @@ describe('elasticsearch db helper', () => {
         }
       ],
       'applicationLocationId',
+      'applicationLocationHirarchyId',
       'createdBy',
       {
         event: 'EMPTY_STRING',
@@ -88,6 +89,15 @@ describe('elasticsearch db helper', () => {
             term: {
               'applicationLocationId.keyword': {
                 value: 'applicationLocationId',
+                // tslint:disable-next-line
+                boost: 2.0
+              }
+            }
+          },
+          {
+            term: {
+              'applicationLocationHirarchyIds.keyword': {
+                value: 'applicationLocationHirarchyId',
                 // tslint:disable-next-line
                 boost: 2.0
               }

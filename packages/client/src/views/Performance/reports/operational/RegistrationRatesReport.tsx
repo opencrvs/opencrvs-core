@@ -79,7 +79,7 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
-const LoaderBox = styled.span<{
+export const LoaderBox = styled.span<{
   width?: number
 }>`
   background: ${({ theme }) => theme.colors.background};

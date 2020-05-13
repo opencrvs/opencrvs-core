@@ -58,6 +58,7 @@ import { AppStore } from './store'
 import { OperationalReport } from '@client/views/Performance/OperationalReport'
 import { PerformanceHome } from '@client/views/Performance/PerformanceHome'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
+import { WorkflowStatus } from '@client//views/Performance/WorkflowStatus'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -311,6 +312,11 @@ export class App extends React.Component<IAppProps> {
                                               routes.EVENT_REGISTRATION_RATES
                                             }
                                             component={RegistrationRates}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.WORKFLOW_STATUS}
+                                            component={WorkflowStatus}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

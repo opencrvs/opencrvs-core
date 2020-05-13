@@ -21,6 +21,7 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import querystring from 'query-string'
 
 describe('OperationalReport tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -44,16 +45,13 @@ describe('OperationalReport tests', () => {
     const testComponent = await createTestComponent(
       <OperationalReport
         // @ts-ignore
-        history={{
-          location: {
-            state: {
-              selectedLocation: LOCATION_DHAKA_DIVISION,
-              sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL
-            },
-            pathname: OPERATIONAL_REPORT,
-            search: '',
-            hash: ''
-          }
+        location={{
+          search: querystring.stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
         }}
       />,
       store
@@ -106,14 +104,10 @@ describe('OperationalReport tests', () => {
       'Birth registration rate within 45 days of event'
     )
 
-    expect(history.location.state).toEqual({
-      selectedLocation: {
-        displayLabel: 'Dhaka Division',
-        id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-        searchableText: 'Dhaka'
-      },
-      timeEnd: new Date(1487076708000),
-      timeStart: new Date(1455454308000),
+    expect(querystring.parse(history.location.search)).toEqual({
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString(),
       title: 'Birth registration rate within 45 days of event'
     })
   })
@@ -125,9 +119,11 @@ describe('OperationalReport tests', () => {
     )
     performanceSelect.prop('onChange')({ label: 'Reports', value: 'REPORTS' })
     component.update()
-    expect(history.location.state).toEqual({
-      selectedLocation: LOCATION_DHAKA_DIVISION,
-      sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
+    expect(querystring.parse(history.location.search)).toEqual({
+      locationId: LOCATION_DHAKA_DIVISION.id,
+      sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
     })
   })
 
@@ -190,13 +186,13 @@ describe('OperationalReport tests', () => {
       expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
     })
 
-    it('clicking on any other preset range changes date along with label', async () => {
+    it('clicking on any other preset range changes date ranges in url', async () => {
       const dateRangePickerElement = await waitForElement(
         component,
         '#date-range-picker-action'
       )
       expect(dateRangePickerElement.hostNodes().text()).toBe('Last 12 months')
-
+      const previousQueryParams = history.location.search
       const last30DaysPresetButtonElement = await waitForElement(
         component,
         '#last30Days'
@@ -207,7 +203,7 @@ describe('OperationalReport tests', () => {
         '#date-range-confirm-action'
       )
       confirmButtonElement.hostNodes().simulate('click')
-      expect(dateRangePickerElement.hostNodes().text()).toBe('Last 30 days')
+      expect(history.location.search).not.toBe(previousQueryParams)
     })
   })
 })
@@ -233,16 +229,13 @@ describe('OperationalReport reports tests', () => {
     const testComponent = await createTestComponent(
       <OperationalReport
         // @ts-ignore
-        history={{
-          location: {
-            state: {
-              selectedLocation: LOCATION_DHAKA_DIVISION,
-              sectionId: OPERATIONAL_REPORT_SECTION.REPORTS
-            },
-            pathname: OPERATIONAL_REPORT,
-            search: '',
-            hash: ''
-          }
+        location={{
+          search: querystring.stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            sectionId: OPERATIONAL_REPORT_SECTION.REPORTS,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
         }}
       />,
       store

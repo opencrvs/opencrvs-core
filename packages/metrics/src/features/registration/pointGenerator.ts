@@ -46,7 +46,8 @@ import {
   getObservationValueByCode,
   isNotification,
   MANNER_OF_DEATH_CODE,
-  CAUSE_OF_DEATH_CODE
+  CAUSE_OF_DEATH_CODE,
+  getPractionerIdFromTask
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -305,10 +306,11 @@ export async function generateEventDurationPoint(
   }
 }
 
-export function generateTimeLoggedPoint(
+export async function generateTimeLoggedPoint(
   payload: fhir.Bundle,
+  authHeader: IAuthHeader,
   fromTask?: boolean
-): IPoints {
+): Promise<IPoints> {
   const currentTask = getTask(payload)
   let compositionId
   if (!fromTask) {
@@ -336,12 +338,14 @@ export function generateTimeLoggedPoint(
 
   const fields: ITimeLoggedFields = {
     timeSpentEditing: timeLoggedInSeconds,
+    practitionerId: getPractionerIdFromTask(currentTask),
     compositionId
   }
 
   const tags: ITimeLoggedTags = {
     currentStatus: getApplicationStatus(currentTask) as string,
-    eventType: getApplicationType(currentTask) as string
+    eventType: getApplicationType(currentTask) as string,
+    ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
@@ -387,6 +391,8 @@ export async function generateApplicationStartedPoint(
 
   const fields: IApplicationsStartedFields = {
     role,
+    status: getApplicationStatus(task),
+    practitionerId: getPractionerIdFromTask(task),
     compositionId: composition.id
   }
 

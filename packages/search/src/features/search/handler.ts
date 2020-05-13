@@ -17,7 +17,11 @@ import {
   DEFAULT_SIZE
 } from '@search/features/search/service'
 import { ISearchQuery } from '@search/features/search/types'
-import { client } from '@search/elasticsearch/client'
+import { client, ISearchResponse } from '@search/elasticsearch/client'
+import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
+import { ApiResponse } from '@elastic/elasticsearch'
+import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
+import { updateComposition } from '@search/elasticsearch/dbhelper'
 
 export async function searchDeclaration(
   request: Hapi.Request,
@@ -73,6 +77,89 @@ export async function getAllDocumentsHandler(
       }
     )
     return h.response(allDocuments).code(200)
+  } catch (err) {
+    return internal(err)
+  }
+}
+
+interface ICountQueryParam {
+  applicationLocationHirarchyId: string
+  status: string[]
+}
+
+export async function getStatusWiseRegistrationCountHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = request.payload as ICountQueryParam
+    const countResult: { status: string; count: number }[] = []
+    for (const regStatus of payload.status) {
+      const searchResult = await searchComposition({
+        applicationLocationHirarchyId: payload.applicationLocationHirarchyId,
+        status: [regStatus]
+      })
+      countResult.push({
+        status: regStatus,
+        count: searchResult?.body?.hits?.total || 0
+      })
+    }
+    return h.response(countResult).code(200)
+  } catch (err) {
+    return internal(err)
+  }
+}
+
+export async function populateHierarchicalLocationIdsHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const updatedCompositionCounts = {
+      birth: 0,
+      death: 0
+    }
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
+      ICompositionBody
+    >> = await client.search(
+      {
+        index: 'ocrvs',
+        body: {
+          query: {
+            bool: {
+              must_not: {
+                exists: {
+                  field: 'applicationLocationHirarchyIds'
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        ignore: [404]
+      }
+    )
+    const compositions =
+      allDocumentsWithoutHierarchicalLocations?.body?.hits?.hits ?? []
+    for (const composition of compositions) {
+      const body: ICompositionBody = composition._source
+      if (body && body.applicationLocationId) {
+        body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
+          body.applicationLocationId
+        )
+        await updateComposition(composition._id, body)
+        if (
+          body.event &&
+          body.event.toLowerCase() === EVENT.DEATH.toLowerCase()
+        ) {
+          updatedCompositionCounts.death += 1
+        } else {
+          updatedCompositionCounts.birth += 1
+        }
+      }
+    }
+    return h.response(updatedCompositionCounts).code(200)
   } catch (err) {
     return internal(err)
   }

@@ -2300,4 +2300,53 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have enough scope')
     })
   })
+
+  describe('fetchRegistrationCounts()', () => {
+    const response = [
+      {
+        status: 'IN_PROGRESS',
+        count: 5
+      },
+      {
+        status: 'DECLARED',
+        count: 3
+      },
+      {
+        status: 'VALIDATED',
+        count: 2
+      },
+      {
+        status: 'REGISTERED',
+        count: 5
+      }
+    ]
+
+    it('returns status wise registration counts', async () => {
+      fetch.mockResponseOnce(JSON.stringify(response))
+      const data = await resolvers.Query.fetchRegistrationCountByStatus(
+        {},
+        {
+          locationId: '123',
+          status: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
+        },
+        authHeaderRegCert
+      )
+      expect(data).toBeDefined()
+      expect(data.results).toEqual(response)
+      expect(data.total).toBe(15)
+    })
+
+    it("throws an error when the user doesn't have required scope", async () => {
+      expect(
+        resolvers.Query.fetchRegistrationCountByStatus(
+          {},
+          {
+            locationId: '123',
+            status: ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'REGISTERED']
+          },
+          authHeaderCertify
+        )
+      ).rejects.toThrowError('User does not have enough scope')
+    })
+  })
 })

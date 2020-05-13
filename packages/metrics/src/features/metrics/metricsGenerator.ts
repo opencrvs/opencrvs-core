@@ -618,10 +618,11 @@ export async function fetchEstimated45DayMetrics(
   authHeader: IAuthHeader
 ) {
   const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const points = await query(`SELECT
-                              COUNT(ageInDays) AS withIn45Day
+                              COUNT(${column}) AS withIn45Day
                               FROM ${measurement}
-                              WHERE ageInDays <= 45
+                              WHERE ${column} <= 45
                               AND time > '${timeFrom}'
                               AND time <= '${timeTo}'
                               AND ${currLocationLevel}='${currLocation}'
@@ -691,8 +692,9 @@ export async function getTotalNumberOfRegistrations(
   event: EVENT_TYPE
 ) {
   const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const totalRegistrationPoint: Registration[] = await query(
-    `SELECT COUNT(ageInDays) AS total
+    `SELECT COUNT(${column}) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
@@ -712,8 +714,9 @@ export async function fetchLocationWiseEventEstimations(
   authHeader: IAuthHeader
 ) {
   const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const registrationsIn45DaysPoints: IGroupedByGender[] = await query(
-    `SELECT COUNT(ageInDays) AS total
+    `SELECT COUNT(${column}) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
@@ -721,7 +724,7 @@ export async function fetchLocationWiseEventEstimations(
           OR locationLevel3 = '${locationId}'
           OR locationLevel4 = '${locationId}'
           OR locationLevel5 = '${locationId}' )
-      AND ageInDays <= 45
+      AND ${column} <= 45
     GROUP BY gender`
   )
 

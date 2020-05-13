@@ -26,6 +26,7 @@ import {
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS
 } from '@client/views/Performance/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
+import queryString from 'query-string'
 
 const LOCATION_DHAKA_DIVISION = {
   displayLabel: 'Dhaka Division',
@@ -118,6 +119,7 @@ describe('Registraion Rates tests', () => {
   let history: History<any>
 
   beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
@@ -133,18 +135,12 @@ describe('Registraion Rates tests', () => {
           url: ''
         }}
         // @ts-ignore
-        history={{
-          location: {
-            state: {
-              title: 'Birth registration rate within 45 days of event',
-              selectedLocation: LOCATION_DHAKA_DIVISION,
-              timeEnd: new Date(1487076708000),
-              timeStart: new Date(1455454308000)
-            },
-            pathname: EVENT_REGISTRATION_RATES,
-            search: '',
-            hash: ''
-          }
+        location={{
+          search: queryString.stringify({
+            locationId: LOCATION_DHAKA_DIVISION.id,
+            timeEnd: new Date(1487076708000).toISOString(),
+            timeStart: new Date(1455454308000).toISOString()
+          })
         }}
       />,
       store,
@@ -183,9 +179,32 @@ describe('Registraion Rates tests', () => {
     backAction.hostNodes().simulate('click')
     await flushPromises()
     expect(history.location.pathname).toBe('/performance/operations')
-    expect(history.location.state).toEqual({
+    expect(queryString.parse(history.location.search)).toEqual({
       sectionId: 'OPERATIONAL',
-      selectedLocation: LOCATION_DHAKA_DIVISION
+      locationId: LOCATION_DHAKA_DIVISION.id,
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
     })
+  })
+
+  it('clicking on any other preset range changes date ranges in url', async () => {
+    const dateRangePickerElement = await waitForElement(
+      component,
+      '#date-range-picker-action'
+    )
+    expect(dateRangePickerElement.hostNodes().text()).toBe('Last 12 months')
+    const previousQueryParams = history.location.search
+    dateRangePickerElement.hostNodes().simulate('click')
+    const last30DaysPresetButtonElement = await waitForElement(
+      component,
+      '#last30Days'
+    )
+    last30DaysPresetButtonElement.hostNodes().simulate('click')
+    const confirmButtonElement = await waitForElement(
+      component,
+      '#date-range-confirm-action'
+    )
+    confirmButtonElement.hostNodes().simulate('click')
+    expect(history.location.search).not.toBe(previousQueryParams)
   })
 })

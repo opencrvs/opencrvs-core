@@ -79,7 +79,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   searchButtonHandler = () => {
     this.state.selectedLocation &&
       this.props.goToOperationalReport(
-        this.state.selectedLocation,
+        this.state.selectedLocation.id,
         OPERATIONAL_REPORT_SECTION.OPERATIONAL
       )
   }

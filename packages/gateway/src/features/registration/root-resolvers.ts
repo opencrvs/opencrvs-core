@@ -25,9 +25,12 @@ import {
   updateFHIRTaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
-import { GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLStatusWiseRegistrationCount
+} from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { RESOURCES_URL, FHIR_URL } from '@gateway/constants'
+import { RESOURCES_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -165,6 +168,56 @@ export const resolvers: GQLResolver = {
           throw new Error(response.operationResult.error.errorMessage)
         } else {
           return response.data
+        }
+      } else {
+        return await Promise.reject(
+          new Error('User does not have enough scope')
+        )
+      }
+    },
+    async fetchRegistrationCountByStatus(
+      _,
+      { locationId, status },
+      authHeader
+    ) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate') ||
+        hasScope(authHeader, 'declare') ||
+        hasScope(authHeader, 'sysadmin')
+      ) {
+        const payload: {
+          applicationLocationHirarchyId: string
+          status: string[]
+        } = {
+          applicationLocationHirarchyId: locationId,
+          status: status as string[]
+        }
+        const results: GQLStatusWiseRegistrationCount[] = await fetch(
+          `${SEARCH_URL}statusWiseRegistrationCount`,
+          {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeader
+            }
+          }
+        ).then(data => data.json())
+        let total = 0
+        if (results && results.length > 0) {
+          total = results.reduce(
+            (totalCount, statusCount) => ({
+              count: totalCount.count + statusCount.count
+            }),
+            {
+              count: total
+            }
+          ).count
+        }
+        return {
+          results,
+          total
         }
       } else {
         return await Promise.reject(

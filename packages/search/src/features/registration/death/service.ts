@@ -30,7 +30,8 @@ import {
   findTask,
   findTaskExtension,
   findTaskIdentifier,
-  findEntryResourceByUrl
+  findEntryResourceByUrl,
+  getLocationHirarchyIDs
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from 'hapi'
 
@@ -367,6 +368,10 @@ async function createApplicationIndex(
     placeOfApplicationExtension.valueReference &&
     placeOfApplicationExtension.valueReference.reference &&
     placeOfApplicationExtension.valueReference.reference.split('/')[1]
+  body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
+    body.applicationLocationId
+  )
+
   body.compositionType =
     (compositionTypeCode && compositionTypeCode.code) || 'death-application'
 

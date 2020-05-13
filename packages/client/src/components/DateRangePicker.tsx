@@ -59,6 +59,7 @@ const PickerButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.smallButtonFocus};
   }
+  white-space: nowrap;
   padding: 0;
   height: 38px;
   background: transparent;

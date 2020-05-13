@@ -78,6 +78,7 @@ export function queryBuilder(
   gender: string,
   nameCombinations: INameCombination[],
   applicationLocationId: string,
+  applicationLocationHirarchyId: string,
   createdBy: string,
   filters: IFilter
 ) {
@@ -155,6 +156,18 @@ export function queryBuilder(
       term: {
         'applicationLocationId.keyword': {
           value: applicationLocationId,
+          // tslint:disable-next-line
+          boost: 2.0
+        }
+      }
+    })
+  }
+
+  if (applicationLocationHirarchyId !== EMPTY_STRING) {
+    must.push({
+      term: {
+        'applicationLocationHirarchyIds.keyword': {
+          value: applicationLocationHirarchyId,
           // tslint:disable-next-line
           boost: 2.0
         }
