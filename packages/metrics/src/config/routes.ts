@@ -28,7 +28,10 @@ import { metricsHandler } from '@metrics/features/metrics/handler'
 import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
-import { applicationsStartedHandler } from '@metrics/features/applicationsStarted/handler'
+import {
+  applicationsStartedHandler,
+  applicationStartedMetricsByPractitionersHandler
+} from '@metrics/features/applicationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { exportHandler } from '@metrics/features/export/handler'
 import { generateLegacyMetricsHandler } from '@metrics/features/legacy/handler'
@@ -306,6 +309,24 @@ export const getRoutes = () => {
           query: Joi.object({
             compositionId: Joi.string().required(),
             status: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
+    {
+      method: 'POST',
+      path: '/applicationStartedMetricsByPractitioners',
+      handler: applicationStartedMetricsByPractitionersHandler,
+      config: {
+        validate: {
+          payload: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string().required(),
+            event: Joi.string().optional(),
+            practitionerIds: Joi.array().required()
           })
         },
         tags: ['api']

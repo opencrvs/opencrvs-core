@@ -10,12 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import { query } from '@metrics/influxdb/client'
 import {
   TIME_FROM,
   TIME_TO,
   LOCATION_ID
 } from '@metrics/features/metrics/constants'
+import {
+  fetchLocationWiseApplicationsStarted,
+  getNumberOfAppStartedByPractitioners,
+  getNumberOfRejectedAppStartedByPractitioners,
+  getAvgTimeSpentOnAppByPractitioners
+} from '@metrics/features/applicationsStarted/service'
+import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export async function applicationsStartedHandler(
   request: Hapi.Request,
@@ -42,52 +48,116 @@ export async function applicationsStartedHandler(
   return applicationsStartedMetrics
 }
 
-export async function fetchLocationWiseApplicationsStarted(
-  timeFrom: string,
-  timeTo: string,
+interface IApplicationStartedMetricsPayload {
+  timeStart: string
+  timeEnd: string
   locationId: string
+  practitionerIds: string[]
+  event?: EVENT_TYPE
+}
+interface IApplicationStartedMetricsByPractitioner {
+  practitionerId: string
+  locationId: string
+  totalNumberOfApplicationStarted: number
+  averageTimeForDeclaredApplications: number
+  totalNumberOfInProgressAppStarted: number
+  totalNumberOfRejectedApplications: number
+}
+
+export async function applicationStartedMetricsByPractitionersHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
 ) {
-  const fieldAgent = await query(
-    `SELECT COUNT(role)
-        FROM applications_started
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND role = 'FIELD_AGENT'`
-  )
+  const {
+    timeStart,
+    timeEnd,
+    locationId,
+    practitionerIds,
+    event
+  } = request.payload as IApplicationStartedMetricsPayload
+  const locId = `Location/${locationId}`
+  let applicationStartedMetricsByPractitioners: IApplicationStartedMetricsByPractitioner[] = []
+  try {
+    const totalStarted = await getNumberOfAppStartedByPractitioners(
+      timeStart,
+      timeEnd,
+      locId,
+      event
+    )
+    const totalInProgressStarted = await getNumberOfAppStartedByPractitioners(
+      timeStart,
+      timeEnd,
+      locId,
+      event,
+      'IN_PROGRESS'
+    )
+    const totalRejectedStarted = await getNumberOfRejectedAppStartedByPractitioners(
+      timeStart,
+      timeEnd,
+      locId,
+      event
+    )
+    const avgTimesForCompleteApplications = await getAvgTimeSpentOnAppByPractitioners(
+      timeStart,
+      timeEnd,
+      locId,
+      'DECLARED',
+      event
+    )
 
-  const office = await query(
-    `SELECT COUNT(role)
-        FROM applications_started
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND ( role = 'REGISTRAR' OR role = 'REGISTRATION_AGENT' )`
-  )
-
-  const hospital = await query(
-    `SELECT COUNT(role)
-        FROM applications_started
-      WHERE time > '${timeFrom}'
-        AND time <= '${timeTo}'
-        AND ( locationLevel2 = '${locationId}'
-            OR locationLevel3 = '${locationId}'
-            OR locationLevel4 = '${locationId}'
-            OR locationLevel5 = '${locationId}' )
-        AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`
-  )
-
-  return {
-    fieldAgentApplications:
-      (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].count) || 0,
-    hospitalApplications:
-      (hospital && hospital.length > 0 && hospital[0].count) || 0,
-    officeApplications: (office && office.length > 0 && office[0].count) || 0
+    applicationStartedMetricsByPractitioners = practitionerIds.map(
+      practitionerId => {
+        const avgTimeSpentRecord = avgTimesForCompleteApplications?.find(
+          applicationStartedCount =>
+            applicationStartedCount.practitionerId === practitionerId
+        )
+        let averageTimeForDeclaredApplications = 0
+        if (
+          avgTimeSpentRecord &&
+          avgTimeSpentRecord.totalTimeSpent &&
+          avgTimeSpentRecord.totalTimeSpent > 0 &&
+          avgTimeSpentRecord.totalApplications &&
+          avgTimeSpentRecord.totalApplications > 0
+        ) {
+          averageTimeForDeclaredApplications = Math.round(
+            (avgTimeSpentRecord.totalTimeSpent /
+              avgTimeSpentRecord.totalApplications) *
+              100
+          )
+        }
+        return {
+          practitionerId,
+          locationId: locId,
+          totalNumberOfApplicationStarted:
+            totalStarted?.find(
+              applicationStartedCount =>
+                applicationStartedCount.practitionerId === practitionerId
+            )?.totalStarted || 0,
+          totalNumberOfInProgressAppStarted:
+            totalInProgressStarted?.find(
+              applicationStartedCount =>
+                applicationStartedCount.practitionerId === practitionerId
+            )?.totalStarted || 0,
+          totalNumberOfRejectedApplications:
+            totalRejectedStarted?.find(
+              applicationStartedCount =>
+                applicationStartedCount.startedBy === practitionerId
+            )?.totalStarted || 0,
+          averageTimeForDeclaredApplications
+        }
+      }
+    )
+  } catch (error) {
+    applicationStartedMetricsByPractitioners = practitionerIds.map(
+      practitionerId => ({
+        practitionerId,
+        locationId: locId,
+        totalNumberOfApplicationStarted: 0,
+        averageTimeForDeclaredApplications: 0,
+        totalNumberOfInProgressAppStarted: 0,
+        totalNumberOfRejectedApplications: 0
+      })
+    )
   }
+  return applicationStartedMetricsByPractitioners
 }
