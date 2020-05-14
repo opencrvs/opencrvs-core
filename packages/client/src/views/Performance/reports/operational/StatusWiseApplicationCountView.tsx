@@ -167,7 +167,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
 }
 
 export const StatusWiseApplicationCountView = connect(
-  (state: IStoreState, ownProps: Props) => {
+  (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
     const jurisdictionType = getJurisidictionType(
       offlineLocations,

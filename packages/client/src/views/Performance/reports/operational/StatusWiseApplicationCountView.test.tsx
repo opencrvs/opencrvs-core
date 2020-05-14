@@ -16,15 +16,21 @@ import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import { ReactWrapper } from 'enzyme'
+import * as locationUtils from '@client/utils/locationUtils'
 
 describe('Status wise registration count', () => {
   const { store } = createStore()
+  beforeEach(async () => {
+    jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
+  })
 
   it('renders loading indicator', async () => {
     const { component } = await createTestComponent(
       <StatusWiseApplicationCountView
         loading={true}
+        locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
+        jurisdictionType="UNION"
       />,
       store
     )
@@ -50,7 +56,9 @@ describe('Status wise registration count', () => {
       component = (await createTestComponent(
         <StatusWiseApplicationCountView
           data={data}
+          locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
           statusMapping={StatusMapping}
+          jurisdictionType="UNION"
         />,
         store
       )).component
