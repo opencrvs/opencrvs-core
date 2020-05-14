@@ -120,14 +120,13 @@ export async function applicationStartedMetricsByPractitionersHandler(
           avgTimeSpentRecord.totalApplications > 0
         ) {
           averageTimeForDeclaredApplications = Math.round(
-            (avgTimeSpentRecord.totalTimeSpent /
-              avgTimeSpentRecord.totalApplications) *
-              100
+            avgTimeSpentRecord.totalTimeSpent /
+              avgTimeSpentRecord.totalApplications
           )
         }
         return {
           practitionerId,
-          locationId: locId,
+          locationId,
           totalNumberOfApplicationStarted:
             totalStarted?.find(
               applicationStartedCount =>
@@ -151,7 +150,7 @@ export async function applicationStartedMetricsByPractitionersHandler(
     applicationStartedMetricsByPractitioners = practitionerIds.map(
       practitionerId => ({
         practitionerId,
-        locationId: locId,
+        locationId,
         totalNumberOfApplicationStarted: 0,
         averageTimeForDeclaredApplications: 0,
         totalNumberOfInProgressAppStarted: 0,

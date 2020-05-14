@@ -17,7 +17,7 @@ import * as service from '@metrics/features/applicationsStarted/service'
 
 const readPoints = influx.query as jest.Mock
 
-describe('verify applicationsStarted handler', () => {
+describe('verify applicationsStarted', () => {
   let server: any
   const token = jwt.sign(
     { scope: ['declare'] },
@@ -33,97 +33,222 @@ describe('verify applicationsStarted handler', () => {
     server = await createServer()
   })
 
-  it('returns ok for valid request', async () => {
+  describe('applicationsStartedHandler', () => {
+    it('returns ok for valid request', async () => {
+      readPoints
+        .mockResolvedValueOnce([
+          {
+            count: 2
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            count: 4
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            count: 2
+          }
+        ])
+
+      const res = await server.server.inject({
+        method: 'GET',
+        url:
+          '/applicationsStarted?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('returns 400 for required params', async () => {
+      const res = await server.server.inject({
+        method: 'GET',
+        url: '/applicationsStarted',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('returns counts', async () => {
+      readPoints
+        .mockResolvedValueOnce([
+          {
+            count: 2
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            count: 4
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            count: 2
+          }
+        ])
+
+      const res = await service.fetchLocationWiseApplicationsStarted(
+        '1552469068679',
+        '1554814894419',
+        '1490d3dd-71a9-47e8-b143-f9fc64f71294'
+      )
+
+      expect(res).toEqual({
+        fieldAgentApplications: 2,
+        hospitalApplications: 2,
+        officeApplications: 4
+      })
+    })
+
+    it('returns zero counts on influx error', async () => {
+      jest
+        .spyOn(service, 'fetchLocationWiseApplicationsStarted')
+        .mockImplementation(() => {
+          throw new Error()
+        })
+      const res = await server.server.inject({
+        method: 'GET',
+        url:
+          '/applicationsStarted?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      expect(res.result).toEqual({
+        fieldAgentApplications: 0,
+        hospitalApplications: 0,
+        officeApplications: 0
+      })
+    })
+  })
+  describe('applicationStartedMetricsByPractitionersHandler', () => {
+    it('returns ok for valid request', async () => {
+      readPoints
+        .mockResolvedValueOnce([
+          {
+            practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+            totalStarted: 14
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+            totalStarted: 4
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            startedBy: 'f361cae7-205a-4251-9f31-125118da1625',
+            totalStarted: 2
+          }
+        ])
+        .mockResolvedValueOnce([
+          {
+            practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+            totalApplications: 6,
+            totalTimeSpent: 874
+          }
+        ])
+
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/applicationStartedMetricsByPractitioners',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload: {
+          timeStart: '2019-03-31T18:00:00.000Z',
+          timeEnd: '2020-06-30T17:59:59.999Z',
+          locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+          practitionerIds: ['f361cae7-205a-4251-9f31-125118da1625']
+        }
+      })
+      expect(res.statusCode).toBe(200)
+    })
+  })
+  it('returns ok for specific events also', async () => {
     readPoints
       .mockResolvedValueOnce([
         {
-          count: 2
+          practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+          totalStarted: 8
         }
       ])
       .mockResolvedValueOnce([
         {
-          count: 4
+          practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+          totalStarted: 3
         }
       ])
       .mockResolvedValueOnce([
         {
-          count: 2
+          startedBy: 'f361cae7-205a-4251-9f31-125118da1625',
+          totalStarted: 2
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+          totalApplications: 4,
+          totalTimeSpent: 674
         }
       ])
 
     const res = await server.server.inject({
-      method: 'GET',
-      url:
-        '/applicationsStarted?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+      method: 'POST',
+      url: '/applicationStartedMetricsByPractitioners',
       headers: {
         Authorization: `Bearer ${token}`
+      },
+      payload: {
+        timeStart: '2019-03-31T18:00:00.000Z',
+        timeEnd: '2020-06-30T17:59:59.999Z',
+        locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+        practitionerIds: ['f361cae7-205a-4251-9f31-125118da1625'],
+        event: 'BIRTH'
       }
     })
-
     expect(res.statusCode).toBe(200)
   })
-
-  it('returns 400 for required params', async () => {
-    const res = await server.server.inject({
-      method: 'GET',
-      url: '/applicationsStarted',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-
-    expect(res.statusCode).toBe(400)
-  })
-
-  it('returns counts', async () => {
-    readPoints
-      .mockResolvedValueOnce([
-        {
-          count: 2
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          count: 4
-        }
-      ])
-      .mockResolvedValueOnce([
-        {
-          count: 2
-        }
-      ])
-
-    const res = await service.fetchLocationWiseApplicationsStarted(
-      '1552469068679',
-      '1554814894419',
-      '1490d3dd-71a9-47e8-b143-f9fc64f71294'
-    )
-
-    expect(res).toEqual({
-      fieldAgentApplications: 2,
-      hospitalApplications: 2,
-      officeApplications: 4
-    })
-  })
-
   it('returns zero counts on influx error', async () => {
     jest
-      .spyOn(service, 'fetchLocationWiseApplicationsStarted')
+      .spyOn(service, 'getNumberOfAppStartedByPractitioners')
       .mockImplementation(() => {
-        throw new Error()
+        throw new Error('')
       })
     const res = await server.server.inject({
-      method: 'GET',
-      url:
-        '/applicationsStarted?timeStart=1552469068679&timeEnd=1554814894419&locationId=1490d3dd-71a9-47e8-b143-f9fc64f71294',
+      method: 'POST',
+      url: '/applicationStartedMetricsByPractitioners',
       headers: {
         Authorization: `Bearer ${token}`
+      },
+      payload: {
+        timeStart: '2019-03-31T18:00:00.000Z',
+        timeEnd: '2020-06-30T17:59:59.999Z',
+        locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+        practitionerIds: ['f361cae7-205a-4251-9f31-125118da1625'],
+        event: 'BIRTH'
       }
     })
-    expect(res.result).toEqual({
-      fieldAgentApplications: 0,
-      hospitalApplications: 0,
-      officeApplications: 0
-    })
+    expect(res.statusCode).toBe(200)
+    expect(res.payload).toEqual(
+      JSON.stringify([
+        {
+          practitionerId: 'f361cae7-205a-4251-9f31-125118da1625',
+          locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+          totalNumberOfApplicationStarted: 0,
+          averageTimeForDeclaredApplications: 0,
+          totalNumberOfInProgressAppStarted: 0,
+          totalNumberOfRejectedApplications: 0
+        }
+      ])
+    )
   })
 })
