@@ -12,17 +12,33 @@
 import { query } from '@metrics/influxdb/client'
 
 export interface ITimeLoggedData {
+  status?: string
   timeSpentEditing: number
 }
 
 export async function getTimeLoggedByStatus(
   compositionId: string,
   status: string
-): Promise<ITimeLoggedData[]> {
-  return await query(
+): Promise<ITimeLoggedData> {
+  const timeLoggedData: ITimeLoggedData[] = await query(
     `SELECT timeSpentEditing
           FROM application_time_logged
         WHERE compositionId = '${compositionId}'
         AND currentStatus = '${status}'`
   )
+  return timeLoggedData && timeLoggedData.length > 0
+    ? timeLoggedData[0]
+    : // Send 0 if no logged data found for given status
+      { timeSpentEditing: 0 }
+}
+
+export async function getTimeLogged(
+  compositionId: string
+): Promise<ITimeLoggedData[]> {
+  const timeLoggedData: ITimeLoggedData[] = await query(
+    `SELECT currentStatus as status, timeSpentEditing
+          FROM application_time_logged
+        WHERE compositionId = '${compositionId}'`
+  )
+  return timeLoggedData && timeLoggedData.length > 0 ? timeLoggedData : []
 }
