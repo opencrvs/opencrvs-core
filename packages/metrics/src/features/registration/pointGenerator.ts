@@ -338,13 +338,13 @@ export async function generateTimeLoggedPoint(
 
   const fields: ITimeLoggedFields = {
     timeSpentEditing: timeLoggedInSeconds,
-    practitionerId: getPractionerIdFromTask(currentTask),
     compositionId
   }
 
   const tags: ITimeLoggedTags = {
     currentStatus: getApplicationStatus(currentTask) as string,
     eventType: getApplicationType(currentTask) as string,
+    practitionerId: getPractionerIdFromTask(currentTask),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -392,12 +392,12 @@ export async function generateApplicationStartedPoint(
   const fields: IApplicationsStartedFields = {
     role,
     status: getApplicationStatus(task),
-    practitionerId: getPractionerIdFromTask(task),
     compositionId: composition.id
   }
 
   const tags = {
     eventType: getApplicationType(task),
+    practitionerId: getPractionerIdFromTask(task),
     ...(await generatePointLocations(payload, authHeader))
   }
 
@@ -426,12 +426,12 @@ export async function generateRejectedPoints(
     throw new Error('compositionId not found')
   }
   const fields: IRejectedFields = {
-    startedBy: getStartedByFieldAgent(taskHistory),
     compositionId
   }
 
   const tags = {
     eventType: getApplicationType(task),
+    startedBy: getStartedByFieldAgent(taskHistory),
     ...(await generatePointLocations(payload, authHeader))
   }
 

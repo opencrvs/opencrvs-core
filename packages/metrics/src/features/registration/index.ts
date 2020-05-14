@@ -83,12 +83,12 @@ export interface ILocationTags {
 export interface ITimeLoggedFields {
   timeSpentEditing: number
   compositionId: string
-  practitionerId?: string
 }
 
 export interface ITimeLoggedTags {
   currentStatus: string
   eventType: string
+  practitionerId?: string
   locationLevel5?: string
   locationLevel4?: string
   locationLevel3?: string
@@ -158,12 +158,10 @@ export interface IApplicationsStartedFields {
   role: string
   status?: APPLICATION_STATUS | null
   compositionId: string
-  practitionerId?: string
 }
 
 export interface IRejectedFields {
   compositionId: string
-  startedBy: string
 }
 
 export interface IRejectedPoints {
