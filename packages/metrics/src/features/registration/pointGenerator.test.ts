@@ -231,6 +231,7 @@ describe('Verify point generation', () => {
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -239,7 +240,6 @@ describe('Verify point generation', () => {
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
         status: 'DECLARED',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'FIELD_AGENT'
       }
     })
@@ -259,6 +259,7 @@ describe('Verify point generation', () => {
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -267,7 +268,6 @@ describe('Verify point generation', () => {
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
         status: 'DECLARED',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'REGISTRATION_AGENT'
       }
     })
@@ -287,6 +287,7 @@ describe('Verify point generation', () => {
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -295,7 +296,6 @@ describe('Verify point generation', () => {
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
         status: 'DECLARED',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'REGISTRAR'
       }
     })
@@ -315,6 +315,7 @@ describe('Verify point generation', () => {
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -323,7 +324,6 @@ describe('Verify point generation', () => {
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
         status: 'DECLARED',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'FIELD_AGENT'
       }
     })
@@ -346,6 +346,7 @@ describe('Verify point generation', () => {
       measurement: 'applications_started',
       tags: {
         eventType: 'BIRTH',
+        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
@@ -354,7 +355,6 @@ describe('Verify point generation', () => {
       fields: {
         compositionId: '9f24f539-8126-4261-baa0-243eea374004',
         status: 'DECLARED',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
         role: 'NOTIFICATION_API_USER'
       }
     })
@@ -374,14 +374,14 @@ describe('Verify point generation', () => {
       measurement: 'applications_rejected',
       tags: {
         eventType: 'BIRTH',
+        startedBy: 'fe16875f-3e5f-47bc-85d6-16482a63e7df',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
         locationLevel5: 'Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8'
       },
       fields: {
-        compositionId: '81278acf-6105-435e-b1c2-91619c8cf6e1',
-        startedBy: 'Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df'
+        compositionId: '81278acf-6105-435e-b1c2-91619c8cf6e1'
       }
     })
   })

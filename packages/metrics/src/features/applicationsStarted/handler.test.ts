@@ -13,7 +13,7 @@ import { createServer } from '@metrics/index'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import * as handler from '@metrics/features/applicationsStarted/handler'
+import * as service from '@metrics/features/applicationsStarted/service'
 
 const readPoints = influx.query as jest.Mock
 
@@ -93,7 +93,7 @@ describe('verify applicationsStarted handler', () => {
         }
       ])
 
-    const res = await handler.fetchLocationWiseApplicationsStarted(
+    const res = await service.fetchLocationWiseApplicationsStarted(
       '1552469068679',
       '1554814894419',
       '1490d3dd-71a9-47e8-b143-f9fc64f71294'
@@ -108,7 +108,7 @@ describe('verify applicationsStarted handler', () => {
 
   it('returns zero counts on influx error', async () => {
     jest
-      .spyOn(handler, 'fetchLocationWiseApplicationsStarted')
+      .spyOn(service, 'fetchLocationWiseApplicationsStarted')
       .mockImplementation(() => {
         throw new Error()
       })

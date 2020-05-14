@@ -120,12 +120,12 @@ exports[`When an in-progress application is received writes the rejected points 
 Object {
   "fields": Object {
     "compositionId": "81278acf-6105-435e-b1c2-91619c8cf6e1",
-    "startedBy": "Practitioner/4bb03541-116e-4ce2-8ea4-407f307f7579",
   },
   "measurement": "applications_rejected",
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/acb24f46-83ec-45c3-b00f-5ded939ecfd8",
+    "startedBy": "4bb03541-116e-4ce2-8ea4-407f307f7579",
   },
 }
 `;
