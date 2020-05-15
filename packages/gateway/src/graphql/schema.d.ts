@@ -28,6 +28,7 @@ export interface GQLQuery {
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
+  searchFieldAgents?: GQLSearchFieldAgentResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
   getEventEstimationMetrics?: GQLEventEstimationMetrics
   getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
@@ -368,6 +369,7 @@ export interface GQLUser {
   localRegistrar: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
+  creationDate?: string
 }
 
 export interface GQLLocalRegistrar {
@@ -571,6 +573,24 @@ export interface GQLStatusWiseRegistrationCount {
 export interface GQLSearchUserResult {
   results?: Array<GQLUser | null>
   totalItems?: number
+}
+
+export interface GQLSearchFieldAgentResult {
+  results?: Array<GQLSearchFieldAgentResponse | null>
+  totalItems?: number
+}
+
+export interface GQLSearchFieldAgentResponse {
+  practitionerId?: string
+  fullName?: string
+  type?: string
+  status?: string
+  primaryOfficeId?: string
+  creationDate?: string
+  totalNumberOfApplicationStarted?: number
+  totalNumberOfInProgressAppStarted?: number
+  totalNumberOfRejectedApplications?: number
+  averageTimeForDeclaredApplications?: number
 }
 
 export interface GQLRegistrationMetrics {
@@ -1104,6 +1124,8 @@ export interface GQLResolver {
   RegistrationCountResult?: GQLRegistrationCountResultTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
+  SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
+  SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   RegistrationMetrics?: GQLRegistrationMetricsTypeResolver
   RegistrationGenderBasisMetrics?: GQLRegistrationGenderBasisMetricsTypeResolver
   GenderBasisDetailsMetrics?: GQLGenderBasisDetailsMetricsTypeResolver
@@ -1163,6 +1185,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
+  searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
   getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
@@ -1440,6 +1463,29 @@ export interface QueryToSearchUsersResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToSearchUsersArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToSearchFieldAgentsArgs {
+  locationId: string
+  status?: string
+  language?: string
+  timeStart: string
+  timeEnd: string
+  event?: string
+  count?: number
+  skip?: number
+  sort?: string
+}
+export interface QueryToSearchFieldAgentsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToSearchFieldAgentsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2357,6 +2403,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
   signature?: UserToSignatureResolver<TParent>
+  creationDate?: UserToCreationDateResolver<TParent>
 }
 
 export interface UserToIdResolver<TParent = any, TResult = any> {
@@ -2416,6 +2463,10 @@ export interface UserToIdentifierResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToSignatureResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToCreationDateResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -2820,6 +2871,116 @@ export interface SearchUserResultToResultsResolver<
 }
 
 export interface SearchUserResultToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSearchFieldAgentResultTypeResolver<TParent = any> {
+  results?: SearchFieldAgentResultToResultsResolver<TParent>
+  totalItems?: SearchFieldAgentResultToTotalItemsResolver<TParent>
+}
+
+export interface SearchFieldAgentResultToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResultToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
+  practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
+  fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
+  type?: SearchFieldAgentResponseToTypeResolver<TParent>
+  status?: SearchFieldAgentResponseToStatusResolver<TParent>
+  primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
+  creationDate?: SearchFieldAgentResponseToCreationDateResolver<TParent>
+  totalNumberOfApplicationStarted?: SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<
+    TParent
+  >
+  totalNumberOfInProgressAppStarted?: SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<
+    TParent
+  >
+  totalNumberOfRejectedApplications?: SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<
+    TParent
+  >
+  averageTimeForDeclaredApplications?: SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<
+    TParent
+  >
+}
+
+export interface SearchFieldAgentResponseToPractitionerIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToFullNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToPrimaryOfficeIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToCreationDateResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToTotalNumberOfApplicationStartedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToTotalNumberOfInProgressAppStartedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToTotalNumberOfRejectedApplicationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToAverageTimeForDeclaredApplicationsResolver<
   TParent = any,
   TResult = any
 > {

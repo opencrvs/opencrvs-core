@@ -66,6 +66,7 @@ type User {
   localRegistrar: LocalRegistrar!
   identifier: Identifier
   signature: Signature
+  creationDate: String
 }
 
 type SearchUserResult {
@@ -76,6 +77,24 @@ type SearchUserResult {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
+}
+
+type SearchFieldAgentResult {
+  results: [SearchFieldAgentResponse]
+  totalItems: Int
+}
+
+type SearchFieldAgentResponse {
+  practitionerId: String
+  fullName: String
+  type: String
+  status: String
+  primaryOfficeId: String
+  creationDate: String
+  totalNumberOfApplicationStarted: Int
+  totalNumberOfInProgressAppStarted: Int
+  totalNumberOfRejectedApplications: Int
+  averageTimeForDeclaredApplications: Int
 }
 
 type Query {
@@ -91,6 +110,17 @@ type Query {
     skip: Int
     sort: String
   ): SearchUserResult
+  searchFieldAgents(
+    locationId: String!
+    status: String
+    language: String
+    timeStart: String!
+    timeEnd: String!
+    event: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchFieldAgentResult
 }
 
 type Mutation {
