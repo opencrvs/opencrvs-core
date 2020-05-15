@@ -81,3 +81,15 @@ export function generateLocations(locations: { [key: string]: ILocation }) {
   )
   return generated
 }
+
+export function getJurisidictionType(
+  locations: { [key: string]: ILocation },
+  locationId: string
+): string {
+  const relevantLocation = Object.values(locations).filter(
+    (location: ILocation) => {
+      return location.id === locationId
+    }
+  )
+  return relevantLocation[0].jurisdictionType as string
+}

@@ -416,7 +416,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   return (
                     <>
                       <RegistrationRatesReport loading={true} />
-                      <ApplicationsStartedReport loading={true} />
+                      <ApplicationsStartedReport
+                        loading={true}
+                        locationId={locationId}
+                      />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
                   )
@@ -434,6 +437,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       />
                       <ApplicationsStartedReport
                         loading={loading}
+                        locationId={locationId}
                         data={data && data.getApplicationsStartedMetrics}
                         reportTimeFrom={timeStart.format()}
                         reportTimeTo={timeEnd.format()}
@@ -529,7 +533,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <StatusWiseApplicationCountView loading={true} />
+                      <StatusWiseApplicationCountView
+                        loading={true}
+                        locationId={locationId}
+                      />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
                   )
@@ -537,6 +544,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 return (
                   <StatusWiseApplicationCountView
                     loading={loading}
+                    locationId={locationId}
                     data={data && data.fetchRegistrationCountByStatus}
                     statusMapping={StatusMapping}
                     onClickStatusDetails={() =>
