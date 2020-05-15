@@ -881,6 +881,28 @@ export const getMetrics = (
     })
 }
 
+export const postMetrics = (
+  prefix: string,
+  payload: IMetricsParam,
+  authHeader: IAuthHeader
+) => {
+  return fetch(`${METRICS_URL}${prefix}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(`Metrics request failed: ${error.message}`)
+      )
+    })
+}
+
 export const getTimeLoggedByStatusFromMetrics = async (
   authHeader: IAuthHeader,
   compositionId: string,
