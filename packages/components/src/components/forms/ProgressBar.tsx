@@ -19,11 +19,12 @@ const HeaderWrapper = styled.div`
   padding-bottom: 5px;
 `
 
-const TitleLink = styled.div`
-  cursor: pointer;
+const TitleLink = styled.div<{ disabled?: boolean }>`
+  ${({ disabled }) => (disabled ? '' : 'cursor: pointer;')};
   ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.primary};
-  text-decoration: underline;
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.copy : theme.colors.primary};
+  ${({ disabled }) => (disabled ? '' : 'text-decoration: underline')};
 `
 const ValueHolder = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -53,6 +54,7 @@ interface IProgressBarProps {
   shape?: ProgressBarShape
   totalPoints?: number
   currentPoints?: number
+  disabled?: boolean
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
@@ -69,7 +71,8 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
       shape = 'square',
       totalPoints = 0,
       currentPoints = 0,
-      loading = false
+      loading = false,
+      disabled = false
     } = this.props
     const percentage =
       totalPoints === 0 || currentPoints === 0
@@ -79,9 +82,15 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
       <>
         {(!loading && (
           <HeaderWrapper>
-            <TitleLink onClick={this.props.onClick || this.defaultClickHadler}>
-              {title}
-            </TitleLink>
+            {!disabled ? (
+              <TitleLink
+                onClick={this.props.onClick || this.defaultClickHadler}
+              >
+                {title}
+              </TitleLink>
+            ) : (
+              <TitleLink disabled={disabled}>{title}</TitleLink>
+            )}
             <ValueHolder>
               <Value>{currentPoints}</Value>{' '}
               <Percentage>({percentage}%)</Percentage>

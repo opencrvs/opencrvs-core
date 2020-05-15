@@ -14,13 +14,21 @@ import { ApplicationsStartedReport } from './ApplicationsStartedReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import * as locationUtils from '@client/utils/locationUtils'
 
 describe('Registration rates report', () => {
   const { store } = createStore()
+  beforeEach(async () => {
+    jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
+  })
 
   it('renders loading indicator', async () => {
     const { component } = await createTestComponent(
-      <ApplicationsStartedReport loading={true} />,
+      <ApplicationsStartedReport
+        loading={true}
+        locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
+        jurisdictionType="UNION"
+      />,
       store
     )
 
@@ -39,7 +47,11 @@ describe('Registration rates report', () => {
       officeApplications: 2
     }
     const { component } = await createTestComponent(
-      <ApplicationsStartedReport data={data} />,
+      <ApplicationsStartedReport
+        data={data}
+        locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
+        jurisdictionType="UNION"
+      />,
       store
     )
 
