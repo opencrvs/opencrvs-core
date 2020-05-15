@@ -17,7 +17,6 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
   goToOperationalReport,
@@ -33,16 +32,10 @@ import {
   PerformancePageVariant
 } from '@client/views/Performance/PerformanceContentWrapper'
 import {
-  ActionContainer,
-  FilterContainer,
   getJurisidictionType,
-  Header
+  FilterContainer
 } from '@client/views/Performance/utils'
-import {
-  ICON_ALIGNMENT,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { ArrowBack, MapPin } from '@opencrvs/components/lib/icons'
+import { MapPin } from '@opencrvs/components/lib/icons'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   GQLMonthWise45DayEstimation,
@@ -65,9 +58,6 @@ import {
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
 
 const { useState } = React
-const NavigationActionContainer = styled.div`
-  margin-top: 24px;
-`
 
 export enum REG_RATE_BASE {
   TIME = 'TIME',

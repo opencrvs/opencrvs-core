@@ -12,7 +12,6 @@
 import * as React from 'react'
 import { createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { Header } from './utils'
 import { createStore } from '@client/store'
 import { Report } from './Report'
 import { PERFORMANCE_METRICS } from '@client/views/Performance/metricsQuery'
@@ -186,7 +185,6 @@ describe('Report page', () => {
               displayLabel: 'Chittagong Divison',
               searchableText: 'Chittagong'
             },
-            reportType: 'weekly',
             eventType: Event.BIRTH,
             timeRange: {
               start: timeStart,
@@ -203,123 +201,9 @@ describe('Report page', () => {
   it('loads with page title from given time range from props', () => {
     expect(
       testComponent
-        .find(Header)
+        .find('#reports-header')
         .first()
         .text()
     ).toBe('December 2019')
-  })
-
-  it('loads and renders data from query after selecting a location', async () => {
-    const locationSearchInput = await waitForElement(
-      testComponent,
-      '#locationSearchInput'
-    )
-
-    locationSearchInput.hostNodes().simulate('change', {
-      target: { id: 'locationSearchInput', value: 'Chittagong' }
-    })
-
-    locationSearchInput.update()
-
-    testComponent
-      .find('#locationOption8cbc862a-b817-4c29-a490-4a8767ff023c')
-      .hostNodes()
-      .simulate('click')
-
-    testComponent.update()
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.update()
-
-    const genderMetricsTable = await waitForElement(
-      testComponent,
-      '#listTable-genderBasisMetrics'
-    )
-
-    const timeFramesTable = await waitForElement(
-      testComponent,
-      '#listTable-timeFrames'
-    )
-
-    const estimated45DayRegistrationsTable = await waitForElement(
-      testComponent,
-      '#listTable-estimated45DayRegistrations'
-    )
-
-    const paymentsTable = await waitForElement(
-      testComponent,
-      '#listTable-payments'
-    )
-
-    expect(genderMetricsTable.hostNodes()).toHaveLength(1)
-    expect(timeFramesTable.hostNodes()).toHaveLength(1)
-    expect(estimated45DayRegistrationsTable.hostNodes()).toHaveLength(1)
-    expect(paymentsTable.hostNodes()).toHaveLength(1)
-
-    const totalValueOfGenderMetrics = genderMetricsTable
-      .find('#row_0')
-      .find('span')
-      .at(5)
-      .text()
-
-    const totalValueOfTimeFrames = timeFramesTable
-      .find('#row_0')
-      .find('span')
-      .at(5)
-      .text()
-
-    const percentageOfEstimatedRegistration = estimated45DayRegistrationsTable
-      .find('#row_0')
-      .find('span')
-      .at(3)
-      .text()
-
-    const totalValueOfPayments = paymentsTable
-      .find('#row_0')
-      .find('span')
-      .at(1)
-      .text()
-
-    expect(totalValueOfGenderMetrics).toBe('2')
-    expect(totalValueOfTimeFrames).toBe('2')
-    expect(percentageOfEstimatedRegistration).toBe('2%')
-    expect(totalValueOfPayments).toBe('200')
-  })
-
-  it('renders no data found for location if no data found from query', async () => {
-    const locationSearchInput = await waitForElement(
-      testComponent,
-      '#locationSearchInput'
-    )
-
-    locationSearchInput.hostNodes().simulate('change', {
-      target: { id: 'locationSearchInput', value: 'Barisal' }
-    })
-
-    locationSearchInput.update()
-
-    testComponent
-      .find('#locationOptiondabffdf7-c174-4450-b306-5a3c2c0e2c0e')
-      .hostNodes()
-      .simulate('click')
-
-    testComponent.update()
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.update()
-    const noResultsReports = await waitForElement(
-      testComponent,
-      '#noResults-reports'
-    )
-    expect(noResultsReports.hostNodes()).toHaveLength(1)
-    expect(noResultsReports.hostNodes().text()).toContain(
-      'No data for BARISAL District, Barisal'
-    )
   })
 })

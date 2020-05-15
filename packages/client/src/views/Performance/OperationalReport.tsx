@@ -31,10 +31,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import {
-  MONTHS_IN_YEAR,
-  PERFORMANCE_REPORT_TYPE_MONTHLY
-} from '@client/utils/constants'
+import { MONTHS_IN_YEAR } from '@client/utils/constants'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
@@ -258,7 +255,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
             onClick={() =>
               this.props.goToPerformanceReport(
                 this.state.selectedLocation!,
-                PERFORMANCE_REPORT_TYPE_MONTHLY,
                 eventType,
                 start.toDate(),
                 end.toDate()

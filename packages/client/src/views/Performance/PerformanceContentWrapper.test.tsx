@@ -12,8 +12,10 @@
 import * as React from 'react'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import { PerformanceContentWrapper } from './PerformanceContentWrapper'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
+import {
+  PerformanceContentWrapper,
+  PerformancePageVariant
+} from './PerformanceContentWrapper'
 import { ReactWrapper } from 'enzyme'
 
 describe('Performance content wrapper', () => {
@@ -24,39 +26,18 @@ describe('Performance content wrapper', () => {
 
     beforeAll(async () => {
       app = (await createTestComponent(
-        <PerformanceContentWrapper tabId={PERFORMANCE_REPORT_TYPE_MONTHLY} />,
+        <PerformanceContentWrapper
+          type={PerformancePageVariant.SUBPAGE}
+          headerTitle="Subpage"
+          backActionHandler={() => {}}
+        />,
         store
       )).component
       app.update()
     })
 
-    it('loads all the tabs', () => {
-      expect(app.find('#tab_monthly').hostNodes()).toHaveLength(1)
-    })
-
-    it('sets active status to selected tab', () => {
-      expect(
-        app
-          .find('#tab_monthly')
-          .first()
-          .prop('active')
-      ).toBeTruthy()
-    })
-  })
-
-  describe('No top bar', () => {
-    let app: ReactWrapper
-
-    beforeAll(async () => {
-      app = (await createTestComponent(
-        <PerformanceContentWrapper hideTopBar={true} />,
-        store
-      )).component
-      app.update()
-    })
-
-    it('hides the top bar', () => {
-      expect(app.find('#top-bar').hostNodes()).toHaveLength(0)
+    it('shows sub page variant', () => {
+      expect(app.find('#sub-page-header').hostNodes()).toHaveLength(1)
     })
   })
 })

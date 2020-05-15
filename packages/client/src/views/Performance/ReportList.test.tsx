@@ -11,7 +11,6 @@
  */
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { ReportList } from './ReportList'
@@ -25,17 +24,7 @@ describe('Report list', () => {
     beforeAll(async () => {
       app = (await createTestComponent(
         // @ts-ignore
-        <ReportList
-          match={{
-            params: {
-              reportType: PERFORMANCE_REPORT_TYPE_MONTHLY
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          history={history}
-        />,
+        <ReportList history={history} />,
         store
       )).component
       app.update()
