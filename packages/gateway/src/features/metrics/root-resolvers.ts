@@ -24,6 +24,7 @@ export interface IMetricsParam {
   timeEnd: string
   locationId: string
   event?: string
+  practitionerIds?: string[]
 }
 
 export const resolvers: GQLResolver = {

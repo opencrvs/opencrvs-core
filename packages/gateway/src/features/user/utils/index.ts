@@ -15,6 +15,7 @@ import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
 import { IAuthHeader } from '@gateway/common-types'
 import * as decode from 'jwt-decode'
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 
 export interface ITokenPayload {
   sub: string
@@ -79,4 +80,9 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export function getFullName(user: IUserModelData, language: string) {
+  const localName = user.name.find(name => name.use === language)
+  return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
 }

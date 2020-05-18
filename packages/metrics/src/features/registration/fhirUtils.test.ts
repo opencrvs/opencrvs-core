@@ -1226,7 +1226,7 @@ describe('fhirUtils', () => {
     const taskHistory = require('./test-data/task-history.json')
 
     expect(getStartedByFieldAgent(taskHistory)).toEqual(
-      'Practitioner/fe16875f-3e5f-47bc-85d6-16482a63e7df'
+      'fe16875f-3e5f-47bc-85d6-16482a63e7df'
     )
   })
   it('throws error if no task associated with declared or in progress application ', () => {

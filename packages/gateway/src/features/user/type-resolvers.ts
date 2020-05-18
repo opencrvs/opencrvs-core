@@ -19,15 +19,21 @@ import {
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
 
-interface IUserModelData {
+export interface IUserModelData {
   _id: string
   username: string
-  name: string
+  name: {
+    use: string
+    family: string
+    given: string[]
+  }[]
   scope?: string[]
   email: string
   mobile: string
   status: string
   role: string
+  type: string
+  creationDate?: string
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
@@ -43,16 +49,10 @@ export interface IUserPayload
     | 'status'
     | 'practitionerId'
     | 'username'
-    | 'name'
     | 'identifiers'
   > {
   id?: string
   identifiers: GQLUserIdentifierInput[]
-  name: {
-    use: string
-    family: string
-    given: string[]
-  }[]
   role: string
   type: string
   signature?: GQLSignatureInput

@@ -13,15 +13,22 @@ import {
   GQLResolver,
   GQLUserInput,
   GQLHumanNameInput,
-  GQLUserIdentifierInput
+  GQLUserIdentifierInput,
+  GQLSearchFieldAgentResponse
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   IUserSearchPayload,
-  IUserPayload
+  IUserPayload,
+  IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { hasScope, isTokenOwner } from '@gateway/features/user/utils'
+import {
+  hasScope,
+  isTokenOwner,
+  getFullName
+} from '@gateway/features/user/utils'
+import { postMetrics } from '@gateway/features/fhir/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -91,6 +98,96 @@ export const resolvers: GQLResolver = {
         }
       })
       return await res.json()
+    },
+
+    async searchFieldAgents(
+      _,
+      {
+        locationId,
+        language = 'en',
+        status = null,
+        timeStart,
+        timeEnd,
+        event,
+        count = 10,
+        skip = 0,
+        sort = 'desc'
+      },
+      authHeader
+    ) {
+      // Only sysadmin should be able to search field agents
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error('Search field agents is only allowed for sysadmin')
+        )
+      }
+
+      let payload: IUserSearchPayload = {
+        locationId,
+        role: 'FIELD_AGENT',
+        count,
+        skip,
+        sortOrder: sort
+      }
+      if (status) {
+        payload = { ...payload, status }
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+      const userResponse = await res.json()
+      if (!userResponse || !userResponse.results || !userResponse.totalItems) {
+        throw new Error('Invalid result found from search user endpoint')
+      }
+      // Loading metrics data by practitioner ids
+      const metricsForPractitioners = await postMetrics(
+        '/applicationStartedMetricsByPractitioners',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event,
+          practitionerIds: userResponse.results.map(
+            (user: IUserModelData) => user.practitionerId
+          )
+        },
+        authHeader
+      )
+
+      const fieldAgentList: GQLSearchFieldAgentResponse[] = userResponse.results.map(
+        (user: IUserModelData) => {
+          const metricsData = metricsForPractitioners.find(
+            (metricsForPractitioner: { practitionerId: string }) =>
+              metricsForPractitioner.practitionerId === user.practitionerId
+          )
+          return {
+            practitionerId: user.practitionerId,
+            fullName: getFullName(user, language),
+            type: user.type,
+            status: user.status,
+            primaryOfficeId: user.primaryOfficeId,
+            creationDate: user?.creationDate,
+            totalNumberOfApplicationStarted:
+              metricsData?.totalNumberOfApplicationStarted ?? 0,
+            totalNumberOfInProgressAppStarted:
+              metricsData?.totalNumberOfInProgressAppStarted ?? 0,
+            totalNumberOfRejectedApplications:
+              metricsData?.totalNumberOfRejectedApplications ?? 0,
+            averageTimeForDeclaredApplications:
+              metricsData?.averageTimeForDeclaredApplications ?? 0
+          }
+        }
+      )
+
+      return {
+        results: fieldAgentList,
+        totalItems: userResponse.totalItems
+      }
     }
   },
 
