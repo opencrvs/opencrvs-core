@@ -44,17 +44,16 @@ import {
   SYS_ADMIN_HOME_TAB,
   VERIFY_COLLECTOR,
   EVENT_REGISTRATION_RATES,
-  WORKFLOW_STATUS
+  WORKFLOW_STATUS,
+  PERFORMANCE_FIELD_AGENT_LIST
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import { Cmd, loop } from 'redux-loop'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 import querystring from 'query-string'
 import moment from 'moment'
-import { GQLRegStatus } from '@opencrvs/gateway/src/graphql/schema'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -378,6 +377,21 @@ export function goToRegistrationRates(
       title,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
+    })
+  })
+}
+
+export function goToFieldAgentList(
+  locationId: string,
+  timeStart: string,
+  timeEnd: string
+) {
+  return push({
+    pathname: PERFORMANCE_FIELD_AGENT_LIST,
+    search: querystring.stringify({
+      locationId,
+      timeStart,
+      timeEnd
     })
   })
 }
