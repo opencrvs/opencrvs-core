@@ -35,6 +35,7 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
   searchEvents?: GQLEventSearchResultSet
+  getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
 }
 
@@ -760,6 +761,7 @@ export interface GQLEventSearchSetNameMap {
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
+  contactRelationship?: string
   dateOfApplication?: GQLDate
   trackingId?: string
   registrationNumber?: string
@@ -783,6 +785,30 @@ export interface GQLOperationHistorySearchSet {
   notificationFacilityAlias?: Array<string | null>
   rejectReason?: string
   rejectComment?: string
+}
+
+export interface GQLEventProgressResultSet {
+  results?: Array<GQLEventProgressSet | null>
+  totalItems?: number
+}
+
+export interface GQLEventProgressSet {
+  id: string
+  type?: string
+  name?: Array<GQLHumanName | null>
+  dateOfEvent?: GQLDate
+  registration?: GQLRegistrationSearchSet
+  startedBy?: GQLUser
+  progressReport?: GQLEventProgressData
+}
+
+export interface GQLEventProgressData {
+  timeInProgress?: number
+  timeInReadyForReview?: number
+  timeInRequiresUpdates?: number
+  timeInWaitingForApproval?: number
+  timeInWaitingForBRIS?: number
+  timeInReadyToPrint?: number
 }
 
 export interface GQLRole {
@@ -1154,6 +1180,9 @@ export interface GQLResolver {
 
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
+  EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
+  EventProgressSet?: GQLEventProgressSetTypeResolver
+  EventProgressData?: GQLEventProgressDataTypeResolver
   Role?: GQLRoleTypeResolver
   Mutation?: GQLMutationTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
@@ -1198,6 +1227,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
     TParent
   >
   searchEvents?: QueryToSearchEventsResolver<TParent>
+  getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
 }
 
@@ -1596,6 +1626,24 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToSearchEventsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetEventsWithProgressArgs {
+  locationIds?: Array<string | null>
+  count?: number
+  skip?: number
+  sort?: string
+}
+export interface QueryToGetEventsWithProgressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetEventsWithProgressArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3753,6 +3801,9 @@ export interface GQLEventSearchSetTypeResolver<TParent = any> {
 export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   status?: RegistrationSearchSetToStatusResolver<TParent>
   contactNumber?: RegistrationSearchSetToContactNumberResolver<TParent>
+  contactRelationship?: RegistrationSearchSetToContactRelationshipResolver<
+    TParent
+  >
   dateOfApplication?: RegistrationSearchSetToDateOfApplicationResolver<TParent>
   trackingId?: RegistrationSearchSetToTrackingIdResolver<TParent>
   registrationNumber?: RegistrationSearchSetToRegistrationNumberResolver<
@@ -3777,6 +3828,13 @@ export interface RegistrationSearchSetToStatusResolver<
 }
 
 export interface RegistrationSearchSetToContactNumberResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToContactRelationshipResolver<
   TParent = any,
   TResult = any
 > {
@@ -3938,6 +3996,134 @@ export interface OperationHistorySearchSetToRejectReasonResolver<
 }
 
 export interface OperationHistorySearchSetToRejectCommentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventProgressResultSetTypeResolver<TParent = any> {
+  results?: EventProgressResultSetToResultsResolver<TParent>
+  totalItems?: EventProgressResultSetToTotalItemsResolver<TParent>
+}
+
+export interface EventProgressResultSetToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressResultSetToTotalItemsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventProgressSetTypeResolver<TParent = any> {
+  id?: EventProgressSetToIdResolver<TParent>
+  type?: EventProgressSetToTypeResolver<TParent>
+  name?: EventProgressSetToNameResolver<TParent>
+  dateOfEvent?: EventProgressSetToDateOfEventResolver<TParent>
+  registration?: EventProgressSetToRegistrationResolver<TParent>
+  startedBy?: EventProgressSetToStartedByResolver<TParent>
+  progressReport?: EventProgressSetToProgressReportResolver<TParent>
+}
+
+export interface EventProgressSetToIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToNameResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToDateOfEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToStartedByResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToProgressReportResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEventProgressDataTypeResolver<TParent = any> {
+  timeInProgress?: EventProgressDataToTimeInProgressResolver<TParent>
+  timeInReadyForReview?: EventProgressDataToTimeInReadyForReviewResolver<
+    TParent
+  >
+  timeInRequiresUpdates?: EventProgressDataToTimeInRequiresUpdatesResolver<
+    TParent
+  >
+  timeInWaitingForApproval?: EventProgressDataToTimeInWaitingForApprovalResolver<
+    TParent
+  >
+  timeInWaitingForBRIS?: EventProgressDataToTimeInWaitingForBRISResolver<
+    TParent
+  >
+  timeInReadyToPrint?: EventProgressDataToTimeInReadyToPrintResolver<TParent>
+}
+
+export interface EventProgressDataToTimeInProgressResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressDataToTimeInReadyForReviewResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressDataToTimeInRequiresUpdatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressDataToTimeInWaitingForApprovalResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressDataToTimeInWaitingForBRISResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressDataToTimeInReadyToPrintResolver<
   TParent = any,
   TResult = any
 > {

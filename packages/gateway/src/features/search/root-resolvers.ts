@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
+import { ApiResponse } from '@elastic/elasticsearch'
 import { postSearch } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -112,6 +112,51 @@ export const resolvers: GQLResolver = {
       }
       if (userId) {
         searchCriteria.createdBy = userId
+      }
+
+      const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
+        authHeader,
+        searchCriteria
+      )
+      return {
+        totalItems:
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.total) ||
+          0,
+        results:
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.hits) ||
+          []
+      }
+    },
+    async getEventsWithProgress(
+      _,
+      { locationIds, count, skip, sort = 'desc' },
+      authHeader
+    ) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error('User does not have a sysadmin scope')
+        )
+      }
+
+      const searchCriteria: ISearchCriteria = {
+        sort
+      }
+      if (locationIds) {
+        if (locationIds.length <= 0 || locationIds.includes('')) {
+          return await Promise.reject(new Error('Invalid location id'))
+        }
+        searchCriteria.applicationLocationId = locationIds.join(',')
+      }
+
+      if (count) {
+        searchCriteria.size = count
+      }
+      if (skip) {
+        searchCriteria.from = skip
       }
 
       const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(
