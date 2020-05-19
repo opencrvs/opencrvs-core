@@ -162,6 +162,13 @@ const TableScroller = styled.div<{
     border-radius: 10px;
   }
 `
+const TableHeaderWrapper = styled.div`
+  padding-right: 10px;
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
 }>`
@@ -208,6 +215,9 @@ export class ListTable extends React.Component<
     sortKey: null
   }
 
+  headerRef = React.createRef<HTMLDivElement>()
+  tableScrollerRef = React.createRef<HTMLDivElement>()
+
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
       this.props.onPageChange(currentPage)
@@ -242,6 +252,15 @@ export class ListTable extends React.Component<
     return true
   }
 
+  onScrollRowWrapper = (event: React.UIEvent<HTMLDivElement>) => {
+    if (this.headerRef.current) {
+      this.headerRef.current.scrollLeft =
+        (this.tableScrollerRef.current &&
+          this.tableScrollerRef.current.scrollLeft) ||
+        0
+    }
+  }
+
   render() {
     const {
       id,
@@ -258,6 +277,7 @@ export class ListTable extends React.Component<
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
+
     return (
       <>
         <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
@@ -291,43 +311,46 @@ export class ListTable extends React.Component<
               </TableHeader>
             </>
           )}
-
-          {!isLoading && (
-            <TableScroller height={tableHeight}>
-              <div>
-                <TableHeader>
-                  {columns.map((preference, index) => (
-                    <ContentWrapper
-                      key={index}
-                      id={`${preference.key}-label`}
-                      width={preference.width}
-                      alignment={preference.alignment}
-                      sortable={preference.isSortable}
-                      onClick={() =>
-                        preference.isSortable &&
-                        preference.sortFunction &&
-                        this.invertSortIcon(preference.key) &&
-                        preference.sortFunction(preference.key)
-                      }
-                    >
-                      <TableHeaderText isSortable={preference.isSortable}>
-                        {preference.label}
-                        {preference.isSortable && (
-                          <ToggleSortIcon
-                            toggle={
-                              this.state.sortIconInverted &&
-                              this.state.sortKey === preference.key
-                            }
-                          >
-                            {preference.icon}
-                          </ToggleSortIcon>
-                        )}
-                      </TableHeaderText>
-                    </ContentWrapper>
-                  ))}
-                </TableHeader>
-              </div>
+          {!isLoading && content.length > 0 && (
+            <TableHeaderWrapper ref={this.headerRef}>
+              <TableHeader>
+                {columns.map((preference, index) => (
+                  <ContentWrapper
+                    key={index}
+                    id={`${preference.key}-label`}
+                    width={preference.width}
+                    alignment={preference.alignment}
+                    sortable={preference.isSortable}
+                    onClick={() =>
+                      preference.isSortable &&
+                      preference.sortFunction &&
+                      this.invertSortIcon(preference.key) &&
+                      preference.sortFunction(preference.key)
+                    }
+                  >
+                    <TableHeaderText isSortable={preference.isSortable}>
+                      {preference.label}
+                      <ToggleSortIcon
+                        toggle={
+                          this.state.sortIconInverted &&
+                          this.state.sortKey === preference.key
+                        }
+                      >
+                        {preference.icon}
+                      </ToggleSortIcon>
+                    </TableHeaderText>
+                  </ContentWrapper>
+                ))}
+              </TableHeader>
               <Line width={totalWidth} />
+            </TableHeaderWrapper>
+          )}
+          {!isLoading && (
+            <TableScroller
+              height={tableHeight}
+              ref={this.tableScrollerRef}
+              onScroll={this.onScrollRowWrapper}
+            >
               <TableBody
                 footerColumns={
                   (footerColumns && footerColumns.length > 0) || false
