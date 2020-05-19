@@ -66,6 +66,11 @@ import {
 } from '@gateway/graphql/schema'
 import { reduce } from 'lodash'
 
+export interface ITimeLoggedResponse {
+  status?: string
+  timeSpentEditing: number
+}
+
 export function findCompositionSectionInBundle(
   code: string,
   fhirBundle: ITemplatedBundle
@@ -903,12 +908,12 @@ export const postMetrics = (
     })
 }
 
-export const getTimeLoggedByStatusFromMetrics = async (
+export const getTimeLoggedFromMetrics = async (
   authHeader: IAuthHeader,
   compositionId: string,
-  status: string
-) => {
-  const params = new URLSearchParams({ compositionId, status })
+  status?: string
+): Promise<ITimeLoggedResponse | ITimeLoggedResponse[]> => {
+  const params = new URLSearchParams({ compositionId })
   return fetch(`${METRICS_URL}/timeLogged?` + params, {
     method: 'GET',
     headers: {
