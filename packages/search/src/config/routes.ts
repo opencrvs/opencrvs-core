@@ -64,7 +64,12 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.VALIDATE,
+            RouteScope.REGISTER,
+            RouteScope.SYSADMIN
+          ]
         },
         description: 'Handles searching from applications'
       }
