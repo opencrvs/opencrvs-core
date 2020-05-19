@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { grid } from '../../grid'
 import { Pagination } from '../DataTable/Pagination'
 import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 
@@ -38,7 +37,8 @@ const TableHeader = styled.div<{
 }>`
   color: ${({ theme }) => theme.colors.copy};
   padding: 10px 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+  display: flex;
+  align-items: flex-end;
 
   & span:first-child {
     padding-left: 12px;
@@ -52,6 +52,11 @@ const TableHeader = styled.div<{
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+const Line = styled.div<{ width: number }>`
+  width: ${({ width }) => (Boolean(width) ? width : 100)}%;
+  background: ${({ theme }) => theme.colors.disabled};
+  height: 1px;
 `
 const TableHeaderText = styled.div<{
   isSortable?: boolean
@@ -72,7 +77,6 @@ const RowWrapper = styled.div`
   display: flex;
   align-items: center;
   min-height: 48px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
 
   & span:first-child {
     padding-left: 12px;
@@ -101,7 +105,7 @@ const ContentWrapper = styled.span<{
   sortable?: boolean
 }>`
   width: ${({ width }) => width}%;
-  display: inline-block;
+  flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
@@ -114,6 +118,7 @@ const ValueWrapper = styled.span<{
 }>`
   width: ${({ width }) => width}%;
   display: flex;
+  flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
@@ -159,6 +164,10 @@ const TableScroller = styled.div<{
 `
 const TableHeaderWrapper = styled.div`
   padding-right: 10px;
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
@@ -193,7 +202,6 @@ interface IListTableProps {
 }
 
 interface IListTableState {
-  width: number
   sortIconInverted: boolean
   sortKey: string | null
 }
@@ -203,21 +211,12 @@ export class ListTable extends React.Component<
   IListTableState
 > {
   state = {
-    width: window.innerWidth,
     sortIconInverted: false,
     sortKey: null
   }
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
+  headerRef = React.createRef<HTMLDivElement>()
+  tableScrollerRef = React.createRef<HTMLDivElement>()
 
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
@@ -253,6 +252,15 @@ export class ListTable extends React.Component<
     return true
   }
 
+  onScrollRowWrapper = (event: React.UIEvent<HTMLDivElement>) => {
+    if (this.headerRef.current) {
+      this.headerRef.current.scrollLeft =
+        (this.tableScrollerRef.current &&
+          this.tableScrollerRef.current.scrollLeft) ||
+        0
+    }
+  }
+
   render() {
     const {
       id,
@@ -267,8 +275,8 @@ export class ListTable extends React.Component<
       hideBoxShadow,
       footerColumns
     } = this.props
-    const { width } = this.state
     const totalItems = this.props.totalItems || 0
+    const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
 
     return (
       <>
@@ -303,8 +311,8 @@ export class ListTable extends React.Component<
               </TableHeader>
             </>
           )}
-          {!isLoading && content.length > 0 && width > grid.breakpoints.lg && (
-            <TableHeaderWrapper>
+          {!isLoading && content.length > 0 && (
+            <TableHeaderWrapper ref={this.headerRef}>
               <TableHeader>
                 {columns.map((preference, index) => (
                   <ContentWrapper
@@ -334,10 +342,15 @@ export class ListTable extends React.Component<
                   </ContentWrapper>
                 ))}
               </TableHeader>
+              <Line width={totalWidth} />
             </TableHeaderWrapper>
           )}
           {!isLoading && (
-            <TableScroller height={tableHeight}>
+            <TableScroller
+              height={tableHeight}
+              ref={this.tableScrollerRef}
+              onScroll={this.onScrollRowWrapper}
+            >
               <TableBody
                 footerColumns={
                   (footerColumns && footerColumns.length > 0) || false
@@ -346,22 +359,25 @@ export class ListTable extends React.Component<
                 {this.getDisplayItems(currentPage, pageSize, content).map(
                   (item, index) => {
                     return (
-                      <RowWrapper key={index} id={'row_' + index}>
-                        {columns.map((preference, indx) => {
-                          return (
-                            <ValueWrapper
-                              key={indx}
-                              width={preference.width}
-                              alignment={preference.alignment}
-                              color={preference.color}
-                            >
-                              {item[preference.key] || (
-                                <Error>{preference.errorValue}</Error>
-                              )}
-                            </ValueWrapper>
-                          )
-                        })}
-                      </RowWrapper>
+                      <div key={index}>
+                        <RowWrapper id={'row_' + index}>
+                          {columns.map((preference, indx) => {
+                            return (
+                              <ValueWrapper
+                                key={indx}
+                                width={preference.width}
+                                alignment={preference.alignment}
+                                color={preference.color}
+                              >
+                                {item[preference.key] || (
+                                  <Error>{preference.errorValue}</Error>
+                                )}
+                              </ValueWrapper>
+                            )
+                          })}
+                        </RowWrapper>
+                        <Line width={totalWidth} />
+                      </div>
                     )
                   }
                 )}
