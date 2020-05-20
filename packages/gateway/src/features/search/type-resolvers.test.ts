@@ -517,4 +517,230 @@ describe('Search type resolvers', () => {
       ])
     })
   })
+  describe('type resolvers for EventProgressSet', () => {
+    it('returns id', () => {
+      const id = searchTypeResolvers.EventProgressSet.id({
+        _id: 'dummy_id'
+      })
+
+      expect(id).toEqual('dummy_id')
+    })
+    it('returns event type', () => {
+      const type = searchTypeResolvers.EventProgressSet.type({
+        _source: {
+          event: 'Birth'
+        }
+      })
+
+      expect(type).toEqual('Birth')
+    })
+    it('returns child name', () => {
+      const childName = searchTypeResolvers.EventProgressSet.name({
+        _source: {
+          event: 'Birth',
+          childFirstNames: 'Jon',
+          childFamilyName: 'Doe',
+          childFirstNamesLocal: 'জন',
+          childFamilyNameLocal: 'ডো'
+        }
+      })
+      expect(childName).toEqual([
+        {
+          use: 'en',
+          given: ['Jon'],
+          family: ['Doe']
+        },
+        {
+          use: 'bn',
+          given: ['জন'],
+          family: ['ডো']
+        }
+      ])
+    })
+    it('returns deceased name', () => {
+      const deceasedName = searchTypeResolvers.EventProgressSet.name({
+        _source: {
+          event: 'Death',
+          deceasedFirstNames: 'Jon',
+          deceasedFamilyName: 'Doe',
+          deceasedFirstNamesLocal: 'জন',
+          deceasedFamilyNameLocal: 'ডো'
+        }
+      })
+      expect(deceasedName).toEqual([
+        {
+          use: 'en',
+          given: ['Jon'],
+          family: ['Doe']
+        },
+        {
+          use: 'bn',
+          given: ['জন'],
+          family: ['ডো']
+        }
+      ])
+    })
+    it('returns date of birth', () => {
+      const dateOfBirth = searchTypeResolvers.EventProgressSet.dateOfEvent({
+        _source: {
+          event: 'Birth',
+          childDoB: '01-01-2019'
+        }
+      })
+      expect(dateOfBirth).toEqual('01-01-2019')
+    })
+    it('returns date of death', () => {
+      const dateOfDeath = searchTypeResolvers.EventProgressSet.dateOfEvent({
+        _source: {
+          event: 'Death',
+          deathDate: '01-01-2019'
+        }
+      })
+      expect(dateOfDeath).toEqual('01-01-2019')
+    })
+    it('return whole _source for registration', () => {
+      const registration = searchTypeResolvers.EventProgressSet.registration({
+        _id: 'dummy_id',
+        _source: {
+          event: 'Birth'
+        }
+      })
+      expect(registration).toEqual({
+        event: 'Birth'
+      })
+    })
+    it('return user model data', async () => {
+      fetch.resetMocks()
+      fetch.mockResponse(
+        JSON.stringify({
+          id: 'dummy_user_id'
+        })
+      )
+      const userModelData = await searchTypeResolvers.EventProgressSet.startedBy(
+        {
+          _source: {
+            createdBy: 'dummy_practioner_id'
+          }
+        },
+        {},
+        {
+          Authorization: 'dummy_token'
+        }
+      )
+      expect(userModelData).toEqual({
+        id: 'dummy_user_id'
+      })
+    })
+    it('return progress report', async () => {
+      fetch.resetMocks()
+      fetch.mockResponse(
+        JSON.stringify([
+          {
+            time: '123',
+            status: 'dummy_status_1',
+            timeSpentEditing: '50'
+          },
+
+          {
+            time: '456',
+            status: 'dummy_status_2',
+            timeSpentEditing: '100'
+          }
+        ])
+      )
+      const progressReport = await searchTypeResolvers.EventProgressSet.progressReport(
+        {
+          _id: 'dummy_id'
+        },
+        {},
+        {
+          Authorization: 'dummy_token'
+        }
+      )
+      expect(progressReport).toEqual([
+        {
+          time: '123',
+          status: 'dummy_status_1',
+          timeSpentEditing: '50'
+        },
+
+        {
+          time: '456',
+          status: 'dummy_status_2',
+          timeSpentEditing: '100'
+        }
+      ])
+    })
+  })
+  describe('type resolvers for EventProgressData', () => {
+    const timeLoggedData = [
+      {
+        time: 1,
+        status: 'IN_PROGRESS',
+        timeSpentEditing: 50
+      },
+
+      {
+        time: 2,
+        status: 'DECLARED',
+        timeSpentEditing: 100
+      },
+      {
+        time: 3,
+        status: 'REJECTED',
+        timeSpentEditing: 150
+      },
+      {
+        time: 4,
+        status: 'VALIDATED',
+        timeSpentEditing: 200
+      },
+      {
+        time: 5,
+        status: 'WAITING_FOR_VALIDATION',
+        timeSpentEditing: 250
+      },
+      {
+        time: 6,
+        status: 'REGISTERED',
+        timeSpentEditing: 300
+      }
+    ]
+    it('return time in progress', () => {
+      const timeInProgress = searchTypeResolvers.EventProgressData.timeInProgress(
+        timeLoggedData
+      )
+      expect(timeInProgress).toEqual(50)
+    })
+    it('return time in ready for review', () => {
+      const timeInReadyForReview = searchTypeResolvers.EventProgressData.timeInReadyForReview(
+        timeLoggedData
+      )
+      expect(timeInReadyForReview).toEqual(100)
+    })
+    it('return time in requires updates', () => {
+      const timeInRequiresUpdates = searchTypeResolvers.EventProgressData.timeInRequiresUpdates(
+        timeLoggedData
+      )
+      expect(timeInRequiresUpdates).toEqual(150)
+    })
+    it('return time in waiting for approval', () => {
+      const timeInWaitingForApproval = searchTypeResolvers.EventProgressData.timeInWaitingForApproval(
+        timeLoggedData
+      )
+      expect(timeInWaitingForApproval).toEqual(200)
+    })
+    it('return time in waiting for BRIS', () => {
+      const timeInWaitingForBRIS = searchTypeResolvers.EventProgressData.timeInWaitingForBRIS(
+        timeLoggedData
+      )
+      expect(timeInWaitingForBRIS).toEqual(250)
+    })
+    it('return time in ready to print', () => {
+      const timeInReadyToPrint = searchTypeResolvers.EventProgressData.timeInReadyToPrint(
+        timeLoggedData
+      )
+      expect(timeInReadyToPrint).toEqual(300)
+    })
+  })
 })
