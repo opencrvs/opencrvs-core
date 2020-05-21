@@ -66,6 +66,10 @@ export const FilterContainer = styled.div`
     margin-right: 8px;
   }
 
+  & > :nth-child(3) {
+    margin-right: 8px;
+  }
+
   & > :last-child {
     margin-right: 0;
   }

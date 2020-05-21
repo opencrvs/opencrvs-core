@@ -384,7 +384,8 @@ export function goToRegistrationRates(
 export function goToFieldAgentList(
   locationId: string,
   timeStart: string,
-  timeEnd: string
+  timeEnd: string,
+  event?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,

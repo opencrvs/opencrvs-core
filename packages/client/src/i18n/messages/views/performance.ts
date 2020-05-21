@@ -36,6 +36,7 @@ interface IPerformanceReportsMessages {
   applicationCountByStatusDescription: MessageDescriptor
   workflowStatusHeader: MessageDescriptor
   fieldAgentsTitle: MessageDescriptor
+  fieldAgentsNoResult: MessageDescriptor
   fieldAgentColumnHeader: MessageDescriptor
   typeColumnHeader: MessageDescriptor
   officeColumnHeader: MessageDescriptor
@@ -44,6 +45,13 @@ interface IPerformanceReportsMessages {
   totalInProgressColumnHeader: MessageDescriptor
   avgCompletionTimeColumnHeader: MessageDescriptor
   totalRejectedColumnHeader: MessageDescriptor
+  fieldAgentStatusOptionActive: MessageDescriptor
+  fieldAgentStatusOptionPending: MessageDescriptor
+  fieldAgentStatusOptionDeactive: MessageDescriptor
+  eventOptionForBoth: MessageDescriptor
+  eventOptionForBirths: MessageDescriptor
+  eventOptionForDeaths: MessageDescriptor
+  showMoreUsersLinkLabel: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -172,9 +180,14 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'Field agnets',
     description: 'Header title for field agent list page'
   },
+  fieldAgentsNoResult: {
+    id: 'performance.fieldAgents.noResult',
+    defaultMessage: 'No users found',
+    description: 'Text for no field agent found'
+  },
   fieldAgentColumnHeader: {
     id: 'performance.fieldAgents.columnHeader.name',
-    defaultMessage: 'Field agnets ({totalAgents})',
+    defaultMessage: 'Field agents ({totalAgents})',
     description: 'Column header for field agent'
   },
   typeColumnHeader: {
@@ -214,6 +227,41 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'Rejected',
     description:
       'Column header for total rejected applications in field agent list'
+  },
+  fieldAgentStatusOptionActive: {
+    id: 'performance.fieldAgents.options.status.active',
+    defaultMessage: 'Active',
+    description: 'Label for active status option'
+  },
+  fieldAgentStatusOptionPending: {
+    id: 'performance.fieldAgents.options.status.pending',
+    defaultMessage: 'Pending',
+    description: 'Label for pending status option'
+  },
+  fieldAgentStatusOptionDeactive: {
+    id: 'performance.fieldAgents.options.status.deactive',
+    defaultMessage: 'Deactive',
+    description: 'Label for deactive status option'
+  },
+  eventOptionForBoth: {
+    id: 'performance.fieldAgents.options.event.both',
+    defaultMessage: 'Births and deaths',
+    description: 'Label for both event option'
+  },
+  eventOptionForBirths: {
+    id: 'performance.fieldAgents.options.event.births',
+    defaultMessage: 'Births',
+    description: 'Label for birth event option'
+  },
+  eventOptionForDeaths: {
+    id: 'performance.fieldAgents.options.event.deaths',
+    defaultMessage: 'Deaths',
+    description: 'Label for death event option'
+  },
+  showMoreUsersLinkLabel: {
+    id: 'performance.fieldAgents.showMore',
+    defaultMessage: 'Show next {pageSize}',
+    description: 'Label for show more link'
   }
 }
 
