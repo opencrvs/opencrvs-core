@@ -53,7 +53,9 @@ export const gradients = {
   gradientSkyLight:
     'background: linear-gradient(180deg, #6291CD 0%, #AACAF3 100%)',
   gradientBabyShade:
-    'background: linear-gradient(180deg, #477cd7 0%, #5c91eb 100%);'
+    'background: linear-gradient(180deg, #477cd7 0%, #5c91eb 100%);',
+  gradientGreyShade:
+    'background: linear-gradient(180deg, #FFFFFF 0%, #F2F3F4 100%);'
 }
 
 export const shadows = {
@@ -92,6 +94,7 @@ export const colors = {
 
   // Grey Scrollbar
   scrollBarGrey: colorDictionary.greySteel,
+  lightScrollBarGrey: colorDictionary.greySmoky,
 
   // Dividers
   dividerLight: colorDictionary.greyPearl,
