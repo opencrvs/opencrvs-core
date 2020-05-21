@@ -229,7 +229,7 @@ class ApplicationsStartedReportComponent extends React.Component<
           <Report>
             <PerformanceLink
               disabled={
-                !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+                !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
                   jurisdictionType as string
                 )
               }
