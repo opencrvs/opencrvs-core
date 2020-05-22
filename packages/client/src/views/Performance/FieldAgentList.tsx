@@ -182,7 +182,72 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
 
-  function getContent(data: GQLSearchFieldAgentResult | undefined) {
+  function toggleSort(key: keyof SortMap) {
+    const invertedOrder =
+      sortOrder[key] === SORT_ORDER.DESCENDING
+        ? SORT_ORDER.ASCENDING
+        : SORT_ORDER.DESCENDING
+    setSortOrder({ ...sortOrder, [key]: invertedOrder })
+  }
+
+  function getColumns(data?: GQLSearchFieldAgentResult) {
+    return [
+      {
+        key: 'name',
+        label: intl.formatMessage(messages.fieldAgentColumnHeader, {
+          totalAgents: (data && data.totalItems) || 0
+        }),
+        width: 20
+      },
+      {
+        key: 'type',
+        label: intl.formatMessage(messages.typeColumnHeader),
+        width: 12
+      },
+      {
+        key: 'officeName',
+        label: intl.formatMessage(messages.officeColumnHeader),
+        width: 20
+      },
+      {
+        key: 'startMonth',
+        label: intl.formatMessage(messages.startMonthColumnHeader),
+        width: 12
+      },
+      {
+        key: 'totalApplications',
+        label: intl.formatMessage(messages.totalSentColumnHeader, {
+          linebreak: <br key={'totalApplications-break'} />
+        }),
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('totalApplications'),
+        icon: <ArrowDownBlue />
+      },
+      {
+        key: 'inProgressApplications',
+        label: intl.formatMessage(messages.totalInProgressColumnHeader, {
+          linebreak: <br key={'inProgressApplications-break'} />
+        }),
+        width: 12
+      },
+      {
+        key: 'avgCompleteApplicationTime',
+        label: intl.formatMessage(messages.avgCompletionTimeColumnHeader, {
+          linebreak: <br key={'avgCompleteApplicationTime-break'} />
+        }),
+        width: 15
+      },
+      {
+        key: 'rejectedApplications',
+        label: intl.formatMessage(messages.totalRejectedColumnHeader),
+        width: 10,
+        alignment: ColumnContentAlignment.LEFT
+      }
+    ]
+  }
+
+  function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
       data &&
       data.results &&
@@ -237,13 +302,6 @@ function FieldAgentListComponent(props: IProps) {
         )) ||
       []
     )
-  }
-  function toggleSort(key: keyof SortMap) {
-    const invertedOrder =
-      sortOrder[key] === SORT_ORDER.DESCENDING
-        ? SORT_ORDER.ASCENDING
-        : SORT_ORDER.DESCENDING
-    setSortOrder({ ...sortOrder, [key]: invertedOrder })
   }
 
   return (
@@ -357,10 +415,14 @@ function FieldAgentListComponent(props: IProps) {
             return (
               <>
                 <ListTable
-                  noResultText={''}
+                  id={'field-agent-error-list'}
+                  noResultText={intl.formatMessage(
+                    messages.fieldAgentsNoResult
+                  )}
                   isLoading={true}
-                  columns={[]}
-                  content={[]}
+                  hideBoxShadow={true}
+                  columns={getColumns(data && data.searchFieldAgents)}
+                  content={getContent(data && data.searchFieldAgents)}
                 />
                 <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
               </>
@@ -371,74 +433,7 @@ function FieldAgentListComponent(props: IProps) {
                 id={'field-agent-list'}
                 noResultText={intl.formatMessage(messages.fieldAgentsNoResult)}
                 isLoading={loading}
-                columns={[
-                  {
-                    key: 'name',
-                    label: intl.formatMessage(messages.fieldAgentColumnHeader, {
-                      totalAgents:
-                        (data &&
-                          data.searchFieldAgents &&
-                          data.searchFieldAgents.totalItems) ||
-                        0
-                    }),
-                    width: 20
-                  },
-                  {
-                    key: 'type',
-                    label: intl.formatMessage(messages.typeColumnHeader),
-                    width: 12
-                  },
-                  {
-                    key: 'officeName',
-                    label: intl.formatMessage(messages.officeColumnHeader),
-                    width: 20
-                  },
-                  {
-                    key: 'startMonth',
-                    label: intl.formatMessage(messages.startMonthColumnHeader),
-                    width: 12
-                  },
-                  {
-                    key: 'totalApplications',
-                    label: intl.formatMessage(messages.totalSentColumnHeader, {
-                      linebreak: <br key={'totalApplications-break'} />
-                    }),
-                    width: 12,
-                    isSortable: true,
-                    sortFunction: () => toggleSort('totalApplications'),
-                    icon: <ArrowDownBlue />
-                  },
-                  {
-                    key: 'inProgressApplications',
-                    label: intl.formatMessage(
-                      messages.totalInProgressColumnHeader,
-                      {
-                        linebreak: <br key={'inProgressApplications-break'} />
-                      }
-                    ),
-                    width: 12
-                  },
-                  {
-                    key: 'avgCompleteApplicationTime',
-                    label: intl.formatMessage(
-                      messages.avgCompletionTimeColumnHeader,
-                      {
-                        linebreak: (
-                          <br key={'avgCompleteApplicationTime-break'} />
-                        )
-                      }
-                    ),
-                    width: 15
-                  },
-                  {
-                    key: 'rejectedApplications',
-                    label: intl.formatMessage(
-                      messages.totalRejectedColumnHeader
-                    ),
-                    width: 10,
-                    alignment: ColumnContentAlignment.LEFT
-                  }
-                ]}
+                columns={getColumns(data && data.searchFieldAgents)}
                 content={getContent(data && data.searchFieldAgents)}
                 totalItems={
                   data &&
