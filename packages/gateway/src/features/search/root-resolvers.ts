@@ -133,7 +133,7 @@ export const resolvers: GQLResolver = {
     },
     async getEventsWithProgress(
       _,
-      { locationIds, count, skip, sort = 'desc' },
+      { locationIds, count, skip, sort = 'desc', status },
       authHeader
     ) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -157,6 +157,10 @@ export const resolvers: GQLResolver = {
       }
       if (skip) {
         searchCriteria.from = skip
+      }
+
+      if (status) {
+        searchCriteria.status = [status]
       }
 
       const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(

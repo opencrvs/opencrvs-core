@@ -1636,6 +1636,7 @@ export interface QueryToGetEventsWithProgressArgs {
   count?: number
   skip?: number
   sort?: string
+  status?: string
 }
 export interface QueryToGetEventsWithProgressResolver<
   TParent = any,
