@@ -80,12 +80,12 @@ export const influx = new Influx.InfluxDB({
       measurement: 'application_time_logged',
       fields: {
         timeSpentEditing: Influx.FieldType.INTEGER,
-        practitionerId: Influx.FieldType.STRING,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'currentStatus',
         'eventType',
+        'practitionerId',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -121,11 +121,11 @@ export const influx = new Influx.InfluxDB({
       fields: {
         role: Influx.FieldType.STRING,
         status: Influx.FieldType.STRING,
-        practitionerId: Influx.FieldType.STRING,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
+        'practitionerId',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',
@@ -135,11 +135,11 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'applications_rejected',
       fields: {
-        startedBy: Influx.FieldType.STRING,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
+        'startedBy',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',

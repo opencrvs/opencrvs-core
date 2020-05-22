@@ -54,6 +54,7 @@ export interface ICompositionBody {
   compositionType?: string
   event?: EVENT
   type?: string
+  contactRelationship?: string
   contactNumber?: string
   dateOfApplication?: string
   trackingId?: string

@@ -20,6 +20,10 @@ import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/sch
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
+import { getOfflineData } from '@client/offline/selectors'
+import { connect } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { getJurisidictionType } from '@client/utils/locationUtils'
 
 const Report = styled.div<{
   total?: boolean
@@ -68,8 +72,22 @@ const KeyPercentage = styled.span`
   margin: 16px 10px;
 `
 
-const PerformanceLink = styled(LinkButton)`
+const PerformanceLink = styled(LinkButton)<{ disabled: boolean }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ disabled, theme }) =>
+    disabled
+      ? `
+    cursor: default;
+    text-decoration-line: none;
+    &:hover {
+      opacity: 1;
+      text-decoration-line: none;
+    }`
+      : ''}
+  &:disabled {
+    color: ${({ theme }) => theme.colors.copy};
+    background-color: none;
+  }
 `
 
 const ReportTitle = styled.div`
@@ -93,6 +111,8 @@ interface BaseProps {
   loading?: boolean
   reportTimeFrom?: string
   reportTimeTo?: string
+  jurisdictionType?: string
+  locationId: string
 }
 
 interface States {}
@@ -168,7 +188,7 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 
   getReport(data: GQLApplicationsStartedMetrics) {
-    const { intl, reportTimeFrom, reportTimeTo } = this.props
+    const { intl, reportTimeFrom, reportTimeTo, jurisdictionType } = this.props
     const {
       fieldAgentApplications,
       hospitalApplications,
@@ -195,7 +215,13 @@ class ApplicationsStartedReportComponent extends React.Component<
             </KeyNumber>
           </Report>
           <Report>
-            <PerformanceLink>
+            <PerformanceLink
+              disabled={
+                !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+                  jurisdictionType as string
+                )
+              }
+            >
               {intl.formatMessage(messages.applicationsStartedFieldAgents)}
             </PerformanceLink>
             <KeyNumber>
@@ -258,6 +284,17 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 }
 
-export const ApplicationsStartedReport = injectIntl(
-  ApplicationsStartedReportComponent
-)
+export const ApplicationsStartedReport = connect(
+  (state: IStoreState, ownProps: BaseProps) => {
+    const offlineLocations = getOfflineData(state).locations
+    const jurisdictionType = getJurisidictionType(
+      offlineLocations,
+      ownProps.locationId
+    )
+    return {
+      ...ownProps,
+      jurisdictionType
+    }
+  },
+  null
+)(injectIntl(ApplicationsStartedReportComponent))

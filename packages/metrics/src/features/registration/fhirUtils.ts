@@ -172,9 +172,9 @@ export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
   const regLastUser =
     regLastUserExtension &&
     regLastUserExtension.valueReference &&
-    regLastUserExtension.valueReference.reference
+    (regLastUserExtension.valueReference.reference as string)
 
-  return regLastUser as string
+  return regLastUser?.split('/')?.[1] || ''
 }
 
 export function getRegLastLocation(bundle: fhir.Bundle) {

@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { filterLocations } from '@client/utils/locationUtils'
+import {
+  filterLocations,
+  getJurisidictionType
+} from '@client/utils/locationUtils'
+import { mockOfflineData } from '@client/tests/util'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -97,6 +101,14 @@ describe('locationUtil tests', () => {
       expect(locations['111']).toBeDefined()
       expect(locations['333']).toBeDefined()
       expect(locations['222']).toBeDefined()
+    })
+  })
+  describe('getJurisidictionType()', () => {
+    it('returns jurisdiction tyoe for location with provided id', () => {
+      const locations = mockOfflineData.locations
+      const locationId = '65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
+
+      expect(getJurisidictionType(locations, locationId)).toEqual('DIVISION')
     })
   })
 })

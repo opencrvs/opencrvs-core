@@ -13,8 +13,9 @@ import {
   findCompositionSection,
   findExtension,
   fetchFHIR,
-  getTimeLoggedByStatusFromMetrics,
-  getStatusFromTask
+  getTimeLoggedFromMetrics,
+  getStatusFromTask,
+  ITimeLoggedResponse
 } from '@gateway/features/fhir/utils'
 import {
   MOTHER_CODE,
@@ -491,11 +492,11 @@ export const typeResolvers: GQLResolver = {
     timeLogged: async (task, _, authHeader) => {
       const compositionId =
         (task.focus.reference && task.focus.reference.split('/')[1]) || ''
-      const timeLoggedResponse = await getTimeLoggedByStatusFromMetrics(
+      const timeLoggedResponse = (await getTimeLoggedFromMetrics(
         authHeader,
         compositionId,
         getStatusFromTask(task) || ''
-      )
+      )) as ITimeLoggedResponse
       return (timeLoggedResponse && timeLoggedResponse.timeSpentEditing) || 0
     }
   },

@@ -232,6 +232,234 @@ describe('User root resolvers', () => {
     })
   })
 
+  describe('searchFieldAgents()', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegister: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const regsiterToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegister = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+    })
+    const dummyUserList = [
+      {
+        name: [
+          {
+            use: 'en',
+            given: ['Sakib Al'],
+            family: ['Hasan']
+          }
+        ],
+        username: 'sakibal.hasan',
+        mobile: '+8801711111111',
+        email: 'test@test.org',
+        passwordHash:
+          'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
+        salt: '12345',
+        role: 'FIELD_AGENT',
+        type: 'HA',
+        status: 'active',
+        practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+        primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+        catchmentAreaIds: [
+          'b21ce04e-7ccd-4d65-929f-453bc193a736',
+          '95754572-ab6f-407b-b51a-1636cb3d0683',
+          '7719942b-16a7-474a-8af1-cd0c94c730d2',
+          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+        ],
+        creationDate: 1559054406433
+      },
+      {
+        name: [
+          {
+            use: 'en',
+            given: ['Md. Ariful'],
+            family: ['Islam']
+          }
+        ],
+        username: 'mdariful.islam',
+        mobile: '+8801740012994',
+        email: 'test@test.org',
+        type: 'HA',
+        passwordHash:
+          'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
+        salt: '12345',
+        role: 'FIELD_AGENT',
+        status: 'pending',
+        practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
+        primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+        catchmentAreaIds: [
+          'b21ce04e-7ccd-4d65-929f-453bc193a736',
+          '95754572-ab6f-407b-b51a-1636cb3d0683',
+          '7719942b-16a7-474a-8af1-cd0c94c730d2',
+          '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+        ],
+        creationDate: 1559054406444
+      }
+    ]
+    it('Returns field agent list with metrics data for sysadmin', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: dummyUserList.length,
+          results: dummyUserList
+        })
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          {
+            practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            totalNumberOfApplicationStarted: 12,
+            totalNumberOfInProgressAppStarted: 5,
+            totalNumberOfRejectedApplications: 2,
+            averageTimeForDeclaredApplications: 360
+          }
+        ])
+      )
+
+      const response = await resolvers.Query.searchFieldAgents(
+        {},
+        {
+          locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
+          timeStart: '2019-03-31T18:00:00.000Z',
+          timeEnd: '2020-06-30T17:59:59.999Z'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(response.totalItems).toBe(2)
+      expect(response.results).toEqual([
+        {
+          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+          fullName: 'Sakib Al Hasan',
+          type: 'HA',
+          status: 'active',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406433,
+          totalNumberOfApplicationStarted: 12,
+          totalNumberOfInProgressAppStarted: 5,
+          totalNumberOfRejectedApplications: 2,
+          averageTimeForDeclaredApplications: 360
+        },
+        {
+          practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
+          fullName: 'Md. Ariful Islam',
+          type: 'HA',
+          status: 'pending',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406444,
+          totalNumberOfApplicationStarted: 0,
+          totalNumberOfInProgressAppStarted: 0,
+          totalNumberOfRejectedApplications: 0,
+          averageTimeForDeclaredApplications: 0
+        }
+      ])
+    })
+    it('should return error for register', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: dummyUserList.length,
+          results: dummyUserList
+        })
+      )
+
+      expect(
+        resolvers.Query.searchFieldAgents(
+          {},
+          {
+            locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
+            timeStart: '2019-03-31T18:00:00.000Z',
+            timeEnd: '2020-06-30T17:59:59.999Z'
+          },
+          authHeaderRegister
+        )
+      ).rejects.toThrow('Search field agents is only allowed for sysadmin')
+    })
+    it('returns field agent list with active status only', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          totalItems: 1,
+          results: [dummyUserList[0]]
+        })
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          {
+            practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+            totalNumberOfApplicationStarted: 12,
+            totalNumberOfInProgressAppStarted: 5,
+            totalNumberOfRejectedApplications: 2,
+            averageTimeForDeclaredApplications: 360
+          }
+        ])
+      )
+
+      const response = await resolvers.Query.searchFieldAgents(
+        {},
+        {
+          locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
+          timeStart: '2019-03-31T18:00:00.000Z',
+          timeEnd: '2020-06-30T17:59:59.999Z',
+          status: 'active'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(response.totalItems).toBe(1)
+      expect(response.results).toEqual([
+        {
+          practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
+          fullName: 'Sakib Al Hasan',
+          type: 'HA',
+          status: 'active',
+          primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+          creationDate: 1559054406433,
+          totalNumberOfApplicationStarted: 12,
+          totalNumberOfInProgressAppStarted: 5,
+          totalNumberOfRejectedApplications: 2,
+          averageTimeForDeclaredApplications: 360
+        }
+      ])
+    })
+    it('should return error if invalid data received from user-mgnt endpoint', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      expect(
+        resolvers.Query.searchFieldAgents(
+          {},
+          {
+            locationId: 'b21ce04e-7ccd-4d65-929f-453bc193a736',
+            timeStart: '2019-03-31T18:00:00.000Z',
+            timeEnd: '2020-06-30T17:59:59.999Z'
+          },
+          authHeaderSysAdmin
+        )
+      ).rejects.toThrow('Invalid result found from search user endpoint')
+    })
+  })
+
   describe('activateUser mutation', () => {
     it('activates the pending user', async () => {
       fetch.mockResponses(
