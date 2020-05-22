@@ -20,7 +20,10 @@ import { messages } from '@client/i18n/messages/views/performance'
 import querystring from 'query-string'
 import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
 import { connect } from 'react-redux'
-import { StatusMapping } from '@client/views/Performance/OperationalReport'
+import {
+  StatusMapping,
+  OPERATIONAL_REPORT_SECTION
+} from '@client/views/Performance/OperationalReport'
 import {
   ListTable,
   ColumnContentAlignment
@@ -57,10 +60,25 @@ import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { generateLocations } from '@client/utils/locationUtils'
 import { LocationPicker } from '@client/views/Performance/RegistrationRates'
 import { Event } from '@client/forms'
+import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
+import { orderBy } from 'lodash'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+
+const { useState } = React
 
 interface ConnectProps {
   offlineResources: IOfflineData
 }
+
+interface SortMap {
+  applicationStartedOn: SORT_ORDER
+}
+
+const INITIAL_SORT_MAP = {
+  applicationStartedOn: SORT_ORDER.DESCENDING
+}
+
+const DEFAULT_APPLICATION_STATUS_PAGE_SIZE = 25
 
 const statusOptions = [
   {
@@ -106,7 +124,28 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const { locationId, status, event } = (querystring.parse(
     props.location.search
   ) as unknown) as ISearchParams
-  const { sectionId, timeStart, timeEnd } = props.location.state
+  const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+  const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
+  const recordCount = DEFAULT_APPLICATION_STATUS_PAGE_SIZE * currentPageNumber
+  let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
+  let timeStart = moment()
+    .subtract(1, 'years')
+    .toDate()
+  let timeEnd = moment().toDate()
+  if (props.location.state) {
+    sectionId = props.location.state.sectionId
+    timeStart = props.location.state.timeStart
+    timeEnd = props.location.state.timeEnd
+  }
+
+  function toggleSort(key: keyof SortMap) {
+    const invertedOrder =
+      sortOrder[key] === SORT_ORDER.DESCENDING
+        ? SORT_ORDER.ASCENDING
+        : SORT_ORDER.DESCENDING
+    setSortOrder({ ...sortOrder, [key]: invertedOrder })
+  }
+
   function getColumns(totalItems = 0): IColumn[] {
     return [
       {
@@ -149,7 +188,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.applicationStarted),
         key: 'applicationStartedOn',
-        width: 12
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('applicationStartedOn'),
+        icon: <ArrowDownBlue />
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStartedBy),
@@ -220,7 +262,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     }
 
-    return data.getEventsWithProgress.results.map(
+    const content = data.getEventsWithProgress.results.map(
       (eventProgress: GQLEventProgressSet | null, index: number) => {
         if (eventProgress !== null) {
           const nameIntl = createNamesMap(
@@ -350,6 +392,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   eventProgress.registration.dateOfApplication
                 )) ||
               '',
+            applicationStartedOnTime:
+              eventProgress.registration &&
+              new Date(eventProgress.registration.dateOfApplication)
+                .getTime()
+                .toString(),
             applicationStartedBy: (
               <>
                 {starterPractitionerName}
@@ -367,6 +414,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         }
         return {}
       }
+    )
+
+    return orderBy(
+      content,
+      ['applicationStartedOnTime'],
+      [sortOrder.applicationStartedOn]
     )
   }
   const searchableLocations = generateLocations(
@@ -480,6 +533,17 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 isLoading={loading || Boolean(error)}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow
+                currentPage={currentPageNumber}
+                pageSize={recordCount}
+                onPageChange={(currentPage: number) => {
+                  setCurrentPageNumber(currentPage)
+                }}
+                loadMoreText={intl.formatMessage(
+                  messages.showMoreUsersLinkLabel,
+                  {
+                    pageSize: DEFAULT_APPLICATION_STATUS_PAGE_SIZE
+                  }
+                )}
               />
               {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
             </>
