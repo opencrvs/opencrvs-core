@@ -100,11 +100,19 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
 `
 
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
-  query data($locationIds: [String], $count: Int, $skip: Int) {
+  query data(
+    $locationIds: [String]!
+    $count: Int
+    $skip: Int
+    $status: [String]
+    $type: [String]
+  ) {
     getEventsWithProgress(
       count: $count
       skip: $skip
       locationIds: $locationIds
+      status: $status
+      type: $type
     ) {
       totalItems
       results {

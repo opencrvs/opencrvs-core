@@ -41,7 +41,7 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   loading?: boolean
   statusMapping?: IStatusMapping
-  onClickStatusDetails?: () => void
+  onClickStatusDetails: (status?: keyof IStatusMapping) => void
   jurisdictionType?: string
   locationId: string
 }
@@ -121,7 +121,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             )}{' '}
             {window.config.APPLICATION_AUDIT_LOCATIONS.includes(this.props
               .jurisdictionType as string) && (
-              <LinkButton onClick={this.props.onClickStatusDetails}>
+              <LinkButton onClick={() => this.props.onClickStatusDetails()}>
                 {intl.formatMessage(constantsMessages.viewAll)}
               </LinkButton>
             )}
@@ -140,6 +140,9 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
                   disabled={
                     !window.config.APPLICATION_AUDIT_LOCATIONS.includes(this
                       .props.jurisdictionType as string)
+                  }
+                  onClick={() =>
+                    this.props.onClickStatusDetails(statusCount.status)
                   }
                   currentPoints={statusCount.count}
                 />

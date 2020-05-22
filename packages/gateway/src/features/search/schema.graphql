@@ -109,6 +109,7 @@ type Query {
     count: Int
     skip: Int
     sort: String
-    status: String
+    status: [String]
+    type: [String]
   ): EventProgressResultSet
 }

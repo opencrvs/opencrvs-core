@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { WrappedComponentProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import { RouteComponentProps } from 'react-router'
 import {
   PerformanceContentWrapper,
@@ -18,10 +22,13 @@ import {
 } from '@client/views/Performance/PerformanceContentWrapper'
 import { messages } from '@client/i18n/messages/views/performance'
 import querystring from 'query-string'
-import { goToOperationalReport } from '@client/navigation'
+import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
 import { connect } from 'react-redux'
-import { OPERATIONAL_REPORT_SECTION, StatusMapping } from './OperationalReport'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import { StatusMapping } from '@client/views/Performance/OperationalReport'
+import {
+  ListTable,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   GQLQuery,
@@ -43,10 +50,36 @@ import { getLocationFromPartOfLocationId } from './reports/utils'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
+import { FilterContainer } from '@client/views/Performance/utils'
+import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
+import {
+  ToastNotification,
+  NOTIFICATION_TYPE
+} from '@client/components/interface/ToastNotification'
+import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
+import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
+import { generateLocations } from '@client/utils/locationUtils'
+import { LocationPicker } from '@client/views/Performance/RegistrationRates'
+import { Event } from '@client/forms'
 
 interface ConnectProps {
   offlineResources: IOfflineData
 }
+
+const statusOptions = [
+  {
+    label: {
+      defaultMessage: 'All statuses',
+      id: 'something'
+    } as MessageDescriptor,
+    value: ''
+  }
+].concat(
+  Object.entries(StatusMapping).map(([status, { labelDescriptor: label }]) => ({
+    label,
+    value: status
+  }))
+)
 
 const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
@@ -62,12 +95,12 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 
 interface DispatchProps {
   goToOperationalReport: typeof goToOperationalReport
+  goToWorkflowStatus: typeof goToWorkflowStatus
 }
 interface ISearchParams {
   locationId: string
-  sectionId: OPERATIONAL_REPORT_SECTION
-  timeStart: string
-  timeEnd: string
+  status?: keyof IStatusMapping
+  event?: Event
 }
 
 interface WorkflowStatusProps
@@ -77,10 +110,10 @@ interface WorkflowStatusProps
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const { intl } = props
-  const { locationId, sectionId, timeStart, timeEnd } = (querystring.parse(
+  const { locationId, status, event } = (querystring.parse(
     props.location.search
   ) as unknown) as ISearchParams
-
+  const { sectionId, timeStart, timeEnd } = props.location.state
   function getColumns(totalItems = 0): IColumn[] {
     return [
       {
@@ -88,79 +121,80 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           totalItems
         }),
         key: 'id',
-        width: 6
+        width: 14
       },
       {
         label: intl.formatMessage(constantsMessages.status),
         key: 'status',
-        width: 9
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.eventType),
         key: 'eventType',
-        width: 3
+        width: 8
       },
       {
         label: intl.formatMessage(constantsMessages.eventDate),
         key: 'dateOfEvent',
-        width: 8
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.nameDefaultLocale),
         key: 'nameIntl',
-        width: 8
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.nameRegionalLocale),
         key: 'nameLocal',
-        width: 8
+        width: 12
       },
       {
         label: intl.formatMessage(formMessages.applicantName),
         key: 'applicant',
-        width: 6
+        width: 14
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStarted),
         key: 'applicationStartedOn',
-        width: 8
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.applicationStartedBy),
         key: 'applicationStartedBy',
-        width: 8
+        width: 10
       },
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
-        width: 6
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 6
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 6
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.timeWatingApproval),
         key: 'timeLoggedValidated',
-        width: 6
+        width: 12
       },
       {
         label: intl.formatMessage(
           constantsMessages.timeWaitingExternalValidation
         ),
         key: 'timeLoggedWaitingValidation',
-        width: 6
+        width: 12
       },
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 6
+        width: 12,
+        alignment: ColumnContentAlignment.LEFT
       }
     ]
   }
@@ -342,11 +376,17 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     )
   }
-
+  const searchableLocations = generateLocations(
+    props.offlineResources.locations
+  )
+  const selectedLocation = searchableLocations.find(
+    ({ id }) => id === locationId
+  )
   const childLocations = (getLocationFromPartOfLocationId(
     locationId,
     props.offlineResources
   ) as ILocation).id
+
   return (
     <PerformanceContentWrapper
       id="workflow-status"
@@ -360,11 +400,74 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           new Date(timeEnd)
         )
       }
+      toolbarComponent={
+        <FilterContainer>
+          <LocationPicker>
+            {selectedLocation && selectedLocation.displayLabel}
+          </LocationPicker>
+          <PerformanceSelect
+            onChange={({ value }) => {
+              props.goToWorkflowStatus(
+                sectionId,
+                locationId,
+                new Date(timeStart),
+                new Date(timeEnd),
+                status,
+                value as Event
+              )
+            }}
+            id="event-select"
+            withLightTheme={true}
+            defaultWidth={175}
+            value={((event as unknown) as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
+            options={[
+              {
+                label: intl.formatMessage(messages.eventOptionForBoth),
+                value: EVENT_OPTIONS.ALL
+              },
+              {
+                label: intl.formatMessage(messages.eventOptionForBirths),
+                value: EVENT_OPTIONS.BIRTH
+              },
+              {
+                label: intl.formatMessage(messages.eventOptionForDeaths),
+                value: EVENT_OPTIONS.DEATH
+              }
+            ]}
+          />
+          <PerformanceSelect
+            onChange={({ value }) => {
+              props.goToWorkflowStatus(
+                sectionId,
+                locationId,
+                new Date(timeStart),
+                new Date(timeEnd),
+                value,
+                event
+              )
+            }}
+            id="status-select"
+            withLightTheme={true}
+            defaultWidth={175}
+            value={(status as string) || ''}
+            options={statusOptions.map(option => ({
+              ...option,
+              label: intl.formatMessage(option.label)
+            }))}
+          />
+        </FilterContainer>
+      }
       hideTopBar
     >
       <Query
         query={FETCH_EVENTS_WITH_PROGRESS}
-        variables={{ locationIds: [childLocations], skip: 0, count: 10 }}
+        variables={{
+          locationIds: [childLocations],
+          skip: 0,
+          count: 10,
+          status: (status && [status]) || undefined,
+          type: (event && [`${event.toLowerCase()}-application`]) || undefined
+        }}
       >
         {({ data, loading, error }) => {
           let total
@@ -377,13 +480,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           }
 
           return (
-            <ListTable
-              content={getContent(data)}
-              columns={getColumns(total)}
-              isLoading={loading}
-              noResultText={intl.formatMessage(constantsMessages.noResults)}
-              hideBoxShadow
-            />
+            <>
+              <ListTable
+                content={getContent(data)}
+                columns={getColumns(total)}
+                isLoading={loading || Boolean(error)}
+                noResultText={intl.formatMessage(constantsMessages.noResults)}
+                hideBoxShadow
+              />
+              {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+            </>
           )
         }}
       </Query>
@@ -397,5 +503,5 @@ export const WorkflowStatus = connect(
       offlineResources: getOfflineData(store)
     }
   },
-  { goToOperationalReport }
+  { goToOperationalReport, goToWorkflowStatus }
 )(injectIntl(WorkflowStatusComponent))
