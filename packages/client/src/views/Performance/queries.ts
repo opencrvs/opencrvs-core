@@ -146,3 +146,42 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
     }
   }
 `
+export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
+  query data(
+    $locationId: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $event: String
+    $status: String
+    $language: String
+    $count: Int
+    $skip: Int
+    $sort: String
+  ) {
+    searchFieldAgents(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+      status: $status
+      language: $language
+      count: $count
+      skip: $skip
+      sort: $sort
+    ) {
+      results {
+        practitionerId
+        fullName
+        type
+        status
+        primaryOfficeId
+        creationDate
+        totalNumberOfApplicationStarted
+        totalNumberOfInProgressAppStarted
+        totalNumberOfRejectedApplications
+        averageTimeForDeclaredApplications
+      }
+      totalItems
+    }
+  }
+`

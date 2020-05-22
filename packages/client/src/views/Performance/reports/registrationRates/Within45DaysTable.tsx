@@ -44,7 +44,7 @@ interface ITableProps extends WrappedComponentProps {
   }
 }
 
-enum SORT_ORDER {
+export enum SORT_ORDER {
   ASCENDING = 'asc',
   DESCENDING = 'desc'
 }

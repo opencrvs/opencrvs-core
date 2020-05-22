@@ -23,10 +23,15 @@ interface IOperationalSelectProps {
   id?: string
   value: string
   options: IPerformanceSelectOption[]
+  withLightTheme?: boolean
   onChange?: (selectedOption: IPerformanceSelectOption) => void
+  defaultWidth?: number
 }
 
-const StyledSelect = styled(Select)<{ defaultWidth: number }>`
+const StyledSelect = styled(Select)<{
+  defaultWidth: number
+  withLightTheme: boolean
+}>`
   .react-select__container {
     border-radius: 2px;
     ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
@@ -35,14 +40,19 @@ const StyledSelect = styled(Select)<{ defaultWidth: number }>`
   .react-select__control {
     ${({ defaultWidth }) =>
       defaultWidth ? `min-width: ${defaultWidth}px` : 'min-width: 160px'};
-    background-color: ${({ theme }) => theme.colors.secondary} !important;
+    background-color: ${({ theme, withLightTheme }) =>
+      withLightTheme ? theme.colors.white : theme.colors.secondary} !important;
     justify-content: center;
     ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
     text-transform: none;
     max-height: 32px;
-
+    border: 1px solid ${({ theme }) => theme.colors.secondary};
     &:hover {
-      ${({ theme }) => theme.gradients.gradientBabyShade}
+      border: 1px solid ${({ theme }) => theme.colors.secondary};
+      ${({ theme, withLightTheme }) =>
+        withLightTheme
+          ? theme.gradients.gradientGreyShade
+          : theme.gradients.gradientBabyShade}
     }
   }
 
@@ -61,8 +71,9 @@ const StyledSelect = styled(Select)<{ defaultWidth: number }>`
   }
 
   .react-select__single-value {
-    color: ${({ theme }) => theme.colors.white};
-    margin-top: -3px;
+    color: ${({ theme, withLightTheme }) =>
+      withLightTheme ? theme.colors.primary : theme.colors.white};
+    margin-top: -1px;
   }
   .react-select__control--is-focused {
     background: ${({ theme }) => theme.colors.secondary};
@@ -74,7 +85,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <KeyboardArrowDown pathStroke="white" />
+        <KeyboardArrowDown />
       </components.DropdownIndicator>
     )
   )
@@ -114,7 +125,10 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
       components={{ DropdownIndicator }}
       options={props.options}
       onChange={handleChange}
-      defaultWidth={selectedOption.label.length * 8 + 50}
+      defaultWidth={
+        props.defaultWidth || selectedOption.label.trim().length * 8 + 50
+      }
+      withLightTheme={props.withLightTheme || false}
     />
   )
 }

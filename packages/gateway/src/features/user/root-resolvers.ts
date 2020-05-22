@@ -30,6 +30,7 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
+import { logger } from '@gateway/logger'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -135,7 +136,11 @@ export const resolvers: GQLResolver = {
       })
       const userResponse = await res.json()
       if (!userResponse || !userResponse.results || !userResponse.totalItems) {
-        throw new Error('Invalid result found from search user endpoint')
+        logger.error('Invalid result found from search user endpoint')
+        return {
+          totalItems: 0,
+          results: []
+        }
       }
       // Loading metrics data by practitioner ids
       const metricsForPractitioners = await postMetrics(

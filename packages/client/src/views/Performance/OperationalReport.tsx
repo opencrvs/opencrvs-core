@@ -423,6 +423,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       <ApplicationsStartedReport
                         loading={true}
                         locationId={locationId}
+                        reportTimeFrom={timeStart}
+                        reportTimeTo={timeEnd}
                       />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
@@ -443,8 +445,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         loading={loading}
                         locationId={locationId}
                         data={data && data.getApplicationsStartedMetrics}
-                        reportTimeFrom={timeStart.format()}
-                        reportTimeTo={timeEnd.format()}
+                        reportTimeFrom={timeStart}
+                        reportTimeTo={timeEnd}
                       />
                     </>
                   )
