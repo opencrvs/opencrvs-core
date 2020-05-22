@@ -31,6 +31,7 @@ describe('Status wise registration count', () => {
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
         jurisdictionType="UNION"
+        onClickStatusDetails={jest.fn()}
       />,
       store
     )
@@ -59,6 +60,7 @@ describe('Status wise registration count', () => {
           locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
           statusMapping={StatusMapping}
           jurisdictionType="UNION"
+          onClickStatusDetails={jest.fn()}
         />,
         store
       )).component
