@@ -10,11 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  WrappedComponentProps,
-  injectIntl,
-  MessageDescriptor
-} from 'react-intl'
+import { WrappedComponentProps, injectIntl } from 'react-intl'
 import { RouteComponentProps } from 'react-router'
 import {
   PerformanceContentWrapper,
@@ -68,10 +64,7 @@ interface ConnectProps {
 
 const statusOptions = [
   {
-    label: {
-      defaultMessage: 'All statuses',
-      id: 'something'
-    } as MessageDescriptor,
+    label: constantsMessages.allStatuses,
     value: ''
   }
 ].concat(

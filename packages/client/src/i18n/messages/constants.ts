@@ -12,6 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages {
+  allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
   applicantContactNumber: MessageDescriptor
   application: MessageDescriptor
@@ -128,6 +129,11 @@ interface IConstantsMessages {
   viewAll: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  allStatuses: {
+    defaultMessage: 'All statuses',
+    description: 'Label for select option All statuses',
+    id: 'constatns.allStatuses'
+  },
   applicantContactNumber: {
     defaultMessage: 'Applicant contact number',
     description: 'The title of contact number label',
