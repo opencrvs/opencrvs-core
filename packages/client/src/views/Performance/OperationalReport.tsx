@@ -183,6 +183,10 @@ export const StatusMapping: IStatusMapping = {
   REGISTERED: {
     labelDescriptor: statusMessages.readyToPrint,
     color: colors.readyToPrint
+  },
+  CERTIFIED: {
+    labelDescriptor: statusMessages.certified,
+    color: colors.readyToPrint
   }
 }
 
