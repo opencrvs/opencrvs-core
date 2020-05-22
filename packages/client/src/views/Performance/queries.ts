@@ -98,3 +98,51 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
     }
   }
 `
+
+export const FETCH_EVENTS_WITH_PROGRESS = gql`
+  query data($locationIds: [String], $count: Int, $skip: Int) {
+    getEventsWithProgress(
+      count: $count
+      skip: $skip
+      locationIds: $locationIds
+    ) {
+      totalItems
+      results {
+        id
+        type
+        name {
+          use
+          firstNames
+          familyName
+        }
+        dateOfEvent
+        registration {
+          status
+          contactNumber
+          contactRelationship
+          dateOfApplication
+          trackingId
+          registrationNumber
+          createdAt
+          modifiedAt
+        }
+        startedBy {
+          name {
+            use
+            firstNames
+            familyName
+          }
+          role
+        }
+        progressReport {
+          timeInProgress
+          timeInReadyForReview
+          timeInRequiresUpdates
+          timeInWaitingForApproval
+          timeInWaitingForBRIS
+          timeInReadyToPrint
+        }
+      }
+    }
+  }
+`

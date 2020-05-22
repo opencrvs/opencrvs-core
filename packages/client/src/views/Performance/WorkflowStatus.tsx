@@ -20,14 +20,49 @@ import { messages } from '@client/i18n/messages/views/performance'
 import querystring from 'query-string'
 import { goToOperationalReport } from '@client/navigation'
 import { connect } from 'react-redux'
-import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
+import { OPERATIONAL_REPORT_SECTION, StatusMapping } from './OperationalReport'
 import { ListTable } from '@opencrvs/components/lib/interface'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  GQLQuery,
+  GQLEventProgressSet,
+  GQLHumanName
+} from '@opencrvs/gateway/src/graphql/schema'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { LANG_EN } from '@client/utils/constants'
+import {
+  userMessages,
+  dynamicConstantsMessages,
+  formMessages,
+  constantsMessages
+} from '@client/i18n/messages'
+import moment from 'moment'
+import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+import { Query } from '@client/components/Query'
+import { getLocationFromPartOfLocationId } from './reports/utils'
+import { IStoreState } from '@client/store'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData, ILocation } from '@client/offline/reducer'
+
+interface ConnectProps {
+  offlineResources: IOfflineData
+}
+
+const PrimaryContactLabelMapping = {
+  MOTHER: formMessages.contactDetailsMother,
+  FATHER: formMessages.contactDetailsFather,
+  APPLICANT: formMessages.contactDetailsApplicant
+}
+
+type PrimaryContact = keyof typeof PrimaryContactLabelMapping
+
+function isPrimaryContact(contact: string): contact is PrimaryContact {
+  return Object.keys(PrimaryContactLabelMapping).includes(contact)
+}
 
 interface DispatchProps {
   goToOperationalReport: typeof goToOperationalReport
 }
-
 interface ISearchParams {
   locationId: string
   sectionId: OPERATIONAL_REPORT_SECTION
@@ -35,27 +70,9 @@ interface ISearchParams {
   timeEnd: string
 }
 
-const MOCK_CONTENT = [
-  {
-    compositionId: 'BKJASD',
-    status: 'WAITING_VALIDATION',
-    eventType: 'BIRTH',
-    dateOfEvent: '2020-05-01',
-    nameIntl: 'Hello',
-    nameLocal: 'World',
-    applicant: 'Mother 0168780980',
-    applicationStartedOn: '2020-05-05',
-    applicationStartedBy: 'Shakib al hasan\n(Field agent)',
-    timeLoggedInProgress: '00:00:00:00',
-    timeLoggedDeclared: '00:00:00:00',
-    timeLoggedRejected: '00:00:00:00',
-    timeLoggedValidated: '00:00:00:00',
-    timeLoggedWaitingValidation: '00:00:00:00',
-    timeLoggedRegistered: '00:00:00:00'
-  }
-]
 interface WorkflowStatusProps
   extends RouteComponentProps,
+    ConnectProps,
     DispatchProps,
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
@@ -64,90 +81,272 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     props.location.search
   ) as unknown) as ISearchParams
 
-  function getColumns(): IColumn[] {
+  function getColumns(totalItems = 0): IColumn[] {
     return [
       {
-        label: 'Applications',
-        key: 'compositionId',
-        width: 15
+        label: intl.formatMessage(constantsMessages.applications, {
+          totalItems
+        }),
+        key: 'id',
+        width: 6
       },
       {
-        label: 'Status',
+        label: intl.formatMessage(constantsMessages.status),
         key: 'status',
-        width: 15
+        width: 9
       },
       {
-        label: 'Event type',
+        label: intl.formatMessage(constantsMessages.eventType),
         key: 'eventType',
-        width: 10
+        width: 3
       },
       {
-        label: 'Date of event',
+        label: intl.formatMessage(constantsMessages.eventDate),
         key: 'dateOfEvent',
-        width: 15
+        width: 8
       },
       {
-        label: 'English name',
+        label: intl.formatMessage(constantsMessages.nameDefaultLocale),
         key: 'nameIntl',
-        width: 15
+        width: 8
       },
       {
-        label: 'Bengali name',
+        label: intl.formatMessage(constantsMessages.nameRegionalLocale),
         key: 'nameLocal',
-        width: 15
+        width: 8
       },
       {
-        label: 'Applicant',
+        label: intl.formatMessage(formMessages.applicantName),
         key: 'applicant',
-        width: 20
+        width: 6
       },
       {
-        label: 'Application started',
+        label: intl.formatMessage(constantsMessages.applicationStarted),
         key: 'applicationStartedOn',
-        width: 20
+        width: 8
       },
       {
-        label: 'Started by',
+        label: intl.formatMessage(constantsMessages.applicationStartedBy),
         key: 'applicationStartedBy',
-        width: 20
+        width: 8
       },
       {
-        label: 'Time in progress',
+        label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
-        width: 15
+        width: 6
       },
       {
-        label: 'Time in ready for review',
+        label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 15
+        width: 6
       },
       {
-        label: 'Time in require updates',
+        label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 15
+        width: 6
       },
       {
-        label: 'Time in waiting for approval',
+        label: intl.formatMessage(constantsMessages.timeWatingApproval),
         key: 'timeLoggedValidated',
-        width: 15
+        width: 6
       },
       {
-        label: 'Time in waiting for waiting for BRIS',
+        label: intl.formatMessage(
+          constantsMessages.timeWaitingExternalValidation
+        ),
         key: 'timeLoggedWaitingValidation',
-        width: 15
+        width: 6
       },
       {
-        label: 'Time in ready to print',
+        label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 15
+        width: 6
       }
     ]
   }
 
-  function getContent() {
-    return MOCK_CONTENT
+  function getContent(data: GQLQuery) {
+    if (
+      !data ||
+      !data.getEventsWithProgress ||
+      !data.getEventsWithProgress.results
+    ) {
+      return []
+    }
+
+    function formateDateWithRelationalText(date: Date) {
+      const dateMoment = moment(date)
+      return (
+        <>
+          {dateMoment.format('MMMM DD, YYYY')}
+          <br />
+          {`(${dateMoment.fromNow()})`}
+        </>
+      )
+    }
+
+    function conditioanllyFormatContactRelationship(relationshipCode: string) {
+      if (isPrimaryContact(relationshipCode)) {
+        return intl.formatMessage(PrimaryContactLabelMapping[relationshipCode])
+      } else {
+        return relationshipCode
+      }
+    }
+
+    return data.getEventsWithProgress.results.map(
+      (eventProgress: GQLEventProgressSet | null, index: number) => {
+        if (eventProgress !== null) {
+          const nameIntl = createNamesMap(
+            eventProgress && (eventProgress.name as GQLHumanName[])
+          )[LANG_EN] as string
+          const localLang = window.config.LANGUAGES.split(',').find(
+            (lang: string) => lang !== LANG_EN
+          )
+          const nameLocal =
+            (localLang &&
+              (createNamesMap(
+                eventProgress && (eventProgress.name as GQLHumanName[])
+              )[localLang] as string)) ||
+            nameIntl
+          let starterPractitionerName = ''
+          let starterPractitionerRole = ''
+
+          if (eventProgress.startedBy != null) {
+            const user = eventProgress.startedBy
+            starterPractitionerName =
+              (createNamesMap(user && (user.name as GQLHumanName[]))[
+                intl.locale
+              ] as string) ||
+              (createNamesMap(user && (user.name as GQLHumanName[]))[
+                LANG_EN
+              ] as string)
+            starterPractitionerRole = intl.formatMessage(
+              userMessages[user.role as string]
+            )
+          }
+
+          const event =
+            (eventProgress.type &&
+              intl.formatMessage(
+                dynamicConstantsMessages[eventProgress.type.toLowerCase()]
+              )) ||
+            ''
+          const status =
+            (eventProgress.registration &&
+              eventProgress.registration.status &&
+              intl.formatMessage(
+                StatusMapping[eventProgress.registration.status].labelDescriptor
+              )) ||
+            ''
+          let timeLoggedInProgress = '-'
+          let timeLoggedDeclared = '-'
+          let timeLoggedRejected = '-'
+          let timeLoggedValidated = '-'
+          let timeLoggedWaitingValidation = '-'
+          let timeLoggedRegistered = '-'
+
+          if (eventProgress.progressReport != null) {
+            const {
+              timeInProgress,
+              timeInReadyForReview,
+              timeInRequiresUpdates,
+              timeInWaitingForApproval,
+              timeInWaitingForBRIS,
+              timeInReadyToPrint
+            } = eventProgress.progressReport
+
+            timeLoggedInProgress =
+              (timeInProgress !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInProgress as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+            timeLoggedDeclared =
+              (timeInReadyForReview !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInReadyForReview as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+            timeLoggedRejected =
+              (timeInRequiresUpdates !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInRequiresUpdates as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+            timeLoggedValidated =
+              (timeInWaitingForApproval !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInWaitingForApproval as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+            timeLoggedWaitingValidation =
+              (timeInWaitingForBRIS !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInWaitingForBRIS as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+            timeLoggedRegistered =
+              (timeInReadyToPrint !== null &&
+                moment()
+                  .startOf('day')
+                  .seconds(timeInReadyToPrint as number)
+                  .format('HH:mm:ss')) ||
+              '-'
+          }
+          return {
+            id:
+              eventProgress.registration &&
+              eventProgress.registration.trackingId,
+            status,
+            eventType: event,
+            dateOfEvent: formateDateWithRelationalText(
+              eventProgress.dateOfEvent
+            ),
+            nameIntl,
+            nameLocal,
+            applicant:
+              (eventProgress.registration &&
+                ((eventProgress.registration.contactRelationship &&
+                  conditioanllyFormatContactRelationship(
+                    eventProgress.registration.contactRelationship
+                  ) + ' ') ||
+                  '') + (eventProgress.registration.contactNumber || '')) ||
+              '',
+            applicationStartedOn:
+              (eventProgress.registration &&
+                formateDateWithRelationalText(
+                  eventProgress.registration.dateOfApplication
+                )) ||
+              '',
+            applicationStartedBy: (
+              <>
+                {starterPractitionerName}
+                <br />
+                {`(${starterPractitionerRole})`}
+              </>
+            ),
+            timeLoggedInProgress,
+            timeLoggedDeclared,
+            timeLoggedRejected,
+            timeLoggedValidated,
+            timeLoggedWaitingValidation,
+            timeLoggedRegistered
+          }
+        }
+        return {}
+      }
+    )
   }
 
+  const childLocations = (getLocationFromPartOfLocationId(
+    locationId,
+    props.offlineResources
+  ) as ILocation).id
   return (
     <PerformanceContentWrapper
       id="workflow-status"
@@ -163,17 +362,40 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
       hideTopBar
     >
-      <ListTable
-        content={getContent()}
-        columns={getColumns()}
-        noResultText={'No results'}
-        hideBoxShadow
-      />
+      <Query
+        query={FETCH_EVENTS_WITH_PROGRESS}
+        variables={{ locationIds: [childLocations], skip: 0, count: 10 }}
+      >
+        {({ data, loading, error }) => {
+          let total
+          if (
+            data &&
+            data.getEventsWithProgress &&
+            data.getEventsWithProgress.totalItems
+          ) {
+            total = data.getEventsWithProgress.totalItems
+          }
+
+          return (
+            <ListTable
+              content={getContent(data)}
+              columns={getColumns(total)}
+              isLoading={loading}
+              noResultText={intl.formatMessage(constantsMessages.noResults)}
+              hideBoxShadow
+            />
+          )
+        }}
+      </Query>
     </PerformanceContentWrapper>
   )
 }
 
 export const WorkflowStatus = connect(
-  null,
+  (store: IStoreState) => {
+    return {
+      offlineResources: getOfflineData(store)
+    }
+  },
   { goToOperationalReport }
 )(injectIntl(WorkflowStatusComponent))
