@@ -463,7 +463,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             value={((event as unknown) as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
             options={[
               {
-                label: intl.formatMessage(messages.eventOptionForBoth),
+                label: intl.formatMessage(constantsMessages.allEvents),
                 value: EVENT_OPTIONS.ALL
               },
               {
