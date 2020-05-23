@@ -45,7 +45,6 @@ import {
 import moment from 'moment'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { Query } from '@client/components/Query'
-import { getLocationFromPartOfLocationId } from './reports/utils'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
@@ -428,10 +427,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const selectedLocation = searchableLocations.find(
     ({ id }) => id === locationId
   )
-  const childLocations = (getLocationFromPartOfLocationId(
-    locationId,
-    props.offlineResources
-  ) as ILocation).id
 
   return (
     <PerformanceContentWrapper
@@ -508,9 +503,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       <Query
         query={FETCH_EVENTS_WITH_PROGRESS}
         variables={{
-          locationIds: [childLocations],
+          parentLocationId: locationId,
           skip: 0,
-          count: 10,
+          count: recordCount,
           status: (status && [status]) || undefined,
           type: (event && [`${event.toLowerCase()}-application`]) || undefined
         }}
@@ -528,6 +523,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           return (
             <>
               <ListTable
+                id="application-status-list"
                 content={getContent(data)}
                 columns={getColumns(total)}
                 isLoading={loading || Boolean(error)}

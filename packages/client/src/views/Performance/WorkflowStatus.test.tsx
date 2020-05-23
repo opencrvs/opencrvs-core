@@ -17,6 +17,8 @@ import { History } from 'history'
 import { ReactWrapper } from 'enzyme'
 import queryString from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
 
 describe('Workflow status tests', () => {
   let store: AppStore
@@ -24,12 +26,126 @@ describe('Workflow status tests', () => {
   let component: ReactWrapper<{}, {}>
   const timeStart = new Date(2019, 11, 6)
   const timeEnd = new Date(2019, 11, 13)
-  const locationId = '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+  const locationId = '50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
+  const graphqlMocks = [
+    {
+      request: {
+        query: FETCH_EVENTS_WITH_PROGRESS,
+        variables: {
+          count: 25,
+          skip: 0,
+          parentLocationId: locationId,
+          status: ['REGISTERED'],
+          type: ['birth-application']
+        }
+      },
+      result: {
+        data: {
+          getEventsWithProgress: {
+            totalItems: 2,
+            results: [
+              {
+                id: '137a4fb2-36ad-4897-8953-dbad0a756d4f',
+                type: 'Birth',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Mother Family Name'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: '',
+                    familyName: 'মায়ের পারিবারিক নাম '
+                  }
+                ],
+                dateOfEvent: '2020-05-17',
+                registration: {
+                  status: 'REGISTERED',
+                  contactNumber: '+8801656568681',
+                  contactRelationship: 'APPLICANT',
+                  dateOfApplication: '2020-05-22T10:24:14.423Z',
+                  trackingId: 'B6N6YSF',
+                  registrationNumber: '20207210411000121',
+                  createdAt: '1590143054612',
+                  modifiedAt: '1590143057091'
+                },
+                startedBy: {
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mohammad',
+                      familyName: 'Ashraful'
+                    }
+                  ],
+                  role: 'LOCAL_REGISTRAR'
+                },
+                progressReport: {
+                  timeInProgress: null,
+                  timeInReadyForReview: null,
+                  timeInRequiresUpdates: null,
+                  timeInWaitingForApproval: null,
+                  timeInWaitingForBRIS: null,
+                  timeInReadyToPrint: 143
+                }
+              },
+              {
+                id: 'd78d29a1-8521-4582-9f4e-902907ca369a',
+                type: 'Birth',
+                name: [
+                  {
+                    use: 'en',
+                    firstNames: '',
+                    familyName: 'Mother Family Name'
+                  },
+                  {
+                    use: 'bn',
+                    firstNames: 'মায়ের নাম',
+                    familyName: 'আমিনা'
+                  }
+                ],
+                dateOfEvent: '2020-02-15',
+                registration: {
+                  status: 'REGISTERED',
+                  contactNumber: '+8801959595999',
+                  contactRelationship: 'Uncle',
+                  dateOfApplication: '2020-05-20T14:40:03.088Z',
+                  trackingId: 'BXOQWTT',
+                  registrationNumber: '20207210411000119',
+                  createdAt: '1589985603133',
+                  modifiedAt: '1589985605583'
+                },
+                startedBy: {
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: 'Mohammad',
+                      familyName: 'Ashraful'
+                    }
+                  ],
+                  role: 'LOCAL_REGISTRAR'
+                },
+                progressReport: {
+                  timeInProgress: null,
+                  timeInReadyForReview: null,
+                  timeInRequiresUpdates: null,
+                  timeInWaitingForApproval: null,
+                  timeInWaitingForBRIS: null,
+                  timeInReadyToPrint: 78
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
 
   beforeAll(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
+    Date.now = jest.fn(() => 1590220497869)
   })
 
   beforeEach(async () => {
@@ -39,15 +155,28 @@ describe('Workflow status tests', () => {
         location={{
           search: queryString.stringify({
             locationId,
-            timeStart: timeStart.toISOString(),
-            timeEnd: timeEnd.toISOString()
-          })
+            event: 'BIRTH',
+            status: 'REGISTERED'
+          }),
+          state: {
+            sectionId: OPERATIONAL_REPORT_SECTION,
+            timeStart,
+            timeEnd
+          }
         }}
       />,
-      store
+      store,
+      graphqlMocks
     )
 
     component = testComponent.component
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    component.update()
   })
 
   it('renders without crashing', async () => {
@@ -59,10 +188,46 @@ describe('Workflow status tests', () => {
       component,
       '#workflow-status-action-back'
     )
-
     backButton.hostNodes().simulate('click')
 
     expect(history.location.pathname).toContain('/performance/operations')
     expect(history.location.pathname).not.toContain('workflowStatus')
+  })
+
+  it('renders data', async () => {
+    const listTable = await waitForElement(
+      component,
+      '#application-status-list'
+    )
+    expect(listTable.find('div#row_1').hostNodes()).toHaveLength(1)
+  })
+
+  it('toggles sort order', async () => {
+    const listTable = await waitForElement(
+      component,
+      '#application-status-list'
+    )
+
+    const toggleSortButton = await waitForElement(
+      component,
+      'span#applicationStartedOn-label'
+    )
+    expect(
+      listTable
+        .find('div#row_0')
+        .hostNodes()
+        .childAt(7)
+        .text()
+    ).toBe('May 22, 2020(a day ago)')
+
+    toggleSortButton.hostNodes().simulate('click')
+
+    expect(
+      listTable
+        .find('div#row_1')
+        .hostNodes()
+        .childAt(7)
+        .text()
+    ).toBe('May 22, 2020(a day ago)')
   })
 })

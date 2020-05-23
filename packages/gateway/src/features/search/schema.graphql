@@ -105,7 +105,7 @@ type Query {
     sort: String
   ): EventSearchResultSet
   getEventsWithProgress(
-    locationIds: [String]
+    parentLocationId: String
     count: Int
     skip: Int
     sort: String

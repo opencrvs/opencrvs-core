@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { postSearch } from '@gateway/features/fhir/utils'
+import { postSearch, fetchFHIR } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { hasScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
@@ -133,7 +133,7 @@ export const resolvers: GQLResolver = {
     },
     async getEventsWithProgress(
       _,
-      { locationIds, count, skip, sort = 'desc', status, type },
+      { parentLocationId, count, skip, sort = 'desc', status, type },
       authHeader
     ) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -145,6 +145,15 @@ export const resolvers: GQLResolver = {
       const searchCriteria: ISearchCriteria = {
         sort
       }
+
+      const bundle = await fetchFHIR(
+        `/Location?partof=${parentLocationId}`,
+        authHeader
+      )
+      const locationIds = bundle.entry.map(
+        (entry: { resource: { id: string } }) => entry.resource.id
+      )
+
       if (locationIds) {
         if (locationIds.length <= 0 || locationIds.includes('')) {
           return await Promise.reject(new Error('Invalid location id'))
