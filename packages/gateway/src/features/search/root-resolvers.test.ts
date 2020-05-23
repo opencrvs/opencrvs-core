@@ -358,17 +358,28 @@ describe('Search root resolvers', () => {
       }
     })
     it('returns an array of results for an authorized user', async () => {
-      fetch.mockResponse(
-        JSON.stringify({
-          body: {
-            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
-          }
-        })
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            entry: [
+              { resource: { id: 'dummy_loc_id1' } },
+              { resource: { id: 'dummy_loc_id2' } }
+            ]
+          }),
+          { status: 200 }
+        ],
+        [
+          JSON.stringify({
+            body: {
+              hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+            }
+          })
+        ]
       )
       const result = await resolvers.Query.getEventsWithProgress(
         {},
         {
-          locationIds: ['dummy_loc_id'],
+          parentLocationId: 'dummy_loc_id_parent',
           count: 25,
           skip: 0
         },
@@ -385,10 +396,15 @@ describe('Search root resolvers', () => {
       ).rejects.toThrowError('User does not have a sysadmin scope')
     })
     it('throws an error for invalid location ids', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: []
+        })
+      )
       await expect(
         resolvers.Query.getEventsWithProgress(
           {},
-          { locationIds: [] },
+          { parentLocationId: null },
           authorizedUser
         )
       ).rejects.toThrowError('Invalid location id')
