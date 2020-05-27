@@ -23,7 +23,7 @@ import {
   roleQueries
 } from '@client/forms/user/fieldDefinitions/query/queries'
 import { userMessages } from '@client/i18n/messages'
-import { userQueries } from '@client/sysadmin/user/queries'
+import { userQueries } from '@client/team/user/queries'
 import { draftToGqlTransformer } from '@client/transformer'
 import {
   ROLE_FIELD_AGENT,

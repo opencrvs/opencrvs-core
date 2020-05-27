@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createStore } from '@client/store'
-import { SEARCH_USERS } from '@client/sysadmin/user/queries'
+import { SEARCH_USERS } from '@client/team/user/queries'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import * as React from 'react'
-import { UserTab } from './userTab'
+import { UserList } from './userList'
 import { ReactWrapper } from 'enzyme'
 import { waitForElement } from '@client/tests/wait-for-element'
 
@@ -43,7 +43,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )
@@ -84,7 +84,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )
@@ -131,7 +131,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )
@@ -242,7 +242,7 @@ describe('User tab tests', () => {
       beforeEach(async () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
-          <UserTab />,
+          <UserList />,
           store,
           userListMock
         )
@@ -385,7 +385,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )
@@ -562,7 +562,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )
@@ -744,7 +744,7 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserTab />,
+        <UserList />,
         store,
         userListMock
       )

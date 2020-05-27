@@ -9,45 +9,51 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Header } from '@client/components/interface/Header/Header'
+import {
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/sysAdmin'
+import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { withTheme } from '@client/styledComponents'
+import { SEARCH_USERS } from '@client/team/user/queries'
+import { LANG_EN, SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { IUserDetails } from '@client/utils/userUtils'
 import {
   AddUser,
   AvatarSmall,
   VerticalThreeDots
 } from '@opencrvs/components/lib/icons'
 import {
-  ListTable,
   ColumnContentAlignment,
+  ListTable,
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLHumanName,
   GQLQuery,
   GQLUser
 } from '@opencrvs/gateway/src/graphql/schema'
-import { SEARCH_USERS } from '@client/sysadmin/user/queries'
-import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
-import { Query } from '@client/components/Query'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import styled from 'styled-components'
-import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import {
-  userMessages,
-  constantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
-import { UserStatus } from '@client/views/SysAdmin/utils'
-import { messages } from '@client/i18n/messages/views/sysAdmin'
+import { RouteComponentProps } from 'react-router'
+import styled from 'styled-components'
+import { UserStatus } from '@client/views/Team/utils'
+import { Query } from '@client/components/Query'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
   margin: 32px auto 0;
 `
-
 const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -82,6 +88,23 @@ const AddUserContainer = styled(AddUser)`
   cursor: pointer;
 `
 
+type BaseProps = {
+  userDetails: IUserDetails | null
+  theme: ITheme
+  goToCreateNewUser: typeof goToCreateNewUser
+  goToReviewUserDetails: typeof goToReviewUserDetails
+}
+
+interface IMatchParams {
+  ofcId: string
+}
+
+type IProps = BaseProps & IntlShapeProps & RouteComponentProps<IMatchParams>
+
+interface IState {
+  usersPageNo: number
+}
+
 interface IStatusProps {
   status: string
 }
@@ -100,16 +123,7 @@ const Status = (statusProps: IStatusProps) => {
   }
 }
 
-interface IProps extends IntlShapeProps {
-  goToCreateNewUser: typeof goToCreateNewUser
-  goToReviewUserDetails: typeof goToReviewUserDetails
-}
-
-interface IState {
-  usersPageNo: number
-}
-
-class UserTabComponent extends React.Component<IProps, IState> {
+class UserListComponent extends React.Component<IProps, IState> {
   pageSize: number
 
   constructor(props: IProps) {
@@ -176,8 +190,10 @@ class UserTabComponent extends React.Component<IProps, IState> {
     this.setState({ usersPageNo: newPageNumber })
   }
 
-  render() {
-    const { intl } = this.props
+  renderUserList = () => {
+    const { intl, match } = this.props
+
+    const primaryOfficeId = match.params.ofcId
     const columns = [
       {
         label: '',
@@ -220,6 +236,7 @@ class UserTabComponent extends React.Component<IProps, IState> {
       <Query
         query={SEARCH_USERS}
         variables={{
+          primaryOfficeId,
           count: this.pageSize,
           skip: (this.state.usersPageNo - 1) * this.pageSize
         }}
@@ -259,9 +276,38 @@ class UserTabComponent extends React.Component<IProps, IState> {
       </Query>
     )
   }
+
+  render() {
+    const { intl, userDetails } = this.props
+    const role = userDetails && userDetails.role
+    return (
+      <>
+        {role && SYS_ADMIN_ROLES.includes(role) && (
+          <>
+            <Header title={intl.formatMessage(messages.systemTitle)} />
+
+            {this.renderUserList()}
+          </>
+        )}
+      </>
+    )
+  }
 }
 
-export const UserTab = connect(
-  null,
-  { goToCreateNewUser, goToReviewUserDetails }
-)(injectIntl(UserTabComponent))
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    userDetails: getUserDetails(store)
+  }
+}
+
+const mapDispatchToProps = () => {
+  return {
+    goToCreateNewUser,
+    goToReviewUserDetails
+  }
+}
+
+export const UserList = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTheme(injectIntl(UserListComponent)))

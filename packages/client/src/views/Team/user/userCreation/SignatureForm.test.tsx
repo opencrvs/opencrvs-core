@@ -20,12 +20,12 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
-import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
+import { CreateNewUser } from '@client/views/Team/tabs/user/userCreation/CreateNewUser'
 import {
   mockDataWithRegistarRoleSelected,
   mockFetchRoleGraphqlOperation,
   mockUserGraphqlOperation
-} from '@client/views/SysAdmin/utils'
+} from '@client/views/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 

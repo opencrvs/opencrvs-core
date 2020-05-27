@@ -39,7 +39,7 @@ import { submitUserFormData } from '@client/user/userReducer'
 import {
   Action,
   FormTitle
-} from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
+} from '@client/views/Team/user/userCreation/UserForm'
 import {
   PrimaryButton,
   SuccessButton,

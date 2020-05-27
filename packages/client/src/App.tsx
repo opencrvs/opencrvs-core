@@ -44,8 +44,7 @@ import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { SysAdminHome } from '@client/views/SysAdmin/SysAdminHome'
-import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
+import { CreateNewUser } from '@client/views/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { ConnectedRouter } from 'connected-react-router'
@@ -60,6 +59,7 @@ import { PerformanceHome } from '@client/views/Performance/PerformanceHome'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { WorkflowStatus } from '@client/views/Performance/WorkflowStatus'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
+import { UserList } from './views/Team/user/userList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -258,12 +258,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.SYS_ADMIN_HOME}
-                                            component={SysAdminHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.SYS_ADMIN_HOME_TAB}
-                                            component={SysAdminHome}
+                                            component={UserList}
                                           />
                                           <ProtectedRoute
                                             exact

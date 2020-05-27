@@ -12,33 +12,30 @@
 import {
   IFormSection,
   IFormSectionData,
-  IFormSectionGroup,
-  UserSection
+  IFormSectionGroup
 } from '@client/forms'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { GET_USER } from '@client/team/user/queries'
+import {
+  clearUserFormData,
+  fetchAndStoreUserData,
+  storeUserFormData
+} from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { UserForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserForm'
-import { UserReviewForm } from '@client/views/SysAdmin/tabs/user/userCreation/UserReviewForm'
+import { UserForm } from '@client/views/Team/user/userCreation/UserForm'
+import { UserReviewForm } from '@client/views/Team/user/userCreation/UserReviewForm'
 import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
-import ApolloClient, { ApolloQueryResult } from 'apollo-client'
+import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { withApollo } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { GET_USER } from '@client/sysadmin/user/queries'
-import { gqlToDraftTransformer } from '@client/transformer'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  storeUserFormData,
-  clearUserFormData,
-  fetchAndStoreUserData
-} from '@client/user/userReducer'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 
 interface IMatchParams {
   userId?: string

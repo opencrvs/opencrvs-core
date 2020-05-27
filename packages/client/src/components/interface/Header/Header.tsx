@@ -390,8 +390,8 @@ class HeaderComp extends React.Component<IProps, IState> {
     ) {
       menuItems = [
         {
-          key: 'sysadmin',
-          title: intl.formatMessage(messages.systemTitle),
+          key: 'team',
+          title: intl.formatMessage(messages.teamTitle),
           onClick: goToHomeAction,
           selected:
             enableMenuSelection &&

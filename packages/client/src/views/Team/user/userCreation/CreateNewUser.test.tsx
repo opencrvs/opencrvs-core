@@ -13,19 +13,19 @@ import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/sysadmin/user/queries'
+import { userQueries, GET_USER } from '@client/team/user/queries'
 import {
   createTestComponent,
   flushPromises,
   mockOfflineData
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
-import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
+import { CreateNewUser } from '@client/views/Team/user/userCreation/CreateNewUser'
 import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockIncompleteFormData
-} from '@client/views/SysAdmin/utils'
+} from '@client/views/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import {
