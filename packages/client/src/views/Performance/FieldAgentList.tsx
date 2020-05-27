@@ -44,6 +44,7 @@ import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { orderBy } from 'lodash'
 import moment from 'moment'
+import { LocationPicker } from '@client/components/LocationPicker'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
@@ -76,36 +77,6 @@ type IProps = RouteComponentProps &
   IConnectProps &
   IDispatchProps
 
-const PickerButton = styled.button`
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
-  border-radius: 2px;
-  &:focus {
-    outline: none;
-  }
-  &:hover {
-    background: ${({ theme }) => theme.colors.smallButtonFocus};
-  }
-  white-space: nowrap;
-  padding: 0;
-  height: 38px;
-  background: transparent;
-  & > div {
-    padding: 0 8px;
-    height: 100%;
-  }
-`
-
-const ContentWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
-  color: ${({ theme }) => theme.colors.tertiary};
-
-  & > svg {
-    margin-left: 8px;
-  }
-`
 export enum EVENT_OPTIONS {
   ALL = '',
   BIRTH = 'BIRTH',
@@ -116,22 +87,6 @@ enum STATUS_OPTIONS {
   ACTIVE = 'active',
   DEACTIVE = 'deactive',
   PENDING = 'pending'
-}
-
-interface LocationPickerProps {
-  handler?: () => void
-  children: React.ReactNode
-}
-
-function LocationPicker(props: LocationPickerProps) {
-  return (
-    <PickerButton onClick={props.handler}>
-      <ContentWrapper>
-        <span>{props.children}</span>
-        <MapPin />
-      </ContentWrapper>
-    </PickerButton>
-  )
 }
 
 function getPercentage(total: number | undefined, current: number | undefined) {
@@ -320,9 +275,15 @@ function FieldAgentListComponent(props: IProps) {
       headerTitle={intl.formatMessage(messages.fieldAgentsTitle)}
       toolbarComponent={
         <FilterContainer>
-          <LocationPicker>
-            {selectedSearchedLocation.displayLabel}
-          </LocationPicker>
+          <LocationPicker
+            selectedLocationId={locationId}
+            onChangeLocation={newLocationId => {
+              props.goToFieldAgentList(newLocationId, timeStart, timeEnd, event)
+            }}
+            requiredJurisdictionTypes={
+              window.config.FIELD_AGENT_AUDIT_LOCATIONS
+            }
+          />
           <DateRangePicker
             startDate={dateStart}
             endDate={dateEnd}
