@@ -50,7 +50,7 @@ interface MonthSelectorProps {
   maxDate: moment.Moment
 }
 
-const PickerButton = styled.button`
+export const PickerButton = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   &:focus {
@@ -69,7 +69,7 @@ const PickerButton = styled.button`
   }
 `
 
-const ContentWrapper = styled.div`
+export const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   align-items: center;
@@ -81,7 +81,7 @@ const ContentWrapper = styled.div`
   }
 `
 
-const ModalContainer = styled.div`
+export const ModalContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   position: absolute;
   z-index: 2;
@@ -91,14 +91,14 @@ const ModalContainer = styled.div`
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.copy};
 `
-const ModalHeader = styled.div`
+export const ModalHeader = styled.div`
   display: flex;
   padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
-const TitleContent = styled.div`
+export const TitleContent = styled.div`
   display: flex;
   align-items: center;
   ${({ theme }) => theme.fonts.buttonStyle}
@@ -108,7 +108,7 @@ const TitleContent = styled.div`
     margin-right: 8px;
   }
 `
-const ModalBody = styled.div`
+export const ModalBody = styled.div`
   display: flex;
   flex: 1;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
@@ -183,7 +183,7 @@ const ModalFooter = styled.div`
   padding: 8px 16px;
   align-items: center;
 `
-const CancelableArea = styled.div`
+export const CancelableArea = styled.div`
   height: 100%;
   width: 100%;
   position: absolute;
