@@ -24,6 +24,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
+import { goToFieldAgentList } from '@client/navigation'
+import moment from 'moment'
 
 const Report = styled.div<{
   total?: boolean
@@ -104,15 +106,19 @@ const LoaderBox = styled.span<{
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
 
-type Props = WrappedComponentProps & BaseProps
+type Props = WrappedComponentProps & BaseProps & IDispatchProps
 
 interface BaseProps {
   data?: GQLApplicationsStartedMetrics
   loading?: boolean
-  reportTimeFrom?: string
-  reportTimeTo?: string
+  reportTimeFrom: moment.Moment
+  reportTimeTo: moment.Moment
   jurisdictionType?: string
   locationId: string
+}
+
+interface IDispatchProps {
+  goToFieldAgentList: typeof goToFieldAgentList
 }
 
 interface States {}
@@ -188,7 +194,13 @@ class ApplicationsStartedReportComponent extends React.Component<
   }
 
   getReport(data: GQLApplicationsStartedMetrics) {
-    const { intl, reportTimeFrom, reportTimeTo, jurisdictionType } = this.props
+    const {
+      intl,
+      reportTimeFrom,
+      reportTimeTo,
+      jurisdictionType,
+      locationId
+    } = this.props
     const {
       fieldAgentApplications,
       hospitalApplications,
@@ -202,7 +214,7 @@ class ApplicationsStartedReportComponent extends React.Component<
           </SubHeader>
           <Description>
             {intl.formatMessage(messages.applicationsStartedDescription)}
-            {reportTimeFrom} - {reportTimeTo}
+            {reportTimeFrom.format()} - {reportTimeTo.format()}
           </Description>
         </ReportHeader>
         <Reports id="applications-started-reports">
@@ -217,10 +229,17 @@ class ApplicationsStartedReportComponent extends React.Component<
           <Report>
             <PerformanceLink
               disabled={
-                !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+                !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
                   jurisdictionType as string
                 )
               }
+              onClick={() => {
+                this.props.goToFieldAgentList(
+                  locationId,
+                  reportTimeFrom.toISOString(),
+                  reportTimeTo.toISOString()
+                )
+              }}
             >
               {intl.formatMessage(messages.applicationsStartedFieldAgents)}
             </PerformanceLink>
@@ -296,5 +315,7 @@ export const ApplicationsStartedReport = connect(
       jurisdictionType
     }
   },
-  null
+  {
+    goToFieldAgentList
+  }
 )(injectIntl(ApplicationsStartedReportComponent))

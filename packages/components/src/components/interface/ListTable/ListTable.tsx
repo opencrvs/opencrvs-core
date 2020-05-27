@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { grid } from '../../grid'
 import { Pagination } from '../DataTable/Pagination'
+import { LoadMore } from '../GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 
 const Wrapper = styled.div<{
@@ -38,7 +38,8 @@ const TableHeader = styled.div<{
 }>`
   color: ${({ theme }) => theme.colors.copy};
   padding: 10px 0px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+  display: flex;
+  align-items: flex-end;
 
   & span:first-child {
     padding-left: 12px;
@@ -52,6 +53,11 @@ const TableHeader = styled.div<{
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
+`
+const Line = styled.div<{ width: number }>`
+  width: ${({ width }) => (Boolean(width) ? width : 100)}%;
+  background: ${({ theme }) => theme.colors.disabled};
+  height: 1px;
 `
 const TableHeaderText = styled.div<{
   isSortable?: boolean
@@ -72,7 +78,6 @@ const RowWrapper = styled.div`
   display: flex;
   align-items: center;
   min-height: 48px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
 
   & span:first-child {
     padding-left: 12px;
@@ -101,7 +106,7 @@ const ContentWrapper = styled.span<{
   sortable?: boolean
 }>`
   width: ${({ width }) => width}%;
-  display: inline-block;
+  flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
@@ -114,6 +119,7 @@ const ValueWrapper = styled.span<{
 }>`
   width: ${({ width }) => width}%;
   display: flex;
+  flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 10px;
@@ -123,10 +129,10 @@ const Error = styled.span`
   color: ${({ theme }) => theme.colors.error};
 `
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-align: center;
-  margin-top: 100px;
+  ${({ theme }) => theme.fonts.h5Style};
+  text-align: left;
+  margin-left: 10px;
+  color: ${({ theme }) => theme.colors.copy};
 `
 const H3 = styled.div`
   padding-left: 12px;
@@ -145,16 +151,14 @@ const TableScroller = styled.div<{
   height?: number
 }>`
   height: ${({ height }) => (height ? `${height}px` : 'auto')};
-  overflow: auto;
+  overflow-x: auto;
   padding-right: 10px;
 
   &::-webkit-scrollbar {
-    width: 8px;
+    height: 5px;
   }
-
-  ::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.scrollBarGrey};
-    border-radius: 10px;
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
   }
 `
 const TableHeaderWrapper = styled.div`
@@ -165,7 +169,6 @@ const ToggleSortIcon = styled.div<{
 }>`
   margin-left: 5px;
   display: inline;
-
   svg {
     transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};
   }
@@ -190,10 +193,10 @@ interface IListTableProps {
   isLoading?: boolean
   tableTitle?: string
   hideBoxShadow?: boolean
+  loadMoreText?: string
 }
 
 interface IListTableState {
-  width: number
   sortIconInverted: boolean
   sortKey: string | null
 }
@@ -203,21 +206,12 @@ export class ListTable extends React.Component<
   IListTableState
 > {
   state = {
-    width: window.innerWidth,
     sortIconInverted: false,
     sortKey: null
   }
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
+  headerRef = React.createRef<HTMLDivElement>()
+  tableScrollerRef = React.createRef<HTMLDivElement>()
 
   onPageChange = (currentPage: number) => {
     if (this.props.onPageChange) {
@@ -253,6 +247,15 @@ export class ListTable extends React.Component<
     return true
   }
 
+  onScrollRowWrapper = (event: React.UIEvent<HTMLDivElement>) => {
+    if (this.headerRef.current) {
+      this.headerRef.current.scrollLeft =
+        (this.tableScrollerRef.current &&
+          this.tableScrollerRef.current.scrollLeft) ||
+        0
+    }
+  }
+
   render() {
     const {
       id,
@@ -265,79 +268,57 @@ export class ListTable extends React.Component<
       tableTitle,
       tableHeight,
       hideBoxShadow,
-      footerColumns
+      footerColumns,
+      loadMoreText
     } = this.props
-    const { width } = this.state
     const totalItems = this.props.totalItems || 0
+    const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
 
     return (
       <>
-        <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
-          {!isLoading && tableTitle && <H3>{tableTitle}</H3>}
-          {isLoading && (
-            <>
-              {tableTitle && <TableTitleLoading />}
-              <TableHeader>
-                {columns.map((preference, index) => (
-                  <ContentWrapper
-                    key={index}
-                    width={preference.width}
-                    alignment={preference.alignment}
-                    sortable={preference.isSortable}
-                  >
-                    <LoadingGrey />
-                  </ContentWrapper>
-                ))}
-              </TableHeader>
-              <TableHeader>
-                {columns.map((preference, index) => (
-                  <ContentWrapper
-                    key={index}
-                    width={preference.width}
-                    alignment={preference.alignment}
-                    sortable={preference.isSortable}
-                  >
-                    <LoadingGrey width={30} />
-                  </ContentWrapper>
-                ))}
-              </TableHeader>
-            </>
-          )}
-          {!isLoading && content.length > 0 && width > grid.breakpoints.lg && (
-            <TableHeaderWrapper>
-              <TableHeader>
-                {columns.map((preference, index) => (
-                  <ContentWrapper
-                    key={index}
-                    id={`${preference.key}-label`}
-                    width={preference.width}
-                    alignment={preference.alignment}
-                    sortable={preference.isSortable}
-                    onClick={() =>
-                      preference.isSortable &&
-                      preference.sortFunction &&
-                      this.invertSortIcon(preference.key) &&
-                      preference.sortFunction(preference.key)
-                    }
-                  >
-                    <TableHeaderText isSortable={preference.isSortable}>
-                      {preference.label}
-                      <ToggleSortIcon
-                        toggle={
-                          this.state.sortIconInverted &&
-                          this.state.sortKey === preference.key
+        {!isLoading && (
+          <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
+            <TableScroller
+              height={tableHeight}
+              ref={this.tableScrollerRef}
+              onScroll={this.onScrollRowWrapper}
+            >
+              {tableTitle && <H3>{tableTitle}</H3>}
+              {content.length > 0 && (
+                <TableHeaderWrapper ref={this.headerRef}>
+                  <TableHeader>
+                    {columns.map((preference, index) => (
+                      <ContentWrapper
+                        key={index}
+                        id={`${preference.key}-label`}
+                        width={preference.width}
+                        alignment={preference.alignment}
+                        sortable={preference.isSortable}
+                        onClick={() =>
+                          preference.isSortable &&
+                          preference.sortFunction &&
+                          this.invertSortIcon(preference.key) &&
+                          preference.sortFunction(preference.key)
                         }
                       >
-                        {preference.icon}
-                      </ToggleSortIcon>
-                    </TableHeaderText>
-                  </ContentWrapper>
-                ))}
-              </TableHeader>
-            </TableHeaderWrapper>
-          )}
-          {!isLoading && (
-            <TableScroller height={tableHeight}>
+                        <TableHeaderText isSortable={preference.isSortable}>
+                          {preference.label}
+                          <ToggleSortIcon
+                            toggle={
+                              this.state.sortIconInverted &&
+                              this.state.sortKey === preference.key
+                            }
+                          >
+                            {preference.icon}
+                          </ToggleSortIcon>
+                        </TableHeaderText>
+                      </ContentWrapper>
+                    ))}
+                  </TableHeader>
+                  <Line width={totalWidth} />
+                </TableHeaderWrapper>
+              )}
+
               <TableBody
                 footerColumns={
                   (footerColumns && footerColumns.length > 0) || false
@@ -346,48 +327,92 @@ export class ListTable extends React.Component<
                 {this.getDisplayItems(currentPage, pageSize, content).map(
                   (item, index) => {
                     return (
-                      <RowWrapper key={index} id={'row_' + index}>
-                        {columns.map((preference, indx) => {
-                          return (
-                            <ValueWrapper
-                              key={indx}
-                              width={preference.width}
-                              alignment={preference.alignment}
-                              color={preference.color}
-                            >
-                              {item[preference.key] || (
-                                <Error>{preference.errorValue}</Error>
-                              )}
-                            </ValueWrapper>
-                          )
-                        })}
-                      </RowWrapper>
+                      <div key={index}>
+                        <RowWrapper id={'row_' + index}>
+                          {columns.map((preference, indx) => {
+                            return (
+                              <ValueWrapper
+                                key={indx}
+                                width={preference.width}
+                                alignment={preference.alignment}
+                                color={preference.color}
+                              >
+                                {item[preference.key] || (
+                                  <Error>{preference.errorValue}</Error>
+                                )}
+                              </ValueWrapper>
+                            )
+                          })}
+                        </RowWrapper>
+                        <Line width={totalWidth} />
+                      </div>
                     )
                   }
                 )}
               </TableBody>
+
+              {footerColumns && content.length > 1 && (
+                <TableFooter id={'listTable-' + id + '-footer'}>
+                  {footerColumns.map((preference, index) => (
+                    <ContentWrapper key={index} width={preference.width}>
+                      {preference.label || ''}
+                    </ContentWrapper>
+                  ))}
+                </TableFooter>
+              )}
             </TableScroller>
-          )}
-          {!isLoading && footerColumns && content.length > 1 && (
-            <TableFooter id={'listTable-' + id + '-footer'}>
-              {footerColumns.map((preference, index) => (
-                <ContentWrapper key={index} width={preference.width}>
-                  {preference.label || ''}
+            {content.length <= 0 && (
+              <ErrorText id="no-record">{noResultText}</ErrorText>
+            )}
+          </Wrapper>
+        )}
+        {isLoading && (
+          <>
+            {tableTitle && <TableTitleLoading />}
+            <TableHeader>
+              {columns.map((preference, index) => (
+                <ContentWrapper
+                  key={index}
+                  width={preference.width}
+                  alignment={preference.alignment}
+                  sortable={preference.isSortable}
+                >
+                  <LoadingGrey />
                 </ContentWrapper>
               ))}
-            </TableFooter>
-          )}
-        </Wrapper>
-
-        {totalItems > pageSize && (
-          <Pagination
-            initialPage={currentPage}
-            totalPages={Math.ceil(totalItems / pageSize)}
-            onPageChange={this.onPageChange}
-          />
+            </TableHeader>
+            <TableHeader>
+              {columns.map((preference, index) => (
+                <ContentWrapper
+                  key={index}
+                  width={preference.width}
+                  alignment={preference.alignment}
+                  sortable={preference.isSortable}
+                >
+                  <LoadingGrey width={30} />
+                </ContentWrapper>
+              ))}
+            </TableHeader>
+          </>
         )}
-        {!isLoading && content.length <= 0 && (
-          <ErrorText id="no-record">{noResultText}</ErrorText>
+        {totalItems > pageSize && (
+          <>
+            {!loadMoreText && (
+              <Pagination
+                initialPage={currentPage}
+                totalPages={Math.ceil(totalItems / pageSize)}
+                onPageChange={this.onPageChange}
+              />
+            )}
+            {loadMoreText && (
+              <LoadMore
+                initialPage={currentPage}
+                loadMoreText={loadMoreText}
+                onLoadMore={this.onPageChange}
+                usageTableType={'list'}
+              />
+            )}
+          </>
         )}
       </>
     )

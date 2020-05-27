@@ -58,7 +58,8 @@ import { AppStore } from './store'
 import { OperationalReport } from '@client/views/Performance/OperationalReport'
 import { PerformanceHome } from '@client/views/Performance/PerformanceHome'
 import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
-import { WorkflowStatus } from '@client//views/Performance/WorkflowStatus'
+import { WorkflowStatus } from '@client/views/Performance/WorkflowStatus'
+import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -317,6 +318,13 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.WORKFLOW_STATUS}
                                             component={WorkflowStatus}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.PERFORMANCE_FIELD_AGENT_LIST
+                                            }
+                                            component={FieldAgentList}
                                           />
                                         </Switch>
                                       </TransitionWrapper>

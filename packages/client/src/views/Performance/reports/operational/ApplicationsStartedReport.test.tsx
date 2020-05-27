@@ -15,6 +15,7 @@ import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as locationUtils from '@client/utils/locationUtils'
+import moment from 'moment'
 
 describe('Registration rates report', () => {
   const { store } = createStore()
@@ -28,6 +29,8 @@ describe('Registration rates report', () => {
         loading={true}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         jurisdictionType="UNION"
+        reportTimeFrom={moment(new Date())}
+        reportTimeTo={moment(new Date())}
       />,
       store
     )
@@ -51,6 +54,8 @@ describe('Registration rates report', () => {
         data={data}
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         jurisdictionType="UNION"
+        reportTimeFrom={moment(new Date())}
+        reportTimeTo={moment(new Date())}
       />,
       store
     )

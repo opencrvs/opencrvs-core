@@ -13,23 +13,30 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { Button } from '../../buttons/Button'
 
+type UsageTableType = 'grid' | 'list'
 interface ILoadMoreCustomProps {
   initialPage: number
   onLoadMore: (page: number) => void
   loadMoreText: string
+  usageTableType?: UsageTableType
 }
 interface IState {
   canNext: boolean
 }
 
-const LoadMoreContainer = styled.div`
+const LoadMoreContainer = styled.div<{ usageTableType?: UsageTableType }>`
   width: 100%;
-  height: 60px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
+  ${({ usageTableType }) =>
+    !usageTableType || usageTableType === 'grid'
+      ? `
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;            
+      justify-content: center;
+      margin-top: 20px;
+      `
+      : ''};
 `
 
 const StyledButton = styled(Button)`
@@ -40,7 +47,7 @@ const StyledButton = styled(Button)`
 export class LoadMore extends React.Component<ILoadMoreCustomProps, IState> {
   render() {
     return (
-      <LoadMoreContainer>
+      <LoadMoreContainer usageTableType={this.props.usageTableType}>
         <StyledButton
           id="load_more_button"
           onClick={() => this.props.onLoadMore(this.props.initialPage + 1)}
