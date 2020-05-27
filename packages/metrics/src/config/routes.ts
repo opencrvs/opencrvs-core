@@ -308,7 +308,7 @@ export const getRoutes = () => {
         validate: {
           query: Joi.object({
             compositionId: Joi.string().required(),
-            status: Joi.string().required()
+            status: Joi.string().optional()
           })
         },
         tags: ['api']

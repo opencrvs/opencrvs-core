@@ -11,6 +11,11 @@
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
+import {
+  getTimeLoggedFromMetrics,
+  ITimeLoggedResponse
+} from '@gateway/features/fhir/utils'
+import { getUser } from '@gateway/features/user/utils'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -32,6 +37,73 @@ export interface ISearchCriteria {
   size?: number
   from?: number
   createdBy?: string
+}
+
+const getTimeLoggedDataByStatus = (
+  timeLoggedData: ITimeLoggedResponse[],
+  status: string
+) => {
+  return (
+    (timeLoggedData &&
+      timeLoggedData.find(
+        timeLoggedByStatus =>
+          timeLoggedByStatus.status && timeLoggedByStatus.status === status
+      )?.timeSpentEditing) ||
+    null
+  )
+}
+
+const getChildName = (source: ISearchDataTemplate) => {
+  if (!source) {
+    return null
+  }
+  const names = [
+    {
+      use: 'en',
+      given: (source.childFirstNames && [source.childFirstNames]) || null,
+      family: (source.childFamilyName && [source.childFamilyName]) || null
+    }
+  ]
+
+  if (NATIVE_LANGUAGE) {
+    names.push({
+      use: NATIVE_LANGUAGE,
+      given:
+        (source.childFirstNamesLocal && [source.childFirstNamesLocal]) || null,
+      family:
+        (source.childFamilyNameLocal && [source.childFamilyNameLocal]) || null
+    })
+  }
+
+  return names
+}
+
+const getDeceasedName = (source: ISearchDataTemplate) => {
+  if (!source) {
+    return null
+  }
+
+  const names = [
+    {
+      use: 'en',
+      given: (source.deceasedFirstNames && [source.deceasedFirstNames]) || null,
+      family: (source.deceasedFamilyName && [source.deceasedFamilyName]) || null
+    }
+  ]
+
+  if (NATIVE_LANGUAGE) {
+    names.push({
+      use: NATIVE_LANGUAGE,
+      given:
+        (source.deceasedFirstNamesLocal && [source.deceasedFirstNamesLocal]) ||
+        null,
+      family:
+        (source.deceasedFamilyNameLocal && [source.deceasedFamilyNameLocal]) ||
+        null
+    })
+  }
+
+  return names
 }
 
 export const searchTypeResolvers: GQLResolver = {
@@ -59,42 +131,7 @@ export const searchTypeResolvers: GQLResolver = {
       return resultSet._source.operationHistories
     },
     childName(resultSet: ISearchEventDataTemplate) {
-      if (!resultSet._source) {
-        return null
-      }
-      const names = [
-        {
-          use: 'en',
-          given:
-            (resultSet._source.childFirstNames && [
-              resultSet._source.childFirstNames
-            ]) ||
-            null,
-          family:
-            (resultSet._source.childFamilyName && [
-              resultSet._source.childFamilyName
-            ]) ||
-            null
-        }
-      ]
-
-      if (NATIVE_LANGUAGE) {
-        names.push({
-          use: NATIVE_LANGUAGE,
-          given:
-            (resultSet._source.childFirstNamesLocal && [
-              resultSet._source.childFirstNamesLocal
-            ]) ||
-            null,
-          family:
-            (resultSet._source.childFamilyNameLocal && [
-              resultSet._source.childFamilyNameLocal
-            ]) ||
-            null
-        })
-      }
-
-      return names
+      return getChildName(resultSet._source)
     },
     dateOfBirth(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.childDoB) || null
@@ -114,43 +151,7 @@ export const searchTypeResolvers: GQLResolver = {
       return resultSet._source.operationHistories
     },
     deceasedName(resultSet: ISearchEventDataTemplate) {
-      if (!resultSet._source) {
-        return null
-      }
-
-      const names = [
-        {
-          use: 'en',
-          given:
-            (resultSet._source.deceasedFirstNames && [
-              resultSet._source.deceasedFirstNames
-            ]) ||
-            null,
-          family:
-            (resultSet._source.deceasedFamilyName && [
-              resultSet._source.deceasedFamilyName
-            ]) ||
-            null
-        }
-      ]
-
-      if (NATIVE_LANGUAGE) {
-        names.push({
-          use: NATIVE_LANGUAGE,
-          given:
-            (resultSet._source.deceasedFirstNamesLocal && [
-              resultSet._source.deceasedFirstNamesLocal
-            ]) ||
-            null,
-          family:
-            (resultSet._source.deceasedFamilyNameLocal && [
-              resultSet._source.deceasedFamilyNameLocal
-            ]) ||
-            null
-        })
-      }
-
-      return names
+      return getDeceasedName(resultSet._source)
     },
     dateOfDeath(resultSet: ISearchEventDataTemplate) {
       return (resultSet._source && resultSet._source.deathDate) || null
@@ -205,6 +206,69 @@ export const searchTypeResolvers: GQLResolver = {
       }
 
       return names
+    }
+  },
+  EventProgressSet: {
+    id(searchData: ISearchEventDataTemplate) {
+      return searchData._id
+    },
+    type(searchData: ISearchEventDataTemplate) {
+      return searchData._source.event
+    },
+    name(searchData: ISearchEventDataTemplate) {
+      if (searchData._source.event === 'Birth') {
+        return getChildName(searchData._source)
+      } else if (searchData._source.event === 'Death') {
+        return getDeceasedName(searchData._source)
+      }
+      return null
+    },
+    dateOfEvent(searchData: ISearchEventDataTemplate) {
+      if (searchData._source.event === 'Birth') {
+        return (searchData._source && searchData._source.childDoB) || null
+      } else if (searchData._source.event === 'Death') {
+        return (searchData._source && searchData._source.deathDate) || null
+      }
+      return null
+    },
+    registration(searchData: ISearchEventDataTemplate) {
+      return searchData._source
+    },
+    startedBy: async (searchData: ISearchEventDataTemplate, _, authHeader) => {
+      return await getUser(
+        { practitionerId: searchData._source && searchData._source.createdBy },
+        authHeader
+      )
+    },
+    progressReport: async (
+      searchData: ISearchEventDataTemplate,
+      _,
+      authHeader
+    ) => {
+      return await getTimeLoggedFromMetrics(authHeader, searchData._id)
+    }
+  },
+  EventProgressData: {
+    timeInProgress(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(timeLoggedResponse, 'IN_PROGRESS')
+    },
+    timeInReadyForReview(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(timeLoggedResponse, 'DECLARED')
+    },
+    timeInRequiresUpdates(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(timeLoggedResponse, 'REJECTED')
+    },
+    timeInWaitingForApproval(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(timeLoggedResponse, 'VALIDATED')
+    },
+    timeInWaitingForBRIS(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(
+        timeLoggedResponse,
+        'WAITING_FOR_VALIDATION'
+      )
+    },
+    timeInReadyToPrint(timeLoggedResponse: ITimeLoggedResponse[]) {
+      return getTimeLoggedDataByStatus(timeLoggedResponse, 'REGISTERED')
     }
   }
 }

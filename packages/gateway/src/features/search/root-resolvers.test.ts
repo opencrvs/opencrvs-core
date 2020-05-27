@@ -323,4 +323,75 @@ describe('Search root resolvers', () => {
       expect(result.totalItems).toBe(1)
     })
   })
+
+  describe('getEventsWithProgress()', () => {
+    let unauthorizedUser: { Authorization: string }
+    let authorizedUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const registerUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      unauthorizedUser = {
+        Authorization: `Bearer ${registerUserToken}`
+      }
+      const sysadminUserToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authorizedUser = {
+        Authorization: `Bearer ${sysadminUserToken}`
+      }
+    })
+    it('returns an array of results for an authorized user', async () => {
+      fetch.mockResponse(
+        JSON.stringify({
+          body: {
+            hits: { total: 1, hits: [{ _type: 'composition', _source: {} }] }
+          }
+        })
+      )
+      const result = await resolvers.Query.getEventsWithProgress(
+        {},
+        {
+          locationIds: ['dummy_loc_id'],
+          count: 25,
+          skip: 0
+        },
+        authorizedUser
+      )
+
+      expect(result).toBeDefined()
+      expect(result.results).toBeInstanceOf(Array)
+      expect(result.totalItems).toBe(1)
+    })
+    it('throws an error for unauthorized user', async () => {
+      await expect(
+        resolvers.Query.getEventsWithProgress({}, {}, unauthorizedUser)
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+    it('throws an error for invalid location ids', async () => {
+      await expect(
+        resolvers.Query.getEventsWithProgress(
+          {},
+          { locationIds: [] },
+          authorizedUser
+        )
+      ).rejects.toThrowError('Invalid location id')
+    })
+  })
 })

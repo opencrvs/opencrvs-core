@@ -9,39 +9,32 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  GQLResolver,
-  GQLUserInput,
-  GQLHumanNameInput,
-  GQLUserIdentifierInput,
-  GQLSearchFieldAgentResponse
-} from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { postMetrics } from '@gateway/features/fhir/utils'
 import {
-  IUserSearchPayload,
+  IUserModelData,
   IUserPayload,
-  IUserModelData
+  IUserSearchPayload
 } from '@gateway/features/user/type-resolvers'
 import {
+  getFullName,
+  getUser,
   hasScope,
-  isTokenOwner,
-  getFullName
+  isTokenOwner
 } from '@gateway/features/user/utils'
-import { postMetrics } from '@gateway/features/fhir/utils'
+import {
+  GQLHumanNameInput,
+  GQLResolver,
+  GQLSearchFieldAgentResponse,
+  GQLUserIdentifierInput,
+  GQLUserInput
+} from '@gateway/graphql/schema'
+import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
   Query: {
     async getUser(_, { userId }, authHeader) {
-      const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
-        method: 'POST',
-        body: JSON.stringify({ userId }),
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeader
-        }
-      })
-      return await res.json()
+      return await getUser({ userId }, authHeader)
     },
 
     async searchUsers(

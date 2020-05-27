@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IAuthHeader } from '@gateway/common-types'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import fetch from 'node-fetch'
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { logger } from '@gateway/logger'
 import { callingCountries } from 'country-data'
-import { IAuthHeader } from '@gateway/common-types'
 import * as decode from 'jwt-decode'
-import { IUserModelData } from '@gateway/features/user/type-resolvers'
+import fetch from 'node-fetch'
 
 export interface ITokenPayload {
   sub: string
@@ -34,6 +34,21 @@ export const convertToLocal = (
     callingCountries[countryCode].countryCallingCodes[0],
     '0'
   )
+}
+
+export async function getUser(
+  body: { [key: string]: string | undefined },
+  authHeader: IAuthHeader
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+  return await res.json()
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
