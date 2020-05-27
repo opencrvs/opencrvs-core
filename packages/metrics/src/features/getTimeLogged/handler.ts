@@ -9,29 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
 import {
   COMPOSITION_ID,
   STATUS
 } from '@metrics/features/getTimeLogged/constants'
 import {
-  getTimeLoggedByStatus,
-  ITimeLoggedData
+  getTimeLogged,
+  getTimeLoggedByStatus
 } from '@metrics/features/getTimeLogged/utils'
+import * as Hapi from 'hapi'
 
 export async function getTimeLoggedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const compositionId = request.query[COMPOSITION_ID]
-  const status = request.query[STATUS].toUpperCase()
+  const status = request.query[STATUS]
 
-  const timeLoggedData: ITimeLoggedData[] = await getTimeLoggedByStatus(
-    compositionId,
-    status
-  )
-  return timeLoggedData && timeLoggedData.length > 0
-    ? timeLoggedData[0]
-    : // Send 0 if no logged data found for given status
-      { timeSpentEditing: 0 }
+  if (status) {
+    return getTimeLoggedByStatus(compositionId, status.toUpperCase())
+  } else {
+    return getTimeLogged(compositionId)
+  }
 }

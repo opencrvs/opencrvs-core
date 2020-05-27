@@ -317,6 +317,14 @@ async function createApplicationIndex(
   bundleEntries?: fhir.BundleEntry[]
 ) {
   const task = findTask(bundleEntries)
+  const contactPersonExtention = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-person'
+  )
+  const contactPersonRelationshipExtention = findTaskExtension(
+    task,
+    'http://opencrvs.org/specs/extension/contact-relationship'
+  )
   const contactNumberExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person-phone-number'
@@ -352,6 +360,10 @@ async function createApplicationIndex(
       code => code.system === 'http://opencrvs.org/doc-types'
     )
 
+  body.contactRelationship =
+    (contactPersonRelationshipExtention &&
+      contactPersonRelationshipExtention.valueString) ||
+    (contactPersonExtention && contactPersonExtention.valueString)
   body.contactNumber =
     contactNumberExtension && contactNumberExtension.valueString
   body.type =
