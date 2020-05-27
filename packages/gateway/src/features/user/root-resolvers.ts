@@ -22,6 +22,7 @@ import {
   hasScope,
   isTokenOwner
 } from '@gateway/features/user/utils'
+import { logger } from '@gateway/logger'
 import {
   GQLHumanNameInput,
   GQLResolver,
@@ -30,7 +31,6 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
-import { logger } from '@gateway/logger'
 
 export const resolvers: GQLResolver = {
   Query: {
