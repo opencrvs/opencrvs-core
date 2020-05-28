@@ -90,7 +90,10 @@ function LocationPickerComponent(props: LocationPickerProps) {
 
   return (
     <div>
-      <PickerButton onClick={() => setModalVisible(true)}>
+      <PickerButton
+        id="location-range-picker-action"
+        onClick={() => setModalVisible(true)}
+      >
         <ContentWrapper>
           <span>{selectedSearchedLocation.displayLabel}</span>
           <MapPin />
@@ -98,7 +101,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
       </PickerButton>
       {modalVisible && (
         <>
-          <ModalContainer>
+          <ModalContainer id="picker-modal">
             <ModalHeader>
               <TitleContent>
                 <Location />

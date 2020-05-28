@@ -38,7 +38,7 @@ describe('Field agent list tests', () => {
         request: {
           query: FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA,
           variables: {
-            locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+            locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             status: 'active',
             event: undefined,
             timeEnd: new Date(1487076708000).toISOString(),
@@ -87,7 +87,7 @@ describe('Field agent list tests', () => {
         // @ts-ignore
         location={{
           search: querystring.stringify({
-            locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+            locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
           })
@@ -124,13 +124,41 @@ describe('Field agent list tests', () => {
         .text()
     ).toBe('Naeem Hossain')
   })
+
+  it('changing location id from location picker updates the query params', async () => {
+    const locationIdBeforeChange = querystring.parse(history.location.search)
+      .locationId
+    const locationPickerElement = await waitForElement(
+      component,
+      '#location-range-picker-action'
+    )
+
+    locationPickerElement.hostNodes().simulate('click')
+
+    const locationSearchInput = await waitForElement(
+      component,
+      '#locationSearchInput'
+    )
+    locationSearchInput.hostNodes().simulate('change', {
+      target: { value: 'Duaz', id: 'locationSearchInput' }
+    })
+
+    const searchResultOption = await waitForElement(
+      component,
+      '#locationOptiond3cef1d4-6187-4f0e-a024-61abd3fce9d4'
+    )
+    searchResultOption.hostNodes().simulate('click')
+    const newLocationId = querystring.parse(history.location.search).locationId
+    expect(newLocationId).not.toBe(locationIdBeforeChange)
+    expect(newLocationId).toBe('d3cef1d4-6187-4f0e-a024-61abd3fce9d4')
+  })
   it('For graphql errors it renders with error components', async () => {
     const testErrorComponent = await createTestComponent(
       <FieldAgentList
         // @ts-ignore
         location={{
           search: querystring.stringify({
-            locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+            locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
           })
