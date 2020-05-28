@@ -47,6 +47,7 @@ const LoaderBox = styled.span<{
 type ProgressBarShape = 'square' | 'round' | 'butt'
 
 interface IProgressBarProps {
+  id?: string
   loading?: boolean
   title?: string
   color?: string
@@ -84,6 +85,7 @@ export class ProgressBar extends React.Component<IProgressBarProps, {}> {
           <HeaderWrapper>
             {!disabled ? (
               <TitleLink
+                id={`${this.props.id}-title-link`}
                 onClick={this.props.onClick || this.defaultClickHadler}
               >
                 {title}

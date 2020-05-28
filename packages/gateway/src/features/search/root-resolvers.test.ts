@@ -381,7 +381,9 @@ describe('Search root resolvers', () => {
         {
           parentLocationId: 'dummy_loc_id_parent',
           count: 25,
-          skip: 0
+          skip: 25,
+          type: ['birth-application'],
+          status: ['REGISTERED']
         },
         authorizedUser
       )
