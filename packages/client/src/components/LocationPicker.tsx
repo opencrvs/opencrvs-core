@@ -51,7 +51,7 @@ const ModalContainer = styled(CommonModalContainer)`
 `
 
 const ModalBody = styled.div`
-  padding: 8px 16px;
+  padding: 8px 0;
 `
 const StyledLocationSearch = styled(LocationSearch)`
   flex-direction: column;
@@ -63,6 +63,8 @@ const StyledLocationSearch = styled(LocationSearch)`
 
   & > input {
     padding-left: 8px;
+    margin: 0 16px;
+    width: calc(100% - 32px);
   }
 
   & > ul {
@@ -70,6 +72,7 @@ const StyledLocationSearch = styled(LocationSearch)`
     z-index: 2;
     top: 0;
     box-shadow: none;
+    padding-top: 8px;
     margin-bottom: 0;
   }
 
