@@ -12,6 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IregistrationHomeMessages {
+  certified: MessageDescriptor
   dataTableResults: MessageDescriptor
   inProgress: MessageDescriptor
   inProgressFieldAgents: MessageDescriptor
@@ -32,6 +33,11 @@ interface IregistrationHomeMessages {
 }
 
 const messagesToDefine: IregistrationHomeMessages = {
+  certified: {
+    defaultMessage: 'Certified',
+    description: 'Label for registration status certified',
+    id: 'register.registrationHome.certified'
+  },
   dataTableResults: {
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component',

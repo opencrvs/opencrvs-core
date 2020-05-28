@@ -77,6 +77,7 @@ interface IFormMessages {
   commentsOrNotesLabel: MessageDescriptor
   confirm: MessageDescriptor
   confirmMotherDetails: MessageDescriptor
+  contactDetailsApplicant: MessageDescriptor
   contactDetailsBoth: MessageDescriptor
   contactDetailsFather: MessageDescriptor
   contactDetailsMother: MessageDescriptor
@@ -688,6 +689,11 @@ const messagesToDefine: IFormMessages = {
       'Does their proof of ID document match the following details?',
     description: 'The label for mother details paragraph',
     id: 'form.field.label.print.confirmMotherInformation'
+  },
+  contactDetailsApplicant: {
+    id: 'form.field.label.application.whoseContactDetails.applicant',
+    defaultMessage: 'Applicant',
+    description: 'Label for "Applicant" select option'
   },
   contactDetailsBoth: {
     defaultMessage: 'Both Parents',

@@ -121,7 +121,7 @@ interface LocationPickerProps {
   children: React.ReactNode
 }
 
-function LocationPicker(props: LocationPickerProps) {
+export function LocationPicker(props: LocationPickerProps) {
   return (
     <PickerButton onClick={props.handler}>
       <ContentWrapper>

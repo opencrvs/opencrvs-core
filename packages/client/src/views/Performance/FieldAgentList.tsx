@@ -106,7 +106,7 @@ const ContentWrapper = styled.div`
     margin-left: 8px;
   }
 `
-enum EVENT_OPTIONS {
+export enum EVENT_OPTIONS {
   ALL = '',
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'

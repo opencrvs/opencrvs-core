@@ -1632,10 +1632,12 @@ export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetEventsWithProgressArgs {
-  locationIds?: Array<string | null>
+  parentLocationId?: string
   count?: number
   skip?: number
   sort?: string
+  status?: Array<string | null>
+  type?: Array<string | null>
 }
 export interface QueryToGetEventsWithProgressResolver<
   TParent = any,
