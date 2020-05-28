@@ -390,20 +390,20 @@ class HeaderComp extends React.Component<IProps, IState> {
     ) {
       menuItems = [
         {
+          key: 'performance',
+          title: intl.formatMessage(constantsMessages.performanceTitle),
+          onClick: goToHomeAction,
+          selected:
+            enableMenuSelection &&
+            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+        },
+        {
           key: 'team',
           title: intl.formatMessage(messages.teamTitle),
           onClick: goToHomeAction,
           selected:
             enableMenuSelection &&
             activeMenuItem !== ACTIVE_MENU_ITEM.PERFORMANCE
-        },
-        {
-          key: 'performance',
-          title: intl.formatMessage(constantsMessages.performanceTitle),
-          onClick: goToPerformanceHomeAction,
-          selected:
-            enableMenuSelection &&
-            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         }
       ]
 
