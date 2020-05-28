@@ -52,7 +52,7 @@ describe('Workflow status tests', () => {
         result: {
           data: {
             getEventsWithProgress: {
-              totalItems: 2,
+              totalItems: 3,
               results: [
                 {
                   id: '137a4fb2-36ad-4897-8953-dbad0a756d4f',
@@ -143,6 +143,51 @@ describe('Workflow status tests', () => {
                     timeInWaitingForBRIS: 1200,
                     timeInReadyToPrint: 78
                   }
+                },
+                {
+                  id: '8a1d92b8-18a6-4074-83fb-cc57134e6dbf',
+                  type: 'Birth',
+                  name: [
+                    {
+                      use: 'en',
+                      firstNames: '',
+                      familyName: 'Mother Family Name'
+                    },
+                    {
+                      use: 'bn',
+                      firstNames: '',
+                      familyName: 'আমিনা'
+                    }
+                  ],
+                  dateOfEvent: '2020-03-15',
+                  registration: {
+                    status: 'CERTIFIED',
+                    contactNumber: '+8801656568682',
+                    contactRelationship: 'MOTHER',
+                    dateOfApplication: '2020-05-22T06:18:04.895Z',
+                    trackingId: 'BGEPVNQ',
+                    registrationNumber: '20207210411000118',
+                    createdAt: '1590128285130',
+                    modifiedAt: null
+                  },
+                  startedBy: {
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful'
+                      }
+                    ],
+                    role: 'LOCAL_REGISTRAR'
+                  },
+                  progressReport: {
+                    timeInProgress: null,
+                    timeInReadyForReview: null,
+                    timeInRequiresUpdates: null,
+                    timeInWaitingForApproval: null,
+                    timeInWaitingForBRIS: null,
+                    timeInReadyToPrint: 72
+                  }
                 }
               ]
             }
@@ -221,17 +266,27 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 20, 2020(3 days ago)')
+      ).toBe('May 22, 2020(a day ago)')
 
       toggleSortButton.hostNodes().simulate('click')
 
       expect(
         listTable
-          .find('div#row_1')
+          .find('div#row_2')
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 20, 2020(3 days ago)')
+      ).toBe('May 22, 2020(a day ago)')
+
+      toggleSortButton.hostNodes().simulate('click')
+
+      expect(
+        listTable
+          .find('div#row_0')
+          .hostNodes()
+          .childAt(7)
+          .text()
+      ).toBe('May 22, 2020(a day ago)')
     })
 
     it('update event from select updates query params', async () => {
@@ -279,9 +334,7 @@ describe('Workflow status tests', () => {
           // @ts-ignore
           location={{
             search: queryString.stringify({
-              locationId,
-              event: 'BIRTH',
-              status: 'REGISTERED'
+              locationId
             }),
             state: {
               sectionId: OPERATIONAL_REPORT_SECTION,
