@@ -63,7 +63,7 @@ const StyledLocationSearch = styled(LocationSearch)`
 
   & > input {
     padding-left: 8px;
-    margin: 0 16px;
+    margin: 0 16px 8px 16px;
     width: calc(100% - 32px);
   }
 
@@ -72,7 +72,6 @@ const StyledLocationSearch = styled(LocationSearch)`
     z-index: 2;
     top: 0;
     box-shadow: none;
-    padding-top: 8px;
     margin-bottom: 0;
   }
 
