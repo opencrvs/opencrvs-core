@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Header } from '@client/components/interface/Header/Header'
+import { Query } from '@client/components/Query'
 import {
   constantsMessages,
   errorMessages,
@@ -17,13 +18,11 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import { SEARCH_USERS } from '@client/user/queries'
-import { LANG_EN, SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { IUserDetails } from '@client/utils/userUtils'
+import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import {
   AddUser,
   AvatarSmall,
@@ -47,8 +46,6 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
-import { UserStatus } from '@client/views/SysAdmin/Team/utils'
-import { Query } from '@client/components/Query'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -89,7 +86,6 @@ const AddUserContainer = styled(AddUser)`
 `
 
 type BaseProps = {
-  userDetails: IUserDetails | null
   theme: ITheme
   goToCreateNewUser: typeof goToCreateNewUser
   goToReviewUserDetails: typeof goToReviewUserDetails
@@ -193,7 +189,7 @@ class UserListComponent extends React.Component<IProps, IState> {
   renderUserList = () => {
     const { intl, match } = this.props
 
-    const primaryOfficeId = match.params.ofcId
+    const primaryOfficeId = match && match.params.ofcId
     const columns = [
       {
         label: '',
@@ -278,36 +274,21 @@ class UserListComponent extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { intl, userDetails } = this.props
-    const role = userDetails && userDetails.role
+    const { intl } = this.props
     return (
       <>
-        {role && SYS_ADMIN_ROLES.includes(role) && (
-          <>
-            <Header title={intl.formatMessage(messages.systemTitle)} />
+        <Header title={intl.formatMessage(messages.systemTitle)} />
 
-            {this.renderUserList()}
-          </>
-        )}
+        {this.renderUserList()}
       </>
     )
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
-  return {
-    userDetails: getUserDetails(store)
-  }
-}
-
-const mapDispatchToProps = () => {
-  return {
+export const UserList = connect(
+  null,
+  {
     goToCreateNewUser,
     goToReviewUserDetails
   }
-}
-
-export const UserList = connect(
-  mapStateToProps,
-  mapDispatchToProps
 )(withTheme(injectIntl(UserListComponent)))
