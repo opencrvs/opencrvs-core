@@ -49,8 +49,8 @@ import {
   WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
-import { IStatusMapping } from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
