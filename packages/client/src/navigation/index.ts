@@ -20,9 +20,11 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
+  EVENT_REGISTRATION_RATES,
   FIELD_AGENT_HOME_TAB,
   HOME,
   OPERATIONAL_REPORT,
+  PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
   PERFORMANCE_REPORT,
   PERFORMANCE_REPORT_LIST,
@@ -42,19 +44,18 @@ import {
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
+  TEAM_SEARCH,
   VERIFY_COLLECTOR,
-  EVENT_REGISTRATION_RATES,
-  WORKFLOW_STATUS,
-  PERFORMANCE_FIELD_AGENT_LIST
+  WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
+import { IStatusMapping } from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
-import { Cmd, loop } from 'redux-loop'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
-import querystring from 'query-string'
 import moment from 'moment'
-import { IStatusMapping } from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
+import querystring from 'query-string'
+import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -174,11 +175,17 @@ export function goToHomeTab(tabId: string, selectorId: string = '') {
   return push(formatUrl(path, { tabId, selectorId }))
 }
 
-type PerformanceHomeHistoryState = {
+type searchedLocation = {
   selectedLocation: ISearchLocation
 }
 
-export function goToPerformanceHome(state?: PerformanceHomeHistoryState) {
+export function goToTeamSearch(searchedLocation: searchedLocation) {
+  return searchedLocation && searchedLocation.selectedLocation
+    ? push(TEAM_SEARCH, { selectedLocation: searchedLocation.selectedLocation })
+    : push(TEAM_SEARCH)
+}
+
+export function goToPerformanceHome(state?: searchedLocation) {
   return state && state.selectedLocation
     ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
     : push(PERFORMANCE_HOME)

@@ -60,6 +60,7 @@ import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
 import { WorkflowStatus } from '@client/views/Performance/WorkflowStatus'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { UserList } from './views/Team/user/userList'
+import { TeamSearch } from './views/Team/TeamSearch'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -257,8 +258,8 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.SYS_ADMIN_HOME}
-                                            component={UserList}
+                                            path={routes.TEAM_SEARCH}
+                                            component={TeamSearch}
                                           />
                                           <ProtectedRoute
                                             exact
