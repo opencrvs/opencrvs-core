@@ -9,13 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore } from '@client/store'
-import { SEARCH_USERS } from '@client/team/user/queries'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { createStore, AppStore } from '@client/store'
+import { SEARCH_USERS } from '@client/user/queries'
+import {
+  createTestComponent,
+  flushPromises,
+  createTestStore
+} from '@client/tests/util'
 import * as React from 'react'
 import { UserList } from './userList'
 import { ReactWrapper } from 'enzyme'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { History } from 'history'
 
 describe('User tab tests', () => {
   const { store, history } = createStore()
@@ -27,6 +32,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -43,7 +49,16 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
@@ -68,6 +83,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -82,29 +98,29 @@ describe('User tab tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const { component } = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
+      component.update()
 
-      // wait for mocked data to load mockedProvider
-      await new Promise(resolve => {
-        setTimeout(resolve, 100)
-      })
+      const addUser = await waitForElement(component, '#add-user')
+      addUser.hostNodes().simulate('click')
 
-      testComponent.component.update()
-      const app = testComponent.component
-      app
-        .find('#add-user')
-        .hostNodes()
-        .simulate('click')
+      component.update()
 
-      await flushPromises()
-
-      testComponent.component.update()
-      expect(window.location.href).toContain('/createUser')
+      expect(history.location.pathname).toContain('/createUser')
     })
   })
 
@@ -115,6 +131,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -131,7 +148,16 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
@@ -153,6 +179,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -242,7 +269,16 @@ describe('User tab tests', () => {
       beforeEach(async () => {
         const testComponent = await createTestComponent(
           // @ts-ignore
-          <UserList />,
+          <UserList
+            match={{
+              params: {
+                ofcId: 'dummy_ofc_id'
+              },
+              isExact: true,
+              path: '',
+              url: ''
+            }}
+          />,
           store,
           userListMock
         )
@@ -298,6 +334,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -385,7 +422,16 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
@@ -405,6 +451,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -562,7 +609,16 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
@@ -587,6 +643,7 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
+              primaryOfficeId: 'dummy_ofc_id',
               count: 10,
               skip: 0
             }
@@ -744,7 +801,16 @@ describe('User tab tests', () => {
       ]
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <UserList />,
+        <UserList
+          match={{
+            params: {
+              ofcId: 'dummy_ofc_id'
+            },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+        />,
         store,
         userListMock
       )
