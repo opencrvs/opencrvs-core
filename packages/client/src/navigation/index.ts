@@ -179,7 +179,7 @@ type searchedLocation = {
   selectedLocation: ISearchLocation
 }
 
-export function goToTeamSearch(searchedLocation: searchedLocation) {
+export function goToTeamSearch(searchedLocation?: searchedLocation) {
   return searchedLocation && searchedLocation.selectedLocation
     ? push(TEAM_SEARCH, { selectedLocation: searchedLocation.selectedLocation })
     : push(TEAM_SEARCH)
