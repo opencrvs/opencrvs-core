@@ -14,7 +14,7 @@ import { goToOperationalReport } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { generateLocations } from '@client/utils/locationUtils'
+import { generateOfficeLocations } from '@client/utils/locationUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceContentWrapper } from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
@@ -75,7 +75,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateLocations(offlineResources.locations)}
+          locationList={generateOfficeLocations(offlineResources.locations)}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />

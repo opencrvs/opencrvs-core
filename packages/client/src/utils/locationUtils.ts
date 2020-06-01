@@ -95,6 +95,36 @@ export function generateLocations(
   return generated
 }
 
+export function generateOfficeLocations(locations: {
+  [key: string]: ILocation
+}) {
+  const generated: ISearchLocation[] = Object.values(locations)
+    .filter(
+      (location: ILocation) =>
+        location.jurisdictionType && location.jurisdictionType === 'UNION'
+    )
+    .map((location: ILocation) => {
+      let locationName = location.name
+      location.jurisdictionType &&
+        (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
+
+      if (location.partOf && location.partOf !== 'Location/0') {
+        const locRef = location.partOf.split('/')[1]
+        let parent
+        if ((parent = locations[locRef] && locations[locRef].name)) {
+          locationName += `, ${parent}`
+        }
+      }
+
+      return {
+        id: location.id,
+        searchableText: location.name,
+        displayLabel: locationName
+      }
+    })
+  return generated
+}
+
 export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string
