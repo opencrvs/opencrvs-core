@@ -49,7 +49,12 @@
 
 **_We are on a mission to ensure that every individual on the planet is recognised, protected and provided for from birth._**
 
-[OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a full stack & fully configurable solution for interoperable, [civil registration](https://en.wikipedia.org/wiki/Civil_registration) services of a country. Built with [microservices](https://en.wikipedia.org/wiki/Microservices), health service compliant [HL7](http://www.hl7.org/index.cfm) - [FHIR standard](https://www.hl7.org/fhir/) [NoSQL databases](https://en.wikipedia.org/wiki/NoSQL), containerised and distributed on [Docker Swarm](https://docs.docker.com/engine/swarm/) for private or public cloud infrastructure, and accessible to front line staff by a multi-lingual, [offline & low connectivity](https://developers.google.com/web/progressive-web-apps) capable mobile web application, managements system and performance analytics dashboard.
+[OpenCRVS](https://www.opencrvs.org) (Civil registration & Vital Statistics) is a digital public good to help achieve universal civil
+registration and evidence-based decision making in all country contexts.
+
+<br />
+
+It is a full stack & fully configurable solution for the interoperable, [civil registration](https://en.wikipedia.org/wiki/Civil_registration) services of a country. Built with [microservices](https://en.wikipedia.org/wiki/Microservices), health service compliant [HL7](http://www.hl7.org/index.cfm) - [FHIR standard](https://www.hl7.org/fhir/) [NoSQL databases](https://en.wikipedia.org/wiki/NoSQL), containerised and distributed on [Docker Swarm](https://docs.docker.com/engine/swarm/) for private or public cloud infrastructure, and accessible to front line staff by a multi-lingual, [offline & low connectivity](https://developers.google.com/web/progressive-web-apps) capable mobile web application, an admin system and a performance analytics dashboard.
 
 <br>
 
@@ -63,7 +68,7 @@ Both **OpenCRVS Core** and a **Resources** package are required to run OpenCRVS.
 
 ## Preparing for installation
 
-- Read the [Introduction](http://documentation.opencrvs.org/docs/technology/technologyIntroduction)
+- Read the [technical documentation](http://documentation.opencrvs.org/opencrvs-core/docs/technology/technologyIntroduction).
 - OpenCRVS uses some exciting tools. Take some time to understand the dependencies below.
 
 When you clone this **OpenCRVS Core** repository, you are downloading:
