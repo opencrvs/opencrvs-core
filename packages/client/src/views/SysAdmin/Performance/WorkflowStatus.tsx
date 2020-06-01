@@ -9,56 +9,56 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { WrappedComponentProps, injectIntl } from 'react-intl'
-import { RouteComponentProps } from 'react-router'
+import {
+  NOTIFICATION_TYPE,
+  ToastNotification
+} from '@client/components/interface/ToastNotification'
+import { LocationPicker } from '@client/components/LocationPicker'
+import { Query } from '@client/components/Query'
+import { Event } from '@client/forms'
+import {
+  constantsMessages,
+  dynamicConstantsMessages,
+  formMessages,
+  userMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/performance'
+import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
+import { LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
+import {
+  OPERATIONAL_REPORT_SECTION,
+  StatusMapping
+} from '@client/views/SysAdmin/Performance/OperationalReport'
 import {
   PerformanceContentWrapper,
   PerformancePageVariant
 } from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
-import { messages } from '@client/i18n/messages/views/performance'
-import querystring from 'query-string'
-import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
-import { connect } from 'react-redux'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
-  StatusMapping,
-  OPERATIONAL_REPORT_SECTION
-} from '@client/views/Performance/OperationalReport'
-import {
-  ListTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  ListTable
 } from '@opencrvs/components/lib/interface'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
-  GQLQuery,
   GQLEventProgressSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { LANG_EN } from '@client/utils/constants'
-import {
-  userMessages,
-  dynamicConstantsMessages,
-  formMessages,
-  constantsMessages
-} from '@client/i18n/messages'
-import moment from 'moment'
-import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
-import { Query } from '@client/components/Query'
-import { FilterContainer } from '@client/views/Performance/utils'
-import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
-import {
-  ToastNotification,
-  NOTIFICATION_TYPE
-} from '@client/components/interface/ToastNotification'
-import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
-import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import { LocationPicker } from '@client/components/LocationPicker'
-import { Event } from '@client/forms'
-import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { orderBy } from 'lodash'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import moment from 'moment'
+import querystring from 'query-string'
+import * as React from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router'
+import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
 
 const { useState } = React
 
