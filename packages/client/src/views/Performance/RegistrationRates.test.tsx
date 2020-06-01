@@ -208,6 +208,59 @@ describe('Registraion Rates tests', () => {
     confirmButtonElement.hostNodes().simulate('click')
     expect(history.location.search).not.toBe(previousQueryParams)
   })
+
+  it('click on close button or outside modal closes location picker modal', async () => {
+    const locationPickerElement = await waitForElement(
+      component,
+      '#location-range-picker-action'
+    )
+    locationPickerElement.hostNodes().simulate('click')
+
+    expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
+
+    component
+      .find('#close-btn')
+      .hostNodes()
+      .simulate('click')
+
+    expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
+
+    locationPickerElement.hostNodes().simulate('click')
+    expect(component.find('#picker-modal').hostNodes()).toHaveLength(1)
+    component
+      .find('#cancelable-area')
+      .hostNodes()
+      .simulate('click')
+    expect(component.find('#picker-modal').hostNodes()).toHaveLength(0)
+  })
+
+  it('changing location id from location picker updates the query params', async () => {
+    const locationIdBeforeChange = queryString.parse(history.location.search)
+      .locationId
+    const locationPickerElement = await waitForElement(
+      component,
+      '#location-range-picker-action'
+    )
+
+    locationPickerElement.hostNodes().simulate('click')
+
+    const locationSearchInput = await waitForElement(
+      component,
+      '#locationSearchInput'
+    )
+    locationSearchInput.hostNodes().simulate('change', {
+      target: { value: 'Baniajan', id: 'locationSearchInput' }
+    })
+
+    const searchResultOption = await waitForElement(
+      component,
+      '#locationOptionbfe8306c-0910-48fe-8bf5-0db906cf3155'
+    )
+    searchResultOption.hostNodes().simulate('click')
+    const newLocationId = queryString.parse(history.location.search).locationId
+    expect(newLocationId).not.toBe(locationIdBeforeChange)
+    expect(newLocationId).toBe('bfe8306c-0910-48fe-8bf5-0db906cf3155')
+  })
 })
 
 describe('Registraion Rates error state tests', () => {

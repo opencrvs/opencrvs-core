@@ -57,8 +57,21 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
-export function generateLocations(locations: { [key: string]: ILocation }) {
-  const generated: ISearchLocation[] = Object.values(locations).map(
+export function generateLocations(
+  locations: { [key: string]: ILocation },
+  filterByJurisdictionTypes?: string[]
+) {
+  let locationArray = Object.values(locations)
+
+  if (filterByJurisdictionTypes) {
+    locationArray = locationArray.filter(
+      location =>
+        location.jurisdictionType &&
+        filterByJurisdictionTypes.includes(location.jurisdictionType)
+    )
+  }
+
+  const generated: ISearchLocation[] = locationArray.map(
     (location: ILocation) => {
       let locationName = location.name
       location.jurisdictionType &&

@@ -45,9 +45,6 @@ import {
 import moment from 'moment'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { Query } from '@client/components/Query'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { FilterContainer } from '@client/views/Performance/utils'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
 import {
@@ -56,18 +53,13 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import { generateLocations } from '@client/utils/locationUtils'
-import { LocationPicker } from '@client/views/Performance/RegistrationRates'
+import { LocationPicker } from '@client/components/LocationPicker'
 import { Event } from '@client/forms'
 import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { orderBy } from 'lodash'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 
 const { useState } = React
-
-interface ConnectProps {
-  offlineResources: IOfflineData
-}
 
 interface SortMap {
   applicationStartedOn: SORT_ORDER
@@ -115,7 +107,6 @@ interface ISearchParams {
 
 interface WorkflowStatusProps
   extends RouteComponentProps,
-    ConnectProps,
     DispatchProps,
     WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
@@ -421,12 +412,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       [sortOrder.applicationStartedOn]
     )
   }
-  const searchableLocations = generateLocations(
-    props.offlineResources.locations
-  )
-  const selectedLocation = searchableLocations.find(
-    ({ id }) => id === locationId
-  )
 
   return (
     <PerformanceContentWrapper
@@ -443,9 +428,22 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
       toolbarComponent={
         <FilterContainer>
-          <LocationPicker>
-            {selectedLocation && selectedLocation.displayLabel}
-          </LocationPicker>
+          <LocationPicker
+            selectedLocationId={locationId}
+            onChangeLocation={(newLocationId: string) => {
+              props.goToWorkflowStatus(
+                sectionId,
+                newLocationId,
+                new Date(timeStart),
+                new Date(timeEnd),
+                status,
+                event
+              )
+            }}
+            requiredJurisdictionTypes={
+              window.config.APPLICATION_AUDIT_LOCATIONS
+            }
+          />
           <PerformanceSelect
             onChange={({ value }) => {
               props.goToWorkflowStatus(
@@ -551,10 +549,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 }
 
 export const WorkflowStatus = connect(
-  (store: IStoreState) => {
-    return {
-      offlineResources: getOfflineData(store)
-    }
-  },
+  null,
   { goToOperationalReport, goToWorkflowStatus }
 )(injectIntl(WorkflowStatusComponent))
