@@ -60,7 +60,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { UserList } from './views/SysAdmin/Team/user/userList'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
   client?: ApolloClient<{}>

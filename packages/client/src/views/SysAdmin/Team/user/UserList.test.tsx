@@ -17,7 +17,7 @@ import {
   createTestStore
 } from '@client/tests/util'
 import * as React from 'react'
-import { UserList } from './userList'
+import { UserList } from './UserList'
 import { ReactWrapper } from 'enzyme'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
