@@ -95,31 +95,16 @@ export function generateLocations(
   return generated
 }
 
-export function generateOfficeLocations(locations: {
-  [key: string]: ILocation
-}) {
+export function getOfficeLocations(locations: { [key: string]: ILocation }) {
   const generated: ISearchLocation[] = Object.values(locations)
     .filter(
-      (location: ILocation) =>
-        location.jurisdictionType && location.jurisdictionType === 'UNION'
+      (location: ILocation) => location.type && location.type === 'CRVS_OFFICE'
     )
     .map((location: ILocation) => {
-      let locationName = location.name
-      location.jurisdictionType &&
-        (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
-
-      if (location.partOf && location.partOf !== 'Location/0') {
-        const locRef = location.partOf.split('/')[1]
-        let parent
-        if ((parent = locations[locRef] && locations[locRef].name)) {
-          locationName += `, ${parent}`
-        }
-      }
-
       return {
         id: location.id,
         searchableText: location.name,
-        displayLabel: locationName
+        displayLabel: location.name
       }
     })
   return generated

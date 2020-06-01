@@ -14,7 +14,7 @@ import { goToTeamUserList } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { generateOfficeLocations } from '@client/utils/locationUtils'
+import { getOfficeLocations } from '@client/utils/locationUtils'
 import { PerformanceContentWrapper } from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
 import {
@@ -71,7 +71,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={generateOfficeLocations(offlineResources.locations)}
+          locationList={getOfficeLocations(offlineResources.facilities)}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />
