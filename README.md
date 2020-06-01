@@ -23,7 +23,7 @@
 - [How can I test OpenCRVS locally on an Android device?](#how-can-i-test-opencrvs-locally-on-an-android-device)
 - [How can I set up continuous integration and delivery?](#how-can-i-set-up-continuous-integration-and-delivery)
 - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
-- [Clearing and creating your own reference data in your resources module]
+- [Clearing and creating your own reference data in your resources module](#clearing-and-creating-your-own-reference-data-in-your-resources-module)
 - [Create a new metadata db dump in your resources module](#create-a-new-metadata-db-dump-in-your-resources-module)
 - [Docker scripts](#docker-scripts)
 - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
