@@ -15,7 +15,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { getOfficeLocations } from '@client/utils/locationUtils'
-import { PerformanceContentWrapper } from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
 import {
   ISearchLocation,
@@ -66,7 +66,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
     const { intl, offlineResources } = this.props
 
     return (
-      <PerformanceContentWrapper>
+      <SysAdminContentWrapper>
         <Header>{intl.formatMessage(messages.sysAdminTeamHomeHeader)}</Header>
 
         <LocationSearch
@@ -75,7 +75,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />
-      </PerformanceContentWrapper>
+      </SysAdminContentWrapper>
     )
   }
 }

@@ -24,7 +24,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
-import { PerformanceContentWrapper } from './PerformanceContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Header } from './utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 
@@ -88,7 +88,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { intl, offlineResources } = this.props
 
     return (
-      <PerformanceContentWrapper>
+      <SysAdminContentWrapper>
         <Header>
           {intl.formatMessage(messages.sysAdminPerformanceHomeHeader)}
         </Header>
@@ -105,7 +105,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           <StyledText>Bhurungamari Upazila</StyledText>
           <StyledText>Narsingdi Upazila</StyledText>
         </MessageContainer>
-      </PerformanceContentWrapper>
+      </SysAdminContentWrapper>
     )
   }
 }

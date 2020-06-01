@@ -12,11 +12,11 @@
 import * as React from 'react'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
-import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from './PerformanceContentWrapper'
 import { ReactWrapper } from 'enzyme'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from './SysAdminContentWrapper'
 
 describe('Performance content wrapper', () => {
   const { store } = createStore()
@@ -26,8 +26,8 @@ describe('Performance content wrapper', () => {
 
     beforeAll(async () => {
       app = (await createTestComponent(
-        <PerformanceContentWrapper
-          type={PerformancePageVariant.SUBPAGE}
+        <SysAdminContentWrapper
+          type={SysAdminPageVariant.SUBPAGE}
           headerTitle="Subpage"
           backActionHandler={() => {}}
         />,

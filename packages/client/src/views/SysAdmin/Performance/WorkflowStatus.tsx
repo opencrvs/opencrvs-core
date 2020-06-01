@@ -32,9 +32,9 @@ import {
   StatusMapping
 } from '@client/views/SysAdmin/Performance/OperationalReport'
 import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
@@ -418,9 +418,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   return (
-    <PerformanceContentWrapper
+    <SysAdminContentWrapper
       id="workflow-status"
-      type={PerformancePageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE}
       headerTitle={intl.formatMessage(messages.workflowStatusHeader)}
       backActionHandler={() =>
         props.goToOperationalReport(
@@ -549,7 +549,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           )
         }}
       </Query>
-    </PerformanceContentWrapper>
+    </SysAdminContentWrapper>
   )
 }
 

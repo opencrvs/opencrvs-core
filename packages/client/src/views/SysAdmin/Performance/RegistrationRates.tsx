@@ -25,13 +25,13 @@ import {
 } from '@client/navigation'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
-import {
   FilterContainer,
   getJurisidictionType
 } from '@client/views/SysAdmin/Performance/utils'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   GQLMonthWise45DayEstimation,
   GQLMonthWiseEstimationMetrics
@@ -120,9 +120,9 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   const dateEnd = new Date(timeEnd)
 
   return (
-    <PerformanceContentWrapper
+    <SysAdminContentWrapper
       id="reg-rates"
-      type={PerformancePageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE}
       backActionHandler={() =>
         goToOperationalReport(
           locationId,
@@ -254,7 +254,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
           }
         }}
       </Query>
-    </PerformanceContentWrapper>
+    </SysAdminContentWrapper>
   )
 }
 

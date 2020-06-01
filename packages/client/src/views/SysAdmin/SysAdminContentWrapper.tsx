@@ -26,19 +26,19 @@ const Content = styled(BodyContent)`
 const SubPageContent = styled(Content)`
   margin: 8px auto 0;
 `
-export enum PerformancePageVariant {
+export enum SysAdminPageVariant {
   DEFAULT = 'DEFAULT',
   SUBPAGE = 'SUBPAGE'
 }
 
 interface BasePage {
   id?: string
-  type?: PerformancePage['type']
+  type?: SysAdminPage['type']
   children?: React.ReactNode
 }
 
 interface DefaultPage extends BasePage {
-  type?: typeof PerformancePageVariant.DEFAULT
+  type?: typeof SysAdminPageVariant.DEFAULT
 }
 
 interface HeaderProps {
@@ -49,13 +49,13 @@ interface HeaderProps {
 }
 
 interface SubPage extends BasePage, HeaderProps {
-  type: typeof PerformancePageVariant.SUBPAGE
+  type: typeof SysAdminPageVariant.SUBPAGE
 }
 
-type PerformancePage = DefaultPage | SubPage
+type SysAdminPage = DefaultPage | SubPage
 
-function isSubPage(page: PerformancePage): page is SubPage {
-  return page.type === PerformancePageVariant.SUBPAGE
+function isSubPage(page: SysAdminPage): page is SubPage {
+  return page.type === SysAdminPageVariant.SUBPAGE
 }
 
 const SubPageHeaderContainer = styled.div`
@@ -111,7 +111,7 @@ function SubPageHeader(props: HeaderProps) {
   )
 }
 
-export function PerformanceContentWrapper(props: PerformancePage) {
+export function SysAdminContentWrapper(props: SysAdminPage) {
   let pageHeader: JSX.Element
   let pageContent: JSX.Element
   if (isSubPage(props)) {

@@ -22,14 +22,14 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -259,9 +259,9 @@ function FieldAgentListComponent(props: IProps) {
   }
 
   return (
-    <PerformanceContentWrapper
+    <SysAdminContentWrapper
       id="field-agent-list"
-      type={PerformancePageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE}
       backActionHandler={() =>
         goToOperationalReport(
           locationId,
@@ -417,7 +417,7 @@ function FieldAgentListComponent(props: IProps) {
           }
         }}
       </Query>
-    </PerformanceContentWrapper>
+    </SysAdminContentWrapper>
   )
 }
 

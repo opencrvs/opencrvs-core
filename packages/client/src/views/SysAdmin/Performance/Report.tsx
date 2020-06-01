@@ -9,52 +9,41 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ICON_ALIGNMENT,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { BackArrow } from '@opencrvs/components/lib/icons'
-import { buttonMessages } from '@client/i18n/messages'
+import { Query } from '@client/components/Query'
+import { Event } from '@client/forms'
 import { goBack } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { PERFORMANCE_REPORT_TYPE_MONTHLY } from '@client/utils/constants'
-import { Header } from '@client/views/SysAdmin/Performance/utils'
+import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
+import {
+  CertificationPaymentReports,
+  Estimated45DayRegistrationReports,
+  GenderBasisReports,
+  TimeFrameReports
+} from '@client/views/SysAdmin/Performance/reports'
+import {
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import {
+  GQLCertificationPaymentMetrics,
+  GQLRegistration45DayEstimatedMetrics,
+  GQLRegistrationGenderBasisMetrics,
+  GQLRegistrationMetrics,
+  GQLRegistrationTimeFrameMetrics
+} from '@opencrvs/gateway/src/graphql/schema'
+import { ApolloError } from 'apollo-client'
+import { get, isEmpty } from 'lodash'
+import moment from 'moment'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from './PerformanceContentWrapper'
 import { NoResultMessage } from './NoResultMessage'
-import { generateLocations } from '@client/utils/locationUtils'
-import {
-  LocationSearch,
-  ISearchLocation
-} from '@opencrvs/components/lib/interface'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { IStoreState } from '@client/store'
-import { Query } from '@client/components/Query'
-import { PERFORMANCE_METRICS } from '@client/views/SysAdmin/Performance/metricsQuery'
-import {
-  GQLCertificationPaymentMetrics,
-  GQLRegistrationMetrics,
-  GQLRegistrationGenderBasisMetrics,
-  GQLRegistrationTimeFrameMetrics,
-  GQLRegistration45DayEstimatedMetrics
-} from '@opencrvs/gateway/src/graphql/schema'
-import { ApolloError } from 'apollo-client'
-import {
-  TimeFrameReports,
-  GenderBasisReports,
-  Estimated45DayRegistrationReports,
-  CertificationPaymentReports
-} from '@client/views/SysAdmin/Performance/reports'
-import moment from 'moment'
-import { Event } from '@client/forms'
-import { isEmpty, get } from 'lodash'
 
 const BackButton = styled(TertiaryButton)`
   margin-top: 24px;
@@ -98,9 +87,9 @@ function ReportComponent(props: Props) {
 
   const title = moment(start).format('MMMM YYYY')
   return (
-    <PerformanceContentWrapper
+    <SysAdminContentWrapper
       id="reports"
-      type={PerformancePageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE}
       backActionHandler={props.goBack}
       headerTitle={title}
     >
@@ -190,7 +179,7 @@ function ReportComponent(props: Props) {
           }
         }}
       </Query>
-    </PerformanceContentWrapper>
+    </SysAdminContentWrapper>
   )
 }
 

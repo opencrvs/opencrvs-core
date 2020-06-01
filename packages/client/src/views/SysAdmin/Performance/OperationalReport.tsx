@@ -43,6 +43,7 @@ import {
   FilterContainer,
   getMonthDateRange
 } from '@client/views/SysAdmin/Performance/utils'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   ICON_ALIGNMENT,
   LinkButton,
@@ -66,7 +67,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
-import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
 import { getToken } from '@client/utils/authUtils'
@@ -387,7 +387,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.state
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
-      <PerformanceContentWrapper>
+      <SysAdminContentWrapper>
         <Container marginRight={mainWindowRightMargin}>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
@@ -608,7 +608,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
             </Query>
           </ApplicationStatusWindow>
         )}
-      </PerformanceContentWrapper>
+      </SysAdminContentWrapper>
     )
   }
 }
