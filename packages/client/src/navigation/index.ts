@@ -46,7 +46,8 @@ import {
   SYS_ADMIN_HOME_TAB,
   TEAM_SEARCH,
   VERIFY_COLLECTOR,
-  WORKFLOW_STATUS
+  WORKFLOW_STATUS,
+  TEAM_USER_LIST
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -224,6 +225,13 @@ export function goToOperationalReport(
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
     })
+  })
+}
+
+export function goToTeamUserList(selectedLocation: ISearchLocation) {
+  return push({
+    pathname: TEAM_USER_LIST,
+    search: querystring.stringify({ locationId: selectedLocation.id })
   })
 }
 

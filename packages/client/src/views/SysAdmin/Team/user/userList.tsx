@@ -46,6 +46,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
+import querystring from 'query-string'
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -84,6 +85,10 @@ const DisabledStatusBox = styled(StatusBox)`
 const AddUserContainer = styled(AddUser)`
   cursor: pointer;
 `
+
+interface ISearchParams {
+  locationId: string
+}
 
 type BaseProps = {
   theme: ITheme
@@ -187,9 +192,14 @@ class UserListComponent extends React.Component<IProps, IState> {
   }
 
   renderUserList = () => {
-    const { intl, match } = this.props
+    const {
+      intl,
+      location: { search }
+    } = this.props
+    const { locationId } = (querystring.parse(
+      search
+    ) as unknown) as ISearchParams
 
-    const primaryOfficeId = match && match.params.ofcId
     const columns = [
       {
         label: '',
@@ -232,7 +242,7 @@ class UserListComponent extends React.Component<IProps, IState> {
       <Query
         query={SEARCH_USERS}
         variables={{
-          primaryOfficeId,
+          primaryOfficeId: locationId,
           count: this.pageSize,
           skip: (this.state.usersPageNo - 1) * this.pageSize
         }}

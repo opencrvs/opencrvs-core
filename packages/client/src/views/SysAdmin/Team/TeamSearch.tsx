@@ -10,12 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToOperationalReport } from '@client/navigation'
+import { goToTeamUserList } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateOfficeLocations } from '@client/utils/locationUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceContentWrapper } from '@client/views/SysAdmin/Performance/PerformanceContentWrapper'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
 import {
@@ -28,7 +27,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 
 interface BaseProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToTeamUserList: typeof goToTeamUserList
 }
 
 type Props = BaseProps &
@@ -60,10 +59,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
   searchButtonHandler = () => {
     this.state.selectedLocation &&
-      this.props.goToOperationalReport(
-        this.state.selectedLocation.id,
-        OPERATIONAL_REPORT_SECTION.OPERATIONAL
-      )
+      this.props.goToTeamUserList(this.state.selectedLocation)
   }
 
   render() {
@@ -93,6 +89,6 @@ function mapStateToProps(state: IStoreState) {
 export const TeamSearch = connect(
   mapStateToProps,
   {
-    goToOperationalReport
+    goToTeamUserList
   }
 )(injectIntl(TeamSearchComponent))

@@ -60,6 +60,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { UserList } from './views/SysAdmin/Team/user/userList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -259,6 +260,11 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.TEAM_SEARCH}
                                             component={TeamSearch}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.TEAM_USER_LIST}
+                                            component={UserList}
                                           />
                                           <ProtectedRoute
                                             exact
