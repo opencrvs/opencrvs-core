@@ -116,6 +116,7 @@ interface IConstantsMessages {
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
   loadMore: MessageDescriptor
+  showMore: MessageDescriptor
   estimated45DayRegistrationTitle: MessageDescriptor
   estimatedNumberOfRegistartion: MessageDescriptor
   totalRegisteredIn45Days: MessageDescriptor
@@ -659,6 +660,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.loadMore',
     defaultMessage: 'Load more',
     description: 'A label for load more'
+  },
+  showMore: {
+    id: 'constants.showMore',
+    defaultMessage: 'Show next {pageSize}',
+    description: 'Label for show more link'
   },
   estimated45DayRegistrationTitle: {
     id: 'constants.estimated45DayRegistrationTitle',
