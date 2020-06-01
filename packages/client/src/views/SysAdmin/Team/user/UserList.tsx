@@ -9,20 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
 import {
+  buttonMessages,
   constantsMessages,
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
-import { goToCreateNewUser, goToReviewUserDetails } from '@client/navigation'
+import {
+  goToCreateNewUser,
+  goToReviewUserDetails,
+  goToTeamSearch
+} from '@client/navigation'
+import { ILocation } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
 import { SEARCH_USERS } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
   AvatarSmall,
@@ -41,17 +50,21 @@ import {
   GQLQuery,
   GQLUser
 } from '@opencrvs/gateway/src/graphql/schema'
+import querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
-import querystring from 'query-string'
+
+const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
+const { useState } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
   margin: 32px auto 0;
 `
+
 const TableHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -59,15 +72,18 @@ const TableHeader = styled.div`
   width: 100%;
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  box-shadow: rgba(53, 67, 93, 0.32) 0px 2px 6px;
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.subtitleStyle};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
+
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
   ${({ theme }) => theme.fonts.bodyStyle};
   text-align: center;
   margin-top: 100px;
 `
+
 const StatusBox = styled.span`
   padding: 4px 6px;
   border-radius: 4px;
@@ -82,8 +98,35 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
-const AddUserContainer = styled(AddUser)`
+
+const AddUserContainer = styled.div`
+  display: flex;
   cursor: pointer;
+  color: ${({ theme }) => theme.colors.primary};
+`
+const AddUserIcon = styled(AddUser)`
+  padding: 4px;
+`
+
+const Header = styled.h1`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.h2Style};
+`
+
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: -32px;
+
+  & > :first-child {
+    margin-right: 24px;
+  }
+
+  & > :nth-child(2) {
+    position: relative;
+    bottom: 2px;
+  }
 `
 
 interface ISearchParams {
@@ -92,19 +135,13 @@ interface ISearchParams {
 
 type BaseProps = {
   theme: ITheme
+  offlineFacilities: ILocation[]
   goToCreateNewUser: typeof goToCreateNewUser
   goToReviewUserDetails: typeof goToReviewUserDetails
+  goToTeamSearch: typeof goToTeamSearch
 }
 
-interface IMatchParams {
-  ofcId: string
-}
-
-type IProps = BaseProps & IntlShapeProps & RouteComponentProps<IMatchParams>
-
-interface IState {
-  usersPageNo: number
-}
+type IProps = BaseProps & IntlShapeProps & RouteComponentProps
 
 interface IStatusProps {
   status: string
@@ -124,28 +161,34 @@ const Status = (statusProps: IStatusProps) => {
   }
 }
 
-class UserListComponent extends React.Component<IProps, IState> {
-  pageSize: number
+function UserListComponent(props: IProps) {
+  const {
+    intl,
+    goToReviewUserDetails,
+    goToCreateNewUser,
+    goToTeamSearch,
+    offlineFacilities,
+    location: { search }
+  } = props
 
-  constructor(props: IProps) {
-    super(props)
+  const { locationId } = (querystring.parse(search) as unknown) as ISearchParams
+  const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+  const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
 
-    this.pageSize = 10
-    this.state = { usersPageNo: 1 }
-  }
+  const searchedLocation: ILocation | undefined = offlineFacilities.find(
+    ({ id }) => locationId === id
+  )
 
-  getMenuItems = (userId: string) => {
+  function getMenuItems(userId: string) {
     return [
       {
-        label: this.props.intl.formatMessage(messages.menuOptionEditDetails),
-        handler: () => this.props.goToReviewUserDetails(userId)
+        label: intl.formatMessage(messages.menuOptionEditDetails),
+        handler: () => goToReviewUserDetails(userId)
       }
     ]
   }
 
-  generateUserContents = (data: GQLQuery) => {
-    const { intl } = this.props
-
+  function generateUserContents(data: GQLQuery) {
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
     }
@@ -155,7 +198,7 @@ class UserListComponent extends React.Component<IProps, IState> {
         if (user !== null) {
           const name =
             (createNamesMap(user && (user.name as GQLHumanName[]))[
-              this.props.intl.locale
+              intl.locale
             ] as string) ||
             (createNamesMap(user && (user.name as GQLHumanName[]))[
               LANG_EN
@@ -173,7 +216,7 @@ class UserListComponent extends React.Component<IProps, IState> {
               <ToggleMenu
                 id={`user-item-${index}-menu`}
                 toggleButton={<VerticalThreeDots />}
-                menuItems={this.getMenuItems(user.id as string)}
+                menuItems={getMenuItems(user.id as string)}
               />
             )
           }
@@ -183,23 +226,23 @@ class UserListComponent extends React.Component<IProps, IState> {
     )
   }
 
-  onClickAddUser = () => {
-    this.props.goToCreateNewUser()
+  function onClickAddUser() {
+    goToCreateNewUser()
   }
 
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ usersPageNo: newPageNumber })
+  function onChangeLocation() {
+    goToTeamSearch(
+      searchedLocation && {
+        selectedLocation: {
+          id: searchedLocation.id,
+          searchableText: searchedLocation.name,
+          displayLabel: searchedLocation.name
+        }
+      }
+    )
   }
 
-  renderUserList = () => {
-    const {
-      intl,
-      location: { search }
-    } = this.props
-    const { locationId } = (querystring.parse(
-      search
-    ) as unknown) as ISearchParams
-
+  function renderUserList() {
     const columns = [
       {
         label: '',
@@ -243,11 +286,11 @@ class UserListComponent extends React.Component<IProps, IState> {
         query={SEARCH_USERS}
         variables={{
           primaryOfficeId: locationId,
-          count: this.pageSize,
-          skip: (this.state.usersPageNo - 1) * this.pageSize
+          count: recordCount
         }}
+        fetchPolicy={'no-cache'}
       >
-        {({ error, data }: { error?: any; data: any }) => {
+        {({ error, data }) => {
           if (error) {
             return (
               <ErrorText id="user_loading_error">
@@ -258,23 +301,29 @@ class UserListComponent extends React.Component<IProps, IState> {
           return (
             <UserTable id="user_list">
               <TableHeader>
-                Users (
-                {(data && data.searchUsers && data.searchUsers.totalItems) || 0}
-                )
-                <AddUserContainer id="add-user" onClick={this.onClickAddUser} />
+                {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
+                users
+                <AddUserContainer id="add-user" onClick={onClickAddUser}>
+                  <AddUserIcon />
+                  {' New user'}
+                </AddUserContainer>
               </TableHeader>
               <ListTable
-                content={this.generateUserContents(data) as IDynamicValues[]}
+                content={generateUserContents(data) as IDynamicValues[]}
                 columns={columns}
                 noResultText="No result to display"
                 onPageChange={(currentPage: number) => {
-                  this.onPageChange(currentPage)
+                  setCurrentPageNumber(currentPage)
                 }}
-                pageSize={this.pageSize}
+                pageSize={recordCount}
                 totalItems={
                   data && data.searchUsers && data.searchUsers.totalItems
                 }
-                currentPage={this.state.usersPageNo}
+                currentPage={currentPageNumber}
+                loadMoreText={intl.formatMessage(constantsMessages.showMore, {
+                  pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
+                })}
+                hideBoxShadow={true}
               />
             </UserTable>
           )
@@ -283,22 +332,28 @@ class UserListComponent extends React.Component<IProps, IState> {
     )
   }
 
-  render() {
-    const { intl } = this.props
-    return (
-      <>
-        <Header title={intl.formatMessage(messages.systemTitle)} />
-
-        {this.renderUserList()}
-      </>
-    )
-  }
+  return (
+    <SysAdminContentWrapper>
+      <HeaderContainer>
+        <Header id="header">
+          {(searchedLocation && searchedLocation.name) || ''}
+        </Header>
+        <LinkButton id="chng-loc" onClick={onChangeLocation}>
+          {intl.formatMessage(buttonMessages.change)}
+        </LinkButton>
+      </HeaderContainer>
+      {renderUserList()}
+    </SysAdminContentWrapper>
+  )
 }
 
 export const UserList = connect(
-  null,
+  (state: IStoreState) => ({
+    offlineFacilities: Object.values(getOfflineData(state).facilities)
+  }),
   {
     goToCreateNewUser,
-    goToReviewUserDetails
+    goToReviewUserDetails,
+    goToTeamSearch
   }
 )(withTheme(injectIntl(UserListComponent)))
