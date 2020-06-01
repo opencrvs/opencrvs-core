@@ -12,15 +12,10 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [OpenCRVS](#opencrvs)
-- [What is Civil Registration?](#what-is-civil-registration)
-- [Why OpenCRVS?](#why-opencrvs)
-- [How secure is OpenCRVS?](#how-secure-is-opencrvs)
+- [Read the docs](#read-the-docs)
+- [Preparing for installation](#preparing-for-installation)
 - [What are the key OpenSource dependencies of OpenCRVS?](#what-are-the-key-opensource-dependencies-of-opencrvs)
-- [What is in the OpenCRVS Core repository?](#what-is-in-the-opencrvs-core-repository)
-- [OpenCRVS microservice business layer packages](#opencrvs-microservice-business-layer-packages)
-- [OpenCRVS client application packages](#opencrvs-client-application-packages)
-- [OpenCRVS component library package](#opencrvs-component-library-package)
-- [OpenCRVS performance testing packages](#opencrvs-performance-testing-packages)
+- [What is inside the OpenCRVS packages?](#what-is-inside-the-opencrvs-packages)
 - [What about end-to-end UI testing?](#what-about-end-to-end-ui-testing)
 - [Why Docker Swarm? ...and is there Kubernetes support?](#why-docker-swarm-and-is-there-kubernetes-support)
 - [OK. How do I set up a development environment?](#ok-how-do-i-set-up-a-development-environment)
@@ -28,7 +23,7 @@
 - [How can I test OpenCRVS locally on an Android device?](#how-can-i-test-opencrvs-locally-on-an-android-device)
 - [How can I set up continuous integration and delivery?](#how-can-i-set-up-continuous-integration-and-delivery)
 - [How can I install and manage an OpenCRVS server cluster?](#how-can-i-install-and-manage-an-opencrvs-server-cluster)
-- [Clearing and creating your own reference data in your resources module](#clearing-and-creating-your-own-reference-data-in-your-resources-module)
+- [Clearing and creating your own reference data in your resources module]
 - [Create a new metadata db dump in your resources module](#create-a-new-metadata-db-dump-in-your-resources-module)
 - [Docker scripts](#docker-scripts)
 - [How can I deploy to a staging environment cluster?](#how-can-i-deploy-to-a-staging-environment-cluster)
@@ -36,10 +31,6 @@
 - [How can I deploy to production?](#how-can-i-deploy-to-production)
 - [How do I export recent registrations?](#how-do-i-export-recent-registrations)
 - [How does OpenCRVS back up registration data?](#how-does-opencrvs-back-up-registration-data)
-- [Meet the people we are building OpenCRVS for](#meet-the-people-we-are-building-opencrvs-for)
-- [Samira and Anir, Parents](#samira-and-anir-parents)
-- [Sophia, Community Health Worker](#sophia-community-health-worker)
-- [Raman, Civil Registrar](#raman-civil-registrar)
 - [Become part of the OpenCRVS Community](#become-part-of-the-opencrvs-community)
 - [Contributing](#contributing)
 - [How to tag an OpenCRVS release?](#how-to-tag-an-opencrvs-release)
@@ -62,69 +53,42 @@
 
 <br>
 
-## What is Civil Registration?
+## Read the docs
 
-Civil registration is the system by which a government records the vital events (births, marriages, and deaths) of its citizens and residents. The resulting repository or database has different names in different countries. It can be called a civil registry.
+Before going further, you should read the [Documentation](http://documentation.opencrvs.org/).
 
-Given the realities of population migration and covering the international scope of vital events affecting a human lifetime, a civil registration recordset is the single source of truth of a country's population data.
+A companion example configuration; the OpenCRVS **Resources** package for Zambia, can be found on [GitHub](https://github.com/opencrvs/opencrvs-zambia).
 
-OpenCRVS supports any country scale data storage regulatory requirements.
+Both **OpenCRVS Core** and a **Resources** package are required to run OpenCRVS. When you configure OpenCRVS for your country, you will need to duplicate and make your own **Resources** package.
 
-<br>
+## Preparing for installation
 
-## Why OpenCRVS?
+- Read the [Introduction](http://documentation.opencrvs.org/docs/technology/technologyIntroduction)
+- OpenCRVS uses some exciting tools. Take some time to understand the dependencies below.
 
-[Plan International](https://plan-international.org/) is challenging the current gap in the market for a user-centric and rights-based CRVS system by leading the development of [OpenCRVS](https://www.opencrvs.org), an open-source digital CRVS solution that is free to use, adaptable to the country context, interoperable with other government systems (e.g. health and ID systems), and rights-based to ensure it protects and provides for those most vulnerable.
+When you clone the **OpenCRVS Core** [repo](https://github.com/opencrvs/opencrvs-core), you are downloading:
 
-An estimated 1 billion people around the world cannot officially prove their identity, and 47% of these are children. [World Bank, 2018](https://id4d.worldbank.org/global-dataset)
+- All of our microservices and the mobile, progressive web application as [Lerna](https://github.com/lerna/lerna) packages.
+- [Docker compose](https://docs.docker.com/compose/) files to run a development environment and deploy OpenCRVS.
+- An Infrastructure folder, containing [Ansible](https://www.ansible.com/) setup, [OpenHIM](http://openhim.org/) [configuration](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/openhim-base-config.json), [Netdata](https://www.netdata.cloud/) configuration, [Hearth](https://github.com/jembi/hearth) plugins, [ElasticSearch](https://www.elastic.co/) configuration, [Traefik]https://containo.us/traefik/ configuration and a number of essential scripts required to automate deployment, netweorking and backup.
 
-For people to count, they must first be counted, and that’s what a Civil Registration and Vital Statistics (CRVS) system does, recording the details of all major life events, such as births and deaths. Birth registration is the first step in securing legal identity and accessing other basic rights like education, healthcare and social protection.
+Now, take some time to understand the directory structure. Read more about what all the packages are for below.
 
-As the sole continuous source of population data, it provides the foundation for human rights, government service delivery, and the measurement of [U.N. development goals](https://sustainabledevelopment.un.org/). Despite this, over 100 countries around the world do not have functioning CRVS systems.
+Now you are ready to follow the step-by-step [development environment installation](https://github.com/opencrvs/opencrvs-core#ok-how-do-i-set-up-a-development-environment) instructions. At a high level you will be required to:
 
-<p align="left">
+- Install some basic dependencies for your workstation.
+- Clone the repo and install some application dependencies.
+- Run a single command to start **OpenCRVS Core** and the OpenCRVS **Resources** module in Docker on your workstation
+- Install a base configuration for OpenHIM
+- Populate your local Mongo DB with reference data and test users for the Zambia configuration.
 
-<img width="539" height="349" src="https://static.wixstatic.com/media/93440e_2f6fb54e63e7488d9b40f32cea7ca10c~mv2.png/v1/crop/x_0,y_36,w_960,h_622/fill/w_539,h_349,al_c,q_80,usm_0.66_1.00_0.01/Civil%20Registration%20and%20Linkages%20to%20Natio.webp">
-
-</p>
-
-OpenCRVS has the potential to go well beyond the scope of traditional CRVS systems. We see OpenCRVS as a foundational identity and population data system which will support and maintain the integrity of many other service delivery, statistical and identity management functions. In particular, OpenCRVS will ensure that these functions are above all inclusive, providing a digital response to the global call to [“Leave No One Behind”](https://sustainabledevelopment.un.org/content/documents/2754713_July_PM_2._Leaving_no_one_behind_Summary_from_UN_Committee_for_Development_Policy.pdf) - U.N. Sustainable Development Goals.
-
-We believe in the open source principle and its potential to achieve universal civil registration and advance children’s rights, and equality for girls.
-
-From the outset we have been committed to the creation of a digital public good that is:
-
-- Freely available with no license fees or ties to software vendors.
-
-- Safe and secure using best-practice security features.
-
-- Fully interoperable with other government systems.
-
-- Data enabled for fast decision-making.
-
-- Based on international CRVS standards.
-
-- Easily configured and deployed in all country contexts.
-
-- Rights-based, empowering all individuals to access their basic human rights.
-
-- User friendly, designed by and for the people it serves.
-
-- Accessible and inclusive
-
-To create OpenCRVS we have partnered with registration authorities, leading health system providers, human-centered design & software development experts, urban and remote, rural communities in developing nations to design and build a global digital product that will serve the needs of end users and those being registered. We have achieved this by following international standards, digital principles for development and agile methodologies.
-
-<br>
-
-## How secure is OpenCRVS?
-
-OpenCRVS has been independently security tested to equivalent [U.K. Government I.T. standards](https://www.cyberessentials.ncsc.gov.uk/) by the [CREST](https://www.crest-approved.org/) certified organisation [MDSec](https://www.mdsec.co.uk/). - authors of ["The Hacker's Handbook"](https://www.oreilly.com/library/view/the-web-application/9781118026472/).
+If you have any issues, we would love to know so that we can improve our documentation. Please talk to us on [Gitter](https://gitter.im/opencrvs/community#). There is a link at the foot of this page.
 
 <br>
 
 ### What are the key OpenSource dependencies of OpenCRVS?
 
-The following dependencies are automatically provisioned alongside the OpenCRVS Core on your infrastructure in [docker](https://www.docker.com/) containers.
+When you run an installation, the following dependencies are automatically provisioned alongside the OpenCRVS Core on your infrastructure in [docker](https://www.docker.com/) containers.
 
 <br>
 <p align="left">
@@ -168,7 +132,7 @@ Hyper efficient and optimised, [Influx](https://www.influxdata.com) is a time se
 
 The [OpenHIM (Health Information Mediator)](https://github.com/jembi/openhim-core-js) is a NodeJS enterprise service bus designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
-## What is in the OpenCRVS Core repository?
+## What is inside the OpenCRVS packages?
 
 The core of OpenCRVS is a monorepo organised using [Lerna](https://github.com/lerna/lerna). Each package reorts unit test coverage in [Jest](https://jestjs.io/). Following the [microservice](https://en.wikipedia.org/wiki/Microservices), 1 service per container model, every package is independently scalable in a single [docker](https://www.docker.com/) container.
 
@@ -522,36 +486,6 @@ Would create a new .zip file `export.zip` with 2 CSV files inside of it. You can
 ## How does OpenCRVS back up registration data?
 
 OpenCRVS backs up all of its data by default and the [Ansible](https://www.ansible.com/) playbook script [here](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook.yml) allows you to configure a remote server in which all data will be zipped and copied to on a nightly cron job. Follow the instructions [here](https://github.com/opencrvs/opencrvs-core/tree/master/infrastructure/server-setup)
-
-<br>
-
-## Meet the people we are building OpenCRVS for
-
-<p align="left">
-<img width="98" height="152" src="https://static.wixstatic.com/media/93440e_3a9b56a792704b138602745282cc87a1~mv2.png/v1/fill/w_98,h_152,al_c,q_80,usm_0.66_1.00_0.01/93440e_3a9b56a792704b138602745282cc87a1~mv2.webp">
-</p>
-
-#### Samira and Anir, Parents
-
-Registering their daughter’s birth is now affordable because they no longer have to skip days of work to make multiple visits to the registration office. The Health Worker comes to them to start the registration process and they can track progress through their mobile phone so they know when and where to collect the birth certificate.
-
-<p align="left">
-<img width="110" height="147" src="https://static.wixstatic.com/media/93440e_311346446ec94a47a047541a2982bf80~mv2.png/v1/crop/x_0,y_0,w_636,h_846/fill/w_110,h_147,al_c,q_80,usm_0.66_1.00_0.01/health-worker.webp">
-</p>
-
-#### Sophia, Community Health Worker
-
-A community health worker (field agent) can easily register the births for all pregnant and lactating mothers in her remote, rural catchment area and provide quality healthcare. This is now possible because she isn’t spending the majority of the consultation filling out paperwork aswell as administering vaccinations, whilst worrying about connectivity.
-
-<p align="left">
-<img width="82" height="169" src="https://static.wixstatic.com/media/93440e_1ed34365b7b94424ac0c7c32ae5b5e3c~mv2.png/v1/crop/x_0,y_0,w_443,h_907/fill/w_82,h_169,al_c,q_80,usm_0.66_1.00_0.01/raman.webp">
-</p>
-
-#### Raman, Civil Registrar
-
-Civil registrars can delegate responsibility to registration agents to validate documentation and perform data entry tasks. Registrars can approve applications easily previewing documentation alongside the data and generate PDF certificates instantly. They can view potential duplicates in real-time.
-
-Performance management reports can be auto-generated, presenting real-time disaggregated registration rates to government policy makers. This leads to improved national decision making amd planning, saving time and money.
 
 <br>
 
