@@ -100,7 +100,6 @@ function ReportComponent(props: Props) {
   return (
     <PerformanceContentWrapper
       id="reports"
-      hideTopBar
       type={PerformancePageVariant.SUBPAGE}
       backActionHandler={props.goBack}
       headerTitle={title}

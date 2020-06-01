@@ -261,7 +261,6 @@ function FieldAgentListComponent(props: IProps) {
   return (
     <PerformanceContentWrapper
       id="field-agent-list"
-      hideTopBar
       type={PerformancePageVariant.SUBPAGE}
       backActionHandler={() =>
         goToOperationalReport(

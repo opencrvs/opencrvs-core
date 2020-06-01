@@ -88,7 +88,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { intl, offlineResources } = this.props
 
     return (
-      <PerformanceContentWrapper hideTopBar>
+      <PerformanceContentWrapper>
         <Header>
           {intl.formatMessage(messages.sysAdminPerformanceHomeHeader)}
         </Header>

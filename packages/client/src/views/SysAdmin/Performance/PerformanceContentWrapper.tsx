@@ -34,8 +34,6 @@ export enum PerformancePageVariant {
 interface BasePage {
   id?: string
   type?: PerformancePage['type']
-  tabId?: string
-  hideTopBar?: boolean
   children?: React.ReactNode
 }
 

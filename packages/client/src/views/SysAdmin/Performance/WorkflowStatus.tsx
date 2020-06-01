@@ -500,7 +500,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           />
         </FilterContainer>
       }
-      hideTopBar
     >
       <Query
         query={FETCH_EVENTS_WITH_PROGRESS}

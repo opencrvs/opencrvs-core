@@ -122,7 +122,6 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   return (
     <PerformanceContentWrapper
       id="reg-rates"
-      hideTopBar
       type={PerformancePageVariant.SUBPAGE}
       backActionHandler={() =>
         goToOperationalReport(

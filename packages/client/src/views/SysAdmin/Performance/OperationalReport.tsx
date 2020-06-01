@@ -387,7 +387,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     } = this.state
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
-      <PerformanceContentWrapper hideTopBar>
+      <PerformanceContentWrapper>
         <Container marginRight={mainWindowRightMargin}>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
