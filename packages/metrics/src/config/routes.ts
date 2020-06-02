@@ -33,7 +33,10 @@ import {
   applicationStartedMetricsByPractitionersHandler
 } from '@metrics/features/applicationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
-import { exportHandler } from '@metrics/features/export/handler'
+import {
+  exportHandler,
+  monthlyExportHandler
+} from '@metrics/features/export/handler'
 import { generateLegacyMetricsHandler } from '@metrics/features/legacy/handler'
 
 export const getRoutes = () => {
@@ -339,6 +342,23 @@ export const getRoutes = () => {
       path: '/export',
       handler: exportHandler,
       config: {
+        tags: ['api']
+      }
+    },
+    // Export all data from InfluxDB to CSV
+    {
+      method: 'GET',
+      path: '/monthlyExport',
+      handler: monthlyExportHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string().required(),
+            event: Joi.string().required()
+          })
+        },
         tags: ['api']
       }
     },

@@ -162,8 +162,8 @@ const TableScroller = styled.div<{
   padding-right: 10px;
 
   &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    height: 5px;
+    width: 5px;
   }
   &::-webkit-scrollbar-thumb {
     background: ${({ theme }) => theme.colors.lightScrollBarGrey};
