@@ -509,7 +509,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         }}
       >
         {({ data, loading, error }) => {
-          let total
+          let total = 0
           if (
             data &&
             data.getEventsWithProgress &&
@@ -529,6 +529,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 hideBoxShadow
                 currentPage={currentPageNumber}
                 pageSize={recordCount}
+                totalItems={total}
+                highlightRowOnMouseOver
                 onPageChange={(currentPage: number) => {
                   setCurrentPageNumber(currentPage)
                 }}
