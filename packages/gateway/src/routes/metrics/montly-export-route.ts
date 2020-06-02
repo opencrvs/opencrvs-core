@@ -13,19 +13,31 @@
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
 import { METRICS_URL } from '@gateway/constants'
+import * as Joi from 'joi'
 
 export default {
   method: 'GET',
-  path: '/metrics/export',
+  path: '/export/monthlyPerformanceMetrics',
   handler: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-    const res = await fetch(`${METRICS_URL}/export`, {
-      headers: request.headers
-    })
+    const res = await fetch(
+      `${METRICS_URL}/monthlyExport?locationId=${request.query['locationId']}` +
+        `&timeStart=${request.query['timeStart']}&timeEnd=${request.query['timeEnd']}&event=${request.query['event']}`,
+      {
+        headers: request.headers
+      }
+    )
     return res.body
   },
   config: {
+    validate: {
+      query: Joi.object({
+        timeStart: Joi.string().required(),
+        timeEnd: Joi.string().required(),
+        locationId: Joi.string().required(),
+        event: Joi.string().required()
+      })
+    },
     tags: ['api'],
-    description:
-      'Exports all collected metrics data in a zip containing a CSV file for each measurement'
+    description: 'Exports metrics data for each measurement for given filters'
   }
 }

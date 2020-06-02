@@ -44,7 +44,10 @@ export const fetchLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ) => {
-  return await fetchFHIR(`Location/${locationId}`, authHeader)
+  return await fetchFHIR(
+    locationId.startsWith('Location/') ? locationId : `Location/${locationId}`,
+    authHeader
+  )
 }
 
 export async function fetchParentLocationByLocationID(
