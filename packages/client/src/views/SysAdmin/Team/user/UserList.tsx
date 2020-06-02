@@ -309,7 +309,7 @@ function UserListComponent(props: IProps) {
         }}
         fetchPolicy={'no-cache'}
       >
-        {({ error, data }) => {
+        {({ data, loading, error }) => {
           if (error) {
             return (
               <ErrorText id="user_loading_error">
@@ -328,6 +328,7 @@ function UserListComponent(props: IProps) {
                 </AddUserContainer>
               </TableHeader>
               <ListTable
+                isLoading={loading}
                 content={generateUserContents(data) as IDynamicValues[]}
                 columns={columns}
                 noResultText="No result to display"
