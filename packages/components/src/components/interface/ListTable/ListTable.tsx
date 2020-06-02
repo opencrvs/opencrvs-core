@@ -156,6 +156,7 @@ const TableScroller = styled.div<{
 
   &::-webkit-scrollbar {
     height: 5px;
+    width: 5px;
   }
   &::-webkit-scrollbar-thumb {
     background: ${({ theme }) => theme.colors.lightScrollBarGrey};

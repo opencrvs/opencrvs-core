@@ -70,6 +70,7 @@ import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { PerformanceContentWrapper } from './PerformanceContentWrapper'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+import { getToken } from '@client/utils/authUtils'
 
 interface IConnectProps {
   offlineLocations: IOfflineData['locations']
@@ -159,6 +160,10 @@ const Title = styled.div`
   }
 `
 
+const RowLink = styled(LinkButton)`
+  padding-right: 15px !important;
+`
+
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
     labelDescriptor: statusMessages.inProgress,
@@ -225,6 +230,28 @@ class OperationalReportComponent extends React.Component<Props, State> {
     return OperationalReportComponent.transformPropsToState(props, state)
   }
 
+  downloadMonthlyData = (
+    monthStart: string,
+    monthEnd: string,
+    event: string
+  ) => {
+    const metricsURL = `${window.config.API_GATEWAY_URL}export/monthlyPerformanceMetrics?locationId=${this.state.selectedLocation.id}&timeStart=${monthStart}&timeEnd=${monthEnd}&event=${event}`
+    fetch(metricsURL, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+      .then(resp => resp.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'export.zip'
+        a.click()
+        window.URL.revokeObjectURL(url)
+      })
+  }
+
   onChangeLocation = () => {
     this.props.goToPerformanceHome({
       selectedLocation: this.state.selectedLocation
@@ -266,9 +293,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </LinkButton>
         ),
         export: (
-          <>
-            <LinkButton>CSV</LinkButton> <LinkButton>PDF</LinkButton>
-          </>
+          <RowLink
+            onClick={() =>
+              this.downloadMonthlyData(
+                start.toISOString(),
+                end.toISOString(),
+                eventType.toString()
+              )
+            }
+          >
+            CSV
+          </RowLink>
         )
       })
       currentMonth++

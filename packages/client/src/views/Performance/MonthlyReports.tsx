@@ -48,7 +48,7 @@ const StyledDiv = styled.div`
 `
 
 function downloadAllData() {
-  fetch(window.config.API_GATEWAY_URL + 'metrics/export', {
+  fetch(window.config.API_GATEWAY_URL + 'export/allPerformanceMetrics', {
     headers: {
       Authorization: `Bearer ${getToken()}`
     }
