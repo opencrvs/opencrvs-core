@@ -221,6 +221,7 @@ interface IListTableProps {
   isLoading?: boolean
   tableTitle?: string
   hideBoxShadow?: boolean
+  hideTableHeader?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
 }
@@ -285,6 +286,7 @@ export class ListTable extends React.Component<
       tableTitle,
       tableHeight,
       hideBoxShadow,
+      hideTableHeader,
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver
@@ -298,7 +300,7 @@ export class ListTable extends React.Component<
           <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
             {tableTitle && <H3>{tableTitle}</H3>}
             <TableScrollerHorizontal>
-              {content.length > 0 && (
+              {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
                   <TableHeader totalWidth={totalWidth}>
                     {columns.map((preference, index) => (

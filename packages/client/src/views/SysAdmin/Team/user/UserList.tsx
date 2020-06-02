@@ -324,6 +324,7 @@ function UserListComponent(props: IProps) {
                   pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
                 })}
                 hideBoxShadow={true}
+                hideTableHeader={true}
               />
             </UserTable>
           )
