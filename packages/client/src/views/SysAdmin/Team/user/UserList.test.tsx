@@ -9,22 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createStore, AppStore } from '@client/store'
+import { AppStore } from '@client/store'
 import {
   createTestComponent,
-  flushPromises,
-  createTestStore
+  createTestStore,
+  flushPromises
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
+import { History } from 'history'
 import querystring from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
-import { History } from 'history'
 
 describe('User list tests', () => {
-  // let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History<any>
 
