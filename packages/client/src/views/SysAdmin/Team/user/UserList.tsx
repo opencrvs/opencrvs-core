@@ -129,6 +129,25 @@ const HeaderContainer = styled.div`
   }
 `
 
+const LocationInfo = styled.div`
+  padding: 8px 0px;
+`
+
+const LocationInfoKey = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
+`
+
+const LocationInfoValue = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const LocationInfoEmptyValue = styled.div`
+  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.bodyStyle};
+`
+
 interface ISearchParams {
   locationId: string
 }
@@ -343,6 +362,18 @@ function UserListComponent(props: IProps) {
           {intl.formatMessage(buttonMessages.change)}
         </LinkButton>
       </HeaderContainer>
+      <LocationInfo>
+        <LocationInfoKey>
+          {intl.formatMessage(constantsMessages.address)}
+        </LocationInfoKey>
+        {searchedLocation && searchedLocation.address ? (
+          <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
+        ) : (
+          <LocationInfoEmptyValue>
+            {intl.formatMessage(constantsMessages.notAvailable)}
+          </LocationInfoEmptyValue>
+        )}
+      </LocationInfo>
       {renderUserList()}
     </SysAdminContentWrapper>
   )

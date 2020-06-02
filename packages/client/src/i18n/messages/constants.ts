@@ -12,6 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages {
+  address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
@@ -129,8 +130,14 @@ interface IConstantsMessages {
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
+  notAvailable: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  address: {
+    defaultMessage: 'Address',
+    description: 'Label for address',
+    id: 'constants.address'
+  },
   allEvents: {
     defaultMessage: 'All events',
     description: 'Label for select option All events',
@@ -726,6 +733,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.viewAll',
     defaultMessage: 'View all',
     description: 'Label for view all link'
+  },
+  notAvailable: {
+    id: 'constants.notAvailable',
+    defaultMessage: 'Not available',
+    description: 'Placeholder for empty value'
   }
 }
 

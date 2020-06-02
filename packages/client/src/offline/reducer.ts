@@ -37,6 +37,7 @@ export interface ILocation {
   id: string
   name: string
   alias: string
+  address?: string
   physicalType: string
   jurisdictionType?: string
   type: string
