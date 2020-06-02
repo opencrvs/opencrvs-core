@@ -31,7 +31,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { MONTHS_IN_YEAR } from '@client/utils/constants'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/Performance/queries'
@@ -273,11 +272,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
   getContent(eventType: Event) {
     moment.locale(this.props.intl.locale)
     let content = []
-
-    const currentYear = moment().year()
-    let currentMonth = 1
-
-    while (currentMonth <= 12) {
+    let currentYear = this.state.timeStart.year()
+    let currentMonth = this.state.timeStart.month() + 1
+    const startMonth =
+      this.state.timeStart.month() + this.state.timeStart.year() * 12
+    const endMonth = this.state.timeEnd.month() + this.state.timeEnd.year() * 12
+    const monthDiff = currentMonth + (endMonth - startMonth)
+    while (currentMonth <= monthDiff) {
       const { start, end } = getMonthDateRange(currentYear, currentMonth)
       const title = start.format('MMMM YYYY')
       content.push({
@@ -312,7 +313,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       })
       currentMonth++
     }
-    return content
+    return content.reverse()
   }
 
   getPercentage(
@@ -507,7 +508,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 isLoading={false}
                 content={this.getContent(Event.BIRTH)}
                 tableHeight={280}
-                pageSize={MONTHS_IN_YEAR}
+                pageSize={24}
                 hideBoxShadow={true}
                 columns={[
                   {
@@ -531,7 +532,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 isLoading={false}
                 content={this.getContent(Event.DEATH)}
                 tableHeight={280}
-                pageSize={MONTHS_IN_YEAR}
+                pageSize={24}
                 hideBoxShadow={true}
                 columns={[
                   {

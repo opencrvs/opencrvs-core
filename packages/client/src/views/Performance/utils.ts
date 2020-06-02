@@ -22,7 +22,9 @@ export const Header = styled.h1`
 `
 
 export function getMonthDateRange(year: number, month: number) {
-  const start = moment([year, month - 1])
+  const currentMonth = month % 12 > 0 ? month % 12 : month
+  const currentYear = year + Math.trunc((month - 1) / 12)
+  const start = moment([currentYear, currentMonth - 1])
   const end = moment(start).endOf('month')
 
   return {
