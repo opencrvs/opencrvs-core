@@ -10,20 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createStore, AppStore } from '@client/store'
-import { SEARCH_USERS } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
   createTestStore
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { SEARCH_USERS } from '@client/user/queries'
+import { ReactWrapper } from 'enzyme'
+import querystring from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
-import { ReactWrapper } from 'enzyme'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 
-describe('User tab tests', () => {
-  const { store, history } = createStore()
+describe('User list tests', () => {
+  // let component: ReactWrapper<{}, {}>
+  let store: AppStore
+  let history: History<any>
+
+  beforeAll(async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    const { store: testStore, history: testHistory } = await createTestStore()
+    store = testStore
+    history = testHistory
+  })
 
   describe('Header test', () => {
     it('renders header with user count', async () => {
@@ -32,9 +42,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -48,15 +57,12 @@ describe('User tab tests', () => {
         }
       ]
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -75,7 +81,7 @@ describe('User tab tests', () => {
           .find('#user_list')
           .hostNodes()
           .html()
-      ).toContain('Users (0)')
+      ).toContain('0 users')
     })
     it('add user button redirects to user form', async () => {
       const userListMock = [
@@ -83,9 +89,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -99,15 +104,12 @@ describe('User tab tests', () => {
         }
       ]
       const { component } = await createTestComponent(
-        // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -131,9 +133,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -149,13 +150,11 @@ describe('User tab tests', () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -179,9 +178,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -268,15 +266,12 @@ describe('User tab tests', () => {
 
       beforeEach(async () => {
         const testComponent = await createTestComponent(
-          // @ts-ignore
           <UserList
-            match={{
-              params: {
-                ofcId: 'dummy_ofc_id'
-              },
-              isExact: true,
-              path: '',
-              url: ''
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              })
             }}
           />,
           store,
@@ -307,6 +302,7 @@ describe('User tab tests', () => {
           component,
           '#user-item-0-menuItem0'
         )
+        expect(menuOptionButton.hostNodes()).toHaveLength(1)
       })
 
       it('clicking on menu options takes to user review page', async () => {
@@ -334,9 +330,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -421,15 +416,12 @@ describe('User tab tests', () => {
         }
       ]
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -451,9 +443,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -608,15 +599,12 @@ describe('User tab tests', () => {
         }
       ]
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -632,10 +620,10 @@ describe('User tab tests', () => {
       const app = testComponent.component
       expect(
         app
-          .find('#pagination')
+          .find('#load_more_button')
           .hostNodes()
           .text()
-      ).toContain('1/2')
+      ).toContain('Show next 10')
     })
     it('renders next page of the user list when the next page button is pressed', async () => {
       const userListMock = [
@@ -643,9 +631,8 @@ describe('User tab tests', () => {
           request: {
             query: SEARCH_USERS,
             variables: {
-              primaryOfficeId: 'dummy_ofc_id',
-              count: 10,
-              skip: 0
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
             }
           },
           result: {
@@ -797,18 +784,243 @@ describe('User tab tests', () => {
               }
             }
           }
+        },
+        {
+          request: {
+            query: SEARCH_USERS,
+            variables: {
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 20
+            }
+          },
+          result: {
+            data: {
+              searchUsers: {
+                totalItems: 15,
+                results: [
+                  {
+                    id: '5d08e102542c7a19fc55b790',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Rabindranath',
+                        familyName: 'Tagore'
+                      }
+                    ],
+                    username: 'r.tagore',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'ENTREPENEUR',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b791',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful'
+                      }
+                    ],
+                    username: 'm.ashraful',
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b792',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Muhammad Abdul',
+                        familyName: 'Muid Khan'
+                      }
+                    ],
+                    username: 'ma.muidkhan',
+                    role: 'DISTRICT_REGISTRAR',
+                    type: 'MAYOR',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b793',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Nasreen Pervin',
+                        familyName: 'Huq'
+                      }
+                    ],
+                    username: 'np.huq',
+                    role: 'STATE_REGISTRAR',
+                    type: 'MAYOR',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b795',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Ariful',
+                        familyName: 'Islam'
+                      }
+                    ],
+                    username: 'ma.islam',
+                    role: 'FIELD_AGENT',
+                    type: 'HOSPITAL',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b796',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Ashraful',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    username: 'ma.alam',
+                    role: 'FIELD_AGENT',
+                    type: 'CHA',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b797',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Lovely',
+                        familyName: 'Khatun'
+                      }
+                    ],
+                    username: 'l.khatun',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b794',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohamed Abu',
+                        familyName: 'Abdullah'
+                      }
+                    ],
+                    username: 'ma.abdullah',
+                    role: 'NATIONAL_REGISTRAR',
+                    type: 'SECRETARY',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b798',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Seikh',
+                        familyName: 'Farid'
+                      }
+                    ],
+                    username: 'ms.farid',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b799',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Jahangir',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    username: 'mj.alam',
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b800',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Ashraful',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    username: 'a.alam',
+                    role: 'FIELD_AGENT',
+                    type: 'CHA',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b801',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Beauty',
+                        familyName: 'Khatun'
+                      }
+                    ],
+                    username: 'b.khatun',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b802',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Abu',
+                        familyName: 'Abdullah'
+                      }
+                    ],
+                    username: 'a.abdullah',
+                    role: 'NATIONAL_REGISTRAR',
+                    type: 'SECRETARY',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b803',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Seikh',
+                        familyName: 'Farid'
+                      }
+                    ],
+                    username: 's.farid',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'DATA_ENTRY_CLERK',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b804',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Jahangir',
+                        familyName: 'Alam'
+                      }
+                    ],
+                    username: 'j.alam',
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
+                  }
+                ]
+              }
+            }
+          }
         }
       ]
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <UserList
-          match={{
-            params: {
-              ofcId: 'dummy_ofc_id'
-            },
-            isExact: true,
-            path: '',
-            url: ''
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+            })
           }}
         />,
         store,
@@ -822,23 +1034,17 @@ describe('User tab tests', () => {
 
       testComponent.component.update()
       const app = testComponent.component
-      expect(app.find('#pagination').hostNodes()).toHaveLength(1)
-      expect(app.find('#next').hostNodes()).toHaveLength(1)
+      expect(app.find('#load_more_button').hostNodes()).toHaveLength(1)
 
       app
-        .find('#next')
+        .find('#load_more_button')
         .hostNodes()
         .simulate('click')
       await new Promise(resolve => {
         setTimeout(resolve, 100)
       })
 
-      expect(
-        app
-          .find('#pagination')
-          .hostNodes()
-          .text()
-      ).toContain('2/2')
+      expect(app.find('#load_more_button').hostNodes()).toHaveLength(0)
     })
   })
 })
