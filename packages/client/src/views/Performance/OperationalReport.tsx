@@ -188,6 +188,10 @@ export const StatusMapping: IStatusMapping = {
   REGISTERED: {
     labelDescriptor: statusMessages.readyToPrint,
     color: colors.readyToPrint
+  },
+  CERTIFIED: {
+    labelDescriptor: statusMessages.certified,
+    color: colors.readyToPrint
   }
 }
 
@@ -357,6 +361,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
 
+  onClickStatusDetails = (status?: keyof IStatusMapping) => {
+    const { selectedLocation, sectionId, timeStart, timeEnd } = this.state
+    const { id: locationId } = selectedLocation
+    this.props.goToWorkflowStatus(
+      sectionId,
+      locationId,
+      timeStart.toDate(),
+      timeEnd.toDate(),
+      status
+    )
+  }
   render() {
     const { intl } = this.props
 
@@ -573,6 +588,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                       <StatusWiseApplicationCountView
                         loading={true}
                         locationId={locationId}
+                        onClickStatusDetails={this.onClickStatusDetails}
                       />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
@@ -584,14 +600,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     locationId={locationId}
                     data={data && data.fetchRegistrationCountByStatus}
                     statusMapping={StatusMapping}
-                    onClickStatusDetails={() =>
-                      this.props.goToWorkflowStatus(
-                        sectionId,
-                        locationId,
-                        timeStart.toDate(),
-                        timeEnd.toDate()
-                      )
-                    }
+                    onClickStatusDetails={this.onClickStatusDetails}
                   />
                 )
               }}

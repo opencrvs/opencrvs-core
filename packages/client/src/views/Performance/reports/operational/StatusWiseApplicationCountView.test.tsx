@@ -17,6 +17,7 @@ import * as React from 'react'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import { ReactWrapper } from 'enzyme'
 import * as locationUtils from '@client/utils/locationUtils'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('Status wise registration count', () => {
   const { store } = createStore()
@@ -31,6 +32,7 @@ describe('Status wise registration count', () => {
         locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
         statusMapping={StatusMapping}
         jurisdictionType="UNION"
+        onClickStatusDetails={jest.fn()}
       />,
       store
     )
@@ -41,6 +43,7 @@ describe('Status wise registration count', () => {
 
   describe('when it has data in props', () => {
     let component: ReactWrapper<{}, {}>
+    const onClickStatusDetailsMock = jest.fn()
     beforeEach(async () => {
       const data: GQLRegistrationCountResult = {
         results: [
@@ -59,6 +62,7 @@ describe('Status wise registration count', () => {
           locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
           statusMapping={StatusMapping}
           jurisdictionType="UNION"
+          onClickStatusDetails={onClickStatusDetailsMock}
         />,
         store
       )).component
@@ -68,6 +72,17 @@ describe('Status wise registration count', () => {
         0
       )
       expect(component.find('#status-header').hostNodes()).toHaveLength(1)
+    })
+    it('clicking on title link triggers onClickStatusDetails', async () => {
+      const viewAllLink = await waitForElement(component, '#view-all-link')
+      viewAllLink.hostNodes().simulate('click')
+      expect(onClickStatusDetailsMock).toBeCalled()
+      const registeredTitleLink = await waitForElement(
+        component,
+        '#registered-5-title-link'
+      )
+      registeredTitleLink.hostNodes().simulate('click')
+      expect(onClickStatusDetailsMock).toBeCalledWith('REGISTERED')
     })
   })
 })

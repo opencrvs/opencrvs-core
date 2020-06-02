@@ -12,14 +12,19 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages {
+  allEvents: MessageDescriptor
+  allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
   applicantContactNumber: MessageDescriptor
   application: MessageDescriptor
+  applications: MessageDescriptor
   applicationCollectedOn: MessageDescriptor
   applicationFailedOn: MessageDescriptor
   applicationInformantLabel: MessageDescriptor
   applicationRegisteredOn: MessageDescriptor
   applicationRejectedOn: MessageDescriptor
+  applicationStarted: MessageDescriptor
+  applicationStartedBy: MessageDescriptor
   applicationStartedOn: MessageDescriptor
   applicationState: MessageDescriptor
   applicationSubmittedOn: MessageDescriptor
@@ -43,6 +48,7 @@ interface IConstantsMessages {
   dod: MessageDescriptor
   downloading: MessageDescriptor
   eventDate: MessageDescriptor
+  eventType: MessageDescriptor
   lastUpdated: MessageDescriptor
   startedBy: MessageDescriptor
   export: MessageDescriptor
@@ -61,6 +67,8 @@ interface IConstantsMessages {
   lastEdited: MessageDescriptor
   month: MessageDescriptor
   name: MessageDescriptor
+  nameDefaultLocale: MessageDescriptor
+  nameRegionalLocale: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
@@ -79,6 +87,12 @@ interface IConstantsMessages {
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
   timeFramesTitle: MessageDescriptor
+  timeInProgress: MessageDescriptor
+  timeReadyForReview: MessageDescriptor
+  timeRequireUpdates: MessageDescriptor
+  timeWatingApproval: MessageDescriptor
+  timeWaitingExternalValidation: MessageDescriptor
+  timeReadyToPrint: MessageDescriptor
   to: MessageDescriptor
   toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
@@ -116,6 +130,16 @@ interface IConstantsMessages {
   viewAll: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  allEvents: {
+    defaultMessage: 'All events',
+    description: 'Label for select option All events',
+    id: 'constants.allEvents'
+  },
+  allStatuses: {
+    defaultMessage: 'All statuses',
+    description: 'Label for select option All statuses',
+    id: 'constants.allStatuses'
+  },
   applicantContactNumber: {
     defaultMessage: 'Applicant contact number',
     description: 'The title of contact number label',
@@ -125,6 +149,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'application',
     description: 'A label for application',
     id: 'constants.application'
+  },
+  applications: {
+    defaultMessage: 'Applications ({totalItems})',
+    description: 'A label for applications count',
+    id: 'constants.applicationsCount'
   },
   applicationCollectedOn: {
     defaultMessage: 'Certificate collected on',
@@ -152,6 +181,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Application rejected on',
     description: 'Label for the workflow timestamp when the status is rejected',
     id: 'constants.applicationRejectedOn'
+  },
+  applicationStarted: {
+    defaultMessage: 'Application started',
+    description: 'Label for table header column Application started',
+    id: 'constants.applicationStarted'
+  },
+  applicationStartedBy: {
+    defaultMessage: 'Started by',
+    description: 'Label for table header column Started by',
+    id: 'constants.applicationStartedBy'
   },
   applicationStartedOn: {
     defaultMessage: 'Started on',
@@ -279,6 +318,11 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for event date in list item',
     id: 'constants.eventDate'
   },
+  eventType: {
+    defaultMessage: 'Event type',
+    description: 'Label for table header column Event type',
+    id: 'constants.eventType'
+  },
   lastUpdated: {
     defaultMessage: 'Last updated',
     description: 'Label for Last updated in list item',
@@ -368,6 +412,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Name',
     description: 'Name label',
     id: 'constants.name'
+  },
+  nameDefaultLocale: {
+    defaultMessage: 'English name',
+    description: 'Label for column of English name',
+    id: 'constants.nameDefaultLocale'
+  },
+  nameRegionalLocale: {
+    defaultMessage: 'Local name',
+    description: 'Label for column of Local name',
+    id: 'constants.nameRegionalLocale'
   },
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
@@ -465,6 +519,36 @@ const messagesToDefine: IConstantsMessages = {
       '{event, select, birth{Birth} death{Death} other{Birth}} registered by time period, from date of occurrence',
     description: 'Header for tabel performance timeframs',
     id: 'constants.timeFramesTitle'
+  },
+  timeInProgress: {
+    defaultMessage: 'Time in progress',
+    description: 'Label for column Time in progress',
+    id: 'constants.timeInProgress'
+  },
+  timeReadyForReview: {
+    defaultMessage: 'Time in ready for review',
+    description: 'Label for column Time in ready for review',
+    id: 'constants.timeReadyForReview'
+  },
+  timeRequireUpdates: {
+    defaultMessage: 'Time in require updates',
+    description: 'Label for column Time in require updates',
+    id: 'constants.timeRequireUpdates'
+  },
+  timeWatingApproval: {
+    defaultMessage: 'Time in waiting for approval',
+    description: 'Label for column Time in waiting for approval',
+    id: 'constants.timeWatingApproval'
+  },
+  timeWaitingExternalValidation: {
+    defaultMessage: 'Time in waiting for waiting for BRIS',
+    description: 'Label for column Time in waiting for waiting for BRIS',
+    id: 'constants.timeWaitingExternalValidation'
+  },
+  timeReadyToPrint: {
+    defaultMessage: 'Time in ready to print',
+    description: 'Label for column Time in ready to print',
+    id: 'constants.timeReadyToPrint'
   },
   to: {
     defaultMessage: 'to',

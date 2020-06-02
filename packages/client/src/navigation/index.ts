@@ -54,6 +54,7 @@ import { Cmd, loop } from 'redux-loop'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
 import querystring from 'query-string'
 import moment from 'moment'
+import { IStatusMapping } from '@client/views/Performance/reports/operational/StatusWiseApplicationCountView'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -401,16 +402,22 @@ export function goToWorkflowStatus(
   sectionId: string,
   locationId: string,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  status?: keyof IStatusMapping,
+  event?: Event
 ) {
   return push({
     pathname: WORKFLOW_STATUS,
     search: querystring.stringify({
-      sectionId,
       locationId,
+      status,
+      event
+    }),
+    state: {
+      sectionId,
       timeStart,
       timeEnd
-    })
+    }
   })
 }
 export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
