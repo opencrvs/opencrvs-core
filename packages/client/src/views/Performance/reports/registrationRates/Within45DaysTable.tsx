@@ -195,6 +195,7 @@ function Within45DaysTableComponent(props: ITableProps) {
       content={sortedContent}
       footerColumns={getFooterColumns()}
       hideBoxShadow={true}
+      highlightRowOnMouseOver
     />
   )
 }

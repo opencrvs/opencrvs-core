@@ -58,6 +58,7 @@ import { Event } from '@client/forms'
 import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
 import { orderBy } from 'lodash'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 const { useState } = React
 
@@ -358,9 +359,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               '-'
           }
           return {
-            id:
-              eventProgress.registration &&
-              eventProgress.registration.trackingId,
+            id: (
+              <LinkButton>
+                {eventProgress.registration &&
+                  eventProgress.registration.trackingId}
+              </LinkButton>
+            ),
             status,
             eventType: event,
             dateOfEvent: formateDateWithRelationalText(
@@ -509,7 +513,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         }}
       >
         {({ data, loading, error }) => {
-          let total
+          let total = 0
           if (
             data &&
             data.getEventsWithProgress &&
@@ -529,6 +533,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 hideBoxShadow
                 currentPage={currentPageNumber}
                 pageSize={recordCount}
+                totalItems={total}
+                highlightRowOnMouseOver
                 onPageChange={(currentPage: number) => {
                   setCurrentPageNumber(currentPage)
                 }}
