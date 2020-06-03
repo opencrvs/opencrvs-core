@@ -413,6 +413,7 @@ function FieldAgentListComponent(props: IProps) {
                   }
                 )}
                 hideBoxShadow={true}
+                highlightRowOnMouseOver
               />
             )
           }
