@@ -33,7 +33,7 @@ export function getMonthDateRange(year: number, month: number) {
   }
 }
 export const ReportHeader = styled.div`
-  margin: 24px 0px;
+  margin: 32px 0 24px 0;
 `
 
 export const SubHeader = styled.div`
@@ -52,8 +52,8 @@ export const ActionContainer = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  margin: 0 -40px 0 -40px;
-  padding: 0 40px 16px 40px;
+  margin: 0 -24px 0 -24px;
+  padding: 12px 24px 11px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 

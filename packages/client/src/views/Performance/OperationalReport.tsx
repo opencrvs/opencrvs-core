@@ -117,13 +117,13 @@ interface State {
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h2Style};
+  margin: 0;
 `
 
 const HeaderContainer = styled.div`
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  margin-top: -32px;
 
   & > :first-child {
     margin-right: 24px;

@@ -17,7 +17,7 @@ import styled from 'styled-components'
 import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
 
 const Content = styled(BodyContent)`
-  padding: 0px;
+  padding: 0px 24px;
   margin: 32px auto 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;

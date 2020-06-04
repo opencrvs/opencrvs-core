@@ -23,7 +23,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled from 'styled-components'
 
 const ReportHeader = styled.div`
-  margin: 24px 0px;
+  margin: 32px 0px;
 `
 
 const Report = styled.div`
