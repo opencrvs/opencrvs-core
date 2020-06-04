@@ -12,6 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages {
+  address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
   areYouSure: MessageDescriptor
@@ -116,6 +117,7 @@ interface IConstantsMessages {
   waitingValidated: MessageDescriptor
   validated: MessageDescriptor
   loadMore: MessageDescriptor
+  showMore: MessageDescriptor
   estimated45DayRegistrationTitle: MessageDescriptor
   estimatedNumberOfRegistartion: MessageDescriptor
   totalRegisteredIn45Days: MessageDescriptor
@@ -128,8 +130,14 @@ interface IConstantsMessages {
   timePeriod: MessageDescriptor
   totalRegistered: MessageDescriptor
   viewAll: MessageDescriptor
+  notAvailable: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  address: {
+    defaultMessage: 'Address',
+    description: 'Label for address',
+    id: 'constants.address'
+  },
   allEvents: {
     defaultMessage: 'All events',
     description: 'Label for select option All events',
@@ -660,6 +668,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Load more',
     description: 'A label for load more'
   },
+  showMore: {
+    id: 'constants.showMore',
+    defaultMessage: 'Show next {pageSize}',
+    description: 'Label for show more link'
+  },
   estimated45DayRegistrationTitle: {
     id: 'constants.estimated45DayRegistrationTitle',
     defaultMessage: 'Estimated vs total registered in 45 days',
@@ -720,6 +733,11 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.viewAll',
     defaultMessage: 'View all',
     description: 'Label for view all link'
+  },
+  notAvailable: {
+    id: 'constants.notAvailable',
+    defaultMessage: 'Not available',
+    description: 'Placeholder for empty value'
   }
 }
 

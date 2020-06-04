@@ -95,6 +95,21 @@ export function generateLocations(
   return generated
 }
 
+export function getOfficeLocations(locations: { [key: string]: ILocation }) {
+  const generated: ISearchLocation[] = Object.values(locations)
+    .filter(
+      (location: ILocation) => location.type && location.type === 'CRVS_OFFICE'
+    )
+    .map((location: ILocation) => {
+      return {
+        id: location.id,
+        searchableText: location.name,
+        displayLabel: location.name
+      }
+    })
+  return generated
+}
+
 export function getJurisidictionType(
   locations: { [key: string]: ILocation },
   locationId: string

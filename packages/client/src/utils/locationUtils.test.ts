@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { mockOfflineData } from '@client/tests/util'
 import {
   filterLocations,
-  getJurisidictionType
+  getJurisidictionType,
+  getOfficeLocations
 } from '@client/utils/locationUtils'
-import { mockOfflineData } from '@client/tests/util'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -102,7 +103,45 @@ describe('locationUtil tests', () => {
       expect(locations['333']).toBeDefined()
       expect(locations['222']).toBeDefined()
     })
+
+    it('gets crvs office for sysadmin', () => {
+      const locations = getOfficeLocations({
+        '111': {
+          id: '111',
+          name: 'Test',
+          alias: 'Test',
+          physicalType: 'Jurisdiction',
+          type: 'ADMIN_STRUCTURE',
+          partOf: 'Location/123'
+        },
+        '222': {
+          id: '222',
+          name: 'Test',
+          alias: 'Test',
+          physicalType: 'Jurisdiction',
+          type: 'CRVS_OFFICE',
+          partOf: 'Location/321'
+        },
+        '333': {
+          id: '333',
+          name: 'Test',
+          alias: 'Test',
+          physicalType: 'Jurisdiction',
+          type: 'ADMIN_STRUCTURE',
+          partOf: 'Location/123'
+        }
+      })
+
+      expect(locations).toStrictEqual([
+        {
+          id: '222',
+          searchableText: 'Test',
+          displayLabel: 'Test'
+        }
+      ])
+    })
   })
+
   describe('getJurisidictionType()', () => {
     it('returns jurisdiction tyoe for location with provided id', () => {
       const locations = mockOfflineData.locations

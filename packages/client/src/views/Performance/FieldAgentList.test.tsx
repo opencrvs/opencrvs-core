@@ -12,13 +12,12 @@
 import { AppStore } from '@client/store'
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import querystring from 'query-string'
 import * as React from 'react'
 import { FieldAgentList } from './FieldAgentList'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import querystring from 'query-string'
-import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from './queries'
 
 describe('Field agent list tests', () => {
   let component: ReactWrapper<{}, {}>

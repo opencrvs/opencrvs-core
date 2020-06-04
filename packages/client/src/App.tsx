@@ -30,8 +30,7 @@ import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
 import { Details } from '@client/views/Home/Details'
-import { Report } from '@client/views/Performance/Report'
-import { ReportList } from '@client/views/Performance/ReportList'
+import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
@@ -44,8 +43,14 @@ import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { SysAdminHome } from '@client/views/SysAdmin/SysAdminHome'
-import { CreateNewUser } from '@client/views/SysAdmin/tabs/user/userCreation/CreateNewUser'
+import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
+import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
+import { Report } from '@client/views/SysAdmin/Performance/Report'
+import { ReportList } from '@client/views/SysAdmin/Performance/ReportList'
+import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
+import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import ApolloClient from 'apollo-client'
 import { ConnectedRouter } from 'connected-react-router'
@@ -55,11 +60,7 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { OperationalReport } from '@client/views/Performance/OperationalReport'
-import { PerformanceHome } from '@client/views/Performance/PerformanceHome'
-import { RegistrationRates } from '@client/views/Performance/RegistrationRates'
-import { WorkflowStatus } from '@client/views/Performance/WorkflowStatus'
-import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -257,13 +258,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.SYS_ADMIN_HOME}
-                                            component={SysAdminHome}
+                                            path={routes.TEAM_SEARCH}
+                                            component={TeamSearch}
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.SYS_ADMIN_HOME_TAB}
-                                            component={SysAdminHome}
+                                            path={routes.TEAM_USER_LIST}
+                                            component={UserList}
                                           />
                                           <ProtectedRoute
                                             exact

@@ -27,7 +27,7 @@ import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
-import { REGISTRAR_HOME, SYS_ADMIN_HOME } from '@client/navigation/routes'
+import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   COUNT_USER_WISE_APPLICATIONS,
@@ -554,7 +554,7 @@ class FieldAgentHomeView extends React.Component<
           </>
         )}
         {role && SYS_ADMIN_ROLES.includes(role) && (
-          <Redirect to={SYS_ADMIN_HOME} />
+          <Redirect to={PERFORMANCE_HOME} />
         )}
         {role && REGISTRAR_ROLES.includes(role) && (
           <Redirect to={REGISTRAR_HOME} />

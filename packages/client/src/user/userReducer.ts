@@ -22,11 +22,11 @@ import {
   showSubmitFormSuccessToast
 } from '@client/notification/actions'
 import * as offlineActions from '@client/offline/actions'
-import { SEARCH_USERS } from '@client/sysadmin/user/queries'
+import { SEARCH_USERS } from '@client/user/queries'
 import {
   alterRolesBasedOnUserRole,
   transformRoleDataToDefinitions
-} from '@client/views/SysAdmin/utils'
+} from '@client/views/SysAdmin/Team/utils'
 import ApolloClient, { ApolloQueryResult } from 'apollo-client'
 import { Action } from 'redux'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'

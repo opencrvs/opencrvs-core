@@ -75,3 +75,6 @@ export const EVENT_REGISTRATION_RATES =
   '/performance/operations/regestrationRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
 export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
+
+export const TEAM_SEARCH = '/team/search'
+export const TEAM_USER_LIST = '/team/users'
