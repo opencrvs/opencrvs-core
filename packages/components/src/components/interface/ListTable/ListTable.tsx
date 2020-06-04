@@ -143,8 +143,9 @@ const ErrorText = styled.div`
 `
 const H3 = styled.div`
   padding-left: 12px;
-  margin-bottom: 30px;
+  margin-bottom: 8px;
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  color: ${({ theme }) => theme.colors.copy};
 `
 const LoadingGrey = styled.span<{
   width?: number
@@ -174,7 +175,7 @@ const TableScroller = styled.div<{
   width: number
 }>`
   display: block;
-  height: ${({ height }) => (height ? `${height}px` : 'auto')};
+  max-height: ${({ height }) => (height ? `${height}px` : 'auto')};
   width: ${({ width }) => width}%;
   overflow-y: scroll;
   overflow-x: hidden;
