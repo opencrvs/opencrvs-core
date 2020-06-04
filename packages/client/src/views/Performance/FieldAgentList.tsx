@@ -14,37 +14,36 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
+import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToOperationalReport, goToFieldAgentList } from '@client/navigation'
+import { goToFieldAgentList, goToOperationalReport } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import styled from '@client/styledComponents'
 import { generateLocations } from '@client/utils/locationUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/Performance/OperationalReport'
+import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
-  PerformanceContentWrapper,
-  PerformancePageVariant
-} from '@client/views/Performance/PerformanceContentWrapper'
-import { FilterContainer } from '@client/views/Performance/utils'
-import { MapPin, ArrowDownBlue } from '@opencrvs/components/lib/icons'
+  SysAdminContentWrapper,
+  SysAdminPageVariant
+} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
+  ColumnContentAlignment,
   ISearchLocation,
-  ListTable,
-  ColumnContentAlignment
+  ListTable
 } from '@opencrvs/components/lib/interface'
+import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
+import { orderBy } from 'lodash'
+import moment from 'moment'
 import querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/Performance/queries'
-import { PerformanceSelect } from '@client/views/Performance/PerformanceSelect'
-import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
-import { SORT_ORDER } from '@client/views/Performance/reports/registrationRates/Within45DaysTable'
-import { orderBy } from 'lodash'
-import moment from 'moment'
-import { LocationPicker } from '@client/components/LocationPicker'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
@@ -260,10 +259,9 @@ function FieldAgentListComponent(props: IProps) {
   }
 
   return (
-    <PerformanceContentWrapper
+    <SysAdminContentWrapper
       id="field-agent-list"
-      hideTopBar
-      type={PerformancePageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE}
       backActionHandler={() =>
         goToOperationalReport(
           locationId,
@@ -419,7 +417,7 @@ function FieldAgentListComponent(props: IProps) {
           }
         }}
       </Query>
-    </PerformanceContentWrapper>
+    </SysAdminContentWrapper>
   )
 }
 

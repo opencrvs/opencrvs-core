@@ -20,6 +20,7 @@ interface IHeaderMessages {
   systemTitle: MessageDescriptor
   settingsTitle: MessageDescriptor
   helpTitle: MessageDescriptor
+  teamTitle: MessageDescriptor
   typeName: MessageDescriptor
   placeholderName: MessageDescriptor
 }
@@ -64,6 +65,11 @@ const messagesToDefine: IHeaderMessages = {
     id: 'home.header.helpTitle',
     defaultMessage: 'Help',
     description: 'Help title'
+  },
+  teamTitle: {
+    id: 'home.header.teamTitle',
+    defaultMessage: 'Team',
+    description: 'Team title'
   },
   typeName: {
     id: 'home.header.typeName',

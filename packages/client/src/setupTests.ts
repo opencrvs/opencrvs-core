@@ -20,7 +20,7 @@ import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
-import { userQueries } from './sysadmin/user/queries'
+import { userQueries } from './user/queries'
 
 if (process.env.CI) {
   jest.setTimeout(30000)

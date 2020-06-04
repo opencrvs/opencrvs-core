@@ -53,7 +53,8 @@ import {
   goToSearchResult,
   goToSettings,
   goToEvents as goToEventsAction,
-  goToPerformanceHome
+  goToPerformanceHome,
+  goToTeamSearch
 } from '@client/navigation'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import {
@@ -83,6 +84,7 @@ type IProps = IntlShapeProps & {
   goToHomeAction: typeof goToHome
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
+  goToTeamSearchAction: typeof goToTeamSearch
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -180,18 +182,18 @@ class HeaderComp extends React.Component<IProps, IState> {
     ) {
       menuItems = [
         {
-          icon: <SystemBlack />,
-          iconHover: <SystemBlue />,
-          label: this.props.intl.formatMessage(messages.systemTitle),
-          onClick: this.props.goToHomeAction
-        },
-        {
           icon: <StatsBlack />,
           iconHover: <StatsBlue />,
           label: this.props.intl.formatMessage(
             constantsMessages.performanceTitle
           ),
           onClick: this.props.goToPerformanceHomeAction
+        },
+        {
+          icon: <SystemBlack />,
+          iconHover: <SystemBlue />,
+          label: this.props.intl.formatMessage(messages.teamTitle),
+          onClick: this.props.goToTeamSearchAction
         },
         {
           icon: <SettingsBlack />,
@@ -326,8 +328,8 @@ class HeaderComp extends React.Component<IProps, IState> {
       userDetails,
       enableMenuSelection = true,
       goToHomeAction,
-      goToPerformanceHomeAction,
       goToPerformanceReportListAction,
+      goToTeamSearchAction,
       activeMenuItem
     } = this.props
     const title =
@@ -335,6 +337,10 @@ class HeaderComp extends React.Component<IProps, IState> {
       intl.formatMessage(
         activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
           ? constantsMessages.performanceTitle
+          : userDetails &&
+            userDetails.role &&
+            SYS_ADMIN_ROLES.includes(userDetails.role)
+          ? messages.teamTitle
           : constantsMessages.applicationTitle
       )
 
@@ -390,20 +396,20 @@ class HeaderComp extends React.Component<IProps, IState> {
     ) {
       menuItems = [
         {
-          key: 'sysadmin',
-          title: intl.formatMessage(messages.systemTitle),
+          key: 'performance',
+          title: intl.formatMessage(constantsMessages.performanceTitle),
           onClick: goToHomeAction,
           selected:
             enableMenuSelection &&
-            activeMenuItem !== ACTIVE_MENU_ITEM.PERFORMANCE
+            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         },
         {
-          key: 'performance',
-          title: intl.formatMessage(constantsMessages.performanceTitle),
-          onClick: goToPerformanceHomeAction,
+          key: 'team',
+          title: intl.formatMessage(messages.teamTitle),
+          onClick: goToTeamSearchAction,
           selected:
             enableMenuSelection &&
-            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+            activeMenuItem !== ACTIVE_MENU_ITEM.PERFORMANCE
         }
       ]
 
@@ -448,6 +454,7 @@ export const Header = connect(
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
     goToPerformanceHomeAction: goToPerformanceHome,
-    goToPerformanceReportListAction: goToPerformanceReportList
+    goToPerformanceReportListAction: goToPerformanceReportList,
+    goToTeamSearchAction: goToTeamSearch
   }
 )(injectIntl<'intl', IProps>(HeaderComp))

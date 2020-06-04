@@ -15,6 +15,7 @@ interface IPerformanceReportsMessages {
   monthlyTabTitle: MessageDescriptor
   monthlyReportsBodyHeader: MessageDescriptor
   sysAdminPerformanceHomeHeader: MessageDescriptor
+  sysAdminTeamHomeHeader: MessageDescriptor
   noResultForLocation: MessageDescriptor
   exportAll: MessageDescriptor
   operational: MessageDescriptor
@@ -69,6 +70,11 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.header.sysadmin.home',
     defaultMessage: 'Search for an administrative area or office',
     description: 'Header for system admin performance home page'
+  },
+  sysAdminTeamHomeHeader: {
+    id: 'team.header.sysadmin.home',
+    defaultMessage: 'Search for an office',
+    description: 'Header for system admin team home page'
   },
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',
