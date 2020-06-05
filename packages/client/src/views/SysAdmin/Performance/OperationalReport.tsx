@@ -31,6 +31,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
+import { getToken } from '@client/utils/authUtils'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_STATUS_WISE_REGISTRATION_COUNT } from '@client/views/SysAdmin/Performance/queries'
@@ -69,7 +70,6 @@ import { withTheme } from 'styled-components'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { ApplicationsStartedReport } from './reports/operational/ApplicationsStartedReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import { getToken } from '@client/utils/authUtils'
 
 interface IConnectProps {
   offlineLocations: IOfflineData['locations']
@@ -111,7 +111,6 @@ interface State {
   timeEnd: moment.Moment
   expandStatusWindow: boolean
   statusWindowWidth: number
-  mainWindowRightMargin: number
 }
 
 const Header = styled.h2`
@@ -217,8 +216,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart: moment(timeStart),
       timeEnd: moment(timeEnd),
       expandStatusWindow: state ? state.expandStatusWindow : false,
-      statusWindowWidth: state ? state.statusWindowWidth : 0,
-      mainWindowRightMargin: state ? state.mainWindowRightMargin : 0
+      statusWindowWidth: state ? state.statusWindowWidth : 0
     }
   }
 
@@ -342,8 +340,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: true,
-      statusWindowWidth: 450,
-      mainWindowRightMargin: 100
+      statusWindowWidth: 450
     })
   }
 
@@ -351,8 +348,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: false,
-      statusWindowWidth: 0,
-      mainWindowRightMargin: 0
+      statusWindowWidth: 0
     })
   }
 
@@ -386,13 +382,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart,
       timeEnd,
       expandStatusWindow,
-      statusWindowWidth,
-      mainWindowRightMargin
+      statusWindowWidth
     } = this.state
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
       <SysAdminContentWrapper>
-        <Container marginRight={mainWindowRightMargin}>
+        <Container marginRight={statusWindowWidth}>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
             <LinkButton
