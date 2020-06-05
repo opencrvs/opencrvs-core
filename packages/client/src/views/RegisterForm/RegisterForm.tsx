@@ -14,7 +14,7 @@ import { FormikTouched, FormikValues } from 'formik'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { isNull, isUndefined, merge, flatten } from 'lodash'
+import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   ICON_ALIGNMENT,
@@ -207,6 +207,7 @@ type Props = {
   activeSection: IFormSection
   activeSectionGroup: IFormSectionGroup
   setAllFieldsDirty: boolean
+  fieldsToShowValidationErrors?: IFormField[]
 }
 
 export type FullProps = IFormProps &
@@ -511,6 +512,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const {
       intl,
       setAllFieldsDirty,
+      fieldsToShowValidationErrors,
       application,
       registerForm,
 
@@ -696,6 +698,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           )
                         }}
                         setAllFieldsDirty={setAllFieldsDirty}
+                        fieldsToShowValidationErrors={
+                          fieldsToShowValidationErrors
+                        }
                         fields={getVisibleGroupFields(activeSectionGroup)}
                         draftData={application.data}
                         onSetTouched={setTouchedFunc => {
@@ -889,10 +894,19 @@ function mapStateToProps(
     application.data
   )
 
+  let updatedFields: IFormField[] = []
+
+  if (!setAllFieldsDirty) {
+    updatedFields = activeSectionGroup.fields.filter(
+      (field, index) => fields[index].initialValue !== field.initialValue
+    )
+  }
+
   return {
     registerForm,
     scope: getScope(state),
     setAllFieldsDirty,
+    fieldsToShowValidationErrors: updatedFields,
     activeSection,
     activeSectionGroup: {
       ...activeSectionGroup,

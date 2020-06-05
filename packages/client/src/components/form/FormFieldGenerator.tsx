@@ -520,6 +520,7 @@ type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 interface IFormSectionProps {
   fields: IFormField[]
   id: string
+  fieldsToShowValidationErrors?: IFormField[]
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
   draftData?: IFormData
@@ -565,6 +566,11 @@ class FormSectionComponent extends React.Component<Props> {
       prevProps.resetForm()
       if (this.props.setAllFieldsDirty) {
         this.showValidationErrors(this.props.fields)
+      } else if (
+        this.props.fieldsToShowValidationErrors &&
+        this.props.fieldsToShowValidationErrors.length > 0
+      ) {
+        this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
     }
   }
