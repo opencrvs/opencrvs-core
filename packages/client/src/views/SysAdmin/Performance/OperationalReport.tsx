@@ -114,7 +114,7 @@ interface State {
   mainWindowRightMargin: number
 }
 
-const Header = styled.h1`
+const Header = styled.h2`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h2Style};
   margin: 0;

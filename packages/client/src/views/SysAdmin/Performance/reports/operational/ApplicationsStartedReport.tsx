@@ -41,6 +41,14 @@ const Report = styled.div<{
   }
 `
 
+const ApplicationsStartedReportHeader = styled(ReportHeader)`
+  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
+`
+
+const ApplicationsStartedSubHeader = styled(SubHeader)`
+  margin-top: 24px;
+`
+
 const Reports = styled.div<{ loading?: boolean }>`
   display: flex;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -208,15 +216,15 @@ class ApplicationsStartedReportComponent extends React.Component<
     } = data
     return (
       <>
-        <ReportHeader>
-          <SubHeader>
+        <ApplicationsStartedReportHeader>
+          <ApplicationsStartedSubHeader>
             {intl.formatMessage(messages.applicationsStartedTitle)}
-          </SubHeader>
+          </ApplicationsStartedSubHeader>
           <Description>
             {intl.formatMessage(messages.applicationsStartedDescription)}
             {reportTimeFrom.format()} - {reportTimeTo.format()}
           </Description>
-        </ReportHeader>
+        </ApplicationsStartedReportHeader>
         <Reports id="applications-started-reports">
           <Report total={true}>
             <ReportTitle>
