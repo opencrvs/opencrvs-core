@@ -215,6 +215,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
             return (
               <div>
                 <StyledPrimaryButton
+                  type={'button'}
                   disabled={isDisabled || isDisconnected}
                   onClick={async (event: React.MouseEvent<HTMLElement>) => {
                     this.performQuery(client)

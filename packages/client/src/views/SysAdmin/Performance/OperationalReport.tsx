@@ -139,10 +139,14 @@ const Container = styled.div<{
   marginRight: number
 }>`
   margin-right: ${({ marginRight }) => `${marginRight}px`};
+  margin-bottom: 160px;
 `
 
 const MonthlyReportsList = styled.div`
-  margin-top: 16px;
+  margin-top: 8px;
+`
+const DeathReportHolder = styled.div`
+  margin-top: 6px;
 `
 
 const StatusTitleContainer = styled.div`
@@ -234,11 +238,15 @@ class OperationalReportComponent extends React.Component<Props, State> {
   }
 
   downloadMonthlyData = (
-    monthStart: string,
-    monthEnd: string,
+    monthStart: moment.Moment,
+    monthEnd: moment.Moment,
     event: string
   ) => {
-    const metricsURL = `${window.config.API_GATEWAY_URL}export/monthlyPerformanceMetrics?locationId=${this.state.selectedLocation.id}&timeStart=${monthStart}&timeEnd=${monthEnd}&event=${event}`
+    const metricsURL = `${
+      window.config.API_GATEWAY_URL
+    }export/monthlyPerformanceMetrics?locationId=${
+      this.state.selectedLocation.id
+    }&timeStart=${monthStart.toISOString()}&timeEnd=${monthEnd.toISOString()}&event=${event}`
     fetch(metricsURL, {
       headers: {
         Authorization: `Bearer ${getToken()}`
@@ -249,7 +257,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = 'export.zip'
+        a.download = `${monthStart.format('MMMM_YYYY')}_export.zip`
         a.click()
         window.URL.revokeObjectURL(url)
       })
@@ -300,11 +308,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
         export: (
           <RowLink
             onClick={() =>
-              this.downloadMonthlyData(
-                start.toISOString(),
-                end.toISOString(),
-                eventType.toString()
-              )
+              this.downloadMonthlyData(start, end, eventType.toString())
             }
           >
             CSV
@@ -527,30 +531,32 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 ]}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               />
-              <ListTable
-                tableTitle={intl.formatMessage(constantsMessages.deaths)}
-                isLoading={false}
-                content={this.getContent(Event.DEATH)}
-                tableHeight={280}
-                pageSize={24}
-                hideBoxShadow={true}
-                columns={[
-                  {
-                    label: intl.formatMessage(constantsMessages.month),
-                    width: 70,
-                    key: 'month',
-                    isSortable: true,
-                    icon: <ArrowDownBlue />,
-                    sortFunction: () => {}
-                  },
-                  {
-                    label: intl.formatMessage(constantsMessages.export),
-                    width: 30,
-                    key: 'export'
-                  }
-                ]}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              />
+              <DeathReportHolder>
+                <ListTable
+                  tableTitle={intl.formatMessage(constantsMessages.deaths)}
+                  isLoading={false}
+                  content={this.getContent(Event.DEATH)}
+                  tableHeight={280}
+                  pageSize={24}
+                  hideBoxShadow={true}
+                  columns={[
+                    {
+                      label: intl.formatMessage(constantsMessages.month),
+                      width: 70,
+                      key: 'month',
+                      isSortable: true,
+                      icon: <ArrowDownBlue />,
+                      sortFunction: () => {}
+                    },
+                    {
+                      label: intl.formatMessage(constantsMessages.export),
+                      width: 30,
+                      key: 'export'
+                    }
+                  ]}
+                  noResultText={intl.formatMessage(constantsMessages.noResults)}
+                />
+              </DeathReportHolder>
             </MonthlyReportsList>
           )}
         </Container>
