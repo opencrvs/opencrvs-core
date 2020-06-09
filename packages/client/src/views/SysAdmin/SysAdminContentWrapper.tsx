@@ -24,7 +24,7 @@ const Content = styled(BodyContent)`
   }
 `
 const SubPageContent = styled(Content)`
-  margin: 8px auto 0;
+  max-width: 100%;
 `
 export enum SysAdminPageVariant {
   DEFAULT = 'DEFAULT',

@@ -17,12 +17,15 @@ import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
+  isFullPage?: boolean
 }>`
   width: 100%;
   overflow-x: hidden;
   background: ${({ theme }) => theme.colors.white};
-  ${({ hideBoxShadow, theme }) =>
-    hideBoxShadow
+  ${({ hideBoxShadow, isFullPage, theme }) =>
+    isFullPage
+      ? `padding-bottom:24px;`
+      : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
     ${theme.shadows.mistyShadow};`}
@@ -135,10 +138,10 @@ const ValueWrapper = styled.span<{
 const Error = styled.span`
   color: ${({ theme }) => theme.colors.error};
 `
-const ErrorText = styled.div`
+const ErrorText = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h5Style};
   text-align: left;
-  margin-left: 10px;
+  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};
 `
 const H3 = styled.div`
@@ -173,9 +176,11 @@ const TableScrollerHorizontal = styled.div`
 const TableScroller = styled.div<{
   height?: number
   width: number
+  isFullPage?: boolean
 }>`
   display: block;
-  max-height: ${({ height }) => (height ? `${height}px` : 'auto')};
+  max-height: ${({ height, isFullPage }) =>
+    isFullPage ? '65vh' : height ? `${height}px` : 'auto'};
   width: ${({ width }) => width}%;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -202,7 +207,9 @@ const ToggleSortIcon = styled.div<{
     transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};
   }
 `
-
+const LodaingContainer = styled.div`
+  overflow: hidden;
+`
 const defaultConfiguration = {
   pageSize: 10,
   currentPage: 1
@@ -225,6 +232,7 @@ interface IListTableProps {
   hideTableHeader?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
+  isFullPage?: boolean
 }
 
 interface IListTableState {
@@ -290,7 +298,8 @@ export class ListTable extends React.Component<
       hideTableHeader,
       footerColumns,
       loadMoreText,
-      highlightRowOnMouseOver
+      highlightRowOnMouseOver,
+      isFullPage
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -298,7 +307,11 @@ export class ListTable extends React.Component<
     return (
       <>
         {!isLoading && (
-          <Wrapper id={`listTable-${id}`} hideBoxShadow={hideBoxShadow}>
+          <Wrapper
+            id={`listTable-${id}`}
+            hideBoxShadow={hideBoxShadow}
+            isFullPage={isFullPage}
+          >
             {tableTitle && <H3>{tableTitle}</H3>}
             <TableScrollerHorizontal>
               {!hideTableHeader && content.length > 0 && (
@@ -337,6 +350,7 @@ export class ListTable extends React.Component<
               )}
               <TableScroller
                 height={tableHeight}
+                isFullPage={isFullPage}
                 width={(totalWidth >= 100 && totalWidth) || 100}
               >
                 <TableBody
@@ -388,12 +402,14 @@ export class ListTable extends React.Component<
               )}
             </TableScrollerHorizontal>
             {content.length <= 0 && (
-              <ErrorText id="no-record">{noResultText}</ErrorText>
+              <ErrorText id="no-record" isFullPage={isFullPage}>
+                {noResultText}
+              </ErrorText>
             )}
           </Wrapper>
         )}
         {isLoading && (
-          <>
+          <LodaingContainer>
             {tableTitle && <TableTitleLoading />}
             <TableHeader>
               {columns.map((preference, index) => (
@@ -419,7 +435,7 @@ export class ListTable extends React.Component<
                 </ContentWrapper>
               ))}
             </TableHeader>
-          </>
+          </LodaingContainer>
         )}
         {totalItems > pageSize && (
           <>

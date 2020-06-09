@@ -543,6 +543,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                     pageSize: DEFAULT_APPLICATION_STATUS_PAGE_SIZE
                   }
                 )}
+                isFullPage
               />
               {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
             </>

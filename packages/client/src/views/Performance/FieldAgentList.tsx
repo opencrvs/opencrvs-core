@@ -410,7 +410,7 @@ function FieldAgentListComponent(props: IProps) {
                     pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
                   }
                 )}
-                hideBoxShadow={true}
+                isFullPage
                 highlightRowOnMouseOver
               />
             )
