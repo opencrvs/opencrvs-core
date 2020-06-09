@@ -15,16 +15,18 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 import * as Hapi from 'hapi'
 import * as DotEnv from 'dotenv'
 import { getPlugins } from '@gateway/config/plugins'
-import { getServer } from '@gateway/config/server'
 import { getRoutes } from '@gateway/config/routes'
 import {
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
   AUTH_URL,
-  PORT
+  PORT,
+  HOST
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
+import { ApolloServer } from 'apollo-server-hapi'
+import { getApolloConfig } from '@gateway/graphql/config'
 
 DotEnv.config({
   path: `${process.cwd()}/.env`
@@ -33,12 +35,20 @@ DotEnv.config({
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  const server = getServer()
+  const apolloServer = new ApolloServer(getApolloConfig())
+  const app = new Hapi.Server({
+    host: HOST,
+    port: PORT,
+    routes: {
+      cors: { origin: ['*'] },
+      payload: { maxBytes: 52428800 }
+    }
+  })
   const plugins = getPlugins()
 
-  await server.register(plugins)
+  await app.register(plugins)
 
-  server.auth.strategy('jwt', 'jwt', {
+  app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
     verifyOptions: {
       algorithms: ['RS256'],
@@ -49,10 +59,14 @@ export async function createServer() {
       validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
   })
 
-  server.auth.default('jwt')
+  app.auth.default('jwt')
+
+  await apolloServer.applyMiddleware({
+    app
+  })
 
   const routes = getRoutes()
-  server.route(routes)
+  app.route(routes)
 
   /*
    * For debugging sent applications on pre-prod environments.
@@ -60,24 +74,24 @@ export async function createServer() {
    * https://github.com/hapijs/good/search?q=request&type=Issues
    */
   if (process.env.NODE_ENV !== 'production') {
-    server.events.on('response', request => {
-      server.log('info', JSON.stringify(request.payload))
+    app.events.on('response', request => {
+      app.log('info', JSON.stringify(request.payload))
     })
   }
 
   async function start() {
-    await server.start()
-    server.log('info', `server started on port ${PORT}`)
+    await app.start()
+    app.log('info', `server started on port ${PORT}`)
   }
 
   async function stop() {
-    await server.stop()
-    server.log('info', 'server stopped')
+    await app.stop()
+    app.log('info', 'server stopped')
   }
 
-  return { server, start, stop }
+  return { app, start, stop }
 }
 
 if (require.main === module) {
-  createServer().then(server => server.start())
+  createServer().then(app => app.start())
 }
