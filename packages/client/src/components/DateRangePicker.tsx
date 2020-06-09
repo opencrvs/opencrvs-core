@@ -83,13 +83,27 @@ export const ContentWrapper = styled.div`
 
 export const ModalContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
-  position: absolute;
+  position: fixed;
   z-index: 2;
   width: 608px;
-  transform: translate(-16px, -42px);
+  top: auto;
+  left: auto;
+  margin: -42px 0 0 -16px;
+
   ${({ theme }) => theme.shadows.thickShadow};
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.copy};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    left: 24px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    width: calc(100vw - 48px);
+    left: 24px;
+    right: 24px;
+    margin: 0;
+  }
 `
 export const ModalHeader = styled.div`
   display: flex;
@@ -186,10 +200,16 @@ const ModalFooter = styled.div`
 export const CancelableArea = styled.div`
   height: 100%;
   width: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1;
+  overflow: hidden;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    background: ${({ theme }) => theme.colors.previewBackground};
+    opacity: 0.5;
+  }
 `
 const StyledPrimaryButton = styled(PrimaryButton)`
   padding: 8px 16px;
