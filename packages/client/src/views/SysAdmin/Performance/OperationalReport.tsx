@@ -111,6 +111,8 @@ interface State {
   timeEnd: moment.Moment
   expandStatusWindow: boolean
   statusWindowWidth: number
+  mainWindowLeftMargin: number
+  mainWindowRightMargin: number
 }
 
 const Header = styled.h2`
@@ -134,10 +136,7 @@ const HeaderContainer = styled.div`
   }
 `
 
-const Container = styled.div<{
-  marginRight: number
-}>`
-  margin-right: ${({ marginRight }) => `${marginRight}px`};
+const Container = styled.div`
   margin-bottom: 160px;
 `
 
@@ -216,7 +215,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart: moment(timeStart),
       timeEnd: moment(timeEnd),
       expandStatusWindow: state ? state.expandStatusWindow : false,
-      statusWindowWidth: state ? state.statusWindowWidth : 0
+      statusWindowWidth: state ? state.statusWindowWidth : 0,
+      mainWindowLeftMargin: state ? state.mainWindowLeftMargin : 0,
+      mainWindowRightMargin: state ? state.mainWindowRightMargin : 0
     }
   }
 
@@ -340,7 +341,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: true,
-      statusWindowWidth: 450
+      statusWindowWidth: 450,
+      mainWindowLeftMargin: 10,
+      mainWindowRightMargin: 460
     })
   }
 
@@ -348,7 +351,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.setState({
       ...this.state,
       expandStatusWindow: false,
-      statusWindowWidth: 0
+      statusWindowWidth: 0,
+      mainWindowLeftMargin: 0,
+      mainWindowRightMargin: 0
     })
   }
 
@@ -382,12 +387,17 @@ class OperationalReportComponent extends React.Component<Props, State> {
       timeStart,
       timeEnd,
       expandStatusWindow,
-      statusWindowWidth
+      statusWindowWidth,
+      mainWindowLeftMargin,
+      mainWindowRightMargin
     } = this.state
     const { displayLabel: title, id: locationId } = selectedLocation
     return (
-      <SysAdminContentWrapper>
-        <Container marginRight={statusWindowWidth}>
+      <SysAdminContentWrapper
+        marginLeft={mainWindowLeftMargin}
+        marginRight={mainWindowRightMargin}
+      >
+        <Container>
           <HeaderContainer>
             <Header id="header-location-name">{title}</Header>
             <LinkButton
