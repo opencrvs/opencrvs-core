@@ -96,7 +96,7 @@ export const fonts = (language: string): IFonts => {
       line-height: 40px;
       font-weight: normal;
       letter-spacing: 0.25px;`,
-    h2Style: `font-family: ${regularFont};
+    h2Style: `font-family: ${semiBoldFont};
       font-size: 36px;
       font-weight: 600;
       line-height: 54px;`,

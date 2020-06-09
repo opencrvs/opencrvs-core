@@ -57,8 +57,8 @@ const Reports = styled.div<{ loading?: boolean }>`
 
 const KeyNumber = styled.div`
   color: ${({ theme }) => theme.colors.menuBackground};
-  ${({ theme }) => theme.fonts.h4Style};
-  margin: 16px 0px;
+  ${({ theme }) => theme.fonts.h2Style};
+  margin: 0px 0px -16px 0px;
 `
 const KeyNumberDescription = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
@@ -75,7 +75,7 @@ const Label = styled.span`
   ${({ theme }) => theme.fonts.bodyStyle};
 `
 const Value = styled.span`
-  color: ${({ theme }) => theme.colors.placeholder};
+  color: ${({ theme }) => theme.colors.menuBackground};
   ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
