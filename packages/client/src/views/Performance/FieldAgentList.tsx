@@ -16,6 +16,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
+import { formatTimeDuration } from '@client/DateUtils'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToFieldAgentList, goToOperationalReport } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
@@ -44,6 +45,12 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import ReactTooltip from 'react-tooltip'
+import styled from 'styled-components'
+
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
@@ -95,22 +102,30 @@ function getPercentage(total: number | undefined, current: number | undefined) {
   return Math.round((current / total) * 100)
 }
 
-function getAverageCompletionTimeInFormat(
-  completionTimeInSeconds: number | undefined
+function getAverageCompletionTimeComponent(
+  completionTimeInSeconds: number | undefined,
+  id: number
 ) {
-  if (!completionTimeInSeconds || completionTimeInSeconds <= 0) {
-    return '00:00:00'
-  }
-  const hours = String(Math.trunc(completionTimeInSeconds / 3600)).padStart(
-    2,
-    '0'
+  const timeStructure = formatTimeDuration(completionTimeInSeconds || 0)
+  const label =
+    (timeStructure &&
+      `${timeStructure.days}:${timeStructure.hours}:${timeStructure.minutes}`) ||
+    '-'
+  const tooltip =
+    (timeStructure &&
+      `${timeStructure.days} days, ${timeStructure.hours} hours, ${timeStructure.minutes} minutes`) ||
+    '-'
+
+  return (
+    <>
+      <ReactTooltip id={`cmpltn_time_${id}`}>
+        <ToolTipContainer>{tooltip}</ToolTipContainer>
+      </ReactTooltip>
+      <span data-tip data-for={`cmpltn_time_${id}`}>
+        {label}
+      </span>
+    </>
   )
-  const minutes = String(Math.trunc(completionTimeInSeconds / 60)).padStart(
-    2,
-    '0'
-  )
-  const seconds = String(completionTimeInSeconds % 60).padStart(2, '0')
-  return `${hours}:${minutes}:${seconds}`
 }
 
 function FieldAgentListComponent(props: IProps) {
@@ -205,7 +220,7 @@ function FieldAgentListComponent(props: IProps) {
     const content =
       data &&
       data.results &&
-      data.results.map(row => {
+      data.results.map((row, idx) => {
         if (row === null) {
           return {
             name: '',
@@ -236,8 +251,9 @@ function FieldAgentListComponent(props: IProps) {
             row.totalNumberOfApplicationStarted,
             row.totalNumberOfInProgressAppStarted
           )}%)`,
-          avgCompleteApplicationTime: getAverageCompletionTimeInFormat(
-            row.averageTimeForDeclaredApplications
+          avgCompleteApplicationTime: getAverageCompletionTimeComponent(
+            row.averageTimeForDeclaredApplications,
+            idx
           ),
           rejectedApplications: `${
             row.totalNumberOfRejectedApplications

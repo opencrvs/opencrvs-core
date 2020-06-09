@@ -15,6 +15,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
+import { formatTimeDuration } from '@client/DateUtils'
 import { Event } from '@client/forms'
 import {
   constantsMessages,
@@ -31,13 +32,13 @@ import {
   OPERATIONAL_REPORT_SECTION,
   StatusMapping
 } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
+import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
-import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
@@ -57,8 +58,14 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import ReactTooltip from 'react-tooltip'
+import styled from 'styled-components'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseApplicationCountView'
+
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
 
 const { useState } = React
 
@@ -253,6 +260,23 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     }
 
+    function getTimeDurationElements(timeDuration: number) {
+      const timeStructure = formatTimeDuration(timeDuration)
+      const label =
+        (timeStructure &&
+          `${timeStructure.days}:${timeStructure.hours}:${timeStructure.minutes}`) ||
+        '-'
+      const tooltip =
+        (timeStructure &&
+          `${timeStructure.days} days, ${timeStructure.hours} hours, ${timeStructure.minutes} minutes`) ||
+        '-'
+
+      return {
+        label,
+        tooltip
+      }
+    }
+
     const content = data.getEventsWithProgress.results.map(
       (eventProgress: GQLEventProgressSet | null, index: number) => {
         if (eventProgress !== null) {
@@ -298,12 +322,13 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 StatusMapping[eventProgress.registration.status].labelDescriptor
               )) ||
             ''
-          let timeLoggedInProgress = '-'
-          let timeLoggedDeclared = '-'
-          let timeLoggedRejected = '-'
-          let timeLoggedValidated = '-'
-          let timeLoggedWaitingValidation = '-'
-          let timeLoggedRegistered = '-'
+
+          let timeLoggedInProgress = <></>
+          let timeLoggedDeclared = <></>
+          let timeLoggedRejected = <></>
+          let timeLoggedValidated = <></>
+          let timeLoggedWaitingValidation = <></>
+          let timeLoggedRegistered = <></>
 
           if (eventProgress.progressReport != null) {
             const {
@@ -315,48 +340,106 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               timeInReadyToPrint
             } = eventProgress.progressReport
 
-            timeLoggedInProgress =
-              (timeInProgress !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInProgress as number)
-                  .format('HH:mm:ss')) ||
-              '-'
-            timeLoggedDeclared =
-              (timeInReadyForReview !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInReadyForReview as number)
-                  .format('HH:mm:ss')) ||
-              '-'
-            timeLoggedRejected =
-              (timeInRequiresUpdates !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInRequiresUpdates as number)
-                  .format('HH:mm:ss')) ||
-              '-'
-            timeLoggedValidated =
-              (timeInWaitingForApproval !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInWaitingForApproval as number)
-                  .format('HH:mm:ss')) ||
-              '-'
-            timeLoggedWaitingValidation =
-              (timeInWaitingForBRIS !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInWaitingForBRIS as number)
-                  .format('HH:mm:ss')) ||
-              '-'
-            timeLoggedRegistered =
-              (timeInReadyToPrint !== null &&
-                moment()
-                  .startOf('day')
-                  .seconds(timeInReadyToPrint as number)
-                  .format('HH:mm:ss')) ||
-              '-'
+            let timeDurationElements = {
+              label: '',
+              tooltip: ''
+            }
+
+            timeDurationElements = getTimeDurationElements(
+              timeInProgress as number
+            )
+            timeLoggedInProgress = (
+              <>
+                <ReactTooltip id={`in_prog_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`in_prog_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
+
+            timeDurationElements = getTimeDurationElements(
+              timeInReadyForReview as number
+            )
+            timeLoggedDeclared = (
+              <>
+                <ReactTooltip id={`dclrd_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`dclrd_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
+
+            timeDurationElements = getTimeDurationElements(
+              timeInRequiresUpdates as number
+            )
+            timeLoggedRejected = (
+              <>
+                <ReactTooltip id={`rjctd_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`rjctd_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
+
+            timeDurationElements = getTimeDurationElements(
+              timeInWaitingForApproval as number
+            )
+            timeLoggedValidated = (
+              <>
+                <ReactTooltip id={`vldtd_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`vldtd_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
+
+            timeDurationElements = getTimeDurationElements(
+              timeInWaitingForBRIS as number
+            )
+            timeLoggedWaitingValidation = (
+              <>
+                <ReactTooltip id={`wtng_vldtn_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`wtng_vldtn_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
+
+            timeDurationElements = getTimeDurationElements(
+              timeInReadyToPrint as number
+            )
+            timeLoggedRegistered = (
+              <>
+                <ReactTooltip id={`rgstrd_tltp_${index}`}>
+                  <ToolTipContainer>
+                    {timeDurationElements.tooltip}
+                  </ToolTipContainer>
+                </ReactTooltip>
+                <span data-tip data-for={`rgstrd_tltp_${index}`}>
+                  {timeDurationElements.label}
+                </span>
+              </>
+            )
           }
           return {
             id: (
