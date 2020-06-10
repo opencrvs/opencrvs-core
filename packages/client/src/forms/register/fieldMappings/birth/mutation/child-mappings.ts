@@ -46,11 +46,13 @@ export const birthEventLocationMutationTransformer = (
       delete transformedData.eventLocation.type
     }
   } else if (transformedFieldName) {
-    transformedData.eventLocation.address[transformedFieldName] =
+    transformedData.eventLocation.address[transformedFieldName] = `${
       draftData[sectionId][field.name]
+    }`
   } else {
-    transformedData.eventLocation.address[field.name] =
+    transformedData.eventLocation.address[field.name] = `${
       draftData[sectionId][field.name]
+    }`
   }
   if (field.name === 'addressLine4') {
     transformedData.eventLocation.partOf = `Location/${

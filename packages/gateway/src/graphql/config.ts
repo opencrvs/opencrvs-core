@@ -28,8 +28,9 @@ import { loadSchemaSync } from '@graphql-tools/load'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { addResolversToSchema } from '@graphql-tools/schema'
 import { readFileSync } from 'fs'
+import { merge } from 'lodash'
 
-const graphQLSchemaPath = `${__dirname}/index.graphql`
+const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
 interface IStringIndexSignatureInterface {
   [index: string]: any
@@ -37,25 +38,24 @@ interface IStringIndexSignatureInterface {
 
 type StringIndexed<T> = T & IStringIndexSignatureInterface
 
+const resolvers: StringIndexed<IResolvers> = merge(
+  notificationRootResolvers as IResolvers,
+  registrationRootResolvers as IResolvers,
+  locationRootResolvers as IResolvers,
+  userRootResolvers as IResolvers,
+  userTypeResolvers as IResolvers,
+  metricsRootResolvers as IResolvers,
+  typeResolvers as IResolvers,
+  searchRootResolvers as IResolvers,
+  searchTypeResolvers as IResolvers,
+  roleRootResolvers as IResolvers,
+  roleTypeResolvers as IResolvers
+)
+
 export const getExecutableSchema = (): GraphQLSchema => {
   const schema = loadSchemaSync(graphQLSchemaPath, {
     loaders: [new GraphQLFileLoader()]
   })
-  const resolvers: StringIndexed<IResolvers> = {
-    // the types we generate out of our schema aren't
-    // compatible with the types graphql-tools uses internally.
-    ...(notificationRootResolvers as IResolvers),
-    ...(registrationRootResolvers as IResolvers),
-    ...(locationRootResolvers as IResolvers),
-    ...(userRootResolvers as IResolvers),
-    ...(userTypeResolvers as IResolvers),
-    ...(metricsRootResolvers as IResolvers),
-    ...(typeResolvers as IResolvers),
-    ...(searchRootResolvers as IResolvers),
-    ...(searchTypeResolvers as IResolvers),
-    ...(roleRootResolvers as IResolvers),
-    ...(roleTypeResolvers as IResolvers)
-  }
 
   return addResolversToSchema({
     schema,
@@ -67,23 +67,12 @@ export const getApolloConfig = (): Config => {
   const typeDefs = gql`
     ${readFileSync(graphQLSchemaPath, 'utf8')}
   `
-  const resolvers: StringIndexed<IResolvers> = {
-    // the types we generate out of our schema aren't
-    // compatible with the types graphql-tools uses internally.
-    ...(notificationRootResolvers as IResolvers),
-    ...(registrationRootResolvers as IResolvers),
-    ...(locationRootResolvers as IResolvers),
-    ...(userRootResolvers as IResolvers),
-    ...(userTypeResolvers as IResolvers),
-    ...(metricsRootResolvers as IResolvers),
-    ...(typeResolvers as IResolvers),
-    ...(searchRootResolvers as IResolvers),
-    ...(searchTypeResolvers as IResolvers),
-    ...(roleRootResolvers as IResolvers),
-    ...(roleTypeResolvers as IResolvers)
-  }
+
   return {
     typeDefs,
-    resolvers
+    resolvers,
+    context: async ({ request, h }) => {
+      return { Authorization: request.headers.authorization }
+    }
   }
 }

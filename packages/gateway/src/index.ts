@@ -47,7 +47,6 @@ export async function createServer() {
   const plugins = getPlugins()
 
   await app.register(plugins)
-
   app.auth.strategy('jwt', 'jwt', {
     key: publicCert,
     verifyOptions: {

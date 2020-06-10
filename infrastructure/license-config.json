@@ -19,6 +19,7 @@
     "**/packages/components/lib",
     "**/packages/*/build",
     "packages/gateway/src/graphql/schema.d.ts",
+    "packages/gateway/src/graphql/schema.graphql",
     "infrastructure/configure-file-monitoring.sh",
     "grafana"
   ],
