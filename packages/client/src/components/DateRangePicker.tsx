@@ -96,6 +96,7 @@ export const ModalContainer = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     left: 24px;
+    margin-left: 0;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
