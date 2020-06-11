@@ -157,6 +157,11 @@ describe('Registraion Rates tests', () => {
   })
 
   it('renders the component', async () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 200
+    })
     const header = await waitForElement(component, '#reg-rates-header')
   })
 
