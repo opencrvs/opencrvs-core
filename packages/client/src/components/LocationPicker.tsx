@@ -32,7 +32,7 @@ import {
 } from '@client/components/DateRangePicker'
 import styled from '@client/styledComponents'
 
-const { useState } = React
+const { useState, useEffect } = React
 
 interface IConnectProps {
   searchableLocations: ISearchLocation[]
@@ -65,6 +65,11 @@ const StyledLocationSearch = styled(LocationSearch)`
     padding-left: 8px;
     margin: 0 16px 8px 16px;
     width: calc(100% - 32px);
+
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+      margin: 0 8px 8px 8px;
+      width: calc(100% - 16px);
+    }
   }
 
   & > ul {
@@ -87,6 +92,17 @@ function LocationPickerComponent(props: LocationPickerProps) {
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
 
+  useEffect(() => {
+    function toggleBodyScroll() {
+      const body = document.querySelector('body') as HTMLBodyElement
+      if (modalVisible) {
+        body.style.overflow = 'hidden'
+      } else {
+        body.style.removeProperty('overflow')
+      }
+    }
+    toggleBodyScroll()
+  }, [modalVisible])
   return (
     <div>
       <PickerButton
