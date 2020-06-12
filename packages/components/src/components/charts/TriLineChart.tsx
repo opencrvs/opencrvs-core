@@ -41,17 +41,12 @@ interface IProps {
   tooltipContent: (dataPoint: any) => React.ReactNode
   legendContent: () => React.ReactNode
   theme: ITheme
-}
-
-interface IActiveState {
-  value: number
-  stroke: string
-}
-interface IState {
-  activeLabel: string
-  activeRegisteredIn45Day: IActiveState
-  activeTotalRegistered: IActiveState
-  activeTotalEstimate: IActiveState
+  chartTop: number
+  chartRight: number
+  chartBottom: number
+  chartLeft: number
+  maximizeXAxisInterval?: boolean
+  legendLayout: string
 }
 
 interface ILineDataPoint {
@@ -92,7 +87,7 @@ function CustomizedDot(props: ICustomisedDot) {
     </svg>
   )
 }
-class TriLineChartComponent extends React.Component<IProps, IState> {
+class TriLineChartComponent extends React.Component<IProps> {
   render() {
     const {
       data,
@@ -101,20 +96,43 @@ class TriLineChartComponent extends React.Component<IProps, IState> {
       dataKeys,
       theme,
       tooltipContent,
-      legendContent
+      legendContent,
+      chartTop,
+      chartRight,
+      chartBottom,
+      chartLeft,
+      maximizeXAxisInterval,
+      legendLayout
     } = this.props
     return (
       <Container>
         <ResponsiveContainer height={500}>
           <LineChart
             data={data}
-            margin={{ top: 40, right: 80, bottom: 40, left: 10 }}
+            margin={{
+              top: chartTop,
+              right: chartRight,
+              bottom: chartBottom,
+              left: chartLeft
+            }}
             onMouseMove={mouseMoveHandler}
             onMouseLeave={mouseLeaveHandler}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis tickLine={false} dataKey="label" />
-            <YAxis interval={1} axisLine={false} tickLine={false} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              horizontal={maximizeXAxisInterval ? false : true}
+            />
+            {(maximizeXAxisInterval && (
+              <XAxis
+                interval={data.length - 2}
+                tickLine={false}
+                dataKey="label"
+              />
+            )) || <XAxis tickLine={false} dataKey="label" />}
+            {!maximizeXAxisInterval && (
+              <YAxis interval={1} axisLine={false} tickLine={false} />
+            )}
 
             <Line
               dataKey={dataKeys[0]}
@@ -147,7 +165,7 @@ class TriLineChartComponent extends React.Component<IProps, IState> {
 
             <Legend
               content={legendContent}
-              layout="vertical"
+              layout={legendLayout as any}
               verticalAlign="top"
               align="right"
             />
