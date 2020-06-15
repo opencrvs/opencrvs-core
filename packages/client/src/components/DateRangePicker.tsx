@@ -195,7 +195,7 @@ const PresetContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex: 1;
     border: none;
-    padding-top: 8px;
+    padding: 8px 0;
     min-width: 360px;
 
     & > :last-child {
@@ -419,7 +419,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         },
         {
           key: 'customDateRangeNav',
-          label: 'Custom time period',
+          label: intl.formatMessage(constantsMessages.customTimePeriod),
           handler: () => setActiveRoute(START_MONTH)
         }
       ]
