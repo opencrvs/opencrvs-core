@@ -22,6 +22,7 @@ import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import moment from 'moment'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { IActionObject } from '@opencrvs/components/lib/interface'
 
 const { useState, useEffect } = React
 
@@ -38,16 +39,50 @@ interface IPresetDateRange {
   endDate: moment.Moment
 }
 
+const PRESET = 'preset'
+const START_MONTH = 'startMonth'
+const END_MONTH = 'endMonth'
+
+type PATHS = typeof PRESET | typeof START_MONTH | typeof END_MONTH
+
+type ROUTES = {
+  [key in PATHS]: {
+    hideHeader?: boolean
+    renderComponent: () => React.ReactNode
+  }
+}
+interface IPresetNavButton extends IActionObject {
+  key: string
+}
+
+type IPresetButton = IPresetDateRange | IPresetNavButton
+
+function isPresetNavButton(button: IPresetButton): button is IPresetNavButton {
+  return typeof (button as IActionObject).handler === 'function'
+}
+
 interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
   onDatesChange: ({ startDate, endDate }: IDateRange) => void
 }
 
+interface PresetSelectorProps {
+  onSelectPreset: ({
+    startDate,
+    endDate
+  }: {
+    startDate: moment.Moment
+    endDate: moment.Moment
+  }) => void
+}
 interface MonthSelectorProps {
   date: moment.Moment
   label: string
+  onNavigateDate: (date: moment.Moment) => void
   onSelectDate: (date: moment.Moment) => void
   minDate?: moment.Moment
   maxDate: moment.Moment
+  hideSelectedMonthOnLabel?: boolean
+  selectedDate: moment.Moment
 }
 
 export const PickerButton = styled.button`
@@ -82,13 +117,11 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  position: fixed;
+  position: absolute;
   z-index: 2;
   width: 608px;
-  top: auto;
-  left: auto;
   margin: -42px 0 0 -16px;
+  overflow: hidden;
 
   ${({ theme }) => theme.shadows.thickShadow};
   border-radius: 4px;
@@ -100,18 +133,25 @@ export const ModalContainer = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: calc(100vw - 48px);
-    left: 24px;
-    right: 24px;
+    position: fixed;
+    border-radius: 2px;
+    width: auto;
+    top: 128px;
+    left: 50vw;
+    transform: translateX(-50%);
     margin: 0;
   }
 `
-export const ModalHeader = styled.div`
+export const ModalHeader = styled.div<{ hide?: boolean }>`
   display: flex;
   padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  background: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ hide }) => (hide ? `display: none;` : '')}
+  }
 `
 export const TitleContent = styled.div`
   display: flex;
@@ -127,32 +167,98 @@ export const ModalBody = styled.div`
   display: flex;
   flex: 1;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
-`
+  background: ${({ theme }) => theme.colors.white};
 
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+export const ModalBodyMobile = styled(ModalBody)`
+  border: none;
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    background: none;
+    display: flex;
+  }
+`
 const PresetContainer = styled.div`
   flex: 0.9;
   flex-direction: column;
+  background: ${({ theme }) => theme.colors.white};
   border-right: 1px solid ${({ theme }) => theme.colors.dividerDark};
+
+  & > :last-child {
+    display: none;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex: 1;
+    border: none;
+    padding-top: 8px;
+    min-width: 360px;
+
+    & > :last-child {
+      display: inline-block;
+    }
+  }
 `
+
 const LabelContainer = styled.div`
   padding: 8px;
   ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    text-align: center;
+  }
+  `
+const YearLabelContainer = styled.div`
+  padding: 8px;
+  ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.h4Style}
+  }
+`
+
+const MonthSelectorHeader = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 16px;
+    border-radius: 2px;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  }
 `
 const MonthContainer = styled.div`
   flex: 1;
   flex-direction: column;
   margin: 0 0 16px 8px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    min-width: 336px;
+    margin: 0;
+  }
 `
 const NavigatorContainer = styled.div`
   padding: 8px;
   justify-content: center;
   align-items: center;
   display: flex;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    justify-content: space-between;
+  }
 `
 
 const MonthButtonsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  background: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border-radius: 2px;
+  }
 `
 const PresetRangeButton = styled.button<{ selected?: boolean }>`
   ${({ theme }) => theme.fonts.bodyStyle}
@@ -164,12 +270,22 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
   &:focus {
     outline: none;
   }
+  
   ${({ theme, selected }) =>
     selected
       ? `background: ${theme.colors.secondary};
   color: ${theme.colors.white};`
       : `background: none;
   color: ${theme.colors.copy};`}
+
+@media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 12px 24px;
+
+    &:active {
+      background: ${({ theme }) => theme.colors.secondary};
+      color: ${({ theme }) => theme.colors.white};
+    }
+  }
 `
 const MonthButton = styled.button<{ selected?: boolean }>`
   ${({ theme }) => theme.fonts.smallButtonStyle}
@@ -187,9 +303,26 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   &:focus {
     outline: none;
   }
+
   &:disabled {
     color: ${({ theme }) => theme.colors.dateDisabled};
     cursor: default;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.bigBodyStyle}
+    height: 72px;
+    width: 33.33%;
+    padding: 12px 8px 11px 8px;
+    background-clip: content-box;
+    -moz-background-clip: content-box;
+
+    &:active {
+      background: ${({ theme }) => theme.colors.secondary};
+      background-clip: content-box;
+      -moz-background-clip: content-box;
+      color: ${({ theme }) => theme.colors.white};
+    }
   }
 `
 const ModalFooter = styled.div`
@@ -197,6 +330,11 @@ const ModalFooter = styled.div`
   flex-direction: row-reverse;
   padding: 8px 16px;
   align-items: center;
+  background: ${({ theme }) => theme.colors.white};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
 `
 export const CancelableArea = styled.div`
   height: 100%;
@@ -223,14 +361,21 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   moment.locale(intl.locale)
   const startDateFromProps = moment(props.startDate)
   const endDateFromProps = moment(props.endDate)
+
   const [startDate, setStartDate] = useState<moment.Moment>(startDateFromProps)
   const [endDate, setEndDate] = useState<moment.Moment>(endDateFromProps)
 
+  const [startDateNav, setStartDateNav] = useState<moment.Moment>(
+    startDateFromProps
+  )
+  const [endDateNav, setEndDateNav] = useState<moment.Moment>(endDateFromProps)
+
   const todaysDateMoment = moment()
-  const [presetOptions, updatePresetOptions] = useState<IPresetDateRange[]>([])
+  const [presetOptions, updatePresetOptions] = useState<IPresetButton[]>([])
+  const [activeRoute, setActiveRoute] = useState<PATHS>(PRESET)
 
   useEffect(() => {
-    function generatePresetOptions(): IPresetDateRange[] {
+    function generatePresetOptions(): IPresetButton[] {
       const today = moment()
       const currentYear = today.year()
       const date30DaysBack = today.clone().subtract(30, 'days')
@@ -271,6 +416,11 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           label: last3YearMoment.format('YYYY'),
           startDate: last3YearMoment,
           endDate: last3YearMoment.clone().endOf('year')
+        },
+        {
+          key: 'customDateRangeNav',
+          label: 'Custom time period',
+          handler: () => setActiveRoute(START_MONTH)
         }
       ]
     }
@@ -280,9 +430,16 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   useEffect(() => {
     function getDerivedStateFromProps() {
+      const body = document.querySelector('body') as HTMLBodyElement
       if (!modalVisible) {
         setStartDate(moment(props.startDate))
         setEndDate(moment(props.endDate))
+        setStartDateNav(moment(props.startDate))
+        setEndDateNav(moment(props.endDate))
+        body.style.removeProperty('overflow')
+        setActiveRoute(PRESET)
+      } else {
+        body.style.overflow = 'hidden'
       }
     }
 
@@ -293,7 +450,11 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     date,
     label,
     onSelectDate,
-    maxDate
+    minDate,
+    maxDate,
+    hideSelectedMonthOnLabel,
+    selectedDate,
+    onNavigateDate
   }: MonthSelectorProps) {
     const limitDate = moment([LIMIT_YEAR_PAST_RECORDS])
     const months = moment.monthsShort()
@@ -301,39 +462,51 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
     return (
       <MonthContainer>
-        <LabelContainer>
-          {date ? `${label}: ${date.format('MMMM YYYY')}` : label}
-        </LabelContainer>
-        <NavigatorContainer>
-          <CircleButton
-            onClick={() => onSelectDate(date.clone().subtract(1, 'years'))}
-            disabled={date.isSame(limitDate, 'year')}
-          >
-            <ChevronLeft />
-          </CircleButton>
-          <LabelContainer>{date.format('YYYY')}</LabelContainer>
-          <CircleButton
-            onClick={() => {
-              const nextDate = date.clone().add(1, 'years')
-              const finalDateNavigateTo = nextDate.isAfter(todaysDateMoment)
-                ? todaysDateMoment
-                : nextDate
-              onSelectDate(finalDateNavigateTo)
-            }}
-            disabled={date.isSame(todaysDateMoment, 'year')}
-          >
-            <ChevronRight />
-          </CircleButton>
-        </NavigatorContainer>
+        <MonthSelectorHeader>
+          <LabelContainer>
+            {selectedDate && !hideSelectedMonthOnLabel
+              ? `${label}: ${selectedDate.format('MMMM YYYY')}`
+              : label}
+          </LabelContainer>
+          <NavigatorContainer>
+            <CircleButton
+              onClick={() => onNavigateDate(date.clone().subtract(1, 'years'))}
+              disabled={date.isSame(limitDate, 'year')}
+            >
+              <ChevronLeft />
+            </CircleButton>
+            <YearLabelContainer>{date.format('YYYY')}</YearLabelContainer>
+            <CircleButton
+              onClick={() => {
+                const nextDate = date.clone().add(1, 'years')
+                const finalDateNavigateTo = nextDate.isAfter(todaysDateMoment)
+                  ? todaysDateMoment
+                  : nextDate
+                onNavigateDate(finalDateNavigateTo)
+              }}
+              disabled={date.isSame(todaysDateMoment, 'year')}
+            >
+              <ChevronRight />
+            </CircleButton>
+          </NavigatorContainer>
+        </MonthSelectorHeader>
         <MonthButtonsContainer>
           {months.map((month, index) => {
             const monthDate = moment(`${month}-${year}`, 'MMM-YYYY')
             return (
               <MonthButton
                 key={index}
-                disabled={monthDate.isAfter(maxDate)}
-                selected={monthDate.isSame(date, 'month')}
-                onClick={() => onSelectDate(monthDate)}
+                disabled={
+                  (moment.isMoment(minDate) && monthDate.isBefore(minDate)) ||
+                  monthDate.isAfter(maxDate)
+                }
+                selected={
+                  monthDate.isSame(selectedDate, 'month') &&
+                  monthDate.isSame(selectedDate, 'year')
+                }
+                onClick={() => {
+                  onSelectDate(monthDate)
+                }}
               >
                 {month}
               </MonthButton>
@@ -344,11 +517,19 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     )
   }
 
-  function PresetSelector() {
+  function PresetSelector(props: PresetSelectorProps) {
     return (
       <PresetContainer>
         {presetOptions.map(item => {
-          return (
+          return isPresetNavButton(item) ? (
+            <PresetRangeButton
+              id={item.key}
+              key={item.key}
+              onClick={item.handler}
+            >
+              {item.label}
+            </PresetRangeButton>
+          ) : (
             <PresetRangeButton
               id={item.key}
               key={item.key}
@@ -356,10 +537,12 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 item.startDate.isSame(startDate, 'month') &&
                 item.endDate.isSame(endDate, 'month')
               }
-              onClick={() => {
-                setStartDate(item.startDate)
-                setEndDate(item.endDate)
-              }}
+              onClick={() =>
+                props.onSelectPreset({
+                  startDate: item.startDate,
+                  endDate: item.endDate
+                })
+              }
             >
               {item.label}
             </PresetRangeButton>
@@ -371,9 +554,68 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   const selectedPresetFromProps = presetOptions.find(
     item =>
+      !isPresetNavButton(item) &&
       item.startDate.isSame(startDateFromProps, 'month') &&
       item.endDate.isSame(endDateFromProps, 'month')
   )
+
+  const routes: ROUTES = {
+    [PRESET]: {
+      renderComponent: () => (
+        <PresetSelector
+          onSelectPreset={({ startDate, endDate }) => {
+            setStartDate(startDate)
+            setEndDate(endDate)
+
+            props.onDatesChange({
+              startDate: startDate.toDate(),
+              endDate: endDate.toDate()
+            })
+
+            setModalVisible(false)
+          }}
+        />
+      )
+    },
+    [START_MONTH]: {
+      renderComponent: () => (
+        <MonthSelector
+          date={startDateNav}
+          onNavigateDate={setStartDateNav}
+          label={intl.formatMessage(constantsMessages.from)}
+          onSelectDate={date => {
+            setStartDate(date)
+            setActiveRoute(END_MONTH)
+          }}
+          maxDate={todaysDateMoment}
+          selectedDate={startDate}
+          hideSelectedMonthOnLabel
+        />
+      ),
+      hideHeader: true
+    },
+    [END_MONTH]: {
+      renderComponent: () => (
+        <MonthSelector
+          date={endDateNav}
+          onNavigateDate={setEndDateNav}
+          label={intl.formatMessage(constantsMessages.toCapitalized)}
+          selectedDate={endDate}
+          onSelectDate={date => {
+            props.onDatesChange({
+              startDate: startDate.toDate(),
+              endDate: date.toDate()
+            })
+            setModalVisible(false)
+          }}
+          minDate={startDate.clone().add(1, 'day')}
+          maxDate={todaysDateMoment}
+          hideSelectedMonthOnLabel
+        />
+      ),
+      hideHeader: true
+    }
+  }
 
   return (
     <div>
@@ -395,7 +637,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
       {modalVisible && (
         <>
           <ModalContainer id="picker-modal">
-            <ModalHeader>
+            <ModalHeader hide={routes[activeRoute].hideHeader}>
               <TitleContent>
                 <CalendarGrey />
                 <span>{intl.formatMessage(constantsMessages.timePeriod)}</span>
@@ -409,20 +651,34 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               </CircleButton>
             </ModalHeader>
             <ModalBody>
-              <PresetSelector />
+              <PresetSelector
+                onSelectPreset={({ startDate, endDate }) => {
+                  setStartDateNav(startDate)
+                  setEndDateNav(endDate)
+                  setStartDate(startDate)
+                  setEndDate(endDate)
+                }}
+              />
               <MonthSelector
-                date={startDate}
+                date={startDateNav}
+                onNavigateDate={setStartDateNav}
                 label={intl.formatMessage(constantsMessages.from)}
+                selectedDate={startDate}
                 onSelectDate={setStartDate}
                 maxDate={endDate.clone().subtract(1, 'days')}
               />
               <MonthSelector
-                date={endDate}
+                date={endDateNav}
+                onNavigateDate={setEndDateNav}
                 label={intl.formatMessage(constantsMessages.toCapitalized)}
+                selectedDate={endDate}
                 onSelectDate={setEndDate}
                 maxDate={todaysDateMoment}
               />
             </ModalBody>
+            <ModalBodyMobile>
+              {routes[activeRoute].renderComponent()}
+            </ModalBodyMobile>
             <ModalFooter>
               <StyledPrimaryButton
                 id="date-range-confirm-action"

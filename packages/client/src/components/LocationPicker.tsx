@@ -48,9 +48,14 @@ type LocationPickerProps = IBaseProps & IConnectProps & WrappedComponentProps
 
 const ModalContainer = styled(CommonModalContainer)`
   width: 400px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    min-width: 360px;
+  }
 `
 
 const ModalBody = styled.div`
+  background: ${({ theme }) => theme.colors.white};
   padding: 8px 0;
 `
 const StyledLocationSearch = styled(LocationSearch)`
