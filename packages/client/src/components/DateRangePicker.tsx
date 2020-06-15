@@ -66,6 +66,7 @@ interface IDateRangePickerProps extends WrappedComponentProps, IDateRange {
 }
 
 interface PresetSelectorProps {
+  id?: string
   onSelectPreset: ({
     startDate,
     endDate
@@ -75,6 +76,7 @@ interface PresetSelectorProps {
   }) => void
 }
 interface MonthSelectorProps {
+  id?: string
   date: moment.Moment
   label: string
   onNavigateDate: (date: moment.Moment) => void
@@ -196,7 +198,18 @@ const PresetContainer = styled.div`
     flex: 1;
     border: none;
     padding: 8px 0;
-    min-width: 360px;
+    width: 360px;
+
+    & > :last-child {
+      display: inline-block;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    flex: 1;
+    border: none;
+    padding: 8px 0;
+    width: calc(100vw - 16px);
 
     & > :last-child {
       display: inline-block;
@@ -209,6 +222,7 @@ const LabelContainer = styled.div`
   ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 8px 0 0;
     ${({ theme }) => theme.fonts.bodyBoldStyle}
     text-align: center;
   }
@@ -226,7 +240,7 @@ const MonthSelectorHeader = styled.div`
   background: ${({ theme }) => theme.colors.white};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 16px;
+    padding: 0 16px;
     border-radius: 2px;
     border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
   }
@@ -237,7 +251,12 @@ const MonthContainer = styled.div`
   margin: 0 0 16px 8px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    min-width: 336px;
+    width: 336px;
+    margin: 0;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    width: calc(100vw - 16px);
     margin: 0;
   }
 `
@@ -249,6 +268,7 @@ const NavigatorContainer = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     justify-content: space-between;
+    padding: 8px 0;
   }
 `
 
@@ -447,6 +467,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
   }, [modalVisible, props.endDate, props.startDate])
 
   function MonthSelector({
+    id,
     date,
     label,
     onSelectDate,
@@ -461,7 +482,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     const year = date.year().toString()
 
     return (
-      <MonthContainer>
+      <MonthContainer id={id}>
         <MonthSelectorHeader>
           <LabelContainer>
             {selectedDate && !hideSelectedMonthOnLabel
@@ -470,13 +491,17 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
           </LabelContainer>
           <NavigatorContainer>
             <CircleButton
+              id={`${id}-prev`}
               onClick={() => onNavigateDate(date.clone().subtract(1, 'years'))}
               disabled={date.isSame(limitDate, 'year')}
             >
               <ChevronLeft />
             </CircleButton>
-            <YearLabelContainer>{date.format('YYYY')}</YearLabelContainer>
+            <YearLabelContainer id={`${id}-year-label`}>
+              {date.format('YYYY')}
+            </YearLabelContainer>
             <CircleButton
+              id={`${id}-next`}
               onClick={() => {
                 const nextDate = date.clone().add(1, 'years')
                 const finalDateNavigateTo = nextDate.isAfter(todaysDateMoment)
@@ -495,6 +520,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             const monthDate = moment(`${month}-${year}`, 'MMM-YYYY')
             return (
               <MonthButton
+                id={`${id}-${month.toLowerCase()}`}
                 key={index}
                 disabled={
                   (moment.isMoment(minDate) && monthDate.isBefore(minDate)) ||
@@ -519,7 +545,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
 
   function PresetSelector(props: PresetSelectorProps) {
     return (
-      <PresetContainer>
+      <PresetContainer id={props.id}>
         {presetOptions.map(item => {
           return isPresetNavButton(item) ? (
             <PresetRangeButton
@@ -563,6 +589,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     [PRESET]: {
       renderComponent: () => (
         <PresetSelector
+          id="preset-small"
           onSelectPreset={({ startDate, endDate }) => {
             setStartDate(startDate)
             setEndDate(endDate)
@@ -580,6 +607,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     [START_MONTH]: {
       renderComponent: () => (
         <MonthSelector
+          id="start-date-small"
           date={startDateNav}
           onNavigateDate={setStartDateNav}
           label={intl.formatMessage(constantsMessages.from)}
@@ -597,6 +625,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     [END_MONTH]: {
       renderComponent: () => (
         <MonthSelector
+          id="end-date-small"
           date={endDateNav}
           onNavigateDate={setEndDateNav}
           label={intl.formatMessage(constantsMessages.toCapitalized)}
@@ -676,7 +705,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 maxDate={todaysDateMoment}
               />
             </ModalBody>
-            <ModalBodyMobile>
+            <ModalBodyMobile id="picker-modal-mobile">
               {routes[activeRoute].renderComponent()}
             </ModalBodyMobile>
             <ModalFooter>

@@ -50,7 +50,11 @@ const ModalContainer = styled(CommonModalContainer)`
   width: 400px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    min-width: 360px;
+    width: 360px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
+    width: calc(100vw - 16px);
   }
 `
 
