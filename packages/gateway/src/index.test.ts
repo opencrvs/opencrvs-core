@@ -23,7 +23,7 @@ describe('Route authorization', () => {
     fetch.resetMocks()
   })
   it('blocks requests without a token', async () => {
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest'
     })
@@ -31,7 +31,7 @@ describe('Route authorization', () => {
   })
 
   it('blocks requests with an invalid token', async () => {
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -47,7 +47,7 @@ describe('Route authorization', () => {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     })
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -63,7 +63,7 @@ describe('Route authorization', () => {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     })
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -85,7 +85,7 @@ describe('Route authorization', () => {
       setTimeout(resolve, 5)
     })
 
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -101,7 +101,7 @@ describe('Route authorization', () => {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:gateway-user'
     })
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -118,7 +118,7 @@ describe('Route authorization', () => {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:NOT_VALID'
     })
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -135,7 +135,7 @@ describe('Route authorization', () => {
       issuer: 'opencrvs:NOT_VALID',
       audience: 'opencrvs:gateway-user'
     })
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/tokenTest',
       headers: {
@@ -151,7 +151,7 @@ describe('Route authorization', () => {
         success: true
       })
     )
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/ping?service=search'
     })
@@ -165,7 +165,7 @@ describe('Route authorization', () => {
         success: true
       })
     )
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/ping'
     })
@@ -177,7 +177,7 @@ describe('Route authorization', () => {
         success: true
       })
     )
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/ping?service=nonsense'
     })
@@ -189,7 +189,7 @@ describe('Route authorization', () => {
         success: false
       })
     )
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/ping?service=auth'
     })
@@ -197,7 +197,7 @@ describe('Route authorization', () => {
   })
   it('Fails the health check for a failed and not running service', async () => {
     fetch.mockReject(new Error('An internal server error occurred'))
-    const res = await server.server.inject({
+    const res = await server.app.inject({
       method: 'GET',
       url: '/ping?service=auth'
     })

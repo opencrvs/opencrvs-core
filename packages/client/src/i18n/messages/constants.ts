@@ -41,6 +41,7 @@ interface IConstantsMessages {
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
+  customTimePeriod: MessageDescriptor
   dateOfApplication: MessageDescriptor
   death: MessageDescriptor
   deaths: MessageDescriptor
@@ -285,6 +286,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'constants.comment'
+  },
+  customTimePeriod: {
+    defaultMessage: 'Custom time period',
+    description: 'Label for Custom time period',
+    id: 'constants.customTimePeriod'
   },
   dateOfApplication: {
     defaultMessage: 'Date of application',

@@ -59,21 +59,22 @@ export const ActionContainer = styled.div`
 
 export const FilterContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
 
   & > :first-child {
-    margin-right: 8px;
+    margin: 0 8px 8px 0;
   }
 
   & > :nth-child(2) {
-    margin-right: 8px;
+    margin: 0 8px 8px 0;
   }
 
   & > :nth-child(3) {
-    margin-right: 8px;
+    margin: 0 8px 8px 0;
   }
 
   & > :last-child {
-    margin-right: 0;
+    margin: 0;
   }
 `
 export function getJurisidictionType(location: GQLLocation): string | null {

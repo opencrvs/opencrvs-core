@@ -483,9 +483,7 @@ describe('User root resolvers', () => {
         }
       )
 
-      expect(response).toEqual({
-        userId: 'ba7022f0ff4822'
-      })
+      expect(response).toEqual('ba7022f0ff4822')
     })
     it('throws error if /activateUser sends anything but 201', async () => {
       fetch.mockResponseOnce(

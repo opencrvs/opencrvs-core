@@ -11,10 +11,18 @@
  */
 import { Header } from '@client/components/interface/Header/Header'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { Container, BodyContent } from '@opencrvs/components/lib/layout'
+import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
+import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
+
+const DynamicContainer = styled.div<{
+  marginLeft?: number
+  marginRight?: number
+}>`
+  margin-right: ${({ marginRight }) => (marginRight ? `${marginRight}px` : 0)};
+  margin-left: ${({ marginLeft }) => (marginLeft ? `${marginLeft}px` : 0)};
+`
 
 const Content = styled(BodyContent)`
   padding: 0px 24px;
@@ -35,6 +43,8 @@ interface BasePage {
   id?: string
   type?: SysAdminPage['type']
   children?: React.ReactNode
+  marginLeft?: number
+  marginRight?: number
 }
 
 interface DefaultPage extends BasePage {
@@ -127,7 +137,14 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
     pageContent = <SubPageContent>{props.children}</SubPageContent>
   } else {
     pageHeader = <Header />
-    pageContent = <Content>{props.children}</Content>
+    pageContent = (
+      <DynamicContainer
+        marginLeft={props.marginLeft}
+        marginRight={props.marginRight}
+      >
+        <Content>{props.children}</Content>
+      </DynamicContainer>
+    )
   }
 
   return (
