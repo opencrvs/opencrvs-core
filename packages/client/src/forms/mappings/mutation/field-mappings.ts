@@ -150,10 +150,11 @@ export const fieldToAddressTransformer = (
     sectionData.address.push(address)
   }
   if (lineNumber > 0) {
-    address.line[lineNumber - 1] = draftData[sectionId][field.name]
+    address.line[lineNumber - 1] = `${draftData[sectionId][field.name]}`
   } else {
-    address[!transformedFieldName ? field.name : transformedFieldName] =
+    address[!transformedFieldName ? field.name : transformedFieldName] = `${
       draftData[sectionId][field.name]
+    }`
   }
 
   return transformedData

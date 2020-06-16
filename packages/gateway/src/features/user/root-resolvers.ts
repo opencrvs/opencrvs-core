@@ -228,6 +228,7 @@ export const resolvers: GQLResolver = {
       })
 
       const response = await res.json()
+
       if (res.status !== 201) {
         return await Promise.reject(
           new Error(
@@ -235,7 +236,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      return response
+      return response.userId
     },
     async changePassword(
       _,

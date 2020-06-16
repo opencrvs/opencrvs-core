@@ -72,18 +72,23 @@ export const deathEventLocationMutationTransformer = (
   }
 
   if (lineNumber > 0) {
-    transformedData.eventLocation.address.line[lineNumber - 1] =
+    transformedData.eventLocation.address.line[lineNumber - 1] = `${
       draftData[sectionId][field.name]
+    }`
   } else if (field.name === 'deathLocation') {
-    transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
+    transformedData.eventLocation._fhirID = `${
+      draftData[sectionId][field.name]
+    }`
     delete transformedData.eventLocation.address
     delete transformedData.eventLocation.type
   } else if (transformedFieldName) {
-    transformedData.eventLocation.address[transformedFieldName] =
+    transformedData.eventLocation.address[transformedFieldName] = `${
       draftData[sectionId][field.name]
+    }`
   } else {
-    transformedData.eventLocation.address[field.name] =
+    transformedData.eventLocation.address[field.name] = `${
       draftData[sectionId][field.name]
+    }`
   }
   if (field.name === 'addressLine4') {
     transformedData.eventLocation.partOf = `Location/${
