@@ -63,7 +63,7 @@ describe('User root resolvers', () => {
   })
   describe('searchUsers()', () => {
     let authHeaderSysAdmin: { Authorization: string }
-    let authHeaderRegister: { Authorization: string }
+    let authHeaderFieldAgent: { Authorization: string }
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
@@ -79,8 +79,8 @@ describe('User root resolvers', () => {
       authHeaderSysAdmin = {
         Authorization: `Bearer ${sysAdminToken}`
       }
-      const regsiterToken = jwt.sign(
-        { scope: ['register'] },
+      const declareToken = jwt.sign(
+        { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -89,8 +89,8 @@ describe('User root resolvers', () => {
           audience: 'opencrvs:gateway-user'
         }
       )
-      authHeaderRegister = {
-        Authorization: `Bearer ${regsiterToken}`
+      authHeaderFieldAgent = {
+        Authorization: `Bearer ${declareToken}`
       }
     })
     const dummyUserList = [
@@ -199,8 +199,10 @@ describe('User root resolvers', () => {
       )
 
       expect(
-        resolvers.Query.searchUsers({}, {}, authHeaderRegister)
-      ).rejects.toThrow('Search user is only allowed for sysadmin')
+        resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent)
+      ).rejects.toThrow(
+        'Search user is only allowed for sysadmin or registrar or registration agent'
+      )
     })
     it('returns filtered user list', async () => {
       fetch.mockResponseOnce(

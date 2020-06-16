@@ -30,6 +30,7 @@ describe('Create new user page tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
+        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets
       })
     )

@@ -14,6 +14,7 @@ import {
   filterLocations,
   getJurisidictionType
 } from '@client/utils/locationUtils'
+import { LocationType } from '@client/offline/reducer'
 
 describe('locationUtil tests', () => {
   describe('filterLocations()', () => {
@@ -45,13 +46,10 @@ describe('locationUtil tests', () => {
             partOf: 'Location/123'
           }
         },
-        '123',
+        LocationType.ADMIN_STRUCTURE,
         {
-          language: 'en',
-          role: 'FIELD_AGENT',
-          localRegistrar: {
-            name: []
-          }
+          locationLevel: 'partOf',
+          locationId: 'Location/123'
         }
       )
 
@@ -60,7 +58,7 @@ describe('locationUtil tests', () => {
       expect(locations['222']).not.toBeDefined()
     })
 
-    it('filters facilities for sysadmin', () => {
+    it('filters offices without any part of location', () => {
       const locations = filterLocations(
         {
           '111': {
@@ -68,7 +66,7 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
-            type: 'ADMIN_STRUCTURE',
+            type: 'CRVS_OFFICE',
             partOf: 'Location/123'
           },
           '222': {
@@ -84,17 +82,13 @@ describe('locationUtil tests', () => {
             name: 'Test',
             alias: 'Test',
             physicalType: 'Jurisdiction',
-            type: 'ADMIN_STRUCTURE',
+            type: 'CRVS_OFFICE',
             partOf: 'Location/123'
           }
         },
-        '123',
+        LocationType.CRVS_OFFICE,
         {
-          language: 'en',
-          role: 'LOCAL_SYSTEM_ADMIN',
-          localRegistrar: {
-            name: []
-          }
+          locationLevel: 'partOf'
         }
       )
 

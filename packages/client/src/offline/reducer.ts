@@ -35,7 +35,8 @@ export const OFFLINE_FACILITIES_KEY = 'facilities'
 
 export enum LocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
-  CRVS_OFFICE = 'CRVS_OFFICE'
+  CRVS_OFFICE = 'CRVS_OFFICE',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
 }
 export interface ILocation {
   id: string
