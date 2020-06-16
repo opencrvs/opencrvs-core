@@ -12,7 +12,7 @@
 import { ApiResponse } from '@elastic/elasticsearch'
 import { postSearch, fetchFHIR } from '@gateway/features/fhir/utils'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
-import { hasScope } from '@gateway/features/user/utils'
+import { hasScope, inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 
 // Complete definition of the Search response
@@ -136,9 +136,11 @@ export const resolvers: GQLResolver = {
       { parentLocationId, count, skip, sort = 'desc', status, type },
       authHeader
     ) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
         return await Promise.reject(
-          new Error('User does not have a sysadmin scope')
+          new Error(
+            'User does not have a sysadmin or register or validate scope'
+          )
         )
       }
 

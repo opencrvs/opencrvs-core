@@ -30,6 +30,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 type Props = WrappedComponentProps & BaseProps
 
@@ -42,7 +44,7 @@ interface BaseProps {
   loading?: boolean
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  jurisdictionType?: string
+  disableApplicationLink?: boolean
   locationId: string
 }
 
@@ -107,7 +109,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
   }
 
   getStatusCountView(data: GQLRegistrationCountResult) {
-    const { intl, statusMapping } = this.props
+    const { intl, statusMapping, disableApplicationLink } = this.props
     const { results, total } = data
     return (
       <ContentHolder>
@@ -119,8 +121,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
             {intl.formatMessage(
               performanceMessages.applicationCountByStatusDescription
             )}{' '}
-            {window.config.APPLICATION_AUDIT_LOCATIONS.includes(this.props
-              .jurisdictionType as string) && (
+            {!disableApplicationLink && (
               <LinkButton
                 id="view-all-link"
                 onClick={() => this.props.onClickStatusDetails()}
@@ -141,10 +142,7 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
                   )}
                   color={statusMapping![statusCount.status].color}
                   totalPoints={total}
-                  disabled={
-                    !window.config.APPLICATION_AUDIT_LOCATIONS.includes(this
-                      .props.jurisdictionType as string)
-                  }
+                  disabled={disableApplicationLink || false}
                   onClick={() =>
                     this.props.onClickStatusDetails(statusCount.status)
                   }
@@ -176,13 +174,23 @@ class StatusWiseApplicationCountViewComponent extends React.Component<
 export const StatusWiseApplicationCountView = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    const jurisdictionType = getJurisidictionType(
-      offlineLocations,
-      ownProps.locationId
+    let disableApplicationLink = !window.config.APPLICATION_AUDIT_LOCATIONS.includes(
+      getJurisidictionType(offlineLocations, ownProps.locationId) as string
     )
+    const userDetails = getUserDetails(state)
+    if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.catchmentArea &&
+      userDetails.catchmentArea[0] &&
+      !SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      disableApplicationLink =
+        ownProps.locationId !== userDetails.catchmentArea[0].id
+    }
     return {
       ...ownProps,
-      jurisdictionType
+      disableApplicationLink
     }
   },
   null
