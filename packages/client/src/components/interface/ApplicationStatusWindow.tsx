@@ -42,6 +42,10 @@ const Window = styled.div<{
   }
 `
 
+const CrossButton = styled(Cross)`
+  cursor: pointer;
+`
+
 const TopBar = styled.div`
   height: 72px;
   display: flex;
@@ -66,7 +70,7 @@ class ApplicationStatusWindowComponent extends React.Component<IProps> {
       <Window id="status-window" width={this.props.width}>
         <TopBar>
           <Title>{this.props.title}</Title>
-          <Cross
+          <CrossButton
             id="btn-sts-wnd-cross"
             onClick={this.props.crossClickHandler}
           />

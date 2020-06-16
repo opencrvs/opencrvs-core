@@ -613,6 +613,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 isLoading={loading || Boolean(error)}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow
+                fixedWidth={2791}
                 currentPage={currentPageNumber}
                 pageSize={recordCount}
                 totalItems={total}

@@ -122,7 +122,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   return (
     <SysAdminContentWrapper
       id="reg-rates"
-      type={SysAdminPageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE_CENTERED}
       backActionHandler={() =>
         goToOperationalReport(
           locationId,

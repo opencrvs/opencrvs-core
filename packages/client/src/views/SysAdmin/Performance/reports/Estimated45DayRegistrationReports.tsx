@@ -101,6 +101,7 @@ class Estimated45DayRegistrationReportComponent extends React.Component<
         tableTitle={intl.formatMessage(
           constantsMessages.estimated45DayRegistrationTitle
         )}
+        fixedWidth={1074}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}
