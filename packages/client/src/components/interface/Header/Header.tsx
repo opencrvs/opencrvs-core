@@ -54,13 +54,16 @@ import {
   goToSettings,
   goToEvents as goToEventsAction,
   goToPerformanceHome,
-  goToTeamSearch
+  goToOperationalReport,
+  goToTeamSearch,
+  goToTeamUserList
 } from '@client/navigation'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import {
   BRN_DRN_TEXT,
   PHONE_TEXT,
   SYS_ADMIN_ROLES,
+  FIELD_AGENT_ROLES,
   TRACKING_ID_TEXT,
   NAME_TEXT
 } from '@client/utils/constants'
@@ -84,7 +87,9 @@ type IProps = IntlShapeProps & {
   goToHomeAction: typeof goToHome
   goToPerformanceHomeAction: typeof goToPerformanceHome
   goToPerformanceReportListAction: typeof goToPerformanceReportList
+  goToOperationalReportAction: typeof goToOperationalReport
   goToTeamSearchAction: typeof goToTeamSearch
+  goToTeamUserListAction: typeof goToTeamUserList
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -99,7 +104,8 @@ interface IState {
 
 enum ACTIVE_MENU_ITEM {
   APPLICATIONS,
-  PERFORMANCE
+  PERFORMANCE,
+  TEAM
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -137,23 +143,40 @@ class HeaderComp extends React.Component<IProps, IState> {
         ? intl.formatMessage(userMessages[userDetails.role])
         : ''
 
-    let menuItems = [
-      {
-        icon: <ApplicationBlack />,
-        iconHover: <ApplicationBlue />,
-        label: this.props.intl.formatMessage(
-          constantsMessages.applicationTitle
-        ),
-        onClick: this.props.goToHomeAction
-      },
-      {
-        icon: <StatsBlack />,
-        iconHover: <StatsBlue />,
-        label: this.props.intl.formatMessage(
-          constantsMessages.performanceTitle
-        ),
-        onClick: this.props.goToPerformanceReportListAction
-      },
+    let menuItems: any[] = []
+    if (userDetails && userDetails.role) {
+      if (!SYS_ADMIN_ROLES.includes(userDetails.role)) {
+        menuItems = menuItems.concat([
+          {
+            icon: <ApplicationBlack />,
+            iconHover: <ApplicationBlue />,
+            label: this.props.intl.formatMessage(
+              constantsMessages.applicationTitle
+            ),
+            onClick: this.props.goToHomeAction
+          }
+        ])
+      }
+      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
+        menuItems = menuItems.concat([
+          {
+            icon: <StatsBlack />,
+            iconHover: <StatsBlue />,
+            label: this.props.intl.formatMessage(
+              constantsMessages.performanceTitle
+            ),
+            onClick: () => this.goToPerformanceView(this.props)
+          },
+          {
+            icon: <SystemBlack />,
+            iconHover: <SystemBlue />,
+            label: this.props.intl.formatMessage(messages.teamTitle),
+            onClick: () => this.goToTeamView(this.props)
+          }
+        ])
+      }
+    }
+    menuItems = menuItems.concat([
       {
         icon: <SettingsBlack />,
         iconHover: <SettingsBlue />,
@@ -173,49 +196,7 @@ class HeaderComp extends React.Component<IProps, IState> {
         secondary: true,
         onClick: this.logout
       }
-    ]
-
-    if (
-      userDetails &&
-      userDetails.role &&
-      SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      menuItems = [
-        {
-          icon: <StatsBlack />,
-          iconHover: <StatsBlue />,
-          label: this.props.intl.formatMessage(
-            constantsMessages.performanceTitle
-          ),
-          onClick: this.props.goToPerformanceHomeAction
-        },
-        {
-          icon: <SystemBlack />,
-          iconHover: <SystemBlue />,
-          label: this.props.intl.formatMessage(messages.teamTitle),
-          onClick: this.props.goToTeamSearchAction
-        },
-        {
-          icon: <SettingsBlack />,
-          iconHover: <SettingsBlue />,
-          label: this.props.intl.formatMessage(messages.settingsTitle),
-          onClick: this.props.goToSettings
-        },
-        {
-          icon: <HelpBlack />,
-          iconHover: <HelpBlue />,
-          label: this.props.intl.formatMessage(messages.helpTitle),
-          onClick: () => alert('Help!')
-        },
-        {
-          icon: <LogoutBlack />,
-          iconHover: <LogoutBlue />,
-          label: this.props.intl.formatMessage(buttonMessages.logout),
-          secondary: true,
-          onClick: this.logout
-        }
-      ]
-    }
+    ])
 
     const userInfo = { name, role }
 
@@ -322,14 +303,57 @@ class HeaderComp extends React.Component<IProps, IState> {
     )
   }
 
+  goToTeamView(props: IProps) {
+    const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
+    if (userDetails && userDetails.role) {
+      if (SYS_ADMIN_ROLES.includes(userDetails.role)) {
+        return goToTeamSearchAction()
+      } else {
+        return goToTeamUserListAction(
+          {
+            id:
+              (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+            searchableText:
+              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
+              '',
+            displayLabel:
+              (userDetails.primaryOffice && userDetails.primaryOffice.name) ||
+              ''
+          },
+          true
+        )
+      }
+    }
+  }
+
+  goToPerformanceView(props: IProps) {
+    const {
+      userDetails,
+      goToPerformanceHomeAction,
+      goToOperationalReportAction
+    } = props
+    if (userDetails && userDetails.role) {
+      if (SYS_ADMIN_ROLES.includes(userDetails.role)) {
+        return goToPerformanceHomeAction()
+      } else {
+        const locationId =
+          userDetails.catchmentArea &&
+          userDetails.catchmentArea[0] &&
+          userDetails.catchmentArea[0].id
+        return (
+          (locationId && goToOperationalReportAction(locationId)) ||
+          goToPerformanceHomeAction()
+        )
+      }
+    }
+  }
+
   render() {
     const {
       intl,
       userDetails,
       enableMenuSelection = true,
       goToHomeAction,
-      goToPerformanceReportListAction,
-      goToTeamSearchAction,
       activeMenuItem
     } = this.props
     const title =
@@ -344,23 +368,41 @@ class HeaderComp extends React.Component<IProps, IState> {
           : constantsMessages.applicationTitle
       )
 
-    let menuItems = [
-      {
-        key: 'application',
-        title: intl.formatMessage(constantsMessages.applicationTitle),
-        onClick: goToHomeAction,
-        selected:
-          enableMenuSelection &&
-          activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
-      },
-      {
-        key: 'performance',
-        title: intl.formatMessage(constantsMessages.performanceTitle),
-        onClick: goToPerformanceReportListAction,
-        selected:
-          enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+    let menuItems: any[] = []
+
+    if (userDetails && userDetails.role) {
+      if (!SYS_ADMIN_ROLES.includes(userDetails.role)) {
+        menuItems = menuItems.concat([
+          {
+            key: 'application',
+            title: intl.formatMessage(constantsMessages.applicationTitle),
+            onClick: goToHomeAction,
+            selected:
+              enableMenuSelection &&
+              activeMenuItem === ACTIVE_MENU_ITEM.APPLICATIONS
+          }
+        ])
       }
-    ]
+      if (!FIELD_AGENT_ROLES.includes(userDetails.role)) {
+        menuItems = menuItems.concat([
+          {
+            key: 'performance',
+            title: intl.formatMessage(constantsMessages.performanceTitle),
+            onClick: () => this.goToPerformanceView(this.props),
+            selected:
+              enableMenuSelection &&
+              activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+          },
+          {
+            key: 'team',
+            title: intl.formatMessage(messages.teamTitle),
+            onClick: () => this.goToTeamView(this.props),
+            selected:
+              enableMenuSelection && activeMenuItem === ACTIVE_MENU_ITEM.TEAM
+          }
+        ])
+      }
+    }
 
     let rightMenu = [
       {
@@ -381,38 +423,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       }
     ]
 
-    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
-      rightMenu = [
-        {
-          element: <ProfileMenu key="profileMenu" />
-        }
-      ]
-    }
-
-    if (
-      userDetails &&
-      userDetails.role &&
-      SYS_ADMIN_ROLES.includes(userDetails.role)
-    ) {
-      menuItems = [
-        {
-          key: 'performance',
-          title: intl.formatMessage(constantsMessages.performanceTitle),
-          onClick: goToHomeAction,
-          selected:
-            enableMenuSelection &&
-            activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-        },
-        {
-          key: 'team',
-          title: intl.formatMessage(messages.teamTitle),
-          onClick: goToTeamSearchAction,
-          selected:
-            enableMenuSelection &&
-            activeMenuItem !== ACTIVE_MENU_ITEM.PERFORMANCE
-        }
-      ]
-
+    if (activeMenuItem !== ACTIVE_MENU_ITEM.APPLICATIONS) {
       rightMenu = [
         {
           element: <ProfileMenu key="profileMenu" />
@@ -442,6 +453,8 @@ export const Header = connect(
   (store: IStoreState) => ({
     activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
+      : window.location.href.includes('team')
+      ? ACTIVE_MENU_ITEM.TEAM
       : ACTIVE_MENU_ITEM.APPLICATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)
@@ -454,7 +467,9 @@ export const Header = connect(
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
     goToPerformanceHomeAction: goToPerformanceHome,
+    goToOperationalReportAction: goToOperationalReport,
     goToPerformanceReportListAction: goToPerformanceReportList,
-    goToTeamSearchAction: goToTeamSearch
+    goToTeamSearchAction: goToTeamSearch,
+    goToTeamUserListAction: goToTeamUserList
   }
 )(injectIntl<'intl', IProps>(HeaderComp))

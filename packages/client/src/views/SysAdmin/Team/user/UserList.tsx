@@ -42,7 +42,10 @@ import {
   ListTable,
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IDynamicValues,
+  IColumn
+} from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -150,11 +153,12 @@ const LocationInfoEmptyValue = styled.div`
 
 interface ISearchParams {
   locationId: string
+  viewOnly?: boolean
 }
 
 type BaseProps = {
   theme: ITheme
-  offlineFacilities: ILocation[]
+  offlineOffices: ILocation[]
   goToCreateNewUser: typeof goToCreateNewUser
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
@@ -186,15 +190,17 @@ function UserListComponent(props: IProps) {
     goToReviewUserDetails,
     goToCreateNewUser,
     goToTeamSearch,
-    offlineFacilities,
+    offlineOffices,
     location: { search }
   } = props
 
-  const { locationId } = (querystring.parse(search) as unknown) as ISearchParams
+  const { locationId, viewOnly } = (querystring.parse(
+    search
+  ) as unknown) as ISearchParams
+
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
-
-  const searchedLocation: ILocation | undefined = offlineFacilities.find(
+  const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
 
@@ -262,7 +268,7 @@ function UserListComponent(props: IProps) {
   }
 
   function renderUserList() {
-    const columns = [
+    let columns: IColumn[] = [
       {
         label: '',
         width: 7,
@@ -292,14 +298,18 @@ function UserListComponent(props: IProps) {
         label: intl.formatMessage(constantsMessages.status),
         width: 8,
         key: 'status'
-      },
-      {
-        label: '',
-        width: 5,
-        alignment: ColumnContentAlignment.CENTER,
-        key: 'menu'
       }
     ]
+    if (!viewOnly) {
+      columns = columns.concat([
+        {
+          label: '',
+          width: 5,
+          alignment: ColumnContentAlignment.CENTER,
+          key: 'menu'
+        }
+      ])
+    }
     return (
       <Query
         query={SEARCH_USERS}
@@ -322,10 +332,12 @@ function UserListComponent(props: IProps) {
               <TableHeader>
                 {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
                 users
-                <AddUserContainer id="add-user" onClick={onClickAddUser}>
-                  <AddUserIcon />
-                  {' New user'}
-                </AddUserContainer>
+                {!viewOnly && (
+                  <AddUserContainer id="add-user" onClick={onClickAddUser}>
+                    <AddUserIcon />
+                    {' New user'}
+                  </AddUserContainer>
+                )}
               </TableHeader>
               <ListTable
                 isLoading={loading}
@@ -359,9 +371,11 @@ function UserListComponent(props: IProps) {
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}
         </Header>
-        <LinkButton id="chng-loc" onClick={onChangeLocation}>
-          {intl.formatMessage(buttonMessages.change)}
-        </LinkButton>
+        {!viewOnly && (
+          <LinkButton id="chng-loc" onClick={onChangeLocation}>
+            {intl.formatMessage(buttonMessages.change)}
+          </LinkButton>
+        )}
       </HeaderContainer>
       <LocationInfo>
         <LocationInfoKey>
@@ -382,7 +396,7 @@ function UserListComponent(props: IProps) {
 
 export const UserList = connect(
   (state: IStoreState) => ({
-    offlineFacilities: Object.values(getOfflineData(state).facilities)
+    offlineOffices: Object.values(getOfflineData(state).offices)
   }),
   {
     goToCreateNewUser,

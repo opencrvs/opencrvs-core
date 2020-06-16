@@ -77,6 +77,11 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
+export function inScope(authHeader: IAuthHeader, scopes: string[]) {
+  const matchedScope = scopes.find(scope => hasScope(authHeader, scope))
+  return !!matchedScope
+}
+
 export function isTokenOwner(authHeader: IAuthHeader, userId: string) {
   if (!authHeader || !authHeader.Authorization) {
     return false

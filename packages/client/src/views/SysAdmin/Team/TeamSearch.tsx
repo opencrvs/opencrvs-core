@@ -11,10 +11,9 @@
  */
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToTeamUserList } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { getOfficeLocations } from '@client/utils/locationUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Header } from '@client/views/SysAdmin/Performance/utils'
 import {
@@ -71,7 +70,15 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
         <LocationSearch
           selectedLocation={this.state.selectedLocation}
-          locationList={getOfficeLocations(offlineResources.facilities)}
+          locationList={Object.values(offlineResources.offices).map(
+            (location: ILocation) => {
+              return {
+                id: location.id,
+                searchableText: location.name,
+                displayLabel: location.name
+              }
+            }
+          )}
           searchHandler={this.searchHandler}
           searchButtonHandler={this.searchButtonHandler}
         />

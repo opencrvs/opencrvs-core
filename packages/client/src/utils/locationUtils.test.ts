@@ -12,8 +12,7 @@
 import { mockOfflineData } from '@client/tests/util'
 import {
   filterLocations,
-  getJurisidictionType,
-  getOfficeLocations
+  getJurisidictionType
 } from '@client/utils/locationUtils'
 
 describe('locationUtil tests', () => {
@@ -102,43 +101,6 @@ describe('locationUtil tests', () => {
       expect(locations['111']).toBeDefined()
       expect(locations['333']).toBeDefined()
       expect(locations['222']).toBeDefined()
-    })
-
-    it('gets crvs office for sysadmin', () => {
-      const locations = getOfficeLocations({
-        '111': {
-          id: '111',
-          name: 'Test',
-          alias: 'Test',
-          physicalType: 'Jurisdiction',
-          type: 'ADMIN_STRUCTURE',
-          partOf: 'Location/123'
-        },
-        '222': {
-          id: '222',
-          name: 'Test',
-          alias: 'Test',
-          physicalType: 'Jurisdiction',
-          type: 'CRVS_OFFICE',
-          partOf: 'Location/321'
-        },
-        '333': {
-          id: '333',
-          name: 'Test',
-          alias: 'Test',
-          physicalType: 'Jurisdiction',
-          type: 'ADMIN_STRUCTURE',
-          partOf: 'Location/123'
-        }
-      })
-
-      expect(locations).toStrictEqual([
-        {
-          id: '222',
-          searchableText: 'Test',
-          displayLabel: 'Test'
-        }
-      ])
     })
   })
 

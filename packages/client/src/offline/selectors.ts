@@ -11,6 +11,8 @@
  */
 import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
+import { IUserDetails } from '@client/utils/userUtils'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -34,6 +36,14 @@ export function isOfflineDataLoaded(
     state.templates
 
   return Boolean(hasAllRequiredData)
+}
+
+export function isSystemAdmin(userDetails: IUserDetails | undefined) {
+  return (
+    userDetails &&
+    userDetails.role &&
+    SYS_ADMIN_ROLES.includes(userDetails.role)
+  )
 }
 
 export const getOfflineDataLoaded = (

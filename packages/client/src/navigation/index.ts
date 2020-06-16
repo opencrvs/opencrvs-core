@@ -228,10 +228,16 @@ export function goToOperationalReport(
   })
 }
 
-export function goToTeamUserList(selectedLocation: ISearchLocation) {
+export function goToTeamUserList(
+  selectedLocation: ISearchLocation,
+  viewOnly?: boolean
+) {
   return push({
     pathname: TEAM_USER_LIST,
-    search: querystring.stringify({ locationId: selectedLocation.id })
+    search: querystring.stringify({
+      locationId: selectedLocation.id,
+      viewOnly
+    })
   })
 }
 

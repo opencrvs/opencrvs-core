@@ -9,31 +9,30 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation } from '@client/offline/reducer'
+import { ILocation, LocationType } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
-import { SYS_ADMIN_ROLES, JURISDICTION_TYPE } from './constants'
+import { JURISDICTION_TYPE } from './constants'
 import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
-  filterValue: string,
-  userDetails: IUserDetails
+  allowedType: LocationType,
+  match: {
+    locationLevel: keyof ILocation // ex: 'partOf' or 'id'
+    locationId?: string
+  }
 ): { [key: string]: ILocation } {
-  const locationsCopy = Object.assign({}, locations)
-  Object.values(locationsCopy).forEach((location: ILocation) => {
+  const filteredLocations: { [key: string]: ILocation } = {}
+  Object.values(locations).forEach((location: ILocation) => {
     if (
-      location.partOf !== `Location/${filterValue}` &&
-      !(
-        userDetails.role &&
-        SYS_ADMIN_ROLES.includes(userDetails.role) &&
-        location.type === 'CRVS_OFFICE'
-      )
+      location.type === allowedType.toString() &&
+      (!match.locationId || location[match.locationLevel] === match.locationId)
     ) {
-      delete locationsCopy[location.id]
+      filteredLocations[location.id] = location
     }
   })
 
-  return locationsCopy
+  return filteredLocations
 }
 
 export function getLocation(userDetails: IUserDetails, locationKey: string) {
@@ -92,21 +91,6 @@ export function generateLocations(
       }
     }
   )
-  return generated
-}
-
-export function getOfficeLocations(locations: { [key: string]: ILocation }) {
-  const generated: ISearchLocation[] = Object.values(locations)
-    .filter(
-      (location: ILocation) => location.type && location.type === 'CRVS_OFFICE'
-    )
-    .map((location: ILocation) => {
-      return {
-        id: location.id,
-        searchableText: location.name,
-        displayLabel: location.name
-      }
-    })
   return generated
 }
 
