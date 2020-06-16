@@ -65,7 +65,7 @@
         name: "backup opencrvs"
         minute: "0"
         hour: "0"
-        job: "cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh crvs 103.4.147.140 5225 172.16.17.54 /mnt/crypthome >> /var/log/opencrvs-backup.log 2>&1"
+        job: "cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} >> /var/log/opencrvs-backup.log 2>&1"
 
     - name: "Check file for encrypted file system exists"
       stat:
