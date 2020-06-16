@@ -26,6 +26,8 @@ import { IStoreState } from '@client/store'
 import { getJurisidictionType } from '@client/utils/locationUtils'
 import { goToFieldAgentList } from '@client/navigation'
 import moment from 'moment'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 
 const Report = styled.div<{
   total?: boolean
@@ -121,7 +123,7 @@ interface BaseProps {
   loading?: boolean
   reportTimeFrom: moment.Moment
   reportTimeTo: moment.Moment
-  jurisdictionType?: string
+  disableFieldAgentLink?: boolean
   locationId: string
 }
 
@@ -206,7 +208,7 @@ class ApplicationsStartedReportComponent extends React.Component<
       intl,
       reportTimeFrom,
       reportTimeTo,
-      jurisdictionType,
+      disableFieldAgentLink,
       locationId
     } = this.props
     const {
@@ -236,11 +238,7 @@ class ApplicationsStartedReportComponent extends React.Component<
           </Report>
           <Report>
             <PerformanceLink
-              disabled={
-                !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
-                  jurisdictionType as string
-                )
-              }
+              disabled={disableFieldAgentLink || false}
               onClick={() => {
                 this.props.goToFieldAgentList(
                   locationId,
@@ -314,13 +312,23 @@ class ApplicationsStartedReportComponent extends React.Component<
 export const ApplicationsStartedReport = connect(
   (state: IStoreState, ownProps: BaseProps) => {
     const offlineLocations = getOfflineData(state).locations
-    const jurisdictionType = getJurisidictionType(
-      offlineLocations,
-      ownProps.locationId
+    let disableFieldAgentLink = !window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
+      getJurisidictionType(offlineLocations, ownProps.locationId) as string
     )
+    const userDetails = getUserDetails(state)
+    if (
+      userDetails &&
+      userDetails.role &&
+      userDetails.catchmentArea &&
+      userDetails.catchmentArea[0] &&
+      !SYS_ADMIN_ROLES.includes(userDetails.role)
+    ) {
+      disableFieldAgentLink =
+        ownProps.locationId !== userDetails.catchmentArea[0].id
+    }
     return {
       ...ownProps,
-      jurisdictionType
+      disableFieldAgentLink
     }
   },
   {
