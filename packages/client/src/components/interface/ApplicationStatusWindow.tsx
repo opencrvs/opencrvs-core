@@ -38,7 +38,7 @@ const Window = styled.div<{
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    top: 56px;
+    top: 0px;
   }
 `
 
@@ -52,6 +52,9 @@ const TopBar = styled.div`
   padding: 0 12px;
 
   background-color: ${({ theme }) => theme.colors.lightGreyBackground};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
