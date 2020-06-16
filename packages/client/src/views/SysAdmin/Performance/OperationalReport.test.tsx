@@ -241,7 +241,10 @@ describe('OperationalReport tests', () => {
         component,
         '#last30Days'
       )
-      last30DaysPresetButtonElement.hostNodes().simulate('click')
+      last30DaysPresetButtonElement
+        .hostNodes()
+        .at(0)
+        .simulate('click')
       const confirmButtonElement = await waitForElement(
         component,
         '#date-range-confirm-action'
