@@ -140,6 +140,7 @@ describe('form component', () => {
 describe('when field definition has location search input', () => {
   let component: ReactWrapper<{}, {}>
   const modifyDraft = jest.fn()
+
   beforeEach(async () => {
     const { store } = createStore()
     const testComponent = await createTestComponent(
@@ -176,11 +177,11 @@ describe('when field definition has location search input', () => {
       .find('#locationSearchInput')
       .hostNodes()
       .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
+        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
       })
 
     const autoCompleteSuggestion = component
-      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
       .hostNodes()
     expect(autoCompleteSuggestion).toHaveLength(1)
   })
@@ -190,11 +191,11 @@ describe('when field definition has location search input', () => {
       .find('#locationSearchInput')
       .hostNodes()
       .simulate('change', {
-        target: { value: 'Moktarpur', id: 'locationSearchInput' }
+        target: { value: 'Dholashadhukhan', id: 'locationSearchInput' }
       })
 
     const autoCompleteSuggestion = component
-      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f020309e')
       .hostNodes()
     expect(autoCompleteSuggestion).toHaveLength(1)
 

@@ -13,8 +13,7 @@ import {
   createReviewApplication,
   getStorageApplicationsSuccess,
   IApplication,
-  storeApplication,
-  SUBMISSION_STATUS
+  storeApplication
 } from '@opencrvs/client/src/applications'
 import { Event, IForm, IFormSectionData } from '@opencrvs/client/src/forms'
 
@@ -69,6 +68,7 @@ describe('ReviewForm tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
+        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets
       })
     )

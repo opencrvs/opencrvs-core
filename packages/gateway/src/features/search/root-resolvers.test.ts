@@ -330,8 +330,8 @@ describe('Search root resolvers', () => {
 
     beforeEach(() => {
       fetch.resetMocks()
-      const registerUserToken = jwt.sign(
-        { scope: ['register'] },
+      const declareToken = jwt.sign(
+        { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -341,7 +341,7 @@ describe('Search root resolvers', () => {
         }
       )
       unauthorizedUser = {
-        Authorization: `Bearer ${registerUserToken}`
+        Authorization: `Bearer ${declareToken}`
       }
       const sysadminUserToken = jwt.sign(
         { scope: ['sysadmin'] },
@@ -395,7 +395,9 @@ describe('Search root resolvers', () => {
     it('throws an error for unauthorized user', async () => {
       await expect(
         resolvers.Query.getEventsWithProgress({}, {}, unauthorizedUser)
-      ).rejects.toThrowError('User does not have a sysadmin scope')
+      ).rejects.toThrowError(
+        'User does not have a sysadmin or register or validate scope'
+      )
     })
     it('throws an error for invalid location ids', async () => {
       fetch.mockResponseOnce(

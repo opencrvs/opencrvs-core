@@ -227,6 +227,7 @@ describe('create new user tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
+        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets
       })
     )
@@ -427,6 +428,7 @@ describe('edit user tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
+        offices: mockOfflineData.offices,
         assets: mockOfflineData.assets
       })
     )

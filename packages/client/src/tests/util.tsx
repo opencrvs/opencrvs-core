@@ -2470,7 +2470,9 @@ export const mockOfflineData = {
       physicalType: 'Building',
       type: 'HEALTH_FACILITY',
       partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
+    }
+  },
+  offices: {
     '0d8474da-0361-4d32-979e-af91f012340a': {
       id: '0d8474da-0361-4d32-979e-af91f012340a',
       name: 'Moktarpur Union Parishad',
@@ -2480,7 +2482,6 @@ export const mockOfflineData = {
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     }
   },
-
   locations: {
     '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
       id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
@@ -2710,6 +2711,7 @@ export async function createTestStore() {
       templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
+      offices: mockOfflineData.offices,
       assets: mockOfflineData.assets
     })
   )
@@ -2735,6 +2737,7 @@ export async function createTestComponent(
       templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
+      offices: mockOfflineData.offices,
       assets: mockOfflineData.assets
     })
   )
@@ -2773,6 +2776,7 @@ export async function createTestComponentWithApolloClient(
       templates: mockOfflineData.templates,
       locations: mockOfflineData.locations,
       facilities: mockOfflineData.facilities,
+      offices: mockOfflineData.offices,
       assets: mockOfflineData.assets
     })
   )

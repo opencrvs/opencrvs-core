@@ -25,7 +25,7 @@ import { referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations, getLocation } from '@client/utils/locationUtils'
 import { ISerializedForm } from '@client/forms'
-import { isOfflineDataLoaded } from './selectors'
+import { isOfflineDataLoaded, isSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
@@ -33,6 +33,11 @@ import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
+export enum LocationType {
+  HEALTH_FACILITY = 'HEALTH_FACILITY',
+  CRVS_OFFICE = 'CRVS_OFFICE',
+  ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
+}
 export interface ILocation {
   id: string
   name: string
@@ -47,6 +52,7 @@ export interface ILocation {
 export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
   languages: ILanguage[]
   forms: {
     // @todo this is also used in review, so it could be named just form
@@ -291,21 +297,40 @@ function reducer(
     }
 
     /*
-     * Facilities
+     * Facilities && Offices
      */
 
     case actions.FACILITIES_LOADED: {
       const facilities = filterLocations(
         action.payload,
-        getLocation(state.userDetails!, window.config.HEALTH_FACILITY_FILTER),
-        state.userDetails!
+        LocationType.HEALTH_FACILITY,
+        {
+          locationLevel: 'partOf',
+          locationId: `Location/${getLocation(
+            state.userDetails!,
+            window.config.HEALTH_FACILITY_FILTER
+          )}`
+        }
       )
 
+      const offices = filterLocations(
+        action.payload,
+        LocationType.CRVS_OFFICE,
+        {
+          locationLevel: 'id',
+          locationId: isSystemAdmin(state.userDetails)
+            ? undefined
+            : state.userDetails &&
+              state.userDetails.primaryOffice &&
+              state.userDetails.primaryOffice.id
+        }
+      )
       return {
         ...state,
         offlineData: {
           ...state.offlineData,
-          facilities
+          facilities,
+          offices
         }
       }
     }

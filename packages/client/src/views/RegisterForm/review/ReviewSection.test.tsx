@@ -586,7 +586,7 @@ describe('when in device of large viewport', () => {
           .hostNodes()
           .childAt(2)
           .text()
-      ).toContain('Moktarpur Union Parishad')
+      ).toContain('Hospital / ClinicChange')
     })
   })
 })

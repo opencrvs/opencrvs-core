@@ -20,6 +20,7 @@ import {
   getFullName,
   getUser,
   hasScope,
+  inScope,
   isTokenOwner
 } from '@gateway/features/user/utils'
 import { logger } from '@gateway/logger'
@@ -53,10 +54,12 @@ export const resolvers: GQLResolver = {
       },
       authHeader
     ) {
-      // Only sysadmin should be able to search user
-      if (!hasScope(authHeader, 'sysadmin')) {
+      // Only sysadmin or registrar or registration agent should be able to search user
+      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
         return await Promise.reject(
-          new Error('Search user is only allowed for sysadmin')
+          new Error(
+            'Search user is only allowed for sysadmin or registrar or registration agent'
+          )
         )
       }
 
@@ -109,10 +112,12 @@ export const resolvers: GQLResolver = {
       },
       authHeader
     ) {
-      // Only sysadmin should be able to search field agents
-      if (!hasScope(authHeader, 'sysadmin')) {
+      // Only sysadmin or registrar or registration agent should be able to search field agents
+      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
         return await Promise.reject(
-          new Error('Search field agents is only allowed for sysadmin')
+          new Error(
+            'Search field agents is only allowed for sysadmin or registrar or registration agent'
+          )
         )
       }
 
