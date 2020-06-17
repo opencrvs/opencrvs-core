@@ -19,9 +19,12 @@ import styled from 'styled-components'
 const DynamicContainer = styled.div<{
   marginLeft?: number
   marginRight?: number
+  fixedWidth?: number
 }>`
   margin-right: ${({ marginRight }) => (marginRight ? `${marginRight}px` : 0)};
   margin-left: ${({ marginLeft }) => (marginLeft ? `${marginLeft}px` : 0)};
+  ${({ fixedWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 `
 
 const Content = styled(BodyContent)`
@@ -36,7 +39,8 @@ const SubPageContent = styled(Content)`
 `
 export enum SysAdminPageVariant {
   DEFAULT = 'DEFAULT',
-  SUBPAGE = 'SUBPAGE'
+  SUBPAGE = 'SUBPAGE',
+  SUBPAGE_CENTERED = 'SUBPAGE_CENTERED'
 }
 
 interface BasePage {
@@ -45,6 +49,7 @@ interface BasePage {
   children?: React.ReactNode
   marginLeft?: number
   marginRight?: number
+  fixedWidth?: number
 }
 
 interface DefaultPage extends BasePage {
@@ -59,13 +64,19 @@ interface HeaderProps {
 }
 
 interface SubPage extends BasePage, HeaderProps {
-  type: typeof SysAdminPageVariant.SUBPAGE
+  type:
+    | typeof SysAdminPageVariant.SUBPAGE
+    | SysAdminPageVariant.SUBPAGE_CENTERED
 }
 
 type SysAdminPage = DefaultPage | SubPage
 
 function isSubPage(page: SysAdminPage): page is SubPage {
   return page.type === SysAdminPageVariant.SUBPAGE
+}
+
+function isSubPageCentered(page: SysAdminPage): page is SubPage {
+  return page.type === SysAdminPageVariant.SUBPAGE_CENTERED
 }
 
 const SubPageHeaderContainer = styled.div`
@@ -135,12 +146,31 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
     )
 
     pageContent = <SubPageContent>{props.children}</SubPageContent>
+  } else if (isSubPageCentered(props)) {
+    pageHeader = (
+      <SubPageHeader
+        id={props.id}
+        headerTitle={props.headerTitle}
+        backActionHandler={props.backActionHandler}
+        toolbarComponent={props.toolbarComponent}
+      />
+    )
+    pageContent = (
+      <DynamicContainer
+        marginLeft={props.marginLeft}
+        marginRight={props.marginRight}
+        fixedWidth={props.fixedWidth}
+      >
+        <Content>{props.children}</Content>
+      </DynamicContainer>
+    )
   } else {
     pageHeader = <Header />
     pageContent = (
       <DynamicContainer
         marginLeft={props.marginLeft}
         marginRight={props.marginRight}
+        fixedWidth={props.fixedWidth}
       >
         <Content>{props.children}</Content>
       </DynamicContainer>

@@ -18,9 +18,16 @@ import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
   isFullPage?: boolean
+  fixedWidth: number | undefined
 }>`
-  width: 100%;
-  overflow-x: hidden;
+ 
+  ${({ fixedWidth }) =>
+    fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
+
+
+    @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
+      width: 100%;
+    }
   background: ${({ theme }) => theme.colors.white};
   ${({ hideBoxShadow, isFullPage, theme }) =>
     isFullPage
@@ -40,8 +47,11 @@ const TableTitleLoading = styled.span`
 const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
+  fixedWidth?: number
 }>`
-  width: ${({ totalWidth }) => totalWidth || 100}%;
+
+${({ fixedWidth, totalWidth }) =>
+  fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
   color: ${({ theme }) => theme.colors.copy};
   padding: 10px 0px;
@@ -55,10 +65,6 @@ const TableHeader = styled.div<{
   & span:last-child {
     text-align: right;
     padding-right: 12px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
   }
 `
 
@@ -175,13 +181,19 @@ const TableScrollerHorizontal = styled.div`
 `
 const TableScroller = styled.div<{
   height?: number
-  width: number
+  totalWidth: number
   isFullPage?: boolean
+  fixedWidth: number | undefined
 }>`
   display: block;
   max-height: ${({ height, isFullPage }) =>
     isFullPage ? '65vh' : height ? `${height}px` : 'auto'};
-  width: ${({ width }) => width}%;
+
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth
+      ? `width: ${fixedWidth}px;`
+      : `width: ${(totalWidth >= 100 && totalWidth) || 100}%;`}
+
   overflow-y: scroll;
   overflow-x: hidden;
 
@@ -207,7 +219,14 @@ const ToggleSortIcon = styled.div<{
     transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};
   }
 `
-const LodaingContainer = styled.div`
+const LoadingContainer = styled.div<{
+  totalWidth: number
+  fixedWidth: number | undefined
+}>`
+  ${({ fixedWidth, totalWidth }) =>
+    fixedWidth
+      ? `width: ${fixedWidth}px;`
+      : `width: ${(totalWidth >= 100 && totalWidth) || 100}%;`}
   overflow: hidden;
 `
 const defaultConfiguration = {
@@ -233,6 +252,7 @@ interface IListTableProps {
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
+  fixedWidth?: number
 }
 
 interface IListTableState {
@@ -299,11 +319,11 @@ export class ListTable extends React.Component<
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver,
-      isFullPage
+      isFullPage,
+      fixedWidth
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
-
     return (
       <>
         {!isLoading && (
@@ -311,12 +331,13 @@ export class ListTable extends React.Component<
             id={`listTable-${id}`}
             hideBoxShadow={hideBoxShadow}
             isFullPage={isFullPage}
+            fixedWidth={fixedWidth}
           >
             {tableTitle && <H3>{tableTitle}</H3>}
             <TableScrollerHorizontal>
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
-                  <TableHeader totalWidth={totalWidth}>
+                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
                     {columns.map((preference, index) => (
                       <ContentWrapper
                         key={index}
@@ -351,7 +372,8 @@ export class ListTable extends React.Component<
               <TableScroller
                 height={tableHeight}
                 isFullPage={isFullPage}
-                width={(totalWidth >= 100 && totalWidth) || 100}
+                totalWidth={totalWidth}
+                fixedWidth={fixedWidth}
               >
                 <TableBody
                   footerColumns={
@@ -409,9 +431,9 @@ export class ListTable extends React.Component<
           </Wrapper>
         )}
         {isLoading && (
-          <LodaingContainer>
+          <LoadingContainer totalWidth={totalWidth} fixedWidth={fixedWidth}>
             {tableTitle && <TableTitleLoading />}
-            <TableHeader>
+            <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper
                   key={index}
@@ -423,7 +445,7 @@ export class ListTable extends React.Component<
                 </ContentWrapper>
               ))}
             </TableHeader>
-            <TableHeader>
+            <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
               {columns.map((preference, index) => (
                 <ContentWrapper
                   key={index}
@@ -435,7 +457,7 @@ export class ListTable extends React.Component<
                 </ContentWrapper>
               ))}
             </TableHeader>
-          </LodaingContainer>
+          </LoadingContainer>
         )}
         {totalItems > pageSize && (
           <>

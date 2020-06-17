@@ -89,7 +89,7 @@ function ReportComponent(props: Props) {
   return (
     <SysAdminContentWrapper
       id="reports"
-      type={SysAdminPageVariant.SUBPAGE}
+      type={SysAdminPageVariant.SUBPAGE_CENTERED}
       backActionHandler={props.goBack}
       headerTitle={title}
     >

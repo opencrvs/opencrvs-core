@@ -113,6 +113,7 @@ class TimeFrameComponent extends React.Component<FullProps> {
           event: eventType
         })}
         isLoading={loading}
+        fixedWidth={1074}
         content={this.getContent()}
         hideBoxShadow={true}
         columns={[

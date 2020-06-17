@@ -62,7 +62,7 @@ Ensure your external server also allows SSH from the OpenCRVS manager node. Foll
 Run the Ansible playbook configuration script from your client computer (You must have Ansible installed, a Dockerhub account & a Papertrail account - remove Papertrail config from playbook if you do not wish to use the logging service. We recommend you use an external Logging service to have live access to logs):
 
 ```
-ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token"
+ansible-playbook -i <inventory_file> playbook.yml -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token external_backup_server_ip=your_external_backup_server_ip external_backup_server_user=your_external_backup_server_user external_backup_server_ssh_port=your_external_backup_server_ssh_port manager_production_server_ip=your_manager_production_server_ip external_backup_server_remote_directory=your_external_backup_server_remote_directory"
 ```
 
 Replace <inventory_file> with the correct inventory file for either you staging, QA or production servers ( Refer to our [example.ini](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/example.ini) file ) and use `-K` option if you need supply an ssh password (add ansible_password to inventory for each node that requires an SSH password). These files contain the list of servers which are to be configured. Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.

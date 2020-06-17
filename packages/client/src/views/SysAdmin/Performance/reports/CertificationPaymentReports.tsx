@@ -68,6 +68,7 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
     return (
       <ListTable
         id="payments"
+        fixedWidth={1074}
         tableTitle={intl.formatMessage(
           constantsMessages.certificationPaymentTitle,
           {

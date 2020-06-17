@@ -148,6 +148,7 @@ function Within45DaysTableComponent(props: ITableProps) {
     <ListTable
       noResultText={intl.formatMessage(constantsMessages.noResults)}
       isLoading={loading}
+      fixedWidth={1074}
       columns={[
         {
           key: firstColProp.dataKey,

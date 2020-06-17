@@ -38,8 +38,12 @@ const Window = styled.div<{
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
-    top: 56px;
+    top: 0px;
   }
+`
+
+const CrossButton = styled(Cross)`
+  cursor: pointer;
 `
 
 const TopBar = styled.div`
@@ -52,6 +56,9 @@ const TopBar = styled.div`
   padding: 0 12px;
 
   background-color: ${({ theme }) => theme.colors.lightGreyBackground};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
 
@@ -63,7 +70,7 @@ class ApplicationStatusWindowComponent extends React.Component<IProps> {
       <Window id="status-window" width={this.props.width}>
         <TopBar>
           <Title>{this.props.title}</Title>
-          <Cross
+          <CrossButton
             id="btn-sts-wnd-cross"
             onClick={this.props.crossClickHandler}
           />

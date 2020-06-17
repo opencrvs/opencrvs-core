@@ -114,6 +114,7 @@ class GenderBasisComponent extends React.Component<FullProps> {
         tableTitle={intl.formatMessage(constantsMessages.registrationTitle, {
           event: eventType
         })}
+        fixedWidth={1074}
         isLoading={loading}
         content={this.getContent()}
         hideBoxShadow={true}
