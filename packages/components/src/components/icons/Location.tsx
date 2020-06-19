@@ -11,12 +11,14 @@
  */
 import * as React from 'react'
 
-export const Location = (props: React.HTMLAttributes<SVGElement>) => (
+export const Location = (
+  props: React.HTMLAttributes<SVGElement> & { inverse?: boolean }
+) => (
   <svg width={24} height={24} fill="none" {...props}>
     <path
       clipRule="evenodd"
       d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0v0z"
-      stroke="#35495D"
+      stroke={props.inverse ? '#ffffff' : '#35495D'}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -24,7 +26,7 @@ export const Location = (props: React.HTMLAttributes<SVGElement>) => (
     <path
       clipRule="evenodd"
       d="M12 13a3 3 0 100-6 3 3 0 000 6z"
-      stroke="#35495D"
+      stroke={props.inverse ? '#ffffff' : '#35495D'}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
