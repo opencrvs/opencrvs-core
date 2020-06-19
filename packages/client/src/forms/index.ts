@@ -514,8 +514,13 @@ export interface ISearchFormField extends IFormFieldBase {
 
 export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  searchableResource: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >
   locationList: ISearchLocation[]
+  searchableType: string
+  dispatchOptions?: IDispatchOptions
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -997,8 +1002,13 @@ export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  searchableResource: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >
+  searchableType: string
   locationList: ISearchLocation[]
+  dispatchOptions?: IDispatchOptions
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {

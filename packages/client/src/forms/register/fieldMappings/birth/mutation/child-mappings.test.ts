@@ -28,7 +28,7 @@ describe('Child section mutation mapping related tests', () => {
       'child',
       {
         name: 'birthLocation',
-        type: 'SEARCH_FIELD'
+        type: 'LOCATION_SEARCH_INPUT'
       } as IFormField
     )
     expect(transformedData.child).toBeDefined()

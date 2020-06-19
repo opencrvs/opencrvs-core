@@ -18844,7 +18844,7 @@
               },
               {
                 "name": "registrationOffice",
-                "type": "SEARCH_FIELD",
+                "type": "LOCATION_SEARCH_INPUT",
                 "label": {
                   "defaultMessage": "Registration Office",
                   "description": "Registration office",
@@ -19160,7 +19160,7 @@
               },
               {
                 "name": "registrationOffice",
-                "type": "SEARCH_FIELD",
+                "type": "LOCATION_SEARCH_INPUT",
                 "label": {
                   "defaultMessage": "Registration Office",
                   "description": "Registration office",

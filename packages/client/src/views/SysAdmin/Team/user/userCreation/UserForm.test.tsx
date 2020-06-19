@@ -17,6 +17,7 @@ import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const { store } = createStore()
 
@@ -57,146 +58,42 @@ describe('Create new user page tests', () => {
     expect(component.containsMatchingElement(ActionPageLight)).toBe(true)
   })
 
-  it('it checks office search modal appears', () => {
-    component
-      .find('#searchInputText')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
-      })
-    component.update()
-
-    component
-      .find('#searchInputIcon')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    expect(component.find('#office-search-modal').hostNodes().length).toBe(1)
+  it('renders location search input without crashing', async () => {
+    const input = await waitForElement(component, '#registrationOffice')
+    expect(input.length).toBeGreaterThan(0)
   })
 
-  it('it changes location selection', () => {
+  it('performs auto complete search among offline data', () => {
     component
-      .find('#searchInputText')
+      .find('#locationSearchInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
+        target: { value: 'Moktarpur', id: 'locationSearchInput' }
       })
-    component.update()
 
-    component
-      .find('#searchInputIcon')
+    const autoCompleteSuggestion = component
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
       .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    component
-      .find('#location-0')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'location-0', value: 'checked' }
-      })
-    component.update()
-
-    component
-      .find('#modal_select')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    expect(
-      component
-        .find('#registrationOffice')
-        .hostNodes()
-        .props().value
-    ).toEqual('Moktarpur Union Parishad')
+    expect(autoCompleteSuggestion).toHaveLength(1)
   })
 
-  it('it closes office search modal while modal cancel clicked', () => {
+  it('clicking on autocomplete suggestion modifies draft', () => {
+    expect(store.getState().userForm.userFormData).toEqual({})
     component
-      .find('#searchInputText')
+      .find('#locationSearchInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'searchInputText', value: 'Barisal' }
+        target: { value: 'Moktarpur', id: 'locationSearchInput' }
       })
-    component.update()
 
-    component
-      .find('#searchInputIcon')
+    const autoCompleteSuggestion = component
+      .find('#locationOption0d8474da-0361-4d32-979e-af91f012340a')
       .hostNodes()
-      .simulate('click')
+    expect(autoCompleteSuggestion).toHaveLength(1)
 
-    component.update()
-
-    component
-      .find('#modal_cancel')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    expect(component.find('#office-search-modal').hostNodes().length).toBe(0)
-  })
-
-  it('it sets value to registerOffice while modal select clicked', () => {
-    component
-      .find('#searchInputText')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
-      })
-    component.update()
-
-    component
-      .find('#searchInputIcon')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    component
-      .find('#modal_select')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    expect(component.find('#registrationOffice').hostNodes().length).toBe(1)
-  })
-
-  it('it opens modal  while edit registration office link clicked', () => {
-    component
-      .find('#searchInputText')
-      .hostNodes()
-      .simulate('change', {
-        target: { id: 'searchInputText', value: 'Moktarpur' }
-      })
-    component.update()
-
-    component
-      .find('#searchInputIcon')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    component
-      .find('#modal_select')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    component
-      .find('#edit-button')
-      .hostNodes()
-      .simulate('click')
-
-    component.update()
-
-    expect(component.find('#office-search-modal').hostNodes().length).toBe(1)
+    autoCompleteSuggestion.simulate('click')
+    expect(store.getState().userForm.userFormData).toEqual({
+      registrationOffice: '0d8474da-0361-4d32-979e-af91f012340a'
+    })
   })
 })

@@ -51,7 +51,8 @@ import {
   OFFLINE_LOCATIONS_KEY,
   OFFLINE_FACILITIES_KEY,
   ILocation,
-  IOfflineData
+  IOfflineData,
+  LocationType
 } from '@client/offline/reducer'
 import {
   Validation,
@@ -359,11 +360,17 @@ export function isDefaultCountry(countryCode: string): boolean {
 
 export function getListOfLocations(
   resource: IOfflineData,
-  resourceType: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  resourceType: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >,
+  locationType?: LocationType
 ) {
-  return (
-    (resource[resourceType] && generateLocations(resource[resourceType])) || []
-  )
+  return resource[resourceType]
+    ? locationType
+      ? generateLocations(resource[resourceType], undefined, [locationType])
+      : generateLocations(resource[resourceType])
+    : []
 }
 
 interface IVars {
