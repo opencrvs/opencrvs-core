@@ -57,7 +57,6 @@ import {
   PARAGRAPH,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  SEARCH_FIELD,
   Section,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
@@ -337,11 +336,7 @@ const renderValue = (
   if (field.type === SELECT_WITH_OPTIONS && field.options) {
     return renderSelectOrRadioLabel(value, field.options, intl)
   }
-  if (
-    (field.type === SEARCH_FIELD ||
-      field.type === SELECT_WITH_DYNAMIC_OPTIONS) &&
-    field.dynamicOptions
-  ) {
+  if (field.type === SELECT_WITH_DYNAMIC_OPTIONS && field.dynamicOptions) {
     const sectionData = draftData[sectionId]
     return renderSelectDynamicLabel(
       value,
