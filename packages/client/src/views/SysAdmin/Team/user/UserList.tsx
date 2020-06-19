@@ -43,8 +43,8 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
 import {
-  IDynamicValues,
-  IColumn
+  IColumn,
+  IDynamicValues
 } from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -366,7 +366,7 @@ function UserListComponent(props: IProps) {
   }
 
   return (
-    <SysAdminContentWrapper>
+    <SysAdminContentWrapper mapPinClickHandler={onChangeLocation}>
       <HeaderContainer>
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}

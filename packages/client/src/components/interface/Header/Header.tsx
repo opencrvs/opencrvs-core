@@ -9,6 +9,40 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import { SCREEN_LOCK } from '@client/components/ProtectedPage'
+import {
+  buttonMessages,
+  constantsMessages,
+  userMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/header'
+import {
+  goToEvents as goToEventsAction,
+  goToHome,
+  goToOperationalReport,
+  goToPerformanceHome,
+  goToPerformanceReportList,
+  goToSearch,
+  goToSearchResult,
+  goToSettings,
+  goToTeamSearch,
+  goToTeamUserList
+} from '@client/navigation'
+import { redirectToAuthentication } from '@client/profile/profileActions'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { storage } from '@client/storage'
+import { IStoreState } from '@client/store'
+import {
+  BRN_DRN_TEXT,
+  FIELD_AGENT_ROLES,
+  NAME_TEXT,
+  PHONE_TEXT,
+  SYS_ADMIN_ROLES,
+  TRACKING_ID_TEXT
+} from '@client/utils/constants'
+import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
   ApplicationBlack,
   ApplicationBlue,
@@ -17,6 +51,7 @@ import {
   Hamburger,
   HelpBlack,
   HelpBlue,
+  Location,
   LogoutBlack,
   LogoutBlue,
   Phone,
@@ -37,44 +72,10 @@ import {
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { storage } from '@client/storage'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
-import { connect } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails, getIndividualNameObj } from '@client/utils/userUtils'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { IStoreState } from '@client/store'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import {
-  goToHome,
-  goToPerformanceReportList,
-  goToSearch,
-  goToSearchResult,
-  goToSettings,
-  goToEvents as goToEventsAction,
-  goToPerformanceHome,
-  goToOperationalReport,
-  goToTeamSearch,
-  goToTeamUserList
-} from '@client/navigation'
-import { ProfileMenu } from '@client/components/ProfileMenu'
-import {
-  BRN_DRN_TEXT,
-  PHONE_TEXT,
-  SYS_ADMIN_ROLES,
-  FIELD_AGENT_ROLES,
-  TRACKING_ID_TEXT,
-  NAME_TEXT
-} from '@client/utils/constants'
-import styled from 'styled-components'
-import { messages } from '@client/i18n/messages/views/header'
-import {
-  constantsMessages,
-  buttonMessages,
-  userMessages
-} from '@client/i18n/messages'
 import * as React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import styled from 'styled-components'
 
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
@@ -96,6 +97,7 @@ type IProps = IntlShapeProps & {
   selectedSearchType?: string
   mobileSearchBar?: boolean
   enableMenuSelection?: boolean
+  mapPinClickHandler?: () => void
 }
 interface IState {
   showMenu: boolean
@@ -105,7 +107,8 @@ interface IState {
 enum ACTIVE_MENU_ITEM {
   APPLICATIONS,
   PERFORMANCE,
-  TEAM
+  TEAM,
+  USERS
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -214,11 +217,26 @@ class HeaderComp extends React.Component<IProps, IState> {
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
+    if (
+      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE ||
+      activeMenuItem === ACTIVE_MENU_ITEM.TEAM
+    ) {
       return {
         mobileLeft: {
           icon: () => this.hamburger(),
           handler: this.toggleMenu
+        }
+      }
+    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+      return {
+        mobileLeft: {
+          icon: () => this.hamburger(),
+          handler: this.toggleMenu
+        },
+        mobileRight: {
+          icon: () => <Location inverse />,
+          handler: () =>
+            this.props.mapPinClickHandler && this.props.mapPinClickHandler()
         }
       }
     } else {
@@ -453,6 +471,8 @@ export const Header = connect(
   (store: IStoreState) => ({
     activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
+      : window.location.href.includes('team/users')
+      ? ACTIVE_MENU_ITEM.USERS
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
       : ACTIVE_MENU_ITEM.APPLICATIONS,
