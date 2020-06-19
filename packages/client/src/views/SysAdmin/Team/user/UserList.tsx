@@ -106,6 +106,10 @@ const AddUserContainer = styled.div`
   display: flex;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const AddUserIcon = styled(AddUser)`
   padding: 4px;
@@ -149,6 +153,12 @@ const LocationInfoValue = styled.div`
 const LocationInfoEmptyValue = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const ChangeButton = styled(LinkButton)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 interface ISearchParams {
@@ -372,9 +382,9 @@ function UserListComponent(props: IProps) {
           {(searchedLocation && searchedLocation.name) || ''}
         </Header>
         {!viewOnly && (
-          <LinkButton id="chng-loc" onClick={onChangeLocation}>
+          <ChangeButton id="chng-loc" onClick={onChangeLocation}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </ChangeButton>
         )}
       </HeaderContainer>
       <LocationInfo>
