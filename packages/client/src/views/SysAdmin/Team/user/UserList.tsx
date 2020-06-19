@@ -61,7 +61,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
-const { useState } = React
+const { useState, useEffect } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -208,6 +208,16 @@ function UserListComponent(props: IProps) {
     search
   ) as unknown) as ISearchParams
 
+  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
+  useEffect(() => {
+    function recordWindowWidth() {
+      setViewportWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', recordWindowWidth)
+
+    return () => window.removeEventListener('resize', recordWindowWidth)
+  }, [])
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
@@ -310,7 +320,7 @@ function UserListComponent(props: IProps) {
         key: 'status'
       }
     ]
-    if (!viewOnly) {
+    if (!viewOnly && viewportWidth > props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
           label: '',
