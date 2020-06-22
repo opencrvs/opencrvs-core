@@ -170,6 +170,221 @@ describe('User list tests', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
+    describe('Table responsiveness test', () => {
+      let component: ReactWrapper<{}, {}>
+      const userListMock = [
+        {
+          request: {
+            query: SEARCH_USERS,
+            variables: {
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
+            }
+          },
+          result: {
+            data: {
+              searchUsers: {
+                totalItems: 5,
+                results: [
+                  {
+                    id: '5d08e102542c7a19fc55b790',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Rabindranath',
+                        familyName: 'Tagore'
+                      }
+                    ],
+                    username: 'r.tagore',
+                    role: 'REGISTRATION_AGENT',
+                    type: 'ENTREPENEUR',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b791',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful'
+                      }
+                    ],
+                    username: 'm.ashraful',
+                    role: 'LOCAL_REGISTRAR',
+                    type: 'CHAIRMAN',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b792',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Muhammad Abdul',
+                        familyName: 'Muid Khan'
+                      }
+                    ],
+                    username: 'ma.muidkhan',
+                    role: 'DISTRICT_REGISTRAR',
+                    type: 'MAYOR',
+                    status: 'pending'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b793',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Nasreen Pervin',
+                        familyName: 'Huq'
+                      }
+                    ],
+                    username: 'np.huq',
+                    role: 'STATE_REGISTRAR',
+                    type: 'MAYOR',
+                    status: 'active'
+                  },
+                  {
+                    id: '5d08e102542c7a19fc55b795',
+                    name: [
+                      {
+                        use: 'en',
+                        firstNames: 'Md. Ariful',
+                        familyName: 'Islam'
+                      }
+                    ],
+                    username: 'ma.islam',
+                    role: 'FIELD_AGENT',
+                    type: 'HOSPITAL',
+                    status: 'disabled'
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+
+      it('renders 2 columns for smaller devices', async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 400
+        })
+        const testComponent = await createTestComponent(
+          <UserList
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              })
+            }}
+          />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
+
+        expect(component.find('div#row_4').children()).toHaveLength(2)
+      })
+
+      it('renders 3 columns for midium devices', async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 700
+        })
+        const testComponent = await createTestComponent(
+          <UserList
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              })
+            }}
+          />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
+
+        expect(component.find('div#row_4').children()).toHaveLength(3)
+      })
+
+      it('renders 4 columns for bigger devices on viewOnly mode', async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1100
+        })
+        const testComponent = await createTestComponent(
+          <UserList
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+                viewOnly: true
+              })
+            }}
+          />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
+
+        expect(component.find('div#row_4').children()).toHaveLength(4)
+      })
+
+      it('renders 5 columns for bigger devices', async () => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1100
+        })
+        const testComponent = await createTestComponent(
+          <UserList
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              })
+            }}
+          />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
+
+        expect(component.find('div#row_4').children()).toHaveLength(5)
+      })
+    })
+
     describe('when there is a result from query', () => {
       let component: ReactWrapper<{}, {}>
       const userListMock = [
