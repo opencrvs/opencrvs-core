@@ -123,7 +123,9 @@ class UserFormComponent extends React.Component<IFullProps> {
           goBack={this.handleBackAction}
         >
           <FormTitle id="form-title">
-            {intl.formatMessage(activeGroup.title || section.title)}
+            {userId
+              ? intl.formatMessage(sysAdminMessages.editUserCommonTitle)
+              : intl.formatMessage(activeGroup.title || section.title)}
           </FormTitle>
           <FormFieldGenerator
             key={activeGroup.id}

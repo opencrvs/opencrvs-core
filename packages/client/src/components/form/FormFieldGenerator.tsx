@@ -74,7 +74,6 @@ import {
   FETCH_BUTTON,
   ILoaderButton,
   FIELD_GROUP_TITLE,
-  SEARCH_FIELD,
   IFormSection,
   SIMPLE_DOCUMENT_UPLOADER,
   IAttachmentValue,
@@ -90,7 +89,6 @@ import { FormList } from '@client/components/form/FormList'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
-import { SearchField } from './SearchField'
 import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -107,7 +105,7 @@ import {
   FormikTouched,
   FormikValues
 } from 'formik'
-import { IOfflineData } from '@client/offline/reducer'
+import { IOfflineData, LocationType } from '@client/offline/reducer'
 import { isEqual, flatten } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 import { IStoreState } from '@client/store'
@@ -423,29 +421,6 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === SEARCH_FIELD) {
-    return (
-      <InputField {...inputFieldProps}>
-        <SearchField
-          fieldName={fieldDefinition.name}
-          fieldValue={fieldDefinition.initialValue as string}
-          searchableResource={fieldDefinition.searchableResource}
-          searchableType={fieldDefinition.searchableType}
-          error={inputProps.error}
-          touched={inputProps.touched}
-          onModalComplete={(value: string) => {
-            onSetFieldValue(fieldDefinition.name, value)
-            if (fieldDefinition.dispatchOptions) {
-              dynamicDispatch(fieldDefinition.dispatchOptions.action, {
-                [fieldDefinition.dispatchOptions.payloadKey]: value
-              })
-            }
-          }}
-        />
-      </InputField>
-    )
-  }
-
   if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
     const selectedLocation = fieldDefinition.locationList.find(
       location => location.id === value
@@ -459,6 +434,11 @@ function GeneratedInputField({
           locationList={fieldDefinition.locationList}
           searchHandler={item => {
             onSetFieldValue(fieldDefinition.name, item.id)
+            if (fieldDefinition.dispatchOptions) {
+              dynamicDispatch(fieldDefinition.dispatchOptions.action, {
+                [fieldDefinition.dispatchOptions.payloadKey]: item.id
+              })
+            }
           }}
         />
       </InputField>
@@ -806,7 +786,8 @@ class FormSectionComponent extends React.Component<Props> {
                   ...field,
                   locationList: getListOfLocations(
                     resources,
-                    field.searchableResource
+                    field.searchableResource,
+                    field.searchableType as LocationType
                   )
                 }
               : field

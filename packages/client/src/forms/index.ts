@@ -58,7 +58,6 @@ export const LINK = 'LINK'
 export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
-export const SEARCH_FIELD = 'SEARCH_FIELD'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 
 export enum Event {
@@ -503,19 +502,16 @@ export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
   allowedDocType?: string[]
 }
-export interface ISearchFormField extends IFormFieldBase {
-  type: typeof SEARCH_FIELD
-  searchableResource: Extract<keyof IOfflineData, 'facilities'>
-  searchableType: string
-  dynamicOptions?: IDynamicOptions
-  dispatchOptions?: IDispatchOptions
-  onCompleted?: (response: string) => void
-}
 
 export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  searchableResource: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >
   locationList: ISearchLocation[]
+  searchableType: string
+  dispatchOptions?: IDispatchOptions
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -584,7 +580,6 @@ export type IFormField =
   | IPDFDocumentViewerFormField
   | IDynamicListFormField
   | ILoaderButton
-  | ISearchFormField
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
 
@@ -987,18 +982,16 @@ export interface Ii18nSimpleDocumentUploaderFormField
   type: typeof SIMPLE_DOCUMENT_UPLOADER
   allowedDocType?: string[]
 }
-export interface Ii18nSearchFormField extends Ii18nFormFieldBase {
-  type: typeof SEARCH_FIELD
-  searchableResource: Extract<keyof IOfflineData, 'locations'>
-  searchableType: string
-  dispatchOptions?: IDispatchOptions
-  onCompleted?: (response: string) => void
-}
 
 export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
-  searchableResource: Extract<keyof IOfflineData, 'facilities' | 'locations'>
+  searchableResource: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >
+  searchableType: string
   locationList: ISearchLocation[]
+  dispatchOptions?: IDispatchOptions
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
@@ -1048,7 +1041,6 @@ export type Ii18nFormField =
   | Ii18nLinkField
   | Ii18nPDFDocumentViewerFormField
   | Ii18nLoaderButtonField
-  | Ii18nSearchFormField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
 

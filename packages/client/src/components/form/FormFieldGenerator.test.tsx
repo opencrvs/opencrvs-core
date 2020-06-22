@@ -24,7 +24,7 @@ import {
   LOCATION_SEARCH_INPUT
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
-import { OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
+import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
 
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -157,6 +157,7 @@ describe('when field definition has location search input', () => {
             label: formMessages.placeOfBirth,
             initialValue: '',
             searchableResource: 'facilities',
+            searchableType: LocationType.HEALTH_FACILITY,
             locationList: []
           }
         ]}

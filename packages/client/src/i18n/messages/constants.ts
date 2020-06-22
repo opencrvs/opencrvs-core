@@ -126,6 +126,7 @@ interface IConstantsMessages {
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
   rateOfRegistrationWithin45d: MessageDescriptor
+  registerConfirmModalDesc: MessageDescriptor
   registeredWithin45d: MessageDescriptor
   registeredIn45d: MessageDescriptor
   timePeriod: MessageDescriptor
@@ -477,6 +478,13 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reason',
     description: 'Label for Reason the application was rejected',
     id: 'constants.reason'
+  },
+  registerConfirmModalDesc: {
+    defaultMessage:
+      'A {event, select, birth{birth} death{death}} certificate will be generated with your signature for issuance.',
+    description:
+      'Description for confirmation modal when registering application',
+    id: 'constants.registerConfirmModalDesc'
   },
   registered: {
     defaultMessage: 'registered',

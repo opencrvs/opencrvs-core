@@ -139,7 +139,7 @@ export const mockUserGraphqlOperation = {
                   },
                   {
                     name: 'registrationOffice',
-                    type: 'SEARCH_FIELD',
+                    type: 'LOCATION_SEARCH_INPUT',
                     label: {
                       defaultMessage: 'Registration Office',
                       description: 'Registration office',
@@ -153,6 +153,7 @@ export const mockUserGraphqlOperation = {
                       action: 'USER_FORM/PROCESS_ROLES',
                       payloadKey: 'primaryOfficeId'
                     },
+                    locationList: [],
                     validate: [],
                     mapping: {
                       mutation: {

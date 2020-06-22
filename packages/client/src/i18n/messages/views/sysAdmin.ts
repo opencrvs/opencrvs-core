@@ -21,6 +21,7 @@ interface ISysAdminMessages {
   systemTitle: MessageDescriptor
   menuOptionEditDetails: MessageDescriptor
   editUserDetailsTitle: MessageDescriptor
+  editUserCommonTitle: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -69,6 +70,11 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Edit details',
     description: 'Title for edit user details',
     id: 'register.sysAdmin.user.header.'
+  },
+  editUserCommonTitle: {
+    defaultMessage: 'Edit user',
+    description: 'Common title of form view groups when edit user',
+    id: 'register.sysAdmin.user.edit.commonGroupTitle'
   }
 }
 

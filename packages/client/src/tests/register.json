@@ -1013,7 +1013,7 @@
                 },
                 {
                   "name": "birthLocation",
-                  "type": "SEARCH_FIELD",
+                  "type": "LOCATION_SEARCH_INPUT",
                   "label": {
                     "defaultMessage": "Health institution",
                     "description": "Label for form field: Health Institution",
@@ -13361,7 +13361,7 @@
               "fields": [
                 {
                   "name": "deathLocation",
-                  "type": "SEARCH_FIELD",
+                  "type": "LOCATION_SEARCH_INPUT",
                   "label": {
                     "defaultMessage": "What hospital did the death occur at?",
                     "description": "Label for form field: Hospital or Health Institution",
@@ -18844,7 +18844,7 @@
               },
               {
                 "name": "registrationOffice",
-                "type": "SEARCH_FIELD",
+                "type": "LOCATION_SEARCH_INPUT",
                 "label": {
                   "defaultMessage": "Registration Office",
                   "description": "Registration office",
@@ -19160,7 +19160,7 @@
               },
               {
                 "name": "registrationOffice",
-                "type": "SEARCH_FIELD",
+                "type": "LOCATION_SEARCH_INPUT",
                 "label": {
                   "defaultMessage": "Registration Office",
                   "description": "Registration office",
