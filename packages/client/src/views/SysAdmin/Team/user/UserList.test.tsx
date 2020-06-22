@@ -82,7 +82,84 @@ describe('User list tests', () => {
           .html()
       ).toContain('0 users')
     })
+    it('load user list in view only mode', async () => {
+      const userListMock = [
+        {
+          request: {
+            query: SEARCH_USERS,
+            variables: {
+              primaryOfficeId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              count: 10
+            }
+          },
+          result: {
+            data: {
+              searchUsers: {
+                totalItems: 0,
+                results: []
+              }
+            }
+          }
+        }
+      ]
+      const { component } = await createTestComponent(
+        <UserList
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+              viewOnly: true
+            })
+          }}
+        />,
+        store,
+        userListMock
+      )
+      component.update()
+      expect(component.find('#add-user').length).toBe(0)
+    })
     it('add user button redirects to user form', async () => {
+      const userListMock = [
+        {
+          request: {
+            query: SEARCH_USERS,
+            variables: {
+              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
+              count: 10
+            }
+          },
+          result: {
+            data: {
+              searchUsers: {
+                totalItems: 0,
+                results: []
+              }
+            }
+          }
+        }
+      ]
+      const { component } = await createTestComponent(
+        <UserList
+          // @ts-ignore
+          location={{
+            search: querystring.stringify({
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+            })
+          }}
+        />,
+        store,
+        userListMock
+      )
+      component.update()
+
+      const addUser = await waitForElement(component, '#add-user')
+      addUser.hostNodes().simulate('click')
+
+      component.update()
+
+      expect(history.location.pathname).toContain('/createUserInLocation')
+    })
+    it('add user button redirects to office selection form for invalid location id', async () => {
       const userListMock = [
         {
           request: {
