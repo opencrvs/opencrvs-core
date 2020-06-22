@@ -279,7 +279,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
                 message: messages.registerConfirmationTitle
               },
               description: {
-                message: constantsMessages.areYouSure
+                message: constantsMessages.registerConfirmModalDesc
               }
             }
           },

@@ -49,6 +49,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
 import { formMessages } from '@client/i18n/messages'
+import { LocationType } from '@client/offline/reducer'
 
 const { store, history } = createStore()
 const mockHandler = jest.fn()
@@ -531,6 +532,7 @@ describe('when in device of large viewport', () => {
                       name: 'birthLocation',
                       type: LOCATION_SEARCH_INPUT,
                       searchableResource: 'facilities',
+                      searchableType: LocationType.HEALTH_FACILITY,
                       locationList: [],
                       required: true,
                       validate: [],

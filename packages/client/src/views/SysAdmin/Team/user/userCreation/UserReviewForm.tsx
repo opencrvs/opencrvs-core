@@ -16,7 +16,7 @@ import {
   IFormField,
   IFormSection,
   IFormSectionData,
-  SEARCH_FIELD,
+  LOCATION_SEARCH_INPUT,
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/fieldDefinitions/mutation/mutations'
@@ -148,7 +148,7 @@ class UserReviewFormComponent extends React.Component<
       )
     }
 
-    if (field.type === SEARCH_FIELD) {
+    if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations = this.props.offlineResources[
         field.searchableResource
       ]

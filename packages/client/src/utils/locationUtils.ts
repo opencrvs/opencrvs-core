@@ -58,9 +58,18 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
 
 export function generateLocations(
   locations: { [key: string]: ILocation },
-  filterByJurisdictionTypes?: string[]
+  filterByJurisdictionTypes?: string[],
+  filterByLocationTypes?: LocationType[]
 ) {
   let locationArray = Object.values(locations)
+
+  if (filterByLocationTypes) {
+    locationArray = locationArray.filter(
+      location =>
+        location.type &&
+        filterByLocationTypes.includes(location.type as LocationType)
+    )
+  }
 
   if (filterByJurisdictionTypes) {
     locationArray = locationArray.filter(
