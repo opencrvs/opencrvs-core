@@ -320,7 +320,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
       case 'VALIDATED':
         return constantsMessages.applicationValidatedOn
       case 'WAITING_VALIDATION':
-        return constantsMessages.applicationWaitingForValidationOn
+        return constantsMessages.applicationSentForExternalValidationOn
       case 'REJECTED':
         return constantsMessages.applicationRejectedOn
       case 'CERTIFIED':
