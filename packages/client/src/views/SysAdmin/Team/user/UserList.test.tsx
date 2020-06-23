@@ -263,6 +263,44 @@ describe('User list tests', () => {
         }
       ]
 
+      it('renders mobile header for smaller devices', async () => {
+        Object.defineProperty(window, 'location', {
+          value: { href: 'location:3000/team/users' }
+        })
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 400
+        })
+        const testComponent = await createTestComponent(
+          <UserList
+            // @ts-ignore
+            location={{
+              search: querystring.stringify({
+                locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
+              })
+            }}
+          />,
+          store,
+          userListMock
+        )
+
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
+
+        testComponent.component.update()
+        component = testComponent.component
+
+        component
+          .find('#mobile_header_right')
+          .hostNodes()
+          .simulate('click')
+
+        expect(history.location.pathname).toContain('team/search')
+      })
+
       it('renders 2 columns for smaller devices', async () => {
         Object.defineProperty(window, 'innerWidth', {
           writable: true,
