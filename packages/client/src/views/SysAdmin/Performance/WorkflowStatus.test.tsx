@@ -291,14 +291,14 @@ describe('Workflow status tests', () => {
 
     it('update event from select updates query params', async () => {
       const eventSelect = await waitForElement(component, '#event-select')
-      eventSelect.prop('onChange')({ label: 'Deaths', value: 'DEATH' })
+      eventSelect.at(0).prop('onChange')({ label: 'Deaths', value: 'DEATH' })
       component.update()
       expect(queryString.parse(history.location.search).event).toBe('DEATH')
     })
 
     it('update status from select updates query params', async () => {
       const statusSelect = await waitForElement(component, '#status-select')
-      statusSelect.prop('onChange')({
+      statusSelect.at(0).prop('onChange')({
         label: 'Ready to print',
         value: 'REGISTERED'
       })

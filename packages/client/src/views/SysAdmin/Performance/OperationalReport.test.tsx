@@ -161,7 +161,10 @@ describe('OperationalReport tests', () => {
       component,
       '#operational-select'
     )
-    performanceSelect.prop('onChange')({ label: 'Reports', value: 'REPORTS' })
+    performanceSelect.at(0).prop('onChange')({
+      label: 'Reports',
+      value: 'REPORTS'
+    })
     component.update()
     expect(querystring.parse(history.location.search)).toEqual({
       locationId: LOCATION_DHAKA_DIVISION.id,
