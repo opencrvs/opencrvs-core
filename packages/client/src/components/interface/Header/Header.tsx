@@ -390,9 +390,8 @@ class HeaderComp extends React.Component<IProps, IState> {
       intl.formatMessage(
         activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
           ? constantsMessages.performanceTitle
-          : userDetails &&
-            userDetails.role &&
-            SYS_ADMIN_ROLES.includes(userDetails.role)
+          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
+            activeMenuItem === ACTIVE_MENU_ITEM.USERS
           ? messages.teamTitle
           : constantsMessages.applicationTitle
       )
