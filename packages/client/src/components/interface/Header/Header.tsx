@@ -230,15 +230,24 @@ class HeaderComp extends React.Component<IProps, IState> {
         }
       }
     } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      return {
-        mobileLeft: {
-          icon: () => this.hamburger(),
-          handler: this.toggleMenu
-        },
-        mobileRight: {
-          icon: () => <Location inverse />,
-          handler: () =>
-            this.props.mapPinClickHandler && this.props.mapPinClickHandler()
+      if (this.props.mapPinClickHandler) {
+        return {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          },
+          mobileRight: {
+            icon: () => <Location inverse />,
+            handler: () =>
+              this.props.mapPinClickHandler && this.props.mapPinClickHandler()
+          }
+        }
+      } else {
+        return {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          }
         }
       }
     } else {

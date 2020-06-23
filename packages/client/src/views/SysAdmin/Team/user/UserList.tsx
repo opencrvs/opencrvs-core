@@ -472,7 +472,9 @@ function UserListComponent(props: IProps) {
   }
 
   return (
-    <SysAdminContentWrapper mapPinClickHandler={onChangeLocation}>
+    <SysAdminContentWrapper
+      mapPinClickHandler={(!viewOnly && onChangeLocation) || undefined}
+    >
       <HeaderContainer>
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}
