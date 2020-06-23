@@ -187,7 +187,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     throw new Error(`No section found ${sectionId}`)
   }
 
-  let formData = state.userForm.userFormData
+  let formData = { ...state.userForm.userFormData }
   if (props.match.params.locationId) {
     formData = {
       ...gqlToDraftTransformer(
@@ -198,11 +198,14 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
           }
         }
       )[section.id],
-      skippedOfficeSelction: true,
-      ...formData
+      ...formData,
+      skippedOfficeSelction: true
     }
   } else {
-    formData.skippedOfficeSelction = false
+    formData = {
+      ...formData,
+      skippedOfficeSelction: false
+    }
   }
   const groupId =
     props.match.params.groupId ||
