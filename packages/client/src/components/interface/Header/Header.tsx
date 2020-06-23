@@ -33,6 +33,7 @@ import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
+import { withTheme } from '@client/styledComponents'
 import {
   BRN_DRN_TEXT,
   FIELD_AGENT_ROLES,
@@ -61,10 +62,9 @@ import {
   SettingsBlue,
   StatsBlack,
   StatsBlue,
-  SystemBlack,
-  SystemBlue,
   TrackingID,
-  User
+  User,
+  Users
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -72,12 +72,14 @@ import {
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 
 type IProps = IntlShapeProps & {
+  theme: ITheme
   userDetails: IUserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
   language: string
@@ -171,8 +173,8 @@ class HeaderComp extends React.Component<IProps, IState> {
             onClick: () => this.goToPerformanceView(this.props)
           },
           {
-            icon: <SystemBlack />,
-            iconHover: <SystemBlue />,
+            icon: <Users />,
+            iconHover: <Users stroke={this.props.theme.colors.secondary} />,
             label: this.props.intl.formatMessage(messages.teamTitle),
             onClick: () => this.goToTeamView(this.props)
           }
@@ -492,4 +494,4 @@ export const Header = connect(
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }
-)(injectIntl<'intl', IProps>(HeaderComp))
+)(withTheme(injectIntl<'intl', IProps>(HeaderComp)))
