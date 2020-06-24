@@ -9,9 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { model, Schema, Document } from 'mongoose'
+import { Document, model, Schema } from 'mongoose'
 // tslint:disable-next-line
 import { statuses } from '../utils/userUtils'
+
+export enum AUDIT_REASON {
+  TERMINATED,
+  SUSPICIOUS,
+  ROLE_REGAINED,
+  NOT_SUSPICIOUS,
+  OTHER
+}
+
+export enum AUDIT_ACTION {
+  DEACTIVATE,
+  REACTIVATE
+}
 
 export interface IUserName {
   use: string
@@ -36,6 +49,13 @@ interface ILocalRegistrar {
   role?: string
   signature: ISignature
 }
+export interface IAuditHistory {
+  auditedBy: string
+  auditedOn: number
+  actionTaken: string
+  reason: string
+  comment?: string
+}
 export interface IUser {
   name: IUserName[]
   username: string
@@ -56,6 +76,7 @@ export interface IUser {
   deviceId?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
   creationDate: number
+  auditHistory?: IAuditHistory[]
 }
 
 export interface IUserModel extends IUser, Document {}
@@ -85,6 +106,36 @@ const SecurityQuestionAnswerSchema = new Schema(
   },
   { _id: false }
 )
+// tslint:disable-next-line
+const AuditHistory = new Schema(
+  {
+    auditedBy: String,
+    auditedOn: {
+      type: Number,
+      default: Date.now
+    },
+    actionTaken: {
+      type: String,
+      enum: [AUDIT_ACTION.DEACTIVATE, AUDIT_ACTION.REACTIVATE],
+      default: AUDIT_ACTION.DEACTIVATE
+    },
+    reason: {
+      type: String,
+      enum: [
+        AUDIT_REASON.TERMINATED,
+        AUDIT_REASON.SUSPICIOUS,
+        AUDIT_REASON.ROLE_REGAINED,
+        AUDIT_REASON.NOT_SUSPICIOUS,
+        AUDIT_REASON.OTHER
+      ],
+      default: AUDIT_REASON.OTHER
+    },
+    comment: String
+  },
+  {
+    _id: false
+  }
+)
 
 const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
@@ -102,12 +153,18 @@ const userSchema = new Schema({
   scope: { type: [String], required: true },
   status: {
     type: String,
-    enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
+    enum: [
+      statuses.PENDING,
+      statuses.ACTIVE,
+      statuses.DISABLED,
+      statuses.DEACTIVATED
+    ],
     default: statuses.PENDING
   },
   securityQuestionAnswers: [SecurityQuestionAnswerSchema],
   deviceId: String,
-  creationDate: { type: Number, default: Date.now }
+  creationDate: { type: Number, default: Date.now },
+  auditHistory: [AuditHistory]
 })
 
 export default model<IUserModel>('User', userSchema)
