@@ -32,7 +32,7 @@ interface IConstantsMessages {
   applicationTitle: MessageDescriptor
   applicationUpdatedOn: MessageDescriptor
   applicationValidatedOn: MessageDescriptor
-  applicationWaitingForValidationOn: MessageDescriptor
+  applicationSentForExternalValidationOn: MessageDescriptor
   birth: MessageDescriptor
   births: MessageDescriptor
   by: MessageDescriptor
@@ -236,11 +236,11 @@ const messagesToDefine: IConstantsMessages = {
       'Label for the workflow timestamp when the status is validated',
     id: 'constants.applicationValidatedOn'
   },
-  applicationWaitingForValidationOn: {
-    defaultMessage: 'Application sent for validation on',
+  applicationSentForExternalValidationOn: {
+    defaultMessage: 'Application sent for external validation on',
     description:
       'Label for the workflow timestamp when the status is waiting_validation',
-    id: 'constants.applicationWaitingForValidationOn'
+    id: 'constants.applicationSentForExternalValidationOn'
   },
   areYouSure: {
     defaultMessage: 'Are you sure?',

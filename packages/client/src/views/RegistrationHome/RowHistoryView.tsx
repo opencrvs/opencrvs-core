@@ -293,7 +293,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       case 'VALIDATED':
         return constantsMessages.applicationValidatedOn
       case 'WAITING_VALIDATION':
-        return constantsMessages.applicationWaitingForValidationOn
+        return constantsMessages.applicationSentForExternalValidationOn
       case 'REGISTERED':
         return constantsMessages.applicationRegisteredOn
       case 'REJECTED':

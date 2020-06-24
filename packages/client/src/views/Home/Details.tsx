@@ -237,7 +237,7 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
       case 'VALIDATED':
         return messages.applicationValidatedOn
       case 'WAITING_VALIDATION':
-        return messages.applicationWaitingForValidationOn
+        return messages.applicationSentForExternalValidationOn
       case 'REGISTERED':
         return messages.applicationRegisteredOn
       case 'REJECTED':
