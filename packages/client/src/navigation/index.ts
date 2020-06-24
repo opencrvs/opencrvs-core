@@ -15,6 +15,7 @@ import {
   APPLICATION_DETAIL,
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
+  CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
   DRAFT_BIRTH_APPLICANT_FORM,
   DRAFT_BIRTH_PARENT_FORM,
@@ -383,6 +384,10 @@ export function goToSettings() {
 
 export function goToCreateNewUser() {
   return push(CREATE_USER)
+}
+
+export function goToCreateNewUserWithLocationId(locationId: string) {
+  return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
 export function goToRegistrationRates(

@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form'
-import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
+import {
+  roleQueries,
+  getRolesQuery
+} from '@client/forms/user/fieldDefinitions/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import { userQueries, GET_USER } from '@client/user/queries'
@@ -236,12 +239,12 @@ describe('create new user tests', () => {
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
       testComponent = (await createTestComponent(
-        // @ts-ignore
         <CreateNewUser
           match={{
+            // @ts-ignore
             params: {
-              sectionId: mockOfflineData.forms.userForm.sections[0].id,
-              groupId: mockOfflineData.forms.userForm.sections[0].groups[1].id
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+              sectionId: mockOfflineData.forms.userForm.sections[0].id
             },
             isExact: true,
             path: '/createUser',
@@ -258,7 +261,6 @@ describe('create new user tests', () => {
       })
       testComponent.update()
       store.dispatch(modifyUserFormData(mockIncompleteFormData))
-      store.dispatch(processRoles(mockIncompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -283,7 +285,6 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -300,9 +301,6 @@ describe('create new user tests', () => {
       testComponent.update()
 
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      store.dispatch(
-        processRoles(mockDataWithRegistarRoleSelected.registrationOffice)
-      )
       testComponent
         .find('#confirm_form')
         .hostNodes()
@@ -487,13 +485,17 @@ describe('edit user tests', () => {
             hash: '',
             search: ''
           }}
+          // @ts-ignore
           submitForm={submitMock}
           match={{
             // @ts-ignore
             params: {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.Preview
-            }
+            },
+            isExact: true,
+            path: REVIEW_USER_FORM,
+            url: ''
           }}
         />,
         store,

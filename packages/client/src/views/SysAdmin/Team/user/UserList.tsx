@@ -19,6 +19,7 @@ import {
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goToCreateNewUser,
+  goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
   goToTeamSearch
 } from '@client/navigation'
@@ -160,6 +161,7 @@ type BaseProps = {
   theme: ITheme
   offlineOffices: ILocation[]
   goToCreateNewUser: typeof goToCreateNewUser
+  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
 }
@@ -189,6 +191,7 @@ function UserListComponent(props: IProps) {
     intl,
     goToReviewUserDetails,
     goToCreateNewUser,
+    goToCreateNewUserWithLocationId,
     goToTeamSearch,
     offlineOffices,
     location: { search }
@@ -252,7 +255,9 @@ function UserListComponent(props: IProps) {
   }
 
   function onClickAddUser() {
-    goToCreateNewUser()
+    ;(searchedLocation &&
+      goToCreateNewUserWithLocationId(searchedLocation.id)) ||
+      goToCreateNewUser()
   }
 
   function onChangeLocation() {
@@ -400,6 +405,7 @@ export const UserList = connect(
   }),
   {
     goToCreateNewUser,
+    goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
     goToTeamSearch
   }
