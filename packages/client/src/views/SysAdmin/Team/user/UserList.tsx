@@ -44,8 +44,8 @@ import {
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
 import {
-  IDynamicValues,
-  IColumn
+  IColumn,
+  IDynamicValues
 } from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -62,11 +62,14 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
-const { useState } = React
+const { useState, useEffect } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
   margin: 32px auto 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0px;
+  }
 `
 
 const TableHeader = styled.div`
@@ -107,6 +110,10 @@ const AddUserContainer = styled.div`
   display: flex;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.primary};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const AddUserIcon = styled(AddUser)`
   padding: 4px;
@@ -150,6 +157,27 @@ const LocationInfoValue = styled.div`
 const LocationInfoEmptyValue = styled.div`
   color: ${({ theme }) => theme.colors.placeholder};
   ${({ theme }) => theme.fonts.bodyStyle};
+`
+
+const ChangeButton = styled(LinkButton)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
+
+const NameRoleTypeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const Name = styled(LinkButton)`
+  align-self: flex-start;
+  text-align: left;
+`
+
+const RoleType = styled.div`
+  ${({ theme }) => theme.fonts.captionStyle}
+  color: ${({ theme }) => theme.colors.waitingForExternalValidation};
 `
 
 interface ISearchParams {
@@ -201,6 +229,16 @@ function UserListComponent(props: IProps) {
     search
   ) as unknown) as ISearchParams
 
+  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
+  useEffect(() => {
+    function recordWindowWidth() {
+      setViewportWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', recordWindowWidth)
+
+    return () => window.removeEventListener('resize', recordWindowWidth)
+  }, [])
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
@@ -214,6 +252,23 @@ function UserListComponent(props: IProps) {
         handler: () => goToReviewUserDetails(userId)
       }
     ]
+  }
+
+  function getRoleType(role: string, type: string) {
+    return (
+      <>
+        {role} &middot; {type}
+      </>
+    )
+  }
+
+  function getNameRoleType(name: string, role: string, type: string) {
+    return (
+      <NameRoleTypeContainer>
+        <Name>{name}</Name>
+        <RoleType>{getRoleType(role, type)}</RoleType>
+      </NameRoleTypeContainer>
+    )
   }
 
   function generateUserContents(data: GQLQuery) {
@@ -231,14 +286,17 @@ function UserListComponent(props: IProps) {
             (createNamesMap(user && (user.name as GQLHumanName[]))[
               LANG_EN
             ] as string)
+          const role =
+            (user.role && intl.formatMessage(userMessages[user.role])) || '-'
+          const type =
+            (user.type && intl.formatMessage(userMessages[user.type])) || '-'
           const status = user.status || 'pending'
 
           return {
             photo: <AvatarSmall />,
-            name,
-            username: user.username,
-            role: user.role && intl.formatMessage(userMessages[user.role]),
-            type: user.type && intl.formatMessage(userMessages[user.type]),
+            name: <LinkButton>{name}</LinkButton>,
+            nameRoleType: getNameRoleType(name, role, type),
+            roleType: getRoleType(role, type),
             status: <Status status={status} />,
             menu: (
               <ToggleMenu
@@ -273,47 +331,95 @@ function UserListComponent(props: IProps) {
   }
 
   function renderUserList() {
-    let columns: IColumn[] = [
-      {
-        label: '',
-        width: 7,
-        key: 'photo'
-      },
-      {
-        label: intl.formatMessage(constantsMessages.name),
-        width: 25,
-        key: 'name'
-      },
-      {
-        label: intl.formatMessage(constantsMessages.username),
-        width: 20,
-        key: 'username'
-      },
-      {
-        label: intl.formatMessage(constantsMessages.labelRole),
-        width: 18,
-        key: 'role'
-      },
-      {
-        label: intl.formatMessage(constantsMessages.type),
-        width: 17,
-        key: 'type'
-      },
-      {
-        label: intl.formatMessage(constantsMessages.status),
-        width: 8,
-        key: 'status'
-      }
-    ]
-    if (!viewOnly) {
+    let columns: IColumn[] = []
+    if (viewportWidth <= props.theme.grid.breakpoints.md) {
+      columns = columns.concat([
+        {
+          label: intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: 'nameRoleType'
+        },
+        {
+          label: intl.formatMessage(constantsMessages.status),
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: 'status'
+        }
+      ])
+    } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
       columns = columns.concat([
         {
           label: '',
-          width: 5,
-          alignment: ColumnContentAlignment.CENTER,
-          key: 'menu'
+          width: 10,
+          key: 'photo'
+        },
+        {
+          label: intl.formatMessage(constantsMessages.name),
+          width: 75,
+          key: 'nameRoleType'
+        },
+        {
+          label: intl.formatMessage(constantsMessages.status),
+          width: 15,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: 'status'
         }
       ])
+    } else {
+      if (viewOnly) {
+        columns = columns.concat([
+          {
+            label: '',
+            width: 8,
+            key: 'photo'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.name),
+            width: 27,
+            key: 'name'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.labelRole),
+            width: 50,
+            key: 'roleType'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.status),
+            width: 15,
+            alignment: ColumnContentAlignment.RIGHT,
+            key: 'status'
+          }
+        ])
+      } else {
+        columns = columns.concat([
+          {
+            label: '',
+            width: 8,
+            key: 'photo'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.name),
+            width: 27,
+            key: 'name'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.labelRole),
+            width: 50,
+            key: 'roleType'
+          },
+          {
+            label: intl.formatMessage(constantsMessages.status),
+            width: 10,
+            alignment: ColumnContentAlignment.RIGHT,
+            key: 'status'
+          },
+          {
+            label: '',
+            width: 5,
+            key: 'menu'
+          }
+        ])
+      }
     }
     return (
       <Query
@@ -371,15 +477,17 @@ function UserListComponent(props: IProps) {
   }
 
   return (
-    <SysAdminContentWrapper>
+    <SysAdminContentWrapper
+      mapPinClickHandler={(!viewOnly && onChangeLocation) || undefined}
+    >
       <HeaderContainer>
         <Header id="header">
           {(searchedLocation && searchedLocation.name) || ''}
         </Header>
         {!viewOnly && (
-          <LinkButton id="chng-loc" onClick={onChangeLocation}>
+          <ChangeButton id="chng-loc" onClick={onChangeLocation}>
             {intl.formatMessage(buttonMessages.change)}
-          </LinkButton>
+          </ChangeButton>
         )}
       </HeaderContainer>
       <LocationInfo>

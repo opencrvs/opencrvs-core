@@ -50,6 +50,7 @@ interface BasePage {
   marginLeft?: number
   marginRight?: number
   fixedWidth?: number
+  mapPinClickHandler?: () => void
 }
 
 interface DefaultPage extends BasePage {
@@ -165,7 +166,7 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       </DynamicContainer>
     )
   } else {
-    pageHeader = <Header />
+    pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
     pageContent = (
       <DynamicContainer
         marginLeft={props.marginLeft}

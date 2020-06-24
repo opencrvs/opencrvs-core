@@ -14,6 +14,7 @@ import styled from 'styled-components'
 import { Pagination } from '../DataTable/Pagination'
 import { LoadMore } from '../GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
+import { ColumnContentAlignment } from '../GridTable'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
@@ -135,6 +136,8 @@ const ValueWrapper = styled.span<{
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
   display: flex;
+  flex-direction: ${({ alignment }) =>
+    alignment === ColumnContentAlignment.RIGHT ? 'row-reverse' : 'row'};
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
