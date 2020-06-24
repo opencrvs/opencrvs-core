@@ -9,11 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
-import verifyPassHandler, {
-  requestSchema as reqAuthSchema,
-  responseSchema as resAuthSchema
-} from '@user-mgnt/features/verifyPassword/handler'
+import activateUser, {
+  requestSchema as activateUserRequestSchema
+} from '@user-mgnt/features/activateUser/handler'
+import changePasswordHandler, {
+  changePasswordRequestSchema
+} from '@user-mgnt/features/changePassword/handler'
+import createUser from '@user-mgnt/features/createUser/handler'
+import getRoles, {
+  searchRoleSchema
+} from '@user-mgnt/features/getRoles/handler'
+import getUser, {
+  getUserRequestSchema
+} from '@user-mgnt/features/getUser/handler'
 import getUserMobile, {
   requestSchema as userIdSchema,
   responseSchema as resMobileSchema
@@ -21,28 +29,24 @@ import getUserMobile, {
 import searchUsers, {
   searchSchema
 } from '@user-mgnt/features/searchUsers/handler'
-import getUser, {
-  getUserRequestSchema
-} from '@user-mgnt/features/getUser/handler'
-import createUser from '@user-mgnt/features/createUser/handler'
 import updateUser from '@user-mgnt/features/updateUser/handler'
-import getRoles, {
-  searchRoleSchema
-} from '@user-mgnt/features/getRoles/handler'
-import activateUser, {
-  requestSchema as activateUserRequestSchema
-} from '@user-mgnt/features/activateUser/handler'
-import verifyUserHandler, {
-  requestSchema as reqVerifyUserSchema,
-  responseSchema as resVerifyUserSchema
-} from '@user-mgnt/features/verifyUser/handler'
-import changePasswordHandler, {
-  changePasswordRequestSchema
-} from '@user-mgnt/features/changePassword/handler'
+import {
+  requestSchema as userAuditSchema,
+  userAuditHandler
+} from '@user-mgnt/features/userAudit/handler'
+import verifyPassHandler, {
+  requestSchema as reqAuthSchema,
+  responseSchema as resAuthSchema
+} from '@user-mgnt/features/verifyPassword/handler'
 import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@user-mgnt/features/verifyUser/handler'
+import * as Hapi from 'hapi'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -298,6 +302,20 @@ export const getRoutes = () => {
         response: {
           schema: resVerifyUserSchema
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auditUser',
+      handler: userAuditHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: userAuditSchema
+        },
+        tags: ['api']
       }
     }
   ]
