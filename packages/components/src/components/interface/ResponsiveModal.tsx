@@ -44,7 +44,6 @@ const ModalContent = styled.div<{ width?: number; responsive?: boolean }>`
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-grow: 1;
-    margin: 0 24px;
   }
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
@@ -52,7 +51,7 @@ const ModalContent = styled.div<{ width?: number; responsive?: boolean }>`
     height: 100vh;
   }
 `
-const Header = styled.div<{ responsive?: boolean }>`
+const Header = styled.div<{ responsive?: boolean; hideBoxShadow?: boolean }>`
   ${({ theme }) => theme.fonts.regularFont};
   height: 64px;
   display: flex;
@@ -62,7 +61,8 @@ const Header = styled.div<{ responsive?: boolean }>`
   padding: 0 8px 0px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
-    ${({ theme }) => theme.shadows.mistyShadow};
+    ${({ theme, hideBoxShadow }) =>
+      !hideBoxShadow && theme.shadows.mistyShadow};
     margin-bottom: 16px;
   }
 `
@@ -128,6 +128,7 @@ interface IProps {
   contentScrollableY?: boolean
   actions: JSX.Element[]
   handleClose?: () => void
+  hideHeaderBoxShadow?: boolean
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
@@ -153,7 +154,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
-      contentScrollableY
+      contentScrollableY,
+      hideHeaderBoxShadow
     } = this.props
 
     this.toggleScroll()
@@ -165,7 +167,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       <ModalContainer id={id}>
         <ScreenBlocker />
         <ModalContent width={width} responsive={responsive}>
-          <Header responsive={responsive}>
+          <Header responsive={responsive} hideBoxShadow={hideHeaderBoxShadow}>
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>
               <Cross color="currentColor" />
