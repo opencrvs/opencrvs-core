@@ -16,7 +16,7 @@ import {
   IFormSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { goToHome } from '@client/navigation'
+import { goToTeamSearch } from '@client/navigation'
 import {
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -385,7 +385,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         { ...state, submitting: false, submissionError: false },
         Cmd.list([
           Cmd.action(clearUserFormData()),
-          Cmd.action(goToHome()),
+          Cmd.action(goToTeamSearch()),
           Cmd.action(
             showSubmitFormSuccessToast(
               (action as ISubmitSuccessAction).payload.isUpdate

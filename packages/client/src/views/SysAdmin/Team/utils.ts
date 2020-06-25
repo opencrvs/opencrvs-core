@@ -123,6 +123,13 @@ export const mockUserGraphqlOperation = {
                   description: 'Assigned Registration Office section',
                   id: 'form.section.assignedRegistrationOffice'
                 },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'values.skippedOfficeSelction && values.registrationOffice'
+                  }
+                ],
                 fields: [
                   {
                     name: 'assignedRegistrationOffice',

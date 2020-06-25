@@ -119,6 +119,7 @@ export function PerformanceSelect(props: IOperationalSelectProps) {
 
   return (
     <StyledSelect
+      id={props.id}
       isSearchable={false}
       value={getSelectedOption(props.value, props.options)}
       classNamePrefix="react-select"

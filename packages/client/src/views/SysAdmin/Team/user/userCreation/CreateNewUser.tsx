@@ -24,7 +24,8 @@ import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
   fetchAndStoreUserData,
-  storeUserFormData
+  storeUserFormData,
+  processRoles
 } from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
@@ -36,9 +37,11 @@ import { withApollo } from 'react-apollo'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import { gqlToDraftTransformer } from '@client/transformer'
 
 interface IMatchParams {
   userId?: string
+  locationId?: string
   sectionId: string
   groupId: string
 }
@@ -52,6 +55,7 @@ type IUserProps = {
   formData: IFormSectionData
   submitting: boolean
   userDetailsStored?: boolean
+  loadingRoles?: boolean
   client: ApolloClient<unknown>
 }
 
@@ -60,6 +64,7 @@ interface IDispatchProps {
   storeUserFormData: typeof storeUserFormData
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
+  processRoles: typeof processRoles
 }
 
 export type Props = RouteComponentProps<IMatchParams> &
@@ -79,6 +84,9 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
     const { userId, client } = this.props
     if (userId) {
       this.props.fetchAndStoreUserData(client, GET_USER, { userId })
+    }
+    if (this.props.match.params.locationId) {
+      this.props.processRoles(this.props.match.params.locationId)
     }
   }
 
@@ -105,8 +113,19 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   }
 
   render() {
-    const { section, submitting, userDetailsStored, userId } = this.props
-    if (submitting || (userId && !userDetailsStored)) {
+    const {
+      section,
+      submitting,
+      userDetailsStored,
+      loadingRoles,
+      userId,
+      match
+    } = this.props
+    if (
+      submitting ||
+      (userId && !userDetailsStored) ||
+      (match.params.locationId && loadingRoles)
+    ) {
       return this.renderLoadingPage()
     }
 
@@ -159,36 +178,58 @@ function getNextSectionIds(
 const mapStateToProps = (state: IStoreState, props: Props) => {
   const sectionId =
     props.match.params.sectionId || state.userForm.userForm!.sections[0].id
+
   const section = state.userForm.userForm!.sections.find(
     section => section.id === sectionId
   ) as IFormSection
-
-  const groupId = props.match.params.groupId || section.groups[0].id
-
-  const group = section.groups.find(
-    group => group.id === groupId
-  ) as IFormSectionGroup
 
   if (!section) {
     throw new Error(`No section found ${sectionId}`)
   }
 
-  const fields = replaceInitialValues(group.fields, state.userForm.userFormData)
+  let formData = { ...state.userForm.userFormData }
+  if (props.match.params.locationId) {
+    formData = {
+      ...gqlToDraftTransformer(
+        { sections: [section] },
+        {
+          [section.id]: {
+            primaryOffice: { id: props.match.params.locationId }
+          }
+        }
+      )[section.id],
+      ...formData,
+      skippedOfficeSelction: true
+    }
+  } else {
+    formData = {
+      ...formData,
+      skippedOfficeSelction: false
+    }
+  }
+  const groupId =
+    props.match.params.groupId ||
+    getVisibleSectionGroupsBasedOnConditions(section, formData)[0].id
+  const group = section.groups.find(
+    group => group.id === groupId
+  ) as IFormSectionGroup
 
+  const fields = replaceInitialValues(group.fields, formData)
   const nextGroupId = getNextSectionIds(
     state.userForm.userForm!.sections,
     section,
     group,
-    state.userForm.userFormData
+    formData
   ) || { sectionId: '', groupId: '' }
 
   return {
     userId: props.match.params.userId,
-    sectionId: sectionId,
+    sectionId,
     section,
-    formData: state.userForm.userFormData,
+    formData,
     submitting: state.userForm.submitting,
     userDetailsStored: state.userForm.userDetailsStored,
+    loadingRoles: state.userForm.loadingRoles,
     activeGroup: {
       ...group,
       fields
@@ -200,5 +241,11 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
 
 export const CreateNewUser = connect(
   mapStateToProps,
-  { goBack, storeUserFormData, clearUserFormData, fetchAndStoreUserData }
+  {
+    goBack,
+    storeUserFormData,
+    clearUserFormData,
+    fetchAndStoreUserData,
+    processRoles
+  }
 )(injectIntl(withApollo(CreateNewUserComponent)))
