@@ -59,6 +59,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -170,6 +171,11 @@ interface IStatusProps {
   status: string
 }
 
+interface ToggleUserActivation {
+  modalVisible: boolean
+  selectedUser: GQLUser | null
+}
+
 const Status = (statusProps: IStatusProps) => {
   const status =
     statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
@@ -198,19 +204,53 @@ function UserListComponent(props: IProps) {
     search
   ) as unknown) as ISearchParams
 
+  const [toggleActivation, setToggleActivation] = useState<
+    ToggleUserActivation
+  >({
+    modalVisible: false,
+    selectedUser: null
+  })
+
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
 
-  function getMenuItems(userId: string) {
-    return [
+  function toggleUserActivationModal(user?: GQLUser) {
+    if (user !== undefined) {
+      setToggleActivation({
+        ...toggleActivation,
+        modalVisible: true,
+        selectedUser: user
+      })
+    } else {
+      setToggleActivation({
+        ...toggleActivation,
+        modalVisible: false,
+        selectedUser: null
+      })
+    }
+  }
+
+  function getMenuItems(user: GQLUser) {
+    const menuItems = [
       {
         label: intl.formatMessage(messages.menuOptionEditDetails),
-        handler: () => goToReviewUserDetails(userId)
+        handler: () => {
+          goToReviewUserDetails(user.id as string)
+        }
       }
     ]
+
+    if (user.status === 'active') {
+      menuItems.push({
+        label: 'Deactivate',
+        handler: () => toggleUserActivationModal(user)
+      })
+    }
+
+    return menuItems
   }
 
   function generateUserContents(data: GQLQuery) {
@@ -241,7 +281,7 @@ function UserListComponent(props: IProps) {
               <ToggleMenu
                 id={`user-item-${index}-menu`}
                 toggleButton={<VerticalThreeDots />}
-                menuItems={getMenuItems(user.id as string)}
+                menuItems={getMenuItems(user)}
               />
             )
           }
@@ -357,6 +397,12 @@ function UserListComponent(props: IProps) {
                 })}
                 hideBoxShadow={true}
                 hideTableHeader={true}
+              />
+              <UserAuditActionModal
+                show={toggleActivation.modalVisible}
+                user={toggleActivation.selectedUser}
+                onClose={() => toggleUserActivationModal()}
+                onConfirm={() => {}}
               />
             </UserTable>
           )
