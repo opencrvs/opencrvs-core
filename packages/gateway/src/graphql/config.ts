@@ -10,24 +10,28 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { IResolvers } from 'graphql-tools'
+import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
+import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
-import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
-import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
-import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { typeResolvers } from '@gateway/features/registration/type-resolvers'
-import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
-import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
-import { userTypeResolvers } from '@gateway/features/user/type-resolvers'
 import { resolvers as roleRootResolvers } from '@gateway/features/role/root-resolvers'
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
-import { Config, gql } from 'apollo-server-hapi'
-import { GraphQLSchema } from 'graphql'
-import { loadSchemaSync } from '@graphql-tools/load'
+import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
+import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
+import {
+  IUserModelData,
+  userTypeResolvers
+} from '@gateway/features/user/type-resolvers'
+import { getUser, getUserId } from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
+import { loadSchemaSync } from '@graphql-tools/load'
 import { addResolversToSchema } from '@graphql-tools/schema'
+import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
+import { GraphQLSchema } from 'graphql'
+import { IResolvers } from 'graphql-tools'
 import { merge } from 'lodash'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
@@ -72,6 +76,21 @@ export const getApolloConfig = (): Config => {
     typeDefs,
     resolvers,
     context: async ({ request, h }) => {
+      try {
+        const userId = getUserId({
+          Authorization: request.headers.authorization
+        })
+        const user: IUserModelData = await getUser(
+          { userId },
+          { Authorization: request.headers.authorization }
+        )
+        if (!user || user.status !== 'active') {
+          throw new AuthenticationError('Authentication failed')
+        }
+      } catch (err) {
+        throw new AuthenticationError(err)
+      }
+
       return { Authorization: request.headers.authorization }
     }
   }
