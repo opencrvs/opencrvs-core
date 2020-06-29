@@ -71,7 +71,8 @@ const dummyUser = {
       answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
     }
   ],
-  creationDate: 1559054406433
+  creationDate: 1559054406433,
+  auditHistory: []
 }
 describe('getUser tests', () => {
   beforeEach(() => {

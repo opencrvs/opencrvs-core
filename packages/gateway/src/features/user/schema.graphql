@@ -135,4 +135,10 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  auditUser(
+    userId: String!
+    action: String!
+    reason: String!
+    comment: String
+  ): String
 }
