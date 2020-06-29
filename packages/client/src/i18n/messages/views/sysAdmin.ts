@@ -16,6 +16,7 @@ interface ISysAdminMessages {
   officesTab: MessageDescriptor
   usersTab: MessageDescriptor
   comments: MessageDescriptor
+  deactivate: MessageDescriptor
   deactivateReason: MessageDescriptor
   deactivateReasonNotEmployee: MessageDescriptor
   deactivateReasonInvestigated: MessageDescriptor
@@ -52,6 +53,11 @@ const messagesToDefine: ISysAdminMessages = {
     id: 'register.sysAdminHome.user.audit.comments',
     defaultMessage: 'Comments: ',
     description: 'The label for form field deactivate comments'
+  },
+  deactivate: {
+    defaultMessage: 'Deactivate',
+    description: 'Label for toggle menu option deactivate',
+    id: 'register.sysAdmin.user.deactivate.'
   },
   deactivateReason: {
     id: 'register.sysAdminHome.user.audit.reason',

@@ -286,7 +286,7 @@ function UserListComponent(props: IProps) {
 
     if (user.status === 'active') {
       menuItems.push({
-        label: 'Deactivate',
+        label: intl.formatMessage(messages.deactivate),
         handler: () => toggleUserActivationModal(user)
       })
     }

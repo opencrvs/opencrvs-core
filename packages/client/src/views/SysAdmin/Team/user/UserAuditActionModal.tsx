@@ -26,6 +26,7 @@ import styled from '@client/styledComponents'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { FormikTouched, FormikValues } from 'formik'
 
 const { useState, useEffect } = React
 
@@ -50,6 +51,7 @@ const Subtitle = styled.h2`
 `
 
 function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
+  let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
   const { intl, user, onClose, onConfirm, show, form } = props
 
   const [formValues, setFormValues] = useState<IFormSectionData>({})
@@ -73,7 +75,25 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
     }
   }, [props.form.fields, formValues, intl])
 
+  useEffect(() => {
+    function cleanUpFormState() {
+      makeErrorVisible(false)
+      setFormValues({})
+    }
+
+    if (!props.show) {
+      cleanUpFormState()
+    }
+  }, [props.show])
+
   function handleConfirm() {
+    if (makeAllFieldsDirty) {
+      const touched = props.form.fields.reduce(
+        (memo, field) => ({ ...memo, [field.name]: true }),
+        {}
+      )
+      makeAllFieldsDirty(touched)
+    }
     makeErrorVisible(true)
     if (!formError) {
       onConfirm()
@@ -116,7 +136,10 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
         id="user-audit-form"
         fields={form.fields}
         onChange={setFormValues}
-        setAllFieldsDirty={isErrorVisible}
+        setAllFieldsDirty={false}
+        onSetTouched={onSetTouchedCallback => {
+          makeAllFieldsDirty = onSetTouchedCallback
+        }}
       />
     </ResponsiveModal>
   )
