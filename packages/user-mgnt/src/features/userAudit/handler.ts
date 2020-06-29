@@ -24,7 +24,7 @@ import * as Joi from 'joi'
 interface IAuditUserPayload {
   userId: string
   auditedBy: string
-  actionTaken: string
+  action: string
   reason: string
   comment: string
 }
@@ -45,10 +45,10 @@ export async function userAuditHandler(
   }
 
   let updatedUserStatus
-  if (AUDIT_ACTION[auditUserPayload.actionTaken] === AUDIT_ACTION.REACTIVATE) {
+  if (AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.REACTIVATE) {
     updatedUserStatus = statuses.ACTIVE
   } else if (
-    AUDIT_ACTION[auditUserPayload.actionTaken] === AUDIT_ACTION.DEACTIVATE
+    AUDIT_ACTION[auditUserPayload.action] === AUDIT_ACTION.DEACTIVATE
   ) {
     updatedUserStatus = statuses.DEACTIVATED
   } else {
@@ -59,7 +59,7 @@ export async function userAuditHandler(
     const auditData: IAuditHistory = {
       auditedBy: auditUserPayload.auditedBy,
       auditedOn: Date.now(),
-      actionTaken: AUDIT_ACTION[AUDIT_ACTION[auditUserPayload.actionTaken]],
+      action: AUDIT_ACTION[AUDIT_ACTION[auditUserPayload.action]],
       reason: AUDIT_REASON[AUDIT_REASON[auditUserPayload.reason]],
       comment: auditUserPayload.comment
     }
@@ -85,7 +85,7 @@ export async function userAuditHandler(
 export const requestSchema = Joi.object({
   userId: Joi.string().required(),
   auditedBy: Joi.string().required(),
-  actionTaken: Joi.string().required(),
+  action: Joi.string().required(),
   reason: Joi.string().required(),
   comment: Joi.string().optional()
 })

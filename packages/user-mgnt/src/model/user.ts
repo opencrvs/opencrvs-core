@@ -52,7 +52,7 @@ interface ILocalRegistrar {
 export interface IAuditHistory {
   auditedBy: string
   auditedOn: number
-  actionTaken: string
+  action: string
   reason: string
   comment?: string
 }
@@ -114,7 +114,7 @@ const AuditHistory = new Schema(
       type: Number,
       default: Date.now
     },
-    actionTaken: {
+    action: {
       type: String,
       enum: [AUDIT_ACTION.DEACTIVATE, AUDIT_ACTION.REACTIVATE],
       default: AUDIT_ACTION.DEACTIVATE

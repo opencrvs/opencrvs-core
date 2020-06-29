@@ -75,7 +75,7 @@ describe('Audit user handler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         auditedBy: '1023984asd89asfj23asdf4',
-        actionTaken: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
+        action: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
         reason: AUDIT_REASON[AUDIT_REASON.SUSPICIOUS]
       },
       headers: {
@@ -96,7 +96,7 @@ describe('Audit user handler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         auditedBy: '1023984asd89asfj23asdf4',
-        actionTaken: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
+        action: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
         reason: AUDIT_REASON[AUDIT_REASON.SUSPICIOUS]
       },
       headers: {
@@ -113,7 +113,7 @@ describe('Audit user handler', () => {
       {
         auditedBy: '1023984asd89asfj23asdf4',
         auditedOn: 982348971234,
-        actionTaken: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
+        action: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
         reason: AUDIT_REASON[AUDIT_REASON.SUSPICIOUS]
       }
     ]
@@ -127,7 +127,7 @@ describe('Audit user handler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         auditedBy: '1023984asd89asfj23asdf4',
-        actionTaken: AUDIT_ACTION[AUDIT_ACTION.REACTIVATE],
+        action: AUDIT_ACTION[AUDIT_ACTION.REACTIVATE],
         reason: AUDIT_REASON[AUDIT_REASON.NOT_SUSPICIOUS]
       },
       headers: {
@@ -147,7 +147,7 @@ describe('Audit user handler', () => {
       payload: {
         userId: '5d10885374be318fa7689f0b',
         auditedBy: '1023984asd89asfj23asdf4',
-        actionTaken: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
+        action: AUDIT_ACTION[AUDIT_ACTION.DEACTIVATE],
         reason: AUDIT_REASON[AUDIT_REASON.SUSPICIOUS]
       },
       headers: {
