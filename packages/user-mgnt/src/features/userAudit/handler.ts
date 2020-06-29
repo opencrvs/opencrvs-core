@@ -56,6 +56,8 @@ export async function userAuditHandler(
   }
 
   if (updatedUserStatus !== user.status) {
+    user.status = updatedUserStatus
+
     const auditData: IAuditHistory = {
       auditedBy: auditUserPayload.auditedBy,
       auditedOn: Date.now(),
