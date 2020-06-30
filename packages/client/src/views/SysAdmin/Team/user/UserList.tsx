@@ -27,7 +27,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { withTheme } from '@client/styledComponents'
-import { SEARCH_USERS } from '@client/user/queries'
+import { SEARCH_USERS, userMutations } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
@@ -106,7 +106,9 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
-
+const DeactivatedStatusBox = styled(StatusBox)`
+  background: rgba(245, 209, 209, 1);
+`
 const AddUserContainer = styled.div`
   display: flex;
   cursor: pointer;
@@ -214,6 +216,8 @@ const Status = (statusProps: IStatusProps) => {
       return <ActiveStatusBox>{status}</ActiveStatusBox>
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return <DisabledStatusBox>{status}</DisabledStatusBox>
+    case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
+      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
       return <PendingStatusBox>{status}</PendingStatusBox>
@@ -468,7 +472,7 @@ function UserListComponent(props: IProps) {
           primaryOfficeId: locationId,
           count: recordCount
         }}
-        fetchPolicy={'no-cache'}
+        fetchPolicy={'cache-and-network'}
       >
         {({ data, loading, error }) => {
           if (error) {
@@ -513,7 +517,17 @@ function UserListComponent(props: IProps) {
                 show={toggleActivation.modalVisible}
                 user={toggleActivation.selectedUser}
                 onClose={() => toggleUserActivationModal()}
-                onConfirm={() => {}}
+                onConfirm={async variables => {
+                  return userMutations.userAuditAction(variables, [
+                    {
+                      query: SEARCH_USERS,
+                      variables: {
+                        primaryOfficeId: locationId,
+                        count: recordCount
+                      }
+                    }
+                  ])
+                }}
               />
             </UserTable>
           )

@@ -11,6 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 export const SEARCH_USERS = gql`
   query($count: Int, $skip: Int, $primaryOfficeId: String) {
@@ -62,6 +63,21 @@ export const GET_USER = gql`
   }
 `
 
+export const USER_AUDIT_ACTION = gql`
+  mutation auditUser(
+    $userId: String!
+    $action: String!
+    $reason: String!
+    $comment: String
+  ) {
+    auditUser(
+      userId: $userId
+      action: $action
+      reason: $reason
+      comment: $comment
+    )
+  }
+`
 async function searchUsers(primaryOfficeId: string) {
   return (
     client &&
@@ -75,4 +91,34 @@ async function searchUsers(primaryOfficeId: string) {
 
 export const userQueries = {
   searchUsers
+}
+
+export interface IUserAuditVariables {
+  userId: string
+  action: string
+  reason: string
+  comment: string
+}
+
+async function userAuditAction(
+  { userId, action, reason, comment }: IUserAuditVariables,
+  refetchQueries?: RefetchQueryDescription
+) {
+  return (
+    client &&
+    client.mutate({
+      mutation: USER_AUDIT_ACTION,
+      variables: {
+        userId,
+        action,
+        reason,
+        comment
+      },
+      refetchQueries
+    })
+  )
+}
+
+export const userMutations = {
+  userAuditAction
 }
