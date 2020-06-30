@@ -89,5 +89,5 @@ export const requestSchema = Joi.object({
   auditedBy: Joi.string().required(),
   action: Joi.string().required(),
   reason: Joi.string().required(),
-  comment: Joi.string().optional()
+  comment: Joi.string().allow('')
 })
