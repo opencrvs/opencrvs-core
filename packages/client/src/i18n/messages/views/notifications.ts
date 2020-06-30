@@ -22,6 +22,7 @@ interface INotificationsMessages {
   statusWaitingToRegister: MessageDescriptor
   statusWaitingToReject: MessageDescriptor
   statusWaitingToSubmit: MessageDescriptor
+  userAuditSuccess: MessageDescriptor
   userFormFail: MessageDescriptor
   userFormSuccess: MessageDescriptor
   userFormUpdateSuccess: MessageDescriptor
@@ -81,6 +82,12 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to submit',
     description: 'Label for application status waiting for reject',
     id: 'register.registrationHome.outbox.statusWaitingToSubmit'
+  },
+  userAuditSuccess: {
+    defaultMessage:
+      '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated}}',
+    description: 'Label for user audit success notification',
+    id: 'notification.userAuditSuccess'
   },
   userFormFail: {
     defaultMessage: 'Sorry! Something went wrong',
