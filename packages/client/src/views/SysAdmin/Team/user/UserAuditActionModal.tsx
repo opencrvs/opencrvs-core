@@ -78,10 +78,10 @@ function isValidAuditStatus(status: string): status is AuditStatus {
   return Object.keys(statusActionMap).includes(status)
 }
 
-function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
-  let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
-  const { intl, user, onClose, onConfirm, show, form } = props
+let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
 
+function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
+  const { intl, user, onClose, onConfirm, show, form } = props
   const [formValues, setFormValues] = useState<IFormSectionData>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isErrorVisible, makeErrorVisible] = useState<boolean>(false)
@@ -90,7 +90,7 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
   let modalTitle = ''
   let modalSubtitle = ''
   const actions = [
-    <TertiaryButton onClick={onClose}>
+    <TertiaryButton id="modal-cancel" onClick={onClose}>
       {intl.formatMessage(buttonMessages.cancel)}
     </TertiaryButton>
   ]
@@ -165,7 +165,7 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
 
   if (user && user.status === 'active') {
     actions.push(
-      <DangerButton onClick={handleConfirm}>
+      <DangerButton id="deactivate-action" onClick={handleConfirm}>
         {intl.formatMessage(buttonMessages.deactivate)}
       </DangerButton>
     )
@@ -173,6 +173,7 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
 
   return (
     <ResponsiveModal
+      id="user-audit-modal"
       title={modalTitle}
       hideHeaderBoxShadow
       show={show}
@@ -182,8 +183,10 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
       responsive
       actions={actions}
     >
-      <Subtitle>{modalSubtitle}</Subtitle>
-      {formError && isErrorVisible && <ErrorText>{formError}</ErrorText>}
+      <Subtitle id="modal-subtitle">{modalSubtitle}</Subtitle>
+      {formError && isErrorVisible && (
+        <ErrorText id="form-error">{formError}</ErrorText>
+      )}
       <FormFieldGenerator
         id="user-audit-form"
         fields={form.fields}
