@@ -21,7 +21,7 @@ export interface IUserAuditForm {
 export const userAuditForm: IUserAuditForm = {
   fields: [
     {
-      name: 'deactivateReason',
+      name: 'reason',
       type: RADIO_GROUP,
       required: true,
       validate: [],
@@ -29,16 +29,16 @@ export const userAuditForm: IUserAuditForm = {
       label: messages.deactivateReason,
       size: RadioSize.LARGE,
       options: [
-        { label: messages.deactivateReasonNotEmployee, value: 'NOT_EMPLOYEE' },
+        { label: messages.deactivateReasonNotEmployee, value: 'TERMINATED' },
         {
           label: messages.deactivateReasonInvestigated,
-          value: 'BEING_INVESTIGATED'
+          value: 'SUSPICIOUS'
         },
         { label: messages.deactivateReasonOther, value: 'OTHER' }
       ]
     },
     {
-      name: 'comments',
+      name: 'comment',
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',
@@ -47,7 +47,7 @@ export const userAuditForm: IUserAuditForm = {
       conditionals: [conditionals.userAuditReasonSpecified]
     },
     {
-      name: 'comments',
+      name: 'comment',
       type: TEXTAREA,
       label: messages.comments,
       initialValue: '',

@@ -703,10 +703,10 @@ export const conditionals: IConditionals = {
   },
   userAuditReasonSpecified: {
     action: 'hide',
-    expression: 'values.deactivateReason === "OTHER"'
+    expression: 'values.reason === "OTHER"'
   },
   userAuditReasonOther: {
     action: 'hide',
-    expression: 'values.deactivateReason !== "OTHER"'
+    expression: 'values.reason !== "OTHER"'
   }
 }
