@@ -45,7 +45,7 @@ export interface IUserModelData {
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
-  identifiers: GQLIdentifier
+  identifiers: GQLIdentifier[]
   device: string
   auditHistory?: IAuditHistory[]
 }
