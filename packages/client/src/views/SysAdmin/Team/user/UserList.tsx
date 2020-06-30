@@ -355,12 +355,12 @@ function UserListComponent(props: IProps) {
         },
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 75,
+          width: 65,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 15,
+          width: 25,
           alignment: ColumnContentAlignment.RIGHT,
           key: 'status'
         }
