@@ -27,6 +27,13 @@ import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { FormikTouched, FormikValues } from 'formik'
+import { IUserAuditVariables } from '@client/user/queries'
+import { Dispatch } from 'redux'
+import {
+  showUserAuditSuccessToast,
+  showSubmitFormErrorToast
+} from '@client/notification/actions'
+import { TOAST_MESSAGES } from '@client/user/userReducer'
 
 const { useState, useEffect } = React
 
@@ -34,12 +41,18 @@ interface ConnectProps {
   form: IUserAuditForm
 }
 
+interface DispatchProps {
+  showSuccessToast: typeof showUserAuditSuccessToast
+  showErrorToast: () => void
+}
+
 interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
-    ConnectProps {
+    ConnectProps,
+    DispatchProps {
   user: GQLUser | null
   show: boolean
-  onConfirm: () => void
+  onConfirm: (variables: IUserAuditVariables) => Promise<boolean>
   onClose: () => void
 }
 
@@ -49,6 +62,21 @@ const Subtitle = styled.h2`
   padding-bottom: 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
 `
+
+export enum AUDIT_ACTION {
+  DEACTIVATE = 'DEACTIVATE',
+  REACTIVATE = 'REACTIVATE'
+}
+const statusActionMap = {
+  active: AUDIT_ACTION.DEACTIVATE,
+  deactivated: AUDIT_ACTION.REACTIVATE
+}
+
+type AuditStatus = keyof typeof statusActionMap
+
+function isValidAuditStatus(status: string): status is AuditStatus {
+  return Object.keys(statusActionMap).includes(status)
+}
 
 function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
   let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
@@ -67,6 +95,17 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
     </TertiaryButton>
   ]
 
+  if (user) {
+    name =
+      (createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
+      (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string)
+
+    modalTitle = intl.formatMessage(messages.deactivateUserTitle, { name })
+    modalSubtitle = intl.formatMessage(messages.deactivateUserSubtitle, {
+      name
+    })
+  }
+
   useEffect(() => {
     if (hasFormError(props.form.fields, formValues)) {
       setFormError(intl.formatMessage(messages.formError))
@@ -81,42 +120,55 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
       setFormValues({})
     }
 
+    function injectAuditActionToFormValues() {
+      const action =
+        user && user.status && isValidAuditStatus(user.status)
+          ? statusActionMap[user.status]
+          : AUDIT_ACTION.DEACTIVATE
+      setFormValues({ action })
+    }
+
     if (!props.show) {
       cleanUpFormState()
+    } else {
+      injectAuditActionToFormValues()
     }
-  }, [props.show])
+  }, [props.show, user])
 
   function handleConfirm() {
     if (makeAllFieldsDirty) {
       const touched = props.form.fields.reduce(
         (memo, field) => ({ ...memo, [field.name]: true }),
         {}
-      )
+      ) as { [key: string]: boolean }
       makeAllFieldsDirty(touched)
     }
     makeErrorVisible(true)
     if (!formError) {
-      onConfirm()
+      const userId = (props.user && (props.user.id as string)) || ''
+
+      onConfirm({
+        ...(formValues as {
+          reason: string
+          comment: string
+          action: AUDIT_ACTION
+        }),
+        userId
+      })
+        .then(() =>
+          props.showSuccessToast(name, formValues.action as AUDIT_ACTION)
+        )
+        .catch(() => props.showErrorToast())
+      onClose()
     }
   }
 
-  if (user) {
-    name =
-      (createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
-      (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string)
-
-    if (user.status === 'active') {
-      actions.push(
-        <DangerButton onClick={handleConfirm}>
-          {intl.formatMessage(buttonMessages.deactivate)}
-        </DangerButton>
-      )
-
-      modalTitle = intl.formatMessage(messages.deactivateUserTitle, { name })
-      modalSubtitle = intl.formatMessage(messages.deactivateUserSubtitle, {
-        name
-      })
-    }
+  if (user && user.status === 'active') {
+    actions.push(
+      <DangerButton onClick={handleConfirm}>
+        {intl.formatMessage(buttonMessages.deactivate)}
+      </DangerButton>
+    )
   }
 
   return (
@@ -135,7 +187,7 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
       <FormFieldGenerator
         id="user-audit-form"
         fields={form.fields}
-        onChange={setFormValues}
+        onChange={values => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
         onSetTouched={onSetTouchedCallback => {
           makeAllFieldsDirty = onSetTouchedCallback
@@ -152,6 +204,16 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const UserAuditActionModal = connect(mapStateToProps)(
-  injectIntl(UserAuditActionModalComponent)
-)
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    showSuccessToast: (userFullName: string, auditAction: AUDIT_ACTION) =>
+      dispatch(showUserAuditSuccessToast(userFullName, auditAction)),
+    showErrorToast: () =>
+      dispatch(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+  }
+}
+
+export const UserAuditActionModal = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(injectIntl(UserAuditActionModalComponent))
