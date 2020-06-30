@@ -128,7 +128,7 @@ export const userTypeResolvers: GQLResolver = {
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id
     },
-    suspiciousUser(userModel: IUserModelData) {
+    underInvestigation(userModel: IUserModelData) {
       return (
         userModel &&
         userModel.status &&

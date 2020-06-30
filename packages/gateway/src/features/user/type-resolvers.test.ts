@@ -57,9 +57,9 @@ describe('User type resolvers', () => {
     expect(res).toEqual('ba7022f0ff4822')
   })
   it('return suspicious user flag', () => {
-    const suspiciousUserMockResponse = mockResponse
-    suspiciousUserMockResponse.status = 'deactivated'
-    suspiciousUserMockResponse.auditHistory = [
+    const underInvestigationUserMockResponse = mockResponse
+    underInvestigationUserMockResponse.status = 'deactivated'
+    underInvestigationUserMockResponse.auditHistory = [
       {
         auditedBy: 'DUMMY_AUDITOR_ID',
         auditedOn: 1234897987,
@@ -67,7 +67,7 @@ describe('User type resolvers', () => {
         reason: 'SUSPICIOUS'
       }
     ]
-    const res = userTypeResolvers.User.suspiciousUser(mockResponse)
+    const res = userTypeResolvers.User.underInvestigation(mockResponse)
     expect(res).toBeTruthy()
   })
   it('return user identifier', () => {
