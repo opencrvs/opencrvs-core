@@ -26,15 +26,37 @@ export const userAuditForm: IUserAuditForm = {
       required: true,
       validate: [],
       initialValue: '',
-      label: messages.deactivateReason,
+      label: messages.auditReason,
       size: RadioSize.LARGE,
+      conditionals: [conditionals.isAuditActionDeactivate],
       options: [
         { label: messages.deactivateReasonNotEmployee, value: 'TERMINATED' },
         {
           label: messages.deactivateReasonInvestigated,
           value: 'SUSPICIOUS'
         },
-        { label: messages.deactivateReasonOther, value: 'OTHER' }
+        { label: messages.auditReasonOther, value: 'OTHER' }
+      ]
+    },
+    {
+      name: 'reason',
+      type: RADIO_GROUP,
+      required: true,
+      validate: [],
+      initialValue: '',
+      label: messages.auditReason,
+      size: RadioSize.LARGE,
+      conditionals: [conditionals.isAuditActionReactivate],
+      options: [
+        {
+          label: messages.reactivateReasonReturnedToRole,
+          value: 'ROLE_REGAINED'
+        },
+        {
+          label: messages.reactivateReasonNoLongerInvestigated,
+          value: 'NOT_SUSPICIOUS'
+        },
+        { label: messages.auditReasonOther, value: 'OTHER' }
       ]
     },
     {

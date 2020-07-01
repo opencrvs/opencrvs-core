@@ -648,6 +648,8 @@ export interface IConditionals {
   certCollectorOther: IConditional
   userAuditReasonSpecified: IConditional
   userAuditReasonOther: IConditional
+  isAuditActionDeactivate: IConditional
+  isAuditActionReactivate: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'
