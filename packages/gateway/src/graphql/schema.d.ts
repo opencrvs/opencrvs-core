@@ -365,6 +365,7 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
+  underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar: GQLLocalRegistrar
