@@ -700,5 +700,13 @@ export const conditionals: IConditionals = {
   certCollectorOther: {
     action: 'hide',
     expression: 'values.type !== "OTHER"'
+  },
+  userAuditReasonSpecified: {
+    action: 'hide',
+    expression: 'values.reason === "OTHER"'
+  },
+  userAuditReasonOther: {
+    action: 'hide',
+    expression: 'values.reason !== "OTHER"'
   }
 }

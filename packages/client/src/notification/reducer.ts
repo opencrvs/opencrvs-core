@@ -11,6 +11,17 @@
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
+import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
+type UserAuditSuccessToastState =
+  | {
+      visible: false
+    }
+  | {
+      visible: true
+      userFullName: string
+      action: AUDIT_ACTION
+    }
 
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
@@ -20,6 +31,7 @@ export type NotificationState = {
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
+  userAuditSuccessToast: UserAuditSuccessToastState
 }
 
 export const initialState: NotificationState = {
@@ -29,7 +41,8 @@ export const initialState: NotificationState = {
   sessionExpired: false,
   saveDraftClicked: false,
   submitFormSuccessToast: null,
-  submitFormErrorToast: null
+  submitFormErrorToast: null,
+  userAuditSuccessToast: { visible: false }
 }
 
 export const notificationReducer: LoopReducer<
@@ -89,6 +102,28 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         submitFormErrorToast: null
+      }
+    case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:
+      const {
+        userFullName,
+        action: auditAction
+      } = (action as actions.ShowUserAuditSuccessToast).payload
+      return {
+        ...state,
+        userAuditSuccessToast: {
+          ...state.userAuditSuccessToast,
+          visible: true,
+          userFullName,
+          action: auditAction
+        }
+      }
+    case actions.HIDE_USER_AUDIT_SUCCESS_TOAST:
+      return {
+        ...state,
+        userAuditSuccessToast: {
+          ...state.userAuditSuccessToast,
+          visible: false
+        }
       }
     default:
       return state

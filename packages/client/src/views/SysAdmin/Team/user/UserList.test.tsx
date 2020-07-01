@@ -570,7 +570,7 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'deactivated'
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -648,6 +648,25 @@ describe('User list tests', () => {
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+      })
+
+      it('clicking on menu options deactivate to user pops up audit action modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
+        menuOptionButton.hostNodes().simulate('click')
+        const userAuditActionModal = await waitForElement(
+          component,
+          '#user-audit-modal'
+        )
       })
     })
   })

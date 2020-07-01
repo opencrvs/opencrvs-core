@@ -19,6 +19,7 @@ interface IButtonsMessages {
   confirm: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
+  deactivate: MessageDescriptor
   delete: MessageDescriptor
   edit: MessageDescriptor
   editRegistration: MessageDescriptor
@@ -96,6 +97,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Create user',
     description: 'Label for submit button of user creation form',
     id: 'user.form.buttons.submit'
+  },
+  deactivate: {
+    defaultMessage: 'Deactivate',
+    description: 'Label for confirmation modal for user deactivation',
+    id: 'team.user.buttons.deactivate'
   },
   delete: {
     defaultMessage: 'Delete',
