@@ -36,7 +36,8 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
   AvatarSmall,
-  VerticalThreeDots
+  VerticalThreeDots,
+  SearchRed
 } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -95,9 +96,13 @@ const StatusBox = styled.span`
   padding: 4px 6px;
   border-radius: 4px;
   text-align: center;
+  margin-left: 4px;
 `
 const ActiveStatusBox = styled(StatusBox)`
   background: rgba(73, 183, 141, 0.3);
+`
+const DeactivatedStatusBox = styled(StatusBox)`
+  background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
   background: rgba(255, 255, 153, 1);
@@ -206,6 +211,8 @@ const Status = (statusProps: IStatusProps) => {
   switch (status.toLowerCase()) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
       return <ActiveStatusBox>{status}</ActiveStatusBox>
+    case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
+      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return <DisabledStatusBox>{status}</DisabledStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
@@ -271,6 +278,15 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  function renderStatus(status?: string, underInvestigation?: boolean) {
+    return (
+      <>
+        {underInvestigation && <SearchRed />}
+        <Status status={status || 'pending'} />
+      </>
+    )
+  }
+
   function generateUserContents(data: GQLQuery) {
     if (!data || !data.searchUsers || !data.searchUsers.results) {
       return []
@@ -290,14 +306,13 @@ function UserListComponent(props: IProps) {
             (user.role && intl.formatMessage(userMessages[user.role])) || '-'
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
-          const status = user.status || 'pending'
 
           return {
             photo: <AvatarSmall />,
             name: <LinkButton>{name}</LinkButton>,
             nameRoleType: getNameRoleType(name, role, type),
             roleType: getRoleType(role, type),
-            status: <Status status={status} />,
+            status: renderStatus(user.status, user.underInvestigation),
             menu: (
               <ToggleMenu
                 id={`user-item-${index}-menu`}
@@ -404,12 +419,12 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 40,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 10,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
             key: 'status'
           },
