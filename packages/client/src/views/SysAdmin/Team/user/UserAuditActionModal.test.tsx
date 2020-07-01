@@ -106,6 +106,39 @@ const graphqlMocksOfDeactivate = [
   }
 ]
 
+const graphqlMocksOfReactivate = [
+  {
+    request: {
+      query: USER_AUDIT_ACTION,
+      variables: {
+        userId: '5d08e102542c7a19fc55b793',
+        action: AUDIT_ACTION.REACTIVATE,
+        reason: 'ROLE_REGAINED',
+        comment: ''
+      }
+    },
+    result: {
+      data: {
+        auditUser: true
+      }
+    }
+  },
+  {
+    request: {
+      query: USER_AUDIT_ACTION,
+      variables: {
+        userId: '5d08e102542c7a19fc55b793',
+        action: AUDIT_ACTION.DEACTIVATE,
+        reason: 'ROLE_REGAINED',
+        comment: ''
+      }
+    },
+    result: {
+      errors: [new GraphQLError('Error!')]
+    }
+  }
+]
+
 describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -226,6 +259,106 @@ describe('user audit action modal tests', () => {
         const confirmButton = await waitForElement(
           component,
           '#deactivate-action'
+        )
+        confirmButton.hostNodes().simulate('click')
+
+        await flushPromises()
+        expect(store.getState().notification.submitFormErrorToast).toBe(
+          'userFormFail'
+        )
+      })
+    })
+  })
+
+  describe('in case of successful reactivate audit action', () => {
+    beforeEach(async () => {
+      let [successMock] = graphqlMocksOfReactivate
+      const testComponent = await createTestComponent(
+        <UserAuditActionModal
+          show={true}
+          user={users[1]}
+          onClose={onCloseMock}
+        />,
+        store,
+        [successMock]
+      )
+      component = testComponent.component
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+
+    it('renders title for reactivation', async () => {
+      const title = await waitForElement(component, '#user-audit-modal h1')
+      expect(title.text()).toBe('Reactivate Nasreen Pervin Huq?')
+    })
+
+    it('renders subtitle for reactivation', async () => {
+      const subtitle = await waitForElement(component, '#modal-subtitle')
+      expect(subtitle.hostNodes().text()).toBe(
+        'This will reactivate Nasreen Pervin Huq’s ability to login and access the system.'
+      )
+    })
+
+    describe('after filling mandatory data', () => {
+      beforeEach(async () => {
+        const roleRegainedRadioOption = await waitForElement(
+          component,
+          '#reason_ROLE_REGAINED'
+        )
+        roleRegainedRadioOption.hostNodes().simulate('change')
+      })
+
+      it('clicking confirm action dispatches success notification action', async () => {
+        const confirmButton = await waitForElement(
+          component,
+          '#reactivate-action'
+        )
+        confirmButton.hostNodes().simulate('click')
+        await flushPromises()
+        expect(
+          store.getState().notification.userAuditSuccessToast.visible
+        ).toBe(true)
+      })
+    })
+  })
+
+  describe('in case of failed reactivate audit action', () => {
+    beforeEach(async () => {
+      let [_, errorMock] = graphqlMocksOfReactivate
+      component = (await createTestComponent(
+        <UserAuditActionModal
+          show={true}
+          user={users[1]}
+          onClose={onCloseMock}
+        />,
+        store,
+        [errorMock]
+      )).component
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+
+    describe('after filling mandatory data', () => {
+      beforeEach(async () => {
+        const roleRegainedRadioOption = await waitForElement(
+          component,
+          '#reason_ROLE_REGAINED'
+        )
+        roleRegainedRadioOption.hostNodes().simulate('change')
+      })
+
+      it('clicking confirm action dispatches error notification action', async () => {
+        const confirmButton = await waitForElement(
+          component,
+          '#reactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
 
