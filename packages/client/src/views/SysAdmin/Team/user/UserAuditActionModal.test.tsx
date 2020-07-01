@@ -11,10 +11,16 @@
  */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { UserAuditActionModal } from './UserAuditActionModal'
-import { createTestStore, createTestComponent } from '@client/tests/util'
+import { UserAuditActionModal, AUDIT_ACTION } from './UserAuditActionModal'
+import {
+  createTestStore,
+  createTestComponent,
+  flushPromises
+} from '@client/tests/util'
 import { AppStore } from '@client/store'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { USER_AUDIT_ACTION } from '@client/user/queries'
+import { GraphQLError } from 'graphql'
 
 const users = [
   {
@@ -67,38 +73,73 @@ const users = [
   }
 ]
 
+const graphqlMocksOfDeactivate = [
+  {
+    request: {
+      query: USER_AUDIT_ACTION,
+      variables: {
+        userId: '5d08e102542c7a19fc55b790',
+        action: AUDIT_ACTION.DEACTIVATE,
+        reason: 'TERMINATED',
+        comment: ''
+      }
+    },
+    result: {
+      data: {
+        auditUser: true
+      }
+    }
+  },
+  {
+    request: {
+      query: USER_AUDIT_ACTION,
+      variables: {
+        userId: '5d08e102542c7a19fc55b790',
+        action: AUDIT_ACTION.DEACTIVATE,
+        reason: 'TERMINATED',
+        comment: ''
+      }
+    },
+    result: {
+      errors: [new GraphQLError('Error!')]
+    }
+  }
+]
+
 describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
+  let onCloseMock: jest.Mock
+
   beforeAll(async () => {
     const testStore = await createTestStore()
     store = testStore.store
+    onCloseMock = jest.fn()
   })
 
-  describe('in case of deactivate audit action', () => {
-    let onCloseMock: jest.Mock
-    let onConfirmMock: jest.Mock
+  afterAll(() => {
+    onCloseMock.mockClear()
+  })
 
-    beforeAll(() => {
-      onCloseMock = jest.fn()
-      onConfirmMock = jest.fn()
-    })
-
-    afterEach(() => {
-      onConfirmMock.mockClear()
-    })
-
+  describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
+      let [successMock] = graphqlMocksOfDeactivate
       const testComponent = await createTestComponent(
         <UserAuditActionModal
           show={true}
           user={users[0]}
           onClose={onCloseMock}
-          onConfirm={onConfirmMock}
         />,
-        store
+        store,
+        [successMock]
       )
       component = testComponent.component
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
     })
 
     it('renders responsive modal', async () => {
@@ -138,30 +179,60 @@ describe('user audit action modal tests', () => {
         terminatedRadioOption.hostNodes().simulate('change')
       })
 
-      it('clicking confirm action triggers on confirm with payload', async () => {
-        onConfirmMock.mockResolvedValueOnce(true)
-
+      it('clicking confirm action dispatches success notification action', async () => {
         const confirmButton = await waitForElement(
           component,
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
-        expect(onConfirmMock).toBeCalledWith({
-          action: 'DEACTIVATE',
-          comment: '',
-          reason: 'TERMINATED',
-          userId: '5d08e102542c7a19fc55b790'
-        })
+        await flushPromises()
+        expect(
+          store.getState().notification.userAuditSuccessToast.visible
+        ).toBe(true)
+      })
+    })
+  })
+
+  describe('in case of failed deactivate audit action', () => {
+    beforeEach(async () => {
+      let [_, errorMock] = graphqlMocksOfDeactivate
+      component = (await createTestComponent(
+        <UserAuditActionModal
+          show={true}
+          user={users[0]}
+          onClose={onCloseMock}
+        />,
+        store,
+        [errorMock]
+      )).component
+
+      // wait for mocked data to load mockedProvider
+      await new Promise(resolve => {
+        setTimeout(resolve, 100)
+      })
+      component.update()
+    })
+
+    describe('after filling mandatory data', () => {
+      beforeEach(async () => {
+        const terminatedRadioOption = await waitForElement(
+          component,
+          '#reason_TERMINATED'
+        )
+        terminatedRadioOption.hostNodes().simulate('change')
       })
 
-      it('handle error if request throws any', async () => {
-        onConfirmMock.mockRejectedValueOnce(new Error('Boom'))
-
+      it('clicking confirm action dispatches error notification action', async () => {
         const confirmButton = await waitForElement(
           component,
           '#deactivate-action'
         )
         confirmButton.hostNodes().simulate('click')
+
+        await flushPromises()
+        expect(store.getState().notification.submitFormErrorToast).toBe(
+          'userFormFail'
+        )
       })
     })
   })

@@ -92,33 +92,3 @@ async function searchUsers(primaryOfficeId: string) {
 export const userQueries = {
   searchUsers
 }
-
-export interface IUserAuditVariables {
-  userId: string
-  action: string
-  reason: string
-  comment: string
-}
-
-async function userAuditAction(
-  { userId, action, reason, comment }: IUserAuditVariables,
-  refetchQueries?: RefetchQueryDescription
-) {
-  return (
-    client &&
-    client.mutate({
-      mutation: USER_AUDIT_ACTION,
-      variables: {
-        userId,
-        action,
-        reason,
-        comment
-      },
-      refetchQueries
-    })
-  )
-}
-
-export const userMutations = {
-  userAuditAction
-}

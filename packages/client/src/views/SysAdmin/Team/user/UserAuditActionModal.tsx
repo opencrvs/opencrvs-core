@@ -27,13 +27,16 @@ import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { FormikTouched, FormikValues } from 'formik'
-import { IUserAuditVariables } from '@client/user/queries'
+import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {
   showUserAuditSuccessToast,
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import ApolloClient from 'apollo-client'
+import { withApollo, WithApolloClient } from 'react-apollo'
 
 const { useState, useEffect } = React
 
@@ -52,8 +55,15 @@ interface ToggleUserActivationModalProps
     DispatchProps {
   user: GQLUser | null
   show: boolean
-  onConfirm: (variables: IUserAuditVariables) => Promise<boolean>
+  onConfirmRefetchQueries?: RefetchQueryDescription
   onClose: () => void
+}
+
+interface IUserAuditVariables {
+  userId: string
+  action: string
+  reason: string
+  comment: string
 }
 
 const Subtitle = styled.h2`
@@ -80,8 +90,10 @@ function isValidAuditStatus(status: string): status is AuditStatus {
 
 let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
 
-function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
-  const { intl, user, onClose, onConfirm, show, form } = props
+function UserAuditActionModalComponent(
+  props: ToggleUserActivationModalProps & WithApolloClient<{}>
+) {
+  const { intl, user, onClose, show, form } = props
   const [formValues, setFormValues] = useState<IFormSectionData>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isErrorVisible, makeErrorVisible] = useState<boolean>(false)
@@ -147,14 +159,19 @@ function UserAuditActionModalComponent(props: ToggleUserActivationModalProps) {
     if (!formError) {
       const userId = (props.user && (props.user.id as string)) || ''
 
-      onConfirm({
-        ...(formValues as {
-          reason: string
-          comment: string
-          action: AUDIT_ACTION
-        }),
-        userId
-      })
+      props.client
+        .mutate({
+          mutation: USER_AUDIT_ACTION,
+          variables: {
+            userId,
+            ...(formValues as {
+              reason: string
+              comment: string
+              action: AUDIT_ACTION
+            })
+          } as IUserAuditVariables,
+          refetchQueries: props.onConfirmRefetchQueries
+        })
         .then(() =>
           props.showSuccessToast(name, formValues.action as AUDIT_ACTION)
         )
@@ -219,4 +236,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
 export const UserAuditActionModal = connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(UserAuditActionModalComponent))
+)(injectIntl(withApollo(UserAuditActionModalComponent)))

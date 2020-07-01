@@ -57,7 +57,7 @@ const messagesToDefine: ISysAdminMessages = {
   deactivate: {
     defaultMessage: 'Deactivate',
     description: 'Label for toggle menu option deactivate',
-    id: 'register.sysAdmin.user.deactivate.'
+    id: 'register.sysAdmin.user.deactivate'
   },
   deactivateReason: {
     id: 'register.sysAdminHome.user.audit.reason',
