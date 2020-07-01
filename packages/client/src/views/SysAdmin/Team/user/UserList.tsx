@@ -111,9 +111,6 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
-const DeactivatedStatusBox = styled(StatusBox)`
-  background: rgba(245, 209, 209, 1);
-`
 const AddUserContainer = styled.div`
   display: flex;
   cursor: pointer;
@@ -298,6 +295,13 @@ function UserListComponent(props: IProps) {
     if (user.status === 'active') {
       menuItems.push({
         label: intl.formatMessage(messages.deactivate),
+        handler: () => toggleUserActivationModal(user)
+      })
+    }
+
+    if (user.status === 'deactivated') {
+      menuItems.push({
+        label: intl.formatMessage(messages.reactivate),
         handler: () => toggleUserActivationModal(user)
       })
     }
