@@ -9,93 +9,61 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { DOWNLOAD_STATUS, IApplication } from '@client/applications'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Header } from '@client/components/interface/Header/Header'
+import { Query } from '@client/components/Query'
+import { IViewHeadingProps } from '@client/components/ViewHeading'
+import { Action } from '@client/forms'
 import {
-  Duplicate,
-  StatusCertified,
-  StatusGray,
-  StatusGreen,
-  StatusOrange,
-  StatusRejected
-} from '@opencrvs/components/lib/icons'
+  buttonMessages,
+  constantsMessages,
+  dynamicConstantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
+import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
+import { messages } from '@client/i18n/messages/views/search'
 import {
+  goToApplicationDetails,
+  goToEvents as goToEventsAction,
+  goToPage as goToPageAction,
+  goToPrintCertificate as goToPrintCertificateAction,
+  goToReviewDuplicate as goToReviewDuplicateAction
+} from '@client/navigation'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { SEARCH_EVENTS } from '@client/search/queries'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { Scope } from '@client/utils/authUtils'
+import {
+  BRN_DRN_TEXT,
+  NAME_TEXT,
+  PHONE_TEXT,
+  SEARCH_RESULT_SORT,
+  TRACKING_ID_TEXT
+} from '@client/utils/constants'
+import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
+import { RowHistoryView } from '@opencrvs/client/src/views/RegistrationHome/RowHistoryView'
+import {
+  ColumnContentAlignment,
+  GridTable,
+  IAction,
   ISearchInputProps,
-  ListItem,
-  ListItemExpansion,
-  Spinner,
   Loader
 } from '@opencrvs/components/lib/interface'
-import { DataTable } from '@opencrvs/components/lib/interface/DataTable'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { HomeContent } from '@opencrvs/components/lib/layout'
 import {
-  GQLComment,
-  GQLDeathRegistration,
-  GQLHumanName,
+  GQLEventSearchResultSet,
   GQLQuery
 } from '@opencrvs/gateway/src/graphql/schema.d'
 import moment from 'moment'
 import * as React from 'react'
-import { Query } from '@client/components/Query'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { IViewHeadingProps } from '@client/components/ViewHeading'
-import {
-  goToEvents as goToEventsAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction,
-  goToPage as goToPageAction
-} from '@client/navigation'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import {
-  buttonMessages,
-  constantsMessages,
-  errorMessages,
-  userMessages
-} from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/search'
-import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
-import { SEARCH_EVENTS } from '@client/search/queries'
-import { transformData } from '@client/search/transformer'
-import { IStoreState } from '@client/store'
-import { Scope } from '@client/utils/authUtils'
-import {
-  DECLARED,
-  LANG_EN,
-  REJECTED,
-  REJECT_REASON,
-  REJECT_COMMENTS,
-  TRACKING_ID_TEXT,
-  BRN_DRN_TEXT,
-  PHONE_TEXT,
-  SEARCH_RESULT_SORT,
-  NAME_TEXT
-} from '@client/utils/constants'
-import {
-  createNamesMap,
-  extractCommentFragmentValue
-} from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 
-import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/SearchResult/queries'
-import { Header } from '@client/components/interface/Header/Header'
-import { IApplication, DOWNLOAD_STATUS } from '@client/applications'
-import { Action } from '@client/forms'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-
-const ListItemExpansionSpinner = styled(Spinner)`
-  width: 70px;
-  height: 70px;
-  top: 0px !important;
-`
-const ExpansionSpinnerContainer = styled.div`
-  min-height: 70px;
-  min-width: 70px;
-  display: flex;
-  justify-content: center;
-`
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -104,28 +72,7 @@ const ErrorText = styled.div`
 `
 
 const Container = styled.div`
-  margin: 35px 250px 0px 250px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-`
-const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  margin-right: 3px;
-`
-const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  text-transform: capitalize !important;
-`
-const ValueContainer = styled.div`
-  display: inline-flex;
-  flex-wrap: wrap;
-  & span:not(:last-child) {
-    border-right: 1px solid ${({ theme }) => theme.colors.placeholder};
-    margin-right: 10px;
-    padding-right: 10px;
-  }
+  margin: 20px 0px 0px 0px;
 `
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -144,49 +91,10 @@ const SearchResultText = styled.div`
   ${({ theme }) => theme.fonts.h4Style};
   color: ${({ theme }) => theme.colors.copy};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    left: 24px;
+    margin-left: 24px;
     margin-top: 24px;
   }
 `
-const TotalResultText = styled.div`
-  left: 268px;
-  margin-top: 6px;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.captionStyle};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    left: 24px;
-  }
-`
-function LabelValue({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <StyledLabel>{label}:</StyledLabel>
-      <StyledValue>{value}</StyledValue>
-    </div>
-  )
-}
-
-function ValuesWithSeparator(props: { strings: string[] }): JSX.Element {
-  return (
-    <ValueContainer>
-      {props.strings.map((value, index) => (
-        <span key={index}>{value}</span>
-      ))}
-    </ValueContainer>
-  )
-}
-
-function formatRoleCode(str: string) {
-  const sections = str.split('_')
-  const formattedString: string[] = []
-  sections.map(section => {
-    return formattedString.push(
-      section.charAt(0) + section.slice(1).toLowerCase()
-    )
-  })
-
-  return formattedString.join(' ')
-}
 
 export function getRejectionReasonDisplayValue(reason: string) {
   switch (reason.toLowerCase()) {
@@ -203,25 +111,6 @@ export function getRejectionReasonDisplayValue(reason: string) {
   }
 }
 
-const ExpansionContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  margin-bottom: 8px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`
-const ExpansionContentContainer = styled.div`
-  flex: 1;
-  margin-left: 10px;
-`
-
-const StatusIcon = styled.div`
-  margin-top: 3px;
-`
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
@@ -232,6 +121,7 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
+  goToApplicationDetails: typeof goToApplicationDetails
 }
 
 interface IMatchParams {
@@ -244,51 +134,103 @@ type ISearchResultProps = IntlShapeProps &
   ISearchInputProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
-export class SearchResultView extends React.Component<ISearchResultProps> {
-  getDeclarationStatusIcon = (status: string) => {
-    switch (status) {
-      case 'DECLARED':
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
-      case 'REGISTERED':
-        return (
-          <StatusIcon>
-            <StatusGreen />
-          </StatusIcon>
-        )
-      case 'VALIDATED':
-        return (
-          <StatusIcon>
-            <StatusGray />
-          </StatusIcon>
-        )
-      case 'WAITING_VALIDATION':
-        return (
-          <StatusIcon>
-            <StatusGray />
-          </StatusIcon>
-        )
-      case 'REJECTED':
-        return (
-          <StatusIcon>
-            <StatusRejected />
-          </StatusIcon>
-        )
-      case 'CERTIFIED':
-        return (
-          <StatusIcon>
-            <StatusCertified />
-          </StatusIcon>
-        )
-      default:
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
+
+interface ISearchResultState {
+  width: number
+  currentPage: number
+}
+
+export class SearchResultView extends React.Component<
+  ISearchResultProps,
+  ISearchResultState
+> {
+  pageSize = 10
+  showPaginated = false
+  constructor(props: ISearchResultProps) {
+    super(props)
+    this.state = {
+      currentPage: 1,
+      width: window.innerWidth
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  getExpandable = () => {
+    return this.state.width > this.props.theme.grid.breakpoints.lg
+      ? true
+      : false
+  }
+
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 10,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 15,
+          key: 'trackingId'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.status),
+          width: 20,
+          key: 'status'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
+          width: 20,
+          key: 'dateOfModification'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.startedBy),
+          width: 15,
+          key: 'startedBy'
+        },
+        {
+          width: 20,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.type),
+          width: 20,
+          key: 'event'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          width: 20,
+          key: 'trackingId'
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.status),
+          width: 30,
+          key: 'status'
+        },
+        {
+          width: 30,
+          key: 'actions',
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.CENTER
+        }
+      ]
     }
   }
 
@@ -311,398 +253,6 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     }
   }
 
-  getWorkflowDateLabel = (status: string) => {
-    switch (status) {
-      case 'DECLARED':
-        return constantsMessages.applicationSubmittedOn
-      case 'REGISTERED':
-        return constantsMessages.applicationRegisteredOn
-      case 'VALIDATED':
-        return constantsMessages.applicationValidatedOn
-      case 'WAITING_VALIDATION':
-        return constantsMessages.applicationSentForExternalValidationOn
-      case 'REJECTED':
-        return constantsMessages.applicationRejectedOn
-      case 'CERTIFIED':
-        return constantsMessages.applicationCollectedOn
-      default:
-        return constantsMessages.applicationSubmittedOn
-    }
-  }
-
-  getEventLabel = (status: string) => {
-    switch (status.toUpperCase()) {
-      case 'BIRTH':
-        return this.props.intl.formatMessage(constantsMessages.birth)
-      case 'DEATH':
-        return this.props.intl.formatMessage(constantsMessages.death)
-      default:
-        return this.props.intl.formatMessage(constantsMessages.birth)
-    }
-  }
-
-  transformDataToTaskHistory = (data: GQLQuery) => {
-    const { locale } = this.props.intl
-    const registration =
-      data && data.fetchRegistration && data.fetchRegistration.registration
-    const deathReg = data && (data.fetchRegistration as GQLDeathRegistration)
-    const informant = deathReg && deathReg.informant
-    const contactInfo =
-      informant &&
-      informant.individual &&
-      informant.individual.telecom &&
-      informant.individual.telecom[0]
-
-    if (!registration || !registration.status) {
-      return []
-    }
-
-    return registration.status.map((status, index) => {
-      const certificate =
-        registration.certificates && registration.certificates[index]
-      const collector = certificate && certificate.collector
-
-      return {
-        type: status && status.type,
-        practitionerName:
-          (status &&
-            status.user &&
-            (createNamesMap(status.user.name as GQLHumanName[])[
-              this.props.language
-            ] as string)) ||
-          (status &&
-            status.user &&
-            (createNamesMap(status.user.name as GQLHumanName[])[
-              ''
-            ] as string)) ||
-          '',
-        timestamp: status && formatLongDate(status.timestamp, locale),
-        practitionerRole:
-          status && status.user && status.user.role
-            ? this.props.intl.formatMessage(
-                userMessages[status.user.role as string]
-              )
-            : '',
-        officeName:
-          locale === LANG_EN
-            ? status && status.office && status.office.name
-            : status && status.office && status.office.alias,
-        collectorName:
-          (collector &&
-            collector.individual &&
-            (createNamesMap(collector.individual.name as GQLHumanName[])[
-              this.props.language
-            ] as string)) ||
-          (collector &&
-            collector.individual &&
-            (createNamesMap(collector.individual.name as GQLHumanName[])[
-              LANG_EN
-            ] as string)) ||
-          '',
-        collectorType: collector && collector.relationship,
-        rejectReasons:
-          (status &&
-            status.type === REJECTED &&
-            extractCommentFragmentValue(
-              status.comments as GQLComment[],
-              REJECT_REASON
-            )) ||
-          '',
-        comment:
-          (status &&
-            status.type === REJECTED &&
-            extractCommentFragmentValue(
-              status.comments as GQLComment[],
-              REJECT_COMMENTS
-            )) ||
-          '',
-        informantContactNumber: contactInfo && contactInfo.value
-      }
-    })
-  }
-
-  renderExpansionContent = (id: string): JSX.Element => {
-    return (
-      <>
-        <Query
-          query={FETCH_REGISTRATION_BY_COMPOSITION}
-          variables={{
-            id
-          }}
-        >
-          {({
-            loading,
-            error,
-            data
-          }: {
-            loading: any
-            error?: any
-            data: any
-          }) => {
-            const { intl, language } = this.props
-            moment.locale(language)
-            if (loading) {
-              return (
-                <ExpansionSpinnerContainer>
-                  <ListItemExpansionSpinner
-                    id="list-expansion-spinner"
-                    baseColor={this.props.theme.colors.background}
-                  />
-                </ExpansionSpinnerContainer>
-              )
-            }
-
-            const statusData = this.transformDataToTaskHistory(data)
-
-            return statusData
-              .map((status, index) => {
-                const {
-                  practitionerName,
-                  practitionerRole,
-                  collectorName,
-                  collectorType,
-                  rejectReasons,
-                  comment,
-                  informantContactNumber
-                } = status
-                const type = status.type as string
-                const officeName = status.officeName as string
-                const timestamp = status.timestamp as string
-                const collectorInfo = collectorName + ' (' + collectorType + ')'
-
-                return (
-                  <ExpansionContainer key={index} id={type + '-' + index}>
-                    {this.getDeclarationStatusIcon(type)}
-                    <ExpansionContentContainer>
-                      <LabelValue
-                        label={intl.formatMessage(
-                          this.getWorkflowDateLabel(type)
-                        )}
-                        value={timestamp}
-                      />
-                      {type === DECLARED && informantContactNumber && (
-                        <LabelValue
-                          label={intl.formatMessage(messages.informantContact)}
-                          value={informantContactNumber}
-                        />
-                      )}
-                      {collectorType && (
-                        <LabelValue
-                          label={intl.formatMessage(
-                            constantsMessages.collectedBy
-                          )}
-                          value={collectorInfo}
-                        />
-                      )}
-                      <ValueContainer>
-                        <StyledLabel>
-                          {this.props.intl.formatMessage(
-                            collectorType
-                              ? constantsMessages.issuedBy
-                              : constantsMessages.by
-                          )}
-                          :
-                        </StyledLabel>
-                        <ValuesWithSeparator
-                          strings={[
-                            practitionerName,
-                            formatRoleCode(practitionerRole),
-                            officeName
-                          ]}
-                        />
-                      </ValueContainer>
-                      {rejectReasons && (
-                        <>
-                          <LabelValue
-                            label={intl.formatMessage(constantsMessages.reason)}
-                            value={rejectReasons}
-                          />
-                          <LabelValue
-                            label={intl.formatMessage(
-                              constantsMessages.comment
-                            )}
-                            value={comment}
-                          />
-                        </>
-                      )}
-                    </ExpansionContentContainer>
-                  </ExpansionContainer>
-                )
-              })
-              .reverse()
-          }}
-        </Query>
-      </>
-    )
-  }
-
-  renderCell = (
-    item: { [key: string]: string & Array<{ [key: string]: string }> },
-    key: number
-  ): JSX.Element => {
-    const applicationIsRegistered = item.declarationStatus === 'REGISTERED'
-    const applicationIsCertified = item.declarationStatus === 'CERTIFIED'
-    const applicationIsRejected = item.declarationStatus === 'REJECTED'
-    const applicationIsValidated = item.declarationStatus === 'VALIDATED'
-    const applicationIsInProgress = item.declarationStatus === 'IN_PROGRESS'
-    const isDuplicate = item.duplicates && item.duplicates.length > 0
-    const application = this.props.outboxApplications.find(
-      application =>
-        (application.compositionId && application.compositionId === item.id) ||
-        application.id === item.id
-    )
-    const downloadStatus = application && application.downloadStatus
-    const info = []
-    const status = []
-    const icons = []
-
-    info.push({
-      label: this.props.intl.formatMessage(constantsMessages.name),
-      value: item.name
-    })
-    if (item.dob) {
-      info.push({
-        label: this.props.intl.formatMessage(constantsMessages.dob),
-        value: item.dob
-      })
-    }
-    if (item.dod) {
-      info.push({
-        label: this.props.intl.formatMessage(constantsMessages.dod),
-        value: item.dod
-      })
-    }
-    if (applicationIsRegistered || applicationIsCertified) {
-      info.push({
-        label: this.props.intl.formatMessage(
-          messages.listItemEventRegistrationNumber,
-          { event: item.event.toLowerCase() }
-        ),
-        value: item.registrationNumber
-      })
-    } else {
-      info.push({
-        label: this.props.intl.formatMessage(constantsMessages.trackingId),
-        value: item.trackingId
-      })
-    }
-
-    status.push({
-      icon: <StatusGray />,
-      label: this.getEventLabel(item.event)
-    })
-    status.push({
-      icon: this.getDeclarationStatusIcon(item.declarationStatus),
-      label: this.getDeclarationStatusLabel(item.declarationStatus)
-    })
-
-    if (applicationIsRejected && item.rejectionReasons) {
-      const reasons = item.rejectionReasons.split(',')
-      const rejectComment = item.rejectionComment
-
-      info.push({
-        label: this.props.intl.formatMessage(constantsMessages.reason),
-        value:
-          reasons &&
-          reasons
-            .reduce(
-              (prev: string[], curr) => [
-                ...prev,
-                this.props.intl.formatMessage(
-                  getRejectionReasonDisplayValue(curr)
-                )
-              ],
-              []
-            )
-            .join(', ')
-      })
-
-      if (rejectComment) {
-        info.push({
-          label: this.props.intl.formatMessage(constantsMessages.comment),
-          value: rejectComment
-        })
-      }
-    }
-
-    if (item.duplicates && item.duplicates.length > 0) {
-      icons.push(<Duplicate />)
-    }
-
-    const listItemActions = []
-
-    if (
-      downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-      ((!applicationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-        (applicationIsValidated && this.userHasRegisterScope()))
-    ) {
-      listItemActions.push({
-        actionComponent: (
-          <DownloadButton
-            key={item.id}
-            downloadConfigs={{
-              event: item.event,
-              compositionId: item.id,
-              action:
-                ((applicationIsRegistered || applicationIsCertified) &&
-                  Action.LOAD_CERTIFICATE_APPLICATION) ||
-                Action.LOAD_REVIEW_APPLICATION
-            }}
-            status={downloadStatus as DOWNLOAD_STATUS}
-          />
-        )
-      })
-    } else if (
-      (applicationIsRegistered || applicationIsCertified) &&
-      this.userHasCertifyScope()
-    ) {
-      listItemActions.push({
-        label: this.props.intl.formatMessage(buttonMessages.print),
-        handler: () => this.props.goToPrintCertificate(item.id, item.event)
-      })
-    } else if (
-      (applicationIsValidated && this.userHasRegisterScope()) ||
-      (!applicationIsValidated &&
-        !applicationIsRegistered &&
-        !applicationIsCertified &&
-        this.userHasValidateOrRegistrarScope())
-    ) {
-      listItemActions.push({
-        label:
-          applicationIsRejected || applicationIsInProgress
-            ? this.props.intl.formatMessage(constantsMessages.update)
-            : this.props.intl.formatMessage(constantsMessages.review),
-        handler: () =>
-          !isDuplicate
-            ? this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                item.id,
-                'review',
-                item.event.toLowerCase()
-              )
-            : this.props.goToReviewDuplicate(item.id)
-      })
-    }
-
-    return (
-      <ListItem
-        index={key}
-        infoItems={info}
-        statusItems={status}
-        icons={icons}
-        key={key}
-        itemData={{}}
-        actions={listItemActions}
-        isBoxShadow={true}
-        isItemFullHeight={false}
-        expandedCellRenderer={() => (
-          <ListItemExpansion>
-            {this.renderExpansionContent(item.id)}
-          </ListItemExpansion>
-        )}
-      />
-    )
-  }
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -719,6 +269,134 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
     return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
+  transformSearchContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
+    if (!data || !data.results) {
+      return []
+    }
+
+    const transformedData = transformData(data, this.props.intl)
+    return transformedData.map((reg, index) => {
+      const foundApplication = this.props.outboxApplications.find(
+        application => application.id === reg.id
+      )
+      const actions: IAction[] = []
+      const downloadStatus =
+        (foundApplication && foundApplication.downloadStatus) || undefined
+
+      const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
+      const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
+      const applicationIsRejected = reg.declarationStatus === 'REJECTED'
+      const applicationIsValidated = reg.declarationStatus === 'VALIDATED'
+      const applicationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+      if (
+        downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
+        ((!applicationIsValidated && this.userHasValidateOrRegistrarScope()) ||
+          (applicationIsValidated && this.userHasRegisterScope()))
+      ) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              key={reg.id}
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action:
+                  ((applicationIsRegistered || applicationIsCertified) &&
+                    Action.LOAD_CERTIFICATE_APPLICATION) ||
+                  Action.LOAD_REVIEW_APPLICATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+      } else if (
+        (applicationIsRegistered || applicationIsCertified) &&
+        this.userHasCertifyScope()
+      ) {
+        actions.push({
+          label: this.props.intl.formatMessage(buttonMessages.print),
+          handler: () => this.props.goToPrintCertificate(reg.id, reg.event)
+        })
+      } else if (
+        (applicationIsValidated && this.userHasRegisterScope()) ||
+        (!applicationIsValidated &&
+          !applicationIsRegistered &&
+          !applicationIsCertified &&
+          this.userHasValidateOrRegistrarScope())
+      ) {
+        actions.push({
+          label:
+            applicationIsRejected || applicationIsInProgress
+              ? this.props.intl.formatMessage(constantsMessages.update)
+              : this.props.intl.formatMessage(constantsMessages.review),
+          handler: () =>
+            !isDuplicate
+              ? this.props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.id,
+                  'review',
+                  reg.event.toLowerCase()
+                )
+              : this.props.goToReviewDuplicate(reg.id)
+        })
+      }
+
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
+      return {
+        ...reg,
+        event,
+        trackingId: reg.trackingId,
+        status: this.getDeclarationStatusLabel(
+          reg.declarationStatus
+        ).toLocaleUpperCase(),
+        dateOfModification:
+          (reg.modifiedAt &&
+            moment(
+              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
+          (reg.createdAt &&
+            moment(
+              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
+          '',
+        startedBy:
+          (reg.createdAt &&
+            moment(
+              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              'YYYY-MM-DD HH:mm:ss'
+            ).fromNow()) ||
+          '',
+        actions,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => this.props.goToApplicationDetails(reg.id)
+          }
+        ]
+      }
+    })
+  }
+
+  renderExpandedComponent = (itemId: string, data: GQLQuery) => {
+    const results = data && data.searchEvents && data.searchEvents.results
+    const eventDetails =
+      results && results.find(result => result && result.id === itemId)
+    return <RowHistoryView eventDetails={eventDetails} />
+  }
+
+  onPageChange = (newPageNumber: number) => {
+    this.setState({ currentPage: newPageNumber })
+  }
+
   render() {
     const { intl, match, userDetails } = this.props
     const { searchText, searchType } = match.params
@@ -731,7 +409,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
           enableMenuSelection={false}
         />
         <Container>
-          <BodyContent>
+          <HomeContent>
             {searchText && searchType && (
               <Query
                 query={SEARCH_EVENTS}
@@ -776,8 +454,11 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                     )
                   }
 
-                  const transformedData = transformData(data.searchEvents, intl)
-                  const total = transformedData.length
+                  const total =
+                    (data.searchEvents &&
+                      data.searchEvents.results &&
+                      data.searchEvents.results.length) ||
+                    0
                   return (
                     <>
                       <SearchResultText>
@@ -788,20 +469,31 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                       </SearchResultText>
                       {total > 0 && (
                         <>
-                          <TotalResultText>
-                            {intl.formatMessage(messages.totalResultText, {
-                              total
-                            })}
-                          </TotalResultText>
-                          <DataTable
-                            data={transformedData}
-                            zeroPagination={true}
-                            cellRenderer={this.renderCell}
-                            resultLabel={intl.formatMessage(
-                              messages.dataTableResults
+                          <GridTable
+                            content={this.transformSearchContent(
+                              data.searchEvents
                             )}
+                            columns={this.getColumns()}
+                            renderExpandedComponent={(itemId: string) =>
+                              this.renderExpandedComponent(itemId, data)
+                            }
                             noResultText={intl.formatMessage(
-                              messages.dataTableNoResults
+                              constantsMessages.noResults
+                            )}
+                            onPageChange={this.onPageChange}
+                            pageSize={this.pageSize}
+                            totalItems={
+                              (data &&
+                                data.searchEvents &&
+                                data.searchEvents.totalItems) ||
+                              0
+                            }
+                            currentPage={this.state.currentPage}
+                            expandable={this.getExpandable()}
+                            clickable={!this.getExpandable()}
+                            showPaginated={this.showPaginated}
+                            loadMoreText={intl.formatMessage(
+                              constantsMessages.loadMore
                             )}
                           />
                         </>
@@ -811,7 +503,7 @@ export class SearchResultView extends React.Component<ISearchResultProps> {
                 }}
               </Query>
             )}
-          </BodyContent>
+          </HomeContent>
         </Container>
       </>
     )
@@ -828,6 +520,7 @@ export const SearchResult = connect(
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
     goToReviewDuplicate: goToReviewDuplicateAction,
-    goToPrintCertificate: goToPrintCertificateAction
+    goToPrintCertificate: goToPrintCertificateAction,
+    goToApplicationDetails
   }
 )(injectIntl(withTheme(SearchResultView)))
