@@ -722,4 +722,88 @@ describe('User root resolvers', () => {
       )
     })
   })
+
+  describe('userAudit mutation', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegister: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const regsiterToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegister = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+    })
+
+    it('audits user for sysadmin', async () => {
+      fetch.mockResponseOnce(JSON.stringify(null), { status: 200 })
+
+      const response = await resolvers.Mutation.auditUser(
+        {},
+        {
+          userId: '5bce8ujkf0fuib',
+          action: 'DEACTIVATE',
+          reason: 'SUSPICIOUS'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(response).toEqual(true)
+    })
+
+    it('throws error for unauthorized user', async () => {
+      await expect(
+        resolvers.Mutation.auditUser(
+          {},
+          {
+            userId: '5bce8ujkf0fuib',
+            action: 'DEACTIVATE',
+            reason: 'SUSPICIOUS'
+          },
+          authHeaderRegister
+        )
+      ).rejects.toThrowError(
+        'User 5bce8ujkf0fuib is not allowed to audit for not having the sys admin scope'
+      )
+    })
+
+    it('throws error when the service response is not 200', async () => {
+      fetch.mockResponseOnce(JSON.stringify(null), { status: 400 })
+
+      await expect(
+        resolvers.Mutation.auditUser(
+          {},
+          {
+            userId: '5bce8ujkf0fuib',
+            action: 'DEACTIVATE',
+            reason: 'SUSPICIOUS'
+          },
+          authHeaderSysAdmin
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't audit user 5bce8ujkf0fuib"
+      )
+    })
+  })
 })
