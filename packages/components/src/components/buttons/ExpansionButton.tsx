@@ -21,6 +21,7 @@ export const StyledButton = styled(Button)`
   width: 40px;
   display: flex;
   border-radius: 100%;
+  align-items: center;
   &:hover {
     background-color: ${({ theme }) => theme.colors.dropdownHover};
   }
