@@ -365,6 +365,7 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
+  underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar: GQLLocalRegistrar
@@ -2448,6 +2449,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
+  underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
@@ -2493,6 +2495,13 @@ export interface UserToEmailResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToUnderInvestigationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -37,6 +37,7 @@ import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 
 export enum UserStatus {
   ACTIVE,
+  DEACTIVATED,
   PENDING,
   DISABLED
 }

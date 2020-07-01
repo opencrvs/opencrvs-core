@@ -98,7 +98,6 @@ const RowWrapper = styled.div<{ totalWidth: number; highlight?: boolean }>`
   & span:last-child {
     text-align: right;
     padding-right: 12px;
-    display: inline-block;
   }
 `
 const TableFooter = styled(RowWrapper)`
@@ -136,8 +135,9 @@ const ValueWrapper = styled.span<{
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
   display: flex;
-  flex-direction: ${({ alignment }) =>
-    alignment === ColumnContentAlignment.RIGHT ? 'row-reverse' : 'row'};
+  justify-content: ${({ alignment }) =>
+    alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
+  align-items: center;
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};

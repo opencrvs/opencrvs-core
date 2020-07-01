@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { userTypeResolvers } from '@gateway/features/user/type-resolvers'
+import {
+  IUserModelData,
+  userTypeResolvers
+} from '@gateway/features/user/type-resolvers'
 import * as fetch from 'jest-fetch-mock'
 
 beforeEach(() => {
@@ -17,22 +20,19 @@ beforeEach(() => {
 })
 
 describe('User type resolvers', () => {
-  const mockResponse = {
+  const mockResponse: IUserModelData = {
     _id: 'ba7022f0ff4822',
     name: [
       {
         use: 'en',
         given: ['Tamim'],
-        family: ['Iqbal']
+        family: 'Iqbal'
       }
     ],
     username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
     identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
-    passwordHash:
-      'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-    salt: '12345',
     role: 'REGISTRATION_AGENT',
     scope: ['certify'],
     status: 'active',
@@ -44,7 +44,9 @@ describe('User type resolvers', () => {
       '7719942b-16a7-474a-8af1-cd0c94c730d2',
       '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
     ],
-    creationDate: 1559054406433
+    creationDate: '1559054406433',
+    type: 'MAYOR',
+    device: ''
   }
   it('return id type', () => {
     const res = userTypeResolvers.User.id(mockResponse)
@@ -53,6 +55,20 @@ describe('User type resolvers', () => {
   it('return userMgntUserID type', () => {
     const res = userTypeResolvers.User.userMgntUserID(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
+  })
+  it('return suspicious user flag', () => {
+    const underInvestigationUserMockResponse = mockResponse
+    underInvestigationUserMockResponse.status = 'deactivated'
+    underInvestigationUserMockResponse.auditHistory = [
+      {
+        auditedBy: 'DUMMY_AUDITOR_ID',
+        auditedOn: 1234897987,
+        action: 'DEACTIVATE',
+        reason: 'SUSPICIOUS'
+      }
+    ]
+    const res = userTypeResolvers.User.underInvestigation(mockResponse)
+    expect(res).toBeTruthy()
   })
   it('return user identifier', () => {
     const res = userTypeResolvers.User.identifier(mockResponse)
