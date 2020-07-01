@@ -131,16 +131,20 @@ export function getValidationErrorsForForm(
   requiredErrorMessage?: MessageDescriptor
 ) {
   return fields.reduce(
-    (errorsForAllFields: Errors, field) => ({
-      ...errorsForAllFields,
-      [field.name]: getValidationErrors.forField(
-        field,
-        values,
-        resource,
-        drafts,
-        requiredErrorMessage
-      )
-    }),
+    (errorsForAllFields: Errors, field) =>
+      errorsForAllFields[field.name] &&
+      errorsForAllFields[field.name].errors.length > 0
+        ? errorsForAllFields
+        : {
+            ...errorsForAllFields,
+            [field.name]: getValidationErrors.forField(
+              field,
+              values,
+              resource,
+              drafts,
+              requiredErrorMessage
+            )
+          },
     {}
   )
 }
