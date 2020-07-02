@@ -25,6 +25,7 @@ export interface IMetricsParam {
   locationId: string
   event?: string
   practitionerIds?: string[]
+  practitionerId?: string
 }
 
 export const resolvers: GQLResolver = {
@@ -132,6 +133,22 @@ export const resolvers: GQLResolver = {
         details: metricsData,
         total: eventIn45DayEstimationCalculator(metricsData)
       }
+    },
+    async fetchTimeLoggedMetricsByPractitioner(
+      _,
+      { timeStart, timeEnd, practitionerId, locationId },
+      authHeader
+    ) {
+      return await getMetrics(
+        '/timeLoggedMetricsByPractitioner',
+        {
+          timeStart,
+          timeEnd,
+          practitionerId,
+          locationId
+        },
+        authHeader
+      )
     }
   }
 }

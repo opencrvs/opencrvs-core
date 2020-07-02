@@ -173,6 +173,13 @@ type LocationWise45DayEstimation {
   locationName: String!
 }
 
+type TimeLoggedMetrics {
+  status: String!
+  trackingId: String!
+  eventType: String!
+  time: String!
+}
+
 type Query {
   fetchRegistrationMetrics(
     timeStart: String!
@@ -202,4 +209,10 @@ type Query {
     locationId: String!
     event: String!
   ): LocationWiseEstimationMetrics
+  fetchTimeLoggedMetricsByPractitioner(
+    timeStart: String!
+    timeEnd: String!
+    practitionerId: String!
+    locationId: String!
+  ): [TimeLoggedMetrics]
 }
