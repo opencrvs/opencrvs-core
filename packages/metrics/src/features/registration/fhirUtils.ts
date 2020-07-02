@@ -138,6 +138,19 @@ export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
   return coding.code as APPLICATION_STATUS
 }
 
+export function getTrackingId(task: Task) {
+  const trackingIdentifier = task?.identifier?.find(identifier => {
+    return (
+      identifier.system === `http://opencrvs.org/specs/id/birth-tracking-id` ||
+      identifier.system === `http://opencrvs.org/specs/id/death-tracking-id`
+    )
+  })
+  if (!trackingIdentifier || !trackingIdentifier.value) {
+    throw new Error("Didn't find any identifier for tracking id")
+  }
+  return trackingIdentifier.value
+}
+
 export function getApplicationType(task: Task): APPLICATION_TYPE | null {
   if (!task.code || !task.code.coding) {
     return null
