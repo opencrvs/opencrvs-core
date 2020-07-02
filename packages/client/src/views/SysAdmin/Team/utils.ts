@@ -39,8 +39,7 @@ export enum UserStatus {
   ACTIVE,
   DEACTIVATED,
   PENDING,
-  DISABLED,
-  DEACTIVATED
+  DISABLED
 }
 
 export const mockIncompleteFormData = {

@@ -11,7 +11,11 @@
  */
 import * as React from 'react'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
-import { TertiaryButton, DangerButton } from '@opencrvs/components/lib/buttons'
+import {
+  TertiaryButton,
+  DangerButton,
+  SuccessButton
+} from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
@@ -26,7 +30,6 @@ import styled from '@client/styledComponents'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { FormikTouched, FormikValues } from 'formik'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {
@@ -37,6 +40,7 @@ import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import ApolloClient from 'apollo-client'
 import { withApollo, WithApolloClient } from 'react-apollo'
+import { draftToGqlTransformer } from '@client/transformer'
 
 const { useState, useEffect } = React
 
@@ -88,7 +92,7 @@ function isValidAuditStatus(status: string): status is AuditStatus {
   return Object.keys(statusActionMap).includes(status)
 }
 
-let makeAllFieldsDirty: (touched: FormikTouched<FormikValues>) => void
+let makeAllFieldsDirty: (touched: {}) => void
 
 function UserAuditActionModalComponent(
   props: ToggleUserActivationModalProps & WithApolloClient<{}>
@@ -111,15 +115,12 @@ function UserAuditActionModalComponent(
     name =
       (createNamesMap(user.name as GQLHumanName[])[intl.locale] as string) ||
       (createNamesMap(user.name as GQLHumanName[])[LANG_EN] as string)
-
-    modalTitle = intl.formatMessage(messages.deactivateUserTitle, { name })
-    modalSubtitle = intl.formatMessage(messages.deactivateUserSubtitle, {
-      name
-    })
   }
 
   useEffect(() => {
-    if (hasFormError(props.form.fields, formValues)) {
+    if (
+      hasFormError(props.form.fields, formValues, undefined, { formValues })
+    ) {
       setFormError(intl.formatMessage(messages.formError))
     } else {
       setFormError(null)
@@ -152,7 +153,7 @@ function UserAuditActionModalComponent(
       const touched = props.form.fields.reduce(
         (memo, field) => ({ ...memo, [field.name]: true }),
         {}
-      ) as { [key: string]: boolean }
+      )
       makeAllFieldsDirty(touched)
     }
     makeErrorVisible(true)
@@ -186,6 +187,24 @@ function UserAuditActionModalComponent(
         {intl.formatMessage(buttonMessages.deactivate)}
       </DangerButton>
     )
+
+    modalTitle = intl.formatMessage(messages.deactivateUserTitle, { name })
+    modalSubtitle = intl.formatMessage(messages.deactivateUserSubtitle, {
+      name
+    })
+  }
+
+  if (user && user.status === 'deactivated') {
+    actions.push(
+      <SuccessButton id="reactivate-action" onClick={handleConfirm}>
+        {intl.formatMessage(buttonMessages.reactivate)}
+      </SuccessButton>
+    )
+
+    modalTitle = intl.formatMessage(messages.reactivateUserTitle, { name })
+    modalSubtitle = intl.formatMessage(messages.reactivateUserSubtitle, {
+      name
+    })
   }
 
   return (
@@ -209,6 +228,7 @@ function UserAuditActionModalComponent(
         fields={form.fields}
         onChange={values => setFormValues({ ...formValues, ...values })}
         setAllFieldsDirty={false}
+        draftData={{ formValues }}
         onSetTouched={onSetTouchedCallback => {
           makeAllFieldsDirty = onSetTouchedCallback
         }}
