@@ -13,6 +13,7 @@ import { Header } from '@client/components/interface/Header/Header'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -59,9 +60,11 @@ interface DefaultPage extends BasePage {
 
 interface HeaderProps {
   id?: string
-  headerTitle: string
+  headerTitle?: string
+  loadingHeader?: boolean
   backActionHandler: () => void
   toolbarComponent?: React.ReactNode
+  menuComponent?: React.ReactNode
 }
 
 interface SubPage extends BasePage, HeaderProps {
@@ -96,6 +99,10 @@ const SubPageHeaderBody = styled.div`
   & > :first-child {
     margin-right: 8px;
   }
+  & > #menuOptionsHolder {
+    margin-left: auto;
+    padding-right: 10px;
+  }
 `
 const ToolbarContainer = styled.div`
   display: flex;
@@ -107,6 +114,10 @@ const ToolbarContainer = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0 -16px;
   }
+`
+const HeaderMenuContainer = styled.div`
+  ${({ theme }) => theme.fonts.bodyStyle};
+  justify-content: space-between;
 `
 
 const HeaderText = styled.span`
@@ -124,7 +135,16 @@ function SubPageHeader(props: HeaderProps) {
         >
           <BackArrowDeepBlue />
         </CircleButton>
-        <HeaderText id={`${props.id}-header`}>{props.headerTitle}</HeaderText>
+        {(props.loadingHeader && <LoadingGrey width={20} />) || (
+          <HeaderText id={`${props.id}-header`}>
+            {props.headerTitle || ''}
+          </HeaderText>
+        )}
+        {props.menuComponent && (
+          <HeaderMenuContainer id="menuOptionsHolder">
+            {props.menuComponent}
+          </HeaderMenuContainer>
+        )}
       </SubPageHeaderBody>
       {props.toolbarComponent && (
         <ToolbarContainer>{props.toolbarComponent}</ToolbarContainer>
@@ -141,8 +161,10 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       <SubPageHeader
         id={props.id}
         headerTitle={props.headerTitle}
+        loadingHeader={props.loadingHeader}
         backActionHandler={props.backActionHandler}
         toolbarComponent={props.toolbarComponent}
+        menuComponent={props.menuComponent}
       />
     )
 
@@ -152,8 +174,10 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       <SubPageHeader
         id={props.id}
         headerTitle={props.headerTitle}
+        loadingHeader={props.loadingHeader}
         backActionHandler={props.backActionHandler}
         toolbarComponent={props.toolbarComponent}
+        menuComponent={props.menuComponent}
       />
     )
     pageContent = (

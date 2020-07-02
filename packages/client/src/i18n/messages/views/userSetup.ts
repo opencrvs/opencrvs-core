@@ -34,6 +34,24 @@ interface IUserSetupMessages {
   userSetupWelcomeTitle: MessageDescriptor
   validationMsg: MessageDescriptor
   waiting: MessageDescriptor
+  assignedOffice: MessageDescriptor
+  roleType: MessageDescriptor
+  phoneNumber: MessageDescriptor
+  userName: MessageDescriptor
+  startDate: MessageDescriptor
+  auditSectionTitle: MessageDescriptor
+  auditActionColumnTitle: MessageDescriptor
+  auditTrackingIDColumnTitle: MessageDescriptor
+  auditEventTypeColumnTitle: MessageDescriptor
+  auditDateColumnTitle: MessageDescriptor
+  noAuditFound: MessageDescriptor
+  inProgressAuditAction: MessageDescriptor
+  declaredAuditAction: MessageDescriptor
+  validatedAuditAction: MessageDescriptor
+  waitingForValidationAuditAction: MessageDescriptor
+  registeredAuditAction: MessageDescriptor
+  rejectedAuditAction: MessageDescriptor
+  certifiedAuditAction: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -149,6 +167,96 @@ const messagesToDefine: IUserSetupMessages = {
     description:
       'The message that displays when the user is waiting for the account to be created',
     id: 'user.setup.waiting'
+  },
+  assignedOffice: {
+    defaultMessage: 'Assigned office',
+    description: 'Title for assigned office field',
+    id: 'user.profile.assignedOffice'
+  },
+  roleType: {
+    defaultMessage: 'Role/Type',
+    description: 'Title for roleType field',
+    id: 'user.profile.roleType'
+  },
+  phoneNumber: {
+    defaultMessage: 'Phone number',
+    description: 'Title for phoneNumber field',
+    id: 'user.profile.phoneNumber'
+  },
+  userName: {
+    defaultMessage: 'Username',
+    description: 'Title for userName field',
+    id: 'user.profile.userName'
+  },
+  startDate: {
+    defaultMessage: 'Start date',
+    description: 'Title for startDate field',
+    id: 'user.profile.startDate'
+  },
+  auditSectionTitle: {
+    defaultMessage: 'Audit',
+    description: 'Title for audit section',
+    id: 'user.profile.sectionTitle.audit'
+  },
+  auditActionColumnTitle: {
+    defaultMessage: 'Action',
+    description: 'Title for audit action column',
+    id: 'user.profile.audit.column.action'
+  },
+  auditTrackingIDColumnTitle: {
+    defaultMessage: 'Tracking ID',
+    description: 'Title for audit tracking id column',
+    id: 'user.profile.audit.column.trackingId'
+  },
+  auditEventTypeColumnTitle: {
+    defaultMessage: 'Event type',
+    description: 'Title for audit event type column',
+    id: 'user.profile.audit.column.eventType'
+  },
+  auditDateColumnTitle: {
+    defaultMessage: 'Date',
+    description: 'Title for audit date column',
+    id: 'user.profile.audit.column.date'
+  },
+  noAuditFound: {
+    defaultMessage: 'No audits to display',
+    description: 'Text for audit list',
+    id: 'user.profile.audit.list.noDataFound'
+  },
+  inProgressAuditAction: {
+    defaultMessage: 'Sent application for review - incomplete',
+    description: 'Description for incomplete application',
+    id: 'user.profile.audit.description.inProgress'
+  },
+  declaredAuditAction: {
+    defaultMessage: 'Sent application for review - complete',
+    description: 'Description for complete application',
+    id: 'user.profile.audit.description.declared'
+  },
+  validatedAuditAction: {
+    defaultMessage: 'Sent application for approval',
+    description: 'Description for validated application',
+    id: 'user.profile.audit.description.validated'
+  },
+  waitingForValidationAuditAction: {
+    defaultMessage: 'Sent application for external system validation',
+    description: 'Description for waiting for external validation application',
+    id: 'user.profile.audit.description.waiting_validation'
+  },
+  registeredAuditAction: {
+    defaultMessage: 'Registered vital event',
+    description: 'Description for registered application',
+    id: 'user.profile.audit.description.registered'
+  },
+  rejectedAuditAction: {
+    defaultMessage: 'Sent application for updates',
+    description: 'Description for rejected application',
+    id: 'user.profile.audit.description.rejected'
+  },
+  certifiedAuditAction: {
+    defaultMessage: 'Printed certificate',
+    description: 'Description for certified application',
+    id: 'user.profile.audit.description.certified'
   }
 }
 

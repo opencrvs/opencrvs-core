@@ -21,7 +21,8 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch
+  goToTeamSearch,
+  goToUserProfile
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -94,6 +95,7 @@ const ErrorText = styled.div`
 const StatusBox = styled.span`
   padding: 4px 6px;
   border-radius: 4px;
+  height: 30px;
   text-align: center;
 `
 const ActiveStatusBox = styled(StatusBox)`
@@ -192,6 +194,7 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
+  goToUserProfile: typeof goToUserProfile
 }
 
 type IProps = BaseProps & IntlShapeProps & RouteComponentProps
@@ -200,7 +203,7 @@ interface IStatusProps {
   status: string
 }
 
-const Status = (statusProps: IStatusProps) => {
+export const Status = (statusProps: IStatusProps) => {
   const status =
     statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
   switch (status.toLowerCase()) {
@@ -221,6 +224,7 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
+    goToUserProfile,
     offlineOffices,
     location: { search }
   } = props
@@ -294,7 +298,11 @@ function UserListComponent(props: IProps) {
 
           return {
             photo: <AvatarSmall />,
-            name: <LinkButton>{name}</LinkButton>,
+            name: (
+              <LinkButton onClick={() => goToUserProfile(user.id || '')}>
+                {name}
+              </LinkButton>
+            ),
             nameRoleType: getNameRoleType(name, role, type),
             roleType: getRoleType(role, type),
             status: <Status status={status} />,
@@ -515,6 +523,7 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch
+    goToTeamSearch,
+    goToUserProfile
   }
 )(withTheme(injectIntl(UserListComponent)))

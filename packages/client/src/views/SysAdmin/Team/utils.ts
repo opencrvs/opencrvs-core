@@ -34,6 +34,8 @@ import {
   ROLE_TYPE_SECRETARY
 } from '@client/utils/constants'
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
+import { MessageDescriptor } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/userSetup'
 
 export enum UserStatus {
   ACTIVE,
@@ -570,4 +572,34 @@ export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
     }
   })
   return roleList
+}
+
+const AuditDescriptionMapping: {
+  [key: string]: { [key: string]: MessageDescriptor }
+} = {
+  FIELD_AGENT: {
+    IN_PROGRESS: messages.inProgressAuditAction,
+    DECLARED: messages.declaredAuditAction
+  },
+  REGISTRATION_AGENT: {
+    VALIDATED: messages.validatedAuditAction,
+    REJECTED: messages.rejectedAuditAction,
+    CERTIFIED: messages.certifiedAuditAction
+  },
+  LOCAL_REGISTRAR: {
+    WAITING_VALIDATION: messages.waitingForValidationAuditAction,
+    REGISTERED: messages.registeredAuditAction,
+    REJECTED: messages.rejectedAuditAction,
+    CERTIFIED: messages.certifiedAuditAction
+  }
+}
+
+export function getUserAuditDescription(
+  status: string,
+  role: string
+): MessageDescriptor | undefined {
+  return (
+    (AuditDescriptionMapping[role] && AuditDescriptionMapping[role][status]) ||
+    undefined
+  )
 }
