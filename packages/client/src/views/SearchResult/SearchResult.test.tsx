@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DataTable, Spinner } from '@opencrvs/components/lib/interface'
+import {
+  DataTable,
+  Spinner,
+  GridTable
+} from '@opencrvs/components/lib/interface'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -318,111 +322,8 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.component.update()
-    const data = testComponent.component.find(DataTable).prop('data')
-    expect(data).toEqual([
-      {
-        id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        name: 'ইলিয়াস খান',
-        dob: '',
-        dod: '01 January 2007',
-        registrationNumber: '',
-        trackingId: 'DW0UTHR',
-        event: 'Death',
-        declarationStatus: 'DECLARED',
-        duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-        rejectionReasons: '',
-        rejectionComment: '',
-        contactNumber: '',
-        dateOfEvent: '2007-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      },
-      {
-        id: 'c7e83060-4db9-4057-8b14-71841243b05f',
-        name: 'জহির রায়হান',
-        dob: '',
-        dod: '01 January 2010',
-        registrationNumber: '',
-        trackingId: 'DXMJPYA',
-        event: 'Death',
-        declarationStatus: 'REJECTED',
-        duplicates: [],
-        rejectionReasons: 'duplicate,misspelling,missing_supporting_doc,other',
-        rejectionComment: 'Rejected',
-        contactNumber: '',
-        dateOfEvent: '2010-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      },
-      {
-        id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
-        name: 'ফকরুল ইসলাম',
-        dob: '01 January 2010',
-        dod: '',
-        registrationNumber: '2019333494BQRZWDR2',
-        duplicates: [],
-        trackingId: 'BQRZWDR',
-        event: 'Birth',
-        declarationStatus: 'REGISTERED',
-        rejectionReasons: '',
-        rejectionComment: '',
-        contactNumber: '',
-        dateOfEvent: '2010-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      },
-      {
-        id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
-        name: 'ফকরুল ইসলাম',
-        dob: '01 January 2010',
-        dod: '',
-        registrationNumber: '2019333494BQRZWDR2',
-        duplicates: [],
-        trackingId: 'BQRZWDR',
-        event: 'Birth',
-        declarationStatus: 'VALIDATED',
-        rejectionReasons: '',
-        rejectionComment: '',
-        contactNumber: '',
-        dateOfEvent: '2010-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      },
-      {
-        id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
-        name: 'ফকরুল ইসলাম',
-        dob: '01 January 2010',
-        dod: '',
-        registrationNumber: '2019333494BQRZWDR2',
-        duplicates: [],
-        trackingId: 'BQRZWDR',
-        event: 'Birth',
-        declarationStatus: 'WAITING_VALIDATION',
-        rejectionReasons: '',
-        rejectionComment: '',
-        contactNumber: '',
-        dateOfEvent: '2010-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      },
-      {
-        id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
-        name: 'রফিক ইসলাম',
-        dob: '01 January 2008',
-        dod: '',
-        registrationNumber: '2019333494B3DBJMP5',
-        duplicates: [],
-        trackingId: 'B3DBJMP',
-        event: 'Birth',
-        declarationStatus: 'CERTIFIED',
-        rejectionReasons: '',
-        rejectionComment: '',
-        contactNumber: '',
-        dateOfEvent: '2008-01-01',
-        createdAt: undefined,
-        modifiedAt: undefined
-      }
-    ])
+    const data = testComponent.component.find(GridTable).prop('content')
+    expect(data.length).toEqual(6)
   })
 
   it('renders error text when an error occurs', async () => {
@@ -867,6 +768,11 @@ describe('SearchResult tests', () => {
       }
     ]
 
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 1100
+    })
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SearchResult
