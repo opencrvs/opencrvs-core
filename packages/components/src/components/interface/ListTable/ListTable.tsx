@@ -159,7 +159,7 @@ const H3 = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
-const LoadingGrey = styled.span<{
+export const LoadingGrey = styled.span<{
   width?: number
 }>`
   background: ${({ theme }) => theme.colors.background};
