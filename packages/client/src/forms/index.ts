@@ -646,6 +646,10 @@ export interface IConditionals {
   deceasedNationIdSelected: IConditional
   isRegistrarOrRegistrationAgentRoleSelected: IConditional
   certCollectorOther: IConditional
+  userAuditReasonSpecified: IConditional
+  userAuditReasonOther: IConditional
+  isAuditActionDeactivate: IConditional
+  isAuditActionReactivate: IConditional
 }
 
 export type ViewType = 'form' | 'preview' | 'review' | 'hidden'

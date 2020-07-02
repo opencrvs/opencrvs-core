@@ -11,6 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 export const SEARCH_USERS = gql`
   query($count: Int, $skip: Int, $primaryOfficeId: String) {
@@ -27,6 +28,7 @@ export const SEARCH_USERS = gql`
         role
         type
         status
+        underInvestigation
       }
     }
   }
@@ -91,6 +93,21 @@ export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
   }
 `
 
+export const USER_AUDIT_ACTION = gql`
+  mutation auditUser(
+    $userId: String!
+    $action: String!
+    $reason: String!
+    $comment: String
+  ) {
+    auditUser(
+      userId: $userId
+      action: $action
+      reason: $reason
+      comment: $comment
+    )
+  }
+`
 async function searchUsers(primaryOfficeId: string) {
   return (
     client &&

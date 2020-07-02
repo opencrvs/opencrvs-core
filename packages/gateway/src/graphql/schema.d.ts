@@ -366,6 +366,7 @@ export interface GQLUser {
   type?: string
   email?: string
   status?: string
+  underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar: GQLLocalRegistrar
@@ -2475,6 +2476,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   type?: UserToTypeResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>
+  underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
@@ -2520,6 +2522,13 @@ export interface UserToEmailResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToStatusResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToUnderInvestigationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4207,6 +4216,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
+  auditUser?: MutationToAuditUserResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -4500,6 +4510,21 @@ export interface MutationToChangePasswordResolver<
   (
     parent: TParent,
     args: MutationToChangePasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToAuditUserArgs {
+  userId: string
+  action: string
+  reason: string
+  comment: string
+}
+export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToAuditUserArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

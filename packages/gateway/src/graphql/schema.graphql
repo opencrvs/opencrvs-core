@@ -159,6 +159,12 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
+  auditUser(
+    userId: String!
+    action: String!
+    reason: String!
+    comment: String
+  ): String
 }
 
 type Dummy {
@@ -283,6 +289,7 @@ type User {
   type: String
   email: String
   status: String
+  underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar!

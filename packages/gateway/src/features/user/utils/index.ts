@@ -102,6 +102,14 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   return decoded
 }
 
+export const getUserId = (authHeader: IAuthHeader): string => {
+  if (!authHeader || !authHeader.Authorization) {
+    throw new Error(`getUserId: Error occurred during token decode`)
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return tokenPayload.sub
+}
+
 export function getFullName(user: IUserModelData, language: string) {
   const localName = user.name.find(name => name.use === language)
   return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()

@@ -19,6 +19,7 @@ interface IButtonsMessages {
   confirm: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
+  deactivate: MessageDescriptor
   delete: MessageDescriptor
   edit: MessageDescriptor
   editRegistration: MessageDescriptor
@@ -40,6 +41,7 @@ interface IButtonsMessages {
   saveExitButton: MessageDescriptor
   deleteApplication: MessageDescriptor
   closeApplication: MessageDescriptor
+  reactivate: MessageDescriptor
   search: MessageDescriptor
   select: MessageDescriptor
   send: MessageDescriptor
@@ -96,6 +98,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Create user',
     description: 'Label for submit button of user creation form',
     id: 'user.form.buttons.submit'
+  },
+  deactivate: {
+    defaultMessage: 'Deactivate',
+    description: 'Label for confirmation modal for user deactivation',
+    id: 'team.user.buttons.deactivate'
   },
   delete: {
     defaultMessage: 'Delete',
@@ -201,6 +208,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Close Application',
     description: 'Close application button text',
     id: 'buttons.closeApplication'
+  },
+  reactivate: {
+    defaultMessage: 'Reactivate',
+    description: 'Label for confirmation modal for user reactivation',
+    id: 'team.user.buttons.reactivate'
   },
   search: {
     defaultMessage: 'Search',

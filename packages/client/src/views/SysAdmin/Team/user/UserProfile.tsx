@@ -341,7 +341,8 @@ class UserProfileComponent extends React.Component<Props, State> {
         {
           label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
           width: 20,
-          key: 'trackingId'
+          key: 'trackingId',
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     } else {
@@ -372,7 +373,8 @@ class UserProfileComponent extends React.Component<Props, State> {
           width: 22,
           key: 'auditTime',
           isSortable: true,
-          icon: <ArrowDownBlue />
+          icon: <ArrowDownBlue />,
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     }

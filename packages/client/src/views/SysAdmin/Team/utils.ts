@@ -39,6 +39,7 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 
 export enum UserStatus {
   ACTIVE,
+  DEACTIVATED,
   PENDING,
   DISABLED
 }

@@ -14,7 +14,8 @@ import * as Hapi from 'hapi'
 export const statuses = {
   PENDING: 'pending',
   ACTIVE: 'active',
-  DISABLED: 'disabled'
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
 }
 
 interface IRoleScopeMapping {

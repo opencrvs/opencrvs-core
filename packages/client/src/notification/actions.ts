@@ -1,3 +1,5 @@
+import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,6 +22,9 @@ export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
 export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
+
+export const SHOW_USER_AUDIT_SUCCESS_TOAST = 'SHOW_USER_AUDIT_SUCCESS_TOAST'
+export const HIDE_USER_AUDIT_SUCCESS_TOAST = 'HIDE_USER_AUDIT_SUCCESS_TOAST'
 
 export type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
@@ -53,6 +58,18 @@ export type ShowSubmitFormErrorToast = {
 
 export type HideSubmitFormErrorToast = {
   type: typeof HIDE_SUBMIT_FORM_ERROR_TOAST
+}
+
+export type ShowUserAuditSuccessToast = {
+  type: typeof SHOW_USER_AUDIT_SUCCESS_TOAST
+  payload: {
+    userFullName: string
+    action: AUDIT_ACTION
+  }
+}
+
+export type HideUserAuditSuccessToast = {
+  type: typeof HIDE_USER_AUDIT_SUCCESS_TOAST
 }
 
 export const showConfigurationErrorNotification = (): ShowConfigurationErrorAction => ({
@@ -113,6 +130,21 @@ export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
   type: HIDE_SUBMIT_FORM_ERROR_TOAST
 })
 
+export const showUserAuditSuccessToast = (
+  userFullName: string,
+  action: AUDIT_ACTION
+): ShowUserAuditSuccessToast => ({
+  type: SHOW_USER_AUDIT_SUCCESS_TOAST,
+  payload: {
+    userFullName,
+    action
+  }
+})
+
+export const hideUserAuditSuccessToast = (): HideUserAuditSuccessToast => ({
+  type: HIDE_USER_AUDIT_SUCCESS_TOAST
+})
+
 export type Action =
   | ShowBackgroundSyncedAction
   | HideBackgroundSyncedAction
@@ -124,3 +156,5 @@ export type Action =
   | HideSubmitFormSuccessToast
   | ShowSubmitFormErrorToast
   | HideSubmitFormErrorToast
+  | ShowUserAuditSuccessToast
+  | HideUserAuditSuccessToast

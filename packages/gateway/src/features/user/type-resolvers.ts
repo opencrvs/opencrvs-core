@@ -19,6 +19,14 @@ import {
   GQLUserIdentifierInput
 } from '@gateway/graphql/schema'
 
+interface IAuditHistory {
+  auditedBy: string
+  auditedOn: number
+  action: string
+  reason: string
+  comment?: string
+}
+
 export interface IUserModelData {
   _id: string
   username: string
@@ -37,8 +45,9 @@ export interface IUserModelData {
   practitionerId: string
   primaryOfficeId: string
   catchmentAreaIds: string[]
-  identifiers: GQLIdentifier
+  identifiers: GQLIdentifier[]
   device: string
+  auditHistory?: IAuditHistory[]
 }
 
 export interface IUserPayload
@@ -118,6 +127,16 @@ export const userTypeResolvers: GQLResolver = {
     },
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id
+    },
+    underInvestigation(userModel: IUserModelData) {
+      return (
+        userModel &&
+        userModel.status &&
+        userModel.status === 'deactivated' &&
+        userModel.auditHistory &&
+        userModel.auditHistory[userModel.auditHistory.length - 1].reason ===
+          'SUSPICIOUS'
+      )
     },
     identifier(userModel: IUserModelData) {
       return userModel.identifiers && userModel.identifiers[0]

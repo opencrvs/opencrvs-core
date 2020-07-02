@@ -275,7 +275,8 @@ describe('User list tests', () => {
                     username: 'r.tagore',
                     role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b791',
@@ -289,7 +290,8 @@ describe('User list tests', () => {
                     username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b792',
@@ -303,7 +305,8 @@ describe('User list tests', () => {
                     username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'pending'
+                    status: 'pending',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b793',
@@ -317,7 +320,8 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -331,7 +335,8 @@ describe('User list tests', () => {
                     username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
-                    status: 'disabled'
+                    status: 'disabled',
+                    underInvestigation: false
                   }
                 ]
               }
@@ -528,7 +533,8 @@ describe('User list tests', () => {
                     username: 'r.tagore',
                     role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b791',
@@ -542,7 +548,8 @@ describe('User list tests', () => {
                     username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b792',
@@ -556,7 +563,8 @@ describe('User list tests', () => {
                     username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'pending'
+                    status: 'pending',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b793',
@@ -570,7 +578,8 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'deactivated',
+                    underInvestigation: true
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -584,7 +593,8 @@ describe('User list tests', () => {
                     username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
-                    status: 'disabled'
+                    status: 'disabled',
+                    underInvestigation: false
                   }
                 ]
               }
@@ -649,6 +659,44 @@ describe('User list tests', () => {
         await flushPromises()
         expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
       })
+
+      it('clicking on menu options deactivate to user pops up audit action modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-1-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-1-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
+        menuOptionButton.hostNodes().simulate('click')
+        const userAuditActionModal = await waitForElement(
+          component,
+          '#user-audit-modal'
+        )
+      })
+
+      it('clicking on menu options reactivate to user pops up audit action modal', async () => {
+        const toggleButtonElement = await waitForElement(
+          component,
+          '#user-item-3-menuToggleButton'
+        )
+
+        toggleButtonElement.hostNodes().simulate('click')
+        const menuOptionButton = await waitForElement(
+          component,
+          '#user-item-3-menuItem1'
+        )
+        expect(menuOptionButton.hostNodes().text()).toBe('Reactivate')
+        menuOptionButton.hostNodes().simulate('click')
+        const userAuditActionModal = await waitForElement(
+          component,
+          '#user-audit-modal'
+        )
+      })
     })
   })
 
@@ -680,7 +728,8 @@ describe('User list tests', () => {
                     username: 'r.tagore',
                     role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b791',
@@ -694,7 +743,8 @@ describe('User list tests', () => {
                     username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b792',
@@ -708,7 +758,8 @@ describe('User list tests', () => {
                     username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'pending'
+                    status: 'pending',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b793',
@@ -722,7 +773,8 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -736,7 +788,8 @@ describe('User list tests', () => {
                     username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
-                    status: 'disabled'
+                    status: 'disabled',
+                    underInvestigation: false
                   }
                 ]
               }
@@ -793,7 +846,8 @@ describe('User list tests', () => {
                     username: 'r.tagore',
                     role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b791',
@@ -807,7 +861,8 @@ describe('User list tests', () => {
                     username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b792',
@@ -821,7 +876,8 @@ describe('User list tests', () => {
                     username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b793',
@@ -835,7 +891,8 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -849,7 +906,8 @@ describe('User list tests', () => {
                     username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b796',
@@ -863,7 +921,8 @@ describe('User list tests', () => {
                     username: 'ma.alam',
                     role: 'FIELD_AGENT',
                     type: 'CHA',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b797',
@@ -877,7 +936,8 @@ describe('User list tests', () => {
                     username: 'l.khatun',
                     role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b794',
@@ -891,7 +951,8 @@ describe('User list tests', () => {
                     username: 'ma.abdullah',
                     role: 'NATIONAL_REGISTRAR',
                     type: 'SECRETARY',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b798',
@@ -905,7 +966,8 @@ describe('User list tests', () => {
                     username: 'ms.farid',
                     role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b799',
@@ -919,7 +981,8 @@ describe('User list tests', () => {
                     username: 'mj.alam',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   }
                 ]
               }
@@ -981,7 +1044,8 @@ describe('User list tests', () => {
                     username: 'r.tagore',
                     role: 'REGISTRATION_AGENT',
                     type: 'ENTREPENEUR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b791',
@@ -995,7 +1059,8 @@ describe('User list tests', () => {
                     username: 'm.ashraful',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b792',
@@ -1009,7 +1074,8 @@ describe('User list tests', () => {
                     username: 'ma.muidkhan',
                     role: 'DISTRICT_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b793',
@@ -1023,7 +1089,8 @@ describe('User list tests', () => {
                     username: 'np.huq',
                     role: 'STATE_REGISTRAR',
                     type: 'MAYOR',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b795',
@@ -1037,7 +1104,8 @@ describe('User list tests', () => {
                     username: 'ma.islam',
                     role: 'FIELD_AGENT',
                     type: 'HOSPITAL',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b796',
@@ -1051,7 +1119,8 @@ describe('User list tests', () => {
                     username: 'ma.alam',
                     role: 'FIELD_AGENT',
                     type: 'CHA',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b797',
@@ -1065,7 +1134,8 @@ describe('User list tests', () => {
                     username: 'l.khatun',
                     role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b794',
@@ -1079,7 +1149,8 @@ describe('User list tests', () => {
                     username: 'ma.abdullah',
                     role: 'NATIONAL_REGISTRAR',
                     type: 'SECRETARY',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b798',
@@ -1093,7 +1164,8 @@ describe('User list tests', () => {
                     username: 'ms.farid',
                     role: 'REGISTRATION_AGENT',
                     type: 'DATA_ENTRY_CLERK',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   },
                   {
                     id: '5d08e102542c7a19fc55b799',
@@ -1107,7 +1179,8 @@ describe('User list tests', () => {
                     username: 'mj.alam',
                     role: 'LOCAL_REGISTRAR',
                     type: 'CHAIRMAN',
-                    status: 'active'
+                    status: 'active',
+                    underInvestigation: false
                   }
                 ]
               }
