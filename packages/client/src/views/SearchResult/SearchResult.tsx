@@ -21,6 +21,7 @@ import {
   dynamicConstantsMessages,
   errorMessages
 } from '@client/i18n/messages'
+import { messages as registrarHomeMessages } from '@client/i18n/messages/views/registrarHome'
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
@@ -46,6 +47,7 @@ import {
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { RowHistoryView } from '@opencrvs/client/src/views/RegistrationHome/RowHistoryView'
+import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -63,6 +65,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import ReactTooltip from 'react-tooltip'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -73,6 +76,9 @@ const ErrorText = styled.div`
 
 const Container = styled.div`
   margin: 20px 0px 0px 0px;
+`
+const ToolTipContainer = styled.span`
+  text-align: center;
 `
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -187,7 +193,7 @@ export class SearchResultView extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 20,
+          width: 15,
           key: 'status'
         },
         {
@@ -199,6 +205,11 @@ export class SearchResultView extends React.Component<
           label: this.props.intl.formatMessage(constantsMessages.startedBy),
           width: 15,
           key: 'startedBy'
+        },
+        {
+          width: 5,
+          key: 'icon',
+          isIconColumns: true
         },
         {
           width: 20,
@@ -221,11 +232,16 @@ export class SearchResultView extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 30,
+          width: 25,
           key: 'status'
         },
         {
-          width: 30,
+          width: 15,
+          key: 'icon',
+          isIconColumns: true
+        },
+        {
+          width: 20,
           key: 'actions',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
@@ -343,6 +359,13 @@ export class SearchResultView extends React.Component<
         })
       }
 
+      let icon: JSX.Element = <div />
+      if (isDuplicate) {
+        icon = <Duplicate />
+      } else if (applicationIsValidated) {
+        icon = <Validate data-tip data-for="validateTooltip" />
+      }
+
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -375,11 +398,15 @@ export class SearchResultView extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
+        icon,
         actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
-            handler: () => this.props.goToApplicationDetails(reg.id)
+            handler: () =>
+              isDuplicate
+                ? this.props.goToReviewDuplicate(reg.id)
+                : this.props.goToApplicationDetails(reg.id)
           }
         ]
       }
@@ -469,6 +496,13 @@ export class SearchResultView extends React.Component<
                       </SearchResultText>
                       {total > 0 && (
                         <>
+                          <ReactTooltip id="validateTooltip">
+                            <ToolTipContainer>
+                              {this.props.intl.formatMessage(
+                                registrarHomeMessages.validatedApplicationTooltipForRegistrar
+                              )}
+                            </ToolTipContainer>
+                          </ReactTooltip>
                           <GridTable
                             content={this.transformSearchContent(
                               data.searchEvents
