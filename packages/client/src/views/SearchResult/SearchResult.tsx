@@ -253,19 +253,29 @@ export class SearchResultView extends React.Component<
   getDeclarationStatusLabel = (status: string) => {
     switch (status) {
       case 'DECLARED':
-        return this.props.intl.formatMessage(constantsMessages.application)
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.readyForReview
+        )
       case 'REGISTERED':
-        return this.props.intl.formatMessage(constantsMessages.registered)
+        return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
       case 'VALIDATED':
-        return this.props.intl.formatMessage(constantsMessages.validated)
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.readyForReview
+        )
       case 'WAITING_VALIDATION':
-        return this.props.intl.formatMessage(constantsMessages.waitingValidated)
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.waitingForExternalValidation
+        )
       case 'REJECTED':
-        return this.props.intl.formatMessage(constantsMessages.rejected)
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.sentForUpdates
+        )
       case 'CERTIFIED':
-        return this.props.intl.formatMessage(constantsMessages.collected)
+        return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
       default:
-        return this.props.intl.formatMessage(constantsMessages.application)
+        return this.props.intl.formatMessage(
+          registrarHomeMessages.readyForReview
+        )
     }
   }
 
@@ -376,9 +386,7 @@ export class SearchResultView extends React.Component<
         ...reg,
         event,
         trackingId: reg.trackingId,
-        status: this.getDeclarationStatusLabel(
-          reg.declarationStatus
-        ).toLocaleUpperCase(),
+        status: this.getDeclarationStatusLabel(reg.declarationStatus),
         dateOfModification:
           (reg.modifiedAt &&
             moment(
