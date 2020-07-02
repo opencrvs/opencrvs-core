@@ -318,6 +318,24 @@ export const getRoutes = () => {
       }
     },
 
+    // Time logged query by application status API
+    {
+      method: 'GET',
+      path: '/timeLoggedMetricsByPractitioner',
+      handler: getTimeLoggedHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            practitionerId: Joi.string().required(),
+            locationId: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+
     {
       method: 'POST',
       path: '/applicationStartedMetricsByPractitioners',

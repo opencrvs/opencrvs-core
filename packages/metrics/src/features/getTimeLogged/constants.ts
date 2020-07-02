@@ -10,4 +10,5 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export const COMPOSITION_ID = 'compositionId'
+export const PRACTITIONER_ID = 'practitionerId'
 export const STATUS = 'status'

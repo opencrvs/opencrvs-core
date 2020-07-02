@@ -11,11 +11,18 @@
  */
 import {
   COMPOSITION_ID,
+  PRACTITIONER_ID,
   STATUS
 } from '@metrics/features/getTimeLogged/constants'
 import {
+  TIME_FROM,
+  TIME_TO,
+  LOCATION_ID
+} from '@metrics/features/metrics/constants'
+import {
   getTimeLogged,
-  getTimeLoggedByStatus
+  getTimeLoggedByStatus,
+  getTimeLoggedForPractitioner
 } from '@metrics/features/getTimeLogged/utils'
 import * as Hapi from 'hapi'
 
@@ -23,10 +30,22 @@ export async function getTimeLoggedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const practitionerId = request.query[PRACTITIONER_ID]
   const compositionId = request.query[COMPOSITION_ID]
   const status = request.query[STATUS]
 
-  if (status) {
+  if (practitionerId) {
+    const timeStart = request.query[TIME_FROM]
+    const timeEnd = request.query[TIME_TO]
+    const locationId = request.query[LOCATION_ID]
+
+    return getTimeLoggedForPractitioner(
+      timeStart,
+      timeEnd,
+      practitionerId,
+      `Location/${locationId}`
+    )
+  } else if (status) {
     return getTimeLoggedByStatus(compositionId, status.toUpperCase())
   } else {
     return getTimeLogged(compositionId)
