@@ -576,31 +576,19 @@ export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
 }
 
 const AuditDescriptionMapping: {
-  [key: string]: { [key: string]: MessageDescriptor }
+  [key: string]: MessageDescriptor
 } = {
-  FIELD_AGENT: {
-    IN_PROGRESS: messages.inProgressAuditAction,
-    DECLARED: messages.declaredAuditAction
-  },
-  REGISTRATION_AGENT: {
-    VALIDATED: messages.validatedAuditAction,
-    REJECTED: messages.rejectedAuditAction,
-    CERTIFIED: messages.certifiedAuditAction
-  },
-  LOCAL_REGISTRAR: {
-    WAITING_VALIDATION: messages.waitingForValidationAuditAction,
-    REGISTERED: messages.registeredAuditAction,
-    REJECTED: messages.rejectedAuditAction,
-    CERTIFIED: messages.certifiedAuditAction
-  }
+  IN_PROGRESS: messages.inProgressAuditAction,
+  DECLARED: messages.declaredAuditAction,
+  VALIDATED: messages.validatedAuditAction,
+  WAITING_VALIDATION: messages.waitingForValidationAuditAction,
+  REGISTERED: messages.registeredAuditAction,
+  REJECTED: messages.rejectedAuditAction,
+  CERTIFIED: messages.certifiedAuditAction
 }
 
 export function getUserAuditDescription(
-  status: string,
-  role: string
+  status: string
 ): MessageDescriptor | undefined {
-  return (
-    (AuditDescriptionMapping[role] && AuditDescriptionMapping[role][status]) ||
-    undefined
-  )
+  return AuditDescriptionMapping[status] || undefined
 }

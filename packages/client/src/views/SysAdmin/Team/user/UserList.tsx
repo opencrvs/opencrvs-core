@@ -95,7 +95,7 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 4px 6px;
+  padding: 2px 6px 4px 6px;
   border-radius: 4px;
   height: 30px;
   text-align: center;
@@ -223,8 +223,6 @@ export const Status = (statusProps: IStatusProps) => {
       return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return <DisabledStatusBox>{status}</DisabledStatusBox>
-    case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
-      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
       return <PendingStatusBox>{status}</PendingStatusBox>
@@ -321,10 +319,15 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getNameRoleType(name: string, role: string, type: string) {
+  function getNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string
+  ) {
     return (
       <NameRoleTypeContainer>
-        <Name>{name}</Name>
+        <Name onClick={() => goToUserProfile(id)}>{name}</Name>
         <RoleType>{getRoleType(role, type)}</RoleType>
       </NameRoleTypeContainer>
     )
@@ -366,7 +369,7 @@ function UserListComponent(props: IProps) {
                 {name}
               </LinkButton>
             ),
-            nameRoleType: getNameRoleType(name, role, type),
+            nameRoleType: getNameRoleType(user.id || '', name, role, type),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
             menu: (

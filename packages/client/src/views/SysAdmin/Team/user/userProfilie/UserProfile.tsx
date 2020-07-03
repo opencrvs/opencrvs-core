@@ -17,32 +17,17 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { Query } from '@client/components/Query'
-import {
-  GET_USER,
-  FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER
-} from '@client/user/queries'
+import { GET_USER } from '@client/user/queries'
 import {
   SysAdminContentWrapper,
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  GQLQuery,
-  GQLTimeLoggedMetrics,
-  GQLUser,
-  GQLHumanName
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLUser, GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import {
+  SearchRed,
   Avatar,
-  VerticalThreeDots,
-  ArrowDownBlue,
-  StatusCollected,
-  StatusGray,
-  StatusGreen,
-  StatusOrange,
-  StatusProgress,
-  StatusRejected,
-  StatusWaitingValidation
+  VerticalThreeDots
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -52,8 +37,6 @@ import { LANG_EN } from '@client/utils/constants'
 import {
   ISearchLocation,
   ToggleMenu,
-  ListTable,
-  ColumnContentAlignment,
   LoadingGrey
 } from '@opencrvs/components/lib/interface'
 
@@ -65,13 +48,9 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
-
-import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
-
-const DEFAULT_LIST_SIZE = 10
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -100,7 +79,7 @@ const InformationHolder = styled.div`
   margin-bottom: 14px;
 `
 
-const InformationTitle = styled.div<{ paddingRight?: number }>`
+export const InformationTitle = styled.div<{ paddingRight?: number }>`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ paddingRight }) => {
     return `padding-right: ${paddingRight ? paddingRight : 0}px`
@@ -108,10 +87,6 @@ const InformationTitle = styled.div<{ paddingRight?: number }>`
 `
 const InformationValue = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
-`
-
-const InformationCaption = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
 `
 
 const LoadingTitle = styled.span<{ width: number; marginRight: number }>`
@@ -127,37 +102,20 @@ const LoadingValue = styled(LoadingGrey)`
     display: none;
   }
 `
-const AuditDescTimeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
 const HeaderMenuHolder = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 
-  & > :first-child {
-    margin: 4px 8px 0px 0px;
+  & > :not(:last-child) {
+    margin: auto 8px;
   }
 `
 
-const RecentActionsHolder = styled.div`
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 1px solid ${({ theme }) => theme.colors.dividerDark};
-`
-
-const SectionTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
-  margin-bottom: 10px;
-`
-
-const AuditListHolder = styled.div`
-  margin-top: 30px;
-`
-
-const StatusIcon = styled.div`
-  margin-top: 4px;
+const HeaderMenu = styled(ToggleMenu)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
 `
 
 interface ISearchParams {
@@ -180,12 +138,10 @@ type Props = WrappedComponentProps &
   IBaseProp
 
 type State = {
-  timeStart: moment.Moment
-  timeEnd: moment.Moment
-  viewportWidth: number
+  modalVisible: boolean
 }
 
-interface IUserData {
+export interface IUserData {
   id?: string
   primaryOffice?: ISearchLocation
   name?: string
@@ -193,6 +149,7 @@ interface IUserData {
   type?: string
   number?: string
   status?: string
+  underInvestigation?: boolean
   username?: string
   practitionerId?: string
   locationId?: string
@@ -204,40 +161,35 @@ class UserProfileComponent extends React.Component<Props, State> {
     super(props)
     moment.locale(props.intl.locale)
     this.state = {
-      timeStart: moment().subtract(1, 'months'),
-      timeEnd: moment(),
-      viewportWidth: 0
+      modalVisible: false
     }
-    this.updateViewPort = this.updateViewPort.bind(this)
   }
 
-  componentDidMount() {
-    this.updateViewPort()
-    window.addEventListener('resize', this.updateViewPort)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateViewPort)
+  toggleUserActivationModal() {
+    this.setState({ modalVisible: !this.state.modalVisible })
   }
 
   getMenuItems(userId: string, status: string) {
-    return [
+    const menuItems: { label: string; handler: () => void }[] = [
       {
         label: this.props.intl.formatMessage(sysMessages.menuOptionEditDetails),
         handler: () => this.props.goToReviewUserDetails(userId)
       }
     ]
-  }
+    if (status === 'active') {
+      menuItems.push({
+        label: this.props.intl.formatMessage(sysMessages.deactivate),
+        handler: () => this.toggleUserActivationModal()
+      })
+    }
 
-  setDateRangePickerValues(startDate: Date, endDate: Date) {
-    this.setState({
-      timeStart: moment(startDate),
-      timeEnd: moment(endDate)
-    })
-  }
-
-  updateViewPort() {
-    this.setState({ viewportWidth: window.innerWidth })
+    if (status === 'deactivated') {
+      menuItems.push({
+        label: this.props.intl.formatMessage(sysMessages.reactivate),
+        handler: () => this.toggleUserActivationModal()
+      })
+    }
+    return menuItems
   }
 
   transformUserQueryResult(userData?: GQLUser) {
@@ -264,6 +216,7 @@ class UserProfileComponent extends React.Component<Props, State> {
       type: userData.type,
       number: userData.mobile,
       status: userData.status,
+      underInvestigation: userData.underInvestigation,
       username: userData.username,
       practitionerId: userData.practitionerId,
       locationId:
@@ -311,203 +264,14 @@ class UserProfileComponent extends React.Component<Props, State> {
           <LoadingTitle width={120} marginRight={112} />
           <LoadingValue width={15} />
         </InformationHolder>
-        <RecentActionsHolder>
-          <SectionTitle>
-            <LoadingGrey width={5} />
-          </SectionTitle>
-          <LoadingGrey width={10} />
-          {this.getLoadingUserAuditView(hasError)}
-        </RecentActionsHolder>
-      </SysAdminContentWrapper>
-    )
-  }
-
-  getAuditColumns() {
-    const { theme, intl } = this.props
-    let columns: IColumn[] = []
-    if (this.state.viewportWidth <= theme.grid.breakpoints.md) {
-      columns = [
-        {
-          label: '',
-          width: 10,
-          key: 'statusIcon',
-          alignment: ColumnContentAlignment.CENTER
-        },
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 70,
-          key: 'actionDescriptionWithAuditTime'
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 20,
-          key: 'trackingId',
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    } else {
-      columns = [
-        {
-          label: intl.formatMessage(messages.auditActionColumnTitle),
-          width: 43,
-          key: 'actionDescription'
-        },
-        {
-          label: '',
-          width: 5,
-          key: 'statusIcon',
-          alignment: ColumnContentAlignment.RIGHT
-        },
-        {
-          label: intl.formatMessage(messages.auditTrackingIDColumnTitle),
-          width: 15,
-          key: 'trackingId'
-        },
-        {
-          label: intl.formatMessage(messages.auditEventTypeColumnTitle),
-          width: 15,
-          key: 'eventType'
-        },
-        {
-          label: intl.formatMessage(messages.auditDateColumnTitle),
-          width: 22,
-          key: 'auditTime',
-          isSortable: true,
-          icon: <ArrowDownBlue />,
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    }
-    return columns
-  }
-
-  getWorkflowStatusIcon = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return (
-          <StatusIcon>
-            <StatusProgress />
-          </StatusIcon>
-        )
-      case 'DECLARED':
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
-      case 'VALIDATED':
-        return (
-          <StatusIcon>
-            <StatusGray />
-          </StatusIcon>
-        )
-      case 'WAITING_VALIDATION':
-        return (
-          <StatusIcon>
-            <StatusWaitingValidation />
-          </StatusIcon>
-        )
-      case 'REGISTERED':
-        return (
-          <StatusIcon>
-            <StatusGreen />
-          </StatusIcon>
-        )
-      case 'REJECTED':
-        return (
-          <StatusIcon>
-            <StatusRejected />
-          </StatusIcon>
-        )
-      case 'CERTIFIED':
-        return (
-          <StatusIcon>
-            <StatusCollected />
-          </StatusIcon>
-        )
-      default:
-        return (
-          <StatusIcon>
-            <StatusOrange />
-          </StatusIcon>
-        )
-    }
-  }
-
-  getAuditData(data: GQLQuery, user: IUserData) {
-    if (
-      !data ||
-      !data.fetchTimeLoggedMetricsByPractitioner ||
-      !data.fetchTimeLoggedMetricsByPractitioner
-    ) {
-      return []
-    }
-    return data.fetchTimeLoggedMetricsByPractitioner.map(
-      (timeLoggedMetrics: GQLTimeLoggedMetrics | null) => {
-        if (timeLoggedMetrics === null) {
-          return {}
-        }
-        const actionDescriptor = getUserAuditDescription(
-          timeLoggedMetrics.status,
-          user.role || ''
-        )
-        return {
-          actionDescription: (
-            <InformationTitle>
-              {(actionDescriptor &&
-                this.props.intl.formatMessage(actionDescriptor)) ||
-                ''}
-            </InformationTitle>
-          ),
-          actionDescriptionWithAuditTime: (
-            <AuditDescTimeContainer>
-              <InformationTitle>
-                {(actionDescriptor &&
-                  this.props.intl.formatMessage(actionDescriptor)) ||
-                  ''}
-              </InformationTitle>
-              <InformationCaption>
-                {moment(timeLoggedMetrics.time).format('MMMM DD, YYYY hh:mm A')}
-              </InformationCaption>
-            </AuditDescTimeContainer>
-          ),
-          statusIcon: this.getWorkflowStatusIcon(timeLoggedMetrics.status),
-          trackingId: (
-            <LinkButton textDecoration={'none'}>
-              {timeLoggedMetrics.trackingId}
-            </LinkButton>
-          ),
-          eventType: timeLoggedMetrics.eventType,
-          auditTime: moment(timeLoggedMetrics.time).format(
-            'MMMM DD, YYYY hh:mm A'
-          )
-        }
-      }
-    )
-  }
-
-  getLoadingUserAuditView(hasError?: boolean) {
-    return (
-      <>
-        <ListTable
-          isLoading={true}
-          columns={this.getAuditColumns()}
-          content={[]}
-          noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
-          hideTableHeader={
-            this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
-          }
-        />
+        <UserAuditList isLoading={true} />
         {hasError && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
-      </>
+      </SysAdminContentWrapper>
     )
   }
 
   render() {
     const { intl, viewOnlyMode, match } = this.props
-    const { timeStart, timeEnd } = this.state
-
     return (
       <>
         <Query
@@ -515,13 +279,11 @@ class UserProfileComponent extends React.Component<Props, State> {
           variables={{
             userId: match.params.userId
           }}
-          fetchPolicy={'no-cache'}
+          fetchPolicy={'cache-and-network'}
         >
           {({ data, loading, error }) => {
-            if (error) {
-              return this.getLoadingUserProfileView(true)
-            } else if (loading) {
-              return this.getLoadingUserProfileView()
+            if (loading || error) {
+              return this.getLoadingUserProfileView(!!error)
             } else {
               const user = this.transformUserQueryResult(data && data.getUser)
               return (
@@ -532,6 +294,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                   headerTitle={user.name}
                   menuComponent={
                     <HeaderMenuHolder>
+                      {user.underInvestigation && <SearchRed />}
                       <Status status={user.status || 'pending'} />
                       <ToggleMenu
                         id={`sub-page-header-munu-button`}
@@ -594,51 +357,20 @@ class UserProfileComponent extends React.Component<Props, State> {
                       </InformationTitle>
                       <InformationValue>{user.startDate}</InformationValue>
                     </InformationHolder>
-                    <RecentActionsHolder>
-                      <SectionTitle>
-                        {intl.formatMessage(messages.auditSectionTitle)}
-                      </SectionTitle>
-                      <DateRangePicker
-                        startDate={timeStart.toDate()}
-                        endDate={timeEnd.toDate()}
-                        onDatesChange={({ startDate, endDate }) => {
-                          this.setDateRangePickerValues(startDate, endDate)
-                        }}
-                      />
-                      <AuditListHolder>
-                        <Query
-                          query={FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER}
-                          variables={{
-                            timeStart: timeStart.toISOString(),
-                            timeEnd: timeEnd.toISOString(),
-                            practitionerId: user.practitionerId,
-                            locationId: user.locationId
-                          }}
-                          fetchPolicy={'no-cache'}
-                        >
-                          {({ data, loading, error }) => {
-                            if (error) {
-                              return this.getLoadingUserAuditView(true)
-                            } else if (loading) {
-                              return this.getLoadingUserAuditView()
-                            } else {
-                              return (
-                                <ListTable
-                                  columns={this.getAuditColumns()}
-                                  content={this.getAuditData(data, user)}
-                                  noResultText="No audits to display"
-                                  hideBoxShadow={true}
-                                  hideTableHeader={
-                                    this.state.viewportWidth <=
-                                    this.props.theme.grid.breakpoints.md
-                                  }
-                                />
-                              )
-                            }
-                          }}
-                        </Query>
-                      </AuditListHolder>
-                    </RecentActionsHolder>
+                    <UserAuditActionModal
+                      show={this.state.modalVisible}
+                      user={data && data.getUser}
+                      onClose={() => this.toggleUserActivationModal()}
+                      onConfirmRefetchQueries={[
+                        {
+                          query: GET_USER,
+                          variables: {
+                            userId: match.params.userId
+                          }
+                        }
+                      ]}
+                    />
+                    <UserAuditList user={user} />
                   </ContentWrapper>
                 </SysAdminContentWrapper>
               )

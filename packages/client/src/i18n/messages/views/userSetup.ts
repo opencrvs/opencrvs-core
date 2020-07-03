@@ -52,6 +52,7 @@ interface IUserSetupMessages {
   registeredAuditAction: MessageDescriptor
   rejectedAuditAction: MessageDescriptor
   certifiedAuditAction: MessageDescriptor
+  showMoreAuditList: MessageDescriptor
 }
 
 const messagesToDefine: IUserSetupMessages = {
@@ -257,6 +258,11 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Printed certificate',
     description: 'Description for certified application',
     id: 'user.profile.audit.description.certified'
+  },
+  showMoreAuditList: {
+    defaultMessage: 'Show next {pageSize} of {totalItems}',
+    description: 'Label for show more link',
+    id: 'user.profile.auditList.showMore'
   }
 }
 

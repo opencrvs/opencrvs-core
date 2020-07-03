@@ -102,6 +102,9 @@ const SubPageHeaderBody = styled.div`
   & > #menuOptionsHolder {
     margin-left: auto;
     padding-right: 10px;
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+      padding-right: 0px;
+    }
   }
 `
 const ToolbarContainer = styled.div`

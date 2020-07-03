@@ -755,7 +755,7 @@ const messagesToDefine: IConstantsMessages = {
   }
 }
 
-export const constantsMessages: IConstantsMessages = defineMessages(
+export const constantsMessages: IDynamicConstants = defineMessages(
   messagesToDefine
 )
 
