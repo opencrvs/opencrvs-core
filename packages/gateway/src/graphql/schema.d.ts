@@ -34,7 +34,7 @@ export interface GQLQuery {
   getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
-  fetchTimeLoggedMetricsByPractitioner?: Array<GQLTimeLoggedMetrics | null>
+  fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -580,6 +580,11 @@ export interface GQLSearchUserResult {
 
 export interface GQLSearchFieldAgentResult {
   results?: Array<GQLSearchFieldAgentResponse | null>
+  totalItems?: number
+}
+
+export interface GQLTimeLoggedMetricsResultSet {
+  results?: Array<GQLTimeLoggedMetrics | null>
   totalItems?: number
 }
 
@@ -1624,6 +1629,7 @@ export interface QueryToFetchTimeLoggedMetricsByPractitionerArgs {
   timeEnd: string
   practitionerId: string
   locationId: string
+  count: number
 }
 export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
   TParent = any,

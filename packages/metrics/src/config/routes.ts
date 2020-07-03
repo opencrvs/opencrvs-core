@@ -329,7 +329,8 @@ export const getRoutes = () => {
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
             practitionerId: Joi.string().required(),
-            locationId: Joi.string().required()
+            locationId: Joi.string().required(),
+            count: Joi.number().required()
           })
         },
         tags: ['api']

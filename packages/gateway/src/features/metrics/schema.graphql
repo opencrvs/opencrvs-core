@@ -180,6 +180,11 @@ type TimeLoggedMetrics {
   time: String!
 }
 
+type TimeLoggedMetricsResultSet {
+  results: [TimeLoggedMetrics]
+  totalItems: Int
+}
+
 type Query {
   fetchRegistrationMetrics(
     timeStart: String!
@@ -214,5 +219,6 @@ type Query {
     timeEnd: String!
     practitionerId: String!
     locationId: String!
-  ): [TimeLoggedMetrics]
+    count: Int!
+  ): TimeLoggedMetricsResultSet
 }

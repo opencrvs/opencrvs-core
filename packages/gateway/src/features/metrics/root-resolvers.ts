@@ -26,6 +26,7 @@ export interface IMetricsParam {
   event?: string
   practitionerIds?: string[]
   practitionerId?: string
+  count?: number
 }
 
 export const resolvers: GQLResolver = {
@@ -136,7 +137,7 @@ export const resolvers: GQLResolver = {
     },
     async fetchTimeLoggedMetricsByPractitioner(
       _,
-      { timeStart, timeEnd, practitionerId, locationId },
+      { timeStart, timeEnd, practitionerId, locationId, count },
       authHeader
     ) {
       return await getMetrics(
@@ -145,7 +146,8 @@ export const resolvers: GQLResolver = {
           timeStart,
           timeEnd,
           practitionerId,
-          locationId
+          locationId,
+          count
         },
         authHeader
       )

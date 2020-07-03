@@ -87,7 +87,8 @@ type Query {
     timeEnd: String!
     practitionerId: String!
     locationId: String!
-  ): [TimeLoggedMetrics]
+    count: Int!
+  ): TimeLoggedMetricsResultSet
   searchEvents(
     userId: String
     locationIds: [String]
@@ -336,11 +337,9 @@ type LocationWiseEstimationMetrics {
   total: EventIn45DayEstimationCount
 }
 
-type TimeLoggedMetrics {
-  status: String!
-  trackingId: String!
-  eventType: String!
-  time: String!
+type TimeLoggedMetricsResultSet {
+  results: [TimeLoggedMetrics]
+  totalItems: Int
 }
 
 type EventSearchResultSet {
@@ -697,6 +696,13 @@ type LocationWise45DayEstimation {
   estimated45DayPercentage: Float!
   locationId: String!
   locationName: String!
+}
+
+type TimeLoggedMetrics {
+  status: String!
+  trackingId: String!
+  eventType: String!
+  time: String!
 }
 
 interface EventSearchSet {

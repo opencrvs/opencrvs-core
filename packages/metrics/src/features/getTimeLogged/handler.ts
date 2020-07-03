@@ -17,12 +17,14 @@ import {
 import {
   TIME_FROM,
   TIME_TO,
-  LOCATION_ID
+  LOCATION_ID,
+  COUNT
 } from '@metrics/features/metrics/constants'
 import {
   getTimeLogged,
   getTimeLoggedByStatus,
-  getTimeLoggedForPractitioner
+  getTimeLoggedForPractitioner,
+  countTimeLoggedForPractitioner
 } from '@metrics/features/getTimeLogged/utils'
 import * as Hapi from 'hapi'
 
@@ -38,13 +40,23 @@ export async function getTimeLoggedHandler(
     const timeStart = request.query[TIME_FROM]
     const timeEnd = request.query[TIME_TO]
     const locationId = request.query[LOCATION_ID]
+    const count = request.query[COUNT]
 
-    return getTimeLoggedForPractitioner(
-      timeStart,
-      timeEnd,
-      practitionerId,
-      `Location/${locationId}`
-    )
+    return {
+      results: await getTimeLoggedForPractitioner(
+        timeStart,
+        timeEnd,
+        practitionerId,
+        `Location/${locationId}`,
+        count
+      ),
+      totalItems: await countTimeLoggedForPractitioner(
+        timeStart,
+        timeEnd,
+        practitionerId,
+        `Location/${locationId}`
+      )
+    }
   } else if (status) {
     return getTimeLoggedByStatus(compositionId, status.toUpperCase())
   } else {

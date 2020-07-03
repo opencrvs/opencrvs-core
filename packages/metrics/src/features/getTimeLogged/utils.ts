@@ -50,18 +50,35 @@ export async function getTimeLoggedForPractitioner(
   timeFrom: string,
   timeTo: string,
   practitionerId: string,
-  locationId: string
+  locationId: string,
+  count?: number
 ): Promise<ITimeLoggedData[]> {
-  const timeLoggedData: ITimeLoggedData[] = await query(
-    `SELECT currentStatus as status, trackingId, 
-        eventType, timeSpentEditing, time
-          FROM application_time_logged
-        WHERE time > '${timeFrom}' AND time <= '${timeTo}'
-        AND practitionerId = '${practitionerId}'
-        AND ( locationLevel2 = '${locationId}' 
-              OR locationLevel3 = '${locationId}' 
-              OR locationLevel4 = '${locationId}' 
-              OR locationLevel5 = '${locationId}')`
-  )
+  const timeLoggedData: ITimeLoggedData[] = await query(`SELECT currentStatus as status, trackingId, 
+                                              eventType, timeSpentEditing, time
+                                            FROM application_time_logged
+                                            WHERE time > '${timeFrom}' AND time <= '${timeTo}'
+                                            AND practitionerId = '${practitionerId}'
+                                            AND ( locationLevel2 = '${locationId}' 
+                                                  OR locationLevel3 = '${locationId}' 
+                                                  OR locationLevel4 = '${locationId}' 
+                                                  OR locationLevel5 = '${locationId}')
+                                            ORDER BY time DESC
+                                            ${count ? 'LIMIT ' + count : ''}`)
+
   return timeLoggedData && timeLoggedData.length > 0 ? timeLoggedData : []
+}
+
+export async function countTimeLoggedForPractitioner(
+  timeFrom: string,
+  timeTo: string,
+  practitionerId: string,
+  locationId: string
+): Promise<number> {
+  const timeLoggedData = await getTimeLoggedForPractitioner(
+    timeFrom,
+    timeTo,
+    practitionerId,
+    locationId
+  )
+  return (timeLoggedData && timeLoggedData.length) || 0
 }
