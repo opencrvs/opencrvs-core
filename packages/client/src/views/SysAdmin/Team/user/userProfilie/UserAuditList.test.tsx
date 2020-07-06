@@ -181,6 +181,26 @@ describe('User audit list tests', () => {
     )).component
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
+  it('toggles sorting order of the list', async () => {
+    const firstRowElement = await waitForElement(component, '#row_0')
+    const toggleSortActionElement = await waitForElement(
+      component,
+      '#auditTime-label'
+    )
+    const firstTrackingId = firstRowElement
+      .hostNodes()
+      .childAt(2)
+      .text()
+
+    toggleSortActionElement.hostNodes().simulate('click')
+    const firstRowElementAfterSort = await waitForElement(component, '#row_0')
+    expect(
+      firstRowElementAfterSort
+        .hostNodes()
+        .childAt(2)
+        .text()
+    ).not.toEqual(firstTrackingId)
+  })
 
   it('renders next page of audits after clicking load more link', async () => {
     const testComponent = (await createTestComponent(
