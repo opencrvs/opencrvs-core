@@ -327,7 +327,12 @@ function UserListComponent(props: IProps) {
   ) {
     return (
       <NameRoleTypeContainer>
-        <Name onClick={() => goToUserProfile(id)}>{name}</Name>
+        <Name
+          id={`name-role-type-link-${id}`}
+          onClick={() => goToUserProfile(id)}
+        >
+          {name}
+        </Name>
         <RoleType>{getRoleType(role, type)}</RoleType>
       </NameRoleTypeContainer>
     )
@@ -365,7 +370,10 @@ function UserListComponent(props: IProps) {
           return {
             photo: <AvatarSmall />,
             name: (
-              <LinkButton onClick={() => goToUserProfile(user.id || '')}>
+              <LinkButton
+                id={`name-link-${user.id}`}
+                onClick={() => goToUserProfile(user.id || '')}
+              >
                 {name}
               </LinkButton>
             ),

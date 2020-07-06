@@ -338,6 +338,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
     return (
       <>
         <ListTable
+          id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
           content={[]}
@@ -358,7 +359,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
     const recordCount = DEFAULT_LIST_SIZE * this.state.currentPageNumber
 
     return (
-      <RecentActionsHolder>
+      <RecentActionsHolder id="user-audit-list">
         {isLoading && this.getLoadingView()}
         {!isLoading && (
           <>
@@ -393,6 +394,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
                         data.fetchTimeLoggedMetricsByPractitioner &&
                         data.fetchTimeLoggedMetricsByPractitioner.totalItems) ||
                       0
+
                     return (
                       <ListTable
                         columns={this.getAuditColumns()}

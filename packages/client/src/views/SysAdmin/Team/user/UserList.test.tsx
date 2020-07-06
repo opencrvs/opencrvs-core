@@ -344,8 +344,7 @@ describe('User list tests', () => {
           }
         }
       ]
-
-      it('renders mobile header for smaller devices', async () => {
+      it('redirecting to user profile for smaller devices', async () => {
         Object.defineProperty(window, 'location', {
           value: { href: 'location:3000/team/users' }
         })
@@ -376,13 +375,21 @@ describe('User list tests', () => {
         component = testComponent.component
 
         component
-          .find('#mobile_header_right')
+          .find('#name-role-type-link-5d08e102542c7a19fc55b790')
           .hostNodes()
           .simulate('click')
 
-        expect(history.location.pathname).toContain('team/search')
-      })
+        // wait for mocked data to load mockedProvider
+        await new Promise(resolve => {
+          setTimeout(resolve, 100)
+        })
 
+        testComponent.component.update()
+
+        expect(history.location.pathname).toContain(
+          '/userProfile/5d08e102542c7a19fc55b790'
+        )
+      })
       it('renders 2 columns for smaller devices', async () => {
         Object.defineProperty(window, 'innerWidth', {
           writable: true,
@@ -695,6 +702,19 @@ describe('User list tests', () => {
         const userAuditActionModal = await waitForElement(
           component,
           '#user-audit-modal'
+        )
+      })
+
+      it('clicking on name link takes to user preview page', async () => {
+        const nameLink = await waitForElement(
+          component,
+          '#name-link-5d08e102542c7a19fc55b790'
+        )
+
+        nameLink.hostNodes().simulate('click')
+        await flushPromises()
+        expect(history.location.pathname).toBe(
+          '/userProfile/5d08e102542c7a19fc55b790'
         )
       })
     })
