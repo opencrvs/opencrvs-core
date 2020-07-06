@@ -225,3 +225,36 @@ describe('get location wise event estimation metrics', () => {
     expect(data.total.actualTotalRegistration).toBe(130)
   })
 })
+describe('get practitioner wise time logged metrics', () => {
+  it('returns estimated data by practitioner and location', async () => {
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        results: [
+          {
+            status: 'DECLARED',
+            trackingId: 'D23S2D0',
+            eventType: 'DEATH',
+            timeSpentEditing: 120,
+            time: '2019-03-31T18:00:00.000Z'
+          }
+        ],
+        totalItems: 1
+      })
+    )
+
+    const data = await resolvers.Query.fetchTimeLoggedMetricsByPractitioner(
+      {},
+      {
+        timeStart: '2019-10-24T18:00:00.000Z',
+        timeEnd: '2019-12-24T18:00:00.000Z',
+        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
+        practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
+        count: 10
+      }
+    )
+
+    expect(data).toBeDefined()
+    expect(data.results[0].trackingId).toBe('D23S2D0')
+    expect(data.totalItems).toBe(1)
+  })
+})
