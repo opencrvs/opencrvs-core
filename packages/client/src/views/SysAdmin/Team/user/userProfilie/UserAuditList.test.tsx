@@ -151,7 +151,7 @@ describe('User audit list tests', () => {
   })
 
   it('renders without crashing', async () => {
-    const header = await waitForElement(component, '#user-audit-list')
+    expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
 
   it('renders in loading mode', async () => {
@@ -195,9 +195,9 @@ describe('User audit list tests', () => {
     ).toBe('B23S2B2')
 
     toggleSortActionElement.hostNodes().simulate('click')
-
+    const firstRowElementAfterSort = await waitForElement(component, '#row_0')
     expect(
-      firstRowElement
+      firstRowElementAfterSort
         .hostNodes()
         .childAt(2)
         .text()
