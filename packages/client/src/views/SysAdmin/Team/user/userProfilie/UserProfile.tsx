@@ -113,7 +113,7 @@ const HeaderMenuHolder = styled.div`
 `
 
 const HeaderMenu = styled(ToggleMenu)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
@@ -139,6 +139,7 @@ type Props = WrappedComponentProps &
 
 type State = {
   modalVisible: boolean
+  viewportWidth: number
 }
 
 export interface IUserData {
@@ -161,8 +162,23 @@ class UserProfileComponent extends React.Component<Props, State> {
     super(props)
     moment.locale(props.intl.locale)
     this.state = {
-      modalVisible: false
+      modalVisible: false,
+      viewportWidth: 0
     }
+    this.updateViewPort = this.updateViewPort.bind(this)
+  }
+
+  componentDidMount() {
+    this.updateViewPort()
+    window.addEventListener('resize', this.updateViewPort)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateViewPort)
+  }
+
+  updateViewPort() {
+    this.setState({ viewportWidth: window.innerWidth })
   }
 
   toggleUserActivationModal() {
@@ -271,7 +287,7 @@ class UserProfileComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, viewOnlyMode, match } = this.props
+    const { intl, viewOnlyMode, match, theme } = this.props
     return (
       <>
         <Query
@@ -303,7 +319,10 @@ class UserProfileComponent extends React.Component<Props, State> {
                           user.id as string,
                           user.status as string
                         )}
-                        hide={viewOnlyMode}
+                        hide={
+                          viewOnlyMode ||
+                          this.state.viewportWidth <= theme.grid.breakpoints.md
+                        }
                       />
                     </HeaderMenuHolder>
                   }
