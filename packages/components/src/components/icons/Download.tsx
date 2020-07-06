@@ -12,9 +12,10 @@
 import * as React from 'react'
 
 export const Download = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={20} height={22} fill="none" {...props}>
+  <svg width={40} height={40} viewBox="0 0 40 40" fill="none" {...props}>
+    <circle cx={20} cy={20} r={11} stroke="#4C68C1" strokeWidth={2} />
     <path
-      d="M1 16v3a2 2 0 002 2h14a2 2 0 002-2v-3M6 11l4 4 4-4M10 1v14"
+      d="M16 22l4 4 4-4M20 14v12"
       stroke="#4C68C1"
       strokeWidth={2}
       strokeLinecap="round"

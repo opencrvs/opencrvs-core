@@ -34,16 +34,36 @@ export const SEARCH_EVENTS = gql`
         type
         registration {
           status
+          contactNumber
           trackingId
           registrationNumber
           registeredLocationId
           duplicates
+          createdAt
+          modifiedAt
+        }
+        operationHistories {
+          operationType
+          operatedOn
+          operatorRole
+          operatorName {
+            firstNames
+            familyName
+            use
+          }
+          operatorOfficeName
+          operatorOfficeAlias
+          notificationFacilityName
+          notificationFacilityAlias
+          rejectReason
+          rejectComment
         }
         ... on BirthEventSearchSet {
           dateOfBirth
           childName {
             firstNames
             familyName
+            use
           }
         }
         ... on DeathEventSearchSet {
@@ -51,6 +71,7 @@ export const SEARCH_EVENTS = gql`
           deceasedName {
             firstNames
             familyName
+            use
           }
         }
       }
