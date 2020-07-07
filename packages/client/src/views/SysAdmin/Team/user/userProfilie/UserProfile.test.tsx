@@ -60,7 +60,7 @@ describe('User audit list tests', () => {
             role: 'FIELD_AGENT',
             type: 'CHA',
             status: 'active',
-            underInvestigation: false,
+            underInvestigation: true,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
               id: '895cc945-94a9-4195-9a29-22e9310f3385',
@@ -184,7 +184,17 @@ describe('User audit list tests', () => {
       '/user/5d08e102542c7a19fc55b790/preview/'
     )
   })
-  it('opens activation/deactivation modal on clicking deactivate menu option', async () => {
+  it('clicking office link redirects user to userlist of primary office', async () => {
+    const officeLink = await waitForElement(component, '#office-link')
+    officeLink.hostNodes().simulate('click')
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+    expect(history.location.pathname).toBe('/team/users')
+  })
+  it('opens deactivation modal on clicking deactivate menu option', async () => {
     const menuLink = await waitForElement(
       component,
       '#sub-page-header-munu-buttonToggleButton'
@@ -197,6 +207,46 @@ describe('User audit list tests', () => {
     )
     deactivationLink.hostNodes().simulate('click')
 
-    expect(await waitForElement(component, '#modal-subtitle')).toBeDefined()
+    expect(await waitForElement(component, '#deactivate-action')).toBeDefined()
+  })
+  it('opens activation modal on clicking deactivate menu option', async () => {
+    // @ts-ignore
+    graphqlMock[0].result.data.getUser.status = 'deactivated'
+    component = (await createTestComponent(
+      // @ts-ignore
+      <UserProfile
+        match={{
+          params: {
+            userId: '5d08e102542c7a19fc55b790'
+          },
+          isExact: true,
+          path: USER_PROFILE,
+          url: ''
+        }}
+      />,
+      store,
+      graphqlMock
+    )).component
+
+    // wait for mocked data to load mockedProvider
+    await new Promise(resolve => {
+      setTimeout(resolve, 100)
+    })
+
+    component.update()
+
+    const menuLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonToggleButton'
+    )
+    menuLink.hostNodes().simulate('click')
+
+    const activationLink = await waitForElement(
+      component,
+      '#sub-page-header-munu-buttonItem1'
+    )
+    activationLink.hostNodes().simulate('click')
+
+    expect(await waitForElement(component, '#reactivate-action')).toBeDefined()
   })
 })

@@ -595,6 +595,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Metrics > Birth Validation",
+          "secured": false,
+          "host": "metrics",
+          "port": 1050,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "priority": 1
