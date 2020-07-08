@@ -730,7 +730,7 @@ export interface GQLEventIn45DayEstimationCount {
 
 export interface GQLTimeLoggedMetrics {
   status: string
-  trackingId: string
+  trackingId?: string
   eventType: string
   time: string
 }
