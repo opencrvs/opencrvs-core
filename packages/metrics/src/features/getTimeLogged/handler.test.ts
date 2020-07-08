@@ -77,3 +77,55 @@ describe('verify time logged handler', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+describe('verify time logged by practitioner handler', () => {
+  let server: any
+  const token = jwt.sign(
+    { scope: ['declare'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:metrics-user'
+    }
+  )
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('returns ok for valid request', async () => {
+    readPoints.mockResolvedValueOnce([
+      {
+        status: 'DECLARED',
+        trackingId: 'D23S2D0',
+        eventType: 'DEATH',
+        timeSpentEditing: 120,
+        time: '2019-03-31T18:00:00.000Z'
+      }
+    ])
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url:
+        '/timeLoggedMetricsByPractitioner?timeStart=1552469068679&timeEnd=1554814894419&' +
+        'practitionerId=94429795-0a09-4de8-8e1e-27dab01877d2&' +
+        'locationId=94429795-0a09-4de8-8e1e-dssdr323&count=10',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
+  })
+  it('returns 400 for required params', async () => {
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/timeLoggedMetricsByPractitioner',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+})

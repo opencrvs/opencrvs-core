@@ -62,12 +62,6 @@ export const APPLICATION_DETAIL = '/details/:applicationId'
 export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
-export const CREATE_USER = '/createUser'
-export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
-export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
-export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'
-export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
-
 export const PERFORMANCE_HOME = '/performance'
 export const PERFORMANCE_REPORT_LIST = '/performance/reports'
 export const PERFORMANCE_REPORT = '/performance/report'
@@ -79,3 +73,11 @@ export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
+
+export const CREATE_USER = '/createUser'
+export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
+export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
+export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'
+export const REVIEW_USER_DETAILS = '/user/:userId/:sectionId/'
+
+export const USER_PROFILE = '/userProfile/:userId'

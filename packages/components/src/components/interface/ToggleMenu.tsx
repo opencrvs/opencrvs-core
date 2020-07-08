@@ -83,6 +83,7 @@ interface IProps {
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
   hasFocusRing?: boolean
+  hide?: boolean
 }
 
 interface IState {
@@ -120,8 +121,17 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { id, toggleButton, menuHeader, menuItems, hasFocusRing } = this.props
-
+    const {
+      id,
+      toggleButton,
+      menuHeader,
+      menuItems,
+      hasFocusRing,
+      hide
+    } = this.props
+    if (hide) {
+      return null
+    }
     return (
       <>
         <ToggleMenuContainer>

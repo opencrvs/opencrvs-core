@@ -48,7 +48,8 @@ import {
   TEAM_SEARCH,
   VERIFY_COLLECTOR,
   WORKFLOW_STATUS,
-  TEAM_USER_LIST
+  TEAM_USER_LIST,
+  USER_PROFILE
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -108,12 +109,21 @@ type GoToReviewUserDetails = {
   }
 }
 
+export const GO_TO_USER_PROFILE = 'navigation/GO_TO_USER_PROFILE'
+type GoToUserProfile = {
+  type: typeof GO_TO_USER_PROFILE
+  payload: {
+    userId: string
+  }
+}
+
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
   | GoToFieldAgentHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
+  | GoToUserProfile
 export const GO_TO_SYS_ADMIN_HOME = 'navigation/GO_TO_SYS_ADMIN_HOME'
 type GoToSysAdminHome = {
   type: typeof GO_TO_SYS_ADMIN_HOME
@@ -455,6 +465,15 @@ export function goToReviewUserDetails(userId: string): GoToReviewUserDetails {
   }
 }
 
+export function goToUserProfile(userId: string): GoToUserProfile {
+  return {
+    type: GO_TO_USER_PROFILE,
+    payload: {
+      userId
+    }
+  }
+}
+
 export const GO_TO_CREATE_USER_SECTION = 'navigation/GO_TO_CREATE_USER_SECTION'
 type GoToCreateUserSection = {
   type: typeof GO_TO_CREATE_USER_SECTION
@@ -655,14 +674,24 @@ export function navigationReducer(state: INavigationState, action: any) {
         )
       )
     case GO_TO_REVIEW_USER_DETAILS:
-      const { userId } = action.payload
       return loop(
         state,
         Cmd.action(
           push(
             formatUrl(REVIEW_USER_DETAILS, {
-              userId,
+              userId: action.payload.userId,
               sectionId: UserSection.Preview
+            })
+          )
+        )
+      )
+    case GO_TO_USER_PROFILE:
+      return loop(
+        state,
+        Cmd.action(
+          push(
+            formatUrl(USER_PROFILE, {
+              userId: action.payload.userId
             })
           )
         )

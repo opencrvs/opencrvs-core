@@ -404,13 +404,24 @@ describe('edit user tests', () => {
             },
             role: 'API_USER',
             type: 'API_USER',
+            status: 'active',
+            underInvestigation: false,
+            practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
               id: '895cc945-94a9-4195-9a29-22e9310f3385',
               name: 'Narsingdi Paurasabha',
               alias: ['নরসিংদী পৌরসভা'],
               __typename: 'Location'
             },
+            catchmentArea: [
+              {
+                id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+                name: 'Sample location',
+                alias: 'স্যাম্পল লোকেশান'
+              }
+            ],
             signature: null,
+            creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
           }
         }

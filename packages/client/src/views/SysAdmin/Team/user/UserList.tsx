@@ -21,7 +21,8 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch
+  goToTeamSearch,
+  goToUserProfile
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -94,8 +95,9 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 4px 6px;
+  padding: 2px 6px 4px 6px;
   border-radius: 4px;
+  height: 30px;
   text-align: center;
   margin-left: 4px;
 `
@@ -197,6 +199,7 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
+  goToUserProfile: typeof goToUserProfile
 }
 
 type IProps = BaseProps & IntlShapeProps & RouteComponentProps
@@ -210,7 +213,7 @@ interface ToggleUserActivation {
   selectedUser: GQLUser | null
 }
 
-const Status = (statusProps: IStatusProps) => {
+export const Status = (statusProps: IStatusProps) => {
   const status =
     statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
   switch (status.toLowerCase()) {
@@ -220,8 +223,6 @@ const Status = (statusProps: IStatusProps) => {
       return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return <DisabledStatusBox>{status}</DisabledStatusBox>
-    case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
-      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
       return <PendingStatusBox>{status}</PendingStatusBox>
@@ -235,6 +236,7 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
+    goToUserProfile,
     offlineOffices,
     location: { search }
   } = props
@@ -317,10 +319,20 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getNameRoleType(name: string, role: string, type: string) {
+  function getNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string
+  ) {
     return (
       <NameRoleTypeContainer>
-        <Name>{name}</Name>
+        <Name
+          id={`name-role-type-link-${id}`}
+          onClick={() => goToUserProfile(id)}
+        >
+          {name}
+        </Name>
         <RoleType>{getRoleType(role, type)}</RoleType>
       </NameRoleTypeContainer>
     )
@@ -357,8 +369,15 @@ function UserListComponent(props: IProps) {
 
           return {
             photo: <AvatarSmall />,
-            name: <LinkButton>{name}</LinkButton>,
-            nameRoleType: getNameRoleType(name, role, type),
+            name: (
+              <LinkButton
+                id={`name-link-${user.id}`}
+                onClick={() => goToUserProfile(user.id || '')}
+              >
+                {name}
+              </LinkButton>
+            ),
+            nameRoleType: getNameRoleType(user.id || '', name, role, type),
             roleType: getRoleType(role, type),
             status: renderStatus(user.status, user.underInvestigation),
             menu: (
@@ -592,6 +611,7 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch
+    goToTeamSearch,
+    goToUserProfile
   }
 )(withTheme(injectIntl(UserListComponent)))

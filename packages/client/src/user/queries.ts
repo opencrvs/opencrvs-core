@@ -51,7 +51,15 @@ export const GET_USER = gql`
       }
       role
       type
+      status
+      underInvestigation
+      practitionerId
       primaryOffice {
+        id
+        name
+        alias
+      }
+      catchmentArea {
         id
         name
         alias
@@ -60,6 +68,33 @@ export const GET_USER = gql`
         type
         data
       }
+      creationDate
+    }
+  }
+`
+
+export const FETCH_TIME_LOGGED_METRICS_FOR_PRACTITIONER = gql`
+  query(
+    $timeStart: String!
+    $timeEnd: String!
+    $practitionerId: String!
+    $locationId: String!
+    $count: Int!
+  ) {
+    fetchTimeLoggedMetricsByPractitioner(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      practitionerId: $practitionerId
+      locationId: $locationId
+      count: $count
+    ) {
+      results {
+        status
+        trackingId
+        eventType
+        time
+      }
+      totalItems
     }
   }
 `

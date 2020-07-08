@@ -868,6 +868,7 @@ export const getMetrics = (
   authHeader: IAuthHeader
 ) => {
   return fetch(
+    // @ts-ignore
     `${METRICS_URL}${prefix}?` + new URLSearchParams({ ...params }),
     {
       method: 'GET',

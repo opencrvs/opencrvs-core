@@ -137,7 +137,7 @@ const ValueWrapper = styled.span<{
   display: flex;
   justify-content: ${({ alignment }) =>
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
-  align-items: center;
+  align-items: stretch;
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
@@ -159,7 +159,7 @@ const H3 = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
-const LoadingGrey = styled.span<{
+export const LoadingGrey = styled.span<{
   width?: number
 }>`
   background: ${({ theme }) => theme.colors.background};

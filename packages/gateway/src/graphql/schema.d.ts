@@ -34,6 +34,7 @@ export interface GQLQuery {
   getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
+  fetchTimeLoggedMetricsByPractitioner?: GQLTimeLoggedMetricsResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getRoles?: Array<GQLRole | null>
@@ -582,6 +583,11 @@ export interface GQLSearchFieldAgentResult {
   totalItems?: number
 }
 
+export interface GQLTimeLoggedMetricsResultSet {
+  results?: Array<GQLTimeLoggedMetrics | null>
+  totalItems?: number
+}
+
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
@@ -722,6 +728,12 @@ export interface GQLEventIn45DayEstimationCount {
   estimated45DayPercentage: number
 }
 
+export interface GQLTimeLoggedMetrics {
+  status: string
+  trackingId: string
+  eventType: string
+  time: string
+}
 export interface GQLLocationWiseEstimationMetrics {
   details?: Array<GQLLocationWise45DayEstimation | null>
   total?: GQLEventIn45DayEstimationCount
@@ -1227,6 +1239,9 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<
     TParent
   >
+  fetchTimeLoggedMetricsByPractitioner?: QueryToFetchTimeLoggedMetricsByPractitionerResolver<
+    TParent
+  >
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getRoles?: QueryToGetRolesResolver<TParent>
@@ -1605,6 +1620,24 @@ export interface QueryToFetchLocationWiseEventMetricsResolver<
   (
     parent: TParent,
     args: QueryToFetchLocationWiseEventMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+export interface QueryToFetchTimeLoggedMetricsByPractitionerArgs {
+  timeStart: string
+  timeEnd: string
+  practitionerId: string
+  locationId: string
+  count: number
+}
+export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchTimeLoggedMetricsByPractitionerArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
