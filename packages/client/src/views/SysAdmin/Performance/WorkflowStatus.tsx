@@ -66,6 +66,9 @@ import { IStatusMapping } from './reports/operational/StatusWiseApplicationCount
 const ToolTipContainer = styled.span`
   text-align: center;
 `
+const DoubleLineValueWrapper = styled.div`
+  margin: 12px 0px;
+`
 
 const { useState } = React
 
@@ -244,11 +247,13 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     function formateDateWithRelationalText(date: Date) {
       const dateMoment = moment(date)
       return (
-        <>
-          {dateMoment.format('MMMM DD, YYYY')}
-          <br />
-          {`(${dateMoment.fromNow()})`}
-        </>
+        (date && (
+          <DoubleLineValueWrapper>
+            {dateMoment.format('MMMM DD, YYYY')}
+            <br />
+            {`(${dateMoment.fromNow()})`}
+          </DoubleLineValueWrapper>
+        )) || <></>
       )
     }
 
@@ -475,11 +480,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 .getTime()
                 .toString(),
             applicationStartedBy: (
-              <>
+              <DoubleLineValueWrapper>
                 {starterPractitionerName}
                 <br />
                 {`(${starterPractitionerRole})`}
-              </>
+              </DoubleLineValueWrapper>
             ),
             timeLoggedInProgress,
             timeLoggedDeclared,
@@ -614,6 +619,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
                 hideBoxShadow
                 fixedWidth={2791}
+                tableHeight={150}
                 currentPage={currentPageNumber}
                 pageSize={recordCount}
                 totalItems={total}
