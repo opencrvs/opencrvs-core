@@ -301,11 +301,11 @@ class UserAuditListComponent extends React.Component<Props, State> {
             </AuditDescTimeContainer>
           ),
           statusIcon: this.getWorkflowStatusIcon(timeLoggedMetrics.status),
-          trackingId: (
+          trackingId: (timeLoggedMetrics.trackingId && (
             <LinkButton textDecoration={'none'}>
               {timeLoggedMetrics.trackingId}
             </LinkButton>
-          ),
+          )) || <></>,
           eventType: this.props.intl.formatMessage(
             constantsMessages[timeLoggedMetrics.eventType.toLowerCase()]
           ),

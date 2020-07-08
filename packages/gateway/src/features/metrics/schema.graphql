@@ -175,7 +175,7 @@ type LocationWise45DayEstimation {
 
 type TimeLoggedMetrics {
   status: String!
-  trackingId: String!
+  trackingId: String
   eventType: String!
   time: String!
 }
