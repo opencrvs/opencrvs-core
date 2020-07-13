@@ -100,18 +100,18 @@ class ApprovalTabComponent extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 20,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 26,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 28,
+          width: 25,
           key: 'eventTimeElapsed'
         },
         {
           label: this.props.intl.formatMessage(messages.sentForApprovals),
-          width: 28,
+          width: 25,
           key: 'dateOfApproval'
         },
         {
@@ -134,9 +134,9 @@ class ApprovalTabComponent extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          label: this.props.intl.formatMessage(constantsMessages.name),
           width: 64,
-          key: 'trackingId'
+          key: 'name'
         },
         {
           width: 6,
