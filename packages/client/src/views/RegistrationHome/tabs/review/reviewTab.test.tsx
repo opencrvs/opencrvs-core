@@ -254,6 +254,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
     expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
     expect(data[0].applicationTimeElapsed).toBe(EXPECTED_DATE_OF_APPLICATION)
+    expect(data[0].name).toBe('Iliyas Khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
