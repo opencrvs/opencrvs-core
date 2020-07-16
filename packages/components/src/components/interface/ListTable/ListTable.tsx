@@ -15,7 +15,6 @@ import { Pagination } from '../DataTable/Pagination'
 import { LoadMore } from '../GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 import { ColumnContentAlignment } from '../GridTable'
-import CustomScroll from 'react-custom-scroll'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
