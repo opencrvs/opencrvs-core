@@ -169,21 +169,20 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
     const contactNumber =
       eventDetails.registration && eventDetails.registration.contactNumber
 
-    let name
     let dateOfEvent
     if (type.toLowerCase() === 'birth') {
       const birthEventDetails = eventDetails as GQLBirthEventSearchSet
-      name = birthEventDetails.childName || []
       dateOfEvent = birthEventDetails.dateOfBirth
     } else {
       const deathEventDetails = eventDetails as GQLDeathEventSearchSet
-      name = deathEventDetails.deceasedName || []
       dateOfEvent = deathEventDetails.dateOfDeath
     }
 
     return {
       type,
-      name: createNamesMap(name as GQLHumanName[])[locale] as string,
+      trackingId:
+        (eventDetails.registration && eventDetails.registration.trackingId) ||
+        '',
       dateOfEvent:
         (dateOfEvent &&
           moment(dateOfEvent.toString(), 'YYYY-MM-DD').format(
@@ -328,8 +327,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       <>
         <BorderedPaddedContent>
           <ExpansionContainer>
-            <label>{intl.formatMessage(constantsMessages.name)}:</label>
-            <BoldSpan>{transformedData.name}</BoldSpan>
+            <label>{intl.formatMessage(constantsMessages.trackingId)}:</label>
+            <BoldSpan>{transformedData.trackingId}</BoldSpan>
           </ExpansionContainer>
           <ExpansionContainer>
             <label>
