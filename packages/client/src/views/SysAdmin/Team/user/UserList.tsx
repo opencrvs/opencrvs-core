@@ -21,7 +21,8 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch
+  goToTeamSearch,
+  goToUserProfile
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -36,7 +37,8 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   AddUser,
   AvatarSmall,
-  VerticalThreeDots
+  VerticalThreeDots,
+  SearchRed
 } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
@@ -60,6 +62,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -92,12 +95,17 @@ const ErrorText = styled.div`
 `
 
 const StatusBox = styled.span`
-  padding: 4px 6px;
+  padding: 2px 6px 4px 6px;
   border-radius: 4px;
+  height: 30px;
   text-align: center;
+  margin-left: 4px;
 `
 const ActiveStatusBox = styled(StatusBox)`
   background: rgba(73, 183, 141, 0.3);
+`
+const DeactivatedStatusBox = styled(StatusBox)`
+  background: rgba(245, 209, 209, 1);
 `
 const PendingStatusBox = styled(StatusBox)`
   background: rgba(255, 255, 153, 1);
@@ -105,7 +113,6 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
-
 const AddUserContainer = styled.div`
   display: flex;
   cursor: pointer;
@@ -192,6 +199,7 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
+  goToUserProfile: typeof goToUserProfile
 }
 
 type IProps = BaseProps & IntlShapeProps & RouteComponentProps
@@ -200,12 +208,19 @@ interface IStatusProps {
   status: string
 }
 
-const Status = (statusProps: IStatusProps) => {
+interface ToggleUserActivation {
+  modalVisible: boolean
+  selectedUser: GQLUser | null
+}
+
+export const Status = (statusProps: IStatusProps) => {
   const status =
     statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
   switch (status.toLowerCase()) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
       return <ActiveStatusBox>{status}</ActiveStatusBox>
+    case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
+      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
     case UserStatus[UserStatus.DISABLED].toLowerCase():
       return <DisabledStatusBox>{status}</DisabledStatusBox>
     case UserStatus[UserStatus.PENDING].toLowerCase():
@@ -221,6 +236,7 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
+    goToUserProfile,
     offlineOffices,
     location: { search }
   } = props
@@ -228,6 +244,13 @@ function UserListComponent(props: IProps) {
   const { locationId, viewOnly } = (querystring.parse(
     search
   ) as unknown) as ISearchParams
+
+  const [toggleActivation, setToggleActivation] = useState<
+    ToggleUserActivation
+  >({
+    modalVisible: false,
+    selectedUser: null
+  })
 
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
   useEffect(() => {
@@ -245,13 +268,47 @@ function UserListComponent(props: IProps) {
     ({ id }) => locationId === id
   )
 
-  function getMenuItems(userId: string) {
-    return [
+  function toggleUserActivationModal(user?: GQLUser) {
+    if (user !== undefined) {
+      setToggleActivation({
+        ...toggleActivation,
+        modalVisible: true,
+        selectedUser: user
+      })
+    } else {
+      setToggleActivation({
+        ...toggleActivation,
+        modalVisible: false,
+        selectedUser: null
+      })
+    }
+  }
+
+  function getMenuItems(user: GQLUser) {
+    const menuItems = [
       {
         label: intl.formatMessage(messages.menuOptionEditDetails),
-        handler: () => goToReviewUserDetails(userId)
+        handler: () => {
+          goToReviewUserDetails(user.id as string)
+        }
       }
     ]
+
+    if (user.status === 'active') {
+      menuItems.push({
+        label: intl.formatMessage(messages.deactivate),
+        handler: () => toggleUserActivationModal(user)
+      })
+    }
+
+    if (user.status === 'deactivated') {
+      menuItems.push({
+        label: intl.formatMessage(messages.reactivate),
+        handler: () => toggleUserActivationModal(user)
+      })
+    }
+
+    return menuItems
   }
 
   function getRoleType(role: string, type: string) {
@@ -262,12 +319,31 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function getNameRoleType(name: string, role: string, type: string) {
+  function getNameRoleType(
+    id: string,
+    name: string,
+    role: string,
+    type: string
+  ) {
     return (
       <NameRoleTypeContainer>
-        <Name>{name}</Name>
+        <Name
+          id={`name-role-type-link-${id}`}
+          onClick={() => goToUserProfile(id)}
+        >
+          {name}
+        </Name>
         <RoleType>{getRoleType(role, type)}</RoleType>
       </NameRoleTypeContainer>
+    )
+  }
+
+  function renderStatus(status?: string, underInvestigation?: boolean) {
+    return (
+      <>
+        {underInvestigation && <SearchRed />}
+        <Status status={status || 'pending'} />
+      </>
     )
   }
 
@@ -290,19 +366,25 @@ function UserListComponent(props: IProps) {
             (user.role && intl.formatMessage(userMessages[user.role])) || '-'
           const type =
             (user.type && intl.formatMessage(userMessages[user.type])) || '-'
-          const status = user.status || 'pending'
 
           return {
             photo: <AvatarSmall />,
-            name: <LinkButton>{name}</LinkButton>,
-            nameRoleType: getNameRoleType(name, role, type),
+            name: (
+              <LinkButton
+                id={`name-link-${user.id}`}
+                onClick={() => goToUserProfile(user.id || '')}
+              >
+                {name}
+              </LinkButton>
+            ),
+            nameRoleType: getNameRoleType(user.id || '', name, role, type),
             roleType: getRoleType(role, type),
-            status: <Status status={status} />,
+            status: renderStatus(user.status, user.underInvestigation),
             menu: (
               <ToggleMenu
                 id={`user-item-${index}-menu`}
                 toggleButton={<VerticalThreeDots />}
-                menuItems={getMenuItems(user.id as string)}
+                menuItems={getMenuItems(user)}
               />
             )
           }
@@ -355,12 +437,12 @@ function UserListComponent(props: IProps) {
         },
         {
           label: intl.formatMessage(constantsMessages.name),
-          width: 75,
+          width: 65,
           key: 'nameRoleType'
         },
         {
           label: intl.formatMessage(constantsMessages.status),
-          width: 15,
+          width: 25,
           alignment: ColumnContentAlignment.RIGHT,
           key: 'status'
         }
@@ -404,12 +486,12 @@ function UserListComponent(props: IProps) {
           },
           {
             label: intl.formatMessage(constantsMessages.labelRole),
-            width: 50,
+            width: 40,
             key: 'roleType'
           },
           {
             label: intl.formatMessage(constantsMessages.status),
-            width: 10,
+            width: 20,
             alignment: ColumnContentAlignment.RIGHT,
             key: 'status'
           },
@@ -428,7 +510,7 @@ function UserListComponent(props: IProps) {
           primaryOfficeId: locationId,
           count: recordCount
         }}
-        fetchPolicy={'no-cache'}
+        fetchPolicy={'cache-and-network'}
       >
         {({ data, loading, error }) => {
           if (error) {
@@ -468,6 +550,20 @@ function UserListComponent(props: IProps) {
                 })}
                 hideBoxShadow={true}
                 hideTableHeader={true}
+              />
+              <UserAuditActionModal
+                show={toggleActivation.modalVisible}
+                user={toggleActivation.selectedUser}
+                onClose={() => toggleUserActivationModal()}
+                onConfirmRefetchQueries={[
+                  {
+                    query: SEARCH_USERS,
+                    variables: {
+                      primaryOfficeId: locationId,
+                      count: recordCount
+                    }
+                  }
+                ]}
               />
             </UserTable>
           )
@@ -515,6 +611,7 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch
+    goToTeamSearch,
+    goToUserProfile
   }
 )(withTheme(injectIntl(UserListComponent)))

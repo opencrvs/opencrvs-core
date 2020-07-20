@@ -47,7 +47,8 @@ import {
   isNotification,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
-  getPractionerIdFromTask
+  getPractionerIdFromTask,
+  getTrackingId
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -343,6 +344,7 @@ export async function generateTimeLoggedPoint(
 
   const tags: ITimeLoggedTags = {
     currentStatus: getApplicationStatus(currentTask) as string,
+    trackingId: getTrackingId(currentTask) as string,
     eventType: getApplicationType(currentTask) as string,
     practitionerId: getPractionerIdFromTask(currentTask),
     ...(await generatePointLocations(payload, authHeader))

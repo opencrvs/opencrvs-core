@@ -82,6 +82,13 @@ type Query {
     locationId: String!
     event: String!
   ): LocationWiseEstimationMetrics
+  fetchTimeLoggedMetricsByPractitioner(
+    timeStart: String!
+    timeEnd: String!
+    practitionerId: String!
+    locationId: String!
+    count: Int!
+  ): TimeLoggedMetricsResultSet
   searchEvents(
     userId: String
     locationIds: [String]
@@ -152,6 +159,12 @@ type Mutation {
     userId: String!
     existingPassword: String!
     password: String!
+  ): String
+  auditUser(
+    userId: String!
+    action: String!
+    reason: String!
+    comment: String
   ): String
 }
 
@@ -277,6 +290,7 @@ type User {
   type: String
   email: String
   status: String
+  underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar!
@@ -321,6 +335,11 @@ type MonthWiseEstimationMetrics {
 type LocationWiseEstimationMetrics {
   details: [LocationWise45DayEstimation]
   total: EventIn45DayEstimationCount
+}
+
+type TimeLoggedMetricsResultSet {
+  results: [TimeLoggedMetrics]
+  totalItems: Int
 }
 
 type EventSearchResultSet {
@@ -677,6 +696,13 @@ type LocationWise45DayEstimation {
   estimated45DayPercentage: Float!
   locationId: String!
   locationName: String!
+}
+
+type TimeLoggedMetrics {
+  status: String!
+  trackingId: String
+  eventType: String!
+  time: String!
 }
 
 interface EventSearchSet {

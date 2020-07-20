@@ -12,12 +12,13 @@
 import styled from 'styled-components'
 import { Button } from './Button'
 
-export const LinkButton = styled(Button)`
+export const LinkButton = styled(Button)<{ textDecoration?: string }>`
   ${({ theme }) => theme.fonts.bodyStyle}
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   height: auto;
-  text-decoration-line: underline;
+  text-decoration-line: ${({ textDecoration }) =>
+    textDecoration ? textDecoration : 'underline'};
   & div {
     padding: 0;
   }

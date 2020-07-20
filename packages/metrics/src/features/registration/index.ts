@@ -87,6 +87,7 @@ export interface ITimeLoggedFields {
 
 export interface ITimeLoggedTags {
   currentStatus: string
+  trackingId: string
   eventType: string
   practitionerId?: string
   locationLevel5?: string

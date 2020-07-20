@@ -482,9 +482,16 @@ export const getSectionFields = (
 
 export const hasFormError = (
   fields: IFormField[],
-  values: IFormSectionData
+  values: IFormSectionData,
+  resource?: IOfflineData,
+  drafts?: IFormData
 ): boolean => {
-  const errors: Errors = getValidationErrorsForForm(fields, values)
+  const errors: Errors = getValidationErrorsForForm(
+    fields,
+    values,
+    resource,
+    drafts
+  )
 
   const fieldListWithErrors = Object.values(errors).filter(
     error =>
@@ -700,5 +707,21 @@ export const conditionals: IConditionals = {
   certCollectorOther: {
     action: 'hide',
     expression: 'values.type !== "OTHER"'
+  },
+  userAuditReasonSpecified: {
+    action: 'hide',
+    expression: 'values.reason === "OTHER"'
+  },
+  userAuditReasonOther: {
+    action: 'hide',
+    expression: 'values.reason !== "OTHER"'
+  },
+  isAuditActionDeactivate: {
+    action: 'hide',
+    expression: 'draftData.formValues.action !== "DEACTIVATE"'
+  },
+  isAuditActionReactivate: {
+    action: 'hide',
+    expression: 'draftData.formValues.action !== "REACTIVATE"'
   }
 }

@@ -26,9 +26,11 @@ import {
   hideConfigurationErrorNotification,
   toggleDraftSavedNotification,
   hideSubmitFormSuccessToast,
-  hideSubmitFormErrorToast
+  hideSubmitFormErrorToast,
+  hideUserAuditSuccessToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
+import { NotificationState } from '@client/notification/reducer'
 
 type NotificationProps = {
   language?: string
@@ -37,6 +39,7 @@ type NotificationProps = {
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
+  userAuditSuccessToast: NotificationState['userAuditSuccessToast']
 }
 
 type DispatchProps = {
@@ -45,6 +48,7 @@ type DispatchProps = {
   hideSubmitFormSuccessToast: typeof hideSubmitFormSuccessToast
   hideSubmitFormErrorToast: typeof hideSubmitFormErrorToast
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
+  hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
 }
 
 class Component extends React.Component<
@@ -70,6 +74,10 @@ class Component extends React.Component<
     this.props.hideSubmitFormErrorToast()
   }
 
+  hideUserAuditSuccessToast = () => {
+    this.props.hideUserAuditSuccessToast()
+  }
+
   render() {
     const {
       children,
@@ -78,7 +86,8 @@ class Component extends React.Component<
       intl,
       saveDraftClicked,
       submitFormSuccessToast,
-      submitFormErrorToast
+      submitFormErrorToast,
+      userAuditSuccessToast
     } = this.props
 
     return (
@@ -137,7 +146,19 @@ class Component extends React.Component<
             {intl.formatMessage(messages.userFormFail)}
           </FloatingNotification>
         )}
-
+        {userAuditSuccessToast.visible && (
+          <FloatingNotification
+            id="userAuditSuccessToast"
+            show={userAuditSuccessToast.visible}
+            type={NOTIFICATION_TYPE.SUCCESS}
+            callback={this.hideUserAuditSuccessToast}
+          >
+            {intl.formatMessage(messages.userAuditSuccess, {
+              name: userAuditSuccessToast.userFullName,
+              action: userAuditSuccessToast.action
+            })}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -152,7 +173,8 @@ const mapStateToProps = (store: IStoreState) => {
     configurationErrorVisible: store.notification.configurationErrorVisible,
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
-    submitFormErrorToast: store.notification.submitFormErrorToast
+    submitFormErrorToast: store.notification.submitFormErrorToast,
+    userAuditSuccessToast: store.notification.userAuditSuccessToast
   }
 }
 
@@ -164,7 +186,8 @@ export const NotificationComponent = withRouter(
       hideConfigurationErrorNotification,
       hideSubmitFormSuccessToast,
       hideSubmitFormErrorToast,
-      toggleDraftSavedNotification
+      toggleDraftSavedNotification,
+      hideUserAuditSuccessToast
     }
   )(injectIntl(Component))
 )

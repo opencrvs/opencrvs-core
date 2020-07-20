@@ -98,7 +98,6 @@ const RowWrapper = styled.div<{ totalWidth: number; highlight?: boolean }>`
   & span:last-child {
     text-align: right;
     padding-right: 12px;
-    display: inline-block;
   }
 `
 const TableFooter = styled(RowWrapper)`
@@ -136,8 +135,9 @@ const ValueWrapper = styled.span<{
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
   display: flex;
-  flex-direction: ${({ alignment }) =>
-    alignment === ColumnContentAlignment.RIGHT ? 'row-reverse' : 'row'};
+  justify-content: ${({ alignment }) =>
+    alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
+  align-items: stretch;
   flex-shrink: 0;
   margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
@@ -159,7 +159,7 @@ const H3 = styled.div`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle};
   color: ${({ theme }) => theme.colors.copy};
 `
-const LoadingGrey = styled.span<{
+export const LoadingGrey = styled.span<{
   width?: number
 }>`
   background: ${({ theme }) => theme.colors.background};
@@ -167,19 +167,41 @@ const LoadingGrey = styled.span<{
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
-const TableScrollerHorizontal = styled.div`
-  overflow-x: scroll;
-  overflow-y: hidden;
-
+const TableScrollerHorizontal = styled.div<{ scrolling: boolean }>`
+  overflow: auto;
+  padding-bottom: 8px;
   padding-right: 10px;
 
   &::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
+    width: 8px;
+    height: 8px;
   }
+
+  @keyframes showScrollBar {
+    from {
+      background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    }
+    to {
+      background: ${({ theme }) => theme.colors.white};
+    }
+  }
+  @keyframes hideScrollBar {
+    from {
+      background: ${({ theme }) => theme.colors.white};
+    }
+    to {
+      background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    }
+  }
+
   &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
     border-radius: 10px;
+    animation: ${({ scrolling }) =>
+        scrolling ? 'showScrollBar' : 'hideScrollBar'}
+      1500ms cubic-bezier(0.65, 0.05, 0.36, 1);
+    :hover {
+      animation: showScrollBar 1500ms cubic-bezier(0.65, 0.05, 0.36, 1);
+    }
   }
 `
 const TableScroller = styled.div<{
@@ -196,18 +218,6 @@ const TableScroller = styled.div<{
     fixedWidth
       ? `width: ${fixedWidth}px;`
       : `width: ${(totalWidth >= 100 && totalWidth) || 100}%;`}
-
-  overflow-y: scroll;
-  overflow-x: hidden;
-
-  &::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
-    border-radius: 10px;
-  }
 `
 
 const TableHeaderWrapper = styled.div`
@@ -261,6 +271,7 @@ interface IListTableProps {
 interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
+  isScrolling: boolean
 }
 
 export class ListTable extends React.Component<
@@ -269,7 +280,24 @@ export class ListTable extends React.Component<
 > {
   state = {
     sortIconInverted: false,
-    sortKey: null
+    sortKey: null,
+    isScrolling: false
+  }
+  private scrollerRef: React.RefObject<HTMLDivElement> = React.createRef()
+
+  componentDidUpdate() {
+    if (this.scrollerRef.current) {
+      this.scrollerRef.current.addEventListener('scroll', this.onScroll)
+    }
+  }
+
+  onScroll = () => {
+    if (!this.state.isScrolling) {
+      this.setState({ isScrolling: true })
+      setTimeout(() => {
+        this.setState({ isScrolling: false })
+      }, 1500)
+    }
   }
 
   onPageChange = (currentPage: number) => {
@@ -327,6 +355,7 @@ export class ListTable extends React.Component<
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
+
     return (
       <>
         {!isLoading && (
@@ -337,7 +366,11 @@ export class ListTable extends React.Component<
             fixedWidth={fixedWidth}
           >
             {tableTitle && <H3>{tableTitle}</H3>}
-            <TableScrollerHorizontal>
+
+            <TableScrollerHorizontal
+              ref={this.scrollerRef}
+              scrolling={this.state.isScrolling}
+            >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
                   <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>

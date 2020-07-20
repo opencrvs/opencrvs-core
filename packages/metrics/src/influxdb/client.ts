@@ -84,6 +84,7 @@ export const influx = new Influx.InfluxDB({
       },
       tags: [
         'currentStatus',
+        'trackingId',
         'eventType',
         'practitionerId',
         'locationLevel5',

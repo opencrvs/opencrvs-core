@@ -36,6 +36,7 @@ import {
   GQLLocation
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -61,7 +62,8 @@ const initialState: IUserFormState = {
   userDetailsStored: false,
   submitting: false,
   loadingRoles: false,
-  submissionError: false
+  submissionError: false,
+  userAuditForm
 }
 
 interface IUpdateUserFormFieldDefsAction {
@@ -249,6 +251,7 @@ export interface IUserFormState {
   submitting: boolean
   loadingRoles: boolean
   submissionError: boolean
+  userAuditForm: IUserAuditForm
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (

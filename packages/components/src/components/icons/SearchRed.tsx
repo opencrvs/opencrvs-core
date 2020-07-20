@@ -11,12 +11,17 @@
  */
 import * as React from 'react'
 
-export const Download = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={40} height={40} viewBox="0 0 40 40" fill="none" {...props}>
-    <circle cx={20} cy={20} r={11} stroke="#4C68C1" strokeWidth={2} />
+export const SearchRed = (props: React.HTMLAttributes<SVGElement>) => (
+  <svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
     <path
-      d="M16 22l4 4 4-4M20 14v12"
-      stroke="#4C68C1"
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 24c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12s5.373 12 12 12z"
+      fill="#D53F3F"
+    />
+    <path
+      d="M11.333 16.667a5.333 5.333 0 100-10.667 5.333 5.333 0 000 10.667zM18 18l-2.9-2.9"
+      stroke="#fff"
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"

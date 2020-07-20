@@ -12,19 +12,43 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface ISysAdminMessages {
+  auditReason: MessageDescriptor
+  auditReasonOther: MessageDescriptor
   overviewTab: MessageDescriptor
   officesTab: MessageDescriptor
   usersTab: MessageDescriptor
+  comments: MessageDescriptor
+  deactivate: MessageDescriptor
+  deactivateReasonNotEmployee: MessageDescriptor
+  deactivateReasonInvestigated: MessageDescriptor
+  deactivateUserTitle: MessageDescriptor
+  deactivateUserSubtitle: MessageDescriptor
   devicesTab: MessageDescriptor
+  formError: MessageDescriptor
   networkTab: MessageDescriptor
   configTab: MessageDescriptor
   systemTitle: MessageDescriptor
   menuOptionEditDetails: MessageDescriptor
   editUserDetailsTitle: MessageDescriptor
   editUserCommonTitle: MessageDescriptor
+  reactivate: MessageDescriptor
+  reactivateUserTitle: MessageDescriptor
+  reactivateUserSubtitle: MessageDescriptor
+  reactivateReasonReturnedToRole: MessageDescriptor
+  reactivateReasonNoLongerInvestigated: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
+  auditReason: {
+    id: 'register.sysAdminHome.user.audit.reason',
+    defaultMessage: 'Please provide a reason: ',
+    description: 'The label for form field deactivate reason'
+  },
+  auditReasonOther: {
+    id: 'register.sysAdminHome.user.audit.reasonOther',
+    defaultMessage: 'Other (please provide a reason in the comments)',
+    description: 'The label for radio option other'
+  },
   overviewTab: {
     id: 'register.sysAdminHome.overview',
     defaultMessage: 'Overview',
@@ -40,10 +64,47 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Users',
     description: 'The title of users tab'
   },
+  comments: {
+    id: 'register.sysAdminHome.user.audit.comments',
+    defaultMessage: 'Comments: ',
+    description: 'The label for form field deactivate comments'
+  },
+  deactivate: {
+    defaultMessage: 'Deactivate',
+    description: 'Label for toggle menu option deactivate',
+    id: 'register.sysAdmin.user.deactivate'
+  },
+  deactivateReasonNotEmployee: {
+    id: 'register.sysAdminHome.user.audit.deactivation.reasonNotEmployee',
+    defaultMessage: 'No longer an employee',
+    description: 'The label for radio option not employee'
+  },
+  deactivateReasonInvestigated: {
+    id: 'register.sysAdminHome.user.audit.deactivation.reasonInvestigated',
+    defaultMessage:
+      'Being investigated due to suspicious activity on their account',
+    description: 'The label for radio option being investigated'
+  },
+  deactivateUserTitle: {
+    id: 'register.sysAdminHome.user.audit.deactivation.title',
+    defaultMessage: 'Deactivate {name}?',
+    description: 'The title of user deactivation confirmation modal'
+  },
+  deactivateUserSubtitle: {
+    id: 'register.sysAdminHome.user.audit.deactivation.subtitle',
+    defaultMessage:
+      'This will revoke {name}’s ability to login and access the system. The account can be reactivated at a later date.',
+    description: 'The subtitle of user deactivation confirmation modal'
+  },
   devicesTab: {
     id: 'register.sysAdminHome.devices',
     defaultMessage: 'Devices',
     description: 'The title of devices tab'
+  },
+  formError: {
+    id: 'register.sysAdminHome.user.audit.form.error',
+    defaultMessage: 'Please complete all mandatory fields',
+    description: 'The label for form error'
   },
   networkTab: {
     id: 'register.sysAdminHome.network',
@@ -75,6 +136,33 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Edit user',
     description: 'Common title of form view groups when edit user',
     id: 'register.sysAdmin.user.edit.commonGroupTitle'
+  },
+  reactivateUserTitle: {
+    id: 'register.sysAdminHome.user.audit.reactivation.title',
+    defaultMessage: 'Reactivate {name}?',
+    description: 'The title of user reactivation confirmation modal'
+  },
+  reactivateUserSubtitle: {
+    id: 'register.sysAdminHome.user.audit.reactivation.subtitle',
+    defaultMessage:
+      'This will reactivate {name}’s ability to login and access the system.',
+    description: 'The subtitle of user reactivation confirmation modal'
+  },
+  reactivate: {
+    defaultMessage: 'Reactivate',
+    description: 'Label for toggle menu option reactivate',
+    id: 'register.sysAdmin.user.reactivate'
+  },
+  reactivateReasonReturnedToRole: {
+    defaultMessage: 'Returned to their role',
+    description: 'The label for radio option Returned to role',
+    id: 'register.sysAdminHome.user.audit.reactivation.reasonReturnedToRole'
+  },
+  reactivateReasonNoLongerInvestigated: {
+    defaultMessage: 'No longer being investigated for suspicious activity',
+    description: 'The label for radio option no longer investigated',
+    id:
+      'register.sysAdminHome.user.audit.reactivation.reasonNoLongerInvestigated'
   }
 }
 

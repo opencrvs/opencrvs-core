@@ -481,8 +481,6 @@ export const Header = connect(
   (store: IStoreState) => ({
     activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
-      : window.location.href.includes('team/users')
-      ? ACTIVE_MENU_ITEM.USERS
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
       : ACTIVE_MENU_ITEM.APPLICATIONS,

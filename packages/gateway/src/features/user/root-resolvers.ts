@@ -21,9 +21,9 @@ import {
   getUser,
   hasScope,
   inScope,
-  isTokenOwner
+  isTokenOwner,
+  getUserId
 } from '@gateway/features/user/utils'
-import { logger } from '@gateway/logger'
 import {
   GQLHumanNameInput,
   GQLResolver,
@@ -31,6 +31,7 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
+import { logger } from '@gateway/logger'
 import fetch from 'node-fetch'
 
 export const resolvers: GQLResolver = {
@@ -275,6 +276,42 @@ export const resolvers: GQLResolver = {
           )
         )
       }
+      return true
+    },
+    async auditUser(_, { userId, action, reason, comment }, authHeader) {
+      if (!hasScope(authHeader, 'sysadmin')) {
+        return await Promise.reject(
+          new Error(
+            `User ${userId} is not allowed to audit for not having the sys admin scope`
+          )
+        )
+      }
+
+      const auditedBy = getUserId(authHeader)
+
+      const res = await fetch(`${USER_MANAGEMENT_URL}auditUser`, {
+        method: 'POST',
+        body: JSON.stringify({
+          userId,
+          auditedBy,
+          action,
+          reason,
+          comment
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on user-mgnt service. Couldn't audit user ${userId}`
+          )
+        )
+      }
+
       return true
     }
   }
