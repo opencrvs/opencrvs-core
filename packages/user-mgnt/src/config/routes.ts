@@ -43,6 +43,11 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
+import {
+  registerSystemClient,
+  reqRegisterSystemSchema,
+  resRegisterSystemSchema
+} from '@user-mgnt/features/system/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -297,6 +302,24 @@ export const getRoutes = () => {
         },
         response: {
           schema: resVerifyUserSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/registerSystemClient',
+      handler: registerSystemClient,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new system client',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: reqRegisterSystemSchema
+        },
+        response: {
+          schema: resRegisterSystemSchema
         }
       }
     }

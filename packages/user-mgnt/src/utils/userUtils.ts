@@ -28,10 +28,14 @@ export const roleScopeMapping: IRoleScopeMapping = {
   LOCAL_SYSTEM_ADMIN: ['sysadmin'],
   NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
   PERFORMANCE_OVERSIGHT: ['performance'],
-  PERFORMANCE_MANAGEMENT: ['performance'],
-  NOTIFICATION_API_USER: ['declare', 'notification-api'],
-  VALIDATOR_API_USER: ['validator-api'],
-  CHATBOT_API_USER: ['declare', 'chatbot-api']
+  PERFORMANCE_MANAGEMENT: ['performance']
+}
+
+export const systemScopeMapping: IRoleScopeMapping = {
+  HEALTH: ['declare', 'notification-api'],
+  NATIONAL_ID: ['nationalId'],
+  EXTERNAL_VALIDATION: ['validator-api'],
+  AGE_CHECK: ['declare', 'chatbot-api']
 }
 
 export const hasScope = (request: Hapi.Request, scope: string): boolean => {
