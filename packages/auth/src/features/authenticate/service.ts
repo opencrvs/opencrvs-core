@@ -15,6 +15,7 @@ import {
   CERT_PRIVATE_KEY_PATH,
   CERT_PUBLIC_KEY_PATH,
   CONFIG_TOKEN_EXPIRY_SECONDS,
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
   QA_ENV
 } from '@auth/constants'
@@ -49,6 +50,12 @@ export interface IAuthentication {
   scope: string[]
 }
 
+export interface ISystemAuthentication {
+  systemId: string
+  status: string
+  scope: string[]
+}
+
 export class UserInfoNotFoundError extends Error {}
 
 export function isUserInfoNotFoundError(err: Error) {
@@ -79,11 +86,37 @@ export async function authenticate(
   }
 }
 
+export async function authenticateSystem(
+  /* tslint:disable */
+  client_id: string,
+  client_secret: string
+  /* tslint:enable */
+): Promise<ISystemAuthentication> {
+  const url = resolve(USER_MANAGEMENT_URL, '/verifySystem')
+
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ client_id, client_secret })
+  })
+
+  if (res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const body = await res.json()
+  return {
+    systemId: body.id,
+    scope: body.scope,
+    status: body.status
+  }
+}
+
 export async function createToken(
   userId: string,
   scope: string[],
   audience: string[],
-  issuer: string
+  issuer: string,
+  system?: boolean
 ): Promise<string> {
   if (typeof userId === undefined) {
     throw new Error('Invalid userId found for token creation')
@@ -91,7 +124,9 @@ export async function createToken(
   return sign({ scope }, cert, {
     subject: userId,
     algorithm: 'RS256',
-    expiresIn: CONFIG_TOKEN_EXPIRY_SECONDS,
+    expiresIn: system
+      ? CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
+      : CONFIG_TOKEN_EXPIRY_SECONDS,
     audience,
     issuer
   })
