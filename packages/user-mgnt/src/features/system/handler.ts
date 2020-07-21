@@ -11,7 +11,7 @@
  */
 
 import { logger } from '@user-mgnt/logger'
-import System from '@user-mgnt/model/system'
+import System, { ISystemModel } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { generateSaltedHash } from '@user-mgnt/utils/hash'
 import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
@@ -44,8 +44,8 @@ export async function registerSystemClient(
     )
     const userId = token.sub
     const systemAdminUser: IUserModel | null = await User.findById(userId)
-    if (!systemAdminUser) {
-      logger.error('system admin user details cannot be found')
+    if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
+      logger.error('active system admin user details cannot be found')
       throw unauthorized()
     }
     if (!systemScopeMapping[scope]) {
@@ -100,4 +100,98 @@ export const resRegisterSystemSchema = Joi.object({
   client_id: Joi.string(),
   secret_id: Joi.string(),
   sha_secret: Joi.string()
+})
+
+interface IAuditSystemPayload {
+  client_id: string
+}
+
+export async function deactivateSystemClient(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const token: ITokenPayload = getTokenPayload(
+      request.headers.authorization.split(' ')[1]
+    )
+    const userId = token.sub
+    const systemAdminUser: IUserModel | null = await User.findById(userId)
+    if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
+      logger.error('active system admin user details cannot be found')
+      throw unauthorized()
+    }
+
+    const auditSystemPayload = request.payload as IAuditSystemPayload
+
+    const system: ISystemModel | null = await System.findById(
+      auditSystemPayload.client_id
+    )
+    if (!system) {
+      logger.error(
+        `No system details found for requested client_id: ${auditSystemPayload.client_id}`
+      )
+      throw unauthorized()
+    }
+
+    system.status = statuses.DEACTIVATED
+
+    try {
+      // tslint:disable-next-line
+      await System.update({ _id: system._id }, system)
+    } catch (err) {
+      logger.error(err.message)
+      return h.response().code(400)
+    }
+    return h.response().code(200)
+  } catch (err) {
+    logger.error(err)
+    return h.response().code(400)
+  }
+}
+
+export async function reactivateSystemClient(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const token: ITokenPayload = getTokenPayload(
+      request.headers.authorization.split(' ')[1]
+    )
+    const userId = token.sub
+    const systemAdminUser: IUserModel | null = await User.findById(userId)
+    if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
+      logger.error('active system admin user details cannot be found')
+      throw unauthorized()
+    }
+
+    const auditSystemPayload = request.payload as IAuditSystemPayload
+
+    const system: ISystemModel | null = await System.findById(
+      auditSystemPayload.client_id
+    )
+    if (!system) {
+      logger.error(
+        `No system details found for requested client_id: ${auditSystemPayload.client_id}`
+      )
+      throw unauthorized()
+    }
+
+    system.status = statuses.ACTIVE
+
+    try {
+      // tslint:disable-next-line
+      await System.update({ _id: system._id }, system)
+    } catch (err) {
+      logger.error(err.message)
+      return h.response().code(400)
+    }
+    return h.response().code(200)
+  } catch (err) {
+    logger.error(err)
+    return h.response().code(400)
+  }
+}
+
+export const auditSystemSchema = Joi.object({
+  client_id: Joi.string().required()
 })
