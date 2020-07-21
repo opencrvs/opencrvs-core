@@ -68,6 +68,7 @@ describe('ReviewForm tests', () => {
         templates: mockOfflineData.templates,
         locations: mockOfflineData.locations,
         facilities: mockOfflineData.facilities,
+        pilotLocations: mockOfflineData.pilotLocations,
         offices: mockOfflineData.offices,
         assets: mockOfflineData.assets
       })
