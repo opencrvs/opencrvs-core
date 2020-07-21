@@ -329,3 +329,11 @@ export async function getEventInformantName(
     .concat(' ')
     .concat(name.family)
 }
+
+export function generateEmptyBundle(): fhir.Bundle {
+  return {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: []
+  }
+}
