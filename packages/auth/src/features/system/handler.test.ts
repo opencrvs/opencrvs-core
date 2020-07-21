@@ -11,7 +11,7 @@
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createServer } from '@auth/index'
-//import * as authService from '@auth/features/authenticate/service'
+import * as authService from '@auth/features/authenticate/service'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {
@@ -36,7 +36,7 @@ describe('authenticate handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
   })
-  /*describe('user management service says credentials are valid', () => {
+  describe('user management service says credentials are valid', () => {
     it('returns a token to the client', async () => {
       jest
         .spyOn(authService, 'createToken')
@@ -59,5 +59,5 @@ describe('authenticate handler receives a request', () => {
 
       expect(JSON.parse(res.payload).token).toBe('789')
     })
-  })*/
+  })
 })
