@@ -56,6 +56,35 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
+function generateSearchableLocations(
+  locations: ILocation[],
+  offlineLocations: { [key: string]: ILocation }
+) {
+  const generated: ISearchLocation[] = locations.map((location: ILocation) => {
+    let locationName = location.name
+    location.jurisdictionType &&
+      (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType] ||
+        ''}`.trimEnd())
+
+    if (location.partOf && location.partOf !== 'Location/0') {
+      const locRef = location.partOf.split('/')[1]
+      let parent
+      if (
+        (parent = offlineLocations[locRef] && offlineLocations[locRef].name)
+      ) {
+        locationName += `, ${parent}`
+      }
+    }
+
+    return {
+      id: location.id,
+      searchableText: location.name,
+      displayLabel: locationName
+    }
+  })
+  return generated
+}
+
 export function generateLocations(
   locations: { [key: string]: ILocation },
   filterByJurisdictionTypes?: string[],
@@ -79,28 +108,17 @@ export function generateLocations(
     )
   }
 
-  const generated: ISearchLocation[] = locationArray.map(
-    (location: ILocation) => {
-      let locationName = location.name
-      location.jurisdictionType &&
-        (locationName += ` ${JURISDICTION_TYPE[location.jurisdictionType]}`)
+  return generateSearchableLocations(locationArray, locations)
+}
 
-      if (location.partOf && location.partOf !== 'Location/0') {
-        const locRef = location.partOf.split('/')[1]
-        let parent
-        if ((parent = locations[locRef] && locations[locRef].name)) {
-          locationName += `, ${parent}`
-        }
-      }
-
-      return {
-        id: location.id,
-        searchableText: location.name,
-        displayLabel: locationName
-      }
-    }
+export function generatePilotLocations(
+  pilotLocations: { [key: string]: ILocation },
+  offlineLocations: { [key: string]: ILocation }
+) {
+  return generateSearchableLocations(
+    Object.values(pilotLocations),
+    offlineLocations
   )
-  return generated
 }
 
 export function getJurisidictionType(

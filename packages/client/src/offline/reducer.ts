@@ -53,6 +53,7 @@ export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
+  pilotLocations: { [key: string]: ILocation }
   languages: ILanguage[]
   forms: {
     // @todo this is also used in review, so it could be named just form
@@ -148,6 +149,11 @@ const LOCATIONS_CMD = Cmd.run(() => referenceApi.loadLocations(), {
   failActionCreator: actions.locationsFailed
 })
 
+const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
+  successActionCreator: actions.pilotLocationsLoaded,
+  failActionCreator: actions.pilotLocationsFailed
+})
+
 const DEFINITIONS_CMD = Cmd.run(() => referenceApi.loadDefinitions(), {
   successActionCreator: actions.definitionsLoaded,
   failActionCreator: actions.definitionsFailed
@@ -171,6 +177,7 @@ function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     FACILITIES_CMD,
     LOCATIONS_CMD,
+    PILOT_LOCATIONS_CMD,
     DEFINITIONS_CMD,
     ASSETS_CMD
   ])
@@ -341,6 +348,29 @@ function reducer(
           loadingError: errorIfDataNotLoaded(state)
         },
         delay(FACILITIES_CMD, RETRY_TIMEOUT)
+      )
+    }
+
+    /*
+     * Pilot Locations
+     */
+
+    case actions.PILOT_LOCATIONS_LOADED: {
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          pilotLocations: action.payload
+        }
+      }
+    }
+    case actions.PILOT_LOCATIONS_FAILED: {
+      return loop(
+        {
+          ...state,
+          loadingError: errorIfDataNotLoaded(state)
+        },
+        delay(PILOT_LOCATIONS_CMD, RETRY_TIMEOUT)
       )
     }
 
