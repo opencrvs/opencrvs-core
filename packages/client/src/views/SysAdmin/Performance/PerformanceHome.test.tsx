@@ -84,6 +84,17 @@ describe('Performance home test', () => {
       })
       expect(history.location.pathname).toContain('operations')
     })
+    it('redirect to operatoins on pilot location link click', () => {
+      Date.now = jest.fn(() => 1455454308000)
+      app
+        .find('#pilot-location-link-0')
+        .hostNodes()
+        .simulate('click')
+      app.update()
+      flushPromises()
+
+      expect(history.location.pathname).toContain('operations')
+    })
   })
 
   describe('Performance home with location in props', () => {
