@@ -53,6 +53,7 @@ interface IPerformanceReportsMessages {
   eventOptionForBirths: MessageDescriptor
   eventOptionForDeaths: MessageDescriptor
   showMoreUsersLinkLabel: MessageDescriptor
+  pilotAreaListHeader: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -268,6 +269,11 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.fieldAgents.showMore',
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
+  },
+  pilotAreaListHeader: {
+    id: 'performance.pilotArea.header',
+    defaultMessage: 'Pilot Areas',
+    description: 'Label for pilot area list header'
   }
 }
 

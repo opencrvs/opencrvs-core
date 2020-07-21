@@ -89,7 +89,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       (this.props.offlineResources.pilotLocations &&
         Object.keys(this.props.offlineResources.pilotLocations).length > 0 && (
           <MessageContainer>
-            <MessageHeader>Pilot Areas</MessageHeader>
+            <MessageHeader>
+              {this.props.intl.formatMessage(messages.pilotAreaListHeader)}
+            </MessageHeader>
             {generatePilotLocations(
               this.props.offlineResources.pilotLocations,
               this.props.offlineResources.locations
