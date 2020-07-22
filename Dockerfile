@@ -25,6 +25,7 @@ COPY packages/client/package.json packages/client/package.json
 COPY packages/search/package.json packages/search/package.json
 COPY packages/user-mgnt/package.json packages/user-mgnt/package.json
 COPY packages/workflow/package.json packages/workflow/package.json
+COPY packages/webhooks/package.json packages/webhooks/package.json
 COPY patches patches
 RUN yarn install
 

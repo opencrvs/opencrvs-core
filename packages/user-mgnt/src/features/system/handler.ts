@@ -244,3 +244,39 @@ export const verifySystemResSchema = Joi.object({
   status: Joi.string(),
   id: Joi.string()
 })
+
+interface IGetSystemPayload {
+  systemId: string
+}
+
+export async function getSystemHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { systemId } = request.payload as IGetSystemPayload
+
+  // tslint:disable-next-line
+  const system: ISystemModel | null = await System.findOne({ _id: systemId })
+
+  if (!system) {
+    // Don't return a 404 as this gives away that this user account exists
+    throw unauthorized()
+  }
+  return {
+    name: `${system.name[0].given} ${system.name[0].family}`,
+    client_id: system.client_id,
+    username: system.username,
+    status: system.status
+  }
+}
+
+export const getSystemRequestSchema = Joi.object({
+  systemId: Joi.string()
+})
+
+export const getSystemResponseSchema = Joi.object({
+  name: Joi.string(),
+  username: Joi.string(),
+  client_id: Joi.string(),
+  status: Joi.string()
+})

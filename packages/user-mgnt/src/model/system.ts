@@ -31,6 +31,7 @@ export interface ISystemModel extends ISystem, Document {}
 const systemSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
+  client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
   salt: { type: String, required: true },
   scope: { type: [String], required: true },
