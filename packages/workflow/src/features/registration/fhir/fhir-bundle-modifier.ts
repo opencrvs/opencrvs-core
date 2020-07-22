@@ -455,13 +455,20 @@ export async function updatePatientIdentifierWithRN(
   if (!patient.identifier) {
     patient.identifier = []
   }
-  patient.identifier.push({
-    // @ts-ignore
-    // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
-    // type should have CodeableConcept instead of string
-    // Need to fix in both places together along with a script for legacy data update
-    type: identifierType,
-    value: registrationNumber
-  })
+  const rnIdentifier = patient.identifier.find(
+    identifier => identifier.type === identifierType
+  )
+  if (rnIdentifier) {
+    rnIdentifier.value = registrationNumber
+  } else {
+    patient.identifier.push({
+      // @ts-ignore
+      // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+      // type should have CodeableConcept instead of string
+      // Need to fix in both places together along with a script for legacy data update
+      type: identifierType,
+      value: registrationNumber
+    })
+  }
   return patient
 }
