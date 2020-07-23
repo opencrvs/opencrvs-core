@@ -41,6 +41,11 @@ export const CONFIG_SMS_CODE_EXPIRY_SECONDS = process.env
   ? parseInt(process.env.CONFIG_SMS_CODE_EXPIRY_SECONDS, 10)
   : 600
 
+export const CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS = process.env
+  .CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
+  ? parseInt(process.env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS, 10)
+  : 600
+
 export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:auth-user',
   'opencrvs:user-mgnt-user',
@@ -55,5 +60,6 @@ export const WEB_USER_JWT_AUDIENCES = [
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
 export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'
 export const CHATBOT_API_USER_AUDIENCE = 'opencrvs:chatbot-api-user'
+export const NATIONAL_ID_USER_AUDIENCE = 'opencrvs:nationalId-api-user'
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'

@@ -48,7 +48,10 @@ import {
   resRegisterSystemSchema,
   deactivateSystemClient,
   reactivateSystemClient,
-  auditSystemSchema
+  auditSystemSchema,
+  verifySystemHandler,
+  verifySystemReqSchema,
+  verifySystemResSchema
 } from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
@@ -371,6 +374,23 @@ export const getRoutes = () => {
         },
         validate: {
           payload: auditSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifySystem',
+      handler: verifySystemHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Verify system',
+        notes: 'Verify system exist and access details are correct',
+        validate: {
+          payload: verifySystemReqSchema
+        },
+        response: {
+          schema: verifySystemResSchema
         }
       }
     }

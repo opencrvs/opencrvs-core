@@ -13,7 +13,7 @@
 import { logger } from '@user-mgnt/logger'
 import System, { ISystemModel } from '@user-mgnt/model/system'
 import User, { IUserModel } from '@user-mgnt/model/user'
-import { generateSaltedHash } from '@user-mgnt/utils/hash'
+import { generateSaltedHash, generateHash } from '@user-mgnt/utils/hash'
 import { statuses, systemScopeMapping } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from 'hapi'
@@ -23,11 +23,11 @@ import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { unauthorized } from 'boom'
 import * as uuid from 'uuid/v4'
 
-interface IVerifyPayload {
+interface IRegisterSystemPayload {
   scope: string
 }
 
-interface IVerifyResponse {
+interface IRegisterSystemResponse {
   client_id: string
   secret_id: string
   sha_secret: string
@@ -37,7 +37,7 @@ export async function registerSystemClient(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { scope } = request.payload as IVerifyPayload
+  const { scope } = request.payload as IRegisterSystemPayload
   try {
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
@@ -79,7 +79,7 @@ export async function registerSystemClient(
 
     await System.create(system)
 
-    const response: IVerifyResponse = {
+    const response: IRegisterSystemResponse = {
       client_id,
       secret_id,
       sha_secret
@@ -194,4 +194,53 @@ export async function reactivateSystemClient(
 
 export const auditSystemSchema = Joi.object({
   client_id: Joi.string().required()
+})
+
+interface IVerifyPayload {
+  client_id: string
+  client_secret: string
+}
+
+interface IVerifyResponse {
+  scope: string[]
+  status: string
+  id: string
+}
+
+export async function verifySystemHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { client_id, client_secret } = request.payload as IVerifyPayload
+
+  // tslint:disable-next-line
+  const system: ISystemModel | null = await System.findOne({ client_id })
+
+  if (!system) {
+    // Don't return a 404 as this gives away that this user account exists
+    throw unauthorized()
+  }
+
+  if (generateHash(client_secret, system.salt) !== system.secretHash) {
+    throw unauthorized()
+  }
+
+  const response: IVerifyResponse = {
+    scope: system.scope,
+    status: system.status,
+    id: system.id
+  }
+
+  return response
+}
+
+export const verifySystemReqSchema = Joi.object({
+  client_id: Joi.string().required(),
+  client_secret: Joi.string().required()
+})
+
+export const verifySystemResSchema = Joi.object({
+  scope: Joi.array().items(Joi.string()),
+  status: Joi.string(),
+  id: Joi.string()
 })
