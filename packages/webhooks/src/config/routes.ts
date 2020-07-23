@@ -13,11 +13,10 @@
 import {
   subscribeWebhooksHandler,
   reqSubscribeWebhookSchema,
-  resSubscribeWebhookSchema
-  /*listWebhooksHandler,
+  resSubscribeWebhookSchema,
+  listWebhooksHandler,
   resListWebhookSchema,
-  deleteWebhookHandler,
-  deleteWebhookSchema*/
+  deleteWebhookHandler
 } from '@webhooks/features/webhooks/handler'
 
 export const getRoutes = () => {
@@ -52,7 +51,7 @@ export const getRoutes = () => {
           schema: resSubscribeWebhookSchema
         }
       }
-    } /*,
+    },
     {
       method: 'GET',
       path: '/webhooks',
@@ -71,12 +70,9 @@ export const getRoutes = () => {
       handler: deleteWebhookHandler,
       config: {
         tags: ['api'],
-        description: 'Delete webhooks',
-        response: {
-          schema: deleteWebhookSchema
-        }
+        description: 'Delete webhooks'
       }
-    }*/
+    }
   ]
   return routes
 }

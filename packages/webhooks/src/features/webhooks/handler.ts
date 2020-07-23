@@ -18,7 +18,7 @@ import {
   ITokenPayload
 } from '@webhooks/features/webhooks/service'
 import { unauthorized, internal } from 'boom'
-import Webhook, { IClient } from '@webhooks/model/webhook'
+import Webhook, { IClient, IWebhook } from '@webhooks/model/webhook'
 import { logger } from '@webhooks/logger'
 import * as uuid from 'uuid/v4'
 
@@ -97,3 +97,77 @@ export const resSubscribeWebhookSchema = Joi.object({
   }),
   trigger: Joi.string()
 })
+
+export async function listWebhooksHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const token: ITokenPayload = getTokenPayload(
+    request.headers.authorization.split(' ')[1]
+  )
+  const systemId = token.sub
+  try {
+    const system: ISystem = await getSystem(
+      { systemId },
+      request.headers.authorization
+    )
+    if (!system || system.status !== 'active') {
+      logger.error('active system details cannot be found')
+      throw unauthorized()
+    }
+    try {
+      const entries = Webhook.find({
+        'createdBy.clientId': system.client_id
+      }).sort({
+        createdAt: 'asc'
+      })
+
+      return h
+        .response({
+          entries
+        })
+        .code(200)
+    } catch (err) {
+      logger.error(err)
+      throw internal()
+    }
+  } catch (err) {
+    logger.error(err)
+    return h.response().code(400)
+  }
+}
+
+export const resListWebhookSchema = Joi.object({
+  entries: Joi.array().items(
+    Joi.object({
+      id: Joi.string(),
+      address: Joi.string(),
+      createdAt: Joi.string(),
+      createdBy: Joi.object({
+        client_id: Joi.string(),
+        type: Joi.string(),
+        username: Joi.string(),
+        name: Joi.string()
+      }),
+      trigger: Joi.string()
+    })
+  )
+})
+
+export async function deleteWebhookHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const webhookId = request.params.webhookId
+  if (!webhookId) {
+    logger.error('no webhook id in URL params')
+    throw internal()
+  }
+  try {
+    Webhook.findOneAndRemove({ webhookId })
+  } catch (err) {
+    logger.error(`could not delete webhook: ${webhookId}: ${err}`)
+    return h.response().code(400)
+  }
+  return h.response().code(204)
+}
