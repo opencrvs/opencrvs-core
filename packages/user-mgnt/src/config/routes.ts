@@ -42,6 +42,14 @@ import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
 } from '@user-mgnt/features/verifySecurityAnswer/handler'
+import {
+  registerSystemClient,
+  reqRegisterSystemSchema,
+  resRegisterSystemSchema,
+  deactivateSystemClient,
+  reactivateSystemClient,
+  auditSystemSchema
+} from '@user-mgnt/features/system/handler'
 import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
@@ -316,6 +324,54 @@ export const getRoutes = () => {
           payload: userAuditSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/registerSystemClient',
+      handler: registerSystemClient,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new system client',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: reqRegisterSystemSchema
+        },
+        response: {
+          schema: resRegisterSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/deactivateSystemClient',
+      handler: deactivateSystemClient,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new system client',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: auditSystemSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/reactivateSystemClient',
+      handler: reactivateSystemClient,
+      config: {
+        tags: ['api'],
+        description: 'Creates a new system client',
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: auditSystemSchema
+        }
       }
     }
   ]

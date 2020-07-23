@@ -82,7 +82,7 @@ export interface IUser {
 export interface IUserModel extends IUser, Document {}
 
 // tslint:disable-next-line
-const UserNameSchema = new Schema(
+export const UserNameSchema = new Schema(
   {
     use: String,
     given: [String],
