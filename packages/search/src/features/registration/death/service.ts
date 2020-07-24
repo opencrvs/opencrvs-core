@@ -31,7 +31,8 @@ import {
   findTaskExtension,
   findTaskIdentifier,
   findEntryResourceByUrl,
-  getLocationHirarchyIDs
+  getLocationHirarchyIDs,
+  findEventLocation
 } from '@search/features/fhir/fhir-utils'
 import * as Hapi from 'hapi'
 
@@ -159,11 +160,10 @@ function createDeceasedIndex(
     bundleEntries
   ) as fhir.Patient
 
-  const deathEncounter = findEntry(
+  const deathLocation = findEventLocation(
     DEATH_ENCOUNTER_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Encounter
+    composition
+  ) as fhir.Location
 
   const deceasedName = deceased && findName(NAME_EN, deceased.name)
   const deceasedNameLocal = deceased && findNameLocale(deceased.name)
@@ -180,10 +180,7 @@ function createDeceasedIndex(
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased && deceased.deceasedDateTime
   body.eventLocationId =
-    deathEncounter &&
-    deathEncounter.location &&
-    deathEncounter.location[0].location.reference &&
-    deathEncounter.location[0].location.reference.split('/')[1]
+    deathLocation && deathLocation.address && deathLocation.address.district
 }
 
 function createMotherIndex(
