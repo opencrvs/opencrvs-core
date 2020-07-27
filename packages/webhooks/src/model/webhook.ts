@@ -11,8 +11,16 @@
  */
 import { model, Schema, Document } from 'mongoose'
 
+export enum TRIGGERS {
+  BIRTH_REGISTERED,
+  DEATH_REGISTERED,
+  BIRTH_CERTIFIED,
+  DEATH_CERTIFIED,
+  BIRTH_CORRECTED,
+  DEATH_CORRECTED
+}
 export interface IClient {
-  clientId: string
+  client_id: string
   type: string
   username: string
   name: string
@@ -22,13 +30,13 @@ export interface IWebhook {
   webhookId: string
   address: string
   createdBy: IClient
-  createdAt: number
+  createdAt: number | string
   trigger: string
 }
 // tslint:disable-next-line
 export const ClientSchema = new Schema(
   {
-    clientId: String,
+    client_id: String,
     type: String,
     username: String,
     name: String

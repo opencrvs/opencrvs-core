@@ -24,6 +24,7 @@ const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
+    subject: '123',
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:user-mgnt-user'

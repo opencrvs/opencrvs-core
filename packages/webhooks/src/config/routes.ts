@@ -15,7 +15,6 @@ import {
   reqSubscribeWebhookSchema,
   resSubscribeWebhookSchema,
   listWebhooksHandler,
-  resListWebhookSchema,
   deleteWebhookHandler
 } from '@webhooks/features/webhooks/handler'
 
@@ -58,10 +57,7 @@ export const getRoutes = () => {
       handler: listWebhooksHandler,
       config: {
         tags: ['api'],
-        description: 'List webhooks',
-        response: {
-          schema: resListWebhookSchema
-        }
+        description: 'List webhooks'
       }
     },
     {

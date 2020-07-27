@@ -17,8 +17,8 @@ import {
   ISystem,
   ITokenPayload
 } from '@webhooks/features/webhooks/service'
-import { unauthorized, internal } from 'boom'
-import Webhook, { IClient, IWebhook } from '@webhooks/model/webhook'
+import { internal } from 'boom'
+import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@webhooks/logger'
 import * as uuid from 'uuid/v4'
 
@@ -32,6 +32,9 @@ export async function subscribeWebhooksHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { address, trigger } = request.payload as ISubscribePayload
+  if (!TRIGGERS[TRIGGERS[trigger]]) {
+    return h.response(`Unsupported trigger: ${trigger}`).code(400)
+  }
   const token: ITokenPayload = getTokenPayload(
     request.headers.authorization.split(' ')[1]
   )
@@ -41,14 +44,19 @@ export async function subscribeWebhooksHandler(
       { systemId },
       request.headers.authorization
     )
+
     if (!system || system.status !== 'active') {
-      logger.error('active system details cannot be found')
-      throw unauthorized()
+      return h
+        .response(
+          'Active system details cannot be found.  This client is no longer enabled'
+        )
+        .code(400)
     }
+
     try {
       const webhookId = uuid()
-      const createdBy: IClient = {
-        clientId: system.client_id,
+      const createdBy = {
+        client_id: system.client_id,
         name: system.name,
         type: 'api',
         username: system.username
@@ -57,7 +65,7 @@ export async function subscribeWebhooksHandler(
         webhookId,
         createdBy,
         address,
-        trigger
+        trigger: TRIGGERS[TRIGGERS[trigger]]
       }
 
       await Webhook.create(webhook)
@@ -112,21 +120,32 @@ export async function listWebhooksHandler(
       request.headers.authorization
     )
     if (!system || system.status !== 'active') {
-      logger.error('active system details cannot be found')
-      throw unauthorized()
+      return h
+        .response(
+          'Active system details cannot be found.  This client is no longer enabled'
+        )
+        .code(400)
     }
     try {
-      const entries = Webhook.find({
-        'createdBy.clientId': system.client_id
+      // tslint:disable-next-line
+      const entries = await Webhook.find({
+        'createdBy.client_id': system.client_id
       }).sort({
         createdAt: 'asc'
       })
 
-      return h
-        .response({
-          entries
-        })
-        .code(200)
+      const sortedEntries: any = []
+      entries.forEach(item => {
+        const entry = {
+          id: item.webhookId,
+          address: item.address,
+          createdAt: new Date((item.createdAt as number) * 1000).toISOString(),
+          createdBy: item.createdBy,
+          trigger: item.trigger
+        }
+        sortedEntries.push(entry)
+      })
+      return h.response({ entries: sortedEntries }).code(200)
     } catch (err) {
       logger.error(err)
       throw internal()
@@ -137,37 +156,19 @@ export async function listWebhooksHandler(
   }
 }
 
-export const resListWebhookSchema = Joi.object({
-  entries: Joi.array().items(
-    Joi.object({
-      id: Joi.string(),
-      address: Joi.string(),
-      createdAt: Joi.string(),
-      createdBy: Joi.object({
-        client_id: Joi.string(),
-        type: Joi.string(),
-        username: Joi.string(),
-        name: Joi.string()
-      }),
-      trigger: Joi.string()
-    })
-  )
-})
-
 export async function deleteWebhookHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const webhookId = request.params.webhookId
   if (!webhookId) {
-    logger.error('no webhook id in URL params')
-    throw internal()
+    return h.response('No webhook id in URL params').code(400)
   }
   try {
-    Webhook.findOneAndRemove({ webhookId })
+    // tslint:disable-next-line
+    await Webhook.findOneAndRemove({ webhookId })
   } catch (err) {
-    logger.error(`could not delete webhook: ${webhookId}: ${err}`)
-    return h.response().code(400)
+    return h.response(`Could not delete webhook: ${webhookId}`).code(400)
   }
   return h.response().code(204)
 }
