@@ -60,6 +60,19 @@ export type FacilitiesFailedAction = {
   type: typeof FACILITIES_FAILED
   payload: Error
 }
+
+export const PILOT_LOCATIONS_LOADED = 'OFFLINE/PILOT_LOCATIONS_LOADED'
+export type PilotLocationsLoadedAction = {
+  type: typeof PILOT_LOCATIONS_LOADED
+  payload: { [key: string]: ILocation }
+}
+
+export const PILOT_LOCATIONS_FAILED = 'OFFLINE/PILOT_LOCATIONS_FAILED'
+export type PilotLocationsFailedAction = {
+  type: typeof PILOT_LOCATIONS_FAILED
+  payload: Error
+}
+
 export const ASSETS_LOADED = 'OFFLINE/ASSETS_LOADED'
 export type AssetsLoadedAction = {
   type: typeof ASSETS_LOADED
@@ -115,6 +128,20 @@ export const facilitiesLoaded = (
 
 export const locationsFailed = (error: Error): LocationsFailedAction => ({
   type: LOCATIONS_FAILED,
+  payload: error
+})
+
+export const pilotLocationsLoaded = (
+  payload: ILocationDataResponse
+): PilotLocationsLoadedAction => ({
+  type: PILOT_LOCATIONS_LOADED,
+  payload: payload
+})
+
+export const pilotLocationsFailed = (
+  error: Error
+): PilotLocationsFailedAction => ({
+  type: PILOT_LOCATIONS_FAILED,
   payload: error
 })
 
@@ -183,6 +210,8 @@ export type Action =
   | IGetOfflineDataFailedAction
   | FacilitiesLoadedAction
   | FacilitiesFailedAction
+  | PilotLocationsLoadedAction
+  | PilotLocationsFailedAction
   | DefinitionsFailedAction
   | DefinitionsLoadedAction
   | AssetsLoadedAction
