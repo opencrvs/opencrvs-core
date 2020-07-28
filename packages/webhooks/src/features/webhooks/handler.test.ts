@@ -183,3 +183,25 @@ describe('listWebhooksHandler handler', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+describe('deleteWebhooksHandler handler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    mockingoose.resetAll()
+    server = await createServer()
+    fetch.resetMocks()
+  })
+
+  it('deletes a webhook for this client', async () => {
+    mockingoose(Webhook).toReturn(mockWebhook, 'findOneAndRemove')
+
+    const res = await server.server.inject({
+      method: 'DELETE',
+      url: '/webhooks/123',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(204)
+  })
+})
