@@ -11,6 +11,7 @@
  */
 import { fhirWorkflowEventHandler } from '@workflow/features/events/handler'
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
+import { updatePatientRegistrationNumberHandler } from '@workflow/features/legacy/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -49,6 +50,16 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Register event based on tracking id and registration number.'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/updateLegacyRegistrationNumbers',
+      handler: updatePatientRegistrationNumberHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Updates existing patient identifier with registration number'
       }
     },
     {
