@@ -14,7 +14,10 @@ import { goToOperationalReport } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { generateLocations } from '@client/utils/locationUtils'
+import {
+  generateLocations,
+  generatePilotLocations
+} from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
@@ -27,21 +30,18 @@ import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Header } from './utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 const MessageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   margin-top: 50px;
 `
 
-const MessageHeader = styled.span`
+const MessageHeader = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 `
 
-const StyledText = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.bodyStyle};
+const MessageRow = styled.div`
   margin-bottom: 10px;
 `
 
@@ -84,6 +84,39 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       )
   }
 
+  renderPilotLocations() {
+    return (
+      (this.props.offlineResources.pilotLocations &&
+        Object.keys(this.props.offlineResources.pilotLocations).length > 0 && (
+          <MessageContainer>
+            <MessageHeader>
+              {this.props.intl.formatMessage(messages.pilotAreaListHeader)}
+            </MessageHeader>
+            {generatePilotLocations(
+              this.props.offlineResources.pilotLocations,
+              this.props.offlineResources.locations
+            ).map((pilotLocation, index) => (
+              <MessageRow key={index}>
+                <LinkButton
+                  id={`pilot-location-link-${index}`}
+                  key={index}
+                  textDecoration="none"
+                  onClick={() =>
+                    this.props.goToOperationalReport(
+                      pilotLocation.id,
+                      OPERATIONAL_REPORT_SECTION.OPERATIONAL
+                    )
+                  }
+                >
+                  {pilotLocation.displayLabel}
+                </LinkButton>
+              </MessageRow>
+            ))}
+          </MessageContainer>
+        )) || <></>
+    )
+  }
+
   render() {
     const { intl, offlineResources } = this.props
 
@@ -100,11 +133,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           searchButtonHandler={this.searchButtonHandler}
         />
 
-        <MessageContainer>
-          <MessageHeader>Pilot Upazilas</MessageHeader>
-          <StyledText>Bhurungamari Upazila</StyledText>
-          <StyledText>Narsingdi Upazila</StyledText>
-        </MessageContainer>
+        {this.renderPilotLocations()}
       </SysAdminContentWrapper>
     )
   }

@@ -98,6 +98,24 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
   return response.data
 }
 
+async function loadPilotLocations(): Promise<ILocationDataResponse> {
+  const url = `${window.config.RESOURCES_URL}/pilotLocations`
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+
+  const response = await res.json()
+  return response.data
+}
+
 async function loadAssets(): Promise<IAssetResponse> {
   const url = `${window.config.RESOURCES_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
   const base64Logo = await ImageDownloader(url, {
@@ -114,6 +132,7 @@ async function loadAssets(): Promise<IAssetResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
+  loadPilotLocations,
   loadDefinitions,
   loadAssets
 }
