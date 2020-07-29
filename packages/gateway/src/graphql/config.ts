@@ -84,7 +84,7 @@ export const getApolloConfig = (): Config => {
           { userId },
           { Authorization: request.headers.authorization }
         )
-        if (!user || user.status !== 'active') {
+        if (!user || !['active', 'pending'].includes(user.status)) {
           throw new AuthenticationError('Authentication failed')
         }
       } catch (err) {

@@ -14,9 +14,6 @@ echo "Setting up deployment config for $1 - `date --iso-8601=ns`"
 # Set hostname in traefik config
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/traefik.toml
 
-# Set hostname in nginx config
-sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/nginx-default.conf
-
 # Set hostname in openhim-console config
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/openhim-console-config.deploy.json
 
