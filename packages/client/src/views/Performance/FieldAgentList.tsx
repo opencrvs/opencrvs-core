@@ -211,7 +211,7 @@ function FieldAgentListComponent(props: IProps) {
         key: 'rejectedApplications',
         label: intl.formatMessage(messages.totalRejectedColumnHeader),
         width: 10,
-        alignment: ColumnContentAlignment.LEFT
+        alignment: ColumnContentAlignment.RIGHT
       }
     ]
   }

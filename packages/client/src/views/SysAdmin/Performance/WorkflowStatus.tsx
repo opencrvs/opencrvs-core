@@ -230,7 +230,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
         width: 12,
-        alignment: ColumnContentAlignment.LEFT
+        alignment: ColumnContentAlignment.RIGHT
       }
     ]
   }
