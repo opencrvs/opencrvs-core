@@ -67,6 +67,18 @@ describe('when user is selecting the vital event', () => {
       })
     })
 
+    describe('when no event is selected', () => {
+      beforeEach(() => {
+        app
+          .find('#continue')
+          .hostNodes()
+          .simulate('click')
+      })
+      it('shows the required error to user', () => {
+        expect(app.find('#require-error').hostNodes().length).toBe(1)
+      })
+    })
+
     describe('when clicked on cross button', () => {
       beforeEach(async () => {
         app
