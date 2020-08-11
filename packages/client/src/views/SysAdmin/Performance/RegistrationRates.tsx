@@ -244,8 +244,9 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   base={base}
                   data={
                     data &&
-                    (data.fetchMonthWiseEventMetrics ||
-                      data.fetchLocationWiseEventMetrics)
+                    (base.baseType === REG_RATE_BASE.TIME
+                      ? data.fetchMonthWiseEventMetrics
+                      : data.fetchLocationWiseEventMetrics)
                   }
                   eventType={eventType as Event}
                 />
