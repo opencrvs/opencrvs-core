@@ -71,7 +71,7 @@ interface ISearchParams {
 
 interface IConnectProps {
   locations: ISearchLocation[]
-  facilities: ISearchLocation[]
+  offices: ISearchLocation[]
 }
 
 interface IDispatchProps {
@@ -134,7 +134,7 @@ function FieldAgentListComponent(props: IProps) {
     location: { search },
     goToOperationalReport,
     locations,
-    facilities
+    offices
   } = props
   const { locationId, timeStart, timeEnd } = (querystring.parse(
     search
@@ -235,7 +235,7 @@ function FieldAgentListComponent(props: IProps) {
         }
         const office =
           row.primaryOfficeId &&
-          facilities.find(({ id }) => id === row.primaryOfficeId)
+          offices.find(({ id }) => id === row.primaryOfficeId)
         return {
           name: row.fullName,
           type: row.type,
@@ -444,11 +444,11 @@ export const FieldAgentList = connect(
   (state: IStoreState) => {
     const offlineLocations = getOfflineData(state).locations
     const offlineSearchableLocations = generateLocations(offlineLocations)
-    const offlineFacilities = getOfflineData(state).facilities
-    const offlineSearchableFacilities = generateLocations(offlineFacilities)
+    const offlineOffices = getOfflineData(state).offices
+    const offlineSearchableOffices = generateLocations(offlineOffices)
     return {
       locations: offlineSearchableLocations,
-      facilities: offlineSearchableFacilities
+      offices: offlineSearchableOffices
     }
   },
   { goToOperationalReport, goToFieldAgentList }
