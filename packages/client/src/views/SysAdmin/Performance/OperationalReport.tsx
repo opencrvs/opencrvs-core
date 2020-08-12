@@ -413,7 +413,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 onChange={option => {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
-                    option.value as OPERATIONAL_REPORT_SECTION
+                    option.value as OPERATIONAL_REPORT_SECTION,
+                    timeStart.toDate(),
+                    timeEnd.toDate()
                   )
                 }}
                 id="operational-select"
