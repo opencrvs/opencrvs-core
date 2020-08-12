@@ -25,7 +25,7 @@ import {
   IFormFieldMutationMapFunction
 } from '@client/forms'
 import { set, omit } from 'lodash'
-import { callingCountries } from 'country-data'
+import { convertToMSISDN } from '@client/forms/utils'
 
 export function transformCertificateData(
   transformedData: TransformedData,
@@ -105,15 +105,6 @@ export function setBirthRegistrationSectionTransformer(
       sectionId
     )
   }
-}
-
-const convertToMSISDN = (phoneWithoutCountryCode: string) => {
-  const countryCode =
-    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
-
-  return phoneWithoutCountryCode.startsWith('0')
-    ? `${countryCode}${phoneWithoutCountryCode.substring(1)}`
-    : `${countryCode}${phoneWithoutCountryCode}`
 }
 
 export const msisdnTransformer = (transformedFieldName?: string) => (

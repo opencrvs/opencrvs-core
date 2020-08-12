@@ -66,6 +66,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
+import { convertToMSISDN } from '@client/forms/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -456,7 +457,10 @@ export class SearchResultView extends React.Component<
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:
                     searchType === BRN_DRN_TEXT ? searchText : '',
-                  contactNumber: searchType === PHONE_TEXT ? searchText : '',
+                  contactNumber:
+                    searchType === PHONE_TEXT
+                      ? convertToMSISDN(searchText)
+                      : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
                 fetchPolicy="no-cache"
