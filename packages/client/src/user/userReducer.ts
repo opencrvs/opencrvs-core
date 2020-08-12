@@ -16,7 +16,7 @@ import {
   IFormSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { goToTeamSearch } from '@client/navigation'
+import { goToTeamUserList } from '@client/navigation'
 import {
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -127,6 +127,7 @@ interface IUserFormDataSubmitAction {
     mutation: any
     variables: object
     isUpdate: boolean
+    officeLocationId: string
   }
 }
 
@@ -140,6 +141,7 @@ interface IStoreUserFormDataAction {
 interface ISubmitSuccessAction {
   type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
   payload: {
+    locationId: string
     isUpdate: boolean
   }
 }
@@ -148,6 +150,7 @@ export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
   variables: object,
+  officeLocationId: string,
   isUpdate: boolean = false
 ): IUserFormDataSubmitAction {
   return {
@@ -156,6 +159,7 @@ export function submitUserFormData(
       client,
       mutation,
       variables,
+      officeLocationId,
       isUpdate
     }
   }
@@ -167,10 +171,14 @@ export function clearUserFormData(): Action {
   }
 }
 
-export function submitSuccess(isUpdate: boolean = false): ISubmitSuccessAction {
+export function submitSuccess(
+  locationId: string,
+  isUpdate: boolean = false
+): ISubmitSuccessAction {
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
     payload: {
+      locationId,
       isUpdate
     }
   }
@@ -361,6 +369,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         client,
         mutation,
         variables,
+        officeLocationId,
         isUpdate
       } = (action as IUserFormDataSubmitAction).payload
       return loop(
@@ -375,7 +384,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               ]
             }),
           {
-            successActionCreator: () => submitSuccess(isUpdate),
+            successActionCreator: () =>
+              submitSuccess(officeLocationId, isUpdate),
             failActionCreator: submitFail
           }
         )
@@ -385,7 +395,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         { ...state, submitting: false, submissionError: false },
         Cmd.list([
           Cmd.action(clearUserFormData()),
-          Cmd.action(goToTeamSearch()),
+          Cmd.action(
+            goToTeamUserList({
+              id: (action as ISubmitSuccessAction).payload.locationId,
+              searchableText: '',
+              displayLabel: ''
+            })
+          ),
           Cmd.action(
             showSubmitFormSuccessToast(
               (action as ISubmitSuccessAction).payload.isUpdate

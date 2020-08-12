@@ -238,6 +238,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
           props.client,
           createOrUpdateUserMutation,
           variables,
+          props.formData.registrationOffice as string,
           Boolean(props.match.params.userId) // to detect if update or create
         )
       )
