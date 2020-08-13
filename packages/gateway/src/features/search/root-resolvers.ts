@@ -152,16 +152,18 @@ export const resolvers: GQLResolver = {
         `/Location?partof=${parentLocationId}`,
         authHeader
       )
+
       const locationIds = bundle.entry.map(
         (entry: { resource: { id: string } }) => entry.resource.id
       )
 
-      if (locationIds) {
-        if (locationIds.length <= 0 || locationIds.includes('')) {
-          return await Promise.reject(new Error('Invalid location id'))
+      if (!locationIds || locationIds.length <= 0 || locationIds.includes('')) {
+        return {
+          totalItems: 0,
+          results: []
         }
-        searchCriteria.applicationLocationId = locationIds.join(',')
       }
+      searchCriteria.applicationLocationId = locationIds.join(',')
 
       if (count) {
         searchCriteria.size = count
