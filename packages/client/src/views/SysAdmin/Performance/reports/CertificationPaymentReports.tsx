@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListTable } from '@opencrvs/components/lib/interface'
+import {
+  ListTable,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { constantsMessages } from '@client/i18n/messages'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -89,6 +92,7 @@ class CertificationPaymentReportComponent extends React.Component<FullProps> {
             label: intl.formatMessage(constantsMessages.total),
             width: 15,
             key: 'total',
+            alignment: ColumnContentAlignment.RIGHT,
             isSortable: false
           }
         ]}

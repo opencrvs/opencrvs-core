@@ -167,10 +167,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
               {
                 label: intl.formatMessage(constantsMessages.month),
                 width: 70,
-                key: 'month',
-                isSortable: true,
-                icon: <ArrowDownBlue />,
-                sortFunction: () => {}
+                key: 'month'
               },
               {
                 label: intl.formatMessage(constantsMessages.export),
@@ -192,10 +189,7 @@ class MonthlyReportsComponent extends React.Component<Props, IState> {
               {
                 label: intl.formatMessage(constantsMessages.month),
                 width: 70,
-                key: 'month',
-                isSortable: true,
-                icon: <ArrowDownBlue />,
-                sortFunction: () => {}
+                key: 'month'
               },
               {
                 label: intl.formatMessage(constantsMessages.export),
