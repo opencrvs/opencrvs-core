@@ -205,7 +205,7 @@ export class SearchResultView extends React.Component<
         {
           label: this.props.intl.formatMessage(constantsMessages.startedBy),
           width: 15,
-          key: 'startedBy'
+          key: 'startedAt'
         },
         {
           width: 5,
@@ -400,7 +400,7 @@ export class SearchResultView extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        startedBy:
+        startedAt:
           (reg.createdAt &&
             moment(
               moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
