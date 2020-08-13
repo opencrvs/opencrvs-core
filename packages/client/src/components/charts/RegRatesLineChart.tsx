@@ -218,7 +218,8 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
           <LegendData>
             <LegendDataLabel>
               {intl.formatMessage(constantsMessages.estimatedNumberOfEvents, {
-                eventType
+                eventType,
+                lineBreak: <span key={'estimated-space'}>&nbsp;</span>
               })}
             </LegendDataLabel>
             <br />
