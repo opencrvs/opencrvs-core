@@ -886,7 +886,7 @@
         "performance.body.header.monthly.reports": "Monthly reports",
         "performance.topbar.tab.title.monthly": "Monthly",
         "performance.reports.exportAll": "Export all performance data",
-        "performance.reports.noResultForLocation": "No data for {searchedLocation}. We are currently piloting for two upazilas:",
+        "performance.reports.noResultForLocation": "No data for {searchedLocation}. We are currently piloting for following areas:",
         "print.certificate.button.confirmPrint": "Continue and print",
         "print.certificate.review.title": "Are all the details on the {event} certificate correct?",
         "print.certificate.review.description": "Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.",

@@ -17,6 +17,7 @@ interface IPerformanceReportsMessages {
   sysAdminPerformanceHomeHeader: MessageDescriptor
   sysAdminTeamHomeHeader: MessageDescriptor
   noResultForLocation: MessageDescriptor
+  noResultForLocationWithoutPilotAreas: MessageDescriptor
   exportAll: MessageDescriptor
   operational: MessageDescriptor
   reports: MessageDescriptor
@@ -80,7 +81,12 @@ const messagesToDefine: IPerformanceReportsMessages = {
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',
     defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for two upazilas:',
+      'No data for {searchedLocation}. We are currently piloting for following areas:',
+    description: 'Message to show if no data is found for a location'
+  },
+  noResultForLocationWithoutPilotAreas: {
+    id: 'performance.reports.noResultForLocationWithoutPilotAreas',
+    defaultMessage: 'No data for {searchedLocation}.',
     description: 'Message to show if no data is found for a location'
   },
   exportAll: {

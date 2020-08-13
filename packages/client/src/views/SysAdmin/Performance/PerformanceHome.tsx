@@ -36,12 +36,12 @@ const MessageContainer = styled.div`
   margin-top: 50px;
 `
 
-const MessageHeader = styled.div`
+export const MessageHeader = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   margin-bottom: 15px;
 `
 
-const MessageRow = styled.div`
+export const MessageRow = styled.div`
   margin-bottom: 10px;
 `
 
