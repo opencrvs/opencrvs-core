@@ -167,7 +167,7 @@ export const LoadingGrey = styled.span<{
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
-const TableScrollerHorizontal = styled.div<{ scrolling: boolean }>`
+const TableScrollerHorizontal = styled.div`
   overflow: auto;
   padding-bottom: 8px;
   padding-right: 10px;
@@ -177,31 +177,9 @@ const TableScrollerHorizontal = styled.div<{ scrolling: boolean }>`
     height: 8px;
   }
 
-  @keyframes showScrollBar {
-    from {
-      background: ${({ theme }) => theme.colors.lightScrollBarGrey};
-    }
-    to {
-      background: ${({ theme }) => theme.colors.white};
-    }
-  }
-  @keyframes hideScrollBar {
-    from {
-      background: ${({ theme }) => theme.colors.white};
-    }
-    to {
-      background: ${({ theme }) => theme.colors.lightScrollBarGrey};
-    }
-  }
-
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    animation: ${({ scrolling }) =>
-        scrolling ? 'showScrollBar' : 'hideScrollBar'}
-      1500ms cubic-bezier(0.65, 0.05, 0.36, 1);
-    :hover {
-      animation: showScrollBar 1500ms cubic-bezier(0.65, 0.05, 0.36, 1);
-    }
+    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
   }
 `
 const TableScroller = styled.div<{
@@ -271,7 +249,6 @@ interface IListTableProps {
 interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
-  isScrolling: boolean
 }
 
 export class ListTable extends React.Component<
@@ -280,24 +257,7 @@ export class ListTable extends React.Component<
 > {
   state = {
     sortIconInverted: false,
-    sortKey: null,
-    isScrolling: false
-  }
-  private scrollerRef: React.RefObject<HTMLDivElement> = React.createRef()
-
-  componentDidUpdate() {
-    if (this.scrollerRef.current) {
-      this.scrollerRef.current.addEventListener('scroll', this.onScroll)
-    }
-  }
-
-  onScroll = () => {
-    if (!this.state.isScrolling) {
-      this.setState({ isScrolling: true })
-      setTimeout(() => {
-        this.setState({ isScrolling: false })
-      }, 1500)
-    }
+    sortKey: null
   }
 
   onPageChange = (currentPage: number) => {
@@ -367,10 +327,7 @@ export class ListTable extends React.Component<
           >
             {tableTitle && <H3>{tableTitle}</H3>}
 
-            <TableScrollerHorizontal
-              ref={this.scrollerRef}
-              scrolling={this.state.isScrolling}
-            >
+            <TableScrollerHorizontal>
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
                   <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
