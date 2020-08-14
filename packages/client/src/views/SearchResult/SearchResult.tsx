@@ -188,9 +188,9 @@ export class SearchResultView extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 15,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 22,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
@@ -199,11 +199,11 @@ export class SearchResultView extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
-          width: 20,
+          width: 15,
           key: 'dateOfModification'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.startedBy),
+          label: this.props.intl.formatMessage(constantsMessages.startedAt),
           width: 15,
           key: 'startedAt'
         },
@@ -213,7 +213,7 @@ export class SearchResultView extends React.Component<
           isIconColumns: true
         },
         {
-          width: 20,
+          width: 18,
           key: 'actions',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
@@ -223,17 +223,17 @@ export class SearchResultView extends React.Component<
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 20,
+          width: 15,
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 20,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 30,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 20,
           key: 'status'
         },
         {
@@ -386,7 +386,7 @@ export class SearchResultView extends React.Component<
       return {
         ...reg,
         event,
-        trackingId: reg.trackingId,
+        name: reg.name,
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
         dateOfModification:
           (reg.modifiedAt &&
