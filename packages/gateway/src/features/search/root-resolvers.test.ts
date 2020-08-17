@@ -399,19 +399,19 @@ describe('Search root resolvers', () => {
         'User does not have a sysadmin or register or validate scope'
       )
     })
-    it('throws an error for invalid location ids', async () => {
+    it('returns empty result for invalid location id', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
           entry: []
         })
       )
-      await expect(
-        resolvers.Query.getEventsWithProgress(
-          {},
-          { parentLocationId: null },
-          authorizedUser
-        )
-      ).rejects.toThrowError('Invalid location id')
+      const result = await resolvers.Query.getEventsWithProgress(
+        {},
+        { parentLocationId: null },
+        authorizedUser
+      )
+      expect(result.totalItems).toBe(0)
+      expect(result.results).toEqual([])
     })
   })
 })
