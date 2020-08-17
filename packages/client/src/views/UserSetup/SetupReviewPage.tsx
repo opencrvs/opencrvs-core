@@ -57,7 +57,6 @@ const GlobalError = styled.div`
 `
 
 const ConfirmButton = styled(PrimaryButton)`
-  display: flex;
   & svg {
     margin-right: 16px;
   }

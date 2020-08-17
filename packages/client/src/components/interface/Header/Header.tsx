@@ -77,6 +77,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 
 type IProps = IntlShapeProps & {
   theme: ITheme
@@ -365,10 +366,7 @@ class HeaderComp extends React.Component<IProps, IState> {
       if (SYS_ADMIN_ROLES.includes(userDetails.role)) {
         return goToPerformanceHomeAction()
       } else {
-        const locationId =
-          userDetails.catchmentArea &&
-          userDetails.catchmentArea[0] &&
-          userDetails.catchmentArea[0].id
+        const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
           (locationId && goToOperationalReportAction(locationId)) ||
           goToPerformanceHomeAction()
