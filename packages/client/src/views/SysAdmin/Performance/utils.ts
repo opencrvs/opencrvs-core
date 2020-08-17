@@ -15,6 +15,7 @@ import {
   GQLLocation,
   GQLIdentifier
 } from '@opencrvs/gateway/src/graphql/schema'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.menuBackground};
@@ -92,4 +93,26 @@ export function getJurisidictionType(location: GQLLocation): string | null {
   }
 
   return jurisdictionType
+}
+
+export function getJurisdictionLocationIdFromUserDetails(
+  userDetails: IUserDetails
+) {
+  const location =
+    userDetails.catchmentArea &&
+    userDetails.catchmentArea.find(location => {
+      const jurisdictionTypeIdentifier =
+        location.identifier &&
+        location.identifier.find(
+          identifier =>
+            identifier.system ===
+            'http://opencrvs.org/specs/id/jurisdiction-type'
+        )
+      return (
+        // Needs to be an administrative location with jurisdiction
+        jurisdictionTypeIdentifier && jurisdictionTypeIdentifier.value
+      )
+    })
+
+  return location && location.id
 }

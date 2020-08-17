@@ -13,7 +13,8 @@ import { messages } from '@client/i18n/messages/views/performance'
 import {
   Description,
   SubHeader,
-  ReportHeader
+  ReportHeader,
+  getJurisdictionLocationIdFromUserDetails
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { GQLApplicationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
@@ -319,12 +320,11 @@ export const ApplicationsStartedReport = connect(
     if (
       userDetails &&
       userDetails.role &&
-      userDetails.catchmentArea &&
-      userDetails.catchmentArea[0] &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
       disableFieldAgentLink =
-        ownProps.locationId !== userDetails.catchmentArea[0].id
+        ownProps.locationId !==
+        getJurisdictionLocationIdFromUserDetails(userDetails)
     }
     return {
       ...ownProps,

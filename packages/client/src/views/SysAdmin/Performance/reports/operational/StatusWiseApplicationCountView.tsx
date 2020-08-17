@@ -14,7 +14,8 @@ import { messages as performanceMessages } from '@client/i18n/messages/views/per
 import { LoaderBox } from '@client/views/SysAdmin/Performance/reports/operational/RegistrationRatesReport'
 import {
   Description,
-  SubHeader
+  SubHeader,
+  getJurisdictionLocationIdFromUserDetails
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ProgressBar } from '@opencrvs/components/lib/forms'
@@ -181,12 +182,11 @@ export const StatusWiseApplicationCountView = connect(
     if (
       userDetails &&
       userDetails.role &&
-      userDetails.catchmentArea &&
-      userDetails.catchmentArea[0] &&
       !SYS_ADMIN_ROLES.includes(userDetails.role)
     ) {
       disableApplicationLink =
-        ownProps.locationId !== userDetails.catchmentArea[0].id
+        ownProps.locationId !==
+        getJurisdictionLocationIdFromUserDetails(userDetails)
     }
     return {
       ...ownProps,
