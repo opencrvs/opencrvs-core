@@ -14,6 +14,6 @@ RUN yarn install --production
 COPY --from=opencrvs-build /packages/webhooks/build packages/webhooks/build
 
 EXPOSE 2525
-WORKDIR /usr/src/app/packages/auth
+WORKDIR /usr/src/app/packages/webhooks
 
 CMD yarn start:prod
