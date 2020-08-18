@@ -21,7 +21,8 @@ import {
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
-  selectOrCreateTaskRefResource
+  selectOrCreateTaskRefResource,
+  getSectionEntryBySectionCode
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
@@ -441,4 +442,33 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     logger.error(`Application is already in ${regStatusCode} state`)
     throw new Error(`Application is already in ${regStatusCode} state`)
   }
+}
+
+export async function updatePatientIdentifierWithRN(
+  composition: fhir.Composition,
+  sectionCode: string,
+  identifierType: string,
+  registrationNumber: string
+): Promise<fhir.Patient> {
+  const section = getSectionEntryBySectionCode(composition, sectionCode)
+  const patient: fhir.Patient = await getFromFhir(`/${section.reference}`)
+  if (!patient.identifier) {
+    patient.identifier = []
+  }
+  const rnIdentifier = patient.identifier.find(
+    identifier => identifier.type === identifierType
+  )
+  if (rnIdentifier) {
+    rnIdentifier.value = registrationNumber
+  } else {
+    patient.identifier.push({
+      // @ts-ignore
+      // Need to fix client/src/forms/mappings/mutation/field-mappings.ts:L93
+      // type should have CodeableConcept instead of string
+      // Need to fix in both places together along with a script for legacy data update
+      type: identifierType,
+      value: registrationNumber
+    })
+  }
+  return patient
 }

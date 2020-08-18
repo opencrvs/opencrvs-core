@@ -17,7 +17,10 @@ import {
   REG_RATE_BASE
 } from '@client/views/SysAdmin/Performance/RegistrationRates'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ListTable } from '@opencrvs/components/lib/interface'
+import {
+  ListTable,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -189,6 +192,7 @@ function Within45DaysTableComponent(props: ITableProps) {
               lineBreak: <br key={'rateOfRegistrationWithin45d-break'} />
             }
           ),
+          alignment: ColumnContentAlignment.RIGHT,
           width: 15
         }
       ]}

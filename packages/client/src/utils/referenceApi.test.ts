@@ -43,22 +43,43 @@ export const mockFetchFacilities = {
   ]
 }
 
+export const mockFetchPilotLocations = {
+  data: {
+    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
+      alias: 'বানিয়াজান',
+      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+      jurisdictionType: 'UNION',
+      name: 'Baniajan',
+      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
+      physicalType: 'Jurisdiction',
+      type: 'ADMIN_STRUCTURE'
+    }
+  }
+}
+
 describe('referenceApi', () => {
   beforeEach(() => {
     fetch.resetMocks()
   })
 
-  it('retrieves the locations.json from the server', async () => {
+  it('retrieves the locations from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchLocations))
 
     const data = await referenceApi.loadLocations()
     expect(data).toEqual(mockFetchLocations.data)
   })
 
-  it('retrieves the facilities.json from the server', async () => {
+  it('retrieves the facilities from the server', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockFetchFacilities))
 
     const data = await referenceApi.loadFacilities()
     expect(data).toEqual(mockFetchFacilities.data)
+  })
+
+  it('retrieves the pilot location list from the server', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockFetchPilotLocations))
+
+    const data = await referenceApi.loadPilotLocations()
+    expect(data).toEqual(mockFetchPilotLocations.data)
   })
 })

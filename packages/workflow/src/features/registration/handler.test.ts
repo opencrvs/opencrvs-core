@@ -25,6 +25,7 @@ import {
   testDeathFhirBundle,
   testFhirBundleWithIdsForDeath,
   motherMock,
+  patientMock,
   compositionMock,
   deathCompositionMock,
   testInProgressFhirBundle,
@@ -1222,6 +1223,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [compositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [patientMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({
@@ -1244,6 +1246,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
       [deathCompositionMock, { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
       [JSON.stringify({}), { status: 200 }],
+      [patientMock, { status: 200 }],
       [motherMock, { status: 200 }]
     )
     const res = await server.server.inject({

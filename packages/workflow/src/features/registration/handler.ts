@@ -18,7 +18,8 @@ import {
   modifyRegistrationBundle,
   setTrackingId,
   markBundleAsWaitingValidation,
-  invokeRegistrationValidation
+  invokeRegistrationValidation,
+  updatePatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -26,7 +27,7 @@ import {
   getPhoneNo,
   getSharedContactMsisdn,
   postToHearth,
-  updateResourceInHearth
+  generateEmptyBundle
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   getTaskEventType,
@@ -38,7 +39,13 @@ import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from 'hapi'
 import fetch from 'node-fetch'
-import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
+import {
+  EVENT_TYPE,
+  CHILD_SECTION_CODE,
+  DECEASED_SECTION_CODE,
+  BIRTH_REG_NUMBER_SYSTEM,
+  DEATH_REG_NUMBER_SYSTEM
+} from '@workflow/features/registration/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -263,7 +270,22 @@ export async function markEventAsRegisteredCallbackHandler(
       event,
       getToken(request)
     )
-    await updateResourceInHearth(task)
+
+    /** pushing registrationNumber on related person's identifier */
+    const patient = await updatePatientIdentifierWithRN(
+      composition,
+      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE,
+      event === EVENT_TYPE.BIRTH
+        ? BIRTH_REG_NUMBER_SYSTEM
+        : DEATH_REG_NUMBER_SYSTEM,
+      registrationNumber
+    )
+
+    //** Making sure db automicity */
+    const bundle = generateEmptyBundle()
+    bundle.entry?.push({ resource: task })
+    bundle.entry?.push({ resource: patient })
+    await sendBundleToHearth(bundle)
 
     const phoneNo = await getPhoneNo(task, event)
     const informantName = await getEventInformantName(composition, event)

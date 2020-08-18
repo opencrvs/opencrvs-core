@@ -182,6 +182,7 @@ services:
   client:
     environment:
       - RESOURCES_URL=https://resources.{{hostname}}
+      - HOST={{hostname}}
     deploy:
       labels:
         - "traefik.enable=true"
@@ -208,6 +209,7 @@ services:
   login:
     environment:
       - RESOURCES_URL=https://resources.{{hostname}}
+      - HOST={{hostname}}
     deploy:
       labels:
         - "traefik.enable=true"

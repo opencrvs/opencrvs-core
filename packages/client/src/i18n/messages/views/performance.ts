@@ -17,6 +17,7 @@ interface IPerformanceReportsMessages {
   sysAdminPerformanceHomeHeader: MessageDescriptor
   sysAdminTeamHomeHeader: MessageDescriptor
   noResultForLocation: MessageDescriptor
+  noResultForLocationWithoutPilotAreas: MessageDescriptor
   exportAll: MessageDescriptor
   operational: MessageDescriptor
   reports: MessageDescriptor
@@ -53,6 +54,7 @@ interface IPerformanceReportsMessages {
   eventOptionForBirths: MessageDescriptor
   eventOptionForDeaths: MessageDescriptor
   showMoreUsersLinkLabel: MessageDescriptor
+  pilotAreaListHeader: MessageDescriptor
 }
 
 const messagesToDefine: IPerformanceReportsMessages = {
@@ -79,7 +81,12 @@ const messagesToDefine: IPerformanceReportsMessages = {
   noResultForLocation: {
     id: 'performance.reports.noResultForLocation',
     defaultMessage:
-      'No data for {searchedLocation}. We are currently piloting for two upazilas:',
+      'No data for {searchedLocation}. We are currently piloting for following areas:',
+    description: 'Message to show if no data is found for a location'
+  },
+  noResultForLocationWithoutPilotAreas: {
+    id: 'performance.reports.noResultForLocationWithoutPilotAreas',
+    defaultMessage: 'No data for {searchedLocation}.',
     description: 'Message to show if no data is found for a location'
   },
   exportAll: {
@@ -268,6 +275,11 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.fieldAgents.showMore',
     defaultMessage: 'Show next {pageSize}',
     description: 'Label for show more link'
+  },
+  pilotAreaListHeader: {
+    id: 'performance.pilotArea.header',
+    defaultMessage: 'Pilot Areas',
+    description: 'Label for pilot area list header'
   }
 }
 

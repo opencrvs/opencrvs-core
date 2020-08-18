@@ -217,20 +217,20 @@ class ReviewTabComponent extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 20,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 22,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(
             messages.listItemApplicationDate
           ),
-          width: 20,
+          width: 19,
           key: 'applicationTimeElapsed'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 20,
+          width: 19,
           key: 'eventTimeElapsed'
         },
         {
@@ -253,9 +253,9 @@ class ReviewTabComponent extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
+          label: this.props.intl.formatMessage(constantsMessages.name),
           width: 64,
-          key: 'trackingId'
+          key: 'name'
         },
         {
           width: 6,

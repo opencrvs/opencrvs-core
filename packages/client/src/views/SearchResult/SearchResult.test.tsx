@@ -91,9 +91,9 @@ describe('SearchResult tests', () => {
           variables: {
             locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
             sort: 'DESC',
-            trackingId: 'DW0UTHR',
+            trackingId: '',
             registrationNumber: '',
-            contactNumber: '',
+            contactNumber: '+8801622688232',
             name: ''
           }
         },
@@ -305,8 +305,8 @@ describe('SearchResult tests', () => {
       <SearchResult
         match={{
           params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
+            searchText: '01622688232',
+            searchType: 'phone'
           },
           isExact: true,
           path: '',
@@ -334,9 +334,9 @@ describe('SearchResult tests', () => {
           variables: {
             locationIds: ['1234567s2323289'],
             sort: 'DESC',
-            trackingId: 'DW0sdsHR',
+            trackingId: '',
             registrationNumber: '',
-            contactNumber: ''
+            contactNumber: '+8801622688232'
           }
         },
         error: new Error('boom')
@@ -348,8 +348,8 @@ describe('SearchResult tests', () => {
       <SearchResult
         match={{
           params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
+            searchText: '+8801622688232',
+            searchType: 'phone'
           },
           isExact: true,
           path: '',

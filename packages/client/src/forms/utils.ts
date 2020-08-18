@@ -63,6 +63,7 @@ import moment from 'moment'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
+import { callingCountries } from 'country-data'
 
 interface IRange {
   start: number
@@ -502,6 +503,18 @@ export const hasFormError = (
   )
 
   return fieldListWithErrors && fieldListWithErrors.length > 0
+}
+
+export const convertToMSISDN = (phone: string) => {
+  const countryCode =
+    callingCountries[window.config.COUNTRY.toUpperCase()].countryCallingCodes[0]
+
+  if (phone.startsWith(countryCode)) {
+    return phone
+  }
+  return phone.startsWith('0')
+    ? `${countryCode}${phone.substring(1)}`
+    : `${countryCode}${phone}`
 }
 
 export const conditionals: IConditionals = {

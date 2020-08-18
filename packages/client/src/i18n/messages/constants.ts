@@ -52,6 +52,7 @@ interface IConstantsMessages {
   eventDate: MessageDescriptor
   eventType: MessageDescriptor
   lastUpdated: MessageDescriptor
+  startedAt: MessageDescriptor
   startedBy: MessageDescriptor
   export: MessageDescriptor
   failedToSend: MessageDescriptor
@@ -342,6 +343,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Last updated',
     description: 'Label for Last updated in list item',
     id: 'constants.lastUpdated'
+  },
+  startedAt: {
+    defaultMessage: 'Started',
+    description: 'Label for Started At in list item',
+    id: 'constants.startedAt'
   },
   startedBy: {
     defaultMessage: 'Started by',

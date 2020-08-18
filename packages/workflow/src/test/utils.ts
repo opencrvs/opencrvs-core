@@ -1034,6 +1034,25 @@ export const deathCompositionMock = JSON.stringify({
   author: []
 })
 
+export const patientMock = JSON.stringify({
+  resourceType: 'Patient',
+  active: true,
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  name: [
+    {
+      use: 'bn',
+      family: ['লদলদসসসস']
+    },
+    {
+      use: 'en',
+      family: ['ttttttt']
+    }
+  ],
+  gender: 'male',
+  birthDate: '2020-07-01',
+  multipleBirthInteger: 1
+})
+
 export const motherMock = JSON.stringify({
   resourceType: 'Patient',
   active: true,

@@ -51,8 +51,12 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
-import { Activity, ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ISearchLocation, ListTable } from '@opencrvs/components/lib/interface'
+import { Activity } from '@opencrvs/components/lib/icons'
+import {
+  ISearchLocation,
+  ListTable,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLApplicationsStartedMetrics,
@@ -413,7 +417,9 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 onChange={option => {
                   this.props.goToOperationalReport(
                     selectedLocation.id,
-                    option.value as OPERATIONAL_REPORT_SECTION
+                    option.value as OPERATIONAL_REPORT_SECTION,
+                    timeStart.toDate(),
+                    timeEnd.toDate()
                   )
                 }}
                 id="operational-select"
@@ -523,14 +529,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   {
                     label: intl.formatMessage(constantsMessages.month),
                     width: 70,
-                    key: 'month',
-                    isSortable: true,
-                    icon: <ArrowDownBlue />,
-                    sortFunction: () => {}
+                    key: 'month'
                   },
                   {
                     label: intl.formatMessage(constantsMessages.export),
                     width: 30,
+                    alignment: ColumnContentAlignment.RIGHT,
                     key: 'export'
                   }
                 ]}
@@ -548,14 +552,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     {
                       label: intl.formatMessage(constantsMessages.month),
                       width: 70,
-                      key: 'month',
-                      isSortable: true,
-                      icon: <ArrowDownBlue />,
-                      sortFunction: () => {}
+                      key: 'month'
                     },
                     {
                       label: intl.formatMessage(constantsMessages.export),
                       width: 30,
+                      alignment: ColumnContentAlignment.RIGHT,
                       key: 'export'
                     }
                   ]}

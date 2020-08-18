@@ -66,6 +66,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
+import { convertToMSISDN } from '@client/forms/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.error};
@@ -187,9 +188,9 @@ export class SearchResultView extends React.Component<
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 15,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 22,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
@@ -198,13 +199,13 @@ export class SearchResultView extends React.Component<
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
-          width: 20,
+          width: 15,
           key: 'dateOfModification'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.startedBy),
+          label: this.props.intl.formatMessage(constantsMessages.startedAt),
           width: 15,
-          key: 'startedBy'
+          key: 'startedAt'
         },
         {
           width: 5,
@@ -212,7 +213,7 @@ export class SearchResultView extends React.Component<
           isIconColumns: true
         },
         {
-          width: 20,
+          width: 18,
           key: 'actions',
           isActionColumn: true,
           alignment: ColumnContentAlignment.CENTER
@@ -222,17 +223,17 @@ export class SearchResultView extends React.Component<
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 20,
+          width: 15,
           key: 'event'
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 20,
-          key: 'trackingId'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 30,
+          key: 'name'
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 25,
+          width: 20,
           key: 'status'
         },
         {
@@ -385,7 +386,7 @@ export class SearchResultView extends React.Component<
       return {
         ...reg,
         event,
-        trackingId: reg.trackingId,
+        name: reg.name,
         status: this.getDeclarationStatusLabel(reg.declarationStatus),
         dateOfModification:
           (reg.modifiedAt &&
@@ -399,7 +400,7 @@ export class SearchResultView extends React.Component<
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',
-        startedBy:
+        startedAt:
           (reg.createdAt &&
             moment(
               moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
@@ -456,7 +457,10 @@ export class SearchResultView extends React.Component<
                   trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
                   registrationNumber:
                     searchType === BRN_DRN_TEXT ? searchText : '',
-                  contactNumber: searchType === PHONE_TEXT ? searchText : '',
+                  contactNumber:
+                    searchType === PHONE_TEXT
+                      ? convertToMSISDN(searchText)
+                      : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
                 fetchPolicy="no-cache"

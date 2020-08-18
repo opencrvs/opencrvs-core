@@ -73,10 +73,15 @@ class SelectVitalEventView extends React.Component<
   }
 > {
   state = {
-    goTo: ''
+    goTo: '',
+    noEventSelectedError: false
   }
   handleContinue = () => {
-    this.props.goToEventInfo(this.state.goTo as Event)
+    if (this.state.goTo === '') {
+      this.setState({ noEventSelectedError: true })
+    } else {
+      this.props.goToEventInfo(this.state.goTo as Event)
+    }
   }
 
   render() {
@@ -95,8 +100,10 @@ class SelectVitalEventView extends React.Component<
             <Title>
               {intl.formatMessage(messages.registerNewEventHeading)}
             </Title>
-            {this.state.goTo === 'error' && (
-              <ErrorText>{intl.formatMessage(messages.errorMessage)}</ErrorText>
+            {this.state.noEventSelectedError && (
+              <ErrorText id="require-error">
+                {intl.formatMessage(messages.errorMessage)}
+              </ErrorText>
             )}
             <Actions id="select_vital_event_view">
               <RadioButton
@@ -107,7 +114,9 @@ class SelectVitalEventView extends React.Component<
                 value="birth"
                 id="select_birth_event"
                 selected={this.state.goTo === 'birth' ? 'birth' : ''}
-                onChange={() => this.setState({ goTo: 'birth' })}
+                onChange={() =>
+                  this.setState({ goTo: 'birth', noEventSelectedError: false })
+                }
               />
               <RadioButton
                 size="large"
@@ -117,7 +126,9 @@ class SelectVitalEventView extends React.Component<
                 value="death"
                 id="select_death_event"
                 selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() => this.setState({ goTo: 'death' })}
+                onChange={() =>
+                  this.setState({ goTo: 'death', noEventSelectedError: false })
+                }
               />
             </Actions>
             <PrimaryButton id="continue" onClick={this.handleContinue}>
