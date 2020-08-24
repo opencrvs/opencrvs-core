@@ -42,6 +42,30 @@ export async function getUser(
   return body
 }
 
+export async function getSystem(
+  systemId: string,
+  authHeader: { Authorization: string }
+) {
+  const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
+    method: 'POST',
+    body: JSON.stringify({ systemId }),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system mobile number. Error: ${res.status} status received`
+    )
+  }
+
+  const body = await res.json()
+
+  return body
+}
+
 export const convertToLocal = (
   mobileWithCountryCode: string,
   countryCode: string
@@ -137,9 +161,20 @@ export async function getLoggedInPractitionerResource(
   token: string
 ): Promise<fhir.Practitioner> {
   const tokenPayload = getTokenPayload(token)
-  const userResponse = await getUser(tokenPayload.sub, {
-    Authorization: `Bearer ${token}`
-  })
+  const isNotificationAPIUser =
+    tokenPayload.scope.indexOf('notification-api') > -1
+
+  let userResponse
+  if (isNotificationAPIUser) {
+    userResponse = await getSystem(tokenPayload.sub, {
+      Authorization: `Bearer ${token}`
+    })
+  } else {
+    userResponse = await getUser(tokenPayload.sub, {
+      Authorization: `Bearer ${token}`
+    })
+  }
+
   return await getFromFhir(`/Practitioner/${userResponse.practitionerId}`)
 }
 

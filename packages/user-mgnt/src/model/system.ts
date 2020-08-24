@@ -21,6 +21,7 @@ export interface ISystem {
   secretHash: string
   salt: string
   sha_secret: string
+  practitionerId: string
   scope: string[]
   status: string
   creationDate: number
@@ -34,6 +35,8 @@ const systemSchema = new Schema({
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
   salt: { type: String, required: true },
+  practitionerId: { type: String, required: true },
+  sha_secret: { type: String, required: true },
   scope: { type: [String], required: true },
   status: {
     type: String,
