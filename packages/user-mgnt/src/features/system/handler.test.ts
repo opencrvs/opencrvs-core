@@ -31,7 +31,7 @@ const token = jwt.sign(
   }
 )
 
-/*const badToken = jwt.sign(
+const badToken = jwt.sign(
   { scope: ['demo'] },
   readFileSync('../auth/test/cert.key'),
   {
@@ -39,7 +39,7 @@ const token = jwt.sign(
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:user-mgnt-user'
   }
-)*/
+)
 
 const mockUser = ({
   name: [
@@ -129,7 +129,7 @@ describe('registerSystemClient handler', () => {
     expect(res.statusCode).toBe(201)
   })
 
-  /*it('return unauthoried error if sysadmin not returned', async () => {
+  it('return unauthoried error if sysadmin not returned', async () => {
     mockingoose(User).toReturn(null, 'findOne')
 
     const res = await server.server.inject({
@@ -174,9 +174,9 @@ describe('registerSystemClient handler', () => {
     })
 
     expect(res.statusCode).toBe(400)
-  })*/
+  })
 })
-/*
+
 describe('deactivateSystemClient handler', () => {
   let server: any
 
@@ -296,4 +296,3 @@ describe('reactivateSystemClient handler', () => {
     expect(res.statusCode).toBe(403)
   })
 })
-*/
