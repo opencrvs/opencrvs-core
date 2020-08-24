@@ -335,9 +335,11 @@ export async function setupLastRegLocation(
     }
   )
   if (
-    !regUserLastLocationExtension ||
-    !regUserLastLocationExtension.valueReference
+    regUserLastLocationExtension &&
+    regUserLastLocationExtension.valueReference
   ) {
+    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
+  } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
       valueReference: { reference: `Location/${location.id}` }
@@ -351,10 +353,9 @@ export async function setupLastRegLocation(
       extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`
     )
   })
-  if (
-    !regUserLastOfficeExtension ||
-    !regUserLastOfficeExtension.valueReference
-  ) {
+  if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
+    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
+  } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
       valueReference: { reference: `Location/${primaryOffice.id}` }
