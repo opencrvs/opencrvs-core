@@ -81,12 +81,10 @@ export async function modifyRegistrationBundle(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
-  /* setting lastRegLocation here */
-  await setupLastRegLocation(
-    taskResource,
-    practitioner,
-    isEventNotification(fhirBundle)
-  )
+  if (!isEventNotification(fhirBundle)) {
+    /* setting lastRegLocation here */
+    await setupLastRegLocation(taskResource, practitioner)
+  }
 
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
@@ -319,8 +317,7 @@ export async function setupRegistrationWorkflow(
 
 export async function setupLastRegLocation(
   taskResource: fhir.Task,
-  practitioner: fhir.Practitioner,
-  isNotification: boolean = false
+  practitioner: fhir.Practitioner
 ): Promise<fhir.Task> {
   if (!practitioner || !practitioner.id) {
     throw new Error('Invalid practitioner data found')
@@ -341,9 +338,7 @@ export async function setupLastRegLocation(
     regUserLastLocationExtension &&
     regUserLastLocationExtension.valueReference
   ) {
-    if (!isNotification) {
-      regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
-    }
+    regUserLastLocationExtension.valueReference.reference = `Location/${location.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastLocation`,
@@ -359,9 +354,7 @@ export async function setupLastRegLocation(
     )
   })
   if (regUserLastOfficeExtension && regUserLastOfficeExtension.valueReference) {
-    if (!isNotification) {
-      regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
-    }
+    regUserLastOfficeExtension.valueReference.reference = `Location/${primaryOffice.id}`
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,

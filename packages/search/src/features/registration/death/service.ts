@@ -179,8 +179,7 @@ function createDeceasedIndex(
   body.deceasedFamilyNameLocal =
     deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
   body.deathDate = deceased && deceased.deceasedDateTime
-  body.eventLocationId =
-    deathLocation && deathLocation.address && deathLocation.address.district
+  body.eventLocationId = deathLocation && deathLocation.id
 }
 
 function createMotherIndex(

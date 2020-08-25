@@ -47,3 +47,7 @@ services:
   notification:
     environment:
       - NODE_ENV=development
+
+  webhooks:
+    environment:
+      - NODE_ENV=development

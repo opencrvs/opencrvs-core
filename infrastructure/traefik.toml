@@ -57,6 +57,7 @@ entryPoint = "http"
     "openhim-api.{{hostname}}",
     "api.{{hostname}}",
     "openhim.{{hostname}}",
+    "webhooks.{{hostname}}",
   ]
 
 [retry]

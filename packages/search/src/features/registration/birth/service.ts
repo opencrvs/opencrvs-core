@@ -122,7 +122,6 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
-
   await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body)
 }
@@ -190,8 +189,7 @@ async function createChildIndex(
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
   body.childDoB = child && child.birthDate
   body.gender = child && child.gender
-  body.eventLocationId =
-    birthLocation && birthLocation.address && birthLocation.address.district
+  body.eventLocationId = birthLocation && birthLocation.id
 }
 
 function createMotherIndex(

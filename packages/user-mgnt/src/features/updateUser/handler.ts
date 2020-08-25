@@ -74,7 +74,7 @@ export default async function updateUser(
     )
   }
   // Updating practitioner and practitioner role in hearth
-  const practitioner = createFhirPractitioner(user)
+  const practitioner = createFhirPractitioner(user, false)
   practitioner.id = existingPractitioner.id
   const practitionerId = await postFhir(token, practitioner)
   if (!practitionerId) {
@@ -84,7 +84,8 @@ export default async function updateUser(
   }
   const practitionerRole = createFhirPractitionerRole(
     user,
-    existingUser.practitionerId
+    existingUser.practitionerId,
+    false
   )
   practitionerRole.id = existingPractitionerRole.id
   const practitionerRoleId = await postFhir(token, practitioner)

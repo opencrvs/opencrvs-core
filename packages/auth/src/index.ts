@@ -60,9 +60,12 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import authenticateSystemClientHandler, {
+import {
+  authenticateSystemClientHandler,
   requestSchema as reqSystemSchema,
-  responseSchema as resSystemSchema
+  responseSchema as resSystemSchema,
+  registerSystemClient,
+  registerRquestSchema
 } from '@auth/features/system/handler'
 
 export async function createServer() {
@@ -326,6 +329,18 @@ export async function createServer() {
       },
       response: {
         schema: resSystemSchema
+      }
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/registerSystemClient',
+    handler: registerSystemClient,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: registerRquestSchema
       }
     }
   })

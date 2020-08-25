@@ -110,6 +110,19 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
+  webhooks:
+    image: opencrvs/ocrvs-webhooks:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/webhooks/Dockerfile
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongo1/webhooks
+      - AUTH_URL=http://auth:4040
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
+      - FHIR_URL=http://openhim-core:5001/fhir
+      - HOST=0.0.0.0
+      - CHECK_INVALID_TOKEN=true
   notification:
     image: opencrvs/ocrvs-notification:${VERSION:-latest}
     build:

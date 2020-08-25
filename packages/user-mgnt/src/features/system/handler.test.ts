@@ -24,6 +24,7 @@ const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
+    subject: '123',
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:user-mgnt-user'
@@ -92,6 +93,7 @@ const mockSystem = ({
   username: 'j.doe1',
   client_id: '123',
   status: statuses.ACTIVE,
+  practitionerId: '123',
   salt: '123',
   sha_secret: '123',
   scope: ['nationalId']
@@ -108,6 +110,10 @@ describe('registerSystemClient handler', () => {
 
   it('creates and saves system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
+    fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
+      ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
+    )
     mockingoose(System).toReturn(mockSystem, 'save')
 
     const res = await server.server.inject({

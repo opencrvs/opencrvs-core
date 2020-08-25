@@ -15,65 +15,117 @@ import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import fetch from 'node-fetch'
 import { logger } from '@user-mgnt/logger'
 
-export const createFhirPractitioner = (user: IUser): fhir.Practitioner => {
-  return {
-    resourceType: 'Practitioner',
-    identifier: user.identifiers,
-    telecom: [
-      { system: 'phone', value: user.mobile },
-      { system: 'email', value: user.email }
-    ],
-    name: user.name,
-    extension: user.signature && [
-      {
-        url: 'http://opencrvs.org/specs/extension/employee-signature',
-        valueSignature: {
-          type: [
-            {
-              system: 'urn:iso-astm:E1762-95:2013',
-              code: '1.2.840.10065.1.12.1.13',
-              display: 'Review Signature'
-            }
-          ],
-          when: new Date().toISOString(),
-          contentType: user.signature.type,
-          blob: user.signature.data
+export const createFhirPractitioner = (
+  user: IUser,
+  system: boolean
+): fhir.Practitioner => {
+  if (system) {
+    return {
+      resourceType: 'Practitioner',
+      identifier: user.identifiers,
+      telecom: [
+        { system: 'phone', value: user.mobile },
+        { system: 'email', value: user.email }
+      ],
+      name: [
+        {
+          use: '',
+          family: 'SYSTEM',
+          given: ['AUTOMATED']
         }
-      }
-    ]
+      ]
+    }
+  } else {
+    return {
+      resourceType: 'Practitioner',
+      identifier: user.identifiers,
+      telecom: [
+        { system: 'phone', value: user.mobile },
+        { system: 'email', value: user.email }
+      ],
+      name: user.name,
+      extension: user.signature && [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueSignature: {
+            type: [
+              {
+                system: 'urn:iso-astm:E1762-95:2013',
+                code: '1.2.840.10065.1.12.1.13',
+                display: 'Review Signature'
+              }
+            ],
+            when: new Date().toISOString(),
+            contentType: user.signature.type,
+            blob: user.signature.data
+          }
+        }
+      ]
+    }
   }
 }
 
 export const createFhirPractitionerRole = (
   user: IUser,
-  practitionerId: string
+  practitionerId: string,
+  system: boolean
 ): fhir.PractitionerRole => {
-  return {
-    resourceType: 'PractitionerRole',
-    practitioner: {
-      reference: `Practitioner/${practitionerId}`
-    },
-    code: [
-      {
-        coding: [
-          {
-            system: `http://opencrvs.org/specs/roles`,
-            code: user.role
-          }
-        ]
+  if (system) {
+    return {
+      resourceType: 'PractitionerRole',
+      practitioner: {
+        reference: `Practitioner/${practitionerId}`
       },
-      {
-        coding: [
-          {
-            system: `http://opencrvs.org/specs/types`,
-            code: user.type
-          }
-        ]
-      }
-    ],
-    location: (user.catchmentAreaIds || []).map(id => ({
-      reference: `Location/${id}`
-    }))
+      code: [
+        {
+          coding: [
+            {
+              system: `http://opencrvs.org/specs/roles`,
+              code: 'AUTOMATED'
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: `http://opencrvs.org/specs/types`,
+              code: 'SYSTEM'
+            }
+          ]
+        }
+      ],
+      location: (user.catchmentAreaIds || []).map(id => ({
+        reference: `Location/${id}`
+      }))
+    }
+  } else {
+    return {
+      resourceType: 'PractitionerRole',
+      practitioner: {
+        reference: `Practitioner/${practitionerId}`
+      },
+      code: [
+        {
+          coding: [
+            {
+              system: `http://opencrvs.org/specs/roles`,
+              code: user.role
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: `http://opencrvs.org/specs/types`,
+              code: user.type
+            }
+          ]
+        }
+      ],
+      location: (user.catchmentAreaIds || []).map(id => ({
+        reference: `Location/${id}`
+      }))
+    }
   }
 }
 

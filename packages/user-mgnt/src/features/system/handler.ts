@@ -22,6 +22,11 @@ import * as Joi from 'joi'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { unauthorized } from 'boom'
 import * as uuid from 'uuid/v4'
+import {
+  createFhirPractitioner,
+  createFhirPractitionerRole,
+  postFhir
+} from '@user-mgnt/features/createUser/service'
 
 interface IRegisterSystemPayload {
   scope: string
@@ -29,7 +34,7 @@ interface IRegisterSystemPayload {
 
 interface IRegisterSystemResponse {
   client_id: string
-  secret_id: string
+  client_secret: string
   sha_secret: string
 }
 
@@ -66,22 +71,44 @@ export async function registerSystemClient(
     const sha_secret = uuid()
     /* tslint:enable */
     const { hash, salt } = generateSaltedHash(secret_id)
+
+    const practitioner = createFhirPractitioner(systemAdminUser, true)
+    const practitionerId = await postFhir(
+      request.headers.authorization,
+      practitioner
+    )
+    if (!practitionerId) {
+      throw new Error(
+        'Practitioner resource not saved correctly, practitioner ID not returned'
+      )
+    }
+    const role = createFhirPractitionerRole(
+      systemAdminUser,
+      practitionerId,
+      true
+    )
+    const roleId = await postFhir(request.headers.authorization, role)
+    if (!roleId) {
+      throw new Error(
+        'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
+      )
+    }
     const system = {
       client_id,
       name: systemAdminUser.name,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
       scope: systemScopes,
+      practitionerId,
       secretHash: hash,
       salt,
       sha_secret
     }
 
     await System.create(system)
-
     const response: IRegisterSystemResponse = {
       client_id,
-      secret_id,
+      client_secret: secret_id,
       sha_secret
     }
     return h.response(response).code(201)
@@ -98,7 +125,7 @@ export const reqRegisterSystemSchema = Joi.object({
 
 export const resRegisterSystemSchema = Joi.object({
   client_id: Joi.string(),
-  secret_id: Joi.string(),
+  client_secret: Joi.string(),
   sha_secret: Joi.string()
 })
 
@@ -243,4 +270,42 @@ export const verifySystemResSchema = Joi.object({
   scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   id: Joi.string()
+})
+
+interface IGetSystemPayload {
+  systemId: string
+}
+
+export async function getSystemHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { systemId } = request.payload as IGetSystemPayload
+
+  // tslint:disable-next-line
+  const system: ISystemModel | null = await System.findOne({ _id: systemId })
+
+  if (!system) {
+    // Don't return a 404 as this gives away that this user account exists
+    throw unauthorized()
+  }
+  return {
+    name: `${system.name[0].given} ${system.name[0].family}`,
+    client_id: system.client_id,
+    username: system.username,
+    status: system.status,
+    practitionerId: system.practitionerId
+  }
+}
+
+export const getSystemRequestSchema = Joi.object({
+  systemId: Joi.string()
+})
+
+export const getSystemResponseSchema = Joi.object({
+  name: Joi.string(),
+  username: Joi.string(),
+  client_id: Joi.string(),
+  status: Joi.string(),
+  practitionerId: Joi.string()
 })
