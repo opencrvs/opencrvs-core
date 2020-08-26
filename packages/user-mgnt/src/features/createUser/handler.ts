@@ -46,7 +46,7 @@ export default async function createUser(
   let autoGenPassword = null
 
   try {
-    const practitioner = createFhirPractitioner(user)
+    const practitioner = createFhirPractitioner(user, false)
     practitionerId = await postFhir(token, practitioner)
     if (!practitionerId) {
       throw new Error(
@@ -58,7 +58,7 @@ export default async function createUser(
       token
     )
     user.role = user.role ? user.role : 'FIELD_AGENT'
-    const role = createFhirPractitionerRole(user, practitionerId)
+    const role = createFhirPractitionerRole(user, practitionerId, false)
     roleId = await postFhir(token, role)
     if (!roleId) {
       throw new Error(
