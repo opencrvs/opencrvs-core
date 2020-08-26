@@ -87,6 +87,44 @@ function CustomizedDot(props: ICustomisedDot) {
     </svg>
   )
 }
+interface IAxisTickProps {
+  x: number
+  y: number
+  stroke: string
+  payload: {
+    value: string
+  }
+}
+
+interface IThemedAxisTickProps extends IAxisTickProps {
+  theme: ITheme
+}
+
+function CustomizedAxisTick(props: IThemedAxisTickProps) {
+  const { x, y, stroke, payload, theme } = props
+  const values = payload.value.split(' ')
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={24}
+        fill={theme.colors.copy}
+        fontFamily="noto_sans_regular"
+        fontSize={12}
+        fontWeight="normal"
+      >
+        {values.map((value, i) => (
+          <tspan textAnchor="middle" x="0" dy={`${i > 0 ? 18 : 24}`}>
+            {value}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  )
+}
+
 class TriLineChartComponent extends React.Component<IProps> {
   render() {
     const {
@@ -129,7 +167,15 @@ class TriLineChartComponent extends React.Component<IProps> {
                 tickLine={false}
                 dataKey="label"
               />
-            )) || <XAxis tickLine={false} dataKey="label" />}
+            )) || (
+              <XAxis
+                tickLine={false}
+                dataKey="label"
+                tick={(props: IAxisTickProps) => (
+                  <CustomizedAxisTick {...props} theme={theme} />
+                )}
+              />
+            )}
             {!maximizeXAxisInterval && (
               <YAxis interval={1} axisLine={false} tickLine={false} />
             )}

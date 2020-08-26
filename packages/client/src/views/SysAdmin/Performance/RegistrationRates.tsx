@@ -51,7 +51,7 @@ import {
   HAS_CHILD_LOCATION
 } from './queries'
 import { Within45DaysTable } from './reports/registrationRates/Within45DaysTable'
-
+import moment from 'moment'
 const { useState } = React
 
 export enum REG_RATE_BASE {
@@ -82,10 +82,17 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
     data &&
     data.details &&
     data.details.reduce(
-      (chartData: any[], dataDetails: GQLMonthWise45DayEstimation | null) => {
+      (
+        chartData: any[],
+        dataDetails: GQLMonthWise45DayEstimation | null,
+        index
+      ) => {
         if (dataDetails !== null) {
           chartData.push({
-            label: `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`,
+            label:
+              moment.months().indexOf(dataDetails.month) == 0 && index > 0
+                ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
+                : `${dataDetails.month.slice(0, 3)}`,
             registeredIn45Days: dataDetails.actual45DayRegistration,
             totalRegistered: dataDetails.actualTotalRegistration,
             totalEstimate: dataDetails.estimatedRegistration,
