@@ -89,8 +89,7 @@ export async function subscribeWebhooksHandler(
         .catch(error => {
           return Promise.reject(new Error(` request failed: ${error.message}`))
         })
-
-      if (challengeCheck !== challengeCheck.challenge) {
+      if (challenge !== challengeCheck.challenge) {
         throw new Error(
           `${challenge} is not equal to ${challengeCheck.challenge}.  Subscription endpoint check failed`
         )
