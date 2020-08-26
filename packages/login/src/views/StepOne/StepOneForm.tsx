@@ -275,7 +275,7 @@ export class StepOneForm extends React.Component<FullProps> {
                 intl.formatMessage(messages.submissionError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
-              {!navigator.onLine && intl.formatMessage(messages.networkError)}
+              {!errorCode && intl.formatMessage(messages.networkError)}
             </ErrorMessage>
           )}
         </Title>

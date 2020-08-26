@@ -14,6 +14,7 @@ import { createTestApp, wait } from '@login/tests/util'
 import { client } from '@login/utils/authApi'
 import { resolve } from 'url'
 import { ReactWrapper } from 'enzyme'
+import { ErrorMessage } from '@opencrvs/components/lib/forms'
 
 it('renders without crashing', async () => {
   createTestApp()
@@ -59,6 +60,18 @@ describe('Login app step one', () => {
       await wait()
       const request = moxios.requests.mostRecent()
       expect(request.url).toMatch(/authenticate/)
+    })
+
+    it('handles no connectivity', async done => {
+      moxios.stubRequest(
+        resolve(window.config.AUTH_API_URL, 'authenticate'),
+        undefined
+      )
+      app.find('form#STEP_ONE').simulate('submit')
+      await wait()
+      done()
+      app.update()
+      expect(app.find(ErrorMessage)).toHaveLength(1)
     })
 
     it('displays loading spinner when the user is submitting the form', async done => {
