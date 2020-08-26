@@ -41,6 +41,11 @@ import {
 export const messages: {
   [key: string]: MessageDescriptor
 } = defineMessages({
+  networkError: {
+    id: 'error.networkError',
+    defaultMessage: 'Unable to connect to server',
+    description: 'The error that appears when there is no internet connection'
+  },
   stepOneTitle: {
     id: 'buttons.login',
     defaultMessage: 'Login',
@@ -270,6 +275,7 @@ export class StepOneForm extends React.Component<FullProps> {
                 intl.formatMessage(messages.submissionError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
+              {!navigator.onLine && intl.formatMessage(messages.networkError)}
             </ErrorMessage>
           )}
         </Title>
