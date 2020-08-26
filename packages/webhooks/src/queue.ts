@@ -11,6 +11,6 @@
  */
 
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import Queue from 'bull'
+import * as Bull from 'bull'
 
-export const webhookQueue = new Queue(QUEUE_NAME, REDIS_HOST)
+export const webhookQueue = new Bull(QUEUE_NAME, REDIS_HOST)

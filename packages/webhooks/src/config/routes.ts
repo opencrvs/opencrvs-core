@@ -17,6 +17,7 @@ import {
   listWebhooksHandler,
   deleteWebhookHandler
 } from '@webhooks/features/manage/handler'
+import { birthRegisteredHandler } from '@webhooks/features/event/handler'
 
 export const getRoutes = () => {
   const routes = [

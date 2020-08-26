@@ -16,7 +16,7 @@ import {
   getSystem,
   ISystem,
   ITokenPayload
-} from '@webhooks/features/webhooks/service'
+} from '@webhooks/features/manage/service'
 import { internal } from 'boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@webhooks/logger'
