@@ -29,9 +29,13 @@ export async function birthRegisteredHandler(
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {
         logger.info(`Queueing webhook ${webhookToNotify.webhookId}`)
+        const payload = {
+          ...webhookToNotify,
+          target: bundle
+        }
         webhookQueue.add(
           {
-            payload: bundle,
+            payload,
             url: webhookToNotify.address
           },
           {
