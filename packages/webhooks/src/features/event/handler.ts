@@ -15,6 +15,7 @@ import * as Hapi from 'hapi'
 import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
 import { webhookQueue } from '@webhooks/queue'
 import * as ShortUIDGen from 'short-uid'
+import { createRequestSignature } from '@webhooks/features/event/service'
 
 export async function birthRegisteredHandler(
   request: Hapi.Request,
@@ -39,10 +40,16 @@ export async function birthRegisteredHandler(
             context: [bundle]
           }
         }
+        const hmac = createRequestSignature(
+          'sha256',
+          webhookToNotify.sha_secret,
+          JSON.stringify(payload)
+        )
         webhookQueue.add(
           {
             payload,
-            url: webhookToNotify.address
+            url: webhookToNotify.address,
+            hmac
           },
           {
             jobId: `WEBHOOK_${new ShortUIDGen().randomUUID().toUpperCase()}_${
