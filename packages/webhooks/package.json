@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "node build/dist/src/index.js",
-    "test": "jest  --coverage --silent --noStackTrace && yarn test:compilation",
+    "test": "jest  --coverage --silent --noStackTrace --forceExit && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "precommit": "tslint --project ./tsconfig.json && lint-staged",
