@@ -30,8 +30,14 @@ export async function birthRegisteredHandler(
       webhooks.forEach(webhookToNotify => {
         logger.info(`Queueing webhook ${webhookToNotify.webhookId}`)
         const payload = {
-          ...webhookToNotify,
-          target: bundle
+          timestamp: new Date().toISOString(),
+          id: webhookToNotify.webhookId,
+          event: {
+            hub: {
+              topic: TRIGGERS.BIRTH_REGISTERED
+            },
+            context: [bundle]
+          }
         }
         webhookQueue.add(
           {

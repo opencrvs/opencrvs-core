@@ -30,6 +30,8 @@ export interface ISystem {
   username: string
   client_id: string
   status: string
+  sha_secret: string
+  practitionerId: string
 }
 
 export function hasScope(authHeader: IAuthHeader, scope: string) {

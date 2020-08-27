@@ -13,7 +13,6 @@
 import {
   subscribeWebhooksHandler,
   reqSubscribeWebhookSchema,
-  resSubscribeWebhookSchema,
   listWebhooksHandler,
   deleteWebhookHandler
 } from '@webhooks/features/manage/handler'
@@ -46,9 +45,6 @@ export const getRoutes = () => {
         description: 'Subscribe to a webhook',
         validate: {
           payload: reqSubscribeWebhookSchema
-        },
-        response: {
-          schema: resSubscribeWebhookSchema
         }
       }
     },
