@@ -752,6 +752,20 @@
           "primary": true,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Webhooks -> Birth Registration",
+          "secured": false,
+          "host": "webhooks",
+          "port": 2525,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "priority": 1

@@ -12,6 +12,7 @@
 import * as decode from 'jwt-decode'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
 import fetch from 'node-fetch'
+import * as crypto from 'crypto'
 
 export interface IAuthHeader {
   Authorization: string
@@ -63,4 +64,11 @@ export async function getSystem(
     }
   })
   return await res.json()
+}
+
+export function generateChallenge() {
+  return crypto
+    .randomBytes(16)
+    .toString('base64')
+    .toString()
 }
