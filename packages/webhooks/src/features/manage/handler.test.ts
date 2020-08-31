@@ -15,6 +15,7 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import mockingoose from 'mockingoose'
+import * as service from '@webhooks/features/manage/service'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -90,7 +91,12 @@ describe('subscribeWebhooksHandler handler', () => {
   })
 
   it('creates and saves a webhook using mongoose', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockActiveSystem))
+    fetch.mockResponses(
+      [JSON.stringify(mockActiveSystem), { status: 200 }],
+      [JSON.stringify({ challenge: '123' }), { status: 200 }]
+    )
+
+    jest.spyOn(service, 'generateChallenge').mockImplementation(() => '123')
     mockingoose(Webhook).toReturn(mockWebhook, 'save')
 
     const res = await server.server.inject({

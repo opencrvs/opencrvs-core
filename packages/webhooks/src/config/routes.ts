@@ -16,7 +16,8 @@ import {
   resSubscribeWebhookSchema,
   listWebhooksHandler,
   deleteWebhookHandler
-} from '@webhooks/features/webhooks/handler'
+} from '@webhooks/features/manage/handler'
+import { birthRegisteredHandler } from '@webhooks/features/event/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -67,6 +68,15 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Delete webhooks'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/birth/mark-registered',
+      handler: birthRegisteredHandler,
+      config: {
+        tags: ['api'],
+        description: 'Dispatches a webhook for the birth registration event'
       }
     }
   ]

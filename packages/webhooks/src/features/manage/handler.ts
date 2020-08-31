@@ -15,12 +15,15 @@ import {
   getTokenPayload,
   getSystem,
   ISystem,
-  ITokenPayload
-} from '@webhooks/features/webhooks/service'
+  ITokenPayload,
+  generateChallenge
+} from '@webhooks/features/manage/service'
 import { internal } from 'boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@webhooks/logger'
 import * as uuid from 'uuid/v4'
+import fetch from 'node-fetch'
+import { resolve } from 'url'
 
 interface ISubscribePayload {
   address: string
@@ -53,21 +56,44 @@ export async function subscribeWebhooksHandler(
         .code(400)
     }
 
+    const webhookId = uuid()
+    const createdBy = {
+      client_id: system.client_id,
+      name: system.name,
+      type: 'api',
+      username: system.username
+    }
+    const webhook = {
+      webhookId,
+      createdBy,
+      address,
+      trigger: TRIGGERS[TRIGGERS[trigger]]
+    }
+    const challenge = generateChallenge()
     try {
-      const webhookId = uuid()
-      const createdBy = {
-        client_id: system.client_id,
-        name: system.name,
-        type: 'api',
-        username: system.username
+      const challengeCheck = await fetch(
+        resolve(
+          address,
+          `?opencrvs.mode=subscribe&opencrvs.challenge=${challenge}`
+        ),
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+        .then(response => {
+          return response.json()
+        })
+        .catch(error => {
+          return Promise.reject(new Error(` request failed: ${error.message}`))
+        })
+      if (challenge !== challengeCheck.challenge) {
+        throw new Error(
+          `${challenge} is not equal to ${challengeCheck.challenge}.  Subscription endpoint check failed`
+        )
       }
-      const webhook = {
-        webhookId,
-        createdBy,
-        address,
-        trigger: TRIGGERS[TRIGGERS[trigger]]
-      }
-
       await Webhook.create(webhook)
       return h
         .response({
