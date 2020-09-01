@@ -25,7 +25,8 @@ export async function webhookProcessor(job: Job) {
       method: 'POST',
       body: JSON.stringify(job.data.payload),
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Hub-Signature': job.data.hmac
       }
     })
   } catch (err) {

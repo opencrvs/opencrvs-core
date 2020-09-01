@@ -34,14 +34,16 @@ const mockActiveSystem = {
   name: 'John William',
   username: 'j.doe1',
   client_id: '123',
-  status: 'active'
+  status: 'active',
+  sha_secret: '123'
 }
 
 const mockInactiveSystem = {
   name: 'John William',
   username: 'j.doe1',
   client_id: '123',
-  status: 'deactivated'
+  status: 'deactivated',
+  sha_secret: '123'
 }
 
 const mockWebhook = ({
@@ -52,8 +54,10 @@ const mockWebhook = ({
     type: 'api',
     username: 'j.doe1'
   },
-  address: 'https://www.your-great-domain.com/webhooks',
-  trigger: 'BIRTH_REGISTERED'
+  callback: 'https://www.your-great-domain.com/webhooks',
+  mode: 'subscribe',
+  secret: '123',
+  topic: 'BIRTH_REGISTERED'
 } as unknown) as IWebhook
 
 const mockWebhooks = [
@@ -65,8 +69,10 @@ const mockWebhooks = [
       type: 'api',
       username: 'j.doe1'
     },
-    address: 'https://www.your-great-domain.com/webhooks',
-    trigger: 'BIRTH_REGISTERED'
+    callback: 'https://www.your-great-domain.com/webhooks',
+    mode: 'subscribe',
+    secret: '123',
+    topic: 'BIRTH_REGISTERED'
   } as unknown,
   {
     webhookId: '456',
@@ -76,8 +82,10 @@ const mockWebhooks = [
       type: 'api',
       username: 'j.doe1'
     },
-    address: 'https://www.your-great-domain.com/webhooks',
-    trigger: 'DEATH_CERTIFIED'
+    callback: 'https://www.your-great-domain.com/webhooks',
+    mode: 'subscribe',
+    secret: '123',
+    topic: 'DEATH_CERTIFIED'
   } as unknown
 ] as IWebhook[]
 
@@ -103,14 +111,18 @@ describe('subscribeWebhooksHandler handler', () => {
       method: 'POST',
       url: '/webhooks',
       payload: {
-        address: 'https://www.your-great-domain.com/webhooks',
-        trigger: 'BIRTH_REGISTERED'
+        hub: {
+          callback: 'https://www.your-great-domain.com/webhooks',
+          mode: 'subscribe',
+          secret: '123',
+          topic: 'BIRTH_REGISTERED'
+        }
       },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.statusCode).toBe(200)
+    expect(res.statusCode).toBe(202)
   })
 
   it('return unauthoried error if system not active', async () => {
@@ -120,32 +132,104 @@ describe('subscribeWebhooksHandler handler', () => {
       method: 'POST',
       url: '/webhooks',
       payload: {
-        address: 'https://www.your-great-domain.com/webhooks',
-        trigger: 'BIRTH_REGISTERED'
+        hub: {
+          callback: 'https://www.your-great-domain.com/webhooks',
+          mode: 'subscribe',
+          secret: '123',
+          topic: 'BIRTH_REGISTERED'
+        }
       },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.result).toEqual(
-      'Active system details cannot be found.  This client is no longer enabled'
+    expect(res.result.hub.reason).toEqual(
+      'Active system details cannot be found.  This system is no longer authorized'
     )
     expect(res.statusCode).toBe(400)
   })
 
-  it('return an error if a trigger is unsupported', async () => {
+  it('return an error if a topic is unsupported', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockActiveSystem), { status: 200 }],
+      [JSON.stringify({ challenge: '123' }), { status: 200 }]
+    )
+
+    jest.spyOn(service, 'generateChallenge').mockImplementation(() => '123')
+    mockingoose(Webhook).toReturn(mockWebhook, 'save')
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/webhooks',
       payload: {
-        address: 'https://www.your-great-domain.com/webhooks',
-        trigger: '123'
+        hub: {
+          callback: 'https://www.your-great-domain.com/webhooks',
+          mode: 'subscribe',
+          secret: '123',
+          topic: 'XXX'
+        }
       },
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
-    expect(res.result).toEqual('Unsupported trigger: 123')
+    expect(res.result.hub.reason).toEqual('Unsupported topic: XXX')
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('return an error if a mode is incorrect', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockActiveSystem), { status: 200 }],
+      [JSON.stringify({ challenge: '123' }), { status: 200 }]
+    )
+
+    jest.spyOn(service, 'generateChallenge').mockImplementation(() => '123')
+    mockingoose(Webhook).toReturn(mockWebhook, 'save')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/webhooks',
+      payload: {
+        hub: {
+          callback: 'https://www.your-great-domain.com/webhooks',
+          mode: 'unsubscribe',
+          secret: '123',
+          topic: 'BIRTH_REGISTERED'
+        }
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.result.hub.reason).toEqual('hub.mode must be set to subscribe')
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('return an error if secret is incorrect', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockActiveSystem), { status: 200 }],
+      [JSON.stringify({ challenge: '123' }), { status: 200 }]
+    )
+
+    jest.spyOn(service, 'generateChallenge').mockImplementation(() => '123')
+    mockingoose(Webhook).toReturn(mockWebhook, 'save')
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/webhooks',
+      payload: {
+        hub: {
+          callback: 'https://www.your-great-domain.com/webhooks',
+          mode: 'subscribe',
+          secret: 'XXX',
+          topic: 'BIRTH_REGISTERED'
+        }
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.result.hub.reason).toEqual('hub.secret is incorrrect')
     expect(res.statusCode).toBe(400)
   })
 })
@@ -184,7 +268,7 @@ describe('listWebhooksHandler handler', () => {
       }
     })
     expect(res.result).toEqual(
-      'Active system details cannot be found.  This client is no longer enabled'
+      'Active system details cannot be found.  This system is no longer authorized'
     )
     expect(res.statusCode).toBe(400)
   })

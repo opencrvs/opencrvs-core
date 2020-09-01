@@ -25,18 +25,32 @@ import * as uuid from 'uuid/v4'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 
+interface IHub {
+  callback: string
+  mode: string
+  topic: string
+  secret: string
+}
+
 interface ISubscribePayload {
-  address: string
-  trigger: string
+  hub: IHub
 }
 
 export async function subscribeWebhooksHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { address, trigger } = request.payload as ISubscribePayload
-  if (!TRIGGERS[TRIGGERS[trigger]]) {
-    return h.response(`Unsupported trigger: ${trigger}`).code(400)
+  const { hub } = request.payload as ISubscribePayload
+  if (!TRIGGERS[TRIGGERS[hub.topic]]) {
+    return h
+      .response({
+        hub: {
+          mode: 'denied',
+          topic: hub.topic,
+          reason: `Unsupported topic: ${hub.topic}`
+        }
+      })
+      .code(400)
   }
   const token: ITokenPayload = getTokenPayload(
     request.headers.authorization.split(' ')[1]
@@ -47,12 +61,40 @@ export async function subscribeWebhooksHandler(
       { systemId },
       request.headers.authorization
     )
-
     if (!system || system.status !== 'active') {
       return h
-        .response(
-          'Active system details cannot be found.  This client is no longer enabled'
-        )
+        .response({
+          hub: {
+            mode: 'denied',
+            topic: hub.topic,
+            reason:
+              'Active system details cannot be found.  This system is no longer authorized'
+          }
+        })
+        .code(400)
+    }
+
+    if (hub.secret !== system.sha_secret) {
+      return h
+        .response({
+          hub: {
+            mode: 'denied',
+            topic: hub.topic,
+            reason: 'hub.secret is incorrrect'
+          }
+        })
+        .code(400)
+    }
+
+    if (hub.mode !== 'subscribe') {
+      return h
+        .response({
+          hub: {
+            mode: 'denied',
+            topic: hub.topic,
+            reason: 'hub.mode must be set to subscribe'
+          }
+        })
         .code(400)
     }
 
@@ -66,16 +108,14 @@ export async function subscribeWebhooksHandler(
     const webhook = {
       webhookId,
       createdBy,
-      address,
-      trigger: TRIGGERS[TRIGGERS[trigger]]
+      address: hub.callback,
+      sha_secret: hub.secret,
+      trigger: TRIGGERS[TRIGGERS[hub.topic]]
     }
     const challenge = generateChallenge()
     try {
       const challengeCheck = await fetch(
-        resolve(
-          address,
-          `?opencrvs.mode=subscribe&opencrvs.challenge=${challenge}`
-        ),
+        resolve(hub.callback, `?mode=subscribe&challenge=${challenge}`),
         {
           method: 'GET',
           headers: {
@@ -95,15 +135,7 @@ export async function subscribeWebhooksHandler(
         )
       }
       await Webhook.create(webhook)
-      return h
-        .response({
-          id: webhookId,
-          createdBy,
-          address,
-          trigger,
-          createdAt: new Date().toISOString()
-        })
-        .code(200)
+      return h.response().code(202)
     } catch (err) {
       logger.error(err)
       throw internal()
@@ -115,21 +147,12 @@ export async function subscribeWebhooksHandler(
 }
 
 export const reqSubscribeWebhookSchema = Joi.object({
-  address: Joi.string(),
-  trigger: Joi.string()
-})
-
-export const resSubscribeWebhookSchema = Joi.object({
-  id: Joi.string(),
-  address: Joi.string(),
-  createdAt: Joi.string(),
-  createdBy: Joi.object({
-    client_id: Joi.string(),
-    type: Joi.string(),
-    username: Joi.string(),
-    name: Joi.string()
-  }),
-  trigger: Joi.string()
+  hub: Joi.object({
+    callback: Joi.string(),
+    mode: Joi.string(),
+    topic: Joi.string(),
+    secret: Joi.string()
+  })
 })
 
 export async function listWebhooksHandler(
@@ -148,7 +171,7 @@ export async function listWebhooksHandler(
     if (!system || system.status !== 'active') {
       return h
         .response(
-          'Active system details cannot be found.  This client is no longer enabled'
+          'Active system details cannot be found.  This system is no longer authorized'
         )
         .code(400)
     }
@@ -164,10 +187,10 @@ export async function listWebhooksHandler(
       entries.forEach(item => {
         const entry = {
           id: item.webhookId,
-          address: item.address,
+          callback: item.address,
           createdAt: new Date((item.createdAt as number) * 1000).toISOString(),
           createdBy: item.createdBy,
-          trigger: item.trigger
+          topic: item.trigger
         }
         sortedEntries.push(entry)
       })
