@@ -42,7 +42,15 @@ export async function subscribeWebhooksHandler(
 ) {
   const { hub } = request.payload as ISubscribePayload
   if (!TRIGGERS[TRIGGERS[hub.topic]]) {
-    return h.response(`Unsupported hub.topic: ${hub.topic}`).code(400)
+    return h
+      .response({
+        hub: {
+          mode: 'denied',
+          topic: hub.topic,
+          reason: `Unsupported topic: ${hub.topic}`
+        }
+      })
+      .code(400)
   }
   const token: ITokenPayload = getTokenPayload(
     request.headers.authorization.split(' ')[1]
@@ -53,7 +61,6 @@ export async function subscribeWebhooksHandler(
       { systemId },
       request.headers.authorization
     )
-
     if (!system || system.status !== 'active') {
       return h
         .response({
@@ -85,7 +92,7 @@ export async function subscribeWebhooksHandler(
           hub: {
             mode: 'denied',
             topic: hub.topic,
-            reason: 'hub.mode must be set to sunscribe'
+            reason: 'hub.mode must be set to subscribe'
           }
         })
         .code(400)
@@ -164,7 +171,7 @@ export async function listWebhooksHandler(
     if (!system || system.status !== 'active') {
       return h
         .response(
-          'Active system details cannot be found.  This client is no longer enabled'
+          'Active system details cannot be found.  This system is no longer authorized'
         )
         .code(400)
     }
