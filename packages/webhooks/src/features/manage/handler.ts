@@ -115,7 +115,10 @@ export async function subscribeWebhooksHandler(
     const challenge = generateChallenge()
     try {
       const challengeCheck = await fetch(
-        resolve(hub.callback, `?mode=subscribe&challenge=${challenge}`),
+        resolve(
+          hub.callback,
+          `?mode=subscribe&challenge=${challenge}&topic=${hub.topic}`
+        ),
         {
           method: 'GET',
           headers: {
