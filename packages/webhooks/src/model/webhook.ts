@@ -31,6 +31,7 @@ export interface IWebhook {
   address: string
   createdBy: IClient
   createdAt: number | string
+  sha_secret: string
   trigger: string
 }
 // tslint:disable-next-line
@@ -51,6 +52,7 @@ const webhookSchema = new Schema({
   address: { type: String, required: true },
   createdBy: { type: ClientSchema, required: true },
   createdAt: { type: Number, default: Date.now },
+  sha_secret: { type: String, required: true },
   trigger: { type: String, required: true }
 })
 

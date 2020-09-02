@@ -66,7 +66,7 @@ jobs:
       install: skip
       script:
         - git clone https://github.com/opencrvs/opencrvs-zambia.git
-        - bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development opencrvs-staging.jembi.org latest opencrvs-zambia
+        - bash deploy.sh --clear-data=no --restore-metadata=no --update-metadata=no development opencrvs-staging.jembi.org latest opencrvs-zambia
       addons:
         ssh_known_hosts: opencrvs-staging.jembi.org
 
