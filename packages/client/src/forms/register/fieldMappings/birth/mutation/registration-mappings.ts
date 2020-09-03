@@ -98,6 +98,16 @@ export function setBirthRegistrationSectionTransformer(
     ]
   }
 
+  if (draftData[sectionId].commentsOrNotes) {
+    if (!transformedData[sectionId].status[0].comments) {
+      transformedData[sectionId].status[0].comments = []
+    }
+    transformedData[sectionId].status[0].comments.push({
+      comment: draftData[sectionId].commentsOrNotes,
+      createdAt: new Date()
+    })
+  }
+
   if (draftData[sectionId].certificates) {
     transformCertificateData(
       transformedData,

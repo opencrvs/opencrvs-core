@@ -33,10 +33,20 @@ export function transformStatusData(
     statusData.find(status => {
       return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
     })
+  transformedData[sectionId] = {
+    ...transformedData[sectionId],
+    commentsOrNotes:
+      (statusData &&
+        statusData[0] &&
+        statusData[0].comments &&
+        statusData[0].comments[0] &&
+        statusData[0].comments[0].comment) ||
+      ''
+  }
+
   if (!registrationStatus) {
     return transformedData
   }
-
   transformedData[sectionId] = {
     ...transformedData[sectionId],
     regStatus: {
