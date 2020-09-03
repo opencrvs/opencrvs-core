@@ -569,7 +569,7 @@ describe('RegistrationHome related tests', () => {
       )
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 100)
+        setTimeout(resolve, 600)
       })
       testComponent.component.update()
       await waitForElement(testComponent.component, '#load_more_button')
