@@ -301,6 +301,9 @@ export function getDeathQueryMappings(action: Action) {
         dataKey: 'fetchDeathRegistration'
       }
     default:
-      return null
+      return {
+        query: GET_DEATH_REGISTRATION_FOR_REVIEW,
+        dataKey: 'fetchDeathRegistration'
+      }
   }
 }

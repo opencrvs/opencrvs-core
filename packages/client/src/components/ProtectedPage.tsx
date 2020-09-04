@@ -169,9 +169,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 }
-export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(
-  null,
-  {
-    onNumPadVisible: refreshOfflineData
-  }
-)(withRouter(ProtectedPageComponent))
+export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
+  onNumPadVisible: refreshOfflineData
+})(withRouter(ProtectedPageComponent))

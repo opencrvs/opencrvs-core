@@ -36,7 +36,7 @@ import {
   GQLMonthWise45DayEstimation,
   GQLMonthWiseEstimationMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -259,7 +259,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   )
 }
 
-export const RegistrationRates = connect(
-  null,
-  { goToOperationalReport, goToRegistrationRates }
-)(injectIntl(RegistrationRatesComponent))
+export const RegistrationRates = connect(null, {
+  goToOperationalReport,
+  goToRegistrationRates
+})(injectIntl(RegistrationRatesComponent))

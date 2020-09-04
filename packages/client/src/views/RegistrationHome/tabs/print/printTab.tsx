@@ -194,12 +194,12 @@ class PrintTabComponent extends React.Component<
               moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
-          ((reg.createdAt &&
+          (reg.createdAt &&
             moment(
               moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
-            ''),
+          '',
         actions,
         rowClickHandler: [
           {
@@ -254,10 +254,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const PrintTab = connect(
-  mapStateToProps,
-  {
-    goToPrintCertificate,
-    goToApplicationDetails
-  }
-)(injectIntl(withTheme(PrintTabComponent)))
+export const PrintTab = connect(mapStateToProps, {
+  goToPrintCertificate,
+  goToApplicationDetails
+})(injectIntl(withTheme(PrintTabComponent)))

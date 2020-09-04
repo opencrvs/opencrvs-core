@@ -603,14 +603,11 @@ function mapStateToProps(
   }
 }
 
-export const RegistrationHome = connect(
-  mapStateToProps,
-  {
-    goToEvents,
-    goToPage,
-    goToRegistrarHomeTab,
-    goToReviewDuplicate,
-    goToPrintCertificate,
-    updateRegistrarWorkqueue
-  }
-)(injectIntl(withTheme(RegistrationHomeView)))
+export const RegistrationHome = connect(mapStateToProps, {
+  goToEvents,
+  goToPage,
+  goToRegistrarHomeTab,
+  goToReviewDuplicate,
+  goToPrintCertificate,
+  updateRegistrarWorkqueue
+})(injectIntl(withTheme(RegistrationHomeView)))

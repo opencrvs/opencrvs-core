@@ -19,7 +19,7 @@ import User, {
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 interface IAuditUserPayload {
   userId: string

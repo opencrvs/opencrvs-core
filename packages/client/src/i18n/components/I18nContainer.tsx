@@ -9,29 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { connect } from 'react-redux'
-import { IntlProvider } from 'react-intl'
 
-import { getLanguage, getMessages } from '@client/i18n/selectors'
-import { IStoreState } from '@client/store'
-import { IntlMessages } from '@client/i18n/reducer'
+import { IntlProvider } from 'react-intl'
+import React from 'react'
+import { IntlMessages, IntlState } from '@client/i18n/reducer'
+import { useSelector } from 'react-redux'
 
 import 'moment/locale/bn'
 
 type StateProps = {
-  locale: string
+  language: string
   messages: IntlMessages
 }
 
-const mapStateToProps = (state: IStoreState): StateProps => {
-  const locale = getLanguage(state)
-
-  return {
-    locale,
-    messages: getMessages(state)
-  }
+export const I18nContainer: React.FC = () => {
+  const { language, messages } = useSelector<IntlState, StateProps>(
+    (state: IntlState) => {
+      return {
+        language: state.language,
+        messages: state.messages
+      }
+    }
+  )
+  return <IntlProvider locale={language} messages={messages} />
 }
-
-export const I18nContainer = connect<StateProps, {}, {}, IStoreState>(
-  mapStateToProps
-)(IntlProvider)

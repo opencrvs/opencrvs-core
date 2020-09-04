@@ -133,7 +133,10 @@ function EventInfoComponet(props: IFullProps) {
   )
 }
 
-export const EventInfo = connect(
-  null,
-  { goBack, goToHome, storeApplication, goToBirthInformant, goToDeathInformant }
-)(injectIntl(EventInfoComponet))
+export const EventInfo = connect(null, {
+  goBack,
+  goToHome,
+  storeApplication,
+  goToBirthInformant,
+  goToDeathInformant
+})(injectIntl(EventInfoComponet))

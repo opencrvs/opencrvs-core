@@ -29,7 +29,7 @@
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",
     "iconv": "^2.3.1",
-    "@hapi/joi": "^14.0.6",
+    "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
     "@types/fhir": "^0.0.30",
-    "@types/hapi": "^17.0.12",
+    "@types/hapi__hapi": "^20.0.0",
     "@types/hapi-auth-jwt2": "8.0.1",
     "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",

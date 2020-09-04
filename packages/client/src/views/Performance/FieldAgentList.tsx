@@ -40,7 +40,7 @@ import {
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import moment from 'moment'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'

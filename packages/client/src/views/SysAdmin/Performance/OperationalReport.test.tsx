@@ -21,7 +21,7 @@ import {
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
 import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import { OPERATIONAL_REPORTS_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
 

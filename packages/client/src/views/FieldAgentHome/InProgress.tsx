@@ -172,7 +172,6 @@ class InProgressComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const InProgress = connect(
-  null,
-  { goToApplicationDetails }
-)(injectIntl(withTheme(InProgressComponent)))
+export const InProgress = connect(null, { goToApplicationDetails })(
+  injectIntl(withTheme(InProgressComponent))
+)

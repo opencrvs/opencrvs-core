@@ -13,7 +13,7 @@
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { METRICS_URL } from '@gateway/constants'
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export default {
   method: 'GET',

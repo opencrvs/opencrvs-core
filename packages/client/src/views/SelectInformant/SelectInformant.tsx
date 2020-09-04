@@ -563,18 +563,15 @@ const mapStateToProps = (
 }
 
 export const SelectInformant = withRouter(
-  connect(
-    mapStateToProps,
-    {
-      goBack,
-      goToHome,
-      goToBirthContactPoint,
-      goToDeathContactPoint,
-      goToBirthRegistrationAsParent,
-      goToPrimaryApplicant,
-      goToDeathRegistration,
-      modifyApplication,
-      deleteApplication
-    }
-  )(injectIntl(SelectInformantView))
+  connect(mapStateToProps, {
+    goBack,
+    goToHome,
+    goToBirthContactPoint,
+    goToDeathContactPoint,
+    goToBirthRegistrationAsParent,
+    goToPrimaryApplicant,
+    goToDeathRegistration,
+    modifyApplication,
+    deleteApplication
+  })(injectIntl(SelectInformantView))
 )

@@ -141,11 +141,8 @@ class SelectVitalEventView extends React.Component<
   }
 }
 
-export const SelectVitalEvent = connect(
-  null,
-  {
-    goBack,
-    goToHome,
-    goToEventInfo
-  }
-)(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = connect(null, {
+  goBack,
+  goToHome,
+  goToEventInfo
+})(injectIntl(SelectVitalEventView))

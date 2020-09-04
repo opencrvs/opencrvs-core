@@ -372,6 +372,9 @@ export function getBirthQueryMappings(action: Action) {
         dataKey: 'fetchBirthRegistration'
       }
     default:
-      return null
+      return {
+        query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
+        dataKey: 'fetchBirthRegistration'
+      }
   }
 }

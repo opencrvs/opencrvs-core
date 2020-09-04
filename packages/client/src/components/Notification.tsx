@@ -179,15 +179,12 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const NotificationComponent = withRouter(
-  connect<NotificationProps, DispatchProps, {}, IStoreState>(
-    mapStateToProps,
-    {
-      hideBackgroundSyncedNotification,
-      hideConfigurationErrorNotification,
-      hideSubmitFormSuccessToast,
-      hideSubmitFormErrorToast,
-      toggleDraftSavedNotification,
-      hideUserAuditSuccessToast
-    }
-  )(injectIntl(Component))
+  connect<NotificationProps, DispatchProps, {}, IStoreState>(mapStateToProps, {
+    hideBackgroundSyncedNotification,
+    hideConfigurationErrorNotification,
+    hideSubmitFormSuccessToast,
+    hideSubmitFormErrorToast,
+    toggleDraftSavedNotification,
+    hideUserAuditSuccessToast
+  })(injectIntl(Component))
 )

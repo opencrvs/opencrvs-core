@@ -93,9 +93,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const TeamSearch = connect(
-  mapStateToProps,
-  {
-    goToTeamUserList
-  }
-)(injectIntl(TeamSearchComponent))
+export const TeamSearch = connect(mapStateToProps, {
+  goToTeamUserList
+})(injectIntl(TeamSearchComponent))

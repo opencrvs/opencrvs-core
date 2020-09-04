@@ -351,9 +351,9 @@ const renderValue = (
   if (
     (field.type === DATE ||
       (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
-        (field.dynamicDefinitions.type &&
-          field.dynamicDefinitions.type.kind === 'static' &&
-          field.dynamicDefinitions.type.staticType === DATE))) &&
+        field.dynamicDefinitions.type &&
+        field.dynamicDefinitions.type.kind === 'static' &&
+        field.dynamicDefinitions.type.staticType === DATE)) &&
     value &&
     typeof value === 'string'
   ) {
@@ -968,13 +968,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
     ;(
       (field.nestedFields &&
-        (draft.data[section.id] &&
-          draft.data[section.id][field.name] &&
-          (draft.data[section.id][field.name] as IFormSectionData).value &&
-          field.nestedFields[
-            (draft.data[section.id][field.name] as IFormSectionData)
-              .value as string
-          ])) ||
+        draft.data[section.id] &&
+        draft.data[section.id][field.name] &&
+        (draft.data[section.id][field.name] as IFormSectionData).value &&
+        field.nestedFields[
+          (draft.data[section.id][field.name] as IFormSectionData)
+            .value as string
+        ]) ||
       []
     ).forEach(nestedField => {
       if (nestedField.previewGroup) {

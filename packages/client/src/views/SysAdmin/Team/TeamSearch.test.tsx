@@ -20,7 +20,7 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 

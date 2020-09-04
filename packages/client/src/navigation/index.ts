@@ -57,7 +57,7 @@ import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/opera
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { goBack as back, push, replace } from 'connected-react-router'
 import moment from 'moment'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {

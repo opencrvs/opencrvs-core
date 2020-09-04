@@ -408,12 +408,16 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
   options: ISelectOption[]
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
-  type: typeof SELECT_WITH_DYNAMIC_OPTIONS
+  type:
+    | typeof SELECT_WITH_DYNAMIC_OPTIONS
+    | typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicOptions: IDynamicOptions
 }
 
 export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
-  type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
+  type:
+    | typeof FIELD_WITH_DYNAMIC_DEFINITIONS
+    | typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 

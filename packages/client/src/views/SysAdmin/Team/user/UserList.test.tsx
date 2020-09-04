@@ -19,7 +19,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
 

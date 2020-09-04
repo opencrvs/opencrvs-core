@@ -56,7 +56,7 @@ import {
   GQLQuery,
   GQLUser
 } from '@opencrvs/gateway/src/graphql/schema'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'

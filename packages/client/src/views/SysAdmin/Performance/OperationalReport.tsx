@@ -65,7 +65,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import moment from 'moment'
-import querystring from 'query-string'
+import * as querystring from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -633,13 +633,10 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const OperationalReport = connect(
-  mapStateToProps,
-  {
-    goToPerformanceHome,
-    goToOperationalReport,
-    goToPerformanceReport,
-    goToRegistrationRates,
-    goToWorkflowStatus
-  }
-)(withTheme(injectIntl(OperationalReportComponent)))
+export const OperationalReport = connect(mapStateToProps, {
+  goToPerformanceHome,
+  goToOperationalReport,
+  goToPerformanceReport,
+  goToRegistrationRates,
+  goToWorkflowStatus
+})(withTheme(injectIntl(OperationalReportComponent)))

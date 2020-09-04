@@ -133,9 +133,9 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   genderBasisMetrics={
                     (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .genderBasisMetrics as GQLRegistrationGenderBasisMetrics))) ||
+                      data.fetchRegistrationMetrics &&
+                      (data.fetchRegistrationMetrics
+                        .genderBasisMetrics as GQLRegistrationGenderBasisMetrics)) ||
                     {}
                   }
                 />
@@ -144,9 +144,9 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   data={
                     (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .timeFrames as GQLRegistrationTimeFrameMetrics))) ||
+                      data.fetchRegistrationMetrics &&
+                      (data.fetchRegistrationMetrics
+                        .timeFrames as GQLRegistrationTimeFrameMetrics)) ||
                     {}
                   }
                 />
@@ -156,9 +156,9 @@ function ReportComponent(props: Props) {
                     loading={loading}
                     data={
                       (data &&
-                        (data.fetchRegistrationMetrics &&
-                          (data.fetchRegistrationMetrics
-                            .estimated45DayMetrics as GQLRegistration45DayEstimatedMetrics))) ||
+                        data.fetchRegistrationMetrics &&
+                        (data.fetchRegistrationMetrics
+                          .estimated45DayMetrics as GQLRegistration45DayEstimatedMetrics)) ||
                       {}
                     }
                   />
@@ -168,9 +168,9 @@ function ReportComponent(props: Props) {
                   loading={loading}
                   data={
                     (data &&
-                      (data.fetchRegistrationMetrics &&
-                        (data.fetchRegistrationMetrics
-                          .payments as GQLCertificationPaymentMetrics))) ||
+                      data.fetchRegistrationMetrics &&
+                      (data.fetchRegistrationMetrics
+                        .payments as GQLCertificationPaymentMetrics)) ||
                     {}
                   }
                 />
@@ -195,7 +195,6 @@ function mapStateToProps(state: IStoreState, props: Props) {
   }
 }
 
-export const Report = connect(
-  mapStateToProps,
-  { goBack }
-)(injectIntl(ReportComponent))
+export const Report = connect(mapStateToProps, { goBack })(
+  injectIntl(ReportComponent)
+)

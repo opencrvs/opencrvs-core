@@ -572,16 +572,13 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(
-  mapStateToProps,
-  {
-    goBack,
-    storeApplication,
-    writeApplication,
-    modifyApplication,
-    goToPrintCertificate,
-    goToVerifyCollector,
-    goToReviewCertificate,
-    goToPrintCertificatePayment
-  }
-)(injectIntl(withTheme(CollectorFormComponent)))
+export const CollectorForm = connect(mapStateToProps, {
+  goBack,
+  storeApplication,
+  writeApplication,
+  modifyApplication,
+  goToPrintCertificate,
+  goToVerifyCollector,
+  goToReviewCertificate,
+  goToPrintCertificatePayment
+})(injectIntl(withTheme(CollectorFormComponent)))

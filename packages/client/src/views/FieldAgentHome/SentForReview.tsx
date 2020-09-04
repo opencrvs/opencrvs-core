@@ -273,7 +273,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const SentForReview = connect(
-  null,
-  { deleteApplication, goToApplicationDetails }
-)(injectIntl(withTheme(SentForReviewComponent)))
+export const SentForReview = connect(null, {
+  deleteApplication,
+  goToApplicationDetails
+})(injectIntl(withTheme(SentForReviewComponent)))

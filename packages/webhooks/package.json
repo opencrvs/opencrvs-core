@@ -29,7 +29,7 @@
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",
     "jest-fetch-mock": "^2.1.2",
-    "@hapi/joi": "^14.0.6",
+    "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
@@ -41,10 +41,10 @@
     "short-uid": "^0.1.0"
   },
   "devDependencies": {
-    "@types/boom": "^7.2.0",
+    "@types/hapi__boom": "^9.0.1",
     "@types/bull": "^3.14.2",
     "@types/fhir": "^0.0.30",
-    "@types/hapi": "^17.0.12",
+    "@types/hapi__hapi": "^20.0.0",
     "@types/hapi-auth-jwt2": "8.0.1",
     "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",
