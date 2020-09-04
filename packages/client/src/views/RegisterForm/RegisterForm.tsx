@@ -327,7 +327,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.action = action
     application.payload = payload
     application.downloadStatus = downloadStatus
-    this.props.modifyApplication(application)
+    this.props.writeApplication(application)
     this.props.history.push(HOME)
   }
 

@@ -733,6 +733,7 @@ describe('ReviewForm tests', () => {
         nestedFields: {}
       },
       presentAtBirthRegistration: 'MOTHER_ONLY',
+      commentsOrNotes: 'This is a note',
       contactPoint: {
         value: 'MOTHER',
         nestedFields: {
