@@ -17,9 +17,9 @@ import User, {
   IUserModel
 } from '@user-mgnt/model/user'
 import { statuses } from '@user-mgnt/utils/userUtils'
-import { unauthorized } from 'boom'
-import * as Hapi from 'hapi'
-import * as Joi from 'joi'
+import { unauthorized } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from '@hapi/joi'
 
 interface IAuditUserPayload {
   userId: string

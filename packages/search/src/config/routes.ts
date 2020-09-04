@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
+import * as Joi from '@hapi/joi'
 import { birthEventHandler } from '@search/features/registration/birth/handler'
 import { deathEventHandler } from '@search/features/registration/death/handler'
 import {

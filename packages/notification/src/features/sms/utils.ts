@@ -11,7 +11,7 @@
  */
 import { NON_UNICODED_LANGUAGES } from '@notification/constants'
 import { HapiRequest } from '@notification/features/sms/handler'
-import { internal } from 'boom'
+import { internal } from '@hapi/boom'
 import { sendSMS } from '@notification/features/sms/service'
 
 interface ISendSMSPayload {

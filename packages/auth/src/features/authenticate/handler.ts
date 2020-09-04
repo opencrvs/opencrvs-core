@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
-import * as Joi from 'joi'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from '@hapi/joi'
 import {
   authenticate,
   storeUserInformation,
@@ -18,7 +18,7 @@ import {
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
-import { unauthorized } from 'boom'
+import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {

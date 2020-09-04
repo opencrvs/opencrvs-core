@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Hapi from 'hapi'
-import * as Joi from 'joi'
+import * as Hapi from '@hapi/hapi'
+import * as Joi from '@hapi/joi'
 import { HapiRequest, ISMSPayload } from '@notification/features/sms/handler'
 import { buildAndSendSMS } from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'

@@ -60,7 +60,7 @@ import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 
 const enum RouteScope {
   DECLARE = 'declare',

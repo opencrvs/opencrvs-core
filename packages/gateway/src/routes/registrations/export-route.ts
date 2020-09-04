@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
-import * as Hapi from 'hapi'
+import * as Joi from '@hapi/joi'
+import * as Hapi from '@hapi/hapi'
 import { graphql } from 'graphql'
 import { getExecutableSchema } from '@gateway/graphql/config'
 import * as stringify from 'csv-stringify'
 import * as flatten from 'flat'
 import * as archiver from 'archiver'
-import { unauthorized } from 'boom'
+import { unauthorized } from '@hapi/boom'
 import { omit } from 'lodash'
 import {
   GQLBirthRegistration,
