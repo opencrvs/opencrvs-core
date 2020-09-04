@@ -28,7 +28,10 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_APPLICATIONS_USER_WISE } from '@client/search/queries'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
-import { gqlToDraftTransformer } from '@client/transformer'
+import {
+  gqlToDraftTransformer,
+  draftToGqlTransformer
+} from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
 import { DECLARED_APPLICATION_SEARCH_QUERY_COUNT } from '@client/utils/constants'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
@@ -41,7 +44,9 @@ import {
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
@@ -641,7 +646,51 @@ export async function getApplicationsOfCurrentUser(): Promise<string> {
   return JSON.stringify(payload)
 }
 
+async function updateWorkqueueData(
+  state: IStoreState,
+  application: IApplication,
+  workQueueId: keyof IQueryData,
+  userWorkqueue?: IWorkqueue
+) {
+  if (!userWorkqueue || !userWorkqueue.data) {
+    return
+  }
+
+  let workqueueApp =
+    userWorkqueue.data[workQueueId] &&
+    userWorkqueue.data[workQueueId].results &&
+    // @ts-ignore
+    userWorkqueue.data[workQueueId].results.find(
+      app => app && app.id === application.id
+    )
+  if (!workqueueApp) {
+    return
+  }
+  const sectionId = application.event === 'birth' ? 'child' : 'deceased'
+  const sectionDefinition = getRegisterForm(state)[
+    application.event
+  ].sections.find(section => section.id === sectionId)
+
+  const transformedApplication = draftToGqlTransformer(
+    // transforming required section only
+    { sections: sectionDefinition ? [sectionDefinition] : [] },
+    application.data
+  )
+  const transformedName =
+    (transformedApplication &&
+      transformedApplication[sectionId] &&
+      transformedApplication[sectionId].name) ||
+    []
+
+  if (application.event === 'birth') {
+    ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
+  } else {
+    ;(workqueueApp as GQLDeathEventSearchSet).deceasedName = transformedName
+  }
+}
+
 export async function writeApplicationByUser(
+  getState: () => IStoreState,
   userId: string,
   application: IApplication
 ): Promise<string> {
@@ -666,9 +715,64 @@ export async function writeApplicationByUser(
     }
     allUserData.push(currentUserData)
   }
+  if (
+    application.registrationStatus &&
+    application.registrationStatus === 'IN_PROGRESS'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      application,
+      'inProgressTab',
+      currentUserData.workqueue
+    )
+    updateWorkqueueData(
+      getState(),
+      application,
+      'notificationTab',
+      currentUserData.workqueue
+    )
+  }
   storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
   return JSON.stringify(currentUserData)
+}
+
+function mergeWorkQueueData(
+  workQueueIds: (keyof IQueryData)[],
+  sourceWorkQueue: IWorkqueue | undefined,
+  destinationWorkQueue: IWorkqueue
+) {
+  if (!sourceWorkQueue || !sourceWorkQueue.data) {
+    return destinationWorkQueue
+  }
+  workQueueIds.forEach(workQueueId => {
+    if (
+      !sourceWorkQueue.data[workQueueId].results ||
+      !destinationWorkQueue.data[workQueueId].results
+    ) {
+      return
+    }
+    ;(sourceWorkQueue.data[workQueueId].results as GQLEventSearchSet[]).forEach(
+      application => {
+        if (application == null) {
+          return
+        }
+        const applicationIndex = (destinationWorkQueue.data[workQueueId]
+          .results as GQLEventSearchSet[]).findIndex(
+          app => app && app.id === application.id
+        )
+        if (applicationIndex >= 0) {
+          ;(destinationWorkQueue.data[workQueueId]
+            .results as GQLEventSearchSet[]).splice(
+            applicationIndex,
+            1,
+            application
+          )
+        }
+      }
+    )
+  })
+  return destinationWorkQueue
 }
 
 async function getWorkqueueData(
@@ -737,7 +841,11 @@ async function getWorkqueueData(
     }
   }
 
-  return workqueue
+  return mergeWorkQueueData(
+    ['inProgressTab', 'notificationTab'],
+    currentWorkqueue,
+    workqueue
+  )
 }
 
 export async function writeRegistrarWorkqueueByUser(
@@ -1010,7 +1118,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         Cmd.run(writeApplicationByUser, {
           successActionCreator: getStorageApplicationsSuccess,
           failActionCreator: getStorageApplicationsFailed,
-          args: [state.userID, action.payload.application]
+          args: [Cmd.getState, state.userID, action.payload.application]
         })
       )
     case USER_DETAILS_AVAILABLE:
@@ -1176,6 +1284,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           newStateAfterDownload,
           Cmd.run(writeApplicationByUser, {
             args: [
+              Cmd.getState,
               state.userID,
               newApplicationsAfterDownload[downloadingApplicationIndex]
             ],
@@ -1203,6 +1312,7 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           [
             Cmd.run(writeApplicationByUser, {
               args: [
+                Cmd.getState,
                 state.userID,
                 newApplicationsAfterDownload[downloadingApplicationIndex]
               ],
@@ -1300,9 +1410,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
             ...state,
             applications: applicationsAfterError
           },
-          Cmd.run(() =>
-            writeApplicationByUser(state.userID, erroredApplication)
-          )
+          Cmd.run(writeApplicationByUser, {
+            args: [Cmd.getState, state.userID, erroredApplication]
+          })
         )
       }
 
@@ -1319,9 +1429,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
         },
         Cmd.list(
           [
-            Cmd.run(() =>
-              writeApplicationByUser(state.userID, erroredApplication)
-            ),
+            Cmd.run(writeApplicationByUser, {
+              args: [Cmd.getState, state.userID, erroredApplication]
+            }),
             Cmd.run(requestWithStateWrapper, {
               args: [
                 nextApplicationRequest({

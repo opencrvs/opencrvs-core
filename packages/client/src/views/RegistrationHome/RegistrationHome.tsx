@@ -48,6 +48,7 @@ import {
   StatusProgress,
   StatusRejected
 } from '@opencrvs/components/lib/icons'
+import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import {
   FloatingNotification,
   ISearchInputProps,
@@ -237,7 +238,7 @@ export class RegistrationHomeView extends React.Component<
   }
 
   componentDidMount() {
-    this.syncWorkqueue()
+    setTimeout(() => this.syncWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
     this.interval = setInterval(() => {
       this.syncWorkqueue()
     }, 300000)

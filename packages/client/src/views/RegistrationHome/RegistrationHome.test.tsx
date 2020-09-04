@@ -13,7 +13,8 @@ import {
   createApplication,
   storeApplication,
   getApplicationsOfCurrentUser,
-  deleteApplication
+  deleteApplication,
+  IUserData
 } from '@client/applications'
 import { Event } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
@@ -40,6 +41,72 @@ const registerScopeToken =
 const getItem = window.localStorage.getItem as jest.Mock
 const mockFetchUserDetails = jest.fn()
 const mockListSyncController = jest.fn()
+
+const application = {
+  id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
+  type: 'Birth',
+  registration: {
+    status: 'IN_PROGRESS',
+    contactNumber: '+8801622688231',
+    trackingId: 'BN99CGM',
+    registeredLocationId: '425b9cab-6ec3-47b3-bb8b-aee1b1afe4fc',
+    createdAt: '1597657903690'
+  },
+  operationHistories: [
+    {
+      operationType: 'IN_PROGRESS',
+      operatedOn: '2020-08-17T09:51:43.350Z',
+      operatorRole: 'FIELD_AGENT',
+      operatorName: [
+        {
+          firstNames: 'Shakib',
+          familyName: 'Al Hasan',
+          use: 'en'
+        },
+        {
+          firstNames: 'সাকিব',
+          familyName: 'হাসান',
+          use: 'bn'
+        }
+      ],
+      operatorOfficeName: 'Baniajan Union Parishad',
+      operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+    }
+  ],
+  childName: [
+    {
+      firstNames: 'Shakib',
+      familyName: 'Al Hasan',
+      use: 'en'
+    },
+    {
+      firstNames: 'সাকিব',
+      familyName: 'হাসান',
+      use: 'bn'
+    }
+  ]
+}
+const currentUserData: IUserData = {
+  userID: '123',
+  applications: [],
+  workqueue: {
+    loading: false,
+    error: false,
+    initialSyncDone: true,
+    data: {
+      inProgressTab: {
+        totalItems: 1,
+        results: [application]
+      },
+      notificationTab: { totalItems: 0, results: [] },
+      reviewTab: { totalItems: 0, results: [] },
+      rejectTab: { totalItems: 0, results: [] },
+      approvalTab: { totalItems: 0, results: [] },
+      printTab: { totalItems: 0, results: [] },
+      externalValidationTab: { totalItems: 0, results: [] }
+    }
+  }
+}
 
 const nameObj = {
   data: {
@@ -154,7 +221,7 @@ describe('RegistrationHome related tests', () => {
 
       // wait for mocked data to load mockedProvider
       await new Promise(resolve => {
-        setTimeout(resolve, 100)
+        setTimeout(resolve, 600)
       })
 
       testComponent.component.update()
@@ -487,9 +554,20 @@ describe('RegistrationHome related tests', () => {
 
   describe('when there are items more than 10', () => {
     beforeEach(() => {
+      // Mocking storage reading
+      // @ts-ignore
+      storage.getItem = jest.fn((key: string) => {
+        switch (key) {
+          case 'USER_DATA':
+            return JSON.stringify([currentUserData])
+          default:
+            return undefined
+        }
+      })
+
       mockListSyncController.mockReturnValue({
         data: {
-          inProgressTab: { totalItems: 15, results: [] },
+          inProgressTab: { totalItems: 15, results: [application] },
           notificationTab: { totalItems: 12, results: [] },
           reviewTab: { totalItems: 13, results: [] },
           rejectTab: { totalItems: 14, results: [] },

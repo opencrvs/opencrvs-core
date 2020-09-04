@@ -135,7 +135,12 @@ describe('when user logs in', () => {
 
     beforeAll(async () => {
       draft = createApplication(Event.DEATH)
-      await writeApplicationByUser(currentUserData.userID, draft)
+      const { store } = await createTestStore()
+      await writeApplicationByUser(
+        store.getState,
+        currentUserData.userID,
+        draft
+      )
     })
 
     it("should save the draft inside the current user's array of drafts", async () => {
