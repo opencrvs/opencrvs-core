@@ -1154,7 +1154,7 @@ export function estimated45DayMetricsTotalCalculator(
         estimatedRegistration,
         registrationIn45Day,
         estimationPercentage:
-          registrationIn45Day === 0
+          registrationIn45Day === 0 || estimatedRegistration === 0
             ? 0
             : Math.round((registrationIn45Day / estimatedRegistration) * 100)
       }
