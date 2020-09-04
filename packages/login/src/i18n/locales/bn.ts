@@ -16,6 +16,7 @@ export const BENGALI_STATE = {
     'buttons.continue': 'পরবর্তী',
     'buttons.login': 'লগইন',
     'constants.phoneNumber': 'ফোন নম্বর',
+    'error.networkError': 'সার্ভারের সাথে সংযোগ করা যাচ্ছে না',
     'error.required.password': 'নতুন পাসওয়ার্ডটি সঠিক নয়',
     'error.errorPhoneNumberNotFound': 'মোবাইল ফোন নম্বর পাওয়া যায় নি।',
     'label.error': 'অবৈধ ইনপুট',
