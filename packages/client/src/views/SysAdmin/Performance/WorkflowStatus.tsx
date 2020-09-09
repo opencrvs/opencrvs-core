@@ -468,12 +468,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   ) + ' ') ||
                   '') + (eventProgress.registration.contactNumber || '')) ||
               '',
-            applicationStartedOn:
-              (eventProgress.registration &&
-                formateDateWithRelationalText(
-                  eventProgress.registration.dateOfApplication
-                )) ||
-              '',
+            applicationStartedOn: formateDateWithRelationalText(
+              eventProgress.startedAt
+            ),
             applicationStartedOnTime:
               eventProgress.registration &&
               new Date(eventProgress.registration.dateOfApplication)

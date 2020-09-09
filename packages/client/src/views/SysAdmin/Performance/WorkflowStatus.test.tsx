@@ -80,6 +80,7 @@ describe('Workflow status tests', () => {
                     createdAt: '1590143054612',
                     modifiedAt: '1590143057091'
                   },
+                  startedAt: '2020-05-17',
                   startedBy: {
                     name: [
                       {
@@ -125,6 +126,7 @@ describe('Workflow status tests', () => {
                     createdAt: '1589985603133',
                     modifiedAt: '1589985605583'
                   },
+                  startedAt: '2020-05-17',
                   startedBy: {
                     name: [
                       {
@@ -170,6 +172,7 @@ describe('Workflow status tests', () => {
                     createdAt: '1590128285130',
                     modifiedAt: null
                   },
+                  startedAt: '2020-05-17',
                   startedBy: {
                     name: [
                       {
@@ -266,7 +269,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 22, 2020(a day ago)')
+      ).toBe('May 17, 2020(7 days ago)')
 
       toggleSortButton.hostNodes().simulate('click')
 
@@ -276,7 +279,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 22, 2020(a day ago)')
+      ).toBe('May 17, 2020(7 days ago)')
 
       toggleSortButton.hostNodes().simulate('click')
 
@@ -286,7 +289,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 22, 2020(a day ago)')
+      ).toBe('May 17, 2020(7 days ago)')
     })
 
     it('update event from select updates query params', async () => {
