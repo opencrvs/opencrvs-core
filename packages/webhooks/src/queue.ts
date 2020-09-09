@@ -11,6 +11,20 @@
  */
 
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import * as Bull from 'bull'
+import { Queue } from 'bullmq'
 
-export const webhookQueue = new Bull(QUEUE_NAME, REDIS_HOST)
+export const webhookQueue = new Queue(QUEUE_NAME, {
+  connection: {
+    host: REDIS_HOST,
+    port: 6379
+  }
+})
+
+export type QueueEventType = {
+  jobId: string
+  delay?: number
+  data?: string
+  returnvalue?: string
+  prev?: string
+  failedReason?: string
+}

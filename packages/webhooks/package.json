@@ -22,7 +22,7 @@
     "@types/pino": "^5.14.0",
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
-    "bull": "^3.18.0",
+    "bullmq": "^1.9.0",
     "crypto": "^1.0.1",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
@@ -37,12 +37,11 @@
     "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
     "redis": "^3.0.2",
-    "uuid": "^3.3.2",
-    "short-uid": "^0.1.0"
+    "short-uid": "^0.1.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/boom": "^7.2.0",
-    "@types/bull": "^3.14.2",
     "@types/fhir": "^0.0.30",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",

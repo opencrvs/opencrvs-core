@@ -18,7 +18,8 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  QUEUE_NAME
 } from '@webhooks/constants'
 import getPlugins from '@webhooks/config/plugins'
 import * as database from '@webhooks/database'
@@ -26,10 +27,9 @@ import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 import { getRoutes } from '@webhooks/config/routes'
 import { EventEmitter } from 'events'
+import { QueueEvents } from 'bullmq'
+import { QueueEventType } from '@webhooks/queue'
 import { logger } from '@webhooks/logger'
-import { webhookQueue } from '@webhooks/queue'
-import { webhookProcessor } from '@webhooks/processor'
-import { Job } from 'bull'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -76,46 +76,23 @@ export async function createServer() {
 
     EventEmitter.defaultMaxListeners = 50
 
-    const handleFailure = (job: Job, err: any) => {
-      if (job.opts.attempts && job.attemptsMade >= job.opts.attempts) {
-        logger.info(
-          `Job failures above threshold in ${
-            job.queue.name
-          } for: ${JSON.stringify(job.data)}`,
-          err
-        )
-        job.remove()
-      }
-      logger.info(
-        `Job in ${job.queue.name} failed for: ${JSON.stringify(job.data)} `
-      )
-      if (job.opts.attempts && job.attemptsMade) {
-        logger.info(
-          `with ${err.message}. ${job.opts.attempts -
-            job.attemptsMade} attempts left`
-        )
-      }
-    }
+    const queueEvents = new QueueEvents(QUEUE_NAME)
 
-    const handleCompleted = (job: Job) => {
-      logger.info(
-        `Job in ${job.queue.name} completed for: ${JSON.stringify(job.data)}`
-      )
-      job.remove()
-    }
+    queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
+      logger.info(`A job with ID ${jobId} is waiting`)
+    })
 
-    const handleStalled = (job: Job) => {
-      logger.info(
-        `Job in ${job.queue.name} stalled for: ${JSON.stringify(job.data)}`
-      )
-    }
+    queueEvents.on('active', ({ jobId, prev }: QueueEventType) => {
+      logger.info(`Job ${jobId} is now active; previous status was ${prev}`)
+    })
 
-    webhookQueue.on('failed', handleFailure)
-    webhookQueue.on('completed', handleCompleted)
-    webhookQueue.on('stalled', handleStalled)
-    webhookQueue.process(webhookProcessor)
+    queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
+      logger.info(`${jobId} has completed and returned ${returnvalue}`)
+    })
 
-    logger.info(`Initialised webhookQueue ${webhookQueue.name}...`)
+    queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
+      logger.info(`${jobId} has failed with reason ${failedReason}`)
+    })
   }
 
   async function stop() {
