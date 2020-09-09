@@ -22,11 +22,13 @@ export async function birthRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+
   try {
     // tslint:disable-next-line
     const webhooks: IWebhookModel[] = await Webhook.find({
-      trigger: TRIGGERS.BIRTH_REGISTERED
+      trigger: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
     })
+    logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {
         logger.info(`Queueing webhook ${webhookToNotify.webhookId}`)
@@ -35,7 +37,7 @@ export async function birthRegisteredHandler(
           id: webhookToNotify.webhookId,
           event: {
             hub: {
-              topic: TRIGGERS.BIRTH_REGISTERED
+              topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
             },
             context: [bundle]
           }
