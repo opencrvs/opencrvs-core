@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IPinMessages {
+type IPinMessages = {
   createTitle: MessageDescriptor
   createDescription: MessageDescriptor
   pinSameDigitsError: MessageDescriptor

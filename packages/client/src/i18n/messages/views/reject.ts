@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IRejectMessages {
+type IRejectMessages = {
   rejectionFormTitle: MessageDescriptor
   rejectionReasonSubmit: MessageDescriptor
   rejectionForm: MessageDescriptor

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IPerformanceReportsMessages {
+type IPerformanceReportsMessages = {
   monthlyTabTitle: MessageDescriptor
   monthlyReportsBodyHeader: MessageDescriptor
   sysAdminPerformanceHomeHeader: MessageDescriptor

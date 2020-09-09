@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISysAdminMessages {
+type ISysAdminMessages = {
   auditReason: MessageDescriptor
   auditReasonOther: MessageDescriptor
   overviewTab: MessageDescriptor

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISessionMessages {
+type ISessionMessages = {
   sessionExpireTxt: MessageDescriptor
 }
 

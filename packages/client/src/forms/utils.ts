@@ -39,7 +39,9 @@ import {
   IFormSectionGroup,
   IRadioGroupFormField,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormFieldWithDynamicDefinitions,
+  FIELD_WITH_DYNAMIC_DEFINITIONS
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -163,18 +165,21 @@ export const getFieldType = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): string => {
-  if (!field.dynamicDefinitions.type) {
+  if (
+    field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+    field.dynamicDefinitions.type
+  ) {
+    switch (field.dynamicDefinitions.type.kind) {
+      case 'dynamic':
+        return field.dynamicDefinitions.type.typeMapper(
+          values[field.dynamicDefinitions.type.dependency] as string
+        )
+      case 'static':
+      default:
+        return field.dynamicDefinitions.type.staticType
+    }
+  } else {
     return field.type
-  }
-
-  switch (field.dynamicDefinitions.type.kind) {
-    case 'dynamic':
-      return field.dynamicDefinitions.type.typeMapper(
-        values[field.dynamicDefinitions.type.dependency] as string
-      )
-    case 'static':
-    default:
-      return field.dynamicDefinitions.type.staticType
   }
 }
 
@@ -182,36 +187,48 @@ export const getFieldLabel = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): MessageDescriptor | undefined => {
-  if (!field.dynamicDefinitions.label) {
+  if (
+    field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+    field.dynamicDefinitions.label
+  ) {
+    return field.dynamicDefinitions.label.labelMapper(
+      values[field.dynamicDefinitions.label.dependency] as string
+    )
+  } else {
     return undefined
   }
-  return field.dynamicDefinitions.label.labelMapper(
-    values[field.dynamicDefinitions.label.dependency] as string
-  )
 }
 
 export const getFieldHelperText = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): MessageDescriptor | undefined => {
-  if (!field.dynamicDefinitions.helperText) {
+  if (
+    field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+    field.dynamicDefinitions.helperText
+  ) {
+    return field.dynamicDefinitions.helperText.helperTextMapper(
+      values[field.dynamicDefinitions.helperText.dependency] as string
+    )
+  } else {
     return undefined
   }
-  return field.dynamicDefinitions.helperText.helperTextMapper(
-    values[field.dynamicDefinitions.helperText.dependency] as string
-  )
 }
 
 export const getFieldLabelToolTip = (
   field: IDynamicFormField,
   values: IFormSectionData
 ): MessageDescriptor | undefined => {
-  if (!field.dynamicDefinitions.tooltip) {
+  if (
+    field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+    field.dynamicDefinitions.tooltip
+  ) {
+    return field.dynamicDefinitions.tooltip.tooltipMapper(
+      values[field.dynamicDefinitions.tooltip.dependency] as string
+    )
+  } else {
     return undefined
   }
-  return field.dynamicDefinitions.tooltip.tooltipMapper(
-    values[field.dynamicDefinitions.tooltip.dependency] as string
-  )
 }
 
 export const getFieldValidation = (
@@ -220,6 +237,7 @@ export const getFieldValidation = (
 ): Validation[] => {
   const validate: Validation[] = []
   if (
+    field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
     field.dynamicDefinitions &&
     field.dynamicDefinitions.validate &&
     field.dynamicDefinitions.validate.length > 0

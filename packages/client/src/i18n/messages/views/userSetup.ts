@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IUserSetupMessages {
+type IUserSetupMessages = {
   confirmPassword: MessageDescriptor
   hasCases: MessageDescriptor
   hasNumber: MessageDescriptor

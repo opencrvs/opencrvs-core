@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IregistrationHomeMessages {
+type IregistrationHomeMessages = {
   certified: MessageDescriptor
   dataTableResults: MessageDescriptor
   inProgress: MessageDescriptor

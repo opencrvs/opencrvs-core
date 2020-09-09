@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IRegisterMessages {
+type IRegisterMessages = {
   newVitalEventRegistration: MessageDescriptor
   previewEventRegistration: MessageDescriptor
   reviewEventRegistration: MessageDescriptor

@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IConfirmationScreenMessages {
+type IConfirmationScreenMessages = {
   backButton: MessageDescriptor
   boxHeaderDesc: MessageDescriptor
   trackingSectionTitle: MessageDescriptor

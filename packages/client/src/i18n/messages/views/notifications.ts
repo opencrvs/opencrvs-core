@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface INotificationsMessages {
+type INotificationsMessages = {
   declarationsSynced: MessageDescriptor
   draftsSaved: MessageDescriptor
   outboxText: MessageDescriptor

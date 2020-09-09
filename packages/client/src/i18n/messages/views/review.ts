@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IReviewMessages {
+type IReviewMessages = {
   additionalComments: MessageDescriptor
   backToPreview: MessageDescriptor
   editApplicationConfirmationTitle: MessageDescriptor

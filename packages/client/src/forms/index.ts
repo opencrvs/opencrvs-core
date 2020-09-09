@@ -408,16 +408,12 @@ export interface ISelectFormFieldWithOptions extends IFormFieldBase {
   options: ISelectOption[]
 }
 export interface ISelectFormFieldWithDynamicOptions extends IFormFieldBase {
-  type:
-    | typeof SELECT_WITH_DYNAMIC_OPTIONS
-    | typeof FIELD_WITH_DYNAMIC_DEFINITIONS
+  type: typeof SELECT_WITH_DYNAMIC_OPTIONS
   dynamicOptions: IDynamicOptions
 }
 
 export interface IFormFieldWithDynamicDefinitions extends IFormFieldBase {
-  type:
-    | typeof FIELD_WITH_DYNAMIC_DEFINITIONS
-    | typeof SELECT_WITH_DYNAMIC_OPTIONS
+  type: typeof FIELD_WITH_DYNAMIC_DEFINITIONS
   dynamicDefinitions: IDynamicFormFieldDefinitions
 }
 
@@ -594,8 +590,9 @@ export interface IFormTag {
   delimiter?: string
 }
 
-export type IDynamicFormField = ISelectFormFieldWithDynamicOptions &
-  IFormFieldWithDynamicDefinitions
+export type IDynamicFormField =
+  | ISelectFormFieldWithDynamicOptions
+  | IFormFieldWithDynamicDefinitions
 
 export interface IConditional {
   action: string

@@ -10,14 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
+import { map } from 'lodash'
 
-interface IEventInfoMessages {
-  title: MessageDescriptor
-  birthBulletListItems: { [key: string]: MessageDescriptor }
-  deathBulletListItems: { [key: string]: MessageDescriptor }
-}
-
-const birthBulletListItemsToDefine: object = [
+const birthBulletListItemsToDefine = [
   {
     id: 'register.eventInfo.birth.listItem0',
     defaultMessage:
@@ -44,7 +39,7 @@ const birthBulletListItemsToDefine: object = [
   }
 ]
 
-const deathBulletListItemsToDefine: object = [
+const deathBulletListItemsToDefine = [
   {
     id: 'register.eventInfo.death.listItem0',
     defaultMessage:
@@ -71,7 +66,17 @@ const deathBulletListItemsToDefine: object = [
   }
 ]
 
-const messagesToDefine = {
+type IEventInfoTitleMessages = {
+  title: MessageDescriptor
+}
+
+type IEventInfoMessages = {
+  title: MessageDescriptor
+  birthBulletListItems: MessageDescriptor[]
+  deathBulletListItems: MessageDescriptor[]
+}
+
+const messagesToDefine: IEventInfoTitleMessages = {
   title: {
     id: 'register.eventInfo.event.title',
     defaultMessage:
@@ -79,8 +84,16 @@ const messagesToDefine = {
   }
 }
 
+function defineMessagesFromArray(messages: MessageDescriptor[]) {
+  return map(messages, message =>
+    defineMessages(
+      message as Record<string | number | symbol, MessageDescriptor>
+    )
+  )
+}
+
 export const messages: IEventInfoMessages = {
   ...defineMessages(messagesToDefine),
-  birthBulletListItems: defineMessages(birthBulletListItemsToDefine),
-  deathBulletListItems: defineMessages(deathBulletListItemsToDefine)
+  birthBulletListItems: defineMessagesFromArray(birthBulletListItemsToDefine),
+  deathBulletListItems: defineMessagesFromArray(deathBulletListItemsToDefine)
 }

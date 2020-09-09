@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IErrorMessages {
+type IErrorMessages = {
   draftFailed: MessageDescriptor
   duplicateQueryError: MessageDescriptor
   errorCodeUnauthorized: MessageDescriptor

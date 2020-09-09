@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISelectPrimaryApplicantMessages {
+type ISelectPrimaryApplicantMessages = {
   registerNewEventTitle: MessageDescriptor
   registerNewEventHeading: MessageDescriptor
   primaryApplicantDescription: MessageDescriptor

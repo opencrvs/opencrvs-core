@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISelectInformantMessages {
+type ISelectInformantMessages = {
   birthInformantTitle: MessageDescriptor
   deathInformantTitle: MessageDescriptor
   parents: MessageDescriptor

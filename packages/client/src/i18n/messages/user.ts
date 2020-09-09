@@ -21,7 +21,7 @@ export enum QUESTION_KEYS {
   FAVORITE_FOOD,
   FIRST_CHILD_NAME
 }
-interface IUserMessages {
+type IUserMessages = {
   accountTitle: MessageDescriptor
   BBS: MessageDescriptor
   BIRTH_TOWN: MessageDescriptor

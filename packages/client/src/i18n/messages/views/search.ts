@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface ISearchMessages {
+type ISearchMessages = {
   dataTableResults: MessageDescriptor
   dataTableNoResults: MessageDescriptor
   listItemEventRegistrationNumber: MessageDescriptor
