@@ -16,17 +16,20 @@ import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
 import { webhookQueue } from '@webhooks/queue'
 import * as ShortUIDGen from 'short-uid'
 import { createRequestSignature } from '@webhooks/features/event/service'
+import { REDIS_HOST } from '@webhooks/constants'
 
 export async function birthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+
   try {
     // tslint:disable-next-line
     const webhooks: IWebhookModel[] = await Webhook.find({
-      trigger: TRIGGERS.BIRTH_REGISTERED
+      trigger: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
     })
+    logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {
         logger.info(`Queueing webhook ${webhookToNotify.webhookId}`)
@@ -35,7 +38,7 @@ export async function birthRegisteredHandler(
           id: webhookToNotify.webhookId,
           event: {
             hub: {
-              topic: TRIGGERS.BIRTH_REGISTERED
+              topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
             },
             context: [bundle]
           }
@@ -45,6 +48,8 @@ export async function birthRegisteredHandler(
           webhookToNotify.sha_secret,
           JSON.stringify(payload)
         )
+
+        logger.info('REDIS_HOST', REDIS_HOST)
         webhookQueue.add(
           {
             payload,
