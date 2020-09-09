@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { NATIVE_LANGUAGE } from '@gateway/constants'
-import { GQLResolver } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLOperationHistorySearchSet
+} from '@gateway/graphql/schema'
 import {
   getTimeLoggedFromMetrics,
   ITimeLoggedResponse
@@ -23,7 +26,7 @@ interface ISearchEventDataTemplate {
   _source: ISearchDataTemplate
 }
 interface ISearchDataTemplate {
-  [key: string]: string
+  [key: string]: any
 }
 export interface ISearchCriteria {
   applicationLocationId?: string
@@ -233,6 +236,14 @@ export const searchTypeResolvers: GQLResolver = {
     },
     registration(searchData: ISearchEventDataTemplate) {
       return searchData._source
+    },
+    startedAt(searchData: ISearchEventDataTemplate) {
+      let startedAt = null
+      if (searchData._source.operationHistories) {
+        startedAt = (searchData._source
+          .operationHistories as GQLOperationHistorySearchSet[])[0].operatedOn
+      }
+      return startedAt
     },
     startedBy: async (searchData: ISearchEventDataTemplate, _, authHeader) => {
       return await getUser(
