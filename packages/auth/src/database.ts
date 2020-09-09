@@ -12,6 +12,7 @@
 import * as redis from 'redis'
 import { REDIS_HOST } from '@auth/constants'
 import { promisify } from 'util'
+import { logger } from '@auth/logger'
 
 let redisClient: redis.RedisClient
 
@@ -29,6 +30,7 @@ export async function stop() {
 }
 
 export async function start() {
+  logger.info('REDIS_HOST', REDIS_HOST)
   redisClient = redis.createClient({
     host: REDIS_HOST,
     retry_strategy: options => {

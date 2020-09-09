@@ -16,6 +16,7 @@ import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
 import { webhookQueue } from '@webhooks/queue'
 import * as ShortUIDGen from 'short-uid'
 import { createRequestSignature } from '@webhooks/features/event/service'
+import { REDIS_HOST } from '@webhooks/constants'
 
 export async function birthRegisteredHandler(
   request: Hapi.Request,
@@ -47,6 +48,8 @@ export async function birthRegisteredHandler(
           webhookToNotify.sha_secret,
           JSON.stringify(payload)
         )
+
+        logger.info('REDIS_HOST', REDIS_HOST)
         webhookQueue.add(
           {
             payload,
