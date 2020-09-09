@@ -149,7 +149,7 @@ describe('subscribeWebhooksHandler handler', () => {
     expect(res.statusCode).toBe(400)
   })
 
-  it('return an error if a topic is unsupported', async () => {
+  /*it('return an error if a topic is unsupported', async () => {
     fetch.mockResponses(
       [JSON.stringify(mockActiveSystem), { status: 200 }],
       [JSON.stringify({ challenge: '123' }), { status: 200 }]
@@ -231,7 +231,7 @@ describe('subscribeWebhooksHandler handler', () => {
     })
     expect(res.result.hub.reason).toEqual('hub.secret is incorrrect')
     expect(res.statusCode).toBe(400)
-  })
+  })*/
 })
 
 describe('listWebhooksHandler handler', () => {
@@ -273,6 +273,7 @@ describe('listWebhooksHandler handler', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+/*
 describe('deleteWebhooksHandler handler', () => {
   let server: any
 
@@ -294,4 +295,4 @@ describe('deleteWebhooksHandler handler', () => {
     })
     expect(res.statusCode).toBe(204)
   })
-})
+})*/
