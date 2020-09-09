@@ -269,7 +269,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 17, 2020(7 days ago)')
+      ).toMatch(/May 17, 2020/)
 
       toggleSortButton.hostNodes().simulate('click')
 
@@ -279,7 +279,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 17, 2020(7 days ago)')
+      ).toMatch(/May 17, 2020/)
 
       toggleSortButton.hostNodes().simulate('click')
 
@@ -289,7 +289,7 @@ describe('Workflow status tests', () => {
           .hostNodes()
           .childAt(7)
           .text()
-      ).toBe('May 17, 2020(7 days ago)')
+      ).toMatch(/May 17, 2020/)
     })
 
     it('update event from select updates query params', async () => {
