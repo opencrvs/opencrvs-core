@@ -273,6 +273,7 @@ describe('listWebhooksHandler handler', () => {
     expect(res.statusCode).toBe(400)
   })
 })
+
 describe('deleteWebhooksHandler handler', () => {
   let server: any
 

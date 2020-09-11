@@ -11,6 +11,76 @@
  */
 
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import * as Bull from 'bull'
+import { Queue, QueueEvents } from 'bullmq'
+import { EventEmitter } from 'events'
+import { logger } from '@webhooks/logger'
+import { getRedis } from '@webhooks/database'
 
-export const webhookQueue = new Bull(QUEUE_NAME, REDIS_HOST)
+type QueueEventType = {
+  jobId: string
+  delay?: number
+  data?: string
+  returnvalue?: string
+  prev?: string
+  failedReason?: string
+}
+
+let webhookQueue: Queue
+
+export interface IQueueConnector {
+  getQueue: () => Promise<Queue | null>
+}
+
+export function getQueue(): Queue {
+  return webhookQueue
+}
+
+export async function startQueue() {
+  try {
+    webhookQueue = initQueue()
+  } catch (error) {
+    logger.error(`Can't init webhook queue: ${error}`)
+    throw Error(error)
+  }
+}
+
+async function removeJob(myQueue: Queue, id: string) {
+  const job = await myQueue.getJob(id)
+  if (job) {
+    job.remove()
+  }
+}
+
+export function initQueue(): Queue {
+  const connection = getRedis()
+  logger.info(
+    `Initialising queue on REDIS_HOST: ${REDIS_HOST} with connection: ${connection}`
+  )
+  const newQueue = new Queue(QUEUE_NAME, {
+    connection
+  })
+
+  EventEmitter.defaultMaxListeners = 50
+
+  const queueEvents = new QueueEvents(QUEUE_NAME, {
+    connection
+  })
+
+  queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
+    logger.info(`A job with ID ${jobId} is waiting`)
+  })
+
+  queueEvents.on('active', ({ jobId, prev }: QueueEventType) => {
+    logger.info(`Job ${jobId} is now active; previous status was ${prev}`)
+  })
+
+  queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
+    logger.info(`${jobId} has completed and returned ${returnvalue}`)
+    removeJob(newQueue, jobId)
+  })
+
+  queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
+    logger.info(`${jobId} has failed with reason ${failedReason}`)
+  })
+  return newQueue
+}

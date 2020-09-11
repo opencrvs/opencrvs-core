@@ -25,11 +25,7 @@ import * as database from '@webhooks/database'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 import { getRoutes } from '@webhooks/config/routes'
-import { EventEmitter } from 'events'
-import { logger } from '@webhooks/logger'
-import { webhookQueue } from '@webhooks/queue'
-import { webhookProcessor } from '@webhooks/processor'
-import { Job } from 'bull'
+import * as queue from '@webhooks/queue'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -72,50 +68,8 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
+    await queue.startQueue()
     server.log('info', `server started on ${HOST}:${PORT}`)
-
-    EventEmitter.defaultMaxListeners = 50
-
-    const handleFailure = (job: Job, err: any) => {
-      if (job.opts.attempts && job.attemptsMade >= job.opts.attempts) {
-        logger.info(
-          `Job failures above threshold in ${
-            job.queue.name
-          } for: ${JSON.stringify(job.data)}`,
-          err
-        )
-        job.remove()
-      }
-      logger.info(
-        `Job in ${job.queue.name} failed for: ${JSON.stringify(job.data)} `
-      )
-      if (job.opts.attempts && job.attemptsMade) {
-        logger.info(
-          `with ${err.message}. ${job.opts.attempts -
-            job.attemptsMade} attempts left`
-        )
-      }
-    }
-
-    const handleCompleted = (job: Job) => {
-      logger.info(
-        `Job in ${job.queue.name} completed for: ${JSON.stringify(job.data)}`
-      )
-      job.remove()
-    }
-
-    const handleStalled = (job: Job) => {
-      logger.info(
-        `Job in ${job.queue.name} stalled for: ${JSON.stringify(job.data)}`
-      )
-    }
-
-    webhookQueue.on('failed', handleFailure)
-    webhookQueue.on('completed', handleCompleted)
-    webhookQueue.on('stalled', handleStalled)
-    webhookQueue.process(webhookProcessor)
-
-    logger.info(`Initialised webhookQueue ${webhookQueue.name}...`)
   }
 
   async function stop() {
