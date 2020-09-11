@@ -11,20 +11,45 @@
  */
 
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import { Queue } from 'bullmq'
+import { Queue, QueueEvents } from 'bullmq'
+import { EventEmitter } from 'events'
+import { logger } from '@webhooks/logger'
 
-export const webhookQueue = new Queue(QUEUE_NAME, {
-  connection: {
-    host: REDIS_HOST,
-    port: 6379
-  }
-})
-
-export type QueueEventType = {
+type QueueEventType = {
   jobId: string
   delay?: number
   data?: string
   returnvalue?: string
   prev?: string
   failedReason?: string
+}
+
+export function initQueue(): Queue {
+  const webhookQueue = new Queue(QUEUE_NAME, {
+    connection: {
+      host: REDIS_HOST,
+      port: 6379
+    }
+  })
+
+  EventEmitter.defaultMaxListeners = 50
+
+  const queueEvents = new QueueEvents(QUEUE_NAME)
+
+  queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
+    logger.info(`A job with ID ${jobId} is waiting`)
+  })
+
+  queueEvents.on('active', ({ jobId, prev }: QueueEventType) => {
+    logger.info(`Job ${jobId} is now active; previous status was ${prev}`)
+  })
+
+  queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
+    logger.info(`${jobId} has completed and returned ${returnvalue}`)
+  })
+
+  queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
+    logger.info(`${jobId} has failed with reason ${failedReason}`)
+  })
+  return webhookQueue
 }

@@ -18,18 +18,13 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL,
-  QUEUE_NAME
+  AUTH_URL
 } from '@webhooks/constants'
 import getPlugins from '@webhooks/config/plugins'
 import * as database from '@webhooks/database'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
 import { getRoutes } from '@webhooks/config/routes'
-import { EventEmitter } from 'events'
-import { QueueEvents } from 'bullmq'
-import { QueueEventType } from '@webhooks/queue'
-import { logger } from '@webhooks/logger'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -73,26 +68,6 @@ export async function createServer() {
     await server.start()
     await database.start()
     server.log('info', `server started on ${HOST}:${PORT}`)
-
-    EventEmitter.defaultMaxListeners = 50
-
-    const queueEvents = new QueueEvents(QUEUE_NAME)
-
-    queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
-      logger.info(`A job with ID ${jobId} is waiting`)
-    })
-
-    queueEvents.on('active', ({ jobId, prev }: QueueEventType) => {
-      logger.info(`Job ${jobId} is now active; previous status was ${prev}`)
-    })
-
-    queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
-      logger.info(`${jobId} has completed and returned ${returnvalue}`)
-    })
-
-    queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
-      logger.info(`${jobId} has failed with reason ${failedReason}`)
-    })
   }
 
   async function stop() {

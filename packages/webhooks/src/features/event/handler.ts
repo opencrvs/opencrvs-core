@@ -13,7 +13,8 @@ import { logger } from '@webhooks/logger'
 import { internal } from 'boom'
 import * as Hapi from 'hapi'
 import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
-import { webhookQueue } from '@webhooks/queue'
+import { initQueue } from '@webhooks/queue'
+import { Queue } from 'bullmq'
 import * as ShortUIDGen from 'short-uid'
 import { createRequestSignature } from '@webhooks/features/event/service'
 
@@ -22,6 +23,15 @@ export async function birthRegisteredHandler(
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+
+  let webhookQueue: Queue
+
+  try {
+    webhookQueue = initQueue()
+  } catch (error) {
+    logger.error(`Can't init webhook queue: ${error}`)
+    return internal(error)
+  }
 
   try {
     // tslint:disable-next-line
