@@ -14,7 +14,7 @@ import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
 import { Queue, QueueEvents } from 'bullmq'
 import { EventEmitter } from 'events'
 import { logger } from '@webhooks/logger'
-import * as IORedis from 'ioredis'
+import { getRedis } from '@webhooks/database'
 
 type QueueEventType = {
   jobId: string
@@ -31,7 +31,7 @@ export interface IQueueConnector {
   getQueue: () => Promise<Queue | null>
 }
 
-export const getQueue = () => {
+export function getQueue(): Queue {
   return webhookQueue
 }
 
@@ -52,15 +52,18 @@ async function removeJob(myQueue: Queue, id: string) {
 }
 
 export function initQueue(): Queue {
-  logger.info(`Initialising queue on REDIS_HOST: ${REDIS_HOST}`)
+  const connection = getRedis()
+  logger.info(
+    `Initialising queue on REDIS_HOST: ${REDIS_HOST} with connection: ${connection}`
+  )
   const newQueue = new Queue(QUEUE_NAME, {
-    connection: new IORedis(REDIS_HOST)
+    connection
   })
 
   EventEmitter.defaultMaxListeners = 50
 
   const queueEvents = new QueueEvents(QUEUE_NAME, {
-    connection: new IORedis(REDIS_HOST)
+    connection
   })
 
   queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
