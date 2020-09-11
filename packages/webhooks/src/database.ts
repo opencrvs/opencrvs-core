@@ -39,7 +39,6 @@ const connect = async (): Promise<void> => {
 
     redisConnection.on('error', error => {
       logger.error('Redis connection error', error)
-      process.exit(1)
     })
 
     redisConnection.on('exit', () => {
