@@ -10,13 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as mongoose from 'mongoose'
-import * as redis from 'redis'
-import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
+import { MONGO_URL } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
 import { Queue } from 'bullmq'
 import { initQueue } from '@webhooks/queue'
 
-let redisClient: redis.RedisClient
 const db = mongoose.connection
 
 db.on('disconnected', () => {
@@ -31,13 +29,6 @@ db.on('connected', () => {
 const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
 const connect = async (): Promise<void> => {
-  logger.info('REDIS_HOST', REDIS_HOST)
-  redisClient = redis.createClient({
-    host: REDIS_HOST,
-    retry_strategy: options => {
-      return 1000
-    }
-  })
   try {
     await mongoose.connect(MONGO_URL, { autoReconnect: true })
   } catch (err) {
@@ -48,30 +39,9 @@ const connect = async (): Promise<void> => {
 }
 
 export async function stop() {
-  redisClient.quit()
   mongoose.disconnect()
 }
 
 export async function start() {
-  return connect()
-}
-
-let webhookQueue: Queue
-
-export interface IDatabaseConnector {
-  getQueue: () => Promise<Queue | null>
-}
-
-export const getQueue = () => {
-  return webhookQueue
-}
-
-export async function startQueue() {
-  try {
-    webhookQueue = initQueue()
-  } catch (error) {
-    logger.error(`Can't init webhook queue: ${error}`)
-    throw Error(error)
-  }
   return connect()
 }

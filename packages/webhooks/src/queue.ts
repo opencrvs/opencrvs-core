@@ -14,6 +14,7 @@ import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
 import { Queue, QueueEvents } from 'bullmq'
 import { EventEmitter } from 'events'
 import { logger } from '@webhooks/logger'
+import * as IORedis from 'ioredis'
 
 type QueueEventType = {
   jobId: string
@@ -22,6 +23,25 @@ type QueueEventType = {
   returnvalue?: string
   prev?: string
   failedReason?: string
+}
+
+let webhookQueue: Queue
+
+export interface IQueueConnector {
+  getQueue: () => Promise<Queue | null>
+}
+
+export const getQueue = () => {
+  return webhookQueue
+}
+
+export async function startQueue() {
+  try {
+    webhookQueue = initQueue()
+  } catch (error) {
+    logger.error(`Can't init webhook queue: ${error}`)
+    throw Error(error)
+  }
 }
 
 async function removeJob(myQueue: Queue, id: string) {
@@ -33,16 +53,15 @@ async function removeJob(myQueue: Queue, id: string) {
 
 export function initQueue(): Queue {
   logger.info(`Initialising queue on REDIS_HOST: ${REDIS_HOST}`)
-  const webhookQueue = new Queue(QUEUE_NAME, {
-    connection: {
-      host: REDIS_HOST,
-      port: 6379
-    }
+  const newQueue = new Queue(QUEUE_NAME, {
+    connection: new IORedis(REDIS_HOST)
   })
 
   EventEmitter.defaultMaxListeners = 50
 
-  const queueEvents = new QueueEvents(QUEUE_NAME)
+  const queueEvents = new QueueEvents(QUEUE_NAME, {
+    connection: new IORedis(REDIS_HOST)
+  })
 
   queueEvents.on('waiting', ({ jobId }: QueueEventType) => {
     logger.info(`A job with ID ${jobId} is waiting`)
@@ -54,11 +73,11 @@ export function initQueue(): Queue {
 
   queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
     logger.info(`${jobId} has completed and returned ${returnvalue}`)
-    removeJob(webhookQueue, jobId)
+    removeJob(newQueue, jobId)
   })
 
   queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
     logger.info(`${jobId} has failed with reason ${failedReason}`)
   })
-  return webhookQueue
+  return newQueue
 }
