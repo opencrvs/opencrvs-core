@@ -12,8 +12,6 @@
 import * as mongoose from 'mongoose'
 import { MONGO_URL } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
-import { Queue } from 'bullmq'
-import { initQueue } from '@webhooks/queue'
 
 const db = mongoose.connection
 
