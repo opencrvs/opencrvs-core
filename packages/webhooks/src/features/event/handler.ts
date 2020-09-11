@@ -35,9 +35,12 @@ export async function birthRegisteredHandler(
 
   try {
     // tslint:disable-next-line
-    const webhooks: IWebhookModel[] = await Webhook.find({
-      trigger: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+    const webhooks: IWebhookModel[] | null = await Webhook.find({
+      trigger: 'BIRTH_REGISTERED'
     })
+    if (!webhooks) {
+      throw internal('Failed to find webhooks')
+    }
     logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {

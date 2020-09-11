@@ -54,7 +54,7 @@ const connect = async (): Promise<void> => {
   try {
     await mongoose.connect(MONGO_URL, { autoReconnect: true })
   } catch (err) {
-    logger.error(err)
+    logger.error(`Cant connect to Mongo: ${err}`)
     await wait(1000)
     return connect()
   }
