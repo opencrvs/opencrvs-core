@@ -13,7 +13,7 @@ import { logger } from '@webhooks/logger'
 import { internal } from 'boom'
 import * as Hapi from 'hapi'
 import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
-import { initQueue } from '@webhooks/queue'
+import { getQueue } from '@webhooks/database'
 import { Queue } from 'bullmq'
 import * as ShortUIDGen from 'short-uid'
 import { createRequestSignature } from '@webhooks/features/event/service'
@@ -27,9 +27,9 @@ export async function birthRegisteredHandler(
   let webhookQueue: Queue
 
   try {
-    webhookQueue = initQueue()
+    webhookQueue = getQueue()
   } catch (error) {
-    logger.error(`Can't init webhook queue: ${error}`)
+    logger.error(`Can't get webhook queue: ${error}`)
     return internal(error)
   }
 

@@ -24,7 +24,15 @@ type QueueEventType = {
   failedReason?: string
 }
 
+async function removeJob(myQueue: Queue, id: string) {
+  const job = await myQueue.getJob(id)
+  if (job) {
+    job.remove()
+  }
+}
+
 export function initQueue(): Queue {
+  logger.info(`Initialising queue on REDIS_HOST: ${REDIS_HOST}`)
   const webhookQueue = new Queue(QUEUE_NAME, {
     connection: {
       host: REDIS_HOST,
@@ -46,6 +54,7 @@ export function initQueue(): Queue {
 
   queueEvents.on('completed', ({ jobId, returnvalue }: QueueEventType) => {
     logger.info(`${jobId} has completed and returned ${returnvalue}`)
+    removeJob(webhookQueue, jobId)
   })
 
   queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {

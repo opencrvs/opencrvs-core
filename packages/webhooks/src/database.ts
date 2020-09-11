@@ -13,6 +13,8 @@ import * as mongoose from 'mongoose'
 import * as redis from 'redis'
 import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
+import { Queue } from 'bullmq'
+import { initQueue } from '@webhooks/queue'
 
 let redisClient: redis.RedisClient
 const db = mongoose.connection
@@ -51,5 +53,25 @@ export async function stop() {
 }
 
 export async function start() {
+  return connect()
+}
+
+let webhookQueue: Queue
+
+export interface IDatabaseConnector {
+  getQueue: () => Promise<Queue | null>
+}
+
+export const getQueue = () => {
+  return webhookQueue
+}
+
+export async function startQueue() {
+  try {
+    webhookQueue = initQueue()
+  } catch (error) {
+    logger.error(`Can't init webhook queue: ${error}`)
+    throw Error(error)
+  }
   return connect()
 }
