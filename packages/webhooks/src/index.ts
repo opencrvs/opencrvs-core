@@ -67,6 +67,7 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
+    await database.startQueue()
     server.log('info', `server started on ${HOST}:${PORT}`)
   }
 
