@@ -13,10 +13,10 @@ import { logger } from '@webhooks/logger'
 import { internal } from 'boom'
 import * as Hapi from 'hapi'
 import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
-import { webhookQueue } from '@webhooks/queue'
+import { getQueue } from '@webhooks/queue'
+import { Queue } from 'bullmq'
 import * as ShortUIDGen from 'short-uid'
 import { createRequestSignature } from '@webhooks/features/event/service'
-import { REDIS_HOST } from '@webhooks/constants'
 
 export async function birthRegisteredHandler(
   request: Hapi.Request,
@@ -24,11 +24,23 @@ export async function birthRegisteredHandler(
 ) {
   const bundle = request.payload as fhir.Bundle
 
+  let webhookQueue: Queue
+
+  try {
+    webhookQueue = getQueue()
+  } catch (error) {
+    logger.error(`Can't get webhook queue: ${error}`)
+    return internal(error)
+  }
+
   try {
     // tslint:disable-next-line
-    const webhooks: IWebhookModel[] = await Webhook.find({
-      trigger: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+    const webhooks: IWebhookModel[] | null = await Webhook.find({
+      trigger: 'BIRTH_REGISTERED'
     })
+    if (!webhooks) {
+      throw internal('Failed to find webhooks')
+    }
     logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {
@@ -48,9 +60,8 @@ export async function birthRegisteredHandler(
           webhookToNotify.sha_secret,
           JSON.stringify(payload)
         )
-
-        logger.info('REDIS_HOST', REDIS_HOST)
         webhookQueue.add(
+          `${webhookToNotify.webhookId}_${TRIGGERS[TRIGGERS.BIRTH_REGISTERED]}`,
           {
             payload,
             url: webhookToNotify.address,

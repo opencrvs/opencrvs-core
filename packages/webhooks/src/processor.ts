@@ -12,14 +12,15 @@
 
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
-import { Job } from 'bull'
+import { Worker } from 'bullmq'
+import { QUEUE_NAME } from '@webhooks/constants'
 
 export interface IProcessData {
   url: string
   payload: any
 }
 
-export async function webhookProcessor(job: Job) {
+export const webhookProcessor = new Worker(QUEUE_NAME, async job => {
   try {
     await fetch(job.data.url, {
       method: 'POST',
@@ -33,4 +34,4 @@ export async function webhookProcessor(job: Job) {
     logger.error(err)
     throw err
   }
-}
+})
