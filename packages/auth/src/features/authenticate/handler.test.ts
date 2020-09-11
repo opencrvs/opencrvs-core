@@ -12,7 +12,6 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createServerWithEnvironment } from '@auth/tests/util'
 import { createServer } from '@auth/index'
-import * as codeService from '@auth/features/verifyCode/service'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {
@@ -37,13 +36,27 @@ describe('authenticate handler receives a request', () => {
       expect(res.statusCode).toBe(401)
     })
   })
-  describe('user management service says credentials are valid', () => {
-    it('returns a nonce to the client', async () => {
-      jest.spyOn(codeService, 'generateNonce').mockReturnValue('12345')
+  describe('user management service says credentials are not valid', () => {
+    it('returns a 401 response to client', async () => {
+      fetch.mockReject(new Error())
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/authenticate',
+        payload: {
+          username: '+345345343',
+          password: '2r23432'
+        }
+      })
+
+      expect(res.statusCode).toBe(401)
+    })
+  })
+  describe('auth service returns 403 for deactivated users', () => {
+    it('returns 403', async () => {
       fetch.mockResponse(
         JSON.stringify({
           userId: '1',
-          status: 'active',
+          status: 'deactivated',
           scope: ['admin']
         })
       )
@@ -56,7 +69,7 @@ describe('authenticate handler receives a request', () => {
         }
       })
 
-      expect(JSON.parse(res.payload).nonce).toBe('12345')
+      expect(res.statusCode).toBe(403)
     })
     it('generates a mobile verification code and sends it to sms gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })

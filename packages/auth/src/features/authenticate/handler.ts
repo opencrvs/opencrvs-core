@@ -18,7 +18,7 @@ import {
   generateAndSendVerificationCode
 } from '@auth/features/authenticate/service'
 import { generateNonce } from '@auth/features/verifyCode/service'
-import { unauthorized } from 'boom'
+import { unauthorized, forbidden } from 'boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
 
 interface IAuthPayload {
@@ -44,6 +44,9 @@ export default async function authenticateHandler(
     result = await authenticate(payload.username, payload.password)
   } catch (err) {
     throw unauthorized()
+  }
+  if (result.status === 'deactivated') {
+    throw forbidden()
   }
 
   const nonce = generateNonce()
