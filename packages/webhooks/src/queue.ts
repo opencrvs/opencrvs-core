@@ -11,10 +11,11 @@
  */
 
 import { REDIS_HOST, QUEUE_NAME } from '@webhooks/constants'
-import { Queue, QueueEvents } from 'bullmq'
+import { Queue, QueueEvents, Worker, Job } from 'bullmq'
 import { EventEmitter } from 'events'
 import { logger } from '@webhooks/logger'
 import { getRedis } from '@webhooks/database'
+import { initWorker } from '@webhooks/processor'
 
 type QueueEventType = {
   jobId: string
@@ -81,6 +82,20 @@ export function initQueue(): Queue {
 
   queueEvents.on('failed', ({ jobId, failedReason }: QueueEventType) => {
     logger.info(`${jobId} has failed with reason ${failedReason}`)
+  })
+
+  const myWorker: Worker = initWorker(QUEUE_NAME)
+
+  myWorker.on('drained', (job: Job) => {
+    logger.info(`Queue is drained, no more jobs left`)
+  })
+
+  myWorker.on('completed', (job: Job) => {
+    logger.info(`job ${job.id} has completed`)
+  })
+
+  myWorker.on('failed', (job: Job) => {
+    logger.info(`job ${job.id} has failed`)
   })
   return newQueue
 }

@@ -13,25 +13,26 @@
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { Worker } from 'bullmq'
-import { QUEUE_NAME } from '@webhooks/constants'
 
 export interface IProcessData {
   url: string
   payload: any
 }
 
-export const webhookProcessor = new Worker(QUEUE_NAME, async job => {
-  try {
-    await fetch(job.data.url, {
-      method: 'POST',
-      body: JSON.stringify(job.data.payload),
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Hub-Signature': job.data.hmac
-      }
-    })
-  } catch (err) {
-    logger.error(err)
-    throw err
-  }
-})
+export function initWorker(name: string): Worker {
+  return new Worker(name, async job => {
+    try {
+      await fetch(job.data.url, {
+        method: 'POST',
+        body: JSON.stringify(job.data.payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Hub-Signature': job.data.hmac
+        }
+      })
+    } catch (err) {
+      logger.error(err)
+      throw err
+    }
+  })
+}
