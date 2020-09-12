@@ -21,6 +21,7 @@
     "import-name": false,
     "match-default-export-name": false,
     "no-require-imports": false,
+    "await-promise": [true, "DocumentQuery"],
     "no-unsafe-any": false,
     "newline-per-chained-call": false,
     "typedef": false,
