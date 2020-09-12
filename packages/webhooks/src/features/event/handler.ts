@@ -34,46 +34,51 @@ export async function birthRegisteredHandler(
   }
 
   try {
-    // tslint:disable-next-line
-    const webhooks: IWebhookModel[] | null = await Webhook.find({
-      trigger: 'BIRTH_REGISTERED'
-    })
+    const webhooks: IWebhookModel[] | null = await Webhook.find()
     if (!webhooks) {
       throw internal('Failed to find webhooks')
     }
     logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
       webhooks.forEach(webhookToNotify => {
-        logger.info(`Queueing webhook ${webhookToNotify.webhookId}`)
-        const payload = {
-          timestamp: new Date().toISOString(),
-          id: webhookToNotify.webhookId,
-          event: {
-            hub: {
-              topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
-            },
-            context: [bundle]
-          }
-        }
-        const hmac = createRequestSignature(
-          'sha256',
-          webhookToNotify.sha_secret,
-          JSON.stringify(payload)
+        logger.info(
+          `Queueing webhook ${webhookToNotify.trigger} ${
+            TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+          }`
         )
-        webhookQueue.add(
-          `${webhookToNotify.webhookId}_${TRIGGERS[TRIGGERS.BIRTH_REGISTERED]}`,
-          {
-            payload,
-            url: webhookToNotify.address,
-            hmac
-          },
-          {
-            jobId: `WEBHOOK_${new ShortUIDGen().randomUUID().toUpperCase()}_${
-              webhookToNotify.webhookId
+        if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_REGISTERED]) {
+          const payload = {
+            timestamp: new Date().toISOString(),
+            id: webhookToNotify.webhookId,
+            event: {
+              hub: {
+                topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
+              },
+              context: [bundle]
+            }
+          }
+          const hmac = createRequestSignature(
+            'sha256',
+            webhookToNotify.sha_secret,
+            JSON.stringify(payload)
+          )
+          webhookQueue.add(
+            `${webhookToNotify.webhookId}_${
+              TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
             }`,
-            attempts: 3
-          }
-        )
+            {
+              payload,
+              url: webhookToNotify.address,
+              hmac
+            },
+            {
+              jobId: `WEBHOOK_${new ShortUIDGen().randomUUID().toUpperCase()}_${
+                webhookToNotify.webhookId
+              }`,
+              attempts: 3
+            }
+          )
+        }
       })
     } else {
       logger.info(`No webhooks subscribed to birth registration trigger`)
