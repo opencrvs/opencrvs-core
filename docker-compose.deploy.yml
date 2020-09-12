@@ -382,7 +382,7 @@ services:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
-      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
+      - MONGO_URL=mongodb://mongo1,mongo2,mongo3/webhooks?replicaSet=rs0
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
       labels:
