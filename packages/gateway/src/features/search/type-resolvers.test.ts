@@ -609,6 +609,46 @@ describe('Search type resolvers', () => {
         event: 'Birth'
       })
     })
+    it('return the startedAt from operationalHistories', () => {
+      const startedAt = searchTypeResolvers.EventProgressSet.startedAt({
+        _id: 'dummy_id',
+        _source: {
+          event: 'Birth',
+          operationHistories: [
+            {
+              operatedOn: '2019-12-12T15:21:51.355Z',
+              operatorFirstNames: 'Shakib',
+              operatorFamilyName: 'Al Hasan',
+              operatorOfficeName: 'Alokbali Union Parishad',
+              operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+              operationType: 'DECLARED',
+              operatorRole: 'FIELD_AGENT'
+            },
+            {
+              operatedOn: '2019-12-12T15:23:21.280Z',
+              operatorFirstNames: 'Tamim',
+              operatorFamilyName: 'Iqbal',
+              operatorOfficeName: 'Alokbali Union Parishad',
+              operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+              operationType: 'VALIDATED',
+              operatorRole: 'REGISTRATION_AGENT'
+            },
+            {
+              operatedOn: '2019-12-12T15:24:53.586Z',
+              operatorFirstNames: 'Mohammad',
+              rejectReason: 'missing_supporting_doc',
+              operatorFamilyName: 'Ashraful',
+              rejectComment: 'No supporting documents provided.',
+              operatorOfficeName: 'Alokbali Union Parishad',
+              operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
+              operationType: 'REJECTED',
+              operatorRole: 'LOCAL_REGISTRAR'
+            }
+          ]
+        }
+      })
+      expect(startedAt).toBe('2019-12-12T15:21:51.355Z')
+    })
     it('return user model data', async () => {
       fetch.resetMocks()
       fetch.mockResponse(

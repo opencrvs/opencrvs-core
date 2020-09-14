@@ -87,6 +87,7 @@ type EventProgressSet {
   dateOfEvent: Date
   registration: RegistrationSearchSet
   startedBy: User
+  startedAt: Date
   progressReport: EventProgressData
 }
 

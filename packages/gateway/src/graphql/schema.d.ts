@@ -812,6 +812,7 @@ export interface GQLEventProgressSet {
   dateOfEvent?: GQLDate
   registration?: GQLRegistrationSearchSet
   startedBy?: GQLUser
+  startedAt?: GQLDate
   progressReport?: GQLEventProgressData
 }
 
@@ -4072,6 +4073,7 @@ export interface GQLEventProgressSetTypeResolver<TParent = any> {
   dateOfEvent?: EventProgressSetToDateOfEventResolver<TParent>
   registration?: EventProgressSetToRegistrationResolver<TParent>
   startedBy?: EventProgressSetToStartedByResolver<TParent>
+  startedAt?: EventProgressSetToDateOfEventResolver<TParent>
   progressReport?: EventProgressSetToProgressReportResolver<TParent>
 }
 

@@ -142,6 +142,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
           }
           role
         }
+        startedAt
         progressReport {
           timeInProgress
           timeInReadyForReview
