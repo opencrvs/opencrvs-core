@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as mongoose from 'mongoose'
-import { MONGO_URL, REDIS_HOST, REDIS_PORT } from '@webhooks/constants'
+import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
 import * as IORedis from 'ioredis'
 
@@ -35,11 +35,10 @@ export function getRedis(): IORedis.Redis {
 
 const connect = async (): Promise<void> => {
   try {
-    redisConnection = new IORedis(REDIS_PORT, REDIS_HOST)
+    redisConnection = new IORedis(REDIS_HOST)
 
     redisConnection.on('error', error => {
       logger.error('Redis connection error', error)
-      process.exit(1)
     })
 
     redisConnection.on('exit', () => {
