@@ -117,8 +117,7 @@ services:
       dockerfile: ./packages/webhooks/Dockerfile
     restart: unless-stopped
     environment:
-      - REDIS_HOST=0.0.0.0
-      - REDIS_PORT=6379
+      - REDIS_HOST=redis://redis:6379
       - MONGO_URL=mongodb://mongo1/webhooks
       - AUTH_URL=http://auth:4040
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/

@@ -11,6 +11,7 @@
     "object-literal-sort-keys": false,
     "no-relative-imports": [true, "allow-siblings"],
     "max-classes-per-file": false,
+    "await-promise": [true, "DocumentQuery"],
     "semicolon": [false, "never"],
     "ordered-imports": false,
     "mocha-no-side-effect-code": false,
