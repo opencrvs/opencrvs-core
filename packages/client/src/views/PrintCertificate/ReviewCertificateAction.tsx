@@ -181,8 +181,8 @@ class ReviewCertificateActionComponent extends React.Component<
         submittableCertificate = {
           payments: {
             type: 'MANUAL' as const,
-            total: paymentAmount,
-            amount: paymentAmount,
+            total: Number(paymentAmount),
+            amount: Number(paymentAmount),
             outcome: 'COMPLETED' as const,
             date: Date.now()
           }
