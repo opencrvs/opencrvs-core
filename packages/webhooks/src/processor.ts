@@ -13,26 +13,31 @@
 import fetch from 'node-fetch'
 import { logger } from '@webhooks/logger'
 import { Worker } from 'bullmq'
+import * as IORedis from 'ioredis'
 
 export interface IProcessData {
   url: string
   payload: any
 }
 
-export function initWorker(name: string): Worker {
-  return new Worker(name, async job => {
-    try {
-      await fetch(job.data.url, {
-        method: 'POST',
-        body: JSON.stringify(job.data.payload),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Hub-Signature': job.data.hmac
-        }
-      })
-    } catch (err) {
-      logger.error(err)
-      throw err
-    }
-  })
+export function initWorker(name: string, connection: IORedis.Redis): Worker {
+  return new Worker(
+    name,
+    async job => {
+      try {
+        await fetch(job.data.url, {
+          method: 'POST',
+          body: JSON.stringify(job.data.payload),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Hub-Signature': job.data.hmac
+          }
+        })
+      } catch (err) {
+        logger.error(err)
+        throw err
+      }
+    },
+    { connection }
+  )
 }
