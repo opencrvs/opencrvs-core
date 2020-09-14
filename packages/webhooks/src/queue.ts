@@ -84,7 +84,7 @@ export function initQueue(): Queue {
     logger.info(`${jobId} has failed with reason ${failedReason}`)
   })
 
-  const myWorker: Worker = initWorker(QUEUE_NAME)
+  const myWorker: Worker = initWorker(QUEUE_NAME, connection)
 
   myWorker.on('drained', (job: Job) => {
     logger.info(`Queue is drained, no more jobs left`)
