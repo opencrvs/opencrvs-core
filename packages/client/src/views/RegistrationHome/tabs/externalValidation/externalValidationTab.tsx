@@ -82,11 +82,6 @@ function ExternalValidationTabComponent(props: IProps) {
               moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
-          (reg.createdAt &&
-            moment(
-              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
           '',
 
         rowClickHandler: [
