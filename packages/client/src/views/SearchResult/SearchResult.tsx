@@ -272,7 +272,7 @@ export class SearchResultView extends React.Component<
           registrarHomeMessages.sentForUpdates
         )
       case 'CERTIFIED':
-        return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
+        return this.props.intl.formatMessage(registrarHomeMessages.certified)
       default:
         return this.props.intl.formatMessage(
           registrarHomeMessages.readyForReview
@@ -394,19 +394,8 @@ export class SearchResultView extends React.Component<
               moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
-          (reg.createdAt &&
-            moment(
-              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
           '',
-        startedAt:
-          (reg.createdAt &&
-            moment(
-              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-              'YYYY-MM-DD HH:mm:ss'
-            ).fromNow()) ||
-          '',
+        startedAt: (reg.createdAt && moment(reg.createdAt).fromNow()) || '',
         icon,
         actions,
         rowClickHandler: [
