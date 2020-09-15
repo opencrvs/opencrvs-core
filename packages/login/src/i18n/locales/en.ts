@@ -28,6 +28,7 @@ export const ENGLISH_STATE = {
     'login.submit': 'Submit',
     'login.forgotPassword': "Can't login?",
     'login.submissionError': 'Sorry that Username and password did not work.',
+    'login.forbiddenCredentialError': 'User is currently deactivated.',
     'login.codeSubmissionError': 'Sorry that code did not work.',
     'login.tooManyLoginAttemptError':
       'Too many login attempts. You can try again after one minute.',

@@ -63,7 +63,7 @@ export default async function updateUser(
     ) {
       userScopes.push('demo')
     }
-    user.scope = userScopes
+    existingUser.scope = userScopes
   }
   existingUser.type = user.type
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {

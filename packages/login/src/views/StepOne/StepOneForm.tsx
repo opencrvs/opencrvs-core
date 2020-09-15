@@ -36,6 +36,7 @@ import { Logo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_INVALID_CREDENTIALS,
+  ERROR_CODE_FORBIDDEN_CREDENTIALS,
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 export const messages: {
@@ -71,6 +72,12 @@ export const messages: {
     defaultMessage: 'Sorry that mobile number and password did not work.',
     description:
       'The error that appears when the user entered details are unauthorised'
+  },
+  forbiddenCredentialError: {
+    id: 'login.forbiddenCredentialError',
+    defaultMessage: 'Sorry given user is not allowed to login.',
+    description:
+      'The error that appears when the user entered details are forbidden'
   },
   optionalLabel: {
     id: 'login.optionalLabel',
@@ -273,6 +280,8 @@ export class StepOneForm extends React.Component<FullProps> {
                 intl.formatMessage(messages.fieldMissing)}
               {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
                 intl.formatMessage(messages.submissionError)}
+              {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
+                intl.formatMessage(messages.forbiddenCredentialError)}
               {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
                 intl.formatMessage(messages.phoneNumberFormat)}
               {!errorCode && intl.formatMessage(messages.networkError)}

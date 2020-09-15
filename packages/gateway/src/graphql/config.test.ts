@@ -13,6 +13,7 @@ import { readFileSync } from 'fs'
 import * as fetch from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { getApolloConfig } from './config'
+import { cloneDeep } from 'lodash'
 
 describe('Test apollo server config', () => {
   const token = jwt.sign(
@@ -41,7 +42,7 @@ describe('Test apollo server config', () => {
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
     role: 'REGISTRATION_AGENT',
-    scope: ['certify'],
+    scope: ['register'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -90,10 +91,32 @@ describe('Test apollo server config', () => {
     ).rejects.toThrowError('AuthenticationError: Authentication failed')
   })
   it('throws authentication error when the token holder is not an active user', async () => {
-    const deactivatedUser = mockUser
+    const deactivatedUser = cloneDeep(mockUser)
     deactivatedUser.status = 'deactivated'
 
     fetch.mockResponseOnce(JSON.stringify(deactivatedUser), { status: 200 })
+    const config = getApolloConfig()
+
+    await expect(
+      // @ts-ignore
+      config.context({
+        request: {
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        },
+        h: {}
+      })
+    ).rejects.toThrowError('AuthenticationError: Authentication failed')
+  })
+  it('throws authentication error when the token holder has different scope', async () => {
+    const userWithDifferentScope = cloneDeep(mockUser)
+    userWithDifferentScope.status = 'active'
+    userWithDifferentScope.scope = ['declare']
+
+    fetch.mockResponseOnce(JSON.stringify(userWithDifferentScope), {
+      status: 200
+    })
     const config = getApolloConfig()
 
     await expect(

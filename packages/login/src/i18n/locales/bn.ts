@@ -30,6 +30,7 @@ export const BENGALI_STATE = {
     'login.submit': 'সাবমিট',
     'login.forgotPassword': 'পাসওয়ার্ড ভুলে গেছেন',
     'login.submissionError': 'ব্যবহারকারীর নাম/পাসওয়ার্ড সঠিক নয়',
+    'login.forbiddenCredentialError': 'ব্যবহারকারীর অ্যাকাউন্টি নিষ্ক্রিয় আছে',
     'login.codeSubmissionError': 'পিনকোডটি সঠিক নয়',
     'login.fieldMissing': 'ব্যবহারকারীর নাম/পাসওয়ার্ড দিতে হবে',
     'login.resentSMS':

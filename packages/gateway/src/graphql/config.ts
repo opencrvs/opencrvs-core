@@ -24,7 +24,11 @@ import {
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
-import { getUser, getUserId } from '@gateway/features/user/utils'
+import {
+  getUser,
+  getUserId,
+  getTokenPayload
+} from '@gateway/features/user/utils'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
 import { addResolversToSchema } from '@graphql-tools/schema'
@@ -32,7 +36,7 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
-import { merge } from 'lodash'
+import { merge, isEqual } from 'lodash'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -85,6 +89,12 @@ export const getApolloConfig = (): Config => {
           { Authorization: request.headers.authorization }
         )
         if (!user || !['active', 'pending'].includes(user.status)) {
+          throw new AuthenticationError('Authentication failed')
+        }
+        const tokenPayload = getTokenPayload(
+          request.headers.authorization.split(' ')[1]
+        )
+        if (tokenPayload && !isEqual(tokenPayload.scope, user.scope)) {
           throw new AuthenticationError('Authentication failed')
         }
       } catch (err) {

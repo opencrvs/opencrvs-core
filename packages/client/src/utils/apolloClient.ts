@@ -45,10 +45,14 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
 
   const errorLink = onError((error: any) => {
     if (
-      error &&
-      error.networkError &&
-      error.networkError.statusCode &&
-      error.networkError.statusCode === 401
+      (error.networkError &&
+        error.networkError.statusCode &&
+        error.networkError.statusCode === 401) ||
+      (error.graphQLErrors &&
+        error.graphQLErrors[0] &&
+        error.graphQLErrors[0].extensions &&
+        error.graphQLErrors[0].extensions.code &&
+        error.graphQLErrors[0].extensions.code === 'UNAUTHENTICATED')
     ) {
       store.dispatch(showSessionExpireConfirmation())
     } else {
