@@ -385,7 +385,8 @@ function GeneratedInputField({
     return (
       <InputField {...inputFieldProps}>
         <TextInput
-          type="number"
+          type="text"
+          inputMode="numeric"
           pattern="[0-9]*"
           step={fieldDefinition.step}
           {...inputProps}
