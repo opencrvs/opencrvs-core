@@ -55,7 +55,8 @@ export function formatSearchParams(params: ISearchQuery) {
     createdBy = EMPTY_STRING,
     from = 0,
     size = DEFAULT_SIZE,
-    sort = SortOrder.ASC
+    sort = SortOrder.ASC,
+    sortColumn = 'dateOfApplication'
   } = params
 
   if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
@@ -84,7 +85,7 @@ export function formatSearchParams(params: ISearchQuery) {
         createdBy,
         { event, status, type }
       ),
-      sort: [{ dateOfApplication: sort }]
+      sort: [{ [sortColumn]: sort }]
     }
   }
 }

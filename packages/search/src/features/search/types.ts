@@ -32,6 +32,7 @@ export interface ISearchQuery {
   from?: number
   size?: number
   sort?: SortOrder
+  sortColumn?: string
 }
 
 export interface INameCombination {

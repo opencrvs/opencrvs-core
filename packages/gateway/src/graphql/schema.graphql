@@ -101,6 +101,7 @@ type Query {
     count: Int
     skip: Int
     sort: String
+    sortColumn: String
   ): EventSearchResultSet
   getEventsWithProgress(
     parentLocationId: String

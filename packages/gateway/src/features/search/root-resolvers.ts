@@ -70,6 +70,7 @@ export const resolvers: GQLResolver = {
         name,
         count,
         skip,
+        sortColumn,
         sort = 'desc'
       },
       authHeader
@@ -112,6 +113,9 @@ export const resolvers: GQLResolver = {
       }
       if (userId) {
         searchCriteria.createdBy = userId
+      }
+      if (sortColumn) {
+        searchCriteria.sortColumn = sortColumn
       }
 
       const searchResult: ApiResponse<ISearchResponse<any>> = await postSearch(

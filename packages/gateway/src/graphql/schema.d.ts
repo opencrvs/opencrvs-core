@@ -1656,6 +1656,7 @@ export interface QueryToSearchEventsArgs {
   count?: number
   skip?: number
   sort?: string
+  sortColumn?: string
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (

@@ -239,7 +239,8 @@ describe('elasticsearch params formatter', () => {
       createdBy: 'EMPTY_STRING',
       from: 0,
       size: 10,
-      sort: SortOrder.ASC
+      sort: SortOrder.ASC,
+      sortColumn: 'modifiedAt.keyword'
     })
 
     expect(params).toEqual({
@@ -329,7 +330,7 @@ describe('elasticsearch params formatter', () => {
             should: []
           }
         },
-        sort: [{ dateOfApplication: 'asc' }]
+        sort: [{ 'modifiedAt.keyword': 'asc' }]
       }
     })
   })
