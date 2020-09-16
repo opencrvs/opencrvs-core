@@ -117,7 +117,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       status: ["REJECTED"]
       count: $rejectCount
       skip: $rejectSkip  
-      sortColumn: "modifiedAt.keyword"          
+      sortColumn: "createdAt.keyword"          
       sort: "asc"
     ) {
       totalItems
