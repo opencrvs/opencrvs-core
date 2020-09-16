@@ -15,20 +15,20 @@ import {
   BIRTH_REGISTRATION_NUMBER,
   DEATH_REGISTRATION_NUMBER
 } from '@client/forms/identity'
-import { NUMBER } from '.'
+import { BIG_NUMBER } from '.'
 
 describe('identity maps tests', () => {
   describe('identityTypeMapper tests', () => {
     it('returns NUMBER for NID', () => {
-      expect(identityTypeMapper(NATIONAL_ID)).toBe(NUMBER)
+      expect(identityTypeMapper(NATIONAL_ID)).toBe(BIG_NUMBER)
     })
 
     it('returns NUMBER for BRN', () => {
-      expect(identityTypeMapper(BIRTH_REGISTRATION_NUMBER)).toBe(NUMBER)
+      expect(identityTypeMapper(BIRTH_REGISTRATION_NUMBER)).toBe(BIG_NUMBER)
     })
 
     it('returns NUMBER for DRN', () => {
-      expect(identityTypeMapper(DEATH_REGISTRATION_NUMBER)).toBe(NUMBER)
+      expect(identityTypeMapper(DEATH_REGISTRATION_NUMBER)).toBe(BIG_NUMBER)
     })
   })
 })

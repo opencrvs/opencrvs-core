@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { MessageDescriptor } from 'react-intl'
-import { NUMBER, TEXT, IDynamicFieldTypeMapper } from '.'
+import { NUMBER, TEXT, IDynamicFieldTypeMapper, BIG_NUMBER } from '.'
 import { formMessages as messages } from '@client/i18n/messages'
 
 export const NATIONAL_ID = 'NATIONAL_ID'
@@ -55,11 +55,11 @@ export const deathIdentityOptions = [
 export const identityTypeMapper: IDynamicFieldTypeMapper = (key: string) => {
   switch (key) {
     case NATIONAL_ID:
-      return NUMBER
+      return BIG_NUMBER
     case BIRTH_REGISTRATION_NUMBER:
-      return NUMBER
+      return BIG_NUMBER
     case DEATH_REGISTRATION_NUMBER:
-      return NUMBER
+      return BIG_NUMBER
     default:
       return TEXT
   }

@@ -65,6 +65,7 @@ import {
   LINK,
   LIST,
   NUMBER,
+  BIG_NUMBER,
   PARAGRAPH,
   PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
@@ -385,6 +386,21 @@ function GeneratedInputField({
     return (
       <InputField {...inputFieldProps}>
         <TextInput
+          type="number"
+          step={fieldDefinition.step}
+          {...inputProps}
+          value={inputProps.value as string}
+          onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
+            event.currentTarget.blur()
+          }}
+        />
+      </InputField>
+    )
+  }
+  if (fieldDefinition.type === BIG_NUMBER) {
+    return (
+      <InputField {...inputFieldProps}>
+        <TextInput
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -398,7 +414,6 @@ function GeneratedInputField({
       </InputField>
     )
   }
-
   if (fieldDefinition.type === WARNING) {
     return <WarningMessage>{fieldDefinition.label}</WarningMessage>
   }
