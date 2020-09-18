@@ -190,9 +190,9 @@ class ReviewTabComponent extends React.Component<
             moment(reg.dateOfEvent.toString(), 'YYYY-MM-DD').fromNow()) ||
           '',
         applicationTimeElapsed:
-          (reg.createdAt &&
+          (reg.modifiedAt &&
             moment(
-              moment(reg.createdAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
+              moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
               'YYYY-MM-DD HH:mm:ss'
             ).fromNow()) ||
           '',

@@ -96,9 +96,13 @@ export const transformData = (
             assignedReg.registration.comment) ||
           '',
         createdAt:
-          assignedReg.registration && assignedReg.registration.createdAt,
+          assignedReg.operationHistories &&
+          assignedReg.operationHistories[0] &&
+          assignedReg.operationHistories[0].operatedOn,
         modifiedAt:
-          assignedReg.registration && assignedReg.registration.modifiedAt
+          assignedReg.registration &&
+          (assignedReg.registration.modifiedAt ||
+            assignedReg.registration.createdAt)
       }
     })
 }

@@ -24,7 +24,8 @@ import {
   StatusOrange,
   StatusRejected,
   StatusProgress,
-  StatusWaitingValidation
+  StatusWaitingValidation,
+  StatusCertified
 } from '@opencrvs/components/lib/icons'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -275,6 +276,12 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
             <StatusRejected />
           </StatusIcon>
         )
+      case 'CERTIFIED':
+        return (
+          <StatusIcon>
+            <StatusCertified />
+          </StatusIcon>
+        )
       default:
         return (
           <StatusIcon>
@@ -298,6 +305,8 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
         return constantsMessages.applicationRegisteredOn
       case 'REJECTED':
         return constantsMessages.applicationRejectedOn
+      case 'CERTIFIED':
+        return constantsMessages.applicationCollectedOn
       default:
         return constantsMessages.applicationSubmittedOn
     }
