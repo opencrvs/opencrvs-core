@@ -37,6 +37,7 @@ export interface ISearchCriteria {
   name?: string
   registrationNumber?: string
   sort?: string
+  sortColumn?: string
   size?: number
   from?: number
   createdBy?: string

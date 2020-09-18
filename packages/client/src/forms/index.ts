@@ -36,6 +36,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/interface'
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
 export const NUMBER = 'NUMBER'
+export const BIG_NUMBER = 'BIG_NUMBER'
 export const RADIO_GROUP = 'RADIO_GROUP'
 export const RADIO_GROUP_WITH_NESTED_FIELDS = 'RADIO_GROUP_WITH_NESTED_FIELDS'
 export const INFORMATIVE_RADIO_GROUP = 'INFORMATIVE_RADIO_GROUP'
@@ -454,6 +455,10 @@ export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
 }
+export interface IBigNumberFormField extends IFormFieldBase {
+  type: typeof BIG_NUMBER
+  step?: number
+}
 export interface ICheckboxGroupFormField extends IFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: ICheckboxOption[]
@@ -559,6 +564,7 @@ export type IFormField =
   | ITextFormField
   | ITelFormField
   | INumberFormField
+  | IBigNumberFormField
   | ISelectFormFieldWithOptions
   | ISelectFormFieldWithDynamicOptions
   | IFormFieldWithDynamicDefinitions
@@ -941,6 +947,12 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
 }
+
+export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
+  type: typeof BIG_NUMBER
+  step?: number
+}
+
 export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: CheckboxComponentOption[]
@@ -1027,6 +1039,7 @@ export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
   | Ii18nNumberFormField
+  | Ii18nBigNumberFormField
   | Ii18nSelectFormField
   | Ii18nRadioGroupFormField
   | Ii18nRadioGroupWithNestedFieldsFormField

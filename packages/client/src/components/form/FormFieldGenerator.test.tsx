@@ -20,6 +20,7 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
   Event,
+  BIG_NUMBER,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   LOCATION_SEARCH_INPUT
 } from '@client/forms'
@@ -86,6 +87,14 @@ describe('form component', () => {
             name: 'phone',
             type: TEL,
             label: formMessages.district,
+            required: true,
+            initialValue: '',
+            validate: []
+          },
+          {
+            name: 'identifier',
+            type: BIG_NUMBER,
+            label: formMessages.NID,
             required: true,
             initialValue: '',
             validate: []

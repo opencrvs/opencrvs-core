@@ -24,6 +24,7 @@ import {
   StatusOrange,
   StatusRejected,
   StatusProgress,
+  StatusWaitingValidation,
   StatusCertified
 } from '@opencrvs/components/lib/icons'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -260,7 +261,7 @@ export class RowHistoryViewComponent extends React.Component<IProps> {
       case 'WAITING_VALIDATION':
         return (
           <StatusIcon>
-            <StatusGray />
+            <StatusWaitingValidation />
           </StatusIcon>
         )
       case 'REGISTERED':
