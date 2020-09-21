@@ -550,4 +550,4 @@ This Source Code Form is subject to the terms of the Mozilla Public License, v. 
 
 OpenCRVS is also distributed under the terms of the Civil Registration & Healthcare Disclaimer located at http://opencrvs.org/license.
 
-Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS graphic logo are (registered/a) trademark(s) of Plan International.
+Copyright (C) Plan International Inc, Plan International Australia, Jembi Health Systems NPC and Vital Strategies Inc.
