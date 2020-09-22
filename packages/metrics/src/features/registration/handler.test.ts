@@ -1096,7 +1096,24 @@ describe('When an existing application is marked registered', () => {
   beforeEach(async () => {
     server = await createServer()
   })
-
+  it('writes the delta between DECLARED and VALIDATED states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/mark-validated-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/mark-validated',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'application_event_duration'
+    )
+    expect(res.statusCode).toBe(200)
+    expect(applicationEventPoint).toMatchSnapshot()
+  })
   it('writes the delta between DECLARED and REGISTERED states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
     const payload = require('./test-data/mark-registered-request.json')
@@ -1115,6 +1132,28 @@ describe('When an existing application is marked registered', () => {
     expect(res.statusCode).toBe(200)
     expect(applicationEventPoint).toMatchSnapshot()
   })
+  it('writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/mark-waiting-validation-request.json')
+    const taskHistory = require('./test-data/task-history-validated-response.json')
+    fetchTaskHistory.mockReset()
+    fetchTaskHistory.mockResolvedValue(taskHistory)
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/waiting-validation',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
+      ({ measurement }: { measurement: string }) =>
+        measurement === 'application_event_duration'
+    )
+    expect(res.statusCode).toBe(200)
+    expect(applicationEventPoint).toMatchSnapshot()
+  })
+
   it('writes the delta between VALIDATED and REGISTERED states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
     const payload = require('./test-data/mark-registered-request.json')

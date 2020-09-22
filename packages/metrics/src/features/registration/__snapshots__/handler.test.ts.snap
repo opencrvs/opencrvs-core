@@ -82,6 +82,23 @@ Object {
 }
 `;
 
+exports[`When an existing application is marked registered writes the delta between DECLARED and VALIDATED states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
+    "currentTaskId": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+    "durationInSeconds": 170630,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "VALIDATED",
+    "eventType": "BIRTH",
+    "previousStatus": "DECLARED",
+  },
+}
+`;
+
 exports[`When an existing application is marked registered writes the delta between VALIDATED and REGISTERED states to influxdb 1`] = `
 Object {
   "fields": Object {
@@ -93,6 +110,23 @@ Object {
   "measurement": "application_event_duration",
   "tags": Object {
     "currentStatus": "REGISTERED",
+    "eventType": "BIRTH",
+    "previousStatus": "VALIDATED",
+  },
+}
+`;
+
+exports[`When an existing application is marked registered writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb 1`] = `
+Object {
+  "fields": Object {
+    "compositionId": "80433e78-7042-4837-b888-a79c0181bf4e",
+    "currentTaskId": "18ea2464-f843-45e2-93b1-8b026e0d93a4",
+    "durationInSeconds": 170630,
+    "previousTaskId": "e172627c-8490-44da-a702-80a082f978f5",
+  },
+  "measurement": "application_event_duration",
+  "tags": Object {
+    "currentStatus": "WAITING_VALIDATION",
     "eventType": "BIRTH",
     "previousStatus": "VALIDATED",
   },
