@@ -70,6 +70,10 @@ export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
 }
+export interface IEventDurationResponse {
+  status: string
+  durationInSeconds: number
+}
 
 export function findCompositionSectionInBundle(
   code: string,
@@ -927,6 +931,29 @@ export const getTimeLoggedFromMetrics = async (
     .catch(error => {
       return Promise.reject(
         new Error(`Time logged from metrics request failed: ${error.message}`)
+      )
+    })
+}
+
+export const getEventDurationsFromMetrics = async (
+  authHeader: IAuthHeader,
+  compositionId: string
+): Promise<IEventDurationResponse | IEventDurationResponse[]> => {
+  const params = new URLSearchParams({ compositionId })
+  return fetch(`${METRICS_URL}/eventDuration?` + params, {
+    method: 'GET',
+    headers: {
+      ...authHeader
+    }
+  })
+    .then(response => {
+      return response.json()
+    })
+    .catch(error => {
+      return Promise.reject(
+        new Error(
+          `Event Durations from metrics request failed: ${error.message}`
+        )
       )
     })
 }
