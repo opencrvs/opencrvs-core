@@ -24,7 +24,7 @@ interface IRoleScopeMapping {
 
 export const roleScopeMapping: IRoleScopeMapping = {
   FIELD_AGENT: ['declare'],
-  REGISTRATION_AGENT: ['validate'],
+  REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
   LOCAL_REGISTRAR: ['register', 'performance', 'certify'],
   LOCAL_SYSTEM_ADMIN: ['sysadmin'],
   NATIONAL_SYSTEM_ADMIN: ['sysadmin'],
