@@ -29,7 +29,7 @@ import {
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 import fetch, { RequestInit } from 'node-fetch'
 
 // TODO: Change these event names to be closer in definition to the comments
