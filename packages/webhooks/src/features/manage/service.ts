@@ -30,6 +30,7 @@ export interface ISystem {
   username: string
   client_id: string
   status: string
+  scope: string[]
   sha_secret: string
   practitionerId: string
 }

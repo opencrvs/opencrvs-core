@@ -97,12 +97,12 @@ export async function subscribeWebhooksHandler(
         })
         .code(400)
     }
-
+    const isNationalIDAPIUser = system.scope.indexOf('nationalId') > -1
     const webhookId = uuid()
     const createdBy = {
       client_id: system.client_id,
       name: system.name,
-      type: 'api',
+      type: isNationalIDAPIUser ? 'nationalId' : 'health',
       username: system.username
     }
     const webhook = {
