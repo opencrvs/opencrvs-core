@@ -58,7 +58,7 @@ export async function birthRegisteredHandler(
         )
         const transformedBundle = await transformBirthBundle(
           bundle,
-          'nationalId',
+          webhookToNotify.createdBy.type,
           authHeader
         )
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_REGISTERED]) {
