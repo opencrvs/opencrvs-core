@@ -30,6 +30,7 @@ import moment from 'moment'
 import { FetchResult } from 'apollo-link'
 import { updateApplicationTaskHistory } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
+import { DocumentNode } from 'graphql'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -170,10 +171,6 @@ export class SubmissionController {
       forms[application.event],
       application
     )
-    const { mutation, variables } = result || {
-      mutation: null,
-      variables: null
-    }
 
     const requestInProgressStatus =
       REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
@@ -184,8 +181,8 @@ export class SubmissionController {
 
     try {
       const mutationResult = await this.client.mutate({
-        mutation,
-        variables,
+        mutation: result?.mutation as DocumentNode,
+        variables: result?.variables,
         refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
         awaitRefetchQueries: true
       })

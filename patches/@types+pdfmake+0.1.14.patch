@@ -1,0 +1,13 @@
+diff --git a/node_modules/@types/pdfmake/build/pdfmake.d.ts b/node_modules/@types/pdfmake/build/pdfmake.d.ts
+index dbba4db..877347a 100644
+--- a/node_modules/@types/pdfmake/build/pdfmake.d.ts
++++ b/node_modules/@types/pdfmake/build/pdfmake.d.ts
+@@ -7,7 +7,7 @@ export let tableLayouts: { [name: string]: CustomTableLayout };
+ 
+ export function createPdf(
+     documentDefinitions: TDocumentDefinitions,
+-    tableLayouts?: { [name: string]: CustomTableLayout },
++    tableLayouts?: { [name: string]: CustomTableLayout } | null,
+     fonts?: TFontDictionary,
+     vfs?: { [file: string]: string },
+ ): TCreatedPdf;

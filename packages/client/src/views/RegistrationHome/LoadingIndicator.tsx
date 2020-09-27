@@ -48,7 +48,7 @@ type IBaseLoadingProps = {
 }
 
 type IState = {
-  intervalID: NodeJS.Timeout | null
+  intervalID: number | null
   isOnline: boolean
 }
 
@@ -66,7 +66,7 @@ export class LoadingIndicatorComp extends React.Component<IProps, IState> {
   }
 
   componentDidMount() {
-    const intervalID: NodeJS.Timeout = setInterval(() => {
+    const intervalID: number = setInterval(() => {
       this.setState({
         isOnline: navigator.onLine,
         intervalID

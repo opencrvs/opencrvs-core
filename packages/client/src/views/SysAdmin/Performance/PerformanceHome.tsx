@@ -49,9 +49,16 @@ interface BaseProps {
   goToOperationalReport: typeof goToOperationalReport
 }
 
+interface IURLProps
+  extends RouteComponentProps<
+    {},
+    any,
+    { selectedLocation?: ISearchLocation | null }
+  > {}
+
 type Props = BaseProps &
   WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
+  IURLProps & {
     offlineResources: IOfflineData
   }
 

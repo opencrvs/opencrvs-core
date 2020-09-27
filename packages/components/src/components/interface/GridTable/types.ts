@@ -30,10 +30,10 @@ export interface IStatus {
 }
 
 type ReactText = string | number
-type ReactChild = React.ReactNodeArray | ReactText
+type ReactChild = React.ReactNodeArray | ReactText | React.ReactNode
 
 export interface IColumn {
-  label?: string | ReactChild
+  label?: string | ReactChild | number | React.ReactNodeArray | undefined | null
   width: number
   key: string
   errorValue?: string

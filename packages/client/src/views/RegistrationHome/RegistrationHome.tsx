@@ -565,7 +565,7 @@ export class RegistrationHomeView extends React.Component<
               this.setState({ showCertificateToast: false })
             }}
           >
-            {intl.formatHTMLMessage(certificateMessage.toastMessage)}
+            {intl.formatMessage(certificateMessage.toastMessage)}
           </FloatingNotification>
         )}
       </>

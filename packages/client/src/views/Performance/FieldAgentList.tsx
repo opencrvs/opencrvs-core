@@ -27,6 +27,7 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/Within45DaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
+import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   SysAdminContentWrapper,
   SysAdminPageVariant
@@ -159,7 +160,7 @@ function FieldAgentListComponent(props: IProps) {
     setSortOrder({ ...sortOrder, [key]: invertedOrder })
   }
 
-  function getColumns(data?: GQLSearchFieldAgentResult) {
+  function getColumns(data?: GQLSearchFieldAgentResult): IColumn[] {
     return [
       {
         key: 'name',

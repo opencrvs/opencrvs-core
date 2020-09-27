@@ -51,11 +51,25 @@ interface IApplicationProp {
   applicationId: string
 }
 
+interface IURLProps
+  extends RouteComponentProps<
+    {},
+    any,
+    {
+      pageRoute: string
+      pageId: string
+      groupId: string
+      applicationId: string
+      event: string
+      duplicate?: string
+    }
+  > {}
+
 type IProps = IReviewProps &
   IApplicationProp &
   FullProps &
   IntlShapeProps &
-  RouteComponentProps<{}>
+  IURLProps
 
 export interface IReviewSectionDetails {
   [key: string]: any
@@ -167,6 +181,7 @@ function mapStatetoProps(
     groupId: string
     applicationId: string
     event: string
+    duplicate?: string
   }>
 ) {
   const { match, history } = props
@@ -188,7 +203,7 @@ function mapStatetoProps(
     event: getEvent(match.params.event),
     registerForm: form,
     pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
-    duplicate: history.location.state && history.location.state.duplicate
+    duplicate: match.params.duplicate && match.params.duplicate
   }
 }
 
