@@ -24,7 +24,7 @@
     "@hapi/boom": "^7.2.0",
     "bullmq": "^1.9.0",
     "crypto": "^1.0.1",
-    "@hapi/hapi": "^17.5.1",
+    "@hapi/hapi": "^20.0.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",

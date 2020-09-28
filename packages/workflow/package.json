@@ -23,7 +23,7 @@
     "app-module-path": "^2.2.0",
     "@hapi/boom": "^7.2.0",
     "country-data": "^0.0.31",
-    "@hapi/hapi": "^17.5.1",
+    "@hapi/hapi": "^20.0.1",
     "hapi-auth-jwt2": "8.1.0",
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",

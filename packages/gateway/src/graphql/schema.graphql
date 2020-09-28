@@ -1,31 +1,124 @@
 type Query {
-  listNotifications(locationIds: [String], status: String, userId: String, from: Date, to: Date): [Notification]
+  listNotifications(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+  ): [Notification]
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
   searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
-  listBirthRegistrations(locationIds: [String], status: String, userId: String, from: Date, to: Date, count: Int, skip: Int): BirthRegResultSet
+  listBirthRegistrations(
+    locationIds: [String]
+    status: String
+    userId: String
+    from: Date
+    to: Date
+    count: Int
+    skip: Int
+  ): BirthRegResultSet
   fetchDeathRegistration(id: ID!): DeathRegistration
   fetchEventRegistration(id: ID!): EventRegistration
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
-  fetchRegistrationCountByStatus(locationId: String!, status: [String]!): RegistrationCountResult
+  fetchRegistrationCountByStatus(
+    locationId: String!
+    status: [String]!
+  ): RegistrationCountResult
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
-  searchUsers(username: String, mobile: String, status: String, role: String, primaryOfficeId: String, locationId: String, count: Int, skip: Int, sort: String): SearchUserResult
-  searchFieldAgents(locationId: String!, status: String, language: String, timeStart: String!, timeEnd: String!, event: String, count: Int, skip: Int, sort: String): SearchFieldAgentResult
-  fetchRegistrationMetrics(timeStart: String!, timeEnd: String!, locationId: String!, event: String!): RegistrationMetrics
-  getEventEstimationMetrics(timeStart: String!, timeEnd: String!, locationId: String!): EventEstimationMetrics
-  getApplicationsStartedMetrics(timeStart: String!, timeEnd: String!, locationId: String!): ApplicationsStartedMetrics
-  fetchMonthWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String!, event: String!): MonthWiseEstimationMetrics
-  fetchLocationWiseEventMetrics(timeStart: String!, timeEnd: String!, locationId: String!, event: String!): LocationWiseEstimationMetrics
-  fetchTimeLoggedMetricsByPractitioner(timeStart: String!, timeEnd: String!, practitionerId: String!, locationId: String!, count: Int!): TimeLoggedMetricsResultSet
-  searchEvents(userId: String, locationIds: [String], status: [String], type: [String], trackingId: String, registrationNumber: String, contactNumber: String, name: String, count: Int, skip: Int, sort: String, sortColumn: String): EventSearchResultSet
-  getEventsWithProgress(parentLocationId: String, count: Int, skip: Int, sort: String, status: [String], type: [String]): EventProgressResultSet
-  getRoles(title: String, value: String, type: String, active: Boolean, sortBy: String, sortOrder: String): [Role]
+  searchUsers(
+    username: String
+    mobile: String
+    status: String
+    role: String
+    primaryOfficeId: String
+    locationId: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchUserResult
+  searchFieldAgents(
+    locationId: String!
+    status: String
+    language: String
+    timeStart: String!
+    timeEnd: String!
+    event: String
+    count: Int
+    skip: Int
+    sort: String
+  ): SearchFieldAgentResult
+  fetchRegistrationMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+    event: String!
+  ): RegistrationMetrics
+  getEventEstimationMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+  ): EventEstimationMetrics
+  getApplicationsStartedMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+  ): ApplicationsStartedMetrics
+  fetchMonthWiseEventMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+    event: String!
+  ): MonthWiseEstimationMetrics
+  fetchLocationWiseEventMetrics(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String!
+    event: String!
+  ): LocationWiseEstimationMetrics
+  fetchTimeLoggedMetricsByPractitioner(
+    timeStart: String!
+    timeEnd: String!
+    practitionerId: String!
+    locationId: String!
+    count: Int!
+  ): TimeLoggedMetricsResultSet
+  searchEvents(
+    userId: String
+    locationIds: [String]
+    status: [String]
+    type: [String]
+    trackingId: String
+    registrationNumber: String
+    contactNumber: String
+    name: String
+    count: Int
+    skip: Int
+    sort: String
+    sortColumn: String
+  ): EventSearchResultSet
+  getEventsWithProgress(
+    parentLocationId: String
+    count: Int
+    skip: Int
+    sort: String
+    status: [String]
+    type: [String]
+  ): EventProgressResultSet
+  getRoles(
+    title: String
+    value: String
+    type: String
+    active: Boolean
+    sortBy: String
+    sortOrder: String
+  ): [Role]
 }
 
 type Mutation {
@@ -33,22 +126,47 @@ type Mutation {
   voidNotification(id: ID!): Notification
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsVerified(id: ID!, details: BirthRegistrationInput): BirthRegistration
+  markBirthAsVerified(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
-  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput): BirthRegistration!
+  markBirthAsRegistered(
+    id: ID!
+    details: BirthRegistrationInput
+  ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(id: ID!, details: DeathRegistrationInput): DeathRegistration
+  markDeathAsVerified(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
-  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput): DeathRegistration!
+  markDeathAsRegistered(
+    id: ID!
+    details: DeathRegistrationInput
+  ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   createOrUpdateUser(user: UserInput!): User!
-  activateUser(userId: String!, password: String!, securityQNAs: [SecurityQuestionAnswer]!): String
-  changePassword(userId: String!, existingPassword: String!, password: String!): String
-  auditUser(userId: String!, action: String!, reason: String!, comment: String): String
+  activateUser(
+    userId: String!
+    password: String!
+    securityQNAs: [SecurityQuestionAnswer]!
+  ): String
+  changePassword(
+    userId: String!
+    existingPassword: String!
+    password: String!
+  ): String
+  auditUser(
+    userId: String!
+    action: String!
+    reason: String!
+    comment: String
+  ): String
 }
 
 type Dummy {
@@ -1086,4 +1204,3 @@ enum PaymentOutcomeType {
   ERROR
   PARTIAL
 }
-

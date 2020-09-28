@@ -25,7 +25,7 @@
     "@hapi/boom": "^7.2.0",
     "crypto": "^1.0.1",
     "dotenv": "^6.1.0",
-    "@hapi/hapi": "^17.5.1",
+    "@hapi/hapi": "^20.0.1",
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",
     "io-ts": "^1.2.1",

@@ -15,7 +15,7 @@
   "private": true,
   "dependencies": {
     "@types/node-fetch": "^2.3.3",
-    "@hapi/hapi": "^17.5.1",
+    "@hapi/hapi": "^20.0.1",
     "node-fetch": "^2.5.0",
     "lint-staged": "^7.1.0",
     "typescript": "^4.0.3"
