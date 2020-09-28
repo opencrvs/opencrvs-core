@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
-    "@types/boom": "^7.2.0",
+    "@types/hapi__boom": "^9.0.1",
     "@types/fhir": "^0.0.30",
     "@types/hapi__hapi": "^20.0.0",
     "@types/hapi-auth-jwt2": "8.0.1",
@@ -62,7 +62,7 @@
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.7.2"
+    "typescript": "^4.0.3"
   },
   "lint-staged": {
     "src/**/*.{ts,graphql}": [

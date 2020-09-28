@@ -33,7 +33,7 @@
     "jsonwebtoken": "^8.3.0",
     "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
-    "typescript": "^3.7.2"
+    "typescript": "^4.0.3"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
