@@ -52,7 +52,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.10",
     "nedb": "^1.8.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pino": "^5.14.0",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.8.0",

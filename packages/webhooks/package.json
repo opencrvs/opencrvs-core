@@ -34,7 +34,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.1.5",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pino": "^5.14.0",
     "redis": "^3.0.2",
     "short-uid": "^0.1.0",

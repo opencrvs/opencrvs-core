@@ -16,7 +16,7 @@
   "dependencies": {
     "@types/node-fetch": "^2.3.3",
     "@hapi/hapi": "^20.0.1",
-    "node-fetch": "^2.5.0",
+    "node-fetch": "^2.6.1",
     "lint-staged": "^7.1.0",
     "typescript": "^3.7.2"
   },

@@ -33,7 +33,7 @@
     "jwt-decode": "^2.2.0",
     "csv-stringify": "^5.3.4",
     "moment": "^2.22.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pino": "^5.14.0",
     "typescript": "^3.7.2"
   },

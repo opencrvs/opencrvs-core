@@ -32,7 +32,7 @@
     "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
     "lint-staged": "^7.1.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "pino": "^5.14.0",
     "redis": "^2.8.0"
   },
