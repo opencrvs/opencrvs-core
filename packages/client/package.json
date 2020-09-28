@@ -149,7 +149,7 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.8.0",
-    "typescript": "^4.0.3",
+    "typescript": "^3.7.2",
     "typescript-react-intl": "^0.3.0",
     "whatwg-fetch": "^3.0.0",
     "workbox-cli": "^4.0.0-alpha.0"

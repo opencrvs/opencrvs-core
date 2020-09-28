@@ -24,9 +24,9 @@
     "archiver": "^3.1.1",
     "@hapi/boom": "^7.2.0",
     "@hapi/hapi": "^20.0.1",
-    "hapi-auth-jwt2": "8.1.0",
+    "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^6.3.0",
-    "hapi-sentry": "^2.1.0",
+    "hapi-sentry": "^3.1.0",
     "influx": "^5.0.7",
     "joi": "^13.4.0",
     "jsonwebtoken": "^8.3.0",
@@ -35,7 +35,7 @@
     "moment": "^2.22.2",
     "node-fetch": "^2.6.0",
     "pino": "^5.14.0",
-    "typescript": "^4.0.3"
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
@@ -43,7 +43,6 @@
     "@types/hapi__boom": "^9.0.1",
     "@types/fhir": "^0.0.30",
     "@types/hapi__hapi": "^20.0.0",
-    "@types/hapi-auth-jwt2": "8.0.1",
     "@types/hapi-pino": "^6.3.0",
     "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",
