@@ -63,6 +63,10 @@ export const GET_USER = gql`
         id
         name
         alias
+        identifier {
+          system
+          value
+        }
       }
       signature {
         type

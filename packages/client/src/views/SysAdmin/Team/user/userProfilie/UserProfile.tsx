@@ -51,6 +51,8 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/UserAuditList'
+import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -212,6 +214,7 @@ class UserProfileComponent extends React.Component<Props, State> {
     if (!userData) {
       return {}
     }
+
     const locale = this.props.intl.locale
     return {
       id: userData.id,
@@ -236,9 +239,7 @@ class UserProfileComponent extends React.Component<Props, State> {
       username: userData.username,
       practitionerId: userData.practitionerId,
       locationId:
-        (userData.catchmentArea &&
-          userData.catchmentArea[0] &&
-          userData.catchmentArea[0].id) ||
+        getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
       startDate:
         (userData.creationDate &&
