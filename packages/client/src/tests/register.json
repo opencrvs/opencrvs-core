@@ -1396,10 +1396,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
                     }
                   ],
@@ -1543,10 +1539,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "(values.placeOfBirth!=\"OTHER\" && values.placeOfBirth!=\"PRIVATE_HOME\")"
                     }
                   ],
@@ -1589,10 +1581,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     },
                     {
                       "action": "hide",
@@ -2995,10 +2983,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -3177,10 +3161,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -3243,10 +3223,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -4053,10 +4029,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -4255,10 +4227,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -4322,10 +4290,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     },
                     {
                       "action": "hide",
@@ -6330,10 +6294,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -6473,10 +6433,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -6526,10 +6482,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -7125,10 +7077,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -7280,10 +7228,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -7334,10 +7278,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     },
                     {
                       "action": "hide",
@@ -8732,10 +8672,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.addressSameAsMother"
                     }
                   ],
@@ -8887,10 +8823,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.addressSameAsMother"
                     }
                   ],
@@ -8941,10 +8873,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     },
                     {
                       "action": "hide",
@@ -9609,10 +9537,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -9764,10 +9688,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -9821,10 +9741,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -11851,10 +11767,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -11994,10 +11906,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -12047,10 +11955,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     }
                   ],
                   "mapping": {
@@ -12643,10 +12547,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -12798,10 +12698,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.currentAddressSameAsPermanent"
                     }
                   ],
@@ -12852,10 +12748,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     },
                     {
                       "action": "hide",
@@ -13729,10 +13621,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -13864,10 +13752,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -13909,10 +13793,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -14503,10 +14383,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -14638,10 +14514,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -14683,10 +14555,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -16109,10 +15977,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -16299,10 +16163,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -16365,10 +16225,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3"
                     }
                   ],
                   "mapping": {
@@ -17154,10 +17010,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.applicantPermanentAddressSameAsCurrent"
                     }
                   ],
@@ -17340,10 +17192,6 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
-                    },
-                    {
-                      "action": "hide",
                       "expression": "values.applicantPermanentAddressSameAsCurrent"
                     }
                   ],
@@ -17407,10 +17255,6 @@
                     {
                       "action": "hide",
                       "expression": "!values.addressLine4Permanent"
-                    },
-                    {
-                      "action": "hide",
-                      "expression": "!values.addressLine3Permanent"
                     },
                     {
                       "action": "hide",
