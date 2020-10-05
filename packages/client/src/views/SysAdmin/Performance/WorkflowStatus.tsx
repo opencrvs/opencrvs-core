@@ -265,8 +265,32 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     }
 
-    function getTimeDurationElements(timeDuration: number) {
-      const timeStructure = formatTimeDuration(timeDuration)
+    function getTimeDifferenceFromLastModification(
+      eventProgress: GQLEventProgressSet
+    ) {
+      const lastUpdateDate =
+        eventProgress.registration &&
+        (eventProgress.registration.modifiedAt ||
+          eventProgress.registration.createdAt)
+      if (!lastUpdateDate) {
+        return 0
+      }
+      return moment().diff(moment(Number(lastUpdateDate)), 'seconds')
+    }
+
+    function getTimeDurationElements(
+      timeDuration: number,
+      tooltipId: string,
+      rowIndex: number,
+      checkStatus: string,
+      eventProgress: GQLEventProgressSet
+    ) {
+      const timeStructure = formatTimeDuration(
+        eventProgress.registration &&
+          eventProgress.registration.status === checkStatus
+          ? getTimeDifferenceFromLastModification(eventProgress)
+          : timeDuration
+      )
       const label =
         (timeStructure &&
           `${timeStructure.days}:${timeStructure.hours}:${timeStructure.minutes}`) ||
@@ -276,10 +300,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           `${timeStructure.days} days, ${timeStructure.hours} hours, ${timeStructure.minutes} minutes`) ||
         '-'
 
-      return {
-        label,
-        tooltip
-      }
+      return (
+        <>
+          <ReactTooltip id={`${tooltipId}_${rowIndex}`}>
+            <ToolTipContainer>{tooltip}</ToolTipContainer>
+          </ReactTooltip>
+          <span data-tip data-for={`${tooltipId}_${rowIndex}`}>
+            {label}
+          </span>
+        </>
+      )
     }
 
     const content = data.getEventsWithProgress.results.map(
@@ -345,105 +375,52 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               timeInReadyToPrint
             } = eventProgress.progressReport
 
-            let timeDurationElements = {
-              label: '',
-              tooltip: ''
-            }
-
-            timeDurationElements = getTimeDurationElements(
-              timeInProgress as number
-            )
-            timeLoggedInProgress = (
-              <>
-                <ReactTooltip id={`in_prog_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`in_prog_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedInProgress = getTimeDurationElements(
+              timeInProgress as number,
+              'in_prog_tltp',
+              index,
+              'IN_PROGRESS',
+              eventProgress
             )
 
-            timeDurationElements = getTimeDurationElements(
-              timeInReadyForReview as number
-            )
-            timeLoggedDeclared = (
-              <>
-                <ReactTooltip id={`dclrd_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`dclrd_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedDeclared = getTimeDurationElements(
+              timeInReadyForReview as number,
+              'dclrd_tltp',
+              index,
+              'DECLARED',
+              eventProgress
             )
 
-            timeDurationElements = getTimeDurationElements(
-              timeInRequiresUpdates as number
-            )
-            timeLoggedRejected = (
-              <>
-                <ReactTooltip id={`rjctd_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`rjctd_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedRejected = getTimeDurationElements(
+              timeInRequiresUpdates as number,
+              'rjctd_tltp',
+              index,
+              'REJECTED',
+              eventProgress
             )
 
-            timeDurationElements = getTimeDurationElements(
-              timeInWaitingForApproval as number
-            )
-            timeLoggedValidated = (
-              <>
-                <ReactTooltip id={`vldtd_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`vldtd_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedValidated = getTimeDurationElements(
+              timeInWaitingForApproval as number,
+              'vldtd_tltp',
+              index,
+              'VALIDATED',
+              eventProgress
             )
 
-            timeDurationElements = getTimeDurationElements(
-              timeInWaitingForBRIS as number
-            )
-            timeLoggedWaitingValidation = (
-              <>
-                <ReactTooltip id={`wtng_vldtn_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`wtng_vldtn_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedWaitingValidation = getTimeDurationElements(
+              timeInWaitingForBRIS as number,
+              'wtng_vldtn_tltp',
+              index,
+              'WAITING_VALIDATION',
+              eventProgress
             )
 
-            timeDurationElements = getTimeDurationElements(
-              timeInReadyToPrint as number
-            )
-            timeLoggedRegistered = (
-              <>
-                <ReactTooltip id={`rgstrd_tltp_${index}`}>
-                  <ToolTipContainer>
-                    {timeDurationElements.tooltip}
-                  </ToolTipContainer>
-                </ReactTooltip>
-                <span data-tip data-for={`rgstrd_tltp_${index}`}>
-                  {timeDurationElements.label}
-                </span>
-              </>
+            timeLoggedRegistered = getTimeDurationElements(
+              timeInReadyToPrint as number,
+              'rgstrd_tltp_tltp',
+              index,
+              'REGISTERED',
+              eventProgress
             )
           }
           return {
@@ -595,6 +572,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           status: (status && [status]) || undefined,
           type: (event && [`${event.toLowerCase()}-application`]) || undefined
         }}
+        fetchPolicy={'no-cache'}
       >
         {({ data, loading, error }) => {
           let total = 0

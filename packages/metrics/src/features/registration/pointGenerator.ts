@@ -262,13 +262,23 @@ export async function generatePaymentPoint(
 export async function generateEventDurationPoint(
   payload: fhir.Bundle,
   allowedPreviousStates: APPLICATION_STATUS[],
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  fromTask?: boolean
 ): Promise<IPoints> {
-  const composition = getComposition(payload)
   const currentTask = getTask(payload)
+  let compositionId
+  if (!fromTask) {
+    const composition = getComposition(payload)
+    if (!composition) {
+      throw new Error('composition not found')
+    }
+    compositionId = composition.id
+  } else {
+    compositionId = currentTask?.focus?.reference?.split('/')[1]
+  }
 
-  if (!composition) {
-    throw new Error('Composition not found')
+  if (!compositionId) {
+    throw new Error('CompositionId not found')
   }
 
   if (!currentTask || !currentTask.lastModified) {
@@ -289,7 +299,7 @@ export async function generateEventDurationPoint(
       previousTask.lastModified,
       currentTask.lastModified
     ),
-    compositionId: composition.id,
+    compositionId: compositionId,
     currentTaskId: currentTask.id,
     previousTaskId: previousTask.id
   }

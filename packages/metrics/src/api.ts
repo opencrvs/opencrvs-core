@@ -58,6 +58,20 @@ export async function fetchParentLocationByLocationID(
   return location && location.partOf && location.partOf.reference
 }
 
+export async function fetchTaskIdByCompositionID(
+  compositionId: string,
+  authHeader: IAuthHeader
+) {
+  const taskBundle = await fetchFHIR(
+    `Task?focus=Composition/${compositionId}`,
+    authHeader
+  )
+  if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
+    return null
+  }
+  return taskBundle.entry[0].resource.id
+}
+
 export async function fetchChildLocationsByParentId(
   locationId: string,
   authHeader: IAuthHeader
