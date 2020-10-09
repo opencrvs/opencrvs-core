@@ -36,7 +36,8 @@ import {
   IPayload,
   modifyApplication,
   SUBMISSION_STATUS,
-  writeApplication
+  writeApplication,
+  writeApplicationWithCallback
 } from '@client/applications'
 import {
   FormFieldGenerator,
@@ -198,6 +199,7 @@ type DispatchProps = {
   goToHome: typeof goToHome
   goToHomeTab: typeof goToHomeTab
   writeApplication: typeof writeApplication
+  writeApplicationWithCallback: typeof writeApplicationWithCallback
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
@@ -427,9 +429,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         return
       }
     }
-    this.updateVisitedGroups()
-    await this.props.writeApplication(this.props.application)
-    this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+
+    this.props.writeApplicationWithCallback(this.props.application, () => {
+      this.updateVisitedGroups()
+      this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+    })
   }
 
   updateVisitedGroups = () => {
@@ -529,7 +533,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     )
 
     const isErrorOccured = this.state.hasError
-    const debouncedModifyApplication = debounce(this.modifyApplication, 500)
+    const debouncedModifyApplication = debounce(this.modifyApplication, 300)
 
     const menuItemDeleteOrClose =
       application.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -925,6 +929,7 @@ export const RegisterForm = connect<
   mapStateToProps,
   {
     writeApplication,
+    writeApplicationWithCallback,
     modifyApplication,
     deleteApplication,
     goToPageGroup: goToPageGroupAction,
