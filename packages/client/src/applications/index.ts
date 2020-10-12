@@ -738,43 +738,38 @@ export async function writeApplicationByUser(
 }
 
 function mergeWorkQueueData(
+  state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
-  sourceWorkQueue: IWorkqueue | undefined,
+  currentApplicatons: IApplication[] | undefined,
   destinationWorkQueue: IWorkqueue
 ) {
-  if (!sourceWorkQueue || !sourceWorkQueue.data) {
+  if (!currentApplicatons) {
     return destinationWorkQueue
   }
   workQueueIds.forEach(workQueueId => {
-    if (
-      !sourceWorkQueue.data[workQueueId].results ||
-      !destinationWorkQueue.data[workQueueId].results
-    ) {
+    if (!destinationWorkQueue.data[workQueueId].results) {
       return
     }
-    ;(sourceWorkQueue.data[workQueueId].results as GQLEventSearchSet[]).forEach(
-      application => {
-        if (application == null) {
-          return
-        }
-        const applicationIndex = (destinationWorkQueue.data[workQueueId]
-          .results as GQLEventSearchSet[]).findIndex(
-          app => app && app.id === application.id
-        )
-        if (applicationIndex >= 0) {
-          ;(destinationWorkQueue.data[workQueueId]
-            .results as GQLEventSearchSet[]).splice(
-            applicationIndex,
-            1,
-            application
-          )
-        }
+    ;(destinationWorkQueue.data[workQueueId]
+      .results as GQLEventSearchSet[]).forEach(application => {
+      if (application == null) {
+        return
       }
-    )
+      const applicationIndex = currentApplicatons.findIndex(
+        app => app && app.id === application.id
+      )
+      if (applicationIndex >= 0) {
+        updateWorkqueueData(
+          state,
+          currentApplicatons[applicationIndex],
+          workQueueId,
+          destinationWorkQueue
+        )
+      }
+    })
   })
   return destinationWorkQueue
 }
-
 async function getWorkqueueData(
   state: IStoreState,
   userDetails: IUserDetails,
@@ -840,10 +835,13 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-
+  const { currentUserData } = await getUserData(
+    userDetails.userMgntUserID || ''
+  )
   return mergeWorkQueueData(
+    state,
     ['inProgressTab', 'notificationTab'],
-    currentWorkqueue,
+    currentUserData && currentUserData.applications,
     workqueue
   )
 }
