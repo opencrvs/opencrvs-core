@@ -86,6 +86,7 @@ interface IConstantsMessages {
   review: MessageDescriptor
   search: MessageDescriptor
   sending: MessageDescriptor
+  sentForUpdatesOn: MessageDescriptor
   sentOn: MessageDescriptor
   status: MessageDescriptor
   submissionStatus: MessageDescriptor
@@ -189,7 +190,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.applicationRegisteredOn'
   },
   applicationRejectedOn: {
-    defaultMessage: 'Application rejected on',
+    defaultMessage: 'Application sent for updates on',
     description: 'Label for the workflow timestamp when the status is rejected',
     id: 'constants.applicationRejectedOn'
   },
@@ -503,7 +504,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.rejected'
   },
   rejectedDays: {
-    defaultMessage: 'Rejected {text}',
+    defaultMessage: 'Sent for updates {text}',
     description: 'The title of rejected days of application',
     id: 'constants.rejectedDays'
   },
@@ -526,6 +527,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sending...',
     description: 'Label for application status Submitting',
     id: 'constants.sending'
+  },
+  sentForUpdatesOn: {
+    defaultMessage: 'Sent for updates on',
+    description: 'Label for rejection date in work queue list item',
+    id: 'constants.sentForUpdatesOn'
   },
   sentOn: {
     defaultMessage: 'Sent on',
