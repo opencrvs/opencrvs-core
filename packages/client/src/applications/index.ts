@@ -505,14 +505,8 @@ export function deleteApplication(
 }
 
 export function writeApplication(
-  application: IApplication | IPrintableApplication
-): IWriteApplicationAction {
-  return { type: WRITE_APPLICATION, payload: { application } }
-}
-
-export function writeApplicationWithCallback(
   application: IApplication | IPrintableApplication,
-  callback: () => void
+  callback?: () => void
 ): IWriteApplicationAction {
   return { type: WRITE_APPLICATION, payload: { application, callback } }
 }

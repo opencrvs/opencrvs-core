@@ -36,8 +36,7 @@ import {
   IPayload,
   modifyApplication,
   SUBMISSION_STATUS,
-  writeApplication,
-  writeApplicationWithCallback
+  writeApplication
 } from '@client/applications'
 import {
   FormFieldGenerator,
@@ -199,7 +198,6 @@ type DispatchProps = {
   goToHome: typeof goToHome
   goToHomeTab: typeof goToHomeTab
   writeApplication: typeof writeApplication
-  writeApplicationWithCallback: typeof writeApplicationWithCallback
   modifyApplication: typeof modifyApplication
   deleteApplication: typeof deleteApplication
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
@@ -430,7 +428,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       }
     }
 
-    this.props.writeApplicationWithCallback(this.props.application, () => {
+    this.props.writeApplication(this.props.application, () => {
       this.updateVisitedGroups()
       this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
     })
@@ -929,7 +927,6 @@ export const RegisterForm = connect<
   mapStateToProps,
   {
     writeApplication,
-    writeApplicationWithCallback,
     modifyApplication,
     deleteApplication,
     goToPageGroup: goToPageGroupAction,
