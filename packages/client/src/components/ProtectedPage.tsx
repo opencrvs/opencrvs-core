@@ -26,6 +26,8 @@ import { REFRESH_TOKEN_CHECK_MILLIS } from '@client/utils/constants'
 import { connect } from 'react-redux'
 import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
+import styled from 'styled-components'
+import { Spinner } from '@opencrvs/components/lib/interface'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -36,6 +38,7 @@ type DispatchProps = {
   onNumPadVisible: () => void
 }
 interface IProtectPageState {
+  loading: boolean
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
@@ -43,10 +46,23 @@ interface IProtectPageState {
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
 
+const SpinnerBackground = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  min-height: 100vh;
+`
+const StyledSpinner = styled(Spinner)`
+  position: absolute;
+  margin-left: -24px;
+  margin-top: -24px;
+  top: 50%;
+  left: 50%;
+`
+
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
     super(props)
     this.state = {
+      loading: true,
       secured: true,
       pinExists: true,
       pendingUser: false
@@ -78,6 +94,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (userDetails && userDetails.practitionerId) {
       LogRocket.identify(userDetails.practitionerId)
     }
+
+    newState.loading = false
     this.setState(newState)
 
     setInterval(() => {
@@ -140,7 +158,15 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   render() {
-    const { pendingUser, secured, pinExists } = this.state
+    const { pendingUser, secured, pinExists, loading } = this.state
+
+    if (loading) {
+      return (
+        <SpinnerBackground>
+          <StyledSpinner id="pin_loading_spinner" />
+        </SpinnerBackground>
+      )
+    }
 
     if (pendingUser) {
       return <ProtectedAccount />
