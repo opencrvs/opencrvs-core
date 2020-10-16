@@ -2036,6 +2036,24 @@ describe('Registration root resolvers', () => {
         ],
         [
           JSON.stringify({
+            id: '1648b1fb-bad4-4b98-b8a3-bd7ceee496b6',
+            resourceType: 'Composition',
+            identifier: {
+              system: 'urn:ietf:rfc:3986',
+              value: 'DewpkiM'
+            },
+            relatesTo: [
+              {
+                code: 'duplicate',
+                targetReference: {
+                  reference: 'Composition/5e3815d1-d039-4399-b47d-af9a9f51993b'
+                }
+              }
+            ]
+          })
+        ],
+        [
+          JSON.stringify({
             resourceType: 'Bundle',
             entry: [
               {
