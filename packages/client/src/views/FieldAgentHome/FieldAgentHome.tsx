@@ -259,7 +259,9 @@ class FieldAgentHomeView extends React.Component<
           color: this.props.theme.colors.secondaryLabel
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.sentOn),
+          label: this.props.intl.formatMessage(
+            constantsMessages.sentForUpdatesOn
+          ),
           width: 40,
           key: 'daysOfRejection'
         }
