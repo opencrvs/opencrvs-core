@@ -427,9 +427,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
         return
       }
     }
-    this.updateVisitedGroups()
-    await this.props.writeApplication(this.props.application)
-    this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+
+    this.props.writeApplication(this.props.application, () => {
+      this.updateVisitedGroups()
+      this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+    })
   }
 
   updateVisitedGroups = () => {
@@ -529,7 +531,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     )
 
     const isErrorOccured = this.state.hasError
-    const debouncedModifyApplication = debounce(this.modifyApplication, 500)
+    const debouncedModifyApplication = debounce(this.modifyApplication, 300)
 
     const menuItemDeleteOrClose =
       application.submissionStatus === SUBMISSION_STATUS.DRAFT

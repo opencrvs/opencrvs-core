@@ -266,6 +266,7 @@ export interface IWriteApplicationAction {
   type: typeof WRITE_APPLICATION
   payload: {
     application: IApplication | IPrintableApplication
+    callback?: () => void
   }
 }
 
@@ -504,9 +505,10 @@ export function deleteApplication(
 }
 
 export function writeApplication(
-  application: IApplication | IPrintableApplication
+  application: IApplication | IPrintableApplication,
+  callback?: () => void
 ): IWriteApplicationAction {
-  return { type: WRITE_APPLICATION, payload: { application } }
+  return { type: WRITE_APPLICATION, payload: { application, callback } }
 }
 
 export async function getCurrentUserID(): Promise<string> {
@@ -1131,7 +1133,12 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run(writeApplicationByUser, {
-          successActionCreator: getStorageApplicationsSuccess,
+          successActionCreator: (response: string) => {
+            if (action.payload.callback) {
+              action.payload.callback()
+            }
+            return getStorageApplicationsSuccess(response)
+          },
           failActionCreator: getStorageApplicationsFailed,
           args: [Cmd.getState, state.userID, action.payload.application]
         })
