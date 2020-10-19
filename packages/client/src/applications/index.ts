@@ -608,9 +608,11 @@ async function updateFieldAgentDeclaredApplicationsByUser(
     currentUserData.applications,
     declaredApplications.results
   )
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
-  return JSON.stringify(currentUserData)
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData)
+  ]).then(([_, currentUserData]) => currentUserData)
 }
 
 export async function getApplicationsOfCurrentUser(): Promise<string> {
@@ -732,9 +734,23 @@ export async function writeApplicationByUser(
       currentUserData.workqueue
     )
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
 
-  return JSON.stringify(currentUserData)
+  if (
+    application.registrationStatus &&
+    application.registrationStatus === 'DECLARED'
+  ) {
+    updateWorkqueueData(
+      getState(),
+      application,
+      'reviewTab',
+      currentUserData.workqueue
+    )
+  }
+
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData)
+  ]).then(([_, currentUserData]) => currentUserData)
 }
 
 function mergeWorkQueueData(
@@ -873,9 +889,10 @@ export async function writeRegistrarWorkqueueByUser(
     }
     allUserData.push(currentUserData)
   }
-  storage.setItem('USER_DATA', JSON.stringify(allUserData))
-
-  return JSON.stringify(currentUserData.workqueue)
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData.workqueue)
+  ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
 }
 
 export async function deleteApplicationByUser(
