@@ -239,6 +239,7 @@ class ReviewTabComponent extends React.Component<
           isIconColumn: true
         },
         {
+          label: this.props.intl.formatMessage(messages.listItemAction),
           width: 20,
           key: 'actions',
           isActionColumn: true,

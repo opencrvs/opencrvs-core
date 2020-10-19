@@ -213,6 +213,9 @@ export class SearchResultView extends React.Component<
           isIconColumns: true
         },
         {
+          label: this.props.intl.formatMessage(
+            registrarHomeMessages.listItemAction
+          ),
           width: 18,
           key: 'actions',
           isActionColumn: true,

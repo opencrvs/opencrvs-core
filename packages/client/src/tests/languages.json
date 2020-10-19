@@ -167,7 +167,7 @@
         "constants.registered": "registered",
         "constants.registrationAgent": "Registration Clerk",
         "constants.rejected": "rejected",
-        "constants.rejectedDays": "Rejected {text}",
+        "constants.rejectedDays": "Sent for updates {text}",
         "constants.relationship": "Relationship",
         "constants.review": "Review",
         "constants.role": "Role",

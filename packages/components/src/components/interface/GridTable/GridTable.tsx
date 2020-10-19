@@ -69,11 +69,12 @@ const ContentWrapper = styled.span<{
   width: number
   alignment?: string
   color?: string
+  paddingRight?: number | null
 }>`
   width: ${({ width }) => width}%;
   display: inline-block;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: 10px;
+  padding-right: ${({ paddingRight }) => (paddingRight ? paddingRight : 10)}px;
   ${({ color }) => color && `color: ${color};`}
   white-space: nowrap;
   overflow: hidden;
@@ -174,6 +175,7 @@ export class GridTable extends React.Component<
             expanded={
               this.state.expanded.findIndex(id => id === itemId) >= 0 || false
             }
+            alignment={alignment}
             arrowExpansion={true}
             id={`ListItemAction-${key}`}
             onExpand={() => this.toggleExpanded(itemId)}
@@ -267,6 +269,9 @@ export class GridTable extends React.Component<
                 key={index}
                 width={preference.width}
                 alignment={preference.alignment}
+                paddingRight={
+                  preference.isActionColumn && this.props.expandable ? 40 : null
+                }
               >
                 {preference.label && preference.label}
               </ContentWrapper>
