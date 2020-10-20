@@ -157,16 +157,16 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     this.setState({ secured: false })
   }
 
+  renderLoadingScreen() {
+    return (
+      <SpinnerBackground>
+        <StyledSpinner id="pin_loading_spinner" />
+      </SpinnerBackground>
+    )
+  }
+
   render() {
     const { pendingUser, secured, pinExists, loading } = this.state
-
-    if (loading) {
-      return (
-        <SpinnerBackground>
-          <StyledSpinner id="pin_loading_spinner" />
-        </SpinnerBackground>
-      )
-    }
 
     if (pendingUser) {
       return <ProtectedAccount />
@@ -179,7 +179,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (isMobileDevice()) {
       return (
         <PageVisibility onChange={this.handleVisibilityChange}>
-          {(secured && this.props.children) ||
+          {(loading && this.renderLoadingScreen()) ||
+            (secured && this.props.children) ||
             (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
         </PageVisibility>
       )
@@ -189,7 +190,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
         onIdle={this.onIdle}
         timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
       >
-        {(secured && this.props.children) ||
+        {(loading && this.renderLoadingScreen()) ||
+          (secured && this.props.children) ||
           (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
       </IdleTimer>
     )
