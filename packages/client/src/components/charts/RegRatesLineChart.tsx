@@ -56,7 +56,7 @@ const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
-  ${({ theme }) => theme.fonts.subtitleStyle};
+  ${({ theme }) => theme.fonts.bodyBoldStyle};
 `
 
 const LegendDetails = styled.div`
@@ -65,14 +65,14 @@ const LegendDetails = styled.div`
 `
 
 const LegendDataLabel = styled.span`
-  ${({ theme }) => theme.fonts.captionStyle}
+  ${({ theme }) => theme.fonts.chartLegendStyle}
 `
 const LegendDataValue = styled.span`
   ${({ theme }) => theme.fonts.bigBodyBoldStyle}
 `
 
 const LegendData = styled.div`
-  padding: 0 4px;
+  padding: 0 8px;
   width: 100%;
   ${({ theme }) => theme.fonts.captionStyle};
 `
