@@ -714,9 +714,13 @@ class FormSectionComponent extends React.Component<Props> {
           }
 
           const isFieldDisabled = conditionalActions.includes('disable')
+          const isDateField =
+            field.type === DATE ||
+            (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+              getFieldType(field as IDynamicFormField, values) === DATE)
 
           if (
-            field.type === DATE &&
+            isDateField &&
             touched[`${field.name}-dd`] !== undefined &&
             touched[`${field.name}-mm`] !== undefined &&
             touched[`${field.name}-yyyy`] !== undefined
