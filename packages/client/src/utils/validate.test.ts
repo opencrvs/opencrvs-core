@@ -478,6 +478,18 @@ describe('validate', () => {
       })
     })
 
+    it('should error when input a date after birth event', () => {
+      const drafts = {
+        child: {
+          childBirthDate: '1992-08-18'
+        }
+      }
+      const invalidDate = '1994-10-22'
+      expect(isValidBirthDate(invalidDate, drafts)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
     it('should pass when supplied a valid birth date with single digit', () => {
       const validDate = '2011-8-12'
       const response = undefined
