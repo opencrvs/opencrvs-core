@@ -158,7 +158,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
   }
 
   onFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    event.target.select()
+    setTimeout(event.target.select.bind(event.target), 20)
     if (
       this.state.selectedItem &&
       this.state.selectedText === this.state.selectedItem.displayLabel
