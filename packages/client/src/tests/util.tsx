@@ -24,7 +24,13 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import ApolloClient from 'apollo-client'
 import { ApolloLink, Observable } from 'apollo-link'
-import { configure, mount, ReactWrapper, shallow } from 'enzyme'
+import {
+  configure,
+  mount,
+  ReactWrapper,
+  shallow,
+  MountRendererProps
+} from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { readFileSync } from 'fs'
 import { join } from 'path'
@@ -2742,7 +2748,8 @@ export async function createTestStore() {
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   store: AppStore,
-  graphqlMocks: any = null
+  graphqlMocks: any = null,
+  options?: MountRendererProps
 ) {
   /*
    * Would it work to replace this fn with createTestApp()
@@ -2773,7 +2780,8 @@ export async function createTestComponent(
           </ThemeProvider>
         </I18nContainer>
       </Provider>
-    </MockedProvider>
+    </MockedProvider>,
+    options
   )
 
   return { component: component.update(), store }
