@@ -35,6 +35,7 @@ const mockActiveSystem = {
   username: 'j.doe1',
   client_id: '123',
   status: 'active',
+  scope: ['nationalId'],
   sha_secret: '123'
 }
 

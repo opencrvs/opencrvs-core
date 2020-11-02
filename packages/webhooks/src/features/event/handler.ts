@@ -16,13 +16,23 @@ import Webhook, { TRIGGERS, IWebhookModel } from '@webhooks/model/webhook'
 import { getQueue } from '@webhooks/queue'
 import { Queue } from 'bullmq'
 import * as ShortUIDGen from 'short-uid'
-import { createRequestSignature } from '@webhooks/features/event/service'
+import {
+  createRequestSignature,
+  transformBirthBundle
+} from '@webhooks/features/event/service'
+
+export interface IAuthHeader {
+  Authorization: string
+}
 
 export async function birthRegisteredHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const bundle = request.payload as fhir.Bundle
+  const authHeader: IAuthHeader = {
+    Authorization: request.headers.authorization
+  }
 
   let webhookQueue: Queue
 
@@ -40,11 +50,16 @@ export async function birthRegisteredHandler(
     }
     logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
     if (webhooks) {
-      webhooks.forEach(webhookToNotify => {
+      for (const webhookToNotify of webhooks) {
         logger.info(
           `Queueing webhook ${webhookToNotify.trigger} ${
             TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
           }`
+        )
+        const transformedBundle = await transformBirthBundle(
+          bundle,
+          webhookToNotify.createdBy.type,
+          authHeader
         )
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_REGISTERED]) {
           const payload = {
@@ -54,7 +69,7 @@ export async function birthRegisteredHandler(
               hub: {
                 topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
               },
-              context: [bundle]
+              context: [transformedBundle]
             }
           }
           const hmac = createRequestSignature(
@@ -79,7 +94,7 @@ export async function birthRegisteredHandler(
             }
           )
         }
-      })
+      }
     } else {
       logger.info(`No webhooks subscribed to birth registration trigger`)
     }
