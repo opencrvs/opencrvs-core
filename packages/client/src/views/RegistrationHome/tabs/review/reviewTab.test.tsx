@@ -155,6 +155,27 @@ const mockReviewTabData = {
     {
       id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
       type: 'Birth',
+      operationHistories: [
+        {
+          operationType: 'DECLARED',
+          operatedOn: new Date(1544188309380).toISOString(),
+          operatorOfficeName: 'Baniajan Union Parishad',
+          operatorRole: 'FIELD_AGENT',
+          operatorName: [
+            {
+              familyName: 'Al Hasan',
+              firstNames: 'Shakib',
+              use: 'en'
+            },
+            {
+              familyName: null,
+              firstNames: '',
+              use: 'bn'
+            }
+          ],
+          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
+        }
+      ],
       registration: {
         status: 'DECLARED',
         contactNumber: '01622688231',
@@ -246,8 +267,7 @@ describe('RegistrationHome sent for review tab related tests', () => {
 
     const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_APPLICATION = moment(
-      moment(TIME_STAMP, 'x').format('YYYY-MM-DD HH:mm:ss'),
-      'YYYY-MM-DD HH:mm:ss'
+      new Date(Number.parseInt(TIME_STAMP))
     ).fromNow()
 
     expect(data.length).toBe(2)

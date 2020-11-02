@@ -290,7 +290,7 @@ export function buildQuery(body: IBirthCompositionBody) {
   if (body.motherDoB) {
     should.push({
       term: {
-        childDoB: body.motherDoB
+        motherDoB: body.motherDoB
       }
     })
   }

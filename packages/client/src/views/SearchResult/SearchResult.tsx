@@ -374,7 +374,7 @@ export class SearchResultView extends React.Component<
       }
 
       let icon: JSX.Element = <div />
-      if (isDuplicate) {
+      if (isDuplicate && !applicationIsRegistered && !applicationIsCertified) {
         icon = <Duplicate />
       } else if (applicationIsValidated) {
         icon = <Validate data-tip data-for="validateTooltip" />
