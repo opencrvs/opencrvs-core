@@ -45,10 +45,11 @@ const StyledSelect = styled(Select)<{
     justify-content: center;
     ${({ theme }) => theme.fonts.smallButtonStyleNoCapitalize};
     text-transform: none;
+    min-height: 32px;
     max-height: 32px;
-    border: 1px solid ${({ theme }) => theme.colors.secondary};
+    border: 2px solid ${({ theme }) => theme.colors.secondary};
     &:hover {
-      border: 1px solid ${({ theme }) => theme.colors.secondary};
+      border: 2px solid ${({ theme }) => theme.colors.secondary};
       ${({ theme, withLightTheme }) =>
         withLightTheme
           ? theme.gradients.gradientGreyShade
@@ -60,8 +61,13 @@ const StyledSelect = styled(Select)<{
     display: none;
   }
 
+  .react-select__indicator {
+    height: 28px;
+    min-height: 28px;
+  }
+
   .react-select__dropdown-indicator {
-    padding-top: 6px;
+    padding-top: 2px;
   }
 
   .react-select__menu {
