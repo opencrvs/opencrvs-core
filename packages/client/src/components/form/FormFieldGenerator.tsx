@@ -114,8 +114,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
-
-const NUMBER_INPUT_SPECIAL_CHAR_REGEX = /[eE+-]/
+import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -393,7 +392,7 @@ function GeneratedInputField({
           max={fieldDefinition.max}
           {...inputProps}
           onKeyPress={e => {
-            if (NUMBER_INPUT_SPECIAL_CHAR_REGEX.test(e.key)) {
+            if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
               e.preventDefault()
             }
           }}
