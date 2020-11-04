@@ -115,6 +115,8 @@ import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
 
+const NUMBER_INPUT_SPECIAL_CHAR_REGEX = /[eE+-]/
+
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -388,7 +390,13 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
+          max={fieldDefinition.max}
           {...inputProps}
+          onKeyPress={e => {
+            if (NUMBER_INPUT_SPECIAL_CHAR_REGEX.test(e.key)) {
+              e.preventDefault()
+            }
+          }}
           value={inputProps.value as string}
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
