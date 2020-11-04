@@ -609,3 +609,12 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
     ? undefined
     : { message: messages.greaterThanZero }
 }
+
+export const notGreaterThan = (maxValue: number): Validation => (
+  value: IFormFieldValue
+) => {
+  const numericValue = Number.parseInt(value as string)
+  return value && !Number.isNaN(numericValue) && numericValue <= maxValue
+    ? undefined
+    : { message: messages.notGreaterThan, props: { maxValue } }
+}
