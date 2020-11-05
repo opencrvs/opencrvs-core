@@ -55,6 +55,7 @@ import {
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
+import { goBack } from 'connected-react-router'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
@@ -121,6 +122,7 @@ type IProps = {
   countries: IAvailableCountries[]
   registerForm: IForm
   resources: IOfflineData
+  goBack: typeof goBack
   modifyApplication: typeof modifyApplication
   writeApplication: typeof writeApplication
   goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
@@ -239,8 +241,19 @@ class ReviewCertificateActionComponent extends React.Component<
     }
   }
 
+  goBack = () => {
+    const naviagatedFromInsideApp = Boolean(
+      this.props.location.state && this.props.location.state.from
+    )
+    if (naviagatedFromInsideApp) {
+      this.props.goBack()
+    } else {
+      this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    }
+  }
+
   render = () => {
-    const { goToRegistrarHomeTabAction, intl } = this.props
+    const { intl } = this.props
 
     return (
       <ActionPageLight
@@ -248,9 +261,7 @@ class ReviewCertificateActionComponent extends React.Component<
         title={intl.formatHTMLMessage(
           certificateMessages.certificateCollectionTitle
         )}
-        goBack={() => {
-          goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
-        }}
+        goBack={this.goBack}
       >
         <Title>{this.getTitle()}</Title>
         <Info>
@@ -346,7 +357,8 @@ const mapDispatchToProps = {
   modifyApplication,
   writeApplication,
   goToRegistrarHomeTabAction,
-  storeApplication
+  storeApplication,
+  goBack
 }
 export const ReviewCertificateAction = connect(
   mapStatetoProps,

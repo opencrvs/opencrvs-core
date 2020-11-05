@@ -331,7 +331,8 @@ export function goToReviewCertificate(registrationId: string, event: Event) {
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId: registrationId.toString(),
       eventType: event
-    })
+    }),
+    { from: window.location.pathname }
   )
 }
 
