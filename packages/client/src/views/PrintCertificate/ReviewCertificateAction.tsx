@@ -245,7 +245,8 @@ class ReviewCertificateActionComponent extends React.Component<
 
   goBack = () => {
     const naviagatedFromInsideApp = Boolean(
-      this.props.location.state && this.props.location.state.from
+      this.props.location.state &&
+        this.props.location.state.isNavigatedInsideApp
     )
     if (naviagatedFromInsideApp) {
       this.props.goBack()

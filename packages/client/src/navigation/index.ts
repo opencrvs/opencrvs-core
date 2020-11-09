@@ -332,7 +332,7 @@ export function goToReviewCertificate(registrationId: string, event: Event) {
       registrationId: registrationId.toString(),
       eventType: event
     }),
-    { from: window.location.pathname }
+    { isNavigatedInsideApp: true }
   )
 }
 

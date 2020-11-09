@@ -197,7 +197,7 @@ describe('back button behavior tests of review certificate action', () => {
   })
 
   it('takes user history back when navigated from inside app', async () => {
-    history.push(history.location.pathname, { from: 'referringPathInsideApp' })
+    history.push(history.location.pathname, { isNavigatedInsideApp: true })
     history.goBack = jest.fn()
     const testComponent = await createTestComponent(
       <ReviewCertificateAction
