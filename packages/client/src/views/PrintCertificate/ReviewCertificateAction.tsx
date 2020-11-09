@@ -29,7 +29,10 @@ import { Action, Event, IForm } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { goToRegistrarHomeTab as goToRegistrarHomeTabAction } from '@client/navigation'
+import {
+  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goBack
+} from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { TAB_ID } from '@client/views/RegistrationHome/tabs/inProgress/inProgressTab'
@@ -55,7 +58,6 @@ import {
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
-import { goBack } from 'connected-react-router'
 
 export const ActionPageWrapper = styled.div`
   position: fixed;
