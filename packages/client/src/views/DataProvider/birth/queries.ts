@@ -313,12 +313,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         id
         contact
         contactPhoneNumber
-        attachments {
-          data
-          type
-          contentType
-          subject
-        }
         status {
           comments {
             comment
