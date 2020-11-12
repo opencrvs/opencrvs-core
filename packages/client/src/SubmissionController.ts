@@ -240,7 +240,11 @@ export class SubmissionController {
       application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
       application.submissionStatus === SUBMISSION_STATUS.REJECTED
     ) {
-      this.store.dispatch(deleteApplication(application))
+      this.store.dispatch(
+        deleteApplication(application, {
+          shouldUpdateFieldAgentHome: scopes.includes('declare')
+        })
+      )
     } else {
       await this.store.dispatch(writeApplication(application))
     }
