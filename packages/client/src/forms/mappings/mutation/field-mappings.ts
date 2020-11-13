@@ -18,7 +18,6 @@ import {
   IFormSectionData,
   IFormFieldMutationMapFunction
 } from '@client/forms'
-import moment from 'moment'
 import { set } from 'lodash'
 
 interface IPersonName {
@@ -516,10 +515,14 @@ export const fieldToReasonsNotApplyingTransformer = (
 
 function formatDate(dateString: string) {
   const [year, month, day] = dateString.split('-')
-  const date = moment(dateString, 'YYYY-M-D')
+  const date = new Date(
+    Number.parseInt(year),
+    Number.parseInt(month) - 1,
+    Number.parseInt(day)
+  )
 
-  if (date.isValid() && year && month && day) {
-    return date.format('YYYY-MM-DD')
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-')
   } else return null
 }
 
