@@ -274,12 +274,14 @@ interface ISetInitialApplicationsAction {
   type: typeof SET_INITIAL_APPLICATION
 }
 
-type DeleteApplicationOptions = Partial<{ shouldUpdateFieldAgentHome: boolean }>
+type OnSuccessDeleteApplicationOptions = Partial<{
+  shouldUpdateFieldAgentHome: boolean
+}>
 interface IDeleteApplicationAction {
   type: typeof DELETE_APPLICATION
   payload: {
     application: IApplication | IPrintableApplication
-  } & DeleteApplicationOptions
+  } & OnSuccessDeleteApplicationOptions
 }
 
 interface IGetStorageApplicationsSuccessAction {
@@ -501,7 +503,7 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
 
 export function deleteApplication(
   application: IApplication | IPrintableApplication,
-  options?: DeleteApplicationOptions
+  options?: OnSuccessDeleteApplicationOptions
 ): IDeleteApplicationAction {
   return { type: DELETE_APPLICATION, payload: { application, ...options } }
 }

@@ -105,7 +105,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch).not.toBeCalled()
   })
 
-  it('syncs all ready to submit and network failed applications in the queue', async () => {
+  it('syncs all ready to submit and network failed applications in the queue and deletes submitted application', async () => {
     const store = {
       getState: () => ({
         profile: {
@@ -160,9 +160,12 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[1][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
+    expect(store.dispatch.mock.calls[9][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
   })
 
-  it('sync all ready to approve application', async () => {
+  it('sync all ready to approve application and deletes approved application', async () => {
     const store = {
       getState: () => ({
         applicationsState: {
@@ -201,6 +204,97 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[0][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.APPROVED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
+  })
+
+  it('sync all ready to register application and deletes registered application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
+              action: Action.REGISTER_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = {
+      mutate: jest
+        .fn()
+        .mockResolvedValueOnce({ data: { markBirthAsValidated: {} } })
+    }
+
+    await subCon.sync()
+
+    expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REGISTERED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
+  })
+
+  it('sync all ready to reject application and deletes rejected application', async () => {
+    const store = {
+      getState: () => ({
+        applicationsState: {
+          applications: [
+            {
+              submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
+              action: Action.REJECT_APPLICATION
+            }
+          ]
+        },
+        registerForm: {
+          registerForm: {}
+        },
+        profile: {
+          tokenPayload: {
+            scope: []
+          }
+        }
+      }),
+      dispatch: jest.fn()
+    }
+
+    // @ts-ignore
+    const subCon = new SubmissionController(store)
+
+    subCon.client = {
+      mutate: jest
+        .fn()
+        .mockResolvedValueOnce({ data: { markBirthAsValidated: {} } })
+    }
+
+    await subCon.sync()
+
+    expect(subCon.client.mutate).toHaveBeenCalledTimes(1)
+    expect(store.dispatch).toHaveBeenCalledTimes(5)
+    expect(
+      store.dispatch.mock.calls[0][0].payload.application.submissionStatus
+    ).toBe(SUBMISSION_STATUS.REJECTED)
+    expect(store.dispatch.mock.calls[4][0].type).toBe(
+      'APPLICATION/DELETE_DRAFT'
+    )
   })
 
   it('fails a application that has a network error', async () => {
