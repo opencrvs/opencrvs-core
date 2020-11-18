@@ -107,7 +107,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     )
 
     return (
-      <div>
+      <div id={`${id}-form-input`}>
         {!hideInputHeader && (
           <InputHeader>
             {label && (
