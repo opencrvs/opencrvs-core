@@ -442,8 +442,12 @@ export const dateFormatIsCorrect = (): Validation => (value: IFormFieldValue) =>
 // Each character has to be a part of the Unicode Bengali script or the hyphen.
 
 export const isValidBengaliWord = (value: string): boolean => {
-  const bengaliRe = XRegExp.cache('^[\\p{Bengali}-.]+$')
-  const lettersRe = XRegExp.cache('^[\\pL\\pM-.]+$')
+  const bengaliRe = XRegExp.cache(
+    '(^[\\p{Bengali}.-]*\\([\\p{Bengali}.-]+\\)[\\p{Bengali}.-]*$)|(^[\\p{Bengali}.-]+$)'
+  )
+  const lettersRe = XRegExp.cache(
+    '(^[\\pL\\pM.-]*\\([\\pL\\pM.-]+\\)[\\pL\\pM.-]*$)|(^[\\pL\\pM.-]+$)'
+  )
 
   return bengaliRe.test(value) && lettersRe.test(value)
 }
@@ -453,7 +457,9 @@ export const isValidBengaliWord = (value: string): boolean => {
 //
 export const isValidEnglishWord = (value: string): boolean => {
   // Still using XRegExp for its caching ability
-  const englishRe = XRegExp.cache('^[\\p{Latin}-.]+$')
+  const englishRe = XRegExp.cache(
+    '(^[\\p{Latin}.-]*\\([\\p{Latin}.-]+\\)[\\p{Latin}.-]*$)|(^[\\p{Latin}.-]+$)'
+  )
 
   return englishRe.test(value)
 }
