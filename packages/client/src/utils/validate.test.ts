@@ -554,6 +554,47 @@ describe('validate', () => {
       const goodValue = 'আব্দুল-জলিল'
       expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
     })
+    describe('when name has brackets', () => {
+      it('should pass when entire name enclosed with bracket', () => {
+        const goodValue = '(আব্দুল-জলিল)'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with first part', () => {
+        const goodValue = '(আব্দুল) জলিল'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with middle part', () => {
+        const goodValue = 'আব্দুল (জলিল) জন'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with last part', () => {
+        const goodValue = 'আব্দুল (জলিল)'
+        expect(bengaliOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should error when brackets are wrongly used', () => {
+        const badValue1 = 'আব্দুল জলিল()'
+        const badValue2 = 'আব্দুল (জলিল'
+        const badValue3 = '()'
+        const badValue4 = 'আব্দুল (জলিল))'
+
+        expect(bengaliOnlyNameFormat(badValue1)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue2)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue3)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+        expect(bengaliOnlyNameFormat(badValue4)).toEqual({
+          message: messages.bengaliOnlyNameFormat
+        })
+      })
+    })
   })
 
   describe('englishOnlyNameFormat. Checks a value is a valid English name', () => {
@@ -586,6 +627,47 @@ describe('validate', () => {
     it('should pass when a hyphenated English name is given', () => {
       const goodValue = 'Anne-Marie'
       expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+    })
+    describe('when name has brackets', () => {
+      it('should pass when entire name enclosed with bracket', () => {
+        const goodValue = '(John-Doe)'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with first part', () => {
+        const goodValue = '(John) Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with middle part', () => {
+        const goodValue = 'John (Denver) Doe'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should pass when brackets are with last part', () => {
+        const goodValue = 'John (Doe)'
+        expect(englishOnlyNameFormat(goodValue)).toBeUndefined()
+      })
+
+      it('should error when brackets are wrongly used', () => {
+        const badValue1 = 'John Doe()'
+        const badValue2 = 'John (Doe'
+        const badValue3 = '()'
+        const badValue4 = 'John (Doe))'
+
+        expect(englishOnlyNameFormat(badValue1)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue2)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue3)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+        expect(englishOnlyNameFormat(badValue4)).toEqual({
+          message: messages.englishOnlyNameFormat
+        })
+      })
     })
   })
 
