@@ -186,11 +186,16 @@ const TableScroller = styled.div<{
   height?: number
   totalWidth: number
   isFullPage?: boolean
+  offsetTop: number
   fixedWidth: number | undefined
 }>`
   display: block;
-  max-height: ${({ height, isFullPage }) =>
-    isFullPage ? '65vh' : height ? `${height}px` : 'auto'};
+  max-height: ${({ height, isFullPage, offsetTop }) =>
+    isFullPage
+      ? `calc(100vh - ${offsetTop}px - 180px)`
+      : height
+      ? `${height}px`
+      : 'auto'};
 
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth
@@ -249,15 +254,18 @@ interface IListTableProps {
 interface IListTableState {
   sortIconInverted: boolean
   sortKey: string | null
+  tableOffsetTop: number
 }
 
 export class ListTable extends React.Component<
   IListTableProps,
   IListTableState
 > {
+  tableRef = React.createRef<HTMLDivElement>()
   state = {
     sortIconInverted: false,
-    sortKey: null
+    sortKey: null,
+    tableOffsetTop: 0
   }
 
   onPageChange = (currentPage: number) => {
@@ -294,6 +302,17 @@ export class ListTable extends React.Component<
     return true
   }
 
+  componentDidUpdate(prevProps: IListTableProps) {
+    if (prevProps.isLoading && !this.props.isLoading) {
+      this.setState({
+        tableOffsetTop:
+          (this.tableRef.current &&
+            this.tableRef.current.getBoundingClientRect().top) ||
+          0
+      })
+    }
+  }
+
   render() {
     const {
       id,
@@ -324,6 +343,7 @@ export class ListTable extends React.Component<
             hideBoxShadow={hideBoxShadow}
             isFullPage={isFullPage}
             fixedWidth={fixedWidth}
+            ref={this.tableRef}
           >
             {tableTitle && <H3>{tableTitle}</H3>}
 
@@ -367,6 +387,7 @@ export class ListTable extends React.Component<
                 isFullPage={isFullPage}
                 totalWidth={totalWidth}
                 fixedWidth={fixedWidth}
+                offsetTop={this.state.tableOffsetTop}
               >
                 <TableBody
                   footerColumns={
