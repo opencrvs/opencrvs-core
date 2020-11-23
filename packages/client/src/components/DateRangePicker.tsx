@@ -88,17 +88,23 @@ interface MonthSelectorProps {
 }
 
 export const PickerButton = styled.button`
-  border: 1px solid ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   &:focus {
     outline: none;
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
   }
+
+  &:active {
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+  }
+
   &:hover {
-    background: ${({ theme }) => theme.colors.smallButtonFocus};
+    background: ${({ theme }) => theme.colors.dropdownHover};
   }
   white-space: nowrap;
   padding: 0;
-  height: 38px;
+  height: 32px;
   background: transparent;
   & > div {
     padding: 0 8px;
