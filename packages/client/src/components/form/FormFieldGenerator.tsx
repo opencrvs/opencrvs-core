@@ -114,6 +114,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
+import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -388,7 +389,13 @@ function GeneratedInputField({
         <TextInput
           type="number"
           step={fieldDefinition.step}
+          max={fieldDefinition.max}
           {...inputProps}
+          onKeyPress={e => {
+            if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
+              e.preventDefault()
+            }
+          }}
           value={inputProps.value as string}
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
             event.currentTarget.blur()
