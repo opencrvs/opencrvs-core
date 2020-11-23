@@ -167,8 +167,11 @@ export const LoadingGrey = styled.span<{
   height: 24px;
   width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
-const TableScrollerHorizontal = styled.div`
-  overflow: auto;
+const TableScrollerHorizontal = styled.div<{
+  disableScrollOnOverflow?: boolean
+}>`
+  ${({ disableScrollOnOverflow }) =>
+    !disableScrollOnOverflow && `overflow: auto`};
   padding-bottom: 8px;
   padding-right: 10px;
 
@@ -233,6 +236,7 @@ interface IListTableProps {
   noResultText: string
   tableHeight?: number
   onPageChange?: (currentPage: number) => void
+  disableScrollOnOverflow?: boolean
   pageSize?: number
   totalItems?: number
   currentPage?: number
@@ -327,7 +331,9 @@ export class ListTable extends React.Component<
           >
             {tableTitle && <H3>{tableTitle}</H3>}
 
-            <TableScrollerHorizontal>
+            <TableScrollerHorizontal
+              disableScrollOnOverflow={this.props.disableScrollOnOverflow}
+            >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
                   <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>

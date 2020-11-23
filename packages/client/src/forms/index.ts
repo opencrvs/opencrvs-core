@@ -454,6 +454,7 @@ export interface ITelFormField extends IFormFieldBase {
 export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
+  max?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -946,6 +947,7 @@ export interface Ii18nTelFormField extends Ii18nFormFieldBase {
 export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
+  max?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {

@@ -34,7 +34,8 @@ import {
   dateFormatIsCorrect,
   dateInPast,
   validLength,
-  isDateAfter
+  isDateAfter,
+  notGreaterThan
 } from '@client/utils/validate'
 import { validationMessages as messages } from '@client/i18n/messages'
 
@@ -478,6 +479,18 @@ describe('validate', () => {
       })
     })
 
+    it('should error when input a date after birth event', () => {
+      const drafts = {
+        child: {
+          childBirthDate: '1992-08-18'
+        }
+      }
+      const invalidDate = '1994-10-22'
+      expect(isValidBirthDate(invalidDate, drafts)).toEqual({
+        message: messages.isValidBirthDate
+      })
+    })
+
     it('should pass when supplied a valid birth date with single digit', () => {
       const validDate = '2011-8-12'
       const response = undefined
@@ -890,6 +903,32 @@ describe('validate', () => {
       const factory = validLength(5)
       const result = factory(99999)
       expect(!!result).toBe(false)
+    })
+  })
+
+  describe('notGreaterThan. Checks if a number value not greater than a given number', () => {
+    it('should pass if the value is not greater than the given number', () => {
+      const goodValue = '13'
+      const maxValue = 15
+      const response = undefined
+      expect(notGreaterThan(maxValue)(goodValue)).toBe(response)
+    })
+
+    it('should error if the value is greater than the given number', () => {
+      const badValue = '37'
+      const maxValue = 15
+      const response = {
+        message: {
+          defaultMessage: 'Must not be more than {maxValue}',
+          description:
+            'The error message that appears on numeric fields that exceed a limit',
+          id: 'validation.notGreaterThan'
+        },
+        props: {
+          maxValue
+        }
+      }
+      expect(notGreaterThan(maxValue)(badValue)).toEqual(response)
     })
   })
 })

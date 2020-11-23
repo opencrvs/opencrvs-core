@@ -550,6 +550,7 @@ function UserListComponent(props: IProps) {
                 })}
                 hideBoxShadow={true}
                 hideTableHeader={true}
+                disableScrollOnOverflow
               />
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}

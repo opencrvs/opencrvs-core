@@ -40,6 +40,7 @@ export const LANG_EN = 'en'
 export const REGEXP_ALPHA_NUMERIC = '^[0-9a-zA-Z]+$'
 export const REGEXP_BLOCK_ALPHA_NUMERIC = '^[0-9A-Z]+$'
 export const REGEXP_BLOCK_ALPHA_NUMERIC_DOT = '^[0-9A-Z.]+$'
+export const REGEXP_NUMBER_INPUT_NON_NUMERIC = '[eE+-]'
 
 export const SECURITY_PIN_INDEX = 'pin'
 export const SECURITY_PIN_EXPIRED_AT = 'locked_time'

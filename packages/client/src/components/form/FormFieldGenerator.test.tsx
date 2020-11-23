@@ -27,7 +27,8 @@ import {
   BIG_NUMBER,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   LOCATION_SEARCH_INPUT,
-  DATE
+  DATE,
+  NUMBER
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
@@ -471,5 +472,48 @@ describe('when field definition has date field', () => {
         component.find('#childDateOfBirth_error').hostNodes()
       ).toHaveLength(1)
     })
+  })
+})
+
+describe('when field definition has number field', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraftMock = jest.fn()
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="numberForm"
+        setAllFieldsDirty={false}
+        onChange={modifyDraftMock}
+        fields={[
+          {
+            name: 'multipleBirth',
+            type: NUMBER,
+            required: true,
+            validate: [],
+            label: formMessages.multipleBirth,
+            initialValue: ''
+          }
+        ]}
+      />,
+      store
+    )
+
+    component = testComponent.component
+  })
+
+  it('field does not take input of non numeric characters', async () => {
+    const eventPreventDefaultMock = jest.fn()
+    const numberInputElement = await waitForElement(
+      component,
+      'input#multipleBirth'
+    )
+    numberInputElement.hostNodes().simulate('keypress', {
+      key: 'e',
+      preventDefault: eventPreventDefaultMock
+    })
+
+    expect(eventPreventDefaultMock).toBeCalledTimes(1)
   })
 })
