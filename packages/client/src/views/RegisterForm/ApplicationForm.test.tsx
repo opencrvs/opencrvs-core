@@ -20,7 +20,8 @@ import {
   setPageVisibility,
   getFileFromBase64String,
   validImageB64String,
-  selectOption
+  selectOption,
+  goToSection
 } from '@client/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
@@ -397,7 +398,7 @@ describe('when user has starts a new application', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
-          await goToEndOfForm(app)
+          await goToSection(app, 4)
           app
             .find('#btn_change_child_familyName')
             .hostNodes()
