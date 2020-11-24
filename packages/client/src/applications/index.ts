@@ -274,11 +274,14 @@ interface ISetInitialApplicationsAction {
   type: typeof SET_INITIAL_APPLICATION
 }
 
+type OnSuccessDeleteApplicationOptions = Partial<{
+  shouldUpdateFieldAgentHome: boolean
+}>
 interface IDeleteApplicationAction {
   type: typeof DELETE_APPLICATION
   payload: {
     application: IApplication | IPrintableApplication
-  }
+  } & OnSuccessDeleteApplicationOptions
 }
 
 interface IGetStorageApplicationsSuccessAction {
@@ -499,9 +502,10 @@ export const getStorageApplicationsFailed = (): IGetStorageApplicationsFailedAct
 })
 
 export function deleteApplication(
-  application: IApplication | IPrintableApplication
+  application: IApplication | IPrintableApplication,
+  options?: OnSuccessDeleteApplicationOptions
 ): IDeleteApplicationAction {
-  return { type: DELETE_APPLICATION, payload: { application } }
+  return { type: DELETE_APPLICATION, payload: { application, ...options } }
 }
 
 export function writeApplication(
@@ -1112,7 +1116,9 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state
         },
         Cmd.run(deleteApplicationByUser, {
-          successActionCreator: getStorageApplicationsSuccess,
+          successActionCreator: action.payload.shouldUpdateFieldAgentHome
+            ? updateFieldAgentDeclaredApplications
+            : getStorageApplicationsSuccess,
           failActionCreator: getStorageApplicationsFailed,
           args: [state.userID, action.payload.application]
         })

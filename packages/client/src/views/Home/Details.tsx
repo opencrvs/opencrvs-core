@@ -306,11 +306,15 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
   }
 
   userHasRegisterOrValidateScope() {
-    return (
-      this.props.scope &&
-      (this.props.scope.includes('register') ||
-        this.props.scope.includes('validate'))
-    )
+    return this.userHasRegisterScope() || this.userHasValidateScope()
+  }
+
+  userHasRegisterScope() {
+    return this.props.scope && this.props.scope.includes('register')
+  }
+
+  userHasValidateScope() {
+    return this.props.scope && this.props.scope.includes('validate')
   }
 
   generateDeclaredApplicationHistorData = (
@@ -514,11 +518,11 @@ class DetailView extends React.Component<IDetailProps & IntlShapeProps> {
         </ActionButton>
       )
     } else if (
-      (applicationState === IN_PROGRESS ||
+      ((applicationState === IN_PROGRESS ||
         applicationState === DECLARED ||
-        applicationState === VALIDATED ||
         applicationState === REJECTED) &&
-      this.userHasRegisterOrValidateScope()
+        this.userHasRegisterOrValidateScope()) ||
+      (applicationState === VALIDATED && this.userHasRegisterScope())
     ) {
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         return (

@@ -17,7 +17,8 @@ import {
   modifyApplication,
   writeApplication,
   SUBMISSION_STATUS,
-  updateRegistrarWorkqueue
+  updateRegistrarWorkqueue,
+  deleteApplication
 } from '@client/applications'
 import { Action } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/application-selectors'
@@ -232,7 +233,21 @@ export class SubmissionController {
     }
     await this.store.dispatch(updateRegistrarWorkqueue())
     await this.store.dispatch(modifyApplication(application))
-    await this.store.dispatch(writeApplication(application))
+
+    if (
+      application.submissionStatus === SUBMISSION_STATUS.SUBMITTED ||
+      application.submissionStatus === SUBMISSION_STATUS.APPROVED ||
+      application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
+      application.submissionStatus === SUBMISSION_STATUS.REJECTED
+    ) {
+      this.store.dispatch(
+        deleteApplication(application, {
+          shouldUpdateFieldAgentHome: scopes.includes('declare')
+        })
+      )
+    } else {
+      await this.store.dispatch(writeApplication(application))
+    }
   }
 
   private onError = async (application: IApplication, error: ApolloError) => {
