@@ -287,6 +287,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return this.props.scope && this.props.scope.includes('validate')
   }
 
+  componentDidUpdate(prevProps: FullProps) {
+    const oldHash = prevProps.location && prevProps.location.hash
+    const newHash = this.props.location && this.props.location.hash
+
+    if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
+      window.location.hash = newHash + '-form-input'
+    }
+  }
+
   modifyApplication = (
     sectionData: IFormSectionData,
     activeSection: IFormSection,

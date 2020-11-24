@@ -125,6 +125,15 @@ const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '32px'};
+
+  & > div::before {
+    content: ' ';
+    height: 80px;
+    margin-top: -80px;
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+  }
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
