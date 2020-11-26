@@ -155,20 +155,17 @@ const LocationSearchFormField = styled(LocationSearch)`
   }
 `
 
-function handleSelectFocus(isSearchable: boolean) {
+function handleSelectFocus(id: string, isSearchable: boolean) {
   if (isMobileDevice() && isSearchable) {
     setTimeout(() => {
-      const optionsElement = document.getElementsByClassName(
-        'react-select__menu'
-      )[0]
+      const inputElement = document.getElementById(`${id}-form-input`)
 
-      if (optionsElement) {
-        optionsElement.scrollIntoView({
-          block: 'center',
+      if (inputElement) {
+        inputElement.scrollIntoView({
           behavior: 'smooth'
         })
       }
-    })
+    }, 20)
   }
 }
 
@@ -241,7 +238,12 @@ function GeneratedInputField({
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
           }}
-          onFocus={() => handleSelectFocus(fieldDefinition.options.length > 10)}
+          onFocus={() =>
+            handleSelectFocus(
+              fieldDefinition.name,
+              fieldDefinition.options.length > 10
+            )
+          }
           options={fieldDefinition.options}
         />
       </InputField>
