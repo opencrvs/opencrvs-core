@@ -160,6 +160,16 @@ export const createStatusHistory = async (
   task: fhir.Task | undefined,
   authHeader: string
 ) => {
+  if (
+    body.operationHistories &&
+    body.operationHistories.length > 0 &&
+    body.operationHistories.some(
+      history => history.operationType && history.operationType === body.type
+    )
+  ) {
+    throw new Error('Duplicate operation history not allowed')
+  }
+
   const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)

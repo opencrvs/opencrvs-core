@@ -66,4 +66,38 @@ describe('elastic search utils', () => {
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
+
+  it('should throw error when going to create duplicate history', async () => {
+    const mockNotificationBody = {
+      compositionId: '9c0dde8d-65b2-49dd-8b7e-5dd0c7c63779',
+      compositionType: 'birth-notification',
+      type: 'REGISTERED',
+      updatedBy: '489b76cf-6b58-4b0d-96ba-caa1271f787b',
+      eventLocationId: '489b76cf-6b58-4b0d-96ba-caa1271f787c',
+      operationHistories: [
+        {
+          operatedOn: '2020-11-23T12:01:15.600Z',
+          operatorFirstNames: 'Mohammad',
+          operatorFamilyNameLocale: '',
+          operatorFamilyName: 'Ashraful',
+          operatorFirstNamesLocale: '',
+          operatorOfficeName: 'Baniajan Union Parishad',
+          operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
+          operationType: 'REGISTERED',
+          operatorRole: 'LOCAL_REGISTRAR'
+        }
+      ]
+    }
+    let error: Error
+    try {
+      await createStatusHistory(
+        mockNotificationBody,
+        mockBirthFhirBundle.entry[1].resource as fhir.Task,
+        'Bearer abc'
+      )
+    } catch (e) {
+      error = e
+      expect(error.message).toBe('Duplicate operation history not allowed')
+    }
+  })
 })
