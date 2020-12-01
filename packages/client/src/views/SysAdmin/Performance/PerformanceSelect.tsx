@@ -68,6 +68,10 @@ const StyledSelect = styled(Select)<{
 
   .react-select__dropdown-indicator {
     padding-top: 2px;
+    & > svg > path {
+      color: ${({ theme, withLightTheme }) =>
+        withLightTheme ? theme.colors.primary : theme.colors.white};
+    }
   }
 
   .react-select__menu {
