@@ -395,6 +395,7 @@ export interface IApplicationsState {
   userID: string
   applications: IApplication[]
   initialApplicationsLoaded: boolean
+  isWritingDraft: boolean
 }
 
 export interface WorkqueueState {
@@ -418,10 +419,11 @@ const workqueueInitialState = {
   }
 }
 
-const initialState = {
+const initialState: IApplicationsState = {
   userID: '',
   applications: [],
-  initialApplicationsLoaded: false
+  initialApplicationsLoaded: false,
+  isWritingDraft: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {
@@ -1136,7 +1138,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     case WRITE_APPLICATION:
       return loop(
         {
-          ...state
+          ...state,
+          isWritingDraft: true
         },
         Cmd.run(writeApplicationByUser, {
           successActionCreator: (response: string) => {
@@ -1170,7 +1173,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state,
           userID: userData.userID,
           applications: userData.applications,
-          initialApplicationsLoaded: true
+          initialApplicationsLoaded: true,
+          isWritingDraft: false
         }
       }
       return {
