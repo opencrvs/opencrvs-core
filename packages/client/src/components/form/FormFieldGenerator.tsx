@@ -115,6 +115,7 @@ import { connect } from 'react-redux'
 import { dynamicDispatch } from '@client/applications'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -153,6 +154,20 @@ const LocationSearchFormField = styled(LocationSearch)`
     border-radius: 0;
   }
 `
+
+function handleSelectFocus(id: string, isSearchable: boolean) {
+  if (isMobileDevice() && isSearchable) {
+    setTimeout(() => {
+      const inputElement = document.getElementById(`${id}-form-input`)
+
+      if (inputElement) {
+        inputElement.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    }, 20)
+  }
+}
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
@@ -223,6 +238,12 @@ function GeneratedInputField({
             resetDependentSelectValues(fieldDefinition.name)
             onSetFieldValue(fieldDefinition.name, val)
           }}
+          onFocus={() =>
+            handleSelectFocus(
+              fieldDefinition.name,
+              fieldDefinition.options.length > 10
+            )
+          }
           options={fieldDefinition.options}
         />
       </InputField>

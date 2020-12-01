@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   selectOption,
-  flushPromises
+  flushPromises,
+  resizeWindow
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
@@ -515,5 +516,60 @@ describe('when field definition has number field', () => {
     })
 
     expect(eventPreventDefaultMock).toBeCalledTimes(1)
+  })
+})
+
+describe('when field definition has select field on mobile device', () => {
+  let component: ReactWrapper<{}, {}>
+  const modifyDraftMock = jest.fn()
+  const scrollMock = jest.fn()
+
+  beforeAll(async () => {
+    resizeWindow(412, 755)
+  })
+
+  beforeEach(async () => {
+    window.HTMLElement.prototype.scrollIntoView = scrollMock
+    const { store } = createStore()
+    const testComponent = await createTestComponent(
+      <FormFieldGenerator
+        id="numberForm"
+        setAllFieldsDirty={false}
+        onChange={modifyDraftMock}
+        fields={[
+          {
+            name: 'countryPermanent',
+            type: SELECT_WITH_OPTIONS,
+            label: formMessages.country,
+            required: true,
+            initialValue: window.config.COUNTRY.toUpperCase(),
+            validate: [],
+            options: countries
+          }
+        ]}
+      />,
+      store,
+      null,
+      { attachTo: document.body }
+    )
+
+    component = testComponent.component
+  })
+
+  it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
+    const input = component.find('#countryPermanent').hostNodes()
+
+    input
+      .find('input')
+      .simulate('focus')
+      .update()
+
+    input
+      .find('.react-select__control')
+      .simulate('mousedown')
+      .update()
+    await flushPromises()
+    component.update()
+    expect(scrollMock).toBeCalled()
   })
 })
