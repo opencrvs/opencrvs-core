@@ -333,15 +333,19 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           if (eventProgress.startedBy != null) {
             const user = eventProgress.startedBy
             starterPractitionerName =
-              (createNamesMap(user && (user.name as GQLHumanName[]))[
-                intl.locale
-              ] as string) ||
-              (createNamesMap(user && (user.name as GQLHumanName[]))[
-                LANG_EN
-              ] as string)
-            starterPractitionerRole = intl.formatMessage(
-              userMessages[user.role as string]
-            )
+              (user &&
+                user.name &&
+                ((createNamesMap(user.name as GQLHumanName[])[
+                  intl.locale
+                ] as string) ||
+                  (createNamesMap(user.name as GQLHumanName[])[
+                    LANG_EN
+                  ] as string))) ||
+              ''
+            starterPractitionerRole =
+              (user.role &&
+                intl.formatMessage(userMessages[user.role as string])) ||
+              ''
           }
 
           const event =
