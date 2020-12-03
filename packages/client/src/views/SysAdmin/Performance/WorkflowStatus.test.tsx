@@ -91,6 +91,7 @@ describe('Workflow status tests', () => {
                     ],
                     role: 'LOCAL_REGISTRAR'
                   },
+                  startedByFacility: null,
                   progressReport: {
                     timeInProgress: null,
                     timeInReadyForReview: null,
