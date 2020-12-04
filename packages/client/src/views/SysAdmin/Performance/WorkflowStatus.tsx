@@ -341,6 +341,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   (createNamesMap(user.name as GQLHumanName[])[
                     LANG_EN
                   ] as string))) ||
+              eventProgress.startedByFacility ||
               ''
             starterPractitionerRole =
               (user.role &&
@@ -457,13 +458,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               new Date(eventProgress.registration.dateOfApplication)
                 .getTime()
                 .toString(),
-            applicationStartedBy: (
-              <DoubleLineValueWrapper>
-                {starterPractitionerName}
-                <br />
-                {`(${starterPractitionerRole})`}
-              </DoubleLineValueWrapper>
-            ),
+            applicationStartedBy:
+              starterPractitionerRole !== '' ? (
+                <DoubleLineValueWrapper>
+                  {starterPractitionerName}
+                  <br />
+                  {`(${starterPractitionerRole})`}
+                </DoubleLineValueWrapper>
+              ) : (
+                starterPractitionerName
+              ),
             timeLoggedInProgress,
             timeLoggedDeclared,
             timeLoggedRejected,

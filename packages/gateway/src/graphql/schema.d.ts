@@ -812,6 +812,7 @@ export interface GQLEventProgressSet {
   dateOfEvent?: GQLDate
   registration?: GQLRegistrationSearchSet
   startedBy?: GQLUser
+  startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
 }
@@ -4074,6 +4075,7 @@ export interface GQLEventProgressSetTypeResolver<TParent = any> {
   dateOfEvent?: EventProgressSetToDateOfEventResolver<TParent>
   registration?: EventProgressSetToRegistrationResolver<TParent>
   startedBy?: EventProgressSetToStartedByResolver<TParent>
+  startedByFacility?: EventProgressSetToStartedByFacilityResolver<TParent>
   startedAt?: EventProgressSetToDateOfEventResolver<TParent>
   progressReport?: EventProgressSetToProgressReportResolver<TParent>
 }
@@ -4105,6 +4107,13 @@ export interface EventProgressSetToRegistrationResolver<
 }
 
 export interface EventProgressSetToStartedByResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventProgressSetToStartedByFacilityResolver<
   TParent = any,
   TResult = any
 > {
