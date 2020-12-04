@@ -216,7 +216,12 @@ class FieldAgentHomeView extends React.Component<
   }
 
   componentDidMount() {
-    this.syncWorkqueue()
+    if (
+      !this.props.history.location.state ||
+      !this.props.history.location.state.ignoreFieldAgentHomeSync
+    ) {
+      this.syncWorkqueue()
+    }
     window.addEventListener('resize', this.recordWindowWidth)
   }
 

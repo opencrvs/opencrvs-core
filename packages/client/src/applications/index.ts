@@ -586,14 +586,6 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   const state = getState()
   const scope = getScope(state)
 
-  if (
-    !state.applicationsState.applications ||
-    state.applicationsState.applications.length !== 0 ||
-    !scope ||
-    !scope.includes('declare')
-  ) {
-    return Promise.reject('Remote declared application merging not applicable')
-  }
   const userDetails =
     getUserDetails(state) ||
     (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
