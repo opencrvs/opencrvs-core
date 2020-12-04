@@ -78,6 +78,7 @@ export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTING = 'SUBMITTING',
+  IN_PROGRESS = 'IN_PROGRESS',
   DECLARED = 'DECLARED',
   SUBMITTED = 'SUBMITTED',
   READY_TO_APPROVE = 'READY_TO_APPROVE',
@@ -546,7 +547,7 @@ async function getFieldAgentDeclaredApplications(userDetails: IUserDetails) {
       query: SEARCH_APPLICATIONS_USER_WISE,
       variables: {
         userId,
-        status: [EVENT_STATUS.DECLARED],
+        status: [EVENT_STATUS.DECLARED, EVENT_STATUS.IN_PROGRESS],
         locationIds,
         count: DECLARED_APPLICATION_SEARCH_QUERY_COUNT,
         sort: Sort.ASC

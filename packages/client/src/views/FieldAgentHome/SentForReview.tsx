@@ -93,6 +93,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         icon = () => <Spinner id={iconId} key={iconId} size={24} />
         statusText = formatMessage(sending)
         break
+      case SUBMISSION_STATUS[SUBMISSION_STATUS.IN_PROGRESS]:
       case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
       case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
         overwriteStatusIfOffline = false
