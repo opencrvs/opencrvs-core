@@ -302,7 +302,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const newHash = this.props.location && this.props.location.hash
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
-      window.location.hash = newHash + '-form-input'
+      this.props.history.replace({
+        pathname: this.props.history.location.pathname,
+        hash: newHash + '-form-input'
+      })
     }
   }
 
