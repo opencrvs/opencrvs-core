@@ -105,7 +105,7 @@ describe('Submission Controller', () => {
     expect(store.dispatch).not.toBeCalled()
   })
 
-  it('syncs all ready to submit and network failed applications in the queue and deletes submitted application', async () => {
+  it('syncs all ready to submit and network failed applications but keeps the submitted application when having declare scope', async () => {
     const store = {
       getState: () => ({
         profile: {
@@ -160,9 +160,7 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[1][0].payload.application.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
-    expect(store.dispatch.mock.calls[9][0].type).toBe(
-      'APPLICATION/DELETE_DRAFT'
-    )
+    expect(store.dispatch.mock.calls[9][0].type).toBe('APPLICATION/WRITE_DRAFT')
   })
 
   it('sync all ready to approve application and deletes approved application', async () => {
