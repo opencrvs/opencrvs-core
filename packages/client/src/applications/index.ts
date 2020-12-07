@@ -579,6 +579,37 @@ export function mergeDeclaredApplications(
     })
 
   applications.push(...transformedDeclaredApplications)
+  const applicationOrderComparator = function(
+    firstApplication: IApplication,
+    secondApplication: IApplication
+  ) {
+    const firstApplicationOperationTime =
+      firstApplication &&
+      firstApplication.operationHistories &&
+      firstApplication.operationHistories[0].operatedOn
+    const secondApplicationOperationTime =
+      secondApplication &&
+      secondApplication.operationHistories &&
+      secondApplication.operationHistories[0].operatedOn
+
+    if (firstApplicationOperationTime && secondApplicationOperationTime) {
+      if (
+        new Date(firstApplicationOperationTime) >
+        new Date(secondApplicationOperationTime)
+      ) {
+        return 1
+      }
+
+      if (
+        new Date(firstApplicationOperationTime) <
+        new Date(secondApplicationOperationTime)
+      ) {
+        return -1
+      }
+    }
+    return 0
+  }
+  applications.sort(applicationOrderComparator)
 }
 
 async function updateFieldAgentDeclaredApplicationsByUser(
