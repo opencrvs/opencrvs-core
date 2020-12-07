@@ -78,7 +78,7 @@ const countQueryGraphqlMock = {
 merge(mockUserResponse, nameObj)
 
 describe('FieldAgentHome tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
     ;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
@@ -98,7 +98,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [{ ...countQueryGraphqlMock, delay: 2000 }]
@@ -123,7 +122,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock]
@@ -154,7 +152,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock]
@@ -290,7 +287,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock, requireUpdatesMock]
@@ -422,7 +418,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock, requireUpdatesMock]
@@ -456,7 +451,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock]
@@ -490,7 +484,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock]
@@ -524,7 +517,6 @@ describe('FieldAgentHome tests', () => {
           path: '',
           url: ''
         }}
-        history={history}
       />,
       store,
       [countQueryGraphqlMock]
@@ -561,7 +553,6 @@ describe('FieldAgentHome tests', () => {
             path: '',
             url: ''
           }}
-          history={history}
         />,
         store
       )).component
@@ -579,7 +570,6 @@ describe('FieldAgentHome tests', () => {
             path: '',
             url: ''
           }}
-          history={history}
         />,
         store
       )
@@ -662,7 +652,6 @@ describe('FieldAgentHome tests', () => {
             path: '',
             url: ''
           }}
-          history={history}
         />,
         store
       )).component
