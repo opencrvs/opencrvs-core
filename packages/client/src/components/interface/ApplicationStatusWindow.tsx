@@ -28,7 +28,7 @@ const Window = styled.div<{
   position: fixed;
   top: 64px;
   right: 0;
-  z-index: 1;
+  z-index: 3;
   height: 100%;
   width: ${({ width }) => `${width}px`};
   border: 1px solid ${({ theme }) => theme.colors.dividerDark};
