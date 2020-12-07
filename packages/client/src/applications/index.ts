@@ -586,7 +586,12 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   const state = getState()
   const scope = getScope(state)
 
-  if (!scope || !scope.includes('declare')) {
+  if (
+    !state.applicationsState.applications ||
+    state.applicationsState.applications.length !== 0 ||
+    !scope ||
+    !scope.includes('declare')
+  ) {
     return Promise.reject('Remote declared application merging not applicable')
   }
 

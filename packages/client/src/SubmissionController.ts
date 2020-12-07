@@ -29,7 +29,10 @@ import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
 import moment from 'moment'
 import { FetchResult } from 'apollo-link'
-import { updateApplicationTaskHistory } from './utils/draftUtils'
+import {
+  getAttachmentSectionKey,
+  updateApplicationTaskHistory
+} from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 
 const INTERVAL_TIME = 5000
@@ -240,11 +243,20 @@ export class SubmissionController {
       application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
       application.submissionStatus === SUBMISSION_STATUS.REJECTED
     ) {
-      this.store.dispatch(
-        deleteApplication(application, {
-          shouldUpdateFieldAgentHome: scopes.includes('declare')
-        })
-      )
+      if (scopes.includes('declare')) {
+        const attachmentSectionKey = getAttachmentSectionKey(application.event)
+        if (
+          application.data &&
+          application.data[attachmentSectionKey] &&
+          Object.keys(application.data[attachmentSectionKey]).length > 0
+        ) {
+          delete application.data[attachmentSectionKey]
+        }
+        this.store.dispatch(modifyApplication(application))
+        this.store.dispatch(writeApplication(application))
+      } else {
+        this.store.dispatch(deleteApplication(application))
+      }
     } else {
       await this.store.dispatch(writeApplication(application))
     }

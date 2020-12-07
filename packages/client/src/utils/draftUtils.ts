@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IApplication, ITaskHistory } from '@client/applications'
-import { Event, IFormSectionData } from '@client/forms'
+import {
+  BirthSection,
+  DeathSection,
+  Event,
+  IFormSectionData
+} from '@client/forms'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -18,6 +23,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
+import { BIRTH, DEATH } from './constants'
 
 const getApplicantFullName = (
   sectionData: IFormSectionData,
@@ -179,5 +185,15 @@ export const updateApplicationTaskHistory = (
         userDetails.primaryOffice &&
         userDetails.primaryOffice.alias) ||
       []
+  }
+}
+
+export const getAttachmentSectionKey = (applicationEvent: Event): string => {
+  switch (applicationEvent) {
+    case DEATH:
+      return DeathSection.DeathDocuments
+    case BIRTH:
+    default:
+      return BirthSection.Documents
   }
 }
