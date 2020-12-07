@@ -252,7 +252,6 @@ export class SubmissionController {
         ) {
           delete application.data[attachmentSectionKey]
         }
-        this.store.dispatch(modifyApplication(application))
         this.store.dispatch(writeApplication(application))
       } else {
         this.store.dispatch(deleteApplication(application))
