@@ -350,7 +350,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     application.payload = payload
     application.downloadStatus = downloadStatus
     this.props.writeApplication(application)
-    this.props.history.push(HOME, { ignoreFieldAgentHomeSync: true })
+    this.props.history.push(HOME)
   }
 
   generateSectionListForReview = (
