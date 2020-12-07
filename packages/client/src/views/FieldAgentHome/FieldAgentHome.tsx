@@ -41,6 +41,7 @@ import {
   FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW,
   FIELD_AGENT_ROLES,
   LANG_EN,
+  PAGE_TRANSITIONS_ENTER_TIME,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
@@ -216,7 +217,7 @@ class FieldAgentHomeView extends React.Component<
   }
 
   componentDidMount() {
-    this.syncWorkqueue()
+    setTimeout(() => this.syncWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
     window.addEventListener('resize', this.recordWindowWidth)
   }
 
