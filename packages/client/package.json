@@ -84,7 +84,7 @@
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
-    "extract:translations": "ts-node -O '{\"module\": \"commonjs\"}' -r tsconfig-paths/register src/extract-translations.ts",
+    "extract:translations": "bash extract-translations.sh",
     "graphql:codegen": "graphql-codegen --config codegen.yml",
     "build:clean": "rm -rf build",
     "serve": "node serve-static.js"

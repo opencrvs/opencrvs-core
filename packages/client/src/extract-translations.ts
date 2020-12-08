@@ -34,29 +34,12 @@ interface IReactIntlSource {
   }
 }
 
-function buildTranslationsCSVData(
-  translations: IMessages,
-  source: IReactIntlSource
-): ITranslationCSVItem[] {
-  const data: ITranslationCSVItem[] = []
-  Object.keys(source).forEach(key => {
-    const translation: ITranslationCSVItem = {
-      // eslint-disable-next-line @typescript-eslint/camelcase
-      Translation_Key: key,
-      Value: translations[key],
-      // eslint-disable-line no-string-literal
-      Description: source[key]['description']
-    }
-    data.push(translation)
-  })
-  return data
-}
-
 async function extractMessages() {
+  const RESOURCES_PATH = process.argv[2]
   const register = JSON.parse(
     fs
       .readFileSync(
-        '../resources/src/bgd/features/languages/generated/register.json'
+        `${RESOURCES_PATH}/src/bgd/features/languages/generated/register.json`
       )
       .toString()
   )
@@ -85,9 +68,6 @@ async function extractMessages() {
       const englishTranslations = register.data.find(
         (obj: ILanguage) => obj.lang === 'en'
       ).messages
-      const bengaliTranslations = register.data.find(
-        (obj: ILanguage) => obj.lang === 'bn'
-      ).messages
       let missingKeys = false
 
       Object.keys(reactIntlSource).forEach(key => {
@@ -96,23 +76,10 @@ async function extractMessages() {
           // eslint-disable-line no-console
           console.log(
             `${chalk.red(
-              `No English translation key exists for message id: ${chalk.white(
+              `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                'resources/src/bgd/features/languages/generated/register.json'
-              )}`
-            )}`
-          )
-        }
-        if (!bengaliTranslations.hasOwnProperty(key)) {
-          missingKeys = true
-          // eslint-disable-line no-console
-          console.log(
-            `${chalk.redBright(
-              `No Bengali translation key exists for message id: ${chalk.white(
-                key
-              )} in ${chalk.yellow(
-                `resources/src/bgd/features/languages/generated/register.json`
+                `${RESOURCES_PATH}/src/bgd/features/languages/generated/register.json`
               )}`
             )}`
           )
@@ -129,24 +96,6 @@ async function extractMessages() {
         process.exit(1)
         return
       }
-
-      const fields = ['Translation_Key', 'Value', 'Description']
-
-      const json2csvParser = new Parser({ fields })
-      const bengaliLanguageCSV = json2csvParser.parse(
-        buildTranslationsCSVData(bengaliTranslations, reactIntlSource)
-      )
-      fs.writeFileSync(
-        `../resources/src/bgd/features/languages/generated/bn.csv`,
-        bengaliLanguageCSV
-      )
-      const englishLanguageCSV = json2csvParser.parse(
-        buildTranslationsCSVData(englishTranslations, reactIntlSource)
-      )
-      fs.writeFileSync(
-        `../resources/src/bgd/features/languages/generated/en.csv`,
-        englishLanguageCSV
-      )
     })
   } catch (err) {
     // eslint-disable-line no-console

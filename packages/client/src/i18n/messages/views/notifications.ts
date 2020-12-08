@@ -56,32 +56,32 @@ const messagesToDefine: INotificationsMessages = {
   statusRegistering: {
     defaultMessage: 'Registering...',
     description: 'Label for application status Registering',
-    id: 'register.registrationHome.outbox.statusRegistering'
+    id: 'registrationHome.outbox.statusRegistering'
   },
   statusRejecting: {
     defaultMessage: 'Rejecting...',
     description: 'Label for application status Rejecting',
-    id: 'register.registrationHome.outbox.statusRejecting'
+    id: 'registrationHome.outbox.statusRejecting'
   },
   statusSubmitting: {
     defaultMessage: 'Submitting...',
     description: 'Label for application status submitting',
-    id: 'register.registrationHome.outbox.statusSubmitting'
+    id: 'registrationHome.outbox.statusSubmitting'
   },
   statusWaitingToRegister: {
     defaultMessage: 'Waiting to register',
     description: 'Label for application status waiting for register',
-    id: 'register.registrationHome.outbox.statusWaitingToRegister'
+    id: 'registrationHome.outbox.statusWaitingToRegister'
   },
   statusWaitingToReject: {
     defaultMessage: 'Waiting to reject',
     description: 'Label for application status waiting for reject',
-    id: 'register.registrationHome.outbox.statusWaitingToReject'
+    id: 'registrationHome.outbox.statusWaitingToReject'
   },
   statusWaitingToSubmit: {
     defaultMessage: 'Waiting to submit',
     description: 'Label for application status waiting for reject',
-    id: 'register.registrationHome.outbox.statusWaitingToSubmit'
+    id: 'registrationHome.outbox.statusWaitingToSubmit'
   },
   userAuditSuccess: {
     defaultMessage:
@@ -110,7 +110,7 @@ const messagesToDefine: INotificationsMessages = {
   waitingToRetry: {
     defaultMessage: 'Waiting to retry',
     description: 'Label for application status waiting for connection',
-    id: 'register.registrationHome.outbox.waitingToRetry'
+    id: 'registrationHome.outbox.waitingToRetry'
   }
 }
 
