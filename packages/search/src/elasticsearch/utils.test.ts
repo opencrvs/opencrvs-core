@@ -67,7 +67,7 @@ describe('elastic search utils', () => {
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
 
-  it('should throw error when going to create duplicate history', async () => {
+  it('should ignore when going to create invalid history', async () => {
     const mockNotificationBody = {
       compositionId: '9c0dde8d-65b2-49dd-8b7e-5dd0c7c63779',
       compositionType: 'birth-notification',
@@ -88,16 +88,12 @@ describe('elastic search utils', () => {
         }
       ]
     }
-    let error: Error
-    try {
-      await createStatusHistory(
-        mockNotificationBody,
-        mockBirthFhirBundle.entry[1].resource as fhir.Task,
-        'Bearer abc'
-      )
-    } catch (e) {
-      error = e
-      expect(error.message).toBe('Duplicate operation history not allowed')
-    }
+
+    await createStatusHistory(
+      mockNotificationBody,
+      mockBirthFhirBundle.entry[1].resource as fhir.Task,
+      'Bearer abc'
+    )
+    expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
 })
