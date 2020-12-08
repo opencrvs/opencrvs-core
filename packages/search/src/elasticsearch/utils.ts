@@ -415,11 +415,6 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
   const previousStatus = getPreviousStatus(body)
   const currentStatus = body.type
 
-  // tslint:disable-next-line:no-console
-  console.log('----------CURRENT-STATUS-----------', currentStatus)
-  // tslint:disable-next-line:no-console
-  console.log('----------PREVIOUS-STATUS----------', previousStatus)
-
   if (
     currentStatus &&
     !validStatusMapping[currentStatus].includes(previousStatus)
