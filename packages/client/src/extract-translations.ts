@@ -27,11 +27,8 @@ interface IMessages {
   [key: string]: string
 }
 
-interface IReactIntlSource {
-  [key: string]: {
-    defaultMessage: string
-    description: string
-  }
+interface IReactIntlDescriptions {
+  [key: string]: string
 }
 
 async function extractMessages() {
@@ -58,19 +55,16 @@ async function extractMessages() {
         var res = main(contents)
         results = results.concat(res)
       })
-      const reactIntlSource: IReactIntlSource = {}
+      const reactIntlDescriptions: IReactIntlDescriptions = {}
       results.forEach(r => {
-        reactIntlSource[r.id] = {
-          defaultMessage: r.defaultMessage,
-          description: r.description
-        }
+        reactIntlDescriptions[r.id] = r.description
       })
       const englishTranslations = register.data.find(
         (obj: ILanguage) => obj.lang === 'en'
       ).messages
       let missingKeys = false
 
-      Object.keys(reactIntlSource).forEach(key => {
+      Object.keys(reactIntlDescriptions).forEach(key => {
         if (!englishTranslations.hasOwnProperty(key)) {
           missingKeys = true
           // eslint-disable-line no-console
@@ -96,6 +90,11 @@ async function extractMessages() {
         process.exit(1)
         return
       }
+
+      fs.writeFileSync(
+        `${RESOURCES_PATH}/src/bgd/features/languages/generated/descriptions.json`,
+        JSON.stringify({ data: reactIntlDescriptions }, null, 2)
+      )
     })
   } catch (err) {
     // eslint-disable-line no-console
