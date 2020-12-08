@@ -661,12 +661,12 @@ const messagesToDefine: IFormMessages = {
   childTab: {
     defaultMessage: 'Child',
     description: 'Form section name for Child',
-    id: 'birth.form.section.child.name'
+    id: 'form.section.child.name'
   },
   childTitle: {
     defaultMessage: "Child's details",
     description: 'Form section title for Child',
-    id: 'birth.form.section.child.title'
+    id: 'form.section.child.title'
   },
   commentsOrNotesDescription: {
     defaultMessage:

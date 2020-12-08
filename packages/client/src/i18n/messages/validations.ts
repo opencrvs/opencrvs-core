@@ -135,7 +135,7 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: 'Must not be more than {maxValue}',
     description:
       'The error message that appears on numeric fields that exceed a limit',
-    id: 'validation.notGreaterThan'
+    id: 'validations.notGreaterThan'
   },
   numberRequired: {
     defaultMessage: 'Must be a number',

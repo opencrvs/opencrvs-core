@@ -41,7 +41,6 @@ interface IReviewMessages {
   validateConfirmationTitle: MessageDescriptor
   valueApprove: MessageDescriptor
   zeroDocumentsText: MessageDescriptor
-  createAndValidateApplicationActionDescription: MessageDescriptor
   validateCompleteApplicationActionTitle: MessageDescriptor
   validateCompleteApplicationActionDescription: MessageDescriptor
   validateApplicationActionModalTitle: MessageDescriptor
@@ -68,11 +67,6 @@ const messagesToDefine: IReviewMessages = {
     id: 'validate.application.action.modal.description',
     defaultMessage:
       'This application will be sent to the registrar from them to register'
-  },
-  createAndValidateApplicationActionDescription: {
-    id: 'create.validate.application.action.decription',
-    defaultMessage:
-      '{completeApplication, select, true {By sending for approval you confirm that the information has been reviewed by the applicant and that it is ready to register.} false {Mandatory information is missing. Please add this information so that you can send to register.}}'
   },
   additionalComments: {
     defaultMessage: 'Any additional comments?',

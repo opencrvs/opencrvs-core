@@ -85,7 +85,7 @@ const messagesToDefine: IUserSetupMessages = {
   labelAssignedOffice: {
     defaultMessage: 'Assigned office',
     description: 'Assigned office',
-    id: 'label.assignedOffice'
+    id: 'settings.user.label.assignedOffice'
   },
   labelBanglaName: {
     defaultMessage: 'Bengali name',
@@ -167,7 +167,7 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage: 'Setting up your account',
     description:
       'The message that displays when the user is waiting for the account to be created',
-    id: 'user.setup.waiting'
+    id: 'userSetup.waiting'
   },
   assignedOffice: {
     defaultMessage: 'Assigned office',
