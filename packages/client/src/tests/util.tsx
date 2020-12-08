@@ -2958,6 +2958,7 @@ export async function goToSection(component: ReactWrapper, nth: number) {
       .simulate('click')
 
     await flushPromises()
+    component.update()
   }
 }
 

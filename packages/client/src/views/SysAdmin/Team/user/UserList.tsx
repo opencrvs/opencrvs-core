@@ -356,12 +356,15 @@ function UserListComponent(props: IProps) {
       (user: GQLUser | null, index: number) => {
         if (user !== null) {
           const name =
-            (createNamesMap(user && (user.name as GQLHumanName[]))[
-              intl.locale
-            ] as string) ||
-            (createNamesMap(user && (user.name as GQLHumanName[]))[
-              LANG_EN
-            ] as string)
+            (user &&
+              user.name &&
+              ((createNamesMap(user.name as GQLHumanName[])[
+                intl.locale
+              ] as string) ||
+                (createNamesMap(user.name as GQLHumanName[])[
+                  LANG_EN
+                ] as string))) ||
+            ''
           const role =
             (user.role && intl.formatMessage(userMessages[user.role])) || '-'
           const type =

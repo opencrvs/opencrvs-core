@@ -38,7 +38,7 @@ const NotificationBar = styled.div`
   ${({ theme }) => theme.fonts.bodyStyle};
   background-color: ${({ theme }) => theme.colors.primary};
   ${({ theme }) => theme.shadows.thickShadow};
-  z-index: 1;
+  z-index: 3;
   &:hover {
     ${({ theme }) => theme.gradients.gradientSkyDark};
   }

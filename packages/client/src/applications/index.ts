@@ -395,6 +395,7 @@ export interface IApplicationsState {
   userID: string
   applications: IApplication[]
   initialApplicationsLoaded: boolean
+  isWritingDraft: boolean
 }
 
 export interface WorkqueueState {
@@ -418,10 +419,11 @@ const workqueueInitialState = {
   }
 }
 
-const initialState = {
+const initialState: IApplicationsState = {
   userID: '',
   applications: [],
-  initialApplicationsLoaded: false
+  initialApplicationsLoaded: false,
+  isWritingDraft: false
 }
 
 export function createApplication(event: Event, initialData?: IFormData) {
@@ -592,6 +594,7 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   ) {
     return Promise.reject('Remote declared application merging not applicable')
   }
+
   const userDetails =
     getUserDetails(state) ||
     (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
@@ -1136,7 +1139,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
     case WRITE_APPLICATION:
       return loop(
         {
-          ...state
+          ...state,
+          isWritingDraft: true
         },
         Cmd.run(writeApplicationByUser, {
           successActionCreator: (response: string) => {
@@ -1170,7 +1174,8 @@ export const applicationsReducer: LoopReducer<IApplicationsState, Action> = (
           ...state,
           userID: userData.userID,
           applications: userData.applications,
-          initialApplicationsLoaded: true
+          initialApplicationsLoaded: true,
+          isWritingDraft: false
         }
       }
       return {

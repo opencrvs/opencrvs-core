@@ -220,7 +220,7 @@ export const dateFormat: Validation = (value: IFormFieldValue) => {
 }
 
 export const isDateNotInFuture = (date: string) => {
-  return new Date(date) <= new Date(new Date())
+  return new Date(date) <= new Date(Date.now())
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
