@@ -122,19 +122,24 @@ const fadeIn = keyframes`
   to { opacity: 1; }
 `
 
-const FormItem = styled.div<{ ignoreBottomMargin?: boolean }>`
+const FormItem = styled.div<{
+  ignoreBottomMargin?: boolean
+  hideFakeMarginTop?: boolean
+}>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
     ignoreBottomMargin ? '0px' : '32px'};
 
-  & > div::before {
+  ${({ hideFakeMarginTop }) =>
+    !hideFakeMarginTop &&
+    `& > div::before {
     content: ' ';
     height: 80px;
     margin-top: -80px;
     display: block;
     visibility: hidden;
     pointer-events: none;
-  }
+  }`}
 `
 const LinkFormField = styled(Link)`
   ${({ theme }) => theme.fonts.bodyStyle};
@@ -917,6 +922,7 @@ class FormSectionComponent extends React.Component<Props> {
                     <FormItem
                       key={nestedFieldName}
                       ignoreBottomMargin={field.ignoreBottomMargin}
+                      hideFakeMarginTop
                     >
                       <FastField name={nestedFieldName}>
                         {(formikFieldProps: FieldProps<any>) => (

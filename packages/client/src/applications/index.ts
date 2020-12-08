@@ -594,6 +594,7 @@ async function updateFieldAgentDeclaredApplicationsByUser(
   ) {
     return Promise.reject('Remote declared application merging not applicable')
   }
+
   const userDetails =
     getUserDetails(state) ||
     (JSON.parse(await storage.getItem('USER_DETAILS')) as IUserDetails)
