@@ -31,7 +31,7 @@ import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
 import { Button } from '@opencrvs/components/lib/buttons'
 
-const PageWrapper = styled.div`
+export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
   ${({ theme }) => theme.gradients.gradientNightshade};
   ${window.config.COUNTRY === 'zmb'
@@ -60,7 +60,7 @@ const StyledLogo = styled(Logo)`
   margin-top: -80px;
 `
 
-const LogoutHeader = styled.a`
+export const LogoutHeader = styled.a`
   float: right;
   color: ${({ theme }) => theme.colors.white};
   display: flex;

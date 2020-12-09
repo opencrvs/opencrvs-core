@@ -28,6 +28,7 @@ import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -180,7 +181,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     if (!secured) {
       if (forgotPin) {
-        console.log('pin forgot, now it should render forgot pin component')
+        return <ForgotPIN goBack={() => this.setState({ forgotPin: false })} />
       }
 
       return (
