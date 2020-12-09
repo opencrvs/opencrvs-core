@@ -165,8 +165,18 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 
+  conditionalRenderUponSecuredState() {
+    const { secured, loading } = this.state
+
+    return (
+      (loading && this.renderLoadingScreen()) ||
+      (secured && this.props.children) ||
+      (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)
+    )
+  }
+
   render() {
-    const { pendingUser, secured, pinExists, loading } = this.state
+    const { pendingUser, pinExists } = this.state
 
     if (pendingUser) {
       return <ProtectedAccount />
@@ -179,9 +189,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     if (isMobileDevice()) {
       return (
         <PageVisibility onChange={this.handleVisibilityChange}>
-          {(loading && this.renderLoadingScreen()) ||
-            (secured && this.props.children) ||
-            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+          {this.conditionalRenderUponSecuredState()}
         </PageVisibility>
       )
     }
@@ -190,9 +198,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
         onIdle={this.onIdle}
         timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
       >
-        {(loading && this.renderLoadingScreen()) ||
-          (secured && this.props.children) ||
-          (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+        {this.conditionalRenderUponSecuredState()}
       </IdleTimer>
     )
   }
