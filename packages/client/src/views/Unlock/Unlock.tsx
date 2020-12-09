@@ -100,6 +100,7 @@ type Props = {
 type IFullProps = Props &
   IntlShapeProps & {
     onCorrectPinMatch: () => void
+    onForgetPin: () => void
   }
 
 const MAX_LOCK_TIME = 1
@@ -275,9 +276,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           {this.showErrorMessage()}
           <PINKeypad
             forgotPinComponent={
-              <ForgottenPinLink
-                onClick={() => console.log('this should come from props')}
-              >
+              <ForgottenPinLink onClick={this.props.onForgetPin}>
                 Forgotten pin
               </ForgottenPinLink>
             }

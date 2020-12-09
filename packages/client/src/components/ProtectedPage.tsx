@@ -42,6 +42,7 @@ interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
+  forgotPin: boolean
 }
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
@@ -65,7 +66,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       loading: true,
       secured: true,
       pinExists: true,
-      pendingUser: false
+      pendingUser: false,
+      forgotPin: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -166,7 +168,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   conditionalRenderUponSecuredState() {
-    const { secured, loading } = this.state
+    const { secured, loading, forgotPin } = this.state
 
     if (loading) {
       return this.renderLoadingScreen()
@@ -177,7 +179,16 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     }
 
     if (!secured) {
-      return <Unlock onCorrectPinMatch={this.markAsSecured} />
+      if (forgotPin) {
+        console.log('pin forgot, now it should render forgot pin component')
+      }
+
+      return (
+        <Unlock
+          onCorrectPinMatch={this.markAsSecured}
+          onForgetPin={() => this.setState({ forgotPin: true })}
+        />
+      )
     }
 
     return null
