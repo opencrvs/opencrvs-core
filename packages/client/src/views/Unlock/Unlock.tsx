@@ -29,6 +29,7 @@ import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
+import { Button } from '@opencrvs/components/lib/buttons'
 
 const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
@@ -76,7 +77,11 @@ const Container = styled.div`
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
 `
-
+const ForgottenPinLink = styled(Button)`
+  ${({ theme }) => theme.fonts.buttonStyle};
+  color: ${({ theme }) => theme.colors.white};
+  text-transform: none;
+`
 interface IState {
   pin: string
   resetKey: number
@@ -269,6 +274,13 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
           {this.showErrorMessage()}
           <PINKeypad
+            forgotPinComponent={
+              <ForgottenPinLink
+                onClick={() => console.log('this should come from props')}
+              >
+                Forgotten pin
+              </ForgottenPinLink>
+            }
             ref={(elem: any) => (this.pinKeyRef = elem)}
             onComplete={this.onPinProvided}
             pin={this.state.pin}
