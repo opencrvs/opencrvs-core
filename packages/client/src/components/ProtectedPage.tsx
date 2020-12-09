@@ -168,11 +168,19 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   conditionalRenderUponSecuredState() {
     const { secured, loading } = this.state
 
-    return (
-      (loading && this.renderLoadingScreen()) ||
-      (secured && this.props.children) ||
-      (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)
-    )
+    if (loading) {
+      return this.renderLoadingScreen()
+    }
+
+    if (secured) {
+      return this.props.children
+    }
+
+    if (!secured) {
+      return <Unlock onCorrectPinMatch={this.markAsSecured} />
+    }
+
+    return null
   }
 
   render() {
