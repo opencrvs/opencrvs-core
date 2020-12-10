@@ -133,6 +133,12 @@ export function ForgotPIN(props: IForgotPINProps) {
     dispatch(redirectToAuthentication())
   }, [dispatch])
 
+  const onForgetPassword = useCallback(() => {
+    storage.removeItem(SCREEN_LOCK)
+    storage.removeItem(SECURITY_PIN_EXPIRED_AT)
+    window.location.assign(window.config.LOGIN_URL + '/forgotten-item')
+  }, [])
+
   function showName() {
     const nameObj =
       (userDetails &&
@@ -179,7 +185,9 @@ export function ForgotPIN(props: IForgotPINProps) {
           />
           <ActionWrapper>
             <PrimaryButton>Verify</PrimaryButton>
-            <ForgotPasswordLink>Forgot password</ForgotPasswordLink>
+            <ForgotPasswordLink type="button" onClick={onForgetPassword}>
+              Forgot password
+            </ForgotPasswordLink>
           </ActionWrapper>
         </StyledForm>
       </Container>
