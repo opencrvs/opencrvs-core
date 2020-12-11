@@ -54,6 +54,7 @@ type Query {
     skip: Int
     sort: String
   ): SearchFieldAgentResult
+  verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
   fetchRegistrationMetrics(
     timeStart: String!
     timeEnd: String!
@@ -308,6 +309,14 @@ type SearchUserResult {
 type SearchFieldAgentResult {
   results: [SearchFieldAgentResponse]
   totalItems: Int
+}
+
+type VerifyPasswordResult {
+  mobile: String
+  scrope: [String]
+  status: String
+  username: String
+  id: String
 }
 
 type RegistrationMetrics {

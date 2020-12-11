@@ -29,6 +29,7 @@ export interface GQLQuery {
   getUser?: GQLUser
   searchUsers?: GQLSearchUserResult
   searchFieldAgents?: GQLSearchFieldAgentResult
+  verifyPasswordById?: GQLVerifyPasswordResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
   getEventEstimationMetrics?: GQLEventEstimationMetrics
   getApplicationsStartedMetrics?: GQLApplicationsStartedMetrics
@@ -581,6 +582,14 @@ export interface GQLSearchUserResult {
 export interface GQLSearchFieldAgentResult {
   results?: Array<GQLSearchFieldAgentResponse | null>
   totalItems?: number
+}
+
+export interface GQLVerifyPasswordResult {
+  mobile?: string
+  scrope?: string[]
+  status?: string
+  username?: string
+  id?: string
 }
 
 export interface GQLTimeLoggedMetricsResultSet {
@@ -1230,6 +1239,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUser?: QueryToGetUserResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
+  verifyPasswordById?: QueryToVerifyPasswordResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
   getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
   getApplicationsStartedMetrics?: QueryToGetApplicationsStartedMetricsResolver<
@@ -1539,6 +1549,19 @@ export interface QueryToSearchFieldAgentsResolver<
   ): TResult
 }
 
+export interface QueryToVerifyPasswordArgs {
+  id: string
+  password: string
+}
+
+export interface QueryToVerifyPasswordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToVerifyPasswordArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
 export interface QueryToFetchRegistrationMetricsArgs {
   timeStart: string
   timeEnd: string

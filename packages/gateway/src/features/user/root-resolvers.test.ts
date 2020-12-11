@@ -464,6 +464,58 @@ describe('User root resolvers', () => {
     })
   })
 
+  describe('verifyPasswordById()', () => {
+    let authHeaderUser: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const declareToken = jwt.sign(
+        { scope: ['declare'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderUser = {
+        Authorization: `Bearer ${declareToken}`
+      }
+    })
+
+    it('returns user data if the user is verified', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'sakibal.hasan',
+          id: '123',
+          scope: ['declare'],
+          status: 'active'
+        })
+      )
+
+      const res = await resolvers.Query.verifyPasswordById(
+        {},
+        { id: '123', password: 'test' },
+        authHeaderUser
+      )
+
+      expect(res.username).toBe('sakibal.hasan')
+    })
+
+    it('returns error data if the user-mgnt response anything other than status 200', async () => {
+      fetch.mockResponses([JSON.stringify({}), { status: 401 }])
+
+      try {
+        await resolvers.Query.verifyPasswordById(
+          {},
+          { id: '123', password: 'test' },
+          authHeaderUser
+        )
+      } catch (e) {
+        expect(e.message).toBe('Unauthorized to verify password')
+      }
+    })
+  })
   describe('activateUser mutation', () => {
     it('activates the pending user', async () => {
       fetch.mockResponses(
