@@ -14,18 +14,7 @@ import * as fs from 'fs'
 import glob from 'glob'
 import main, { Message } from 'typescript-react-intl'
 import chalk from 'chalk'
-import { Parser } from 'json2csv'
 import { ILanguage } from '@client/i18n/reducer'
-
-interface ITranslationCSVItem {
-  Translation_Key: string
-  Value: string
-  Description: string
-}
-
-interface IMessages {
-  [key: string]: string
-}
 
 interface IReactIntlDescriptions {
   [key: string]: string
@@ -60,7 +49,7 @@ async function extractMessages() {
         reactIntlDescriptions[r.id] = r.description
       })
       const englishTranslations = register.data.find(
-        (obj: ILanguage) => obj.lang === 'en'
+        (obj: ILanguage) => obj.lang === 'en-US'
       ).messages
       let missingKeys = false
 

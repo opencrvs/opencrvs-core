@@ -130,12 +130,12 @@ const messagesToDefine: IReviewMessages = {
   registerActionDescriptionComplete: {
     defaultMessage:
       'By clicking register, you confirm that the information is correct and has been reviewed by the applicant. The applicant understands that it will be used to register the birth and for planning purposes.\n\nBy registering this birth, a birth certificate will be generated with your signature for issuance.',
-    id: 'review.actions.description.registerConfirmComplete'
+    id: 'review.actions.desc.regConfComp'
   },
   registerActionDescriptionIncomplete: {
     defaultMessage:
       'Mandatory information is missing. Please add this information so that you can complete the registration process.',
-    id: 'review.actions.description.registerConfirmInComplete'
+    id: 'review.actions.desc.regConfInComp'
   },
   registerActionTitle: {
     defaultMessage: 'Ready to register?',

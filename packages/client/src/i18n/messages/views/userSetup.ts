@@ -151,7 +151,7 @@ const messagesToDefine: IUserSetupMessages = {
     defaultMessage:
       'Check the details below to confirm your account details are correct. and make annecessary changes to confirm your account details are correct.',
     description: 'User setup review page instruction',
-    id: 'userSetupReview.instruction'
+    id: 'userSetup.instruction'
   },
   userSetupWelcomeTitle: {
     defaultMessage: 'Welcome to OpenCRVS',

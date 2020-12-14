@@ -36,17 +36,17 @@ const messagesToDefine: IregistrationHomeMessages = {
   certified: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
-    id: 'registrationHome.certified'
+    id: 'regHome.certified'
   },
   dataTableResults: {
     defaultMessage: 'Results',
     description: 'Results label at the top of the data table component',
-    id: 'registrationHome.table.label'
+    id: 'regHome.table.label'
   },
   inProgress: {
     defaultMessage: 'In progress',
     description: 'The title of In progress',
-    id: 'registrationHome.inProgress'
+    id: 'regHome.inProgress'
   },
   inProgressFieldAgents: {
     defaultMessage: 'Field agents',
@@ -66,62 +66,62 @@ const messagesToDefine: IregistrationHomeMessages = {
   listItemAction: {
     defaultMessage: 'Action',
     description: 'Label for action in work queue list item',
-    id: 'registrationHome.table.label.action'
+    id: 'regHome.table.label.action'
   },
   listItemApplicationDate: {
     defaultMessage: 'Application sent',
     description: 'Label for application date in work queue list item',
-    id: 'registrationHome.table.label.applicationDate'
+    id: 'regHome.table.label.applicationDate'
   },
   listItemRegisteredDate: {
     defaultMessage: 'Application registered',
     description: 'Label for date of registration in work queue list item',
-    id: 'registrationHome.table.label.registeredDate'
+    id: 'regHome.table.label.registeredDate'
   },
   readyForReview: {
     defaultMessage: 'Ready for review',
     description: 'The title of ready for review',
-    id: 'registrationHome.readyForReview'
+    id: 'regHome.readyForReview'
   },
   readyToPrint: {
     defaultMessage: 'Ready to print',
     description: 'The title of ready to print tab',
-    id: 'registrationHome.readyToPrint'
+    id: 'regHome.readyToPrint'
   },
   registrationNumber: {
     defaultMessage: 'Registration no.',
     description: 'The heading of registration no. column',
-    id: 'registrationHome.registrationNumber'
+    id: 'regHome.registrationNumber'
   },
   sentForApprovals: {
     defaultMessage: 'Sent for approval',
     description: 'The title of sent for approvals tab',
-    id: 'registrationHome.sentForApprovals'
+    id: 'regHome.sentForApprovals'
   },
   sentForExternalValidation: {
     defaultMessage: 'Sent to BRIS',
     description: 'The label for external validation waiting duration column',
-    id: 'registrationHome.sentForExternalValidation'
+    id: 'regHome.sentForExternalValidation'
   },
   sentForUpdates: {
     defaultMessage: 'Sent for updates',
     description: 'The title of sent for updates tab',
-    id: 'registrationHome.sentForUpdates'
+    id: 'regHome.sentForUpdates'
   },
   validatedApplicationTooltipForRegistrar: {
     defaultMessage: 'Application has been validated by a registration agent',
     description: 'Text to display for validated application as tooltip',
-    id: 'registrationHome.validated.registrar.tooltip'
+    id: 'regHome.validated.registrar.tooltip'
   },
   validatedApplicationTooltipForRegistrationAgent: {
     defaultMessage: 'Application has been validated and waiting for approval',
     description: 'Text to display for validated application as tooltip',
-    id: 'registrationHome.validated.registrationAgent.tooltip'
+    id: 'regHome.val.regAgent.tooltip'
   },
   waitingForExternalValidation: {
     defaultMessage: 'Waiting for BRIS',
     description: 'The title of waiting for external validation',
-    id: 'registrationHome.waitingForExternalValidation'
+    id: 'regHome.waitingForExternalValidation'
   }
 }
 

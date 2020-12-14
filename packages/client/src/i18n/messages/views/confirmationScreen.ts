@@ -54,12 +54,12 @@ const messagesToDefine: IConfirmationScreenMessages = {
       'The tracking section description that appear on the confirmation screen'
   },
   backToDuplicatesButton: {
-    id: 'register.confirmationScreen.buttons.back.duplicate',
+    id: 'register.conf.butt.back.dup',
     defaultMessage: 'Back to duplicates',
     description: 'The button to return to the duplicates'
   },
   newButton: {
-    id: 'register.confirmationScreen.buttons.newDeclaration',
+    id: 'register.conf.butt.newDecl',
     defaultMessage: 'New application',
     description:
       'The button to start a new application now that they are finished with this one'

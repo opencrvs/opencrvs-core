@@ -513,7 +513,7 @@ const messagesToDefine: IFormMessages = {
   attendantAtBirthOtherParamedicalPersonnel: {
     defaultMessage: 'Other paramedical personnel',
     description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthOtherParamedicalPersonnel'
+    id: 'form.field.label.attBirthOtherParaPers'
   },
   attendantAtBirthPhysician: {
     defaultMessage: 'Physician',
@@ -672,7 +672,7 @@ const messagesToDefine: IFormMessages = {
     defaultMessage:
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
     description: 'Help text for the notes field',
-    id: 'form.field.label.application.commentsOrNotes.description'
+    id: 'form.field.label.application.comment.desc'
   },
   commentsOrNotesLabel: {
     defaultMessage: 'Comments or notes',
@@ -691,24 +691,24 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.print.confirmMotherInformation'
   },
   contactDetailsApplicant: {
-    id: 'form.field.label.application.whoseContactDetails.applicant',
+    id: 'form.field.label.app.whoContDet.app',
     defaultMessage: 'Applicant',
     description: 'Label for "Applicant" select option'
   },
   contactDetailsBoth: {
     defaultMessage: 'Both Parents',
     description: 'Label for "Both Parents" select option',
-    id: 'form.field.label.application.whoseContactDetails.both'
+    id: 'form.field.label.app.whoContDet.both'
   },
   contactDetailsFather: {
     defaultMessage: 'Father',
     description: 'Label for "Father" select option',
-    id: 'form.field.label.application.whoseContactDetails.father'
+    id: 'form.field.label.app.whoContDet.father'
   },
   contactDetailsMother: {
     defaultMessage: 'Mother',
     description: 'Label for "Mother" select option',
-    id: 'form.field.label.application.whoseContactDetails.mother'
+    id: 'form.field.label.app.whoContDet.mother'
   },
   country: {
     defaultMessage: 'Country',
@@ -816,7 +816,7 @@ const messagesToDefine: IFormMessages = {
       'Is deceased’s current address the same as their permanent address?',
     description:
       'Title for the radio button to select that the deceased current address is the same as their permanent address',
-    id: 'form.field.label.deceasedCurrentAddressSameAsPermanent'
+    id: 'form.field.label.deceasedCurAddSamePerm'
   },
   deceasedDateOfBirth: {
     defaultMessage: 'Date of Birth',
@@ -932,7 +932,7 @@ const messagesToDefine: IFormMessages = {
   dischargeCertificate: {
     defaultMessage: 'Discharge Certificate',
     description: 'Document type label for Discharge Certificate',
-    id: 'form.field.label.docTypeHospitalDischargeCertificate'
+    id: 'form.field.label.docHospDischCert'
   },
   district: {
     defaultMessage: 'District',
@@ -997,7 +997,7 @@ const messagesToDefine: IFormMessages = {
   docTypeHospitalDischargeCertificate: {
     defaultMessage: 'Hospital discharge certificate',
     description: 'Label for select option Hospital Discharge Certificate',
-    id: 'form.field.label.docTypeHospitalDischargeCertificate'
+    id: 'form.field.label.docHospDischCert'
   },
   docTypeLetterOfDeath: {
     defaultMessage: 'Attested letter of death',
@@ -1179,7 +1179,7 @@ const messagesToDefine: IFormMessages = {
     defaultMessage:
       'The request to the NID system was unsuccessful. Please try again with a better connection.',
     description: 'Label for fetch modal error title',
-    id: 'form.field.label.fetchPersonByNIDModalNetworkErrorText'
+    id: 'form.field.label.NIDNetErr'
   },
   fetchPersonByNIDModalInfo: {
     defaultMessage: 'National ID',
@@ -1495,7 +1495,7 @@ const messagesToDefine: IFormMessages = {
       'Is applicant’s permanent address the same as their current address?',
     description:
       'Title for the radio button to select that the applicants current address is the same as their permanent address',
-    id: 'form.field.label.applicantsCurrentAddressSameAsPermanent'
+    id: 'form.field.label.appCurrAddSameAsPerm'
   },
   permanentAddressSameAsMother: {
     defaultMessage: "Is his permanent address the same as the mother's?",
@@ -1512,7 +1512,7 @@ const messagesToDefine: IFormMessages = {
     defaultMessage:
       'Check with the applicant that the mobile phone number you have entered is correct',
     description: 'Warning message to verify applicant phone number ',
-    id: 'form.field.label.application.phoneVerificationWarning'
+    id: 'form.field.label.app.phoneVerWarn'
   },
   placeOfBirth: {
     defaultMessage: 'Place of delivery',
@@ -1695,24 +1695,24 @@ const messagesToDefine: IFormMessages = {
   headOfTheInstitute: {
     defaultMessage: 'Head of the institution where the death occurred',
     description: 'Option for form field: Head of the institute',
-    id: 'form.field.label.applicantRelation.headOfTheInstitute'
+    id: 'form.field.label.applicantRelation.headInst'
   },
   driverOfTheVehicle: {
     defaultMessage:
       'Driver or operator of the land or water vehicle or aircraft where the death occurred',
     description: 'Option for form field: Driver of the vehicle',
-    id: 'form.field.label.applicantRelation.driverOfTheVehicle'
+    id: 'form.field.label.applicantRelation.driver'
   },
   ownerOfTheHouse: {
     defaultMessage: 'Owner of the house or building where the death occurred',
     description: 'Option for form field: Owner of the house',
-    id: 'form.field.label.applicantRelation.ownerOfTheHouse'
+    id: 'form.field.label.applicantRelation.owner'
   },
   officerInCharge: {
     defaultMessage:
       'Officer-in-charge of the Thana of a road or public space where the death occurred',
     description: 'Option for form field: Officer-in-charge',
-    id: 'form.field.label.applicantRelation.officerInCharge'
+    id: 'form.field.label.applicantRelation.officer'
   },
   state: {
     defaultMessage: 'Division',
