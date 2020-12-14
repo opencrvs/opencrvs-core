@@ -22,42 +22,18 @@ import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
 import { NetworkStatus } from 'apollo-client'
-import { VERIFY_PASSWORD_BY_ID } from '@client/user/queries'
+import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-
-const graphqlMocks = [
-  {
-    request: {
-      query: VERIFY_PASSWORD_BY_ID,
-      variables: {
-        id: '5eba726866458970cf2e23c2',
-        password: 'wrongPassword'
-      }
-    },
-    result: {
-      data: {
-        verifyPasswordById: null
-      },
-      errors: [
-        {
-          message: 'Unauthorized to verify password',
-          path: ['verifyPasswordById'],
-          extensions: {
-            code: 'INTERNAL_SERVER_ERROR'
-          }
-        }
-      ]
-    }
-  }
-]
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
   let store: AppStore
   let history: History
   const goBackMock: jest.Mock = jest.fn()
+  const onVerifyPasswordMock = jest.fn()
+  userQueries.verifyPasswordById = jest.fn()
 
   beforeAll(async () => {
     const testStore = await createTestStore()
@@ -119,9 +95,8 @@ describe('ForgotPIN tests', () => {
 
   beforeEach(async () => {
     component = (await createTestComponent(
-      <ForgotPIN goBack={goBackMock} />,
-      store,
-      graphqlMocks
+      <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
+      store
     )).component
 
     // wait for mocked data to load mockedProvider
@@ -140,6 +115,80 @@ describe('ForgotPIN tests', () => {
     const backButton = await waitForElement(component, '#action_back')
     backButton.hostNodes().simulate('click')
     expect(goBackMock).toBeCalledTimes(1)
+  })
+
+  it('clicking on verify with empty password field shows error', async () => {
+    const formElement = await waitForElement(
+      component,
+      '#password_verification_form'
+    )
+    formElement.hostNodes().simulate('submit')
+    component.update()
+    const formError = await waitForElement(component, '#form_error')
+    expect(formError.hostNodes()).toHaveLength(1)
+    expect(formError.hostNodes().text()).toBe('This field is required')
+  })
+
+  it('wrong password submission shows error', async () => {
+    ;(userQueries.verifyPasswordById as jest.Mock).mockRejectedValueOnce({
+      data: {
+        verifyPasswordById: null
+      },
+      errors: [
+        {
+          message: 'Unauthorized to verify password',
+          path: ['verifyPasswordById'],
+          extensions: {
+            code: 'INTERNAL_SERVER_ERROR'
+          }
+        }
+      ]
+    })
+    const passwordInput = await waitForElement(component, 'input#password')
+    passwordInput.hostNodes().simulate('change', {
+      target: { id: 'password', value: 'wrongPassword' }
+    })
+
+    const formElement = await waitForElement(
+      component,
+      '#password_verification_form'
+    )
+
+    formElement.hostNodes().simulate('submit')
+
+    await flushPromises()
+
+    const formError = await waitForElement(component, '#form_error')
+    expect(formError.hostNodes()).toHaveLength(1)
+    expect(formError.hostNodes().text()).toBe(
+      'Sorry that password did not work'
+    )
+  })
+
+  it('correct password submission triggers onVerifyPassword', async () => {
+    ;(userQueries.verifyPasswordById as jest.Mock).mockReturnValueOnce({
+      data: {
+        verifyPasswordById: {
+          id: '5eba726866458970cf2e23c2',
+          username: 'sakibal.hasan'
+        }
+      }
+    })
+    const passwordInput = await waitForElement(component, 'input#password')
+    passwordInput.hostNodes().simulate('change', {
+      target: { id: 'password', value: 'correctPassword' }
+    })
+
+    const formElement = await waitForElement(
+      component,
+      '#password_verification_form'
+    )
+
+    formElement.hostNodes().simulate('submit')
+
+    await flushPromises()
+
+    expect(onVerifyPasswordMock).toBeCalledTimes(1)
   })
 
   it('clicking on logout removes indexedDB entries', async () => {
@@ -191,40 +240,6 @@ describe('ForgotPIN tests', () => {
     expect(indexeddb[SECURITY_PIN_EXPIRED_AT]).toBeFalsy()
     expect(window.location.assign).toBeCalledWith(
       'http://localhost:3020/forgotten-item'
-    )
-  })
-
-  it('clicking on verify with empty password field shows error', async () => {
-    const formElement = await waitForElement(
-      component,
-      '#password_verification_form'
-    )
-    formElement.hostNodes().simulate('submit')
-    component.update()
-    const formError = await waitForElement(component, '#form_error')
-    expect(formError.hostNodes()).toHaveLength(1)
-    expect(formError.hostNodes().text()).toBe('This field is required')
-  })
-
-  it('wrong password submission shows error', async () => {
-    const passwordInput = await waitForElement(component, 'input#password')
-    passwordInput.hostNodes().simulate('change', {
-      target: { id: 'password', value: 'wrongPassword' }
-    })
-
-    const formElement = await waitForElement(
-      component,
-      '#password_verification_form'
-    )
-
-    formElement.hostNodes().simulate('submit')
-
-    await flushPromises()
-
-    const formError = await waitForElement(component, '#form_error')
-    expect(formError.hostNodes()).toHaveLength(1)
-    expect(formError.hostNodes().text()).toBe(
-      'Sorry that password did not work'
     )
   })
 })

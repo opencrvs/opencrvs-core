@@ -42,9 +42,12 @@ const Bold = styled.span`
   ${({ theme }) => theme.fonts.h4Style};
 `
 
-export class SecureAccount extends React.Component<{ onComplete: () => void }> {
+export class SecureAccount extends React.Component<{
+  onComplete: () => void
+  collectPin?: boolean
+}> {
   state = {
-    collectPin: false
+    collectPin: this.props.collectPin || false
   }
   render() {
     return (

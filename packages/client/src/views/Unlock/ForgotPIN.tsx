@@ -53,6 +53,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 interface IForgotPINProps {
   goBack: () => void
+  onVerifyPassword: () => void
 }
 
 const PageWrapper = styled(UnlockPageWrapper)`
@@ -197,17 +198,17 @@ export function ForgotPIN(props: IForgotPINProps) {
       try {
         const { data } = await userQueries.verifyPasswordById(id, password)
 
-        if (data) {
+        if (data && data.verifyPasswordById) {
           setVerifyingPassword(false)
           setError('')
-          // Redirect to create pin here
+          props.onVerifyPassword()
         }
       } catch (e) {
         setVerifyingPassword(false)
         setError(intl.formatMessage(errorMessages.passwordSubmissionError))
       }
     },
-    [password, userDetails, intl]
+    [password, userDetails, intl, props]
   )
 
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {

@@ -44,6 +44,7 @@ interface IProtectPageState {
   pinExists: boolean
   pendingUser: boolean
   forgotPin: boolean
+  passwordVerified: boolean
 }
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
@@ -68,7 +69,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       secured: true,
       pinExists: true,
       pendingUser: false,
-      forgotPin: false
+      forgotPin: false,
+      passwordVerified: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -134,7 +136,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   markAsSecured() {
-    this.setState({ secured: true, pinExists: true })
+    this.setState({
+      secured: true,
+      pinExists: true,
+      passwordVerified: false,
+      forgotPin: false
+    })
     storage.removeItem(SCREEN_LOCK)
   }
 
@@ -181,7 +188,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 
     if (!secured) {
       if (forgotPin) {
-        return <ForgotPIN goBack={() => this.setState({ forgotPin: false })} />
+        return (
+          <ForgotPIN
+            goBack={() => this.setState({ forgotPin: false })}
+            onVerifyPassword={() => this.setState({ passwordVerified: true })}
+          />
+        )
       }
 
       return (
@@ -196,14 +208,19 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   render() {
-    const { pendingUser, pinExists } = this.state
+    const { pendingUser, pinExists, passwordVerified } = this.state
 
     if (pendingUser) {
       return <ProtectedAccount />
     }
 
-    if (!pinExists) {
-      return <SecureAccount onComplete={this.markAsSecured} />
+    if (!pinExists || passwordVerified) {
+      return (
+        <SecureAccount
+          onComplete={this.markAsSecured}
+          collectPin={passwordVerified}
+        />
+      )
     }
 
     if (isMobileDevice()) {
