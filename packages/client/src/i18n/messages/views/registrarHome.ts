@@ -51,17 +51,17 @@ const messagesToDefine: IregistrationHomeMessages = {
   inProgressFieldAgents: {
     defaultMessage: 'Field agents',
     description: 'The title of In progress field agents',
-    id: 'tab.inProgress.selector.field.agents'
+    id: 'regHome.inPro.selector.field.agents'
   },
   inProgressOwnDrafts: {
     defaultMessage: 'Yours',
     description: 'The title of In progress own drafts',
-    id: 'tab.inProgress.selector.own.drafts'
+    id: 'regHome.inPro.selector.own.drafts'
   },
   hospitalDrafts: {
     defaultMessage: 'Hospitals',
     description: 'The title of In progress Hospitals',
-    id: 'tab.inProgress.selector.hospital.drafts'
+    id: 'regHome.inPro.selector.hospital.drafts'
   },
   listItemAction: {
     defaultMessage: 'Action',

@@ -70,12 +70,12 @@ const messagesToDefine = {
 
   // Password confirmation form messages
   passwordUpdateFormBodyHeader: {
-    id: 'newPassword.header',
+    id: 'misc.newPass.header',
     defaultMessage: 'Choose a new password',
     description: 'New Password header'
   },
   passwordUpdateFormBodySubheader: {
-    id: 'newPassword.instruction',
+    id: 'misc.newPass.instruction',
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     description: 'New Password instruction'

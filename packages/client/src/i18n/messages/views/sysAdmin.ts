@@ -71,7 +71,7 @@ const messagesToDefine: ISysAdminMessages = {
   deactivate: {
     defaultMessage: 'Deactivate',
     description: 'Label for toggle menu option deactivate',
-    id: 'sysAdmin.user.deactivate'
+    id: 'sysAdHome.user.deactivate'
   },
   deactivateReasonNotEmployee: {
     id: 'sysAdHome.user.audit.deactiv.reasonNotEmp',
@@ -123,12 +123,12 @@ const messagesToDefine: ISysAdminMessages = {
   editUserDetailsTitle: {
     defaultMessage: 'Edit details',
     description: 'Title for edit user details',
-    id: 'sysAdmin.user.header'
+    id: 'sysAdHome.user.header'
   },
   editUserCommonTitle: {
     defaultMessage: 'Edit user',
     description: 'Common title of form view groups when edit user',
-    id: 'sysAdmin.user.edit.commonGroupTitle'
+    id: 'sysAdHome.user.edit.commonGroupTitle'
   },
   reactivateUserTitle: {
     id: 'sysAdHome.user.audit.reactivation.title',
@@ -144,7 +144,7 @@ const messagesToDefine: ISysAdminMessages = {
   reactivate: {
     defaultMessage: 'Reactivate',
     description: 'Label for toggle menu option reactivate',
-    id: 'sysAdmin.user.reactivate'
+    id: 'sysAdHome.user.reactivate'
   },
   reactivateReasonReturnedToRole: {
     defaultMessage: 'Returned to their role',

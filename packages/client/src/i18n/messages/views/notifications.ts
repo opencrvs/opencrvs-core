@@ -35,23 +35,23 @@ const messagesToDefine: INotificationsMessages = {
       'As you have connectivity, we can synchronize your applications.',
     description:
       'The message that appears in notification when background sync takes place',
-    id: 'notification.declarationsSynced'
+    id: 'misc.notif.declarationsSynced'
   },
   draftsSaved: {
     defaultMessage: 'Your draft has been saved',
     description:
       'The message that appears in notification when save drafts button is clicked',
-    id: 'notification.draftsSaved'
+    id: 'misc.notif.draftsSaved'
   },
   outboxText: {
     defaultMessage: 'Outbox({num})',
     description: 'Application outbox text',
-    id: 'notification.outboxText'
+    id: 'misc.notif.outboxText'
   },
   processingText: {
     defaultMessage: '{num} application processing...',
     description: 'Application processing text',
-    id: 'notification.processingText'
+    id: 'misc.notif.processingText'
   },
   statusRegistering: {
     defaultMessage: 'Registering...',
@@ -87,25 +87,25 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage:
       '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated}}',
     description: 'Label for user audit success notification',
-    id: 'notification.userAuditSuccess'
+    id: 'misc.notif.userAuditSuccess'
   },
   userFormFail: {
     defaultMessage: 'Sorry! Something went wrong',
     description:
       'The message that appears in notification when a new user creation fails',
-    id: 'notification.sorryError'
+    id: 'misc.notif.sorryError'
   },
   userFormSuccess: {
     defaultMessage: 'New user created',
     description:
       'The message that appears in notification when a new user is created',
-    id: 'notification.userFormSuccess'
+    id: 'misc.notif.userFormSuccess'
   },
   userFormUpdateSuccess: {
     defaultMessage: 'User details have been updated',
     description:
       'The message that appears in notification when user details have been updated',
-    id: 'notification.userFormUpdateSuccess'
+    id: 'misc.notif.userFormUpdateSuccess'
   },
   waitingToRetry: {
     defaultMessage: 'Waiting to retry',

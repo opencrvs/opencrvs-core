@@ -151,18 +151,18 @@ const messagesToDefine: IReviewMessages = {
       'By sending for approval you confirm that the application is ready for approval.',
     description:
       'Description for review action component when complete application',
-    id: 'approval.actions.description.Complete'
+    id: 'misc.description.Complete'
   },
   approvalActionDescriptionIncomplete: {
     defaultMessage:
       'Mandatory information is missing. Please add this information so that you can send for approval.',
-    id: 'approval.actions.description.inComplete'
+    id: 'misc.description.inComplete'
   },
   approvalActionTitle: {
     defaultMessage:
       'Send for {draftStatus, select, true {approval} false {approval or reject}}?',
     description: 'Title for review action component',
-    id: 'approval.actions.title.applicationStatus'
+    id: 'misc.title.applicationStatus'
   },
   reviewActionDescriptionComplete: {
     defaultMessage:

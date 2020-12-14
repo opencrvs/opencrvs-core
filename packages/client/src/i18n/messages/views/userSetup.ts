@@ -74,13 +74,13 @@ const messagesToDefine: IUserSetupMessages = {
   header: {
     defaultMessage: 'Choose a new password',
     description: 'New Password header',
-    id: 'newPassword.header'
+    id: 'misc.newPass.header'
   },
   instruction: {
     defaultMessage:
       'We recommend you create a unique password - one that you don’t use for another website or app. Note. You can’t reuse your old password once you change it.',
     description: 'New Password instruction',
-    id: 'newPassword.instruction'
+    id: 'misc.newPass.instruction'
   },
   labelAssignedOffice: {
     defaultMessage: 'Assigned office',
