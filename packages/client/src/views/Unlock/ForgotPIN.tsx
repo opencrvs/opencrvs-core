@@ -36,10 +36,20 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import {
   InputField,
   PasswordInput,
-  THEME_MODE
+  THEME_MODE,
+  ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import {
+  constantsMessages,
+  userMessages,
+  errorMessages,
+  buttonMessages
+} from '@client/i18n/messages'
+import { userQueries } from '@client/user/queries'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { getDefaultLanguage } from '@client/i18n/utils'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -70,6 +80,10 @@ const Container = styled.div`
 `
 const StyledLogo = styled(Logo)`
   margin-top: 104px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 80px;
+  }
 `
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
@@ -88,6 +102,9 @@ const ForgotPasswordLink = styled(Button)`
   text-transform: none;
   margin-top: 24px;
 `
+const SpinnerContainer = styled.div`
+  margin-top: 48px;
+`
 type MetaProps = { touched: boolean; error: string }
 type InputProps = {
   value: any
@@ -96,12 +113,18 @@ type InputProps = {
 }
 
 const Password = injectIntl(
-  (props: { meta: MetaProps; input: InputProps } & WrappedComponentProps) => {
-    const { intl, meta, input } = props
+  (
+    props: {
+      meta: MetaProps
+      input: InputProps
+      id: string
+    } & WrappedComponentProps
+  ) => {
+    const { id, intl, meta, input } = props
 
     return (
       <InputField
-        id="password"
+        id={id}
         touched={meta.touched}
         label={intl.formatMessage(constantsMessages.labelPassword)}
         ignoreMediaQuery
@@ -109,6 +132,7 @@ const Password = injectIntl(
         mode={THEME_MODE.DARK}
       >
         <PasswordInput
+          id={id}
           {...input}
           touched={meta.touched}
           error={Boolean(meta.error)}
@@ -120,9 +144,12 @@ const Password = injectIntl(
 )
 
 export function ForgotPIN(props: IForgotPINProps) {
-  const [value, setValue] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
+
+  const intl = useIntl()
+  const [verifyingPassword, setVerifyingPassword] = useState<boolean>(false)
 
   const userDetails = useSelector(getUserDetails)
   const dispatch = useDispatch()
@@ -154,8 +181,37 @@ export function ForgotPIN(props: IForgotPINProps) {
     return <Name>{fullName}</Name>
   }
 
+  const onSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+
+      if (!password) {
+        setTouched(true)
+        setError(intl.formatMessage(userMessages.requiredfield))
+        return
+      }
+
+      setVerifyingPassword(true)
+
+      const id = (userDetails && userDetails.userMgntUserID) || ''
+      try {
+        const { data } = await userQueries.verifyPasswordById(id, password)
+
+        if (data) {
+          setVerifyingPassword(false)
+          setError('')
+          // Redirect to create pin here
+        }
+      } catch (e) {
+        setVerifyingPassword(false)
+        setError(intl.formatMessage(errorMessages.passwordSubmissionError))
+      }
+    },
+    [password, userDetails, intl]
+  )
+
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value)
+    setPassword(e.target.value)
   }, [])
 
   const onBlur = useCallback(() => {
@@ -164,32 +220,51 @@ export function ForgotPIN(props: IForgotPINProps) {
 
   return (
     <PageWrapper id="forgot_pin_page">
-      <BackButton onClick={props.goBack}>
+      <BackButton id="action_back" onClick={props.goBack}>
         <BackArrow />
       </BackButton>
       <LogoutContainer onClick={logout} id="logout">
-        <span>Logout</span>
+        <span>{intl.formatMessage(buttonMessages.logout)}</span>
         <Logout />
       </LogoutContainer>
       <Container>
         <StyledLogo />
         {showName()}
-        <StyledForm onSubmit={() => console.log('should submit the form')}>
-          <Password
-            meta={{ touched, error }}
-            input={{
-              onChange,
-              onBlur,
-              value
-            }}
-          />
-          <ActionWrapper>
-            <PrimaryButton>Verify</PrimaryButton>
-            <ForgotPasswordLink type="button" onClick={onForgetPassword}>
-              Forgot password
-            </ForgotPasswordLink>
-          </ActionWrapper>
-        </StyledForm>
+        {verifyingPassword ? (
+          <SpinnerContainer>
+            <Spinner
+              id="verifying_password_spinner"
+              baseColor={getTheme(getDefaultLanguage()).colors.white}
+            />
+          </SpinnerContainer>
+        ) : (
+          <>
+            {error && <ErrorMessage id="form_error">{error}</ErrorMessage>}
+            <StyledForm id="password_verification_form" onSubmit={onSubmit}>
+              <Password
+                id="password"
+                meta={{ touched, error }}
+                input={{
+                  onChange,
+                  onBlur,
+                  value: password
+                }}
+              />
+              <ActionWrapper>
+                <PrimaryButton id="form_submit">
+                  {intl.formatMessage(buttonMessages.verify)}
+                </PrimaryButton>
+                <ForgotPasswordLink
+                  type="button"
+                  id="forgot_password"
+                  onClick={onForgetPassword}
+                >
+                  {intl.formatMessage(buttonMessages.forgotPassword)}
+                </ForgotPasswordLink>
+              </ActionWrapper>
+            </StyledForm>
+          </>
+        )}
       </Container>
     </PageWrapper>
   )

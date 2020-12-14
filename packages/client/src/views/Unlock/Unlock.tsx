@@ -30,6 +30,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import zambiaBackground from './background-zmb.jpg'
 import { Button } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bodyBoldStyle};
@@ -266,7 +267,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
     ) : (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.logout} id="logout">
-          <span>Logout</span>
+          <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
           <Logout />
         </LogoutHeader>
         <Container onClick={this.focusKeypad}>
@@ -276,8 +277,11 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           {this.showErrorMessage()}
           <PINKeypad
             forgotPinComponent={
-              <ForgottenPinLink onClick={this.props.onForgetPin}>
-                Forgotten pin
+              <ForgottenPinLink
+                id="forgotten_pin"
+                onClick={this.props.onForgetPin}
+              >
+                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
               </ForgottenPinLink>
             }
             ref={(elem: any) => (this.pinKeyRef = elem)}

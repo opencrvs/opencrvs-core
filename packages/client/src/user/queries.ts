@@ -129,6 +129,26 @@ async function searchUsers(primaryOfficeId: string) {
   )
 }
 
+export const VERIFY_PASSWORD_BY_ID = gql`
+  query verifyPasswordById($id: String!, $password: String!) {
+    verifyPasswordById(id: $id, password: $password) {
+      id
+      username
+    }
+  }
+`
+
+async function verifyPasswordById(id: string, password: string) {
+  return (
+    client &&
+    client.query({
+      query: VERIFY_PASSWORD_BY_ID,
+      variables: { id, password },
+      fetchPolicy: 'no-cache'
+    })
+  )
+}
 export const userQueries = {
-  searchUsers
+  searchUsers,
+  verifyPasswordById
 }

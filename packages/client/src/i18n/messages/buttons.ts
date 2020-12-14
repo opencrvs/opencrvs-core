@@ -25,6 +25,8 @@ interface IButtonsMessages {
   editRegistration: MessageDescriptor
   exitButton: MessageDescriptor
   finish: MessageDescriptor
+  forgotPassword: MessageDescriptor
+  forgottenPIN: MessageDescriptor
   goToHomepage: MessageDescriptor
   login: MessageDescriptor
   logout: MessageDescriptor
@@ -53,6 +55,7 @@ interface IButtonsMessages {
   status: MessageDescriptor
   update: MessageDescriptor
   upload: MessageDescriptor
+  verify: MessageDescriptor
   yes: MessageDescriptor
   approve: MessageDescriptor
   editRecord: MessageDescriptor
@@ -128,6 +131,16 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Finish',
     description: 'The label for finish printing certificate button',
     id: 'buttons.finish'
+  },
+  forgotPassword: {
+    defaultMessage: 'Forgot password',
+    description: 'The label for forgot password button',
+    id: 'buttons.forgotPassword'
+  },
+  forgottenPIN: {
+    defaultMessage: 'Forgotten pin',
+    description: 'The label for forgotten pin button',
+    id: 'buttons.forgottenPIN'
   },
   goToHomepage: {
     defaultMessage: 'Go to Homepage',
@@ -268,6 +281,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Upload',
     description: 'Upload buttton',
     id: 'buttons.upload'
+  },
+  verify: {
+    defaultMessage: 'Verify',
+    description: 'Label for verify password button',
+    id: 'buttons.verify'
   },
   yes: {
     defaultMessage: 'Yes',
