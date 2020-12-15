@@ -192,6 +192,12 @@ class UserProfileComponent extends React.Component<Props, State> {
       {
         label: this.props.intl.formatMessage(sysMessages.menuOptionEditDetails),
         handler: () => this.props.goToReviewUserDetails(userId)
+      },
+      {
+        label: this.props.intl.formatMessage(sysMessages.resendSMS),
+        handler: () => {
+          console.log('To call resend SMS mutation')
+        }
       }
     ]
     if (status === 'active') {

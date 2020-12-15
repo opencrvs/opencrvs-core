@@ -291,6 +291,12 @@ function UserListComponent(props: IProps) {
         handler: () => {
           goToReviewUserDetails(user.id as string)
         }
+      },
+      {
+        label: intl.formatMessage(messages.resendSMS),
+        handler: () => {
+          console.log('To call resend SMS mutation')
+        }
       }
     ]
 
