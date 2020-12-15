@@ -60,6 +60,9 @@ import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@user-mgnt/features/verifyUser/handler'
+import resendSMSInviteHandler, {
+  requestSchema as resendSMSRequestSchema
+} from '@user-mgnt/features/resendSMSInvite/handler'
 import * as Hapi from 'hapi'
 
 const enum RouteScope {
@@ -330,6 +333,21 @@ export const getRoutes = () => {
           payload: userAuditSchema
         },
         tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resendSMSInvite',
+      handler: resendSMSInviteHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.SYSADMIN]
+        },
+        validate: {
+          payload: resendSMSRequestSchema
+        },
+        description:
+          'Resend sms for given mobile number and make the corresponding user pending'
       }
     },
     {
