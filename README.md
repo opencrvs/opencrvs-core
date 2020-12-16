@@ -298,7 +298,7 @@ OpenCRVS has the capability to be fully multi-lingual and languages can be confi
 
 However currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
 
-Currently the supported language straings can be set to either:
+Currently the supported language strings can be set to either:
 
 **Bengali and English**
 
@@ -307,6 +307,8 @@ Currently the supported language straings can be set to either:
 **English only**
 
 "en"
+
+In the [Zambia](https://github.com/opencrvs/opencrvs-zambia) resources package you can see how to set up OpenCRVS with a Content Management System.
 
 Run `yarn dev <supported-languages>` to up the OpenCRVS core dev environment (frontend and backend services in this repo start as local dev servers that will autoreload and dependencies are started via docker-compose) OR alternatively you may run the dependencies and the services in this repo separated in two diffrent terminal with `yarn compose:deps` (dependencies) and `yarn start` manually setting the supported languages string in a .env file. We also provide [tmux](https://github.com/tmuxinator/tmuxinator) commands.
 
