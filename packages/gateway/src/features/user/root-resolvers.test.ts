@@ -806,4 +806,82 @@ describe('User root resolvers', () => {
       )
     })
   })
+
+  describe('resendSMSInvite mutation', () => {
+    let authHeaderSysAdmin: { Authorization: string }
+    let authHeaderRegAgent: { Authorization: string }
+    beforeEach(() => {
+      fetch.resetMocks()
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
+      const validateToken = jwt.sign(
+        { scope: ['validate'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderRegAgent = {
+        Authorization: `Bearer ${validateToken}`
+      }
+    })
+
+    it('throws error for unauthorized user', async () => {
+      await expect(
+        resolvers.Mutation.resendSMSInvite(
+          {},
+          {
+            mobile: '+880123456780'
+          },
+          authHeaderRegAgent
+        )
+      ).rejects.toThrowError(
+        'SMS invite can only be resent by a user with sys admin scope'
+      )
+    })
+
+    it('throws error when the user-mgnt response is not 200', async () => {
+      fetch.mockResponses([JSON.stringify({}), { status: 401 }])
+
+      await expect(
+        resolvers.Mutation.resendSMSInvite(
+          {},
+          {
+            mobile: '+880123456780'
+          },
+          authHeaderSysAdmin
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't send sms to +880123456780"
+      )
+    })
+
+    it('returns true if status from user-mgnt response is 200', async () => {
+      fetch.mockResponses([JSON.stringify({}), { status: 200 }])
+
+      const res = await resolvers.Mutation.resendSMSInvite(
+        {},
+        {
+          mobile: '+880123456780'
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(res).toBe(true)
+    })
+  })
 })

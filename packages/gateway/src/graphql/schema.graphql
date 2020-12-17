@@ -167,6 +167,7 @@ type Mutation {
     reason: String!
     comment: String
   ): String
+  resendSMSInvite(mobile: String!): String
 }
 
 type Dummy {
