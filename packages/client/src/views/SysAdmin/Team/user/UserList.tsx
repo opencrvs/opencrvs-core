@@ -43,7 +43,9 @@ import {
 import {
   ColumnContentAlignment,
   ListTable,
-  ToggleMenu
+  ToggleMenu,
+  FloatingNotification,
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import {
   IColumn,
@@ -63,6 +65,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { userMutations } from '@client/user/mutations'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -230,6 +233,11 @@ export const Status = (statusProps: IStatusProps) => {
 }
 
 function UserListComponent(props: IProps) {
+  const [showResendSMSSuccess, setShowResendSMSSuccess] = useState<boolean>(
+    false
+  )
+  const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
+
   const {
     intl,
     goToReviewUserDetails,
@@ -284,6 +292,22 @@ function UserListComponent(props: IProps) {
     }
   }
 
+  async function resendSMS(userId: string) {
+    try {
+      const res = await userMutations.resendSMSInvite(userId, [
+        {
+          query: SEARCH_USERS,
+          variables: { primaryOfficeId: locationId, count: recordCount }
+        }
+      ])
+      if (res && res.data && res.data.resendSMSInvite) {
+        setShowResendSMSSuccess(true)
+      }
+    } catch (err) {
+      setShowResendSMSError(true)
+    }
+  }
+
   function getMenuItems(user: GQLUser) {
     const menuItems = [
       {
@@ -291,14 +315,17 @@ function UserListComponent(props: IProps) {
         handler: () => {
           goToReviewUserDetails(user.id as string)
         }
-      },
-      {
-        label: intl.formatMessage(messages.resendSMS),
-        handler: () => {
-          console.log('To call resend SMS mutation')
-        }
       }
     ]
+
+    if (user.status !== 'deactivated' && user.status !== 'disabled') {
+      menuItems.push({
+        label: intl.formatMessage(messages.resendSMS),
+        handler: () => {
+          resendSMS(user.id as string)
+        }
+      })
+    }
 
     if (user.status === 'active') {
       menuItems.push({
@@ -609,6 +636,24 @@ function UserListComponent(props: IProps) {
         )}
       </LocationInfo>
       {renderUserList()}
+      {showResendSMSSuccess && (
+        <FloatingNotification
+          type={NOTIFICATION_TYPE.SUCCESS}
+          show={showResendSMSSuccess}
+          callback={() => setShowResendSMSSuccess(false)}
+        >
+          Invite sent
+        </FloatingNotification>
+      )}
+      {showResendSMSError && (
+        <FloatingNotification
+          type={NOTIFICATION_TYPE.ERROR}
+          show={showResendSMSError}
+          callback={() => setShowResendSMSError(false)}
+        >
+          Invite not sent
+        </FloatingNotification>
+      )}
     </SysAdminContentWrapper>
   )
 }
