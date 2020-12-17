@@ -85,14 +85,14 @@ async function extractMessages() {
         if (contentfulIds && !existsInContentful(contentfulIds, key)) {
           console.log(
             `${chalk.red(
-              `You have set up a Contentful Content Management System.  You have created a new key: ${chalk.white(
+              `You have set up a Contentful Content Management System.  OpenCRVS core has created this new key in this version: ${chalk.white(
                 key
               )} in ${chalk.white(`${key}`)}`
             )}`
           )
           console.log(
             `${chalk.yellow(
-              'This key must be migrated into contentful.  Saving to ...'
+              'This key must be migrated into your Contentful CMS.  Saving to ...'
             )} in ${chalk.white(
               `${RESOURCES_PATH}/src/bgd/features/languages/generated/contentful-keys-to-migrate.json`
             )}`
