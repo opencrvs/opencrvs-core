@@ -20,12 +20,26 @@ interface IReactIntlDescriptions {
   [key: string]: string
 }
 
+function existsInContentful(obj: any, value: string): boolean {
+  if (Object.values(obj).indexOf(value) > -1) {
+    return true
+  }
+  return false
+}
+
 async function extractMessages() {
   const RESOURCES_PATH = process.argv[2]
   const register = JSON.parse(
     fs
       .readFileSync(
         `${RESOURCES_PATH}/src/bgd/features/languages/generated/register.json`
+      )
+      .toString()
+  )
+  const contentfulIds = JSON.parse(
+    fs
+      .readFileSync(
+        `${RESOURCES_PATH}/src/bgd/features/languages/generated/contentful-ids.json`
       )
       .toString()
   )
@@ -48,6 +62,7 @@ async function extractMessages() {
       results.forEach(r => {
         reactIntlDescriptions[r.id] = r.description
       })
+      const contentfulKeysToMigrate: string[] = []
       const englishTranslations = register.data.find(
         (obj: ILanguage) => obj.lang === 'en-US'
       ).messages
@@ -67,6 +82,23 @@ async function extractMessages() {
             )}`
           )
         }
+        if (contentfulIds && !existsInContentful(contentfulIds, key)) {
+          console.log(
+            `${chalk.red(
+              `You have set up a Contentful Content Management System.  You have created a new key: ${chalk.white(
+                key
+              )} in ${chalk.white(`${key}`)}`
+            )}`
+          )
+          console.log(
+            `${chalk.yellow(
+              'This key must be migrated into contentful.  Saving to ...'
+            )} in ${chalk.white(
+              `${RESOURCES_PATH}/src/bgd/features/languages/generated/contentful-keys-to-migrate.json`
+            )}`
+          )
+          contentfulKeysToMigrate.push(key)
+        }
       })
 
       if (missingKeys) {
@@ -83,6 +115,10 @@ async function extractMessages() {
       fs.writeFileSync(
         `${RESOURCES_PATH}/src/bgd/features/languages/generated/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
+      )
+      fs.writeFileSync(
+        `${RESOURCES_PATH}/src/bgd/features/languages/generated/contentful-keys-to-migrate.json`,
+        JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })
   } catch (err) {
