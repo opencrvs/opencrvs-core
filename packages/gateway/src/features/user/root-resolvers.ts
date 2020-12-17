@@ -314,7 +314,7 @@ export const resolvers: GQLResolver = {
 
       return true
     },
-    async resendSMSInvite(_, { mobile }, authHeader) {
+    async resendSMSInvite(_, { userId }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {
         return await Promise.reject(
           new Error(
@@ -326,7 +326,7 @@ export const resolvers: GQLResolver = {
       const res = await fetch(`${USER_MANAGEMENT_URL}resendSMSInvite`, {
         method: 'POST',
         body: JSON.stringify({
-          mobile
+          userId
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ export const resolvers: GQLResolver = {
       if (res.status !== 200) {
         return await Promise.reject(
           new Error(
-            `Something went wrong on user-mgnt service. Couldn't send sms to ${mobile}`
+            `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
           )
         )
       }

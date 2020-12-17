@@ -21,7 +21,7 @@ import { hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { sendCredentialsNotification } from '@user-mgnt/features/createUser/service'
 
 interface IResendSMSPayload {
-  mobile: string
+  userId: string
 }
 
 export default async function resendSMSInvite(
@@ -29,9 +29,9 @@ export default async function resendSMSInvite(
   h: Hapi.ResponseToolkit
 ) {
   let randomPassword = null
-  const { mobile } = request.payload as IResendSMSPayload
+  const { userId } = request.payload as IResendSMSPayload
 
-  const user = await User.findOne({ mobile })
+  const user = await User.findById(userId)
 
   if (!user) {
     throw unauthorized()
@@ -58,5 +58,5 @@ export default async function resendSMSInvite(
 }
 
 export const requestSchema = Joi.object({
-  mobile: Joi.string().required()
+  userId: Joi.string().required()
 })

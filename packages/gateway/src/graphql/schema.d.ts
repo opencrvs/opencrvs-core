@@ -4550,7 +4550,7 @@ export interface MutationToAuditUserResolver<TParent = any, TResult = any> {
 }
 
 export interface MutationToResendSMSInviteArgs {
-  mobile: string
+  userId: string
 }
 export interface MutationToResendSMSInviteResolver<
   TParent = any,

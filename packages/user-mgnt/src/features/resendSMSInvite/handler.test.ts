@@ -85,7 +85,7 @@ describe('resendSMSInvite handler', () => {
       method: 'POST',
       url: '/resendSMSInvite',
       payload: {
-        mobile: '+8801234567890'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -102,7 +102,7 @@ describe('resendSMSInvite handler', () => {
       method: 'POST',
       url: '/resendSMSInvite',
       payload: {
-        mobile: '+8801234567890'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`
@@ -118,7 +118,7 @@ describe('resendSMSInvite handler', () => {
       method: 'POST',
       url: '/resendSMSInvite',
       payload: {
-        mobile: '+8801234567890'
+        userId: '5d10885374be318fa7689f0b'
       },
       headers: {
         Authorization: `Bearer ${sysAdminToken}`

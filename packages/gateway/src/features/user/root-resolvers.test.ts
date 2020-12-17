@@ -845,7 +845,7 @@ describe('User root resolvers', () => {
         resolvers.Mutation.resendSMSInvite(
           {},
           {
-            mobile: '+880123456780'
+            userId: '123'
           },
           authHeaderRegAgent
         )
@@ -861,12 +861,12 @@ describe('User root resolvers', () => {
         resolvers.Mutation.resendSMSInvite(
           {},
           {
-            mobile: '+880123456780'
+            userId: '123'
           },
           authHeaderSysAdmin
         )
       ).rejects.toThrowError(
-        "Something went wrong on user-mgnt service. Couldn't send sms to +880123456780"
+        "Something went wrong on user-mgnt service. Couldn't send sms to 123"
       )
     })
 
@@ -876,7 +876,7 @@ describe('User root resolvers', () => {
       const res = await resolvers.Mutation.resendSMSInvite(
         {},
         {
-          mobile: '+880123456780'
+          userId: '123'
         },
         authHeaderSysAdmin
       )
