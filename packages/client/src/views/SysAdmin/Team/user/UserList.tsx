@@ -638,6 +638,7 @@ function UserListComponent(props: IProps) {
       {renderUserList()}
       {showResendSMSSuccess && (
         <FloatingNotification
+          id="resend_invite_success"
           type={NOTIFICATION_TYPE.SUCCESS}
           show={showResendSMSSuccess}
           callback={() => setShowResendSMSSuccess(false)}
@@ -647,6 +648,7 @@ function UserListComponent(props: IProps) {
       )}
       {showResendSMSError && (
         <FloatingNotification
+          id="resend_invite_error"
           type={NOTIFICATION_TYPE.ERROR}
           show={showResendSMSError}
           callback={() => setShowResendSMSError(false)}

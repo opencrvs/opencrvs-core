@@ -429,6 +429,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                     />
                     {showResendSMSSuccess && (
                       <FloatingNotification
+                        id="resend_invite_success"
                         type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
                         show={showResendSMSSuccess}
                         callback={() =>
@@ -440,6 +441,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                     )}
                     {showResendSMSError && (
                       <FloatingNotification
+                        id="resend_invite_error"
                         type={FLOATING_NOTIFICATION_TYPE.ERROR}
                         show={showResendSMSError}
                         callback={() =>
