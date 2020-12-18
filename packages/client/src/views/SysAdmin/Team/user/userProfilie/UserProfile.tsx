@@ -435,7 +435,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                           this.setState({ showResendSMSSuccess: false })
                         }
                       >
-                        Invite sent
+                        {intl.formatMessage(sysMessages.resendSMSSuccess)}
                       </FloatingNotification>
                     )}
                     {showResendSMSError && (
@@ -446,7 +446,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                           this.setState({ showResendSMSError: false })
                         }
                       >
-                        Invite not sent
+                        {intl.formatMessage(sysMessages.resendSMSError)}
                       </FloatingNotification>
                     )}
                     <UserAuditList user={user} />

@@ -642,7 +642,7 @@ function UserListComponent(props: IProps) {
           show={showResendSMSSuccess}
           callback={() => setShowResendSMSSuccess(false)}
         >
-          Invite sent
+          {intl.formatMessage(messages.resendSMSSuccess)}
         </FloatingNotification>
       )}
       {showResendSMSError && (
@@ -651,7 +651,7 @@ function UserListComponent(props: IProps) {
           show={showResendSMSError}
           callback={() => setShowResendSMSError(false)}
         >
-          Invite not sent
+          {intl.formatMessage(messages.resendSMSError)}
         </FloatingNotification>
       )}
     </SysAdminContentWrapper>
