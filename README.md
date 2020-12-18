@@ -294,7 +294,7 @@ Now that you have a good backround in the OpenCRVS core, it is time to set up a 
 
 6) You need to pass a comma delimited string of supported languages to the `yarn dev` command in order to start the stack.
 
-OpenCRVS has the capability to be fully multi-lingual and languages can be configured in [register.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/register.json) following the [FormatJS React Intl package](https://github.com/formatjs/react-intl) approach.
+OpenCRVS has the capability to be fully multi-lingual and languages can be configured in [client.json](https://github.com/opencrvs/opencrvs-zambia/blob/master/src/zmb/features/languages/generated/client.json) following the [FormatJS React Intl package](https://github.com/formatjs/react-intl) approach.
 
 However currently we only have Bengali and English translations. If you are planning to introduce a new language, please talk to us on [Gitter](https://gitter.im/opencrvs/community#) and submit a new translation file. We can easily enable the new language string in a PR.
 
