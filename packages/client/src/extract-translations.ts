@@ -29,10 +29,10 @@ function existsInContentful(obj: any, value: string): boolean {
 
 async function extractMessages() {
   const RESOURCES_PATH = process.argv[2]
-  const register = JSON.parse(
+  const client = JSON.parse(
     fs
       .readFileSync(
-        `${RESOURCES_PATH}/src/bgd/features/languages/generated/register.json`
+        `${RESOURCES_PATH}/src/bgd/features/languages/generated/client.json`
       )
       .toString()
   )
@@ -63,7 +63,7 @@ async function extractMessages() {
         reactIntlDescriptions[r.id] = r.description
       })
       const contentfulKeysToMigrate: string[] = []
-      const englishTranslations = register.data.find(
+      const englishTranslations = client.data.find(
         (obj: ILanguage) => obj.lang === 'en-US'
       ).messages
       let missingKeys = false
@@ -77,7 +77,7 @@ async function extractMessages() {
               `No English translation key exists for message id.  Remeber to translate and add for all locales!!!: ${chalk.white(
                 key
               )} in ${chalk.white(
-                `${RESOURCES_PATH}/src/bgd/features/languages/generated/register.json`
+                `${RESOURCES_PATH}/src/bgd/features/languages/generated/client.json`
               )}`
             )}`
           )
