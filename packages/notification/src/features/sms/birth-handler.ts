@@ -11,9 +11,14 @@
  */
 import * as Hapi from 'hapi'
 import * as Joi from 'joi'
-import { HapiRequest, ISMSPayload } from '@notification/features/sms/handler'
-import { buildAndSendSMS } from '@notification/features/sms/utils'
+import {
+  buildAndSendSMS,
+  getTranslations,
+  ISMSPayload
+} from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
+import { getDefaultLanguage } from '@notification/i18n/utils'
+import { messageKeys } from '@notification/i18n/messages'
 
 export interface IInProgressPayload extends ISMSPayload {
   trackingId: string
@@ -37,7 +42,7 @@ export interface IRejectionPayload extends ISMSPayload {
 }
 
 export async function sendBirthInProgressConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IInProgressPayload
@@ -46,20 +51,24 @@ export async function sendBirthInProgressConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthInProgressNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.birthInProgressNotification,
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendBirthDeclarationConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
@@ -68,20 +77,24 @@ export async function sendBirthDeclarationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthDeclarationNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.birthDeclarationNotification,
     {
       name: payload.name,
       trackingId: payload.trackingId
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendBirthRegistrationConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
@@ -90,20 +103,24 @@ export async function sendBirthRegistrationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'birthRegistrationNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.birthRegistrationNotification,
     {
       name: payload.name,
       trackingId: payload.trackingId
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendBirthRejectionConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRejectionPayload
@@ -112,10 +129,19 @@ export async function sendBirthRejectionConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(request, payload.msisdn, 'birthRejectionNotification', {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.birthRejectionNotification,
+    {
+      name: payload.name,
+      trackingId: payload.trackingId
+    },
+    getDefaultLanguage()
+  )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 

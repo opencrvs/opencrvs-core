@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import * as utils from '@notification/features/sms/utils'
 import { createServer } from '@notification/index'
 import * as fetchAny from 'jest-fetch-mock'
+import { translationsMock } from '@notification/tests/util'
 
 const fetch = fetchAny as any
 describe('Verify death handlers', () => {
@@ -24,8 +25,6 @@ describe('Verify death handlers', () => {
   })
   describe('sendDeathInProgressConfirmation', () => {
     it('returns OK the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -35,6 +34,7 @@ describe('Verify death handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -49,13 +49,9 @@ describe('Verify death handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with invalid trackingId', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -66,6 +62,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathInProgressSMS',
@@ -79,8 +76,6 @@ describe('Verify death handlers', () => {
           language: 'en' // default is bn
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -98,6 +93,7 @@ describe('Verify death handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -119,8 +115,6 @@ describe('Verify death handlers', () => {
   })
   describe('sendDeathDeclarationConfirmation', () => {
     it('returns OK the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -130,6 +124,7 @@ describe('Verify death handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -144,13 +139,9 @@ describe('Verify death handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with invalid trackingId', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),
@@ -161,6 +152,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathDeclarationSMS',
@@ -174,8 +166,6 @@ describe('Verify death handlers', () => {
           language: 'en' // default is bn
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -194,6 +184,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathDeclarationSMS',
@@ -214,8 +205,6 @@ describe('Verify death handlers', () => {
   })
   describe('sendDeathRegistrationConfirmation', () => {
     it('returns OK the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['register'] },
         readFileSync('../auth/test/cert.key'),
@@ -226,6 +215,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathRegistrationSMS',
@@ -240,13 +230,9 @@ describe('Verify death handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with invalid payload', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['register'] },
         readFileSync('../auth/test/cert.key'),
@@ -257,6 +243,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathRegistrationSMS',
@@ -268,8 +255,6 @@ describe('Verify death handlers', () => {
           language: 'en' // default is bn
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -287,6 +272,7 @@ describe('Verify death handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -309,8 +295,6 @@ describe('Verify death handlers', () => {
   })
   describe('sendDeathRejectionConfirmation', () => {
     it('returns OK the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['validate'] },
         readFileSync('../auth/test/cert.key'),
@@ -320,6 +304,7 @@ describe('Verify death handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -334,13 +319,9 @@ describe('Verify death handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with invalid trackingId', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['register'] },
         readFileSync('../auth/test/cert.key'),
@@ -351,6 +332,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathRejectionSMS',
@@ -364,8 +346,6 @@ describe('Verify death handlers', () => {
           language: 'en' // default is bn
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -384,6 +364,7 @@ describe('Verify death handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/deathRejectionSMS',

@@ -15,6 +15,7 @@ import * as utils from '@notification/features/sms/utils'
 import { createServer } from '@notification/index'
 import { createServerWithEnvironment } from '@notification/tests/util'
 import * as fetchAny from 'jest-fetch-mock'
+import { translationsMock } from '@notification/tests/util'
 
 const fetch = fetchAny as any
 describe('Verify user handlers', () => {
@@ -26,7 +27,6 @@ describe('Verify user handlers', () => {
   describe('userCredentials', () => {
     it('returns OK if the sms gets sent', async () => {
       server = await createServerWithEnvironment({ SMS_PROVIDER: 'clickatell' })
-      const spy = fetch.once('')
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
@@ -37,6 +37,7 @@ describe('Verify user handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -51,13 +52,9 @@ describe('Verify user handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no username', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -67,6 +64,7 @@ describe('Verify user handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -79,8 +77,6 @@ describe('Verify user handlers', () => {
           Authorization: `Bearer ${token}`
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -99,6 +95,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/userCredentialsSMS',
@@ -119,8 +116,6 @@ describe('Verify user handlers', () => {
   })
   describe('retrieveUserName', () => {
     it('returns OK if the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -131,6 +126,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/retrieveUserNameSMS',
@@ -143,13 +139,9 @@ describe('Verify user handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no username', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -160,6 +152,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/retrieveUserNameSMS',
@@ -170,8 +163,6 @@ describe('Verify user handlers', () => {
           Authorization: `Bearer ${token}`
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -190,6 +181,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/retrieveUserNameSMS',
@@ -209,8 +201,6 @@ describe('Verify user handlers', () => {
   })
   describe('sendUserAuthenticationCode', () => {
     it('returns OK if the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -221,6 +211,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticationCode',
@@ -233,13 +224,9 @@ describe('Verify user handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no code', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -250,6 +237,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticationCode',
@@ -260,8 +248,6 @@ describe('Verify user handlers', () => {
           Authorization: `Bearer ${token}`
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -280,6 +266,7 @@ describe('Verify user handlers', () => {
         }
       )
 
+      fetch.mockResponse(JSON.stringify(translationsMock))
       const res = await server.server.inject({
         method: 'POST',
         url: '/authenticationCode',
@@ -299,8 +286,6 @@ describe('Verify user handlers', () => {
   })
   describe('updateUserName', () => {
     it('returns OK if the sms gets sent', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -310,6 +295,7 @@ describe('Verify user handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -323,13 +309,9 @@ describe('Verify user handlers', () => {
         }
       })
 
-      expect(spy).toHaveBeenCalled()
-
       expect(res.statusCode).toBe(200)
     })
     it('returns 400 if called with no username', async () => {
-      const spy = fetch.once('')
-
       const token = jwt.sign(
         { scope: ['sysadmin'] },
         readFileSync('../auth/test/cert.key'),
@@ -339,6 +321,7 @@ describe('Verify user handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',
@@ -350,8 +333,6 @@ describe('Verify user handlers', () => {
           Authorization: `Bearer ${token}`
         }
       })
-
-      expect(spy).toHaveBeenCalled()
 
       expect(res.statusCode).toBe(400)
     })
@@ -369,6 +350,7 @@ describe('Verify user handlers', () => {
           audience: 'opencrvs:notification-user'
         }
       )
+      fetch.mockResponse(JSON.stringify(translationsMock))
 
       const res = await server.server.inject({
         method: 'POST',

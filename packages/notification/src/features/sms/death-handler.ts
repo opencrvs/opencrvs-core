@@ -10,18 +10,22 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from 'hapi'
-import { HapiRequest } from '@notification/features/sms/handler'
 import {
   IInProgressPayload,
   IDeclarationPayload,
   IRegistrationPayload,
   IRejectionPayload
 } from '@notification/features/sms/birth-handler'
-import { buildAndSendSMS } from '@notification/features/sms/utils'
+import {
+  buildAndSendSMS,
+  getTranslations
+} from '@notification/features/sms/utils'
 import { logger } from '@notification/logger'
+import { getDefaultLanguage } from '@notification/i18n/utils'
+import { messageKeys } from '@notification/i18n/messages'
 
 export async function sendDeathInProgressConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IInProgressPayload
@@ -30,20 +34,24 @@ export async function sendDeathInProgressConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathInProgressNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.deathInProgressNotification,
     {
       trackingId: payload.trackingId,
       crvsOffice: payload.crvsOffice
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendDeathDeclarationConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IDeclarationPayload
@@ -52,20 +60,24 @@ export async function sendDeathDeclarationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathDeclarationNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.deathDeclarationNotification,
     {
       name: payload.name,
       trackingId: payload.trackingId
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendDeathRegistrationConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRegistrationPayload
@@ -74,20 +86,24 @@ export async function sendDeathRegistrationConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(
-    request,
-    payload.msisdn,
-    'deathRegistrationNotification',
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.deathRegistrationNotification,
     {
       name: payload.name,
       trackingId: payload.trackingId
-    }
+    },
+    getDefaultLanguage()
   )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }
 
 export async function sendDeathRejectionConfirmation(
-  request: HapiRequest,
+  request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const payload = request.payload as IRejectionPayload
@@ -96,9 +112,18 @@ export async function sendDeathRejectionConfirmation(
       payload
     )}`
   )
-  await buildAndSendSMS(request, payload.msisdn, 'deathRejectionNotification', {
-    name: payload.name,
-    trackingId: payload.trackingId
-  })
+  const authHeader = {
+    Authorization: request.headers.authorization
+  }
+  const message = await getTranslations(
+    authHeader,
+    messageKeys.deathRejectionNotification,
+    {
+      name: payload.name,
+      trackingId: payload.trackingId
+    },
+    getDefaultLanguage()
+  )
+  await buildAndSendSMS(request, payload.msisdn, message)
   return h.response().code(200)
 }

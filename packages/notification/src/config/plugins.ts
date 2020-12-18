@@ -10,15 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import * as HapiI18n from 'hapi-i18n'
 import * as Pino from 'hapi-pino'
 import * as JWT from 'hapi-auth-jwt2'
 import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@notification/constants'
-import {
-  getAvailableLanguages,
-  getDefaultLanguage
-} from '@notification/i18n/utils'
 import { logger } from '@notification/logger'
 
 export default function getPlugins() {
@@ -30,15 +25,6 @@ export default function getPlugins() {
         prettyPrint: false,
         logPayload: false,
         instance: logger
-      }
-    },
-    {
-      plugin: HapiI18n,
-      options: {
-        locales: getAvailableLanguages(),
-        directory: __dirname + '/../i18n/locales',
-        defaultLocale: getDefaultLanguage(),
-        languageHeaderField: 'language'
       }
     },
     {
