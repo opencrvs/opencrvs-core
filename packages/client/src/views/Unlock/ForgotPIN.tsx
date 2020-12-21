@@ -162,8 +162,7 @@ export function ForgotPIN(props: IForgotPINProps) {
   }, [dispatch])
 
   const onForgetPassword = useCallback(() => {
-    storage.removeItem(SCREEN_LOCK)
-    storage.removeItem(SECURITY_PIN_EXPIRED_AT)
+    logout()
     window.location.assign(window.config.LOGIN_URL + '/forgotten-item')
   }, [])
 
