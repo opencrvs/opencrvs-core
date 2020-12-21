@@ -83,6 +83,7 @@ async function extractMessages() {
             )}`
           )
         }
+
         if (contentfulIds && !existsInContentful(contentfulIds, key)) {
           console.log(
             `${chalk.red(
