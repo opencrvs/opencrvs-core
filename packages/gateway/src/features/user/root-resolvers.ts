@@ -192,6 +192,24 @@ export const resolvers: GQLResolver = {
         results: fieldAgentList,
         totalItems: userResponse.totalItems
       }
+    },
+    async verifyPasswordById(_, { id, password }, authHeader) {
+      const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
+        method: 'POST',
+        body: JSON.stringify({ id, password }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error('Unauthorized to verify password')
+        )
+      }
+
+      return await res.json()
     }
   },
 

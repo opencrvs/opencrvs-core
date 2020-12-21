@@ -28,6 +28,7 @@ import { refreshOfflineData } from '@client/offline/actions'
 import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
 import { Spinner } from '@opencrvs/components/lib/interface'
+import { ForgotPIN } from '@client/views/Unlock/ForgotPIN'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -42,6 +43,8 @@ interface IProtectPageState {
   secured: boolean
   pinExists: boolean
   pendingUser: boolean
+  forgotPin: boolean
+  passwordVerified: boolean
 }
 
 type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
@@ -65,7 +68,9 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       loading: true,
       secured: true,
       pinExists: true,
-      pendingUser: false
+      pendingUser: false,
+      forgotPin: false,
+      passwordVerified: false
     }
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this)
     this.markAsSecured = this.markAsSecured.bind(this)
@@ -131,7 +136,12 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   }
 
   markAsSecured() {
-    this.setState({ secured: true, pinExists: true })
+    this.setState({
+      secured: true,
+      pinExists: true,
+      passwordVerified: false,
+      forgotPin: false
+    })
     storage.removeItem(SCREEN_LOCK)
   }
 
@@ -165,23 +175,58 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 
+  conditionalRenderUponSecuredState() {
+    const { secured, loading, forgotPin } = this.state
+
+    if (loading) {
+      return this.renderLoadingScreen()
+    }
+
+    if (secured) {
+      return this.props.children
+    }
+
+    if (!secured) {
+      if (forgotPin) {
+        return (
+          <ForgotPIN
+            goBack={() => this.setState({ forgotPin: false })}
+            onVerifyPassword={() => this.setState({ passwordVerified: true })}
+          />
+        )
+      }
+
+      return (
+        <Unlock
+          onCorrectPinMatch={this.markAsSecured}
+          onForgetPin={() => this.setState({ forgotPin: true })}
+        />
+      )
+    }
+
+    return null
+  }
+
   render() {
-    const { pendingUser, secured, pinExists, loading } = this.state
+    const { pendingUser, pinExists, passwordVerified } = this.state
 
     if (pendingUser) {
       return <ProtectedAccount />
     }
 
-    if (!pinExists) {
-      return <SecureAccount onComplete={this.markAsSecured} />
+    if (!pinExists || passwordVerified) {
+      return (
+        <SecureAccount
+          onComplete={this.markAsSecured}
+          collectPin={passwordVerified}
+        />
+      )
     }
 
     if (isMobileDevice()) {
       return (
         <PageVisibility onChange={this.handleVisibilityChange}>
-          {(loading && this.renderLoadingScreen()) ||
-            (secured && this.props.children) ||
-            (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+          {this.conditionalRenderUponSecuredState()}
         </PageVisibility>
       )
     }
@@ -190,9 +235,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
         onIdle={this.onIdle}
         timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
       >
-        {(loading && this.renderLoadingScreen()) ||
-          (secured && this.props.children) ||
-          (!secured && <Unlock onCorrectPinMatch={this.markAsSecured} />)}
+        {this.conditionalRenderUponSecuredState()}
       </IdleTimer>
     )
   }

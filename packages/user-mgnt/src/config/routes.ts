@@ -38,6 +38,10 @@ import verifyPassHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
 } from '@user-mgnt/features/verifyPassword/handler'
+import verifyPassByIdHandler, {
+  requestSchema as verifyPassByIdRequestSchema,
+  responseSchema as verifyPassByIdResponseSchema
+} from '@user-mgnt/features/verifyPasswordById/handler'
 import verifySecurityAnswer, {
   verifySecurityRequestSchema,
   verifySecurityResponseSchema
@@ -106,6 +110,23 @@ export const getRoutes = () => {
         },
         response: {
           schema: resAuthSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyPasswordById',
+      handler: verifyPassByIdHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Verify user password',
+        notes: 'Verify account exist by id and password is correct',
+        validate: {
+          payload: verifyPassByIdRequestSchema
+        },
+        response: {
+          schema: verifyPassByIdResponseSchema
         }
       }
     },
