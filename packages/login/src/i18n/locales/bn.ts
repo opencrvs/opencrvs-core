@@ -75,8 +75,8 @@ export const BENGALI_STATE = {
       '{forgottenItem, select, username {ব্যবহারকারীর নাম পাঠানো হয়েছে} password {সফলভাবে পাসওয়ার্ড পুনরায় সেট হয়েছে}}',
     'resetCredentials.success.page.subtitle':
       '{forgottenItem, select, username {আপনার ব্যবহারকারীর নামের জন্য আপনার ফোনটি পরীক্ষা করুন} password {আপনি এখন আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করতে পারেন}}',
-    'newPassword.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
-    'newPassword.instruction':
+    'misc.newPass.header': 'নতুন একটি পাসওয়ার্ড পছন্দ করুন',
+    'misc.newPass.instruction':
       'আমরা আপনাকে একটি অনন্য পাসওয়ার্ড তৈরির সুপারিশ করি - যেটি আপনি অন্য কোনও ওয়েবসাইট বা অ্যাপ্লিকেশনের জন্য ব্যবহার করেন না। বিঃদ্রঃ. আপনি এটি একবার পরিবর্তন করার পরে আপনার পুরানো পাসওয়ার্ড পুনরায় ব্যবহার করতে পারবেন না।',
     'password.cases': 'বড় হাতের এবং ছোট হাতের অক্ষর',
     'password.label.confirm': 'পাসওয়ার্ড নিশ্চিত করুন',

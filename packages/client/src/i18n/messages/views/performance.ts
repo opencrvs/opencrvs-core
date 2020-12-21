@@ -85,7 +85,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Message to show if no data is found for a location'
   },
   noResultForLocationWithoutPilotAreas: {
-    id: 'performance.reports.noResultForLocationWithoutPilotAreas',
+    id: 'performance.reports.noResultInPilot',
     defaultMessage: 'No data for {searchedLocation}.',
     description: 'Message to show if no data is found for a location'
   },
@@ -110,7 +110,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Title for applications started in performance reports'
   },
   applicationsStartedDescription: {
-    id: 'performance.reports.applicationsStarted.description',
+    id: 'performance.reports.appStart.desc',
     defaultMessage:
       'Total and percentage breakdown of the applications started by source from ',
     description: 'Description for applications started in performance reports'
@@ -121,7 +121,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Total applications started title'
   },
   applicationsStartedFieldAgents: {
-    id: 'performance.reports.applicationsStarted.fieldAgents',
+    id: 'performance.reports.appStart.fieldAgents',
     defaultMessage: 'Field agents',
     description: 'Field agent applications started title'
   },
@@ -153,12 +153,12 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Event registration rate report description'
   },
   birthRegistrationRatesReportHeader: {
-    id: 'performance.report.registration.rates.birth.header',
+    id: 'performance.report.regrates.birth.head',
     defaultMessage: 'Birth registration rate within 45 days of event',
     description: 'Header for birth registration rates report'
   },
   deathRegistrationRatesReportHeader: {
-    id: 'performance.report.registration.rates.death.header',
+    id: 'performance.report.regrates.death.head',
     defaultMessage: 'Death registration rate within 45 days of event',
     description: 'Header for death registration rates report'
   },
@@ -178,7 +178,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Title for location column on estimation table'
   },
   applicationCountByStatusDescription: {
-    id: 'performance.operational.statusWiseCount.description',
+    id: 'performance.ops.statCount.desc',
     defaultMessage:
       'Current status of all applications being processed for your selected administrative area.',
     description: 'Description of the status wise application count view'
@@ -224,19 +224,19 @@ const messagesToDefine: IPerformanceReportsMessages = {
     description: 'Column header for total application sent in field agent list'
   },
   totalInProgressColumnHeader: {
-    id: 'performance.fieldAgents.columnHeader.totalInProgress',
+    id: 'performance.fieldAgents.col.totInProg',
     defaultMessage: 'Sent{linebreak}incomplete',
     description:
       'Column header for total inprogress application sent in field agent list'
   },
   avgCompletionTimeColumnHeader: {
-    id: 'performance.fieldAgents.columnHeader.avgCompletionTime',
+    id: 'performance.fieldAgents.col.avgCompTime',
     defaultMessage: 'Avg. time to send{linebreak}complete application',
     description:
       'Column header for avg application completion time in field agent list'
   },
   totalRejectedColumnHeader: {
-    id: 'performance.fieldAgents.columnHeader.totalRejected',
+    id: 'performance.fieldAgents.col.totRej',
     defaultMessage: 'Rejected',
     description:
       'Column header for total rejected applications in field agent list'

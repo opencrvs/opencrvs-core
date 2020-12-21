@@ -311,7 +311,7 @@ function UserListComponent(props: IProps) {
   function getMenuItems(user: GQLUser) {
     const menuItems = [
       {
-        label: intl.formatMessage(messages.menuOptionEditDetails),
+        label: intl.formatMessage(messages.editUserDetailsTitle),
         handler: () => {
           goToReviewUserDetails(user.id as string)
         }

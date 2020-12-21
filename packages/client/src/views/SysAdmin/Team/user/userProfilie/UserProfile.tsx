@@ -215,7 +215,7 @@ class UserProfileComponent extends React.Component<Props, State> {
   getMenuItems(userId: string, status: string) {
     const menuItems: { label: string; handler: () => void }[] = [
       {
-        label: this.props.intl.formatMessage(sysMessages.menuOptionEditDetails),
+        label: this.props.intl.formatMessage(sysMessages.editUserDetailsTitle),
         handler: () => this.props.goToReviewUserDetails(userId)
       }
     ]

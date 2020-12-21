@@ -24,12 +24,12 @@ import { IApplication, SUBMISSION_STATUS } from '@client/applications'
 
 const messages = defineMessages({
   processingText: {
-    id: 'notification.processingText',
+    id: 'misc.notif.processingText',
     defaultMessage: '{num} application processing...',
     description: 'Application processing text'
   },
   outboxText: {
-    id: 'notification.outboxText',
+    id: 'misc.notif.outboxText',
     defaultMessage: 'Outbox({num})',
     description: 'Application outbox text'
   }

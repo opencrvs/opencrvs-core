@@ -14,7 +14,8 @@
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "postbuild": "ef-tspm",
-    "build:clean": "rm -rf build"
+    "build:clean": "rm -rf build",
+    "extract:translations": "bash extract-translations.sh"
   },
   "dependencies": {
     "@opencrvs/commons": "^1.0.0-alpha.2.0",
@@ -23,9 +24,9 @@
     "app-module-path": "^2.2.0",
     "boom": "^7.2.0",
     "dotenv": "^6.1.0",
+    "handlebars": "^4.7.6",
     "hapi": "^17.5.1",
     "hapi-auth-jwt2": "8.1.0",
-    "hapi-i18n": "^2.0.0",
     "hapi-pino": "^6.3.0",
     "hapi-sentry": "^2.1.0",
     "iconv": "^2.3.1",
@@ -38,11 +39,13 @@
   "devDependencies": {
     "@ef-carbon/tspm": "^2.2.5",
     "@types/fhir": "^0.0.30",
+    "@types/handlebars": "^4.1.0",
     "@types/hapi": "^17.0.12",
     "@types/hapi-auth-jwt2": "8.0.1",
     "@types/jest": "^24.0.13",
     "@types/joi": "^14.0.0",
     "@types/node-fetch": "^2.3.4",
+    "chalk": "^4.1.0",
     "copyfiles": "^2.1.1",
     "cross-env": "^5.2.0",
     "jest": "24.7.1",
@@ -59,7 +62,8 @@
   "lint-staged": {
     "src/**/*.{ts,graphql}": [
       "prettier --write",
-      "git add"
+      "git add",
+      "yarn extract:translations"
     ]
   },
   "jest": {

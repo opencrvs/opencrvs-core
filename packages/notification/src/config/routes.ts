@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { smsHandler, requestSchema } from '@notification/features/sms/handler'
 import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
@@ -60,19 +59,6 @@ export default function getRoutes() {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
-      }
-    },
-    /* curl -H 'Content-Type: application/json' -d '{"msisdn": "+27855555555", "message": "Test"}' http://localhost:2020/sms */
-    {
-      method: 'POST',
-      path: '/sms',
-      handler: smsHandler,
-      config: {
-        tags: ['api'],
-        description: 'Sends an sms to a user',
-        validate: {
-          payload: requestSchema
-        }
       }
     },
     {
